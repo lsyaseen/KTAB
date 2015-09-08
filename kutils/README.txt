@@ -56,11 +56,11 @@ On Linux, the build has been verified with KDevelop 3 and plain Unix makefiles,
 using both g++ 4.8 and clang++ 3.4.
 
 We will assume you have checked out or unpacked the KTAB
-sources into /home/ktab/, so that the top of the directory
+sources into /home/KTAB/, so that the top of the directory
 tree appears like this:
-  /home/ktab/cmakemodules
-  /home/ktab/kmodel
-  /home/ktab/kutils
+  /home/KTAB/cmakemodules
+  /home/KTAB/kmodel
+  /home/KTAB/kutils
   ...
   
 You should start cmake-gui.
@@ -69,11 +69,11 @@ In the CMake GUI, you should answer "Where is the source code"
 with the location of the CMake source file CMakeLists.txt,
 not the C++ source files.
 
-Hence, if your KTAB source is checked out into /home/ktab,
-the CMakeLists.txt file would be in /home/ktab/kutils/CMakeLists.txt
+Hence, if your KTAB source is checked out into /home/KTAB,
+the CMakeLists.txt file would be in /home/KTAB/kutils/CMakeLists.txt
 
 In the CMake GUI, you  should answer "Where to build the binaries"
-with /home/ktab/kutils/build.
+with /home/KTAB/kutils/build.
 
 Hit the "Configure" button. The first time you configure the system,
 CMake should immediately ask if it should create the build directory;
@@ -94,8 +94,8 @@ If errors occur, you will probably need to consult the CMake documentation to di
 
 After all problems are resolved, there are no error messages, and no items in the upper window
 are red, hit "Generate" to generate the build files for your chosen IDE. They will appear
-in the build directory, like /home/ktab/kutils/build/kutils.sln for Windows and Visual Studio
-or /home/ktab/kutils/build/Makefile for Linux and make.
+in the build directory, like /home/KTAB/kutils/build/kutils.sln for Windows and Visual Studio
+or /home/KTAB/kutils/build/Makefile for Linux and make.
 
 Open the kutils project with your IDE; it should display two targets: kutils and demoutils.
 The former is the library of utility functions; the latter is a simple command-line demonstration
@@ -103,7 +103,7 @@ of some of the utility functions.
 
 The demonstration program provides a help menu, as follows:
 
-C:\home\ktab\kutils\Debug>demoutils.exe --help
+C:\home\KTAB\kutils\Debug>demoutils.exe --help
 
   Start time: Sun Apr 26 13:14:03 2015
 Usage: specify one or more of these options
