@@ -1,0 +1,356 @@
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+Each of the following is a verbatim transcript of the 'demoutils' program.
+It does not use any of the flexible class structure, just a hand-coded functions for
+this specific purpose.
+While it is interesting from the modeling perspective, the software is 
+merely designed to test the "vector hill climbing" optimization routine.
+
+-------------------------------------------------------------------------------------------------------------------
+
+[kutils 522]$ demoutils --seed 0 --vhc 2 
+
+
+  Start time: Fri Feb 20 20:04:52 2015
+
+Using PRNG seed:  13832120008685267274 
+Same seed in hex:   0xBFF58FDCB842294A 
+Nash bargaining problem, with 4D points and 8D bargains
+When both are risk-averse, the NBS seems always to be that t2i == tb == t2j
+even though tb is not a weighted mix of ti and tj.
+When one or both are risk-seeking, then there may not
+be a bargain they both prefer to conflict. When there is one,
+they might or might not take the same position.
+
+ti:   0.8500  0.8500  0.8500  0.8500 
+si:   0.9500  0.0500  0.5000  0.5000 
+pi: 0.6656  ri: -0.75341 
+
+tj:   0.1500  0.1500  0.1500  0.1500 
+sj:   0.0500  0.9500  0.0500  0.9500 
+pj: 0.3344  rj: -0.82541 
+
+Prob-weighted compromise:        0.6159  0.6159  0.6159  0.6159  0.6159  0.6159  0.6159  0.6159 
+Sqr-prob-weighted  compromise:   0.7717  0.7717  0.7717  0.7717  0.4601  0.4601  0.4601  0.4601 
+
+Initial NP: -132.1245 
+Initial point:    -0.0166  -0.0240  0.0149  -0.0455  0.0110  0.0107  0.0422  -0.0284 
+
+Iter: 260  Stable: 1 
+Best NP:  +4.4190 
+Best point:    0.8480  0.1519  0.8430  0.3008  0.8500  0.2535  0.8499  0.8119 
+Found a bargain which both sides prefer to conflict
+0:4  0.0019 
+1:5  0.1016 
+2:6  0.0069 
+3:7  0.5110 
+
+Effective fractional shifts:  +0.33767  +0.66233 
+Interpolated bargain:   0.6136  0.6136  0.6136  0.6136 
+Resulting RMS estimation error: 0.2654 
+
+Prob-Sal-weighted estB11:   0.8320  0.2164  0.8165  0.5082 
+Prob-Sal-weighted estB12:   0.8408  0.2708  0.8328  0.6231 
+Prob-Sal-weighted estB21:   0.8490  0.1538  0.8465  0.3988 
+Prob-Sal-weighted estB22:   0.8495  0.1576  0.8482  0.5163 
+Resulting RMS estimation error: 
+ e11       e12       e21       e22
+ 0.0304 ,  0.0484 ,  0.0825 ,  0.0302 
+
+
+
+  End time: Fri Feb 20 20:04:52 2015
+  Seconds elapsed: 0.299 
+
+[kutils 523]$ 
+
+
+-------------------------------------------------------------------------------------------------------------------
+
+
+
+  Start time: Fri Feb 20 20:10:39 2015
+
+Using PRNG seed:  08289873853467206563 
+Same seed in hex:   0x730B8C591CB623A3 
+Nash bargaining problem, with 4D points and 8D bargains
+When both are risk-averse, the NBS seems always to be that t2i == tb == t2j
+even though tb is not a weighted mix of ti and tj.
+When one or both are risk-seeking, then there may not
+be a bargain they both prefer to conflict. When there is one,
+they might or might not take the same position.
+
+ti:   0.8500  0.8500  0.8500  0.8500 
+si:   0.9500  0.0500  0.5000  0.5000 
+pi: 0.5136  ri: +0.15508 
+
+tj:   0.1500  0.1500  0.1500  0.1500 
+sj:   0.0500  0.9500  0.0500  0.9500 
+pj: 0.4864  rj: -0.27525 
+
+Prob-weighted compromise:        0.5095  0.5095  0.5095  0.5095  0.5095  0.5095  0.5095  0.5095 
+Sqr-prob-weighted  compromise:   0.6844  0.6844  0.6844  0.6844  0.3346  0.3346  0.3346  0.3346 
+
+Initial NP: -96.8042 
+Initial point:    0.0387  -0.0188  -0.0126  0.0493  -0.0062  0.0035  0.0483  0.0204 
+
+Iter: 181  Stable: 2 
+Best NP:  +11.8426 
+Best point:    0.8480  0.1519  0.8429  0.2998  0.8480  0.1519  0.8429  0.2998 
+Found a bargain which both sides prefer to conflict
+0:4  0.0000 
+1:5  0.0000 
+2:6  0.0000 
+3:7  0.0000 
+
+Effective fractional shifts:  +0.44904  +0.55096 
+Interpolated bargain:   0.5357  0.5357  0.5357  0.5357 
+Resulting RMS estimation error: 0.3142 
+
+Prob-Sal-weighted estB11:   0.8168  0.1869  0.7894  0.4001 
+Prob-Sal-weighted estB12:   0.8184  0.1888  0.7924  0.4089 
+Prob-Sal-weighted estB21:   0.8482  0.1520  0.8434  0.3084 
+Prob-Sal-weighted estB22:   0.8483  0.1522  0.8438  0.3152 
+Resulting RMS estimation error: 
+ e11       e12       e21       e22
+ 0.0615 ,  0.0646 ,  0.0043 ,  0.0077 
+
+
+
+  End time: Fri Feb 20 20:10:39 2015
+  Seconds elapsed: 0.211 
+
+[kutils 526]$ 
+
+
+-------------------------------------------------------------------------------------------------------------------
+
+  Start time: Fri Feb 20 20:11:15 2015
+
+Using PRNG seed:  02226164825974457764 
+Same seed in hex:   0x1EE4ED1D4FAD45A4 
+Nash bargaining problem, with 4D points and 8D bargains
+When both are risk-averse, the NBS seems always to be that t2i == tb == t2j
+even though tb is not a weighted mix of ti and tj.
+When one or both are risk-seeking, then there may not
+be a bargain they both prefer to conflict. When there is one,
+they might or might not take the same position.
+
+ti:   0.8500  0.8500  0.8500  0.8500 
+si:   0.9500  0.0500  0.5000  0.5000 
+pi: 0.7755  ri: -0.58362 
+
+tj:   0.1500  0.1500  0.1500  0.1500 
+sj:   0.0500  0.9500  0.0500  0.9500 
+pj: 0.2245  rj: +0.91837 
+
+Prob-weighted compromise:        0.6928  0.6928  0.6928  0.6928  0.6928  0.6928  0.6928  0.6928 
+Sqr-prob-weighted  compromise:   0.8147  0.8147  0.8147  0.8147  0.5709  0.5709  0.5709  0.5709 
+
+Initial NP: -148.9033 
+Initial point:    -0.0287  0.0164  0.0132  -0.0079  -0.0044  -0.0040  0.0179  0.0046 
+
+Iter: 228  Stable: 1 
+Best NP:  +8.4172 
+Best point:    0.8499  0.2112  0.8498  0.7838  0.8499  0.2112  0.8498  0.7838 
+Found a bargain which both sides prefer to conflict
+0:4  0.0000 
+1:5  0.0000 
+2:6  0.0000 
+3:7  0.0000 
+
+Effective fractional shifts:  +0.25188  +0.74812 
+Interpolated bargain:   0.6737  0.6737  0.6737  0.6737 
+Resulting RMS estimation error: 0.2684 
+
+Prob-Sal-weighted estB11:   0.8395  0.2577  0.8303  0.6016 
+Prob-Sal-weighted estB12:   0.8469  0.4200  0.8442  0.7538 
+Prob-Sal-weighted estB21:   0.8494  0.1566  0.8480  0.4923 
+Prob-Sal-weighted estB22:   0.8498  0.1724  0.8494  0.6874 
+Resulting RMS estimation error: 
+ e11       e12       e21       e22
+ 0.0947 ,  0.1055 ,  0.1483 ,  0.0520 
+
+
+
+  End time: Fri Feb 20 20:11:15 2015
+  Seconds elapsed: 0.265 
+
+[kutils 533]$ 
+
+
+
+-------------------------------------------------------------------------------------------------------------------
+
+
+  Start time: Fri Feb 20 20:12:34 2015
+
+Using PRNG seed:  14720940205674920033 
+Same seed in hex:   0xCC4B491F4704F861 
+Nash bargaining problem, with 4D points and 8D bargains
+When both are risk-averse, the NBS seems always to be that t2i == tb == t2j
+even though tb is not a weighted mix of ti and tj.
+When one or both are risk-seeking, then there may not
+be a bargain they both prefer to conflict. When there is one,
+they might or might not take the same position.
+
+ti:   0.8500  0.8500  0.8500  0.8500 
+si:   0.9500  0.0500  0.5000  0.5000 
+pi: 0.8008  ri: -0.88387 
+
+tj:   0.1500  0.1500  0.1500  0.1500 
+sj:   0.0500  0.9500  0.0500  0.9500 
+pj: 0.1992  rj: -0.65481 
+
+Prob-weighted compromise:        0.7105  0.7105  0.7105  0.7105  0.7105  0.7105  0.7105  0.7105 
+Sqr-prob-weighted  compromise:   0.8222  0.8222  0.8222  0.8222  0.5989  0.5989  0.5989  0.5989 
+
+Initial NP: -157.6627 
+Initial point:    0.0022  0.0387  0.0199  -0.0363  -0.0213  0.0482  -0.0110  0.0364 
+
+Iter: 240  Stable: 1 
+Best NP:  +2.8384 
+Best point:    0.8499  0.1856  0.8496  0.7399  0.8499  0.1856  0.8496  0.7399 
+Found a bargain which both sides prefer to conflict
+0:4  0.0000 
+1:5  0.0000 
+2:6  0.0000 
+3:7  0.0000 
+
+Effective fractional shifts:  +0.27680  +0.72320 
+Interpolated bargain:   0.6562  0.6562  0.6562  0.6562 
+Resulting RMS estimation error: 0.2754 
+
+Prob-Sal-weighted estB11:   0.8410  0.2722  0.8330  0.6253 
+Prob-Sal-weighted estB12:   0.8477  0.4717  0.8457  0.7763 
+Prob-Sal-weighted estB21:   0.8495  0.1577  0.8483  0.5188 
+Prob-Sal-weighted estB22:   0.8499  0.1800  0.8496  0.7222 
+Resulting RMS estimation error: 
+ e11       e12       e21       e22
+ 0.0724 ,  0.1442 ,  0.1114 ,  0.0093 
+
+
+
+  End time: Fri Feb 20 20:12:35 2015
+  Seconds elapsed: 0.351 
+
+[kutils 543]$ 
+
+
+
+-------------------------------------------------------------------------------------------------------------------
+
+
+  Start time: Fri Feb 20 20:13:05 2015
+
+Using PRNG seed:  16627113717877739630 
+Same seed in hex:   0xE6BF5FD50A20906E 
+Nash bargaining problem, with 4D points and 8D bargains
+When both are risk-averse, the NBS seems always to be that t2i == tb == t2j
+even though tb is not a weighted mix of ti and tj.
+When one or both are risk-seeking, then there may not
+be a bargain they both prefer to conflict. When there is one,
+they might or might not take the same position.
+
+ti:   0.8500  0.8500  0.8500  0.8500 
+si:   0.9500  0.0500  0.5000  0.5000 
+pi: 0.8657  ri: +0.34458 
+
+tj:   0.1500  0.1500  0.1500  0.1500 
+sj:   0.0500  0.9500  0.0500  0.9500 
+pj: 0.1343  rj: +0.90736 
+
+Prob-weighted compromise:        0.7560  0.7560  0.7560  0.7560  0.7560  0.7560  0.7560  0.7560 
+Sqr-prob-weighted  compromise:   0.8374  0.8374  0.8374  0.8374  0.6746  0.6746  0.6746  0.6746 
+
+Initial NP: -139.4556 
+Initial point:    0.0093  -0.0295  0.0026  0.0008  0.0464  0.0022  0.0352  -0.0138 
+
+Iter: 274  Stable: 2 
+Best NP:  +5.0235 
+Best point:    0.8500  0.2228  0.8498  0.7945  0.8500  0.2228  0.8498  0.7945 
+Found a bargain which both sides prefer to conflict
+0:4  0.0000 
+1:5  0.0000 
+2:6  0.0000 
+3:7  0.0000 
+
+Effective fractional shifts:  +0.24389  +0.75611 
+Interpolated bargain:   0.6793  0.6793  0.6793  0.6793 
+Resulting RMS estimation error: 0.2645 
+
+Prob-Sal-weighted estB11:   0.8443  0.3274  0.8393  0.6907 
+Prob-Sal-weighted estB12:   0.8491  0.6304  0.8483  0.8194 
+Prob-Sal-weighted estB21:   0.8497  0.1623  0.8489  0.5987 
+Prob-Sal-weighted estB22:   0.8500  0.2223  0.8498  0.7941 
+Resulting RMS estimation error: 
+ e11       e12       e21       e22
+ 0.0739 ,  0.2042 ,  0.1024 ,  0.0003 
+
+
+
+  End time: Fri Feb 20 20:13:05 2015
+  Seconds elapsed: 0.318 
+
+[kutils 545]$ 
+
+
+
+-------------------------------------------------------------------------------------------------------------------
+
+  Start time: Fri Feb 20 20:13:44 2015
+
+Using PRNG seed:  12177013803490139964 
+Same seed in hex:   0xA8FD7189A60EDF3C 
+Nash bargaining problem, with 4D points and 8D bargains
+When both are risk-averse, the NBS seems always to be that t2i == tb == t2j
+even though tb is not a weighted mix of ti and tj.
+When one or both are risk-seeking, then there may not
+be a bargain they both prefer to conflict. When there is one,
+they might or might not take the same position.
+
+ti:   0.8500  0.8500  0.8500  0.8500 
+si:   0.9500  0.0500  0.5000  0.5000 
+pi: 0.7460  ri: +0.66013 
+
+tj:   0.1500  0.1500  0.1500  0.1500 
+sj:   0.0500  0.9500  0.0500  0.9500 
+pj: 0.2540  rj: +0.76346 
+
+Prob-weighted compromise:        0.6722  0.6722  0.6722  0.6722  0.6722  0.6722  0.6722  0.6722 
+Sqr-prob-weighted  compromise:   0.8048  0.8048  0.8048  0.8048  0.5395  0.5395  0.5395  0.5395 
+
+Initial NP: -126.2302 
+Initial point:    -0.0198  0.0037  0.0109  0.0473  0.0003  0.0144  -0.0460  0.0007 
+
+Iter: 247  Stable: 1 
+Best NP:  +9.7041 
+Best point:    0.8497  0.1622  0.8489  0.5982  0.8497  0.1622  0.8489  0.5982 
+Found a bargain which both sides prefer to conflict
+0:4  0.0000 
+1:5  0.0000 
+2:6  0.0000 
+3:7  0.0000 
+
+Effective fractional shifts:  +0.33605  +0.66395 
+Interpolated bargain:   0.6148  0.6148  0.6148  0.6148 
+Resulting RMS estimation error: 0.2807 
+
+Prob-Sal-weighted estB11:   0.8377  0.2437  0.8269  0.5750 
+Prob-Sal-weighted estB12:   0.8458  0.3685  0.8420  0.7236 
+Prob-Sal-weighted estB21:   0.8493  0.1556  0.8476  0.4640 
+Prob-Sal-weighted estB22:   0.8498  0.1663  0.8492  0.6434 
+Resulting RMS estimation error: 
+ e11       e12       e21       e22
+ 0.0442 ,  0.1208 ,  0.0672 ,  0.0227 
+
+
+
+  End time: Fri Feb 20 20:13:44 2015
+  Seconds elapsed: 0.283 
+
+[kutils 552]$ 
+
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
