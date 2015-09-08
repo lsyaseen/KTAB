@@ -4,7 +4,7 @@
 # before using this script. CMake is the recommended was to do so.
 #
 #------------------------------------------
-FILES="kutils  kmodel  power-dispatch  refpri"
+FILES="kutils  kmodel"
 
 for d in $FILES
 do

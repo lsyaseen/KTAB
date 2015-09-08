@@ -5,7 +5,7 @@
 # rebuild them
 #
 #------------------------------------------
-FILES="kutils  kmodel  power-dispatch  refpri"
+FILES="kutils  kmodel"
 
 for d in $FILES
 do
