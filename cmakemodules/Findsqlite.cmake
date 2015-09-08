@@ -39,11 +39,12 @@ set(SQLITE_POSSIBLE_PATHS
   /usr/local
   /usr/local/sqlite
   /usr/lib
+  /usr/lib/x86_64-linux-gnu  # odd path for Debian
   "C:/local/sqlite"
   )
 
 # try to find the compiled library object
-find_library(SQLITE_LIBRARY NAMES sqlite
+find_library(SQLITE_LIBRARY NAMES sqlite3
   PATHS ${SQLITE_POSSIBLE_PATHS}
   )
 
