@@ -25,10 +25,10 @@ This directory contains the abstract base classes for most KTAB models. Some cri
 are implemented here, such as Probabilistic Condorcet Elections.
 
 Several examples are included:
-- smpApp
-- leonApp
-- mtchApp
-- minApp
+- smpApp: this is a simple command-line implementation of the Spatial Model of Politics
+- leonApp: agents negotiate over tax/subsidy policies in a simple Leontief economy
+- mtchApp: abstract problem where agents negotiate over which sweets get matched with which agents
+- minApp: optimize actor-weights to approximate estimated likelihood of outcomes
 
 -------------------------------------------------
 To build the kmodel library and examples, you must
