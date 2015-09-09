@@ -21,10 +21,14 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 --------------------------------------------
 
-This directory contains the abstract base classes
-for most KTAB models. Some critical methods
-are implemented here, such as Probabilistic
-Condorcet Elections.
+This directory contains the abstract base classes for most KTAB models. Some critical methods
+are implemented here, such as Probabilistic Condorcet Elections.
+
+Several examples are included:
+- smpApp
+- leonApp
+- mtchApp
+- minApp
 
 -------------------------------------------------
 To build the kmodel library and examples, you must
