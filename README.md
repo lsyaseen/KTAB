@@ -35,8 +35,8 @@ Examples and details can be found in the documentation.
 KTAB is released under The MIT License (Expat).
 For details, see the following URLs:
 
--   http://opensource.org/
--   http://opensource.org/licenses/MIT
+- [http://opensource.org/](http://opensource.org/)
+- [http://opensource.org/licenses/MIT](http://opensource.org/licenses/MIT)
 
 
 ----------
