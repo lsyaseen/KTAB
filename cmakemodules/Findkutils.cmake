@@ -40,6 +40,7 @@ set(KUTILS_POSSIBLE_PATHS
   ${CMAKE_CURRENT_SOURCE_DIR}/../kutils/
   ${CMAKE_CURRENT_SOURCE_DIR}/../build/kutils/
   ${CMAKE_CURRENT_SOURCE_DIR}/../../kutils/
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../KTAB/kutils/
   ${KTAB_PREFIX}
   "C:/local/ktab"
   ${CMAKE_CURRENT_SOURCE_DIR}/../kutils/Debug
