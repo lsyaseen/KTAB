@@ -1,22 +1,13 @@
 # KTAB
 
 
-This is the top-level README file for KTAB,
-KAPSARC's open-source toolkit for assembling agent-based models of negotiation and bargaining.
+KTAB is an open-source toolkit for assembling agent-based models of negotiation and bargaining. The main development site for KTAB is the King Abdullah Center for Petroleum Studies and Research, [KAPSARC](http://www.kapsarg.org) and the main page for  KTAB information is [here](https://ktab.kapsarc.org).
 
-KTAB is written in portable, cross-platform C++11.
-It was developed and tested on 64bit Windows and Linux
-platforms. Because no platform-specific code is allowed,
-porting to Mac or other platforms should be feasible.
+KTAB is written in portable, cross-platform C++11. It was developed and tested on 64-bit Windows and Linux platforms. Because no platform-specific code is allowed, porting to Mac or other platforms should be feasible.
 
-KTAB uses CMake for configuration, then your favorite IDE to build.
-CMake and instructions can be obtained from www.cmake.org. The basic
-procedure is to configure kutils with CMake, then build the library
-and examples with your favorite IDE. Then configure kmodel with CMake
-and build with your favorite IDE. Detailed build instructions can be
-found in the subdirectories, starting with kutils.
+KTAB uses CMake for configuration, then your favorite IDE to build. CMake and instructions can be obtained from [www.cmake.org](http://www.cmake.org). The basic procedure is to configure kutils with CMake, then build the library and examples with your favorite IDE. Then configure kmodel with CMake and build with your favorite IDE. Detailed build instructions can be found in the subdirectories, starting with kutils.
 
-Three examples are provided to illustrate the range of modelling
+Three examples are provided to illustrate the range of modeling
 which can be done in the framework and to provide templates
 for further work. None of them are either calibrated or verified.
 For rigorous work, one could make whatever local modifications were
