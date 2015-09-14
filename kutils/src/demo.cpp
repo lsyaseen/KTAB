@@ -714,7 +714,7 @@ namespace UDemo {
     auto wv0 = KMatrix::uniform(rng, numBits, 1, 1.0, 10.0);
     wv0 = 100.0 *(wv0 / sum(wv0));
 
-    auto efn = [bv0, wv0](BVec bv) { // obvviously, function<double(BVec)>
+    auto efn = [bv0, wv0](BVec bv) { // obviously, function<double(BVec)>
       double s = 0;
       for (unsigned int i = 0; i < bv0.size(); i++){
         if (bv[i] == bv0[i]) {
