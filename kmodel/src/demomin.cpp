@@ -53,11 +53,11 @@ namespace DemoWaterMin {
   double waterMinProb(ReportingLevel rl, const KMatrix & p0) {
     // p0 is a set of modifiers on w
 
-    const unsigned int numA = 4;
-    const unsigned int numP = 4;
+    //const unsigned int numA = 4;
+    //const unsigned int numP = 4;
     assert(p0.numR() == numA);
     assert(p0.numC() == 1);
-    
+
     // base weights
     double wArray[] = { 1600, 7000, 100, 1300 }; // numA
     const KMatrix w0 = KMatrix::arrayInit(wArray, numA, 1);
@@ -71,24 +71,8 @@ namespace DemoWaterMin {
     double wSum = KBase::sum(w);
     w = (w0Sum / wSum)*w;
 
-    double uArray[] = { // numA x numP
-      0.0000, 0.8383, 0.7532, 0.9660,
-      1.0000, 1.0000, 1.0000, 0.7500,
-      1.0000, 0.0000, 0.7500, 0.0000,
-      0.0000, 0.6107, 0.3407, 0.9027
-    };
-
-
-   // double pArray[] = { 0.10, 0.88, 0.01, 0.01 }; // numP
-    double pArray[] = { 0.10, 0.80, 0.05, 0.05 }; // numP
-
-   
-    auto u = KMatrix::arrayInit(uArray, numA, numP);
-    auto pInit = KMatrix::arrayInit(pArray, numP, 1);
-
-
-    auto vfn = [w, p0, u](unsigned int k, unsigned int i, unsigned int j) {
-      double vkij = Model::vote(KBase::VotingRule::Proportional, w(k, 0), u(k, i), u(k, j));
+    auto vfn = [w, p0](unsigned int k, unsigned int i, unsigned int j) {
+      double vkij = Model::vote(KBase::VotingRule::Proportional, w(k, 0), uInit(k, i), uInit(k, j));
       return vkij;
     };
 
@@ -105,7 +89,7 @@ namespace DemoWaterMin {
       cout << endl << flush;
 
       cout << "Raw actor-pos util matrix" << endl;
-      u.printf(" %.4f ");
+      uInit.printf(" %.4f ");
       cout << endl << flush;
 
       cout << "Coalition strength matrix" << endl;
@@ -131,12 +115,12 @@ namespace DemoWaterMin {
   }
 
   void minProbErr() {
-    const unsigned int numA = 4; 
+    const unsigned int numA = 4;
     auto vhc = new VHCSearch();
 
     vhc->eval = [](const KMatrix & wm) {
       const double err = waterMinProb(ReportingLevel::Low, wm);
-      return 1-err;
+      return 1 - err;
     };
 
     vhc->nghbrs = VHCSearch::vn1;

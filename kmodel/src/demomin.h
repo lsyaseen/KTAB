@@ -58,7 +58,22 @@ namespace DemoWaterMin {
   using KBase::VotingRule;
   using KBase::ReportingLevel;
 
-  
+  /// Define a hard-coded scenario
+  const unsigned int numA = 4;
+  const unsigned int numP = 4;
+
+  const double uArray[] = { // numA x numP
+    0.0000, 0.8383, 0.7532, 0.9660,
+    1.0000, 1.0000, 1.0000, 0.7500,
+    1.0000, 0.0000, 0.7500, 0.0000,
+    0.0000, 0.6107, 0.3407, 0.9027
+  };
+
+  const double pArray[] = { 0.10, 0.80, 0.05, 0.05 }; // numP
+
+  const KMatrix uInit = KMatrix::arrayInit(uArray, numA, numP);
+  const KMatrix pInit = KMatrix::arrayInit(pArray, numP, 1);
+
 }; // end of namespace
 
 // -------------------------------------------------
