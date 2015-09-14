@@ -1,7 +1,7 @@
 # KTAB
 
 
-KTAB is an open-source toolkit for assembling agent-based models of negotiation and bargaining. The main development site for KTAB is the King Abdullah Center for Petroleum Studies and Research, [KAPSARC](http://www.kapsarg.org) and the main page for  KTAB information is [here](https://ktab.kapsarc.org).
+KTAB is an open-source toolkit for assembling agent-based models of negotiation and bargaining. The main development site for KTAB is the King Abdullah Center for Petroleum Studies and Research, [KAPSARC](http://www.kapsarc.org) and the main page for  KTAB information is [here](http://ktab.kapsarc.org).
 
 KTAB is written in portable, cross-platform C++11. It was developed and tested on 64-bit Windows and Linux platforms. Because no platform-specific code is allowed, porting to Mac or other platforms should be feasible.
 
