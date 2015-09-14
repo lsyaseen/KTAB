@@ -42,8 +42,9 @@ set(KMODEL_POSSIBLE_PATHS
   ${CMAKE_CURRENT_SOURCE_DIR}/../../KTAB/kmodel/
   ${KTAB_PREFIX}
   "C:/local/ktab"
-  ${CMAKE_CURRENT_SOURCE_DIR}/../kmodel/Debug
-  ${CMAKE_CURRENT_SOURCE_DIR}/../kmodel/Release
+  #${CMAKE_CURRENT_SOURCE_DIR}/../kmodel/Debug
+  #${CMAKE_CURRENT_SOURCE_DIR}/../kmodel/Release
+  #${CMAKE_CURRENT_SOURCE_DIR}/../../KTAB/kmodel/Debug
   )
 
 # try to find a key header
@@ -54,6 +55,7 @@ find_path(KMODEL_INCLUDE_DIR kmodel.h
 
 # try to find the compiled library object
 find_library(KMODEL_LIBRARY NAMES kmodel
+  PATH_SUFFIXES build Debug Release
   PATHS ${KMODEL_POSSIBLE_PATHS}
   )
 
@@ -65,16 +67,22 @@ endif(KMODEL_LIBRARY)
 
 # if found both library object and that key header,
 # record the data and let the user know it succeeded
+if(KMODEL_LIBRARIES) 
+  message(STATUS "Found kmodel library: ${KMODEL_LIBRARY}") 
+endif(KMODEL_LIBRARIES)
+
+if(KMODEL_INCLUDE_DIR)
+  message(STATUS "Found kmodel headers: ${KMODEL_INCLUDE_DIR}")
+endif(KMODEL_INCLUDE_DIR)
+
 if(KMODEL_LIBRARIES AND KMODEL_INCLUDE_DIR)
   set(KMODEL_FOUND "YES")
-  message(STATUS "Found kmodel library and headers: ")
-  message(STATUS "  ${KMODEL_LIBRARY}")
-  message(STATUS "  ${KMODEL_INCLUDE_DIR}")
+  #message(STATUS "Found both kmodel library and headers.")
 endif(KMODEL_LIBRARIES AND KMODEL_INCLUDE_DIR)
 
 # if not found, stop immediately
 if(NOT KMODEL_FOUND)
-  message(FATAL_ERROR "Could not find kmodel library and headers")
+  message(FATAL_ERROR "Could not find both kmodel library and headers")
 endif(NOT KMODEL_FOUND)		
 		
 # --------------------------------------------

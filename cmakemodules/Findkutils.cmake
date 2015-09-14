@@ -42,8 +42,9 @@ set(KUTILS_POSSIBLE_PATHS
   ${CMAKE_CURRENT_SOURCE_DIR}/../../KTAB/kutils/
   ${KTAB_PREFIX}
   "C:/local/ktab"
-  ${CMAKE_CURRENT_SOURCE_DIR}/../kutils/Debug
-  ${CMAKE_CURRENT_SOURCE_DIR}/../kutils/Release
+  #${CMAKE_CURRENT_SOURCE_DIR}/../kutils/Debug
+  #${CMAKE_CURRENT_SOURCE_DIR}/../kutils/Release
+  #${CMAKE_CURRENT_SOURCE_DIR}/../../KTAB/kutils/Debug
   )
 
 # try to find a key header
@@ -54,27 +55,34 @@ find_path(KUTILS_INCLUDE_DIR kutils.h
 
 # try to find the compiled library object
 find_library(KUTILS_LIBRARY NAMES kutils
+  PATH_SUFFIXES build Debug Release
   PATHS ${KUTILS_POSSIBLE_PATHS}
   )
 
 # if the library object was found, record it.
-# may need to add other system files latter.
+# may need to add other system files later.
 if(KUTILS_LIBRARY)
   set(KUTILS_LIBRARIES  ${KUTILS_LIBRARY})
 endif(KUTILS_LIBRARY)
 
 # if found both library object and that key header,
 # record the data and let the user know it succeeded
+if(KUTILS_LIBRARIES) 
+  message(STATUS "Found kutils library: ${KUTILS_LIBRARY}")
+endif(KUTILS_LIBRARIES)
+
+if(KUTILS_INCLUDE_DIR) 
+  message(STATUS "Found kutils headers: ${KUTILS_INCLUDE_DIR}")
+endif(KUTILS_INCLUDE_DIR)
+
 if(KUTILS_LIBRARIES AND KUTILS_INCLUDE_DIR)
   set(KUTILS_FOUND "YES")
-  message(STATUS "Found kutils library and headers: ")
-  message(STATUS "  ${KUTILS_LIBRARY}")
-  message(STATUS "  ${KUTILS_INCLUDE_DIR}")
+  #message(STATUS "Found both kutils library and headers.") 
 endif(KUTILS_LIBRARIES AND KUTILS_INCLUDE_DIR)
 
 # if not found, stop immediately
 if(NOT KUTILS_FOUND)
-  message(FATAL_ERROR "Could not find kutils library and headers")
+  message(FATAL_ERROR "Could not find both kutils library and headers")
 endif(NOT KUTILS_FOUND)		
 		
 # --------------------------------------------
