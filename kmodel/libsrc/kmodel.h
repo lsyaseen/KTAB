@@ -33,6 +33,8 @@
 // z = w * u is the row-vector of weighted sums of utilities.
 // Hence, we always treat u_ij, p_i, e_i, w_j, and z_j as
 // matrix, c-vec, c-vec, r-vec, and r-vec respectively.
+//
+// Notice that we declare operators at the very end, outside the namespace.
 // -------------------------------------------------
 #ifndef KTAB_MODEL_H
 #define KTAB_MODEL_H
@@ -40,7 +42,7 @@
 #include "kutils.h"
 #include "kmatrix.h"
 #include "prng.h"
-
+ 
 namespace KBase {
   using std::shared_ptr;
   using std::tuple;
@@ -53,12 +55,20 @@ namespace KBase {
   class Actor;
   class Position;
   class State;
+  
+  class VctrPstn;
+  class MtchPstn;
+  class MtchGene;
 
   // How much influence to exert (vote) given a difference in [0,1] utility
   enum class VotingRule : char { Binary, PropBin, Proportional, PropCbc, Cubic };
   // No more than 256 distinct voting rules
 
   string vrName(VotingRule vr);
+  
+  
+  vector <MtchPstn> uniqueMP(vector <MtchPstn> mps);
+  
 
   enum class ThirdPartyCommit { None, Semi, Full };
   // third parties have the same range of voting rules as in VotingRule enum.
@@ -217,10 +227,15 @@ namespace KBase {
     virtual ~Position();
   };
 
+  /*
+   
   class VctrPstn;
   class MtchPstn;
   class MtchGene;
 
+  bool operator==(const MtchPstn& lhs, const MtchPstn& rhs);
+  */
+  
   // ------------------------------------------------- 
 
   // Basic vector position: just a column-vector of numbers.
@@ -237,7 +252,9 @@ namespace KBase {
   // ------------------------------------------------- 
   // this is a matching of N items to M categories.
   // Note that this is intended to be independent of MtchState, MtchActor, etc.
-  // Thus, there are M^N possible matchings.
+  // Each category is a bucket into which 0, 1, or more items can be put.
+  // Each item goes in exactly one category. A Matching states, for each of N items,
+  // which of M categories it goes into. Thus, there are M^N possible matchings.
   // Examples are items = pieces of candy, categories = which actor gets them,
   // or items = projects to fund, categories = {High, Medium, Low} priority, actors = interest groups
   // or items = cabinet seats, categories = parties, actors = interest groups
@@ -248,6 +265,8 @@ namespace KBase {
     virtual ~MtchPstn();
     virtual vector<MtchPstn> neighbors(unsigned int nVar) const; 
     // assumes no interaction between items (permutation requires interaction)
+    
+    
     
     unsigned int numItm;
     unsigned int numCat;
@@ -277,12 +296,14 @@ namespace KBase {
   };
 
 
-};
+}; // end of namespace
+
+
+bool operator==(const KBase::MtchPstn& mp1, const KBase::MtchPstn& mp2);
 
 
 // -------------------------------------------------
 #endif
-
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------

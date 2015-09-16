@@ -27,6 +27,14 @@
 #include "kmodel.h"
 
 
+bool operator==(const KBase::MtchPstn& mp1, const KBase::MtchPstn& mp2) {
+  bool eqv = (mp1.numItm == mp2.numItm) && (mp1.numCat == mp2.numCat); 
+  for (unsigned int i = 0; i < mp1.numItm; i++){
+    eqv = eqv && (mp1.match[i] == mp2.match[i]);
+  }
+  return eqv;
+}
+  
 namespace KBase {
   using KBase::PRNG;
   using KBase::KMatrix;
@@ -37,6 +45,26 @@ namespace KBase {
   VctrPstn::~VctrPstn() {}
 
   // -------------------------------------------------
+  
+  
+  vector <MtchPstn> uniqueMP(vector <MtchPstn> mps) {
+    auto unq = vector <MtchPstn>();
+    
+    for (auto newMP : mps) {
+      bool found = false;
+      for (auto oldMP : unq) {
+	if (newMP == oldMP) {
+	  found = true;
+	}
+      }
+      if (!found) {
+	unq.push_back(newMP);
+      }
+    }
+    return unq;
+  }
+  
+  
   MtchPstn::MtchPstn() : Position()  {
     numCat = 0;
     numItm = 0;
@@ -199,10 +227,12 @@ namespace KBase {
 
   bool MtchGene::equiv(const MtchGene * mg2) const {
     assert((numItm == mg2->numItm) && (numCat == mg2->numCat));
-    bool e = true;
+    bool e = (*this == *mg2);
+    /*
     for (unsigned int i = 0; i < numItm; i++){
       e = e && (match[i] == mg2->match[i]);
     }
+    */
     return e;
   }
 
