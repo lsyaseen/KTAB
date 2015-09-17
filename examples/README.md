@@ -1,4 +1,4 @@
-# KTAB Examples
+l# KTAB Examples
 
 
 KTAB is an open-source toolkit for assembling agent-based models of negotiation and bargaining using the Probabilistic Condorcet Election paradigm. Important URLs for KTAB include the following: 
@@ -8,7 +8,8 @@ KTAB is an open-source toolkit for assembling agent-based models of negotiation 
 - Main development site is the King Abdullah Center for Petroleum Studies and Research, [KAPSARC](http://www.kapsarc.org) 
  
 
-The "examples" directory holds examples of how to build models outside the main library structure, as one would do for a custom model. To build the examples, the entire "examples" directory would be copied parallel to the KTAB directory, as in the following screenshot.
+The "examples" directory holds examples of how to build models outside the main library structure, as one would do for a custom model.
+Note that the entire "examples" directory is parallel to the KTAB directory, as in the following screenshot.
 
 ![Recommended 'examples' location](images/working-location.png)
 
