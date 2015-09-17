@@ -106,18 +106,6 @@ TARGET_LINK_LIBRARIES(mtchApp
   )
 
 # -------------------------------------------------
-ADD_EXECUTABLE(minApp
-  src/demomin.cpp
-  )
-
-
-TARGET_LINK_LIBRARIES(minApp
-  kmodel
-  ${KUTILS_LIBRARY}
-  ${EFENCE_LIBRARIES}
-  )
-
-# -------------------------------------------------
 ADD_EXECUTABLE(smpApp
   src/demosmp.cpp
   csvparser/csv_parser.cpp
