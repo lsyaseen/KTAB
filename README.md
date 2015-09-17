@@ -7,21 +7,9 @@ KTAB is written in portable, cross-platform C++11. It was developed and tested o
 
 KTAB uses CMake for configuration, then your favorite IDE to build. CMake and instructions can be obtained from [www.cmake.org](http://www.cmake.org). The basic procedure is to configure kutils with CMake, then build the library and examples with your favorite IDE. Then configure kmodel with CMake and build with your favorite IDE. Detailed build instructions can be found in the subdirectories, starting with kutils.
 
-Three examples are provided to illustrate the range of modeling
-which can be done in the framework and to provide templates
-for further work. None of them are either calibrated or verified.
-For rigorous work, one could make whatever local modifications were
-needed to produce a model which met one's own standards for validation. 
+Examples are provided to illustrate the range of modeling which can be done in the framework and to provide templates for further work. Examples of the spatial model of politics, using an I/O model to bargain over tax/subsidy rates, and simple discrete matching are in the kmodel directory. Example of how to build models outside the main library structure, as one would do for a custom model, are in the examples directory; see the README file therein. None of the examples are either calibrated or verified. For rigorous work, one could make whatever local modifications were needed to produce a model which met one's own standards for validation. 
 
-KTAB is not a general-purpose agent-based modelling system.
-All KTAB models represent stochastic decision-making among
-comparatively small numbers of stakeholder groups (roughly 5 to 50),
-within the paradigm of "Probabilistic Condorcet Elections". 
-PCEs are used to estimate the likelihood of different outcomes from a
-collective decision making process, depending on what kinds of options
-each agent has or can generate, how they value those options,
-and what kinds of coalitions they can form to support or oppose each option.
-Examples and details can be found in the documentation.
+KTAB is not a general-purpose agent-based modeling system. All KTAB models represent stochastic decision-making among comparatively small numbers of stakeholder groups (roughly 5 to 50), within the paradigm of "Probabilistic Condorcet Elections". PCEs are used to estimate the likelihood of different outcomes from a collective decision making process, depending on what kinds of options each agent has or can generate, how they value those options, and what kinds of coalitions they can form to support or oppose each option. Examples and details can be found in the documentation.
 
 KTAB is released under The MIT License (Expat).
 For details, see the following URLs:
