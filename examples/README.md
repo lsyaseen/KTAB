@@ -10,7 +10,7 @@ KTAB is an open-source toolkit for assembling agent-based models of negotiation 
 
 The "examples" directory holds examples of how to build models outside the main library structure, as one would do for a custom model. To build the examples, the entire "examples" directory would be copied parallel to the KTAB directory, as in the following screenshot.
 
-![alt text](images/working-location.png)
+![Recommended 'examples' location](images/working-location.png)
 
 This mirrors the recommended structure for building your own custom models: setup a directory parallel to the main KTAB directory, and build your models there. The CMakeLists.txt file in 'reformpri' uses relative paths that work in the recommended structure, so it can be used as a template for developing your own CMakeLlists.txt files.
 
