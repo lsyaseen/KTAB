@@ -24,8 +24,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "smpApp", "..\kmodel\build\s
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demomodel", "..\kmodel\build\demomodel.vcxproj", "{57634FB2-2691-4FB1-B035-AD07E62AF148}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "minApp", "..\kmodel\build\minApp.vcxproj", "{6946EF2C-3EBE-4C40-B3C3-9B79F46E08E6}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -90,14 +88,6 @@ Global
 		{57634FB2-2691-4FB1-B035-AD07E62AF148}.Release|x64.Build.0 = Debug|x64
 		{57634FB2-2691-4FB1-B035-AD07E62AF148}.RelWithDebInfo|x64.ActiveCfg = Debug|x64
 		{57634FB2-2691-4FB1-B035-AD07E62AF148}.RelWithDebInfo|x64.Build.0 = Debug|x64
-		{6946EF2C-3EBE-4C40-B3C3-9B79F46E08E6}.Debug|x64.ActiveCfg = Debug|x64
-		{6946EF2C-3EBE-4C40-B3C3-9B79F46E08E6}.Debug|x64.Build.0 = Debug|x64
-		{6946EF2C-3EBE-4C40-B3C3-9B79F46E08E6}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
-		{6946EF2C-3EBE-4C40-B3C3-9B79F46E08E6}.MinSizeRel|x64.Build.0 = MinSizeRel|x64
-		{6946EF2C-3EBE-4C40-B3C3-9B79F46E08E6}.Release|x64.ActiveCfg = Release|x64
-		{6946EF2C-3EBE-4C40-B3C3-9B79F46E08E6}.Release|x64.Build.0 = Release|x64
-		{6946EF2C-3EBE-4C40-B3C3-9B79F46E08E6}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
-		{6946EF2C-3EBE-4C40-B3C3-9B79F46E08E6}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
