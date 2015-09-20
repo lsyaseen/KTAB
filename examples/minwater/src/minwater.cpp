@@ -51,7 +51,9 @@ namespace DemoWaterMin {
 
   // -------------------------------------------------
   double waterMinProb(ReportingLevel rl, const KMatrix & p0) {
-    // p0 is a set of modifiers on w
+    // Report the RMS error in predicted probabilities
+    // TODO: change this to get both initial-year and nominal-policy
+    // p0 is a set of modifiers on initial weights, w
 
     //const unsigned int numA = 4;
     //const unsigned int numP = 4;
