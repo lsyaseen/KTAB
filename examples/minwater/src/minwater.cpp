@@ -73,6 +73,7 @@ double waterMinProb(ReportingLevel rl, const KMatrix & p0) {
     double wSum = KBase::sum(w);
     w = (w0Sum / wSum)*w;
 
+    double pRMS = KBase::norm(p0) / sqrt(p0.numC() * p0.numR()); // RMS of p0;
 
     auto vpm = Model::VPModel::Linear;
 
@@ -105,7 +106,7 @@ double waterMinProb(ReportingLevel rl, const KMatrix & p0) {
     //double err = KBase::norm(pr1 - pInit) / sqrt(pr1.numC() * pr1.numR()); // RMS of difference in distributions
 
     double err = sqrt( ((err0*err0) + (err1*err1)) / 2.0); // RMS difference of the two critical probabilities
-
+    
 
     if (ReportingLevel::Silent < rl) {
         cout << "Actor-cap matrix" << endl;
@@ -133,9 +134,11 @@ double waterMinProb(ReportingLevel rl, const KMatrix & p0) {
         cout << endl << flush;
 
         printf("RMS error: %.4f \n", err);
+
+        printf("RMS weight factors: %.4f \n", pRMS);
     }
 
-    return err;
+    return (err + (pRMS * prmsW));
 }
 
 void minProbErr() {

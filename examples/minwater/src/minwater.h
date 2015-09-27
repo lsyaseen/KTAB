@@ -162,7 +162,7 @@ double wArray[] = { 1600, 7000, 100, 1300 }; // numA
 
 double trgtP0 = 0.90; // probability of base-year scenario (#0) when waterMin actor has little strength
 double trgtP1 = 0.80; // probability of nominal-policy scenario (#1) when waterMin actor has full strength
-
+double prmsW = 1.0 / 25.0; // weight of RMS weight-factors, compared to weight 1 of RMS prob-error
 
 const KMatrix w0 = KMatrix::arrayInit(wArray, numA, 1);
 
