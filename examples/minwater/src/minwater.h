@@ -59,8 +59,8 @@ using KBase::VotingRule;
 using KBase::ReportingLevel;
 
 /// Define a hard-coded scenario
-const unsigned int numA = 4;
-const unsigned int numP = 4;
+//const unsigned int numA = 4;
+//const unsigned int numP = 4;
 
 const double uArray[] = { // numA x numP
     0.0000, 0.8383, 0.7532, 0.9660,
@@ -69,6 +69,9 @@ const double uArray[] = { // numA x numP
     0.0000, 0.6107, 0.3407, 0.9027
 };
 
+
+const unsigned int numA = 38;
+const unsigned int numP = 17;
 // 38 rows/actors, 17 columns/positions
 // Column 0 is the base-year, Column 1 is the 'nominal policy'
 double u2Array[] = {
@@ -114,7 +117,7 @@ double u2Array[] = {
 
 // all but the first are base-year total revenue
 double w2Array[] {
-    2000000.0 ,   // 01
+   2000000.0 ,   // 01
     744645.7 ,   // 02
     369065.2 ,   // 03
     558530.62 ,  // 04
@@ -162,11 +165,11 @@ double wArray[] = { 1600, 7000, 100, 1300 }; // numA
 
 double trgtP0 = 0.90; // probability of base-year scenario (#0) when waterMin actor has little strength
 double trgtP1 = 0.80; // probability of nominal-policy scenario (#1) when waterMin actor has full strength
-double prmsW = 1.0 / 25.0; // weight of RMS weight-factors, compared to weight 1 of RMS prob-error
+double prmsW = 0.020; //  weight of RMS weight-factors, compared to weight 1 of RMS prob-error
 
-const KMatrix w0 = KMatrix::arrayInit(wArray, numA, 1);
+const KMatrix w0 = KMatrix::arrayInit(w2Array, numA, 1);
 
-const KMatrix uInit = KMatrix::arrayInit(uArray, numA, numP);
+const KMatrix uInit = KMatrix::arrayInit(u2Array, numA, numP);
 const KMatrix pInit = KMatrix::arrayInit(pArray, numP, 1);
 
 }; // end of namespace

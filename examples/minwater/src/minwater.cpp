@@ -142,11 +142,13 @@ double waterMinProb(ReportingLevel rl, const KMatrix & p0) {
 }
 
 void minProbErr() {
-    const unsigned int numA = 4;
+    //const unsigned int numA = 4;
     auto vhc = new VHCSearch();
+    auto eRL = ReportingLevel::Low;
+    auto rRL = ReportingLevel::Medium;
 
-    vhc->eval = [](const KMatrix & wm) {
-        const double err = waterMinProb(ReportingLevel::Low, wm);
+    vhc->eval = [eRL](const KMatrix & wm) {
+      const double err = waterMinProb(eRL, wm);
         return 1 - err;
     };
 
@@ -156,9 +158,9 @@ void minProbErr() {
     trans(p0).printf(" %+.4f ");
     cout << endl;
     auto rslt = vhc->run(p0,
-                         1000, 10, 1E-10,
-                         1.0, 0.618, 1.25, 1e-8,
-                         ReportingLevel::High);
+                         100, 10, 1E-5, // iMax, sMax, sTol
+                         1.0, 0.618, 1.25, 1e-8, // step, shrink, grow, minStep
+                         rRL);
     double vBest = get<0>(rslt);
     KMatrix pBest = get<1>(rslt);
     unsigned int in = get<2>(rslt);
