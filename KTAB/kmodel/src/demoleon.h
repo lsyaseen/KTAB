@@ -156,7 +156,7 @@ namespace DemoLeon {
 
     
     // use the parameters of your state to compute the relative probability of each actor's position
-    virtual KMatrix pDist(int persp) const ;
+    virtual tuple <KMatrix, vector<unsigned int>>  pDist(int persp) const ;
     
     virtual void setAUtil(ReportingLevel rl);
     
@@ -164,6 +164,7 @@ namespace DemoLeon {
     
   protected:
     LeonState * doSUSN(ReportingLevel rl) const;
+    virtual bool equivNdx(unsigned int i, unsigned int j) const;
     
   private:
   };
@@ -211,6 +212,8 @@ namespace DemoLeon {
     // considering all the positions as vectors, return the distance between states.
     static double stateDist (const LeonState* s1 , const LeonState* s2 );
 
+    /// how close together positions must be to be considered equivalent
+    double posTol;
 
   protected:
     unsigned int L; // factors of production

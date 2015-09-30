@@ -2,22 +2,22 @@
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------
 // The MIT License (MIT)
-// 
+//
 // Copyright (c) 2015 King Abdullah Petroleum Studies and Research Center
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 // and associated documentation files (the "Software"), to deal in the Software without
 // restriction, including without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom 
+// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom
 // the Software is furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all copies or
 // substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
-// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // --------------------------------------------
 
@@ -42,43 +42,45 @@
 #include "kmodel.h"
 
 namespace DemoMtch {
-  // namespace to which KBase has no access
+// namespace to which KBase has no access
 
-  using std::string;
-  using std::tuple;
-  using std::vector;
+using std::string;
+using std::tuple;
+using std::vector;
 
-  using KBase::KMatrix;
-  using KBase::PRNG;
+using KBase::KMatrix;
+using KBase::PRNG;
 
-  using KBase::Actor;
-  using KBase::Position;
-  using KBase::State;
-  using KBase::Model;
-  using KBase::VotingRule;
-  using KBase::ReportingLevel;
+using KBase::Actor;
+using KBase::Position;
+using KBase::State;
+using KBase::Model;
+using KBase::VotingRule;
+using KBase::ReportingLevel;
 
-  using KBase::MtchPstn;
-  using KBase::MtchGene;
+using KBase::MtchPstn;
+using KBase::MtchGene;
 
-  class MtchActor;
-  class MtchState;
-  class MtchModel;
-  
-  // ------------------------------------------------- 
-  void demoDivideSweets(uint64_t s, PRNG* rng);
-  void demoMaxSupport(uint64_t s, PRNG* rng);
-  void demoMtchSUSN(uint64_t s, PRNG* rng);
-  void multiMtchSUSN(uint64_t s, PRNG* rng);
-  bool oneMtchSUSN(uint64_t s, PRNG* rng);
+class MtchActor;
+class MtchState;
+class MtchModel;
 
-  void showMtchPstn(const MtchPstn & mp);
-  bool stableMtchState(unsigned int iter, const State* s);
-  
-  // ------------------------------------------------- 
-  class MtchActor : public Actor {
-  public:
-    enum class PropModel { ExpUtil, Probability, AgreeUtil };
+// -------------------------------------------------
+void demoDivideSweets(uint64_t s, PRNG* rng);
+void demoMaxSupport(uint64_t s, PRNG* rng);
+void demoMtchSUSN(uint64_t s, PRNG* rng);
+void multiMtchSUSN(uint64_t s, PRNG* rng);
+bool oneMtchSUSN(uint64_t s, PRNG* rng);
+
+void showMtchPstn(const MtchPstn & mp);
+bool stableMtchState(unsigned int iter, const State* s);
+
+// -------------------------------------------------
+class MtchActor : public Actor {
+public:
+    enum class PropModel {
+        ExpUtil, Probability, AgreeUtil
+    };
 
     MtchActor(string n, string d);
     ~MtchActor();
@@ -107,59 +109,59 @@ namespace DemoMtch {
     // lowest utility, 0, to get nothing, and
     // highest utility, 1, to get everything.
     vector<double> vals;
-    
-  protected:
-    
-  private:
-    
-  };
 
-  class MtchState : public State {
-  public:
+protected:
+
+private:
+
+};
+
+class MtchState : public State {
+public:
     MtchState(Model* mod);
     ~MtchState();
-    
+
     KMatrix actrCaps() const;
 
 
     // use the parameters of your state to compute the relative probability of each actor's position.
     // persp = -1 means use everyone's separate perspectives (i.e. get actual probabilities, not one actor's beliefs)
-    KMatrix pDist(int persp) const;
+    tuple <KMatrix, vector<unsigned int>>  pDist(int persp) const;
 
-    
+
     void setAUtil(ReportingLevel rl);
     MtchState * stepSUSN();
-  
+
     MtchState * stepBCN();
-  
-  protected:
+
+protected:
     MtchState * doSUSN(ReportingLevel rl) const;
     MtchState * doBCN(ReportingLevel rl) const;
-    
-    
-   // bool stableMtchState(unsigned int iter, const State* s);
-    
-  private:
-    
-  };
-  
-  
-  class MtchModel : public Model {
-  public:
+
+    bool equivNdx(unsigned int i, unsigned int j) const;
+    // bool stableMtchState(unsigned int iter, const State* s);
+
+private:
+
+};
+
+
+class MtchModel : public Model {
+public:
     MtchModel(PRNG* rng);
     virtual ~MtchModel();
 
     static MtchModel* randomMS(unsigned int numA, unsigned int numI, VotingRule vr, MtchActor::PropModel pMod, PRNG * rng);
-    
+
     unsigned int numItm;
     unsigned int numCat;  // happens to equal numAct, in this demo
-    
-  protected:
-    
-  private:
-    
-  };
-  
+
+protected:
+
+private:
+
+};
+
 }; // end of namespace
 
 // -------------------------------------------------

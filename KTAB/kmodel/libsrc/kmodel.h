@@ -2,22 +2,22 @@
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------
 // The MIT License (MIT)
-// 
+//
 // Copyright (c) 2015 King Abdullah Petroleum Studies and Research Center
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 // and associated documentation files (the "Software"), to deal in the Software without
 // restriction, including without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom 
+// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom
 // the Software is furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all copies or
 // substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
-// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // --------------------------------------------
 // Define the abstract top-level classes of KTAB models.
@@ -42,40 +42,44 @@
 #include "kutils.h"
 #include "kmatrix.h"
 #include "prng.h"
- 
+
 namespace KBase {
-  using std::shared_ptr;
-  using std::tuple;
-  using KBase::KMatrix;
-  using KBase::ReportingLevel;
+using std::shared_ptr;
+using std::tuple;
+using KBase::KMatrix;
+using KBase::ReportingLevel;
 
-  class KMatrix;
-  class PRNG;
-  class Model;
-  class Actor;
-  class Position;
-  class State;
-  
-  class VctrPstn;
-  class MtchPstn;
-  class MtchGene;
+class KMatrix;
+class PRNG;
+class Model;
+class Actor;
+class Position;
+class State;
 
-  // How much influence to exert (vote) given a difference in [0,1] utility
-  enum class VotingRule : char { Binary, PropBin, Proportional, PropCbc, Cubic };
-  // No more than 256 distinct voting rules
+class VctrPstn;
+class MtchPstn;
+class MtchGene;
 
-  string vrName(VotingRule vr);
-  
-  
-  vector <MtchPstn> uniqueMP(vector <MtchPstn> mps);
-  
+// How much influence to exert (vote) given a difference in [0,1] utility
+enum class VotingRule : char {
+    Binary, PropBin, Proportional, PropCbc, Cubic
+};
+// No more than 256 distinct voting rules
 
-  enum class ThirdPartyCommit { None, Semi, Full };
-  // third parties have the same range of voting rules as in VotingRule enum.
-  string tpcName(ThirdPartyCommit tpc);
+string vrName(VotingRule vr);
 
-  class Model {
-  public:
+
+vector <MtchPstn> uniqueMP(vector <MtchPstn> mps);
+
+
+enum class ThirdPartyCommit {
+    None, Semi, Full
+};
+// third parties have the same range of voting rules as in VotingRule enum.
+string tpcName(ThirdPartyCommit tpc);
+
+class Model {
+public:
     Model(PRNG * r);
     virtual ~Model();
 
@@ -98,14 +102,16 @@ namespace KBase {
 
     // calculate strength of coalitions for general actors and options.
     static KMatrix coalitions(function<double(unsigned int ak, unsigned int pi, unsigned int pj)> vfn,
-			      unsigned int numAct, unsigned int numOpt);
+                              unsigned int numAct, unsigned int numOpt);
 
     // whether you consider the probability of a coalition winning to go up linearly
     // or quadratically in strength-compared-to-opponent:
     // Linear law says 2:1 advantage gives pv = 2/3, and 3:1 gives 3/4
     // Square law says 2:1 advantage gives pv = 4/5, and 3:1 gives 9/10
     //
-    enum class VPModel { Linear, Square };
+    enum class VPModel {
+        Linear, Square
+    };
     static string VPMName(VPModel vpm);
 
     // calculate pv[i>j] from coalitions
@@ -121,7 +127,7 @@ namespace KBase {
     static KMatrix condPCE(const KMatrix & pv);
 
     static KMatrix scalarPCE(unsigned int numAct, unsigned int numOpt, const KMatrix & w,
-			     const KMatrix & u, VotingRule vr, VPModel vpm, ReportingLevel rl);
+                             const KMatrix & u, VotingRule vr, VPModel vpm, ReportingLevel rl);
 
     virtual unsigned int addActor(Actor* a);
     int actrNdx(const Actor* a) const;
@@ -135,11 +141,11 @@ namespace KBase {
     unsigned int numAct;
     PRNG * rng;
     vector<State*> history;
-  };
+};
 
 
-  class State {
-  public:
+class State {
+public:
     State(Model* mod);
     virtual ~State();
 
@@ -149,36 +155,45 @@ namespace KBase {
     void clear();
     virtual void addPstn(Position* p);
 
-    // use the parameters of your state to compute the relative probability of each actor's position.
-    // persp = -1 means use everyone's separate perspectives (i.e. get actual probabilities, not one actor's beliefs)
-    virtual KMatrix pDist(int persp) const = 0;
+    // use the parameters of your state to compute the relative probability of each unique position.
+    // persp = -1 means use everyone's separate perspectives (i.e. get actual probabilities, not one actor's beliefs).
+    // Because the voting mechanisms may differ, so v_k(i:j) could differ widely from sub-class to sub-class,
+    // it is tricky to make a single function to do this.
+    virtual tuple< KMatrix, vector<unsigned int>> pDist(int persp) const = 0;
 
     Model * model;
     function <State* () > step; // you have to provide this λ-fn
     vector<KMatrix> aUtil; // aUtil[h](i,j) is h's estimate of the utility to A_i of Pos_j
     vector<Position*> pstns;
 
-  };
+protected:
+
+    virtual bool equivNdx(unsigned int i, unsigned int j) const = 0;
+    vector<unsigned int> testUniqueNdx( function <bool(unsigned int, unsigned int)> tfn) const;
+    vector<unsigned int> uniqueNdx() const;
+
+private:
+};
 
 
-  // In the abstract, we can not say much about actors.
-  // Different utility models might assume different parameters
-  // in the utility function - and the associated actor
-  // would have to have their own value for those parameters.
-  // For example, their capability may change over time,
-  // so an actor like that would have to have a history of capabilities
-  // into  which the State could look.
-  // An actor in multi-dimensional issues might have different
-  // capabilities on different issues.
-  // They do not have fixed positions, but change over time.
-  // And so on.
-  class Actor {
-  public:
+// In the abstract, we can not say much about actors.
+// Different utility models might assume different parameters
+// in the utility function - and the associated actor
+// would have to have their own value for those parameters.
+// For example, their capability may change over time,
+// so an actor like that would have to have a history of capabilities
+// into  which the State could look.
+// An actor in multi-dimensional issues might have different
+// capabilities on different issues.
+// They do not have fixed positions, but change over time.
+// And so on.
+class Actor {
+public:
     Actor(string n, string d);
     virtual ~Actor();
 
     static double thirdPartyVoteSU(double wk, VotingRule vr, ThirdPartyCommit comm,
-				   double pik, double pjk, double uki, double ukj, double ukk);
+                                   double pik, double pjk, double uki, double ukj, double ukk);
 
     static double vProbLittle(VotingRule vr, double wn, double uni, double unj, double contrib_i_ij, double contrib_j_ij);
 
@@ -189,7 +204,7 @@ namespace KBase {
     // the most common kinds of votes for actors are the following:
 
     // Vote between positions occupied by two different actors in the same
-    // state, just looking up stored information. 
+    // state, just looking up stored information.
     // Note well: it cannot be assumed that the vote between two
     // options can be determined simply by looking at the difference
     // in stored utilities.
@@ -199,7 +214,7 @@ namespace KBase {
     // full-scale computable general equilibrium (CGE) models, may
     // be very expensive to evaluate. Evaluating one policy position yields
     // a predicted state to which all the actors react with their differing utility fns.
-    // Thus, we can get a whole column of the U_ij matrix from one CGE evaluation; 
+    // Thus, we can get a whole column of the U_ij matrix from one CGE evaluation;
     // it would be very slow to evaluate the model once for each actor.
     // Of course, if every actor has a completely different model to predict the
     // states that will result from a policy, then you have no choice but to
@@ -208,75 +223,75 @@ namespace KBase {
     // heuristics that are *informed* by complex off-line considerations, so you'd
     // be back to using very simple models.
     // Most actors will have functions somewhat like the following, but
-    // the number and type of inputs will vary. Use lambda-fns to 
+    // the number and type of inputs will vary. Use lambda-fns to
     // construct the 'vfn' for Models::coalition, binding whatever extra
     // parameters your actor needs (e.g. a State* is necessary for strategic voting).
-    // double posUtil(const Position * ap1) const = 0; 
+    // double posUtil(const Position * ap1) const = 0;
     // double vote(const Position * ap1, const Position * ap2) const = 0;
 
 
-  protected:
-  };
+protected:
+};
 
 
-  // -------------------------------------------------
-  // Similarly, there is not much to say about abstract positions.
-  class Position {
-  public:
+// -------------------------------------------------
+// Similarly, there is not much to say about abstract positions.
+class Position {
+public:
     Position();
     virtual ~Position();
-  };
+};
 
-  /*
-   
-  class VctrPstn;
-  class MtchPstn;
-  class MtchGene;
+/*
 
-  bool operator==(const MtchPstn& lhs, const MtchPstn& rhs);
-  */
-  
-  // ------------------------------------------------- 
+class VctrPstn;
+class MtchPstn;
+class MtchGene;
 
-  // Basic vector position: just a column-vector of numbers.
-  // They could be interpretted in many ways, as policies
-  // are often described by a vector of numbers (e.g. tax/subsidy rates).
-  class VctrPstn : public Position, public KMatrix {
-  public:
+bool operator==(const MtchPstn& lhs, const MtchPstn& rhs);
+*/
+
+// -------------------------------------------------
+
+// Basic vector position: just a column-vector of numbers.
+// They could be interpretted in many ways, as policies
+// are often described by a vector of numbers (e.g. tax/subsidy rates).
+class VctrPstn : public Position, public KMatrix {
+public:
     VctrPstn();
     VctrPstn(unsigned int nr, unsigned int nc);
     VctrPstn(const KMatrix & m); // copy constructor
     virtual ~VctrPstn();
-  };
+};
 
-  // ------------------------------------------------- 
-  // this is a matching of N items to M categories.
-  // Note that this is intended to be independent of MtchState, MtchActor, etc.
-  // Each category is a bucket into which 0, 1, or more items can be put.
-  // Each item goes in exactly one category. A Matching states, for each of N items,
-  // which of M categories it goes into. Thus, there are M^N possible matchings.
-  // Examples are items = pieces of candy, categories = which actor gets them,
-  // or items = projects to fund, categories = {High, Medium, Low} priority, actors = interest groups
-  // or items = cabinet seats, categories = parties, actors = interest groups
-  // or ....
-  class MtchPstn : public Position {
-  public:
+// -------------------------------------------------
+// this is a matching of N items to M categories.
+// Note that this is intended to be independent of MtchState, MtchActor, etc.
+// Each category is a bucket into which 0, 1, or more items can be put.
+// Each item goes in exactly one category. A Matching states, for each of N items,
+// which of M categories it goes into. Thus, there are M^N possible matchings.
+// Examples are items = pieces of candy, categories = which actor gets them,
+// or items = projects to fund, categories = {High, Medium, Low} priority, actors = interest groups
+// or items = cabinet seats, categories = parties, actors = interest groups
+// or ....
+class MtchPstn : public Position {
+public:
     MtchPstn();
     virtual ~MtchPstn();
-    virtual vector<MtchPstn> neighbors(unsigned int nVar) const; 
+    virtual vector<MtchPstn> neighbors(unsigned int nVar) const;
     // assumes no interaction between items (permutation requires interaction)
-    
-    
-    
+
+
+
     unsigned int numItm;
     unsigned int numCat;
-    vector<unsigned int> match; // must be of length numItm     
-  };
+    vector<unsigned int> match; // must be of length numItm
+};
 
 
-  // bundle up methods relevant to GA over MtchPstn
-  class MtchGene : public MtchPstn {
-  public:
+// bundle up methods relevant to GA over MtchPstn
+class MtchGene : public MtchPstn {
+public:
     MtchGene();
     ~MtchGene();
 
@@ -288,12 +303,12 @@ namespace KBase {
 
     void setState(vector<Actor*> as, vector<MtchPstn*> ps);
 
-  protected:
+protected:
     void copySelf(MtchGene*) const;
     // links to the State are necessary to evaluate the net support, EU, etc.
     vector<Actor*> actrs;
     vector<MtchPstn*> pstns;
-  };
+};
 
 
 }; // end of namespace

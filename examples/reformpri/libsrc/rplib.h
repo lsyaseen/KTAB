@@ -44,39 +44,39 @@ using namespace std;
 
 
 namespace RfrmPri {
-  // namespace to hold everything related to the
-  // "priority of reforms" CDMP. Note that KBase has no access.
+// namespace to hold everything related to the
+// "priority of reforms" CDMP. Note that KBase has no access.
 
-  using std::string;
-  using std::tuple;
-  using std::vector;
+using std::string;
+using std::tuple;
+using std::vector;
 
-  using KBase::KMatrix;
-  using KBase::PRNG;
+using KBase::KMatrix;
+using KBase::PRNG;
 
-  using KBase::Actor;
-  using KBase::Position;
-  using KBase::State;
-  using KBase::Model;
-  using KBase::VotingRule;
-  using KBase::ReportingLevel;
+using KBase::Actor;
+using KBase::Position;
+using KBase::State;
+using KBase::Model;
+using KBase::VotingRule;
+using KBase::ReportingLevel;
 
-  using KBase::MtchPstn;
-  using KBase::MtchGene;
+using KBase::MtchPstn;
+using KBase::MtchGene;
 
-  class RPActor;
-  class RPState;
-  class RPModel;
+class RPActor;
+class RPState;
+class RPModel;
 
 
 
-  // -------------------------------------------------
-  // class declarations
+// -------------------------------------------------
+// class declarations
 
-  class RPActor : public Actor {
-  public:
+class RPActor : public Actor {
+public:
     enum class PropModel {
-      ExpUtil, Probability, AgreeUtil
+        ExpUtil, Probability, AgreeUtil
     };
 
     RPActor(string n, string d, const RPModel* rm);
@@ -87,7 +87,7 @@ namespace RfrmPri {
 
     static MtchPstn* rPos(unsigned int numI, unsigned int numA, PRNG * rng); // make a random position
     static RPActor* rAct(unsigned int numI, double minCap,
-      double maxCap, PRNG* rng, unsigned int i); // make a random actor
+                         double maxCap, PRNG* rng, unsigned int i); // make a random actor
 
     void randomize(PRNG* rng, double minCap, double maxCap, unsigned int id, unsigned int numI); // randomly alter this actor
 
@@ -108,18 +108,18 @@ namespace RfrmPri {
 
     const RPModel *rpMod; // these particular actors need model-parameters to compute utility.
 
-  protected:
-  private:
-  };
+protected:
+private:
+};
 
 
-  class RPModel : public Model {
-  public:
+class RPModel : public Model {
+public:
     RPModel(PRNG* rng);
     virtual ~RPModel();
 
     static RPModel* randomMS(unsigned int numA, unsigned int numI,
-      VotingRule vr, RPActor::PropModel pMod, PRNG * rng);
+                             VotingRule vr, RPActor::PropModel pMod, PRNG * rng);
 
     double utilActorPos(unsigned int ai, const vector<unsigned int> pstn) const;
 
@@ -131,23 +131,23 @@ namespace RfrmPri {
     vector<string> rpNames;
 
     unsigned int numCat;  // happens to equal numItm, in this demo, at the categories are 1, 2, ... numItm.
-    
+
     void initScen(unsigned int ns);
     void showHist() const;
 
     static bool equivStates(const RPState * rs1, const RPState * rs2);
 
-  protected:
+protected:
     void initScen0();
     void initScen1();
     void configScen(unsigned int numA, const double aCap[], const KMatrix & utils);
 
-  private:
-  };
+private:
+};
 
 
-  class RPState : public State {
-  public:
+class RPState : public State {
+public:
     RPState(Model* mod);
     ~RPState();
     //KMatrix actrCaps() const;
@@ -155,21 +155,23 @@ namespace RfrmPri {
     // use the parameters of your state to compute the relative probability of
     // each actor's position. persp = -1 means use everyone's separate perspectives
     //(i.e. get actual probabilities, not one actor's beliefs)
-    KMatrix pDist(int persp) const;
+    tuple <KMatrix, vector<unsigned int>> pDist(int persp) const;
     void setAUtil(ReportingLevel rl);
     RPState * stepSUSN();
     RPState * stepBCN();
-    
+
     void show() const;
 
-  protected:
+protected:
     RPState * doSUSN(ReportingLevel rl) const;
     RPState * doBCN(ReportingLevel rl) const;
     // bool stableRPState(unsigned int iter, const State* s);
     const RPModel * rpMod; // saves a lot of type-casting later
 
-  private:
-  };
+    virtual bool equivNdx(unsigned int i, unsigned int j) const;
+
+private:
+};
 
 
 

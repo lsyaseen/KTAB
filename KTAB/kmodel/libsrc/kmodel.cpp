@@ -316,7 +316,9 @@ namespace KBase {
     };
     KMatrix::mapV(test, numOpt, numOpt); // catch gross errors 
 
-    KMatrix p = markovPCE(pv); // TODO: add a switch between markovPCE and condPCE
+    // TODO: add a switch between markovPCE and condPCE?
+    //KMatrix p = markovPCE(pv); 
+    KMatrix p = condPCE(pv); 
 
     assert(fabs(sum(p) - 1.0) < pTol);
     return p;

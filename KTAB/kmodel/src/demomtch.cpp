@@ -187,8 +187,8 @@ namespace DemoMtch {
   MtchState::~MtchState() {
     //
   }
-
-  KMatrix MtchState::pDist(int persp) const {
+ 
+  tuple <KMatrix, vector<unsigned int>> MtchState::pDist(int persp) const {
     auto na = model->numAct;
     auto w = actrCaps();
     auto vr = VotingRule::Proportional;
@@ -212,10 +212,20 @@ namespace DemoMtch {
       assert(false);
     }
     auto pd = Model::scalarPCE(na, na, w, uij, vr, vpm, rl);
-    return pd;
+    
+    // TODO: test whether all positions are unique or not, see RPState::pDist for an example
+    auto uNdx = vector<unsigned int>();
+    for (unsigned int i = 0; i < na; i++) {
+      uNdx.push_back(i);
+    }
+    return tuple< KMatrix, vector<unsigned int>> (pd, uNdx); 
   }
 
 
+bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
+ assert (false); // TODO: finish this stub 
+  return false;
+}
 
   KMatrix MtchState::actrCaps() const {
     auto wFn = [this](unsigned int i, unsigned int j) {
@@ -637,14 +647,15 @@ namespace DemoMtch {
     cout << "Util matrix for U(actor_r, pstn_c) in random initial state: " << endl;
     u.printf(" %.4f ");
 
-    auto p = st0->pDist(-1);
+    auto pn = st0->pDist(-1);
+    auto p = std::get<0>(pn);
 
     cout << "Probability of outcomes in random initial state: " << endl;
     p.printf(" %.4f ");
     cout << endl << flush;
 
     cout << "Expected utility to actors in random initial state: " << endl;
-    (u*p).printf(" %.4f ");
+    (u*p).printf(" %.4f "); //TODO: may need to modify this to use only unique positions
     cout << endl << flush;
 
     md0->run();
@@ -704,14 +715,15 @@ namespace DemoMtch {
     cout << "Util matrix for U(actor_r, pstn_c) in random initial state: " << endl;
     u.printf(" %.4f ");
 
-    auto p = st0->pDist(-1);
+    auto pn = st0->pDist(-1);
+    auto p = std::get<0>(pn);
 
     cout << "Probability of outcomes in random initial state: " << endl;
     p.printf(" %.4f ");
     cout << endl << flush;
 
     cout << "Expected utility to actors in random initial state: " << endl;
-    (u*p).printf(" %.4f ");
+    (u*p).printf(" %.4f "); // TODO: may need to modify this to use only unique positions
     cout << endl << flush;
 
     auto newPstns = vector<Position*>();
@@ -791,14 +803,15 @@ namespace DemoMtch {
       cout << "Util matrix for U(actor_r, pstn_c): " << endl;
       u2.printf(" %.4f ");
 
-      auto p2 = st0->pDist(-1);
+      auto pn2 = st0->pDist(-1);
+      auto p2 = std::get<0>(pn2);
 
       cout << "Probability of outcomes: " << endl;
       p2.printf(" %.4f ");
       cout << endl << flush;
 
       cout << "Expected utility to actors: " << endl;
-      (u2*p2).printf(" %.4f ");
+      (u2*p2).printf(" %.4f "); // TODO: may need to modify this to use only unique positions
       cout << endl << flush;
 
 
@@ -961,7 +974,8 @@ namespace DemoMtch {
       s2->setAUtil(ReportingLevel::Silent);
       auto u2 = s2->aUtil[0]; // they all have the same aUtil matrix, in this demo.
 
-      auto p2 = pDist(-1); // objective perspective
+      auto pn2 = pDist(-1); // objective perspective
+      auto p2 = std::get<0>(pn2);
       cout << "Util matrix for U(actor_r, pstn_c) in new state: " << endl;
       u2.printf(" %.4f ");
 
@@ -970,7 +984,7 @@ namespace DemoMtch {
       cout << endl << flush;
 
       cout << "Expected utility to actors in new state: " << endl;
-      (u2*p2).printf(" %.4f ");
+      (u2*p2).printf(" %.4f "); // TODO: may need to modify this to use only unique positions
       cout << endl << flush;
     }
 
