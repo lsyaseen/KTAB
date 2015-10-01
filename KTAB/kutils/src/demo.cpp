@@ -565,7 +565,8 @@ namespace UDemo {
     return;
   }
 
-  void demoEllipse(PRNG* rng) {
+
+    void demoEllipse(PRNG* rng) {
     cout << endl;
     unsigned int numD = 9;
     auto a = KMatrix::uniform(rng, numD, 1, 1.0, 10.0);

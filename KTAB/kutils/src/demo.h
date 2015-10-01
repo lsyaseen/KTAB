@@ -46,6 +46,8 @@ namespace UDemo {
   KMatrix projEllipse(const KMatrix & a, const KMatrix & w);
   void demoEllipseLVI(PRNG* rng, unsigned int n);
   void demoAntiLemke(PRNG* rng, unsigned int n);
+
+
   // ------------------------------------------------- 
   // define a simple class of boolean vectors that
   // get evaluated by how close they are to a target

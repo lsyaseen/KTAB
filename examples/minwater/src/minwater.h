@@ -172,11 +172,39 @@ const KMatrix w0 = KMatrix::arrayInit(w2Array, numA, 1);
 const KMatrix uInit = KMatrix::arrayInit(u2Array, numA, numP);
 const KMatrix pInit = KMatrix::arrayInit(pArray, numP, 1);
 
+
+
+// -------------------------------------------------
+// define a simple class of Linear Programs that
+// minimize resource usage, subject to two kinds of constraints:
+// 1: Bounds on reduction or growth of each item
+// 2: Bounds on reduction of portfolio components
+class RsrcMinLP {
+public:
+  RsrcMinLP();
+  virtual ~RsrcMinLP();
+  static RsrcMinLP* makeRMLP(PRNG* rng, unsigned int numPd, unsigned int numPt);
+  tuple<KMatrix, KMatrix> makeMq() const;
+
+  unsigned int numProd; // number of products
+  KMatrix xInit;
+  KMatrix rCosts;
+  KMatrix bounds; // first column is max reduction fraction, second is max growth
+  // i.e. (1-ri)*xInit <= x <= (1+gi)*xInit
+  unsigned int numPortC; // number of portfolio constraints
+  KMatrix portWghts; // matrix of portfolio weights (all 0 or 1)
+  KMatrix portRed; // column vector of max reduction fractions
+
+protected:
+private:
+  void clear();
+
+};
+
 }; // end of namespace
 
 // -------------------------------------------------
 #endif
-
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------
