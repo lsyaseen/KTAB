@@ -496,6 +496,8 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
 
     s2 = new RPState(model);
 
+    // Each actor, h, finds the position which maximizes their EU in this situation.
+    // TODO: parallelize these separate searches
     for (unsigned int h = 0; h < numA; h++) {
         auto ph = ((const MtchPstn *)(pstns[h]));
 
@@ -701,6 +703,8 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
             cout << endl << flush;
         }
         MtchPstn * posBest = new MtchPstn(pBest);
+	
+	// TODO: change this push() to a thread-safe insertion
         s2->pstns.push_back(posBest);
 
         double du = vBest - eu0(h, 0); // (hypothetical, future) - (actual, current)
