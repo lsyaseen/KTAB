@@ -78,6 +78,13 @@ set(KTABBASIC_SRCS
 
 add_library(kutils STATIC ${KTABBASIC_SRCS})
 
+
+set(KTABSQLITE_SRCS
+  ${PROJECT_SOURCE_DIR}/../../../sqlite/sqlite3.c
+)
+
+#add_library(ksqlite STATIC ${KTABSQLITE_SRCS})
+
 # Under Linux, default start of DESTINATION path is /usr/local/ 
 # so "ktab/lib" denotes destination /usr/local/ktab/lib
 # Under Windows, default start of DESTINATION path is "C:\Program Files\kutils\"
@@ -107,6 +114,7 @@ install(
 include_directories(
   ${PROJECT_SOURCE_DIR}/libsrc/
   ${PROJECT_SOURCE_DIR}/src/
+  ${PROJECT_SOURCE_DIR}/../../../sqlite/
 )
 
 set(UTILDEMO_SRCS
@@ -132,6 +140,7 @@ add_executable(demoutils
 
 target_link_libraries(demoutils
   kutils
+  #ksqlite
   ${EFENCE_LIBRARIES}
   ${SQLITE_LIBRARIES}
   )

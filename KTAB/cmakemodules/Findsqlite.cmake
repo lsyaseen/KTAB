@@ -34,13 +34,14 @@ set(SQLITE_PREFIX
   )
 
   # Note Well the locations in and order of search
-  # The only one I now for sqlite is the Unix standard
+  # The Unix standard is OK, but Windows is still tricky.
 set(SQLITE_POSSIBLE_PATHS
   /usr/local
   /usr/local/sqlite
   /usr/lib
   /usr/lib/x86_64-linux-gnu  # odd path for Debian
-  "C:/local/sqlite"
+  /local/sqlite
+  C:/local/sqlite
   )
 
 # try to find the compiled library object
@@ -54,8 +55,8 @@ if(SQLITE_LIBRARY)
 endif(SQLITE_LIBRARY)
 
 find_path(SQLITE_INCLUDE_DIR sqlite3.h
-  PATH_SUFFIXES src
   PATHS
+  PATH_SUFFIXES src
   ${SQLITE_POSSIBLE_PATHS}
 )
 
