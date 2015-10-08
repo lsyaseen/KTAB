@@ -194,6 +194,7 @@ public:
   unsigned int numPortC; // number of portfolio constraints
   KMatrix portWghts; // matrix of portfolio weights (all 0 or 1)
   KMatrix portRed; // column vector of max reduction fractions
+  vector<string> pNames; // product names
 
 protected:
 private:

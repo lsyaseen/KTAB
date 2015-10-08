@@ -198,6 +198,7 @@ void RsrcMinLP::clear() {
     bounds = KMatrix();
     portRed = KMatrix();
     portWghts = KMatrix();
+    pNames = vector<string>();
 }
 
 RsrcMinLP* RsrcMinLP::makeRMLP(PRNG* rng, unsigned int numPd, unsigned int numPt) {
@@ -206,14 +207,22 @@ RsrcMinLP* RsrcMinLP::makeRMLP(PRNG* rng, unsigned int numPd, unsigned int numPt
     rmlp->numPortC = numPt;
     rmlp->xInit = KMatrix::uniform(rng, numPd, 1, 100.0, 990.0);
     rmlp->rCosts = KMatrix::uniform(rng, numPd, 1, 10.0, 90.0);
+
+    const unsigned int nameLen = 20;
+    for (unsigned int i=0; i<numPd; i++) {
+        auto nameBuff = new char[nameLen];
+        sprintf(nameBuff, "Prod-%02i", i);
+        rmlp->pNames.push_back(nameBuff);
+    }
+    
     auto rgFn = [rng](unsigned int i, unsigned int j) {
         double f = 0.0;
         switch (j) {
         case 0: // reduction
-            f = rng->uniform(0.05, 0.20); // 5% to 20% decrease
+            f = rng->uniform(0.05, 0.20); // at most 5% to 20% decrease
             break;
         case 1: // growth
-            f = rng->uniform(0.50, 1.00); // 50% to 100% increase (i.e. double)
+            f = rng->uniform(0.50, 1.00); // at most 50% to 100% increase (i.e. double)
             break;
         default:
             assert(false);
@@ -309,7 +318,7 @@ int main(int ac, char **av) {
         return;
     };
 
-    const unsigned int numP = 50;
+    const unsigned int numP = 45;
     const unsigned int numC = numP / 5;
     const unsigned int iterLim = 100 * 1000;
 
@@ -330,9 +339,10 @@ int main(int ac, char **av) {
         assert(0.0 <= xi);
         double ri = rmlp->bounds(i, 0);
         assert(0.0 <= ri);
-        assert(ri <= 1.0);
+        assert(ri <= 1.10); // 100% reduction is OK, but not 110% (that would be negative)
         double gi = rmlp->bounds(i, 1);
-        assert(0.0 <= gi);
+        assert(-1.0 <= gi); // can force up to 100% reduction
+	assert (1.0-ri <= 1.0+gi);
         rBounds(i, 0) = (1.0 - ri)*xi;
         gBounds(i, 0) = (1.0 + gi)*xi;
     }
