@@ -111,7 +111,20 @@ include_directories(
 
 set(UTILDEMO_SRCS
  src/demo.cpp
-  )
+ )
+
+if (ENABLE_SQLITE)
+set(UTILDEMO_SRCS
+  src/sqlitedemo.cpp
+  ${UTILDEMO_SRCS}
+ )
+elseif (NOT ENABLE_SQLITE)
+set(UTILDEMO_SRCS
+  src/sqlitedummy.cpp
+  ${UTILDEMO_SRCS}
+ )
+endif (ENABLE_SQLITE)
+
 
 add_executable(demoutils
   ${UTILDEMO_SRCS}

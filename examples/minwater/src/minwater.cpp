@@ -198,6 +198,9 @@ void RsrcMinLP::clear() {
     bounds = KMatrix();
     portRed = KMatrix();
     portWghts = KMatrix();
+    numSpplyC = 0;
+    spplyWghts = KMatrix();
+    dmndWghts = KMatrix();
     pNames = vector<string>();
 }
 

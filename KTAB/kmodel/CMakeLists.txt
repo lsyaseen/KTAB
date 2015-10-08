@@ -42,6 +42,17 @@ if (ENABLE_EFENCE)
     message(FATAL_ERROR "Could not find Electric Fence memory debugger")
   endif (NOT EFENCE_FOUND)
 endif (ENABLE_EFENCE)
+
+# -------------------------------------------------
+set (ENABLE_SQLITE false CACHE  BOOL "Use SQLite relational database")
+
+if (ENABLE_SQLITE)
+  find_package(sqlite)
+  if (NOT SQLITE_FOUND)
+    message(FATAL_ERROR "Could not find SQLite")
+  endif (NOT SQLITE_FOUND)
+endif (ENABLE_SQLITE)
+
 # -------------------------------------------------
 # find libraries on which this project depends
 #

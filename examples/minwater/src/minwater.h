@@ -176,9 +176,17 @@ const KMatrix pInit = KMatrix::arrayInit(pArray, numP, 1);
 
 // -------------------------------------------------
 // define a simple class of Linear Programs that
-// minimize resource usage, subject to two kinds of constraints:
+// minimize resource usage, subject to three kinds of constraints:
 // 1: Bounds on reduction or growth of each item
-// 2: Bounds on reduction of portfolio components
+//    (1-r)*x0 <= x <= (1+g)*x0
+// 2: Bounds on reduction of portfolio components. 
+//    For example, total livestock production cannot fall more than 5%.
+//    dot(p, x) >= (1-r) * dot(p, x0)
+// 3: Minimum supply-to-meet-demand constraints.
+//    For example, Livestock creates demand for nutrition, fodder supplies nutrition, fodder/livestock ratio cannot decrease.
+//    final fodder/livestock = dot(s,x)/dot(d,x) >= dot(s,x0)/dot(d,x0) = initial fodder/livestock
+//    dot(s,x) * (dot(d, x0) / dot(s,x0)) >= dot(d, x)
+
 class RsrcMinLP {
 public:
   RsrcMinLP();
@@ -189,11 +197,19 @@ public:
   unsigned int numProd; // number of products
   KMatrix xInit;
   KMatrix rCosts;
-  KMatrix bounds; // first column is max reduction fraction, second is max growth
+  KMatrix bounds;
+  // first column is max reduction fraction, second is max growth
   // i.e. (1-ri)*xInit <= x <= (1+gi)*xInit
+  // Note that -1 <= gi < 0 is allowed to force reductions, provided
+  // that 0 <= (1-r1) <= (1+gi)
   unsigned int numPortC; // number of portfolio constraints
-  KMatrix portWghts; // matrix of portfolio weights (all 0 or 1)
+  KMatrix portWghts; // matrix of portfolio weights (all non-negative, probably all 0 or 1)
   KMatrix portRed; // column vector of max reduction fractions
+  
+  unsigned int numSpplyC; // number of supply constraints
+  KMatrix spplyWghts; // matrix of supply weights (all non-negative, probably all 0 or 1)
+  KMatrix dmndWghts; // matrix of demand weights (all non-negative, probably all 0 or 1)
+  
   vector<string> pNames; // product names
 
 protected:
