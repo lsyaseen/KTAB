@@ -112,6 +112,9 @@ bool RPModel::equivStates(const RPState * rs1, const RPState * rs2) {
 
 void RPModel::initScen(unsigned int ns) {
     switch (ns) {
+    case 0:
+        initScen0();
+        break;
     case 1:
         initScen1();
         break;
@@ -124,6 +127,28 @@ void RPModel::initScen(unsigned int ns) {
 }
 
 
+
+void RPModel::initScen0() {
+    assert (nullptr != rng);
+    const unsigned int numA = 15;
+    numItm = 7;
+    numCat = numItm;
+
+    govCost = KMatrix::uniform(rng, 1, numItm, 25, 100);
+    govBudget = 0.6 * sum(govCost); // cannot afford everything
+    obFactor = 0.10;
+
+    const KMatrix utils = KMatrix::uniform(rng, numA, numItm, 10, 100);
+    // The 'utils' matrix shows the utilities to the actor (row) of each reform item (clm)
+    double aCap[numA];
+    for (unsigned int i=0; i<numA; i++) {
+        aCap[i] = rng->uniform(1.0, 100.0);
+    }
+
+
+    configScen(numA, aCap, utils);
+    return;
+}
 
 void RPModel::initScen1() {
     // Notionally, we have 15 actors who are negotiating over what the government's
@@ -199,7 +224,6 @@ void RPModel::initScen1() {
     };
 
     configScen(numA, aCap, utils);
-    return;
     return;
 }
 
@@ -496,9 +520,15 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
 
     s2 = new RPState(model);
 
-    // Each actor, h, finds the position which maximizes their EU in this situation.
-    // TODO: parallelize these separate searches
+    //s2->pstns = vector<KBase::Position*>();
     for (unsigned int h = 0; h < numA; h++) {
+        s2->pstns.push_back(nullptr);
+    }
+
+    // TODO: clean up the nesting of lambda-functions
+    auto newPosFn = [this, rl, euMat, u, eu0, s2](const unsigned int h) {
+        s2->pstns[h] = nullptr;
+
         auto ph = ((const MtchPstn *)(pstns[h]));
 
         // Evaluate h's estimate of the expected utility, to h, of
@@ -703,9 +733,9 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
             cout << endl << flush;
         }
         MtchPstn * posBest = new MtchPstn(pBest);
-	
-	// TODO: change this push() to a thread-safe insertion
-        s2->pstns.push_back(posBest);
+        s2->pstns[h] = posBest;
+        // no need for mutex, as s2->pstns is the only shared var,
+        // and each h is different.
 
         double du = vBest - eu0(h, 0); // (hypothetical, future) - (actual, current)
         if (ReportingLevel::Low < rl) {
@@ -715,14 +745,31 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
         //printf("  eu0(%i, 0) for %i = %+.6f \n", h, h, eu0(h,0));
         //cout << endl << flush;
         // Logically, du should always be non-negative, as GHC never returns a worse value than the starting point.
-        const double eps = 1E-2; // TODO: figure out why this is not precisely zero, instead of something like 1E-5 ;
+        const double eps = 1E-8; // enough to avoid problems with round-off error
         assert(-eps <= du);
+        return;
+    };
 
+    auto ts = vector<thread>();
+    // Each actor, h, finds the position which maximizes their EU in this situation.
+    for (unsigned int h = 0; h < numA; h++) {
+        ts.push_back(thread([newPosFn, h]() {
+            newPosFn(h);
+            return;
+        }));
+    }
+
+    // now join them all before continuing
+    for(auto& t : ts) {
+        t.join();
     }
 
     assert(nullptr != s2);
     assert(numP == s2->pstns.size());
     assert(numA == s2->model->numAct);
+    for (auto p : s2->pstns) {
+        assert (nullptr != p);
+    }
     return s2;
 }
 // end of doSUSN

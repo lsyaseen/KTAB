@@ -138,8 +138,8 @@ public:
     static bool equivStates(const RPState * rs1, const RPState * rs2);
 
 protected:
-    void initScen0();
-    void initScen1();
+    void initScen0(); // random
+    void initScen1(); // fixed, but dummy data
     void configScen(unsigned int numA, const double aCap[], const KMatrix & utils);
 
 private:
