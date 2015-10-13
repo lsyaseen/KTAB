@@ -6,7 +6,7 @@
 # This script just builds them all in order, as a shortcut
 # after you have set it up.
 #------------------------------------------
-FILES="minwater  reformpri"
+FILES="minwater  reformpri  smp"
 
 for d in $FILES
 do
