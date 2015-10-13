@@ -96,13 +96,13 @@ INCLUDE_DIRECTORIES(
 
 
 # -------------------------------------------------
-ADD_EXECUTABLE(smpApp
+ADD_EXECUTABLE(smpcli
   src/demosmp.cpp
   ${CSVPARSER_DIR}/csv_parser.cpp
   )
 
 
-TARGET_LINK_LIBRARIES(smpApp
+TARGET_LINK_LIBRARIES(smpcli
   smplib
   ${KMODEL_LIBRARY}
   ${KUTILS_LIBRARY}
