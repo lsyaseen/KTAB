@@ -47,7 +47,7 @@ endif (ENABLE_EFENCE)
 set (ENABLE_SQLITE false CACHE  BOOL "Use SQLite relational database")
 
 if (ENABLE_SQLITE)
-  find_package(sqlite)
+  find_package(Sqlite)
   if (NOT SQLITE_FOUND)
     message(FATAL_ERROR "Could not find SQLite")
   endif (NOT SQLITE_FOUND)
