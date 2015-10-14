@@ -61,23 +61,48 @@ void demoCoords(PRNG* rng) {
     const unsigned int iterLim = 500 * 1000;
     cout << "Testing CoordMap "<< iterLim <<" times ... " << flush;
 
-    auto test = [rng] () {
+    auto make = [rng] () {
         int s1 = ((int) (rng->uniform(-1000, +1000)));
-        int s2 = s1; 
+        int s2 = s1;
         while (s1 == s2) {
-            s2 = ((int) (rng->uniform(-1000, +1000))); 
-        } 
+            s2 = ((int) (rng->uniform(-1000, +1000)));
+        }
 
         double d1 = rng->uniform(-1000, +1000);
         double d2 = rng->uniform(-1000, +1000);
 
         auto cm1 = new CoordMap(s1, d1, s2, d2);
-        delete cm1; 
+	// this tests the end points internally.
+	
+	// this must be exact, s->d does not lose information.
+	int s3A = ((int) (rng->uniform(s1, s2)));
+	double d3 = cm1->s2d(s3A);
+	int s3B = cm1->d2s(d3);
+	assert (s3A == s3B);
+	
+	// Because we lose information going from d->s, 
+	// we have to show that we do not lose too much.
+	double d4A = rng->uniform(d1, d2);
+	int s4A = cm1->d2s(d4A);
+	double d4B = cm1->s2d(s4A);
+	// now d4A and db4 are not necessarily the same, as everything within 1 pixel rounds to the center.
+	// But they will be closer to each other than to the center of the adjoining pixels.
+	
+	// check the left pixel
+	int s5 = s4A-1;
+	double d5 = cm1->s2d(s5);
+	assert (fabs(d4A-d4B) < fabs(d4A - d5));
+	
+	// check the right pixel
+	int s6 = s4A+1;
+	double d6 = cm1->s2d(s6);
+	assert (fabs(d4A-d4B) < fabs(d4A - d6));
+        delete cm1;
         return;
     };
 
     for (unsigned int i=0; i<iterLim; i++) {
-    test();
+        make();
     }
 
     cout << "done"<<endl<<flush;
