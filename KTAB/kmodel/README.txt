@@ -41,11 +41,12 @@ On Linux, the build has been verified with KDevelop 3 and plain Unix makefiles,
 using both g++ 4.8 and clang++ 3.4.
 
 We will assume you have checked out or unpacked the KTAB
-sources into /home/ktab/, so that the top of the directory
+sources into /home/KTAB/, so that the top of the directory
 tree appears like this:
-  /home/ktab/cmakemodules
-  /home/ktab/kmodel
-  /home/ktab/kutils
+  /home/KTAB/examples
+  /home/KTAB/KTAB/cmakemodules
+  /home/KTAB/KTAB/kmodel
+  /home/KTAB/KTAB/kutils
   ...
 
 Before attempting to build kmodel, you must configure and build kutils,
@@ -58,11 +59,11 @@ In the CMake GUI, you should answer "Where is the source code"
 with the location of the CMake source file CMakeLists.txt,
 not the C++ source files.
 
-Hence, if your KTAB source is checked out into /home/ktab,
-the CMakeLists.txt file would be in /home/ktab/kmodel/CMakeLists.txt
+Hence, if your KTAB source is checked out into /home/KTAB,
+the CMakeLists.txt file would be in /home/KTAB/KTAB/kmodel/CMakeLists.txt
 
 In the CMake GUI, you  should answer "Where to build the binaries"
-with /home/ktab/kutils/build.
+with /home/KTAB/KTAB/kutils/build.
 
 Hit the "Configure" button. The first time you configure the system,
 CMake should immediately ask if it should create the build directory;
@@ -86,8 +87,8 @@ If errors occur, you will probably need to consult the CMake documentation to di
 
 After all problems are resolved, there are no error messages, and no items in the upper window
 are red, hit "Generate" to generate the build files for your chosen IDE. They will appear
-in the build directory, like /home/ktab/kmodel/build/kmodel.sln for Windows and Visual Studio
-or /home/ktab/kmodel/build/Makefile for Linux and make.
+in the build directory, like /home/KTAB/kmodel/build/kmodel.sln for Windows and Visual Studio
+or /home/KTAB/KTAB/kmodel/build/Makefile for Linux and make.
 
 Open the kmodel project with your IDE; it should display several targets.
 
@@ -141,7 +142,7 @@ one pipe the output to a text file with a command such as the following:
    smpApp --seed 31416 --euSMP  > tmp.txt
 
 The "--csv" option reads in the named file and simulates bargaining until the actor positions stabilize.
-An example of the expected format is in kmode/doc/dummyData_3Dim.csv
+An example of the expected format is in kmodel/doc/dummyData_3Dim.csv
 Again, it is recommended that the output be piped into a text file.
 
 The output consists of a great deal of detailed information as the bargaining progresses.
