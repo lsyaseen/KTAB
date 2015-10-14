@@ -1,33 +1,15 @@
 # --------------------------------------------
 # Copyright KAPSARC. Open source MIT License.
 # --------------------------------------------
-# The MIT License (MIT)
-# 
-# Copyright (c) 2015 King Abdullah Petroleum Studies and Research Center
-# 
-# Permission is hereby granted, free of charge, to any person obtaining a copy of this software
-# and associated documentation files (the "Software"), to deal in the Software without
-# restriction, including without limitation the rights to use, copy, modify, merge, publish,
-# distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom 
-# the Software is furnished to do so, subject to the following conditions:
-# 
-# The above copyright notice and this permission notice shall be included in all copies or
-# substantial portions of the Software.
-# 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
-# BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
-# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
-# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-# -------------------------------------------------
 # CMake comes with 'helper files' for many common libraries (e.g. X11).
 # This is an example of how to build one for an uncommon library.
-# -------------------------------------------------
+# --------------------------------------------
+
 
 set(KMODEL_FOUND "NO")
 
 set(KMODEL_PREFIX
-  "/usr/local/ktab/"
+  /usr/local/ktab/
   CACHE STRING
   "kmodel is installed in this prefix (if non-standard)"
   )
@@ -41,10 +23,7 @@ set(KMODEL_POSSIBLE_PATHS
   ${CMAKE_CURRENT_SOURCE_DIR}/../../kmodel/
   ${CMAKE_CURRENT_SOURCE_DIR}/../../KTAB/kmodel/
   ${KTAB_PREFIX}
-  "C:/local/ktab"
-  #${CMAKE_CURRENT_SOURCE_DIR}/../kmodel/Debug
-  #${CMAKE_CURRENT_SOURCE_DIR}/../kmodel/Release
-  #${CMAKE_CURRENT_SOURCE_DIR}/../../KTAB/kmodel/Debug
+  c:/local/ktab
   )
 
 # try to find a key header
@@ -77,7 +56,6 @@ endif(KMODEL_INCLUDE_DIR)
 
 if(KMODEL_LIBRARIES AND KMODEL_INCLUDE_DIR)
   set(KMODEL_FOUND "YES")
-  #message(STATUS "Found both kmodel library and headers.")
 endif(KMODEL_LIBRARIES AND KMODEL_INCLUDE_DIR)
 
 # if not found, stop immediately

@@ -1,50 +1,65 @@
-# --------------------------------------------
-# Copyright KAPSARC. Open source MIT License.
-# --------------------------------------------
-# The MIT License (MIT)
-# 
-# Copyright (c) 2015 King Abdullah Petroleum Studies and Research Center
-# 
-# Permission is hereby granted, free of charge, to any person obtaining a copy of this software
-# and associated documentation files (the "Software"), to deal in the Software without
-# restriction, including without limitation the rights to use, copy, modify, merge, publish,
-# distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom 
-# the Software is furnished to do so, subject to the following conditions:
-# 
-# The above copyright notice and this permission notice shall be included in all copies or
-# substantial portions of the Software.
-# 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
-# BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
-# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
-# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-# -------------------------------------------------
+# ===========================================
+# Copyright KAPSARC. Open Source MIT License 
+# ===========================================
+
 
 project(smp)
 
-cmake_minimum_required(VERSION 2.8)
-cmake_policy(VERSION 2.8)
+cmake_minimum_required (VERSION 2.8)
+cmake_policy(SET CMP0017 NEW) # prefer built-in modules
+
+set (LOCAL_MODULE_DIR
+  ${PROJECT_SOURCE_DIR}/../../KTAB/cmakemodules)
+
 set(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
-  "${PROJECT_SOURCE_DIR}/../../KTAB/cmakemodules")
+  ${LOCAL_MODULE_DIR}
+  )
+
+
+set(CMAKE_BUILD_TYPE Debug)
+
+if (COMMAND CMAKE_POLICY)
+  cmake_policy(SET CMP0003 OLD)
+endif (COMMAND CMAKE_POLICY)
 
 set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
-# -------------------------------------------------
-set (ENABLE_SQLITE false CACHE  BOOL "Use SQLite relational database")
-
-if (ENABLE_SQLITE)
-  find_package(sqlite)
-  if (NOT SQLITE_FOUND)
-    message(FATAL_ERROR "Could not find SQLite")
-  endif (NOT SQLITE_FOUND)
-endif (ENABLE_SQLITE)
 
 # -------------------------------------------------
-# find libraries on which this project depends
-#
+find_package(Sqlite)
+if (NOT SQLITE_FOUND)
+  message(FATAL_ERROR "Could not find SQLite")
+endif (NOT SQLITE_FOUND)
+
+# --------------------------------------------------------
+# See this page for useful hints: https://cmake.org/Wiki/CMakeForFLTK
+
+set (SMP_XLIBS  )
+
+if(UNIX)
+  find_package(X11)
+  if (NOT X11_FOUND)
+    message (FATAL_ERROR "Couldn't find X11: required for building smpg")
+  endif (NOT X11_FOUND)
+  set (SMP_XLIBS
+    #           Xaw Xmu Xpm Xt Xft X11 Xinerama dl fontconfig
+    Xext Xft fontconfig Xinerama dl m X11
+    )
+endif (UNIX)
+
+
+include (${LOCAL_MODULE_DIR}/FLTKHelper.cmake)
+find_package(FLTK REQUIRED)
+if (NOT FLTK_FOUND)
+  message (FATAL_ERROR "Could not find fltk: required for building smpg")
+endif (NOT FLTK_FOUND)
+
+set (FLUID_DIR
+  fluid)
+
+# --------------------------------------------------------
 # See "Findkutils.cmake" in cmakemodules to figure
 # out where it looks and what variables it sets
 
@@ -66,62 +81,84 @@ endif(NOT KMODEL_FOUND)
 # files to be built into a library go in libsrc/
 # any application or testing code goes in src
 
-include_directories(
+set (CSVPARSER_DIR
+  ${PROJECT_SOURCE_DIR}/../../KTAB/kmodel/csvparser/
+  )
+
+include_directories (
   ${KUTILS_INCLUDE_DIR}
   ${KMODEL_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}/libsrc/
+  ${PROJECT_SOURCE_DIR}/src/
+  ${FLUID_DIR}
+  ${FLTK_INCLUDE_DIR}
+  ${CSVPARSER_DIR}
   )
+
 
 set(SMPLIB_SRCS
   ${PROJECT_SOURCE_DIR}/libsrc/smp.cpp
   )
 
-add_library(smplib STATIC ${SMPLIB_SRCS})
+add_library(smp STATIC ${SMPLIB_SRCS})
+
+# -------------------------------------------------
+# define a little library of smp GUI stuff
+
+set (SMPGUI_FLS
+  ${FLUID_DIR}/mainw.fl
+  )
+
+message (STATUS "Use these SMPGUI_FLS: ${SMPGUI_FLS}")
+
+fltk_wrap_ui (smpGUI ${SMPGUI_FLS})
+add_library (smpGUI STATIC ${smpGUI_FLTK_UI_SRCS})
+
+# --------------------------------------------------------
+
+set (SMPG_SRCS
+  ${PROJECT_SOURCE_DIR}/src/guimain.cpp
+  )
+
+set (SMPG_LIBS
+  ${FLTK_LIBRARIES}
+  smpGUI
+  ${SMP_XLIBS}
+  )
+
+add_executable (smpg ${SMPG_SRCS})
+target_link_libraries(smpg ${SMPG_LIBS})
 
 
 # -------------------------------------------------
-# demo programs
-set (CSVPARSER_DIR
-  ${PROJECT_SOURCE_DIR}/../../KTAB/kmodel/csvparser/
-  )
 
-INCLUDE_DIRECTORIES(
-  ${KUTILS_INCLUDE_DIR}
-  ${KMODEL_INCLUDE_DIR}
-  ${PROJECT_SOURCE_DIR}/libsrc/
-  ${PROJECT_SOURCE_DIR}/src/
-  #  ${PROJECT_SOURCE_DIR}/../../KTAB/kmodel/csvparser/
-  ${CSVPARSER_DIR}
-  )
-
-
-# -------------------------------------------------
-ADD_EXECUTABLE(smpcli
+add_executable (smpc
   src/demosmp.cpp
   ${CSVPARSER_DIR}/csv_parser.cpp
   )
 
 
-TARGET_LINK_LIBRARIES(smpcli
-  smplib
+target_link_libraries (smpc
+  smp
   ${KMODEL_LIBRARY}
   ${KUTILS_LIBRARY}
-  ${EFENCE_LIBRARIES}
+  #  ${EFENCE_LIBRARIES}
   )
 
 # -------------------------------------------------
 # show some useful status/debugging information
-message(STATUS "PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
-message(STATUS "KUTILS_INCLUDE_DIR: " ${KUTILS_INCLUDE_DIR})
-message(STATUS "KMODEL_INCLUDE_DIR: " ${KMODEL_INCLUDE_DIR})
+message (STATUS "Using PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
+message (STATUS "KUTILS_INCLUDE_DIR: " ${KUTILS_INCLUDE_DIR})
+message (STATUS "KMODEL_INCLUDE_DIR: " ${KMODEL_INCLUDE_DIR})
+
 # -------------------------------------------------
-# As of February 2014, C++11 is still not the default
+# As of early 2014, C++11 is still not the default
 # for g++, so I have to provide it here.
 # Also on Unix, the C++11 thread library relies on pthreads
 if (UNIX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 ")
 endif(UNIX)
 
-# --------------------------------------------
-# Copyright KAPSARC. Open source MIT License.
-# --------------------------------------------
+# ===========================================
+# Copyright KAPSARC. Open Source MIT License 
+# ===========================================
