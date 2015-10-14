@@ -52,7 +52,7 @@ namespace KBase {
     function<KMatrix(const KMatrix & x)> P,
     double beta, double thresh, unsigned int iMax);
 
-  tuple<KMatrix, unsigned int, KMatrix> solveLVI_BSHe96(const KMatrix & M, const KMatrix & q,
+  tuple<KMatrix, unsigned int, KMatrix> viBSHe96(const KMatrix & M, const KMatrix & q,
     function<KMatrix(const KMatrix &)> pK,
     KMatrix u0, const double eps, const unsigned int iMax);
 

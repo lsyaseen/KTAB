@@ -454,7 +454,7 @@ int main(int ac, char **av) {
         try {
             cout << endl << flush;
             cout << "Solve via BSHe96" << endl;
-            auto r1 = solveLVI_BSHe96(matM, matQ, KBase::projPos, start, eps, iterLim);
+            auto r1 = viBSHe96(matM, matQ, KBase::projPos, start, eps, iterLim);
             auto x1 = processRslt(r1);
 
             printf("Initial resource usage:   %10.2f \n", rsrc0);

@@ -102,7 +102,7 @@ namespace KBase {
   // "A Modified Projection and Contraction Method for a Class of Linear Complementarity Problems",
   // B. S. He, Nanjing University, in Journal of Computational Mathematics, 1996
 
-  tuple<KMatrix, unsigned int, KMatrix> solveLVI_BSHe96(const KMatrix & M, const KMatrix & q,
+  tuple<KMatrix, unsigned int, KMatrix> viBSHe96(const KMatrix & M, const KMatrix & q,
     function<KMatrix(const KMatrix &)> pK,
     KMatrix u0, const double eps, const unsigned int iMax) {
     if (false) {

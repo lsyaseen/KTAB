@@ -1,5 +1,5 @@
 # data file for the Fltk User Interface Designer (fluid)
-version 1.0303 
+version 1.0302 
 header_name {.h} 
 code_name {.cpp}
 class SMPMainW {open
@@ -7,7 +7,7 @@ class SMPMainW {open
   Function {SMPMainW()} {open
   } {
     Fl_Window mainWindow {open
-      xywh {103 206 1062 653} type Double size_range {800 500 0 0} visible
+      xywh {103 206 1060 650} type Double size_range {800 500 0 0} visible
     } {
       Fl_Menu_Bar menuBar {open
         xywh {0 0 1060 25}
@@ -45,7 +45,7 @@ return;}
         } {}
         Fl_Group tabHistory {
           label History open
-          xywh {0 45 1060 625}
+          xywh {0 45 1060 625} hide
         } {
           Fl_Box drawAreaHstry {
             xywh {20 65 860 560} box DOWN_BOX color 7
@@ -55,7 +55,7 @@ return;}
             xywh {895 80 150 180} type Multi align 5
           }
           Fl_Browser browseHistDim {
-            label Dimension selected
+            label Dimension
             xywh {895 285 150 90} type Select align 5
           }
         }
@@ -85,7 +85,7 @@ return;}
         }
         Fl_Group tabQuadChart {
           label {Quad Charts} open
-          xywh {20 65 1060 615} hide
+          xywh {20 65 1060 615}
         } {
           Fl_Box drawAreaQChart {
             xywh {20 65 860 560} box DOWN_BOX color 7
@@ -103,8 +103,8 @@ return;}
             xywh {895 530 115 90} box THIN_DOWN_BOX align 5
           } {
             Fl_Round_Button {} {
-              label Initiator
-              xywh {905 540 95 20} type Radio box UP_BOX down_box ROUND_DOWN_BOX
+              label Initiator selected
+              xywh {905 540 95 20} type Radio box THIN_DOWN_BOX down_box ROUND_DOWN_BOX
             }
             Fl_Round_Button {} {
               label Receivers
@@ -117,7 +117,7 @@ return;}
           }
           Fl_Counter counterQCState {
             label State
-            xywh {895 485 150 20} type Simple align 5 minimum 0 maximum 20 step 1
+            xywh {895 485 150 20} type Simple box THIN_DOWN_BOX align 5 minimum 0 maximum 20 step 1
           }
         }
       }
