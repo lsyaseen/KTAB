@@ -9,7 +9,7 @@
 set(SQLITE_FOUND "NO")
 
 set(SQLITE_PREFIX
-  "/usr/local/sqlite"
+  /usr/local/sqlite
   CACHE STRING
   "SQLite is installed in this prefix (if non-standard)"
   )
@@ -22,11 +22,12 @@ set(SQLITE_POSSIBLE_PATHS
   /usr/lib
   /usr/lib/x86_64-linux-gnu  # odd path for Debian
   /local/sqlite
-  C:/local/sqlite
+  c:/local/sqlite
   )
 
 # try to find the compiled library object
 find_library(SQLITE_LIBRARY NAMES sqlite3
+  NAMES sqlite3.a  sqlite3.lib
   PATHS ${SQLITE_POSSIBLE_PATHS}
   )
 
@@ -37,7 +38,7 @@ endif(SQLITE_LIBRARY)
 
 find_path(SQLITE_INCLUDE_DIR sqlite3.h
   PATHS
-  PATH_SUFFIXES src
+  PATH_SUFFIXES ./ src/
   ${SQLITE_POSSIBLE_PATHS}
 )
 

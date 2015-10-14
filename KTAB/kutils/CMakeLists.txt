@@ -47,7 +47,7 @@ endif (ENABLE_EFENCE)
 set (ENABLE_SQLITE false CACHE  BOOL "Use SQLite relational database")
 
 if (ENABLE_SQLITE)
-  find_package(sqlite)
+  find_package(Sqlite)
   if (NOT SQLITE_FOUND)
     message(FATAL_ERROR "Could not find SQLite")
   endif (NOT SQLITE_FOUND)
@@ -79,10 +79,7 @@ set(KTABBASIC_SRCS
 add_library(kutils STATIC ${KTABBASIC_SRCS})
 
 
-set(KTABSQLITE_SRCS
-  ${PROJECT_SOURCE_DIR}/../../../sqlite/sqlite3.c
-)
-
+#set(KTABSQLITE_SRCS   ${PROJECT_SOURCE_DIR}/../../../sqlite/sqlite3.c )
 #add_library(ksqlite STATIC ${KTABSQLITE_SRCS})
 
 # Under Linux, default start of DESTINATION path is /usr/local/ 
@@ -114,7 +111,7 @@ install(
 include_directories(
   ${PROJECT_SOURCE_DIR}/libsrc/
   ${PROJECT_SOURCE_DIR}/src/
-  ${PROJECT_SOURCE_DIR}/../../../sqlite/
+#  ${PROJECT_SOURCE_DIR}/../../../sqlite/
 )
 
 set(UTILDEMO_SRCS
@@ -122,11 +119,13 @@ set(UTILDEMO_SRCS
  )
 
 if (ENABLE_SQLITE)
+message (STATUS "Using actual sqlite demo")
 set(UTILDEMO_SRCS
   src/sqlitedemo.cpp
   ${UTILDEMO_SRCS}
  )
 elseif (NOT ENABLE_SQLITE)
+message (STATUS "Using dummy sqlite demo")
 set(UTILDEMO_SRCS
   src/sqlitedummy.cpp
   ${UTILDEMO_SRCS}
