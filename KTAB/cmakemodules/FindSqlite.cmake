@@ -22,13 +22,14 @@ set(SQLITE_POSSIBLE_PATHS
   /usr/lib
   /usr/lib/x86_64-linux-gnu  # odd path for Debian
   /local/sqlite
-  c:/local/sqlite
+  c:/local/sqlite/
   )
 
 # try to find the compiled library object
 find_library(SQLITE_LIBRARY NAMES sqlite3
   NAMES sqlite3.a  sqlite3.lib
   PATHS ${SQLITE_POSSIBLE_PATHS}
+  PATH_SUFFIXES ./ src/
   )
 
 # if the library object was found, record it.
@@ -37,9 +38,8 @@ if(SQLITE_LIBRARY)
 endif(SQLITE_LIBRARY)
 
 find_path(SQLITE_INCLUDE_DIR sqlite3.h
-  PATHS
-  PATH_SUFFIXES ./ src/
-  ${SQLITE_POSSIBLE_PATHS}
+  PATHS ${SQLITE_POSSIBLE_PATHS}
+  PATH_SUFFIXES  src/ 
 )
 
 # if found both library object and directories,

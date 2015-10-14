@@ -44,7 +44,7 @@ if (ENABLE_EFENCE)
 endif (ENABLE_EFENCE)
 
 # -------------------------------------------------
-set (ENABLE_SQLITE false CACHE  BOOL "Use SQLite relational database")
+set (ENABLE_SQLITE true CACHE  BOOL "Use SQLite relational database")
 
 if (ENABLE_SQLITE)
   find_package(Sqlite)
