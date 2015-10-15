@@ -55,18 +55,6 @@ On Windows, the KTAB build has been verified with Visual Studio 12 2013 Win64
 On Linux, the build has been verified with KDevelop 3 and plain Unix makefiles,
 using both g++ 4.8 and clang++ 3.4.
 
-
-KUTILS uses SQLite3. Under Linux, simply install the sqlite3 package,
-and everything will be where CMake expects it.
-
-Under Windows, the simplest and most reliable way is to compile it and put the library and
-header into C:/local/sqlite. First, download the source code "amalgamation" from the main
-website, www.sqlite.org. The amalgamation contains the complete source code as a single
-"sqlite3.c" file, as well as a simple shell demo (shell.c). Use Visual Studio to make a solution which contains two projects. The first project should build a static library, sqlite3.lib, 
-using only sqlite3.c. The second project should build a console program using the library and shell.c in order to test/demo functionality.
-
-Then, copy sqlite3.h, sqlite3ext.h and sqlite3.lib into C:/local/sqlite.
-
 We will assume you have checked out or unpacked the KTAB
 sources into /home/KTAB/, so that the top of the directory
 tree appears like this:
@@ -103,9 +91,6 @@ Hit "Finish".
 CMake should display some notifications in the lower window, but there should be no errors.
 The upper window may have some items marked in red; hitting "Configure" again should resolve them.
 
-In some Windows systems, CMake will locate the SQLite library but not the include directory.
-You may need to edit the SQLITE_INCLUDE_DIR field to "C:/local/sqlite".
-
 If more difficult errors occur, you will probably need to consult the CMake documentation
 to diagnose the problem.
 
@@ -136,8 +121,6 @@ Usage: specify one or more of these options
 --pMult           asynchronous parallel matrix multiply (very slow)
 
 --gopt            demo genetic optimization
-
---sql             demo SQLite
 
 --vhc <n>         demo vector hill-climbing
                   0: maximizing a simple quadratic
