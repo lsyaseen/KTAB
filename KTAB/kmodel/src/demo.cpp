@@ -31,8 +31,7 @@
 #include "hcsearch.h"
 #include "demo.h"
 #include "demomtch.h"
-#include "demoleon.h"
-#include "demosmp.h"
+#include "demoleon.h" 
 
 
 using KBase::PRNG;
@@ -206,6 +205,7 @@ int main(int ac, char **av) {
   bool run = true;
   bool pceP = false;
   bool spvsrP = false;
+    bool sqlP = false;
 
   auto showHelp = [dSeed]() {
     printf("\n");
@@ -213,6 +213,8 @@ int main(int ac, char **av) {
     printf("--help            print this message\n");
     printf("--pce             simple PCE\n");
     printf("--spvsr           demonstrated shared_ptr<void> return\n");
+        printf("--sql             demo SQLite \n");
+        printf("\n");
     printf("--seed <n>        set a 64bit seed\n");
     printf("                  0 means truly random\n");
     printf("                  default: %020lu \n", dSeed);
@@ -233,6 +235,9 @@ int main(int ac, char **av) {
       else if (strcmp(av[i], "--spvsr") == 0) {
         spvsrP = true;
       }
+            else if (strcmp(av[i], "--sql") == 0) {
+                sqlP = true;
+            }
       else {
         run = false;
         printf("Unrecognized argument %s\n", av[i]);
@@ -262,6 +267,10 @@ int main(int ac, char **av) {
     cout << "-----------------------------------" << endl;
     MDemo::demoSpVSR(seed, rng);
   }
+
+    if (sqlP) {
+        MDemo::demoSQLite();
+    }
 
 
   cout << "-----------------------------------" << endl;

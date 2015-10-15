@@ -32,9 +32,10 @@ set(CMAKE_MODULE_PATH
 set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
-
 # -------------------------------------------------
-set (ENABLE_EFENCE false CACHE  BOOL "Use Electric Femce memory debugger")
+# find libraries on which this project depends
+#
+set (ENABLE_EFENCE false CACHE  BOOL "Use Electric Fence memory debugger")
 
 if (ENABLE_EFENCE)
   find_package(efence)
@@ -43,19 +44,14 @@ if (ENABLE_EFENCE)
   endif (NOT EFENCE_FOUND)
 endif (ENABLE_EFENCE)
 
-# -------------------------------------------------
-set (ENABLE_SQLITE false CACHE  BOOL "Use SQLite relational database")
-
-if (ENABLE_SQLITE)
-  find_package(Sqlite)
-  if (NOT SQLITE_FOUND)
-    message(FATAL_ERROR "Could not find SQLite")
-  endif (NOT SQLITE_FOUND)
-endif (ENABLE_SQLITE)
+# ------------------------------------------------- 
+ 
+find_package(Sqlite)
+if (NOT SQLITE_FOUND)
+  message(FATAL_ERROR "Could not find SQLite")
+endif (NOT SQLITE_FOUND) 
 
 # -------------------------------------------------
-# find libraries on which this project depends
-#
 # See "Findkutils.cmake" in cmakemodules to figure
 # out where it looks and what variables it sets
 
@@ -89,6 +85,8 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/libsrc/
   ${PROJECT_SOURCE_DIR}/src/
   ${PROJECT_SOURCE_DIR}/csvparser/
+  ${EFENCE_INCLUDE_DIR}
+  ${SQLITE_INCLUDE_DIR}
   )
 
 
@@ -117,28 +115,18 @@ TARGET_LINK_LIBRARIES(mtchApp
   )
 
 # -------------------------------------------------
-ADD_EXECUTABLE(smpApp
-  src/demosmp.cpp
-  csvparser/csv_parser.cpp
-  )
-
-
-TARGET_LINK_LIBRARIES(smpApp
-  kmodel
-  ${KUTILS_LIBRARY}
-  ${EFENCE_LIBRARIES}
-  )
-
-# -------------------------------------------------
 ADD_EXECUTABLE(demomodel
   src/demo.cpp
+  src/sqlitedemo.cpp
   src/zactor.cpp
+  csvparser/csv_parser.cpp
   )
 
 TARGET_LINK_LIBRARIES(demomodel
   kmodel
   ${KUTILS_LIBRARY}
   ${EFENCE_LIBRARIES}
+  ${SQLITE_LIBRARIES}
   )
 # -------------------------------------------------
 # show some useful status/debugging information

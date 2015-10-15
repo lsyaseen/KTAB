@@ -34,7 +34,7 @@ using std::flush;
 
 // ------------------------------------------------------------------------------------
 
-namespace UDemo {
+namespace MDemo {
 void demoSQLite () {
 
     auto callBack = [] (void *NotUsed, int argc, char **argv, char **azColName) {

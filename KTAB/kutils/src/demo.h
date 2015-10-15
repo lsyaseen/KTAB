@@ -47,7 +47,6 @@ KMatrix projEllipse(const KMatrix & a, const KMatrix & w);
 void demoEllipseLVI(PRNG* rng, unsigned int n);
 void demoAntiLemke(PRNG* rng, unsigned int n);
 
-void demoSQLite ();
 
 // -------------------------------------------------
 // define a simple class of boolean vectors that

@@ -1874,7 +1874,6 @@ int main(int ac, char **av) {
     bool ghcP = false;
     unsigned int ghcN = 0;
     bool pMultP = false;
-    bool sqlP = false;
     bool vimcpP = false;
     unsigned int vimcpN = 0;
     bool threadP = false;
@@ -1895,8 +1894,6 @@ int main(int ac, char **av) {
         printf("--pMult           asynchronous parallel matrix multiply (very slow) \n");
         printf("\n");
         printf("--gopt            demo genetic optimization \n");
-        printf("\n");
-        printf("--sql             demo SQLite \n");
         printf("\n");
         printf("--vhc <n>         demo vector hill-climbing \n");
         printf("                  0: maximizing a simple quadratic \n");
@@ -1934,9 +1931,6 @@ int main(int ac, char **av) {
             }
             else if (strcmp(av[i], "--thread") == 0) {
                 threadP = true;
-            }
-            else if (strcmp(av[i], "--sql") == 0) {
-                sqlP = true;
             }
             else if (strcmp(av[i], "--gopt") == 0) {
                 goptP = true;
@@ -1990,10 +1984,6 @@ int main(int ac, char **av) {
         UDemo::demoThreadSynch(10);
         UDemo::demoThreadSynch(10);
         UDemo::demoThreadSynch(10);
-    }
-
-    if (sqlP) {
-        UDemo::demoSQLite();
     }
 
     if (matrixP) {

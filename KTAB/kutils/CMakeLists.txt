@@ -34,28 +34,16 @@ set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
 # -------------------------------------------------
-set (ENABLE_EFENCE false CACHE  BOOL "Use Electric Femce memory debugger")
+# find libraries on which this project depends
+
+set (ENABLE_EFENCE false CACHE  BOOL "Use Electric Fence memory debugger")
 
 if (ENABLE_EFENCE)
   find_package(efence)
   if (NOT EFENCE_FOUND)
     message(FATAL_ERROR "Could not find Electric Fence memory debugger")
   endif (NOT EFENCE_FOUND)
-endif (ENABLE_EFENCE)
-
-# -------------------------------------------------
-set (ENABLE_SQLITE true CACHE  BOOL "Use SQLite relational database")
-
-if (ENABLE_SQLITE)
-  find_package(Sqlite)
-  if (NOT SQLITE_FOUND)
-    message(FATAL_ERROR "Could not find SQLite")
-  endif (NOT SQLITE_FOUND)
-endif (ENABLE_SQLITE)
-
-# -------------------------------------------------
-# find libraries on which this project depends
-# (nothing special yet)
+endif (ENABLE_EFENCE) 
 
 # -------------------------------------------------
 # files to be built into a library go in libsrc/
@@ -63,8 +51,7 @@ endif (ENABLE_SQLITE)
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/libsrc/
-  ${EFENCE_INCLUDE_DIR}
-  ${SQLITE_INCLUDE_DIR}
+  ${EFENCE_INCLUDE_DIR} 
 )
 
 set(KTABBASIC_SRCS
@@ -77,11 +64,7 @@ set(KTABBASIC_SRCS
 )
 
 add_library(kutils STATIC ${KTABBASIC_SRCS})
-
-
-#set(KTABSQLITE_SRCS   ${PROJECT_SOURCE_DIR}/../../../sqlite/sqlite3.c )
-#add_library(ksqlite STATIC ${KTABSQLITE_SRCS})
-
+ 
 # Under Linux, default start of DESTINATION path is /usr/local/ 
 # so "ktab/lib" denotes destination /usr/local/ktab/lib
 # Under Windows, default start of DESTINATION path is "C:\Program Files\kutils\"
@@ -110,38 +93,21 @@ install(
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/libsrc/
-  ${PROJECT_SOURCE_DIR}/src/
-#  ${PROJECT_SOURCE_DIR}/../../../sqlite/
+  ${PROJECT_SOURCE_DIR}/src/ 
 )
 
 set(UTILDEMO_SRCS
  src/demo.cpp
  )
-
-if (ENABLE_SQLITE)
-message (STATUS "Using actual sqlite demo")
-set(UTILDEMO_SRCS
-  src/sqlitedemo.cpp
-  ${UTILDEMO_SRCS}
- )
-elseif (NOT ENABLE_SQLITE)
-message (STATUS "Using dummy sqlite demo")
-set(UTILDEMO_SRCS
-  src/sqlitedummy.cpp
-  ${UTILDEMO_SRCS}
- )
-endif (ENABLE_SQLITE)
-
+ 
 
 add_executable(demoutils
   ${UTILDEMO_SRCS}
   )
 
 target_link_libraries(demoutils
-  kutils
-  #ksqlite
+  kutils 
   ${EFENCE_LIBRARIES}
-  ${SQLITE_LIBRARIES}
   )
 
 # -------------------------------------------------

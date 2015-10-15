@@ -49,6 +49,7 @@ namespace MDemo {
   class SMPActor;
   class LeonActor;
 
+void demoSQLite ();
 
 };
 // -------------------------------------------------
