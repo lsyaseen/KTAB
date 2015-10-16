@@ -27,7 +27,7 @@ cmake_minimum_required(VERSION 2.8)
 cmake_policy(VERSION 2.8)
 set(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
-  "${PROJECT_SOURCE_DIR}/../../KTAB/cmakemodules"
+  ${PROJECT_SOURCE_DIR}/../../KTAB/cmakemodules
   )
 
 set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
@@ -99,6 +99,9 @@ target_link_libraries(mwdemo
 # -------------------------------------------------
 # show some useful status/debugging information
 message(STATUS "Using PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
+message (STATUS "KUTILS_INCLUDE_DIR: " ${KUTILS_INCLUDE_DIR})
+message (STATUS "KMODEL_INCLUDE_DIR: " ${KMODEL_INCLUDE_DIR})
+
 # -------------------------------------------------
 # As of February 2014, C++11 is still not the default
 # for g++, so I have to provide it here.
