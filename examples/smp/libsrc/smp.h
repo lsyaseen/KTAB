@@ -24,6 +24,7 @@
 #ifndef SMP_LIB_H
 #define SMP_LIB_H
 
+#include "sqlite3.h"
 #include "kutils.h"
 #include "prng.h"
 #include "kmatrix.h"

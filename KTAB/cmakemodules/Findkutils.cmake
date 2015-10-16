@@ -7,10 +7,20 @@
 
 set(KUTILS_FOUND "NO")
 
+set (KTAB_INSTALL_DIR)
+if (WIN32)
+  set (KTAB_INSTALL_DIR
+  c:/local/ktab
+  )
+endif(WIN32)
+if (UNIX)
+  set (KTAB_INSTALL_DIR
+  /usr/local/ktab
+  )
+endif(UNIX)
+
 set(KUTILS_PREFIX
-  /usr/local/ktab/
-  CACHE STRING
-  "kutils is installed in this prefix (if non-standard)"
+  ${KTAB_INSTALL_DIR} 
   )
 
 # Note Well the locations in and order of search
@@ -21,8 +31,6 @@ set(KUTILS_POSSIBLE_PATHS
   ${CMAKE_CURRENT_SOURCE_DIR}/../build/kutils/
   ${CMAKE_CURRENT_SOURCE_DIR}/../../kutils/
   ${CMAKE_CURRENT_SOURCE_DIR}/../../KTAB/kutils/
-  ${KTAB_PREFIX}
-  c:/local/ktab
   )
 
 # try to find a key header

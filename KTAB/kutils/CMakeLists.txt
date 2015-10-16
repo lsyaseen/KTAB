@@ -65,17 +65,29 @@ set(KTABBASIC_SRCS
 
 add_library(kutils STATIC ${KTABBASIC_SRCS})
  
+# -------------------------------------------------
 # Under Linux, default start of DESTINATION path is /usr/local/ 
 # so "ktab/lib" denotes destination /usr/local/ktab/lib
 # Under Windows, default start of DESTINATION path is "C:\Program Files\kutils\"
 # so "ktab/lib" denotes destination C:\Program Files\kutils\ktab\lib
 
+set (KTAB_INSTALL_DIR)
+if (WIN32)
+  set (KTAB_INSTALL_DIR
+  c:/local/ktab
+  )
+endif(WIN32)
+if (UNIX)
+  set (KTAB_INSTALL_DIR
+  /usr/local/ktab
+  )
+endif(UNIX)
 
 install(
   TARGETS
     kutils
   DESTINATION 
-    ktab/lib)  
+    ${KTAB_INSTALL_DIR}/lib)  
 
 install(
   FILES
@@ -86,7 +98,7 @@ install(
     libsrc/prng.h  
     libsrc/vimcp.h
   DESTINATION
-    ktab/include)
+    ${KTAB_INSTALL_DIR}/include)
 
 # -------------------------------------------------
 # demo program
@@ -109,7 +121,6 @@ target_link_libraries(demoutils
   kutils 
   ${EFENCE_LIBRARIES}
   )
-
 # -------------------------------------------------
 # show some useful status/debugging information
 MESSAGE( STATUS "UNIX: " ${UNIX} )
@@ -117,6 +128,7 @@ MESSAGE( STATUS "WIN32: " ${WIN32} )
 
 message(STATUS "CMAKE_SYSTEM_NAME: " ${CMAKE_SYSTEM_NAME} )
 message(STATUS "Using PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
+message(STATUS "KTAB_INSTALL_DIR: " ${KTAB_INSTALL_DIR})
 # -------------------------------------------------
 # As of February 2014, C++11 is still not the default
 # for g++, so I have to provide it here.

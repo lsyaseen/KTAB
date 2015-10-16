@@ -20,8 +20,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leonApp", "..\kmodel\build\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mtchApp", "..\kmodel\build\mtchApp.vcxproj", "{8454D230-A4B2-4473-9EED-94001545AA43}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "smpApp", "..\kmodel\build\smpApp.vcxproj", "{469AE189-7273-438F-8394-A3D0B654FD41}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demomodel", "..\kmodel\build\demomodel.vcxproj", "{5D701F83-6AD6-4636-A167-43371EB1BE66}"
 EndProject
 Global
@@ -72,14 +70,6 @@ Global
 		{8454D230-A4B2-4473-9EED-94001545AA43}.Release|x64.Build.0 = Debug|x64
 		{8454D230-A4B2-4473-9EED-94001545AA43}.RelWithDebInfo|x64.ActiveCfg = Debug|x64
 		{8454D230-A4B2-4473-9EED-94001545AA43}.RelWithDebInfo|x64.Build.0 = Debug|x64
-		{469AE189-7273-438F-8394-A3D0B654FD41}.Debug|x64.ActiveCfg = Debug|x64
-		{469AE189-7273-438F-8394-A3D0B654FD41}.Debug|x64.Build.0 = Debug|x64
-		{469AE189-7273-438F-8394-A3D0B654FD41}.MinSizeRel|x64.ActiveCfg = Debug|x64
-		{469AE189-7273-438F-8394-A3D0B654FD41}.MinSizeRel|x64.Build.0 = Debug|x64
-		{469AE189-7273-438F-8394-A3D0B654FD41}.Release|x64.ActiveCfg = Debug|x64
-		{469AE189-7273-438F-8394-A3D0B654FD41}.Release|x64.Build.0 = Debug|x64
-		{469AE189-7273-438F-8394-A3D0B654FD41}.RelWithDebInfo|x64.ActiveCfg = Debug|x64
-		{469AE189-7273-438F-8394-A3D0B654FD41}.RelWithDebInfo|x64.Build.0 = Debug|x64
 		{5D701F83-6AD6-4636-A167-43371EB1BE66}.Debug|x64.ActiveCfg = Debug|x64
 		{5D701F83-6AD6-4636-A167-43371EB1BE66}.Debug|x64.Build.0 = Debug|x64
 		{5D701F83-6AD6-4636-A167-43371EB1BE66}.MinSizeRel|x64.ActiveCfg = Debug|x64

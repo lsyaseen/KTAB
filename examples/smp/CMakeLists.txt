@@ -93,6 +93,7 @@ include_directories (
   ${FLUID_DIR}
   ${FLTK_INCLUDE_DIR}
   ${CSVPARSER_DIR}
+  ${SQLITE_INCLUDE_DIR}
   )
 
 
