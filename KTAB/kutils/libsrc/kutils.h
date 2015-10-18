@@ -34,6 +34,8 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
+#include <iomanip>  
 #include <iostream>
 #include <functional>
 #include <future>
@@ -57,8 +59,9 @@ enum class ReportingLevel {
     Silent, Low, Medium, High, Debugging
 };
 
-std::chrono::time_point <std::chrono::system_clock, std::chrono::system_clock::duration> displayProgramStart();
-void displayProgramEnd(std::chrono::time_point<std::chrono::system_clock, std::chrono::system_clock::duration>  & sTime);
+
+std::chrono::time_point<std::chrono::system_clock>  displayProgramStart();
+void displayProgramEnd(std::chrono::time_point<std::chrono::system_clock> st);
 
 // linearly (actually, affine) rescale the [x0,x1] range into the [y0,y1] range
 double rescale(double x, double x0, double x1, double y0, double y1);

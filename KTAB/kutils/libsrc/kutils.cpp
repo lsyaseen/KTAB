@@ -36,35 +36,28 @@ using std::cout;
 using std::endl;
 using std::flush;
 
-std::chrono::time_point <std::chrono::system_clock, std::chrono::system_clock::duration> displayProgramStart() {
-    using std::chrono::high_resolution_clock;
-    using std::chrono::system_clock;
 
-    auto sTime = high_resolution_clock::now();
-    time_t st = system_clock::to_time_t(sTime);
-    cout << endl << endl;
-    cout << "  Start time: " << ctime(&st);
-    cout << endl << flush;
-    return sTime;
+// -------------------------------------------------
+
+std::chrono::time_point<std::chrono::system_clock>  displayProgramStart() {
+  std::chrono::time_point<std::chrono::system_clock> st;
+  st = std::chrono::system_clock::now();
+  std::time_t start_time = std::chrono::system_clock::to_time_t(st);
+  cout << "  Start time: " << std::ctime(&start_time) << endl << flush;
+  return st;
 }
 
-void displayProgramEnd(std::chrono::time_point<std::chrono::system_clock, std::chrono::system_clock::duration>  & sTime) {
-    using std::chrono::high_resolution_clock;
-    using std::chrono::duration_cast;
-    using std::chrono::milliseconds;
-    using std::chrono::system_clock;
-
-    auto fTime = high_resolution_clock::now();
-    time_t ft = system_clock::to_time_t(fTime);
-    auto eTime = (duration_cast<milliseconds>(fTime - sTime).count()) / 1000.00;
-    cout << endl << endl;
-    cout << "  End time: " << ctime(&ft);
-    printf("  Seconds elapsed: %.4f \n", eTime);
-    cout << endl << flush;
-    return;
+void displayProgramEnd(std::chrono::time_point<std::chrono::system_clock> st) {
+  std::chrono::time_point<std::chrono::system_clock> ft;
+  ft = std::chrono::system_clock::now();
+  std::chrono::duration<double> eTime = ft - st;
+  std::time_t fTime = std::chrono::system_clock::to_time_t(ft);
+  cout << "  Finish time: " << std::ctime(&fTime) << endl << flush;
+  printf("  Elapsed time: %.4f seconds \n", eTime.count());
+  return;
 }
 
-
+// -------------------------------------------------
 double rescale(double x, double x0, double x1, double y0, double y1) {
     assert ((x0 < x1) ||( x1 < x0));
     const double f = (x-x0)/(x1-x0);
