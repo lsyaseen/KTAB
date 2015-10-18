@@ -468,10 +468,6 @@ int main(int ac, char **av) {
     printf("             default: %020llu \n", dSeed);
   };
 
-  // tmp args
-  // seed = 0;
-
-
   if (ac > 1) {
     for (int i = 1; i < ac; i++) {
       if (strcmp(av[i], "--seed") == 0) {
