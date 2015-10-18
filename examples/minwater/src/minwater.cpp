@@ -393,7 +393,6 @@ namespace DemoWaterMin {
       return x;
     };
 
-
     auto start = joinV(rmlp->xInit, KMatrix(M, 1));
     auto F = [matM, matQ](const KMatrix & x) {
       return (matM*x + matQ);
@@ -422,7 +421,6 @@ namespace DemoWaterMin {
         cout << "Solve via ABG" << endl;
         auto r2 = viABG(start, F, KBase::projPos, 0.5, eps, iterLim);
         auto x2 = processRslt(r2);
-
         printf("Initial resource usage:   %10.2f \n", rsrc0);
         const double rsrc2 = dot(x2, rmlp->rCosts);
         printf("Minimized resource usage: %10.2f \n", rsrc2);
@@ -435,8 +433,6 @@ namespace DemoWaterMin {
 
     delete rmlp;
     rmlp = nullptr;
-
-
     return;
   }
 
