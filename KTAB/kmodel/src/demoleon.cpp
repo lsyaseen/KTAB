@@ -1315,7 +1315,7 @@ LeonModel* demoSetup(unsigned int numFctr, unsigned int numCGrp, unsigned int nu
     using std::flush;
     using std::get;
 
-    printf("Setting up with PRNG seed:  %020lu \n", s);
+    printf("Setting up with PRNG seed:  %020llu \n", s);
     rng->setSeed(s);
 
     // because votes, and hence coalition strengths, cannot be computed simply as a function
@@ -1634,7 +1634,7 @@ int main(int ac, char **av) {
         printf("--maxEcon         max support of IO econ model\n");
         printf("--seed <n>        set a 64bit seed, in decimal\n");
         printf("                  0 means truly random\n");
-        printf("                  default: %020lu \n", dSeed);
+        printf("                  default: %020llu \n", dSeed);
     };
 
     // tmp args
@@ -1669,12 +1669,12 @@ int main(int ac, char **av) {
         return 0;
     }
 
-    printf("Given PRNG seed:  %020lu \n", seed);
+    printf("Given PRNG seed:  %020llu \n", seed);
     PRNG * rng = new PRNG();
     seed = rng->setSeed(seed); // 0 == get a random number
 
-    printf("Using PRNG seed:  %020lu \n", seed);
-    printf("Same seed in hex:   0x%016lX \n", seed);
+    printf("Using PRNG seed:  %020llu \n", seed);
+    printf("Same seed in hex:   0x%016llX \n", seed);
 
     const unsigned int numF = 5; // 2;
     const unsigned int numG = 5; // 2;
