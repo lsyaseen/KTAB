@@ -417,9 +417,9 @@ void demoABG00(PRNG* rng) {
         return 2 * trans(A)*(A*x - b);
     };
 
-
+    bool extra = false;
     auto x0 = KMatrix::uniform(rng, dx, 1, -100, +100);
-    auto xie = viABG(x0, F, P, 0.5, 1E-8, 1000);
+    auto xie = viABG(x0, F, P, 0.5, 1E-8, 1000, extra);
     KMatrix xf = get<0>(xie);
     unsigned int iter = get<1>(xie);
     KMatrix e = get<2>(xie);
@@ -646,8 +646,13 @@ void demoEllipseLVI(PRNG* rng, unsigned int n) {
 
     cout << endl;
     cout << "Solve via ABG" << endl << flush;
-    auto r2 = viABG(x0, F, projE, 0.5, eps, iterLim);
+    auto r2 = viABG(x0, F, projE, 0.5, eps, iterLim, false);
     processRslt(r2);
+
+    cout << endl;
+    cout << "Solve via AEG" << endl << flush;
+    auto r2e = viABG(x0, F, projE, 0.5, eps, iterLim, true);
+    processRslt(r2e);
 
     cout << endl;
     cout << "Solve via BSHe96" << endl << flush;
@@ -736,9 +741,16 @@ void demoAntiLemke(PRNG* rng, unsigned int n) {
     auto r1 = viBSHe96(M, q, KBase::projPos, xInit, eps, iterLim);
     processRslt(r1);
 
+    cout << endl;
     cout << "Solve via ABG" << endl;
-    auto r2 = viABG(xInit, F, KBase::projPos, 0.5, eps, iterLim);
+    auto r2 = viABG(xInit, F, KBase::projPos, 0.5, eps, iterLim, false);
     processRslt(r2);
+
+    cout << endl;
+    cout << "Solve via AEG" << endl;
+    auto r2b = viABG(xInit, F, KBase::projPos, 0.5, eps, iterLim, true);
+    processRslt(r2b);
+
     return;
 }
 

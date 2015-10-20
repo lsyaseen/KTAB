@@ -50,7 +50,8 @@ namespace KBase {
   tuple<KMatrix, unsigned int, KMatrix> viABG(const KMatrix & xInit,
     function<KMatrix(const KMatrix & x)> F,
     function<KMatrix(const KMatrix & x)> P,
-    double beta, double thresh, unsigned int iMax);
+    double beta, double thresh, unsigned int iMax,
+    bool extra);
 
   tuple<KMatrix, unsigned int, KMatrix> viBSHe96(const KMatrix & M, const KMatrix & q,
     function<KMatrix(const KMatrix &)> pK,

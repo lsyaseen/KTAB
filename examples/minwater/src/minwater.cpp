@@ -415,11 +415,27 @@ namespace DemoWaterMin {
       }
     }
 
-    if (false) { //  exceeds the iteration limit much more often than BSHe96
+    if (true) { 
+      try {
+        cout << endl << flush;
+        cout << "Solve via AEG" << endl;
+        auto r2 = viABG(start, F, KBase::projPos, 0.5, eps, iterLim, true);
+        auto x2 = processRslt(r2);
+        printf("Initial resource usage:   %10.2f \n", rsrc0);
+        const double rsrc2 = dot(x2, rmlp->rCosts);
+        printf("Minimized resource usage: %10.2f \n", rsrc2);
+        printf("Percentage change %+.3f", (100.0*(rsrc2 - rsrc0) / rsrc0));
+      }
+      catch (...) {
+        cout << "Caught exception" << endl << flush;
+      }
+    }
+
+    if (true) { //  exceeds the iteration limit much more often than BSHe96
       try {
         cout << endl << flush;
         cout << "Solve via ABG" << endl;
-        auto r2 = viABG(start, F, KBase::projPos, 0.5, eps, iterLim);
+        auto r2 = viABG(start, F, KBase::projPos, 0.5, eps, iterLim, false);
         auto x2 = processRslt(r2);
         printf("Initial resource usage:   %10.2f \n", rsrc0);
         const double rsrc2 = dot(x2, rmlp->rCosts);
@@ -493,8 +509,8 @@ int main(int ac, char **av) {
 
   PRNG * rng = new PRNG();
   seed = rng->setSeed(seed); // 0 == get a random number
-  printf("Using PRNG seed:  %020lu \n", seed);
-  printf("Same seed in hex:   0x%016lX \n", seed);
+  printf("Using PRNG seed:  %020llu \n", seed);
+  printf("Same seed in hex:   0x%016llX \n", seed);
 
   if (waterMinP){
     DemoWaterMin::waterMin();

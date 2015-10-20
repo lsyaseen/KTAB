@@ -62,8 +62,9 @@ namespace KBase {
   tuple<KMatrix, unsigned int, KMatrix> viABG(const KMatrix & xInit,
     function<KMatrix(const KMatrix & x)> F,
     function<KMatrix(const KMatrix & x)> P,
-    double beta, double thresh, unsigned int iMax) {
-
+    double beta, double thresh, unsigned int iMax,
+    bool extra) {
+   
     if ((beta <= 0) || (1 <= beta) || (thresh <= 0)) {
       throw KException("viABG: invalid input parameters");
     }
@@ -82,6 +83,14 @@ namespace KBase {
       auto x1 = P(x0 - gamma * f0);
       auto f1 = F(x1);
       estL = norm(f1 - f0) / norm(x1 - x0);
+
+      if (extra) {
+        const KMatrix x1b = P(x0 - gamma * f1);
+        const KMatrix f1b = F(x1b);
+
+        x1 = x1b;
+        f1 = f1b;
+      }
 
       change = maxAbs(x1 - x0) / gamma;
       x0 = x1;
