@@ -206,6 +206,9 @@ public:
 
 protected:
     void addDim(string dn);
+    sqlite3 *smpDB;
+    
+    string createTableSQL(unsigned int tn);
 
 private:
 };

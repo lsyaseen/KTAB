@@ -242,14 +242,7 @@ public:
     virtual ~Position();
 };
 
-/*
 
-class VctrPstn;
-class MtchPstn;
-class MtchGene;
-
-bool operator==(const MtchPstn& lhs, const MtchPstn& rhs);
-*/
 
 // -------------------------------------------------
 

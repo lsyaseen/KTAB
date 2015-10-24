@@ -303,7 +303,7 @@ int main(int ac, char **av) {
     using std::string;
 
     auto sTime = KBase::displayProgramStart();
-    uint64_t dSeed = 0x89B9E56731783372; // 0x9B3BDF88E9E466D3; // arbitrary
+    uint64_t dSeed = 0xD67CC16FE69C2868;  // arbitrary
     uint64_t seed = dSeed;
     bool run = true;
     bool euSmpP = false;
@@ -324,11 +324,6 @@ int main(int ac, char **av) {
     };
 
     // tmp args
-    //seed = 0xC4CB0A3E298562EA;
-    //euSmpP = true;
-    //csvP = true;
-    //inputCSV = "doc/dummyData_3Dim.csv";
-    seed =  0x10299382392D026D;//  01164624166166266477;
 
     if (ac > 1) {
         for (int i = 1; i < ac; i++) {
@@ -361,8 +356,8 @@ int main(int ac, char **av) {
 
     PRNG * rng = new PRNG();
     seed = rng->setSeed(seed); // 0 == get a random number
-    printf("Using PRNG seed:  %020lu \n", seed);
-    printf("Same seed in hex:   0x%016lX \n", seed);
+    printf("Using PRNG seed:  %020llu \n", seed);
+    printf("Same seed in hex:   0x%016llX \n", seed);
 
     // note that we reset the seed every time, so that in case something
     // goes wrong, we need not scroll back too far to find the

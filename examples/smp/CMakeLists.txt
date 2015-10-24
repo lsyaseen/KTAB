@@ -28,6 +28,16 @@ set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
 
 # -------------------------------------------------
+set (ENABLE_EFENCE false CACHE  BOOL "Use Electric Femce memory debugger")
+
+if (ENABLE_EFENCE)
+  find_package(efence)
+  if (NOT EFENCE_FOUND)
+    message(FATAL_ERROR "Could not find Electric Fence memory debugger")
+  endif (NOT EFENCE_FOUND)
+endif (ENABLE_EFENCE)
+
+# --------------------------------------------------------
 find_package(Sqlite)
 if (NOT SQLITE_FOUND)
   message(FATAL_ERROR "Could not find SQLite")
@@ -128,7 +138,12 @@ set (SMPG_LIBS
   )
 
 add_executable (smpg ${SMPG_SRCS})
-target_link_libraries(smpg ${SMPG_LIBS})
+target_link_libraries(smpg
+  smp
+  ${SMPG_LIBS}
+  ${SQLITE_LIBRARIES}
+  ${EFENCE_LIBRARIES}
+  )
 
 
 # -------------------------------------------------
@@ -143,7 +158,8 @@ target_link_libraries (smpc
   smp
   ${KMODEL_LIBRARY}
   ${KUTILS_LIBRARY}
-  #  ${EFENCE_LIBRARIES}
+  ${SQLITE_LIBRARIES}
+  ${EFENCE_LIBRARIES}
   )
 
 # -------------------------------------------------
