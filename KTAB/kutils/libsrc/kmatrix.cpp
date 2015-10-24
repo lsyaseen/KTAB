@@ -137,6 +137,8 @@ namespace KBase {
   // 21  22  23
   // Trying to embed the mv declaration in the mArrayInit 
   // call does not seem to work easily.
+  //
+  // You have to make very sure that the mv[] really is of size nr*nc. If not, it just reads in random memory.
   KMatrix KMatrix::arrayInit(const double mv[], const unsigned int & nr, const unsigned int & nc) {
     KMatrix m = KMatrix(nr, nc);
     for (unsigned int i = 0; i < nr; i++) {
