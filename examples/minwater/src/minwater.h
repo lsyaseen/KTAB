@@ -118,20 +118,24 @@ double prmsW = 0.020; //  weight of RMS weight-factors, compared to weight 1 of 
 // define a simple class of Linear Program that
 // minimize resource usage, subject to three kinds of constraints:
 // 1: Bounds on reduction or growth of each item
-//    (1-r)*x0 <= x <= (1+g)*x0
+//      (1-r)*x0 <= x <= (1+g)*x0
 // 2: Bounds on reduction of portfolio components. 
 //    For example, total livestock production cannot fall more than 5%.
-//    dot(p, x) >= (1-r) * dot(p, x0)
+//      dot(p, x) >= (1-r) * dot(p, x0)
 // 3: Minimum supply-to-meet-demand constraints.
-//    For example, Livestock creates demand for nutrition, fodder supplies nutrition, fodder/livestock ratio cannot decrease.
-//    final fodder/livestock = dot(s,x)/dot(d,x) >= dot(s,x0)/dot(d,x0) = initial fodder/livestock
-//    dot(s,x) * (dot(d, x0) / dot(s,x0)) >= dot(d, x)
+//    For example, Livestock creates demand for nutrition, fodder supplies nutrition,
+//    so fodder/livestock ratio cannot decrease: final fodder/livestock >= initial fodder/livestock
+//    In symbols,
+//      dot(s,x) * (dot(d, x0) / dot(s,x0)) >= dot(d, x)
+//      dot(s, x) / dot(d, x) >= dot(s, x0) / dot(d, x0).
+//    As the right hand side is a constant, r = dot(s,x0)/dot(d,x0), this means
+//      dot(s,x) >= r * dot(d,x) or dot(s-r*d, x) >= 0
 
 class RsrcMinLP {
 public:
   RsrcMinLP();
   virtual ~RsrcMinLP();
-  static RsrcMinLP* makeRMLP(PRNG* rng, unsigned int numPd, unsigned int numPt);
+  static RsrcMinLP* makeRMLP(PRNG* rng, unsigned int numPd, unsigned int numPt, unsigned int numSD);
   tuple<KMatrix, KMatrix> makeMq() const;
 
   unsigned int numProd; // number of products
@@ -142,10 +146,18 @@ public:
   // i.e. (1-ri)*xInit <= x <= (1+gi)*xInit
   // Note that -1 <= gi < 0 is allowed to force reductions, provided
   // that 0 <= (1-r1) <= (1+gi)
+
+  // a portfolio constraint says that the weighted sum cannot decline by more
+  // than a certain percentage: dot (w, x) >= (1-r)*dot(w, x0).
+  // One example would be a diet problem, where the amount of protein cannot fall below a threshold.
   unsigned int numPortC; // number of portfolio constraints
   KMatrix portWghts; // matrix of portfolio weights (all non-negative, probably all 0 or 1)
   KMatrix portRed; // column vector of max reduction fractions
   
+  // supply constraints say that the ratio of supply over demand cannot fall below the
+  // initial value.
+  // One example would be an agricultural output problem, where the ratio of 
+  // cattle-feed over cattle-meat cannot fall below the initial value.
   unsigned int numSpplyC; // number of supply constraints
   KMatrix spplyWghts; // matrix of supply weights (all non-negative, probably all 0 or 1)
   KMatrix dmndWghts; // matrix of demand weights (all non-negative, probably all 0 or 1)

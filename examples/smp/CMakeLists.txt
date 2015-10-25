@@ -109,6 +109,7 @@ include_directories (
 
 set(SMPLIB_SRCS
   ${PROJECT_SOURCE_DIR}/libsrc/smp.cpp
+  ${PROJECT_SOURCE_DIR}/libsrc/smpsql.cpp
   )
 
 add_library(smp STATIC ${SMPLIB_SRCS})

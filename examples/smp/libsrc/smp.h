@@ -53,6 +53,9 @@ class SMPState;
 class SMPModel;
 
 const string appVersion = "0.1";
+
+char* newChars(unsigned int len);
+
 // -------------------------------------------------
 // Plain-Old-Data
 struct BargainSMP {
