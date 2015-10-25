@@ -109,8 +109,9 @@ double w2Array[] {
 
 const KMatrix w0 = KMatrix::arrayInit(w2Array, numA, 1);
 
-double trgtP0 = 0.90; // probability of base-year scenario (#0) when waterMin actor has little strength
-double trgtP1 = 0.80; // probability of nominal-policy scenario (#1) when waterMin actor has full strength
+const double trgtP0 = 0.80; // probability of base-year scenario (#0) when waterMin actor has little strength
+const double trgtP1 = 0.80; // probability of nominal-policy scenarios when waterMin actor has full strength
+// these are the cases where dates are cut by 5% or less, and wheat is cut by 75% or more.
 double prmsW = 0.020; //  weight of RMS weight-factors, compared to weight 1 of RMS prob-error
  
 

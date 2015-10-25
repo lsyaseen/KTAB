@@ -176,7 +176,7 @@ namespace DemoWaterMin {
     auto pr0 = Model::condPCE(pv0); // [numP,1]
     auto priorBase = pr0(0, 0);
     double err0 = trgtP0 - priorBase; // shortfall if positive
-    //if (err0 < 0.0) { err0 = 0.0;}
+    if (err0 < 0.0) { err0 = 0.0;}
 
     // voting in nominal-policy scenario
     auto v1fn = [w, p0](unsigned int k, unsigned int i, unsigned int j) {
@@ -191,7 +191,7 @@ namespace DemoWaterMin {
       postNom = postNom + pr1(i, 0);
     }
     double err1 = trgtP1 - postNom; // shortfall if positive
-    //if (err1 < 0.0) { err1 = 0.0;}
+    if (err1 < 0.0) { err1 = 0.0;}
 
 
 
@@ -220,11 +220,17 @@ namespace DemoWaterMin {
       }
 
       cout << "Estimated prior probability Opt_i" << endl;
-      pr0.printf(" %.4f ");
+      for (unsigned int i = 0; i < pr0.numR(); i++) {
+        printf("%2i , %6.4f \n", i, pr0(i, 0));
+      }
+      //pr0.printf(" %.4f ");
       cout << endl << flush;
 
       cout << "Estimated posterior probability Opt_i" << endl;
-      pr1.printf(" %.4f ");
+      for (unsigned int i = 0; i < pr1.numR(); i++) {
+        printf("%2i , %6.4f \n", i, pr1(i, 0));
+      }
+      //pr1.printf(" %.4f ");
       cout << endl << flush;
 
       printf("Probability of base case %.3f ( %.3f )\n", priorBase, trgtP0);
@@ -614,7 +620,7 @@ int main(int ac, char **av) {
   bool run = true;
 
   // tmp args
-  rmlpP = true;
+  //rmlpP = true;
 
   auto showHelp = [dSeed]() {
     printf("\n");
