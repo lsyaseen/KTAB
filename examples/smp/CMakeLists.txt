@@ -55,7 +55,9 @@ if(UNIX)
   endif (NOT X11_FOUND)
   set (SMP_XLIBS
     #           Xaw Xmu Xpm Xt Xft X11 Xinerama dl fontconfig
-    Xext Xft fontconfig Xinerama dl m X11
+    # Xext Xft fontconfig Xinerama dl m X11
+    Xext Xft fontconfig dl m X11  Xfixes 
+    # Xft dl m X11
     )
 endif (UNIX)
 
@@ -168,6 +170,8 @@ target_link_libraries (smpc
 message (STATUS "Using PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
 message (STATUS "KUTILS_INCLUDE_DIR: " ${KUTILS_INCLUDE_DIR})
 message (STATUS "KMODEL_INCLUDE_DIR: " ${KMODEL_INCLUDE_DIR})
+
+message (STATUS "FLTK_INCLUDE_DIR: " ${FLTK_INCLUDE_DIR})
 
 # -------------------------------------------------
 # As of early 2014, C++11 is still not the default

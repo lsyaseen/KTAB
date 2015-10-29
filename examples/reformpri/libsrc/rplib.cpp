@@ -130,8 +130,8 @@ namespace RfrmPri {
 
   void RPModel::initScen0() {
     assert(nullptr != rng);
-    const unsigned int numA = 25;
-    numItm = 6;
+    const unsigned int numA = 40;
+    numItm = 7;
     numCat = numItm;
 
     govCost = KMatrix::uniform(rng, 1, numItm, 25, 100);
@@ -182,23 +182,23 @@ namespace RfrmPri {
     obFactor = 0.10;
 
     const double uArray[] =
-    {
-      65, 60, 40, 25, 10, 100, 40, //  0
-      70, 35, 80, 50, 0, 20, 100, //  1
-      60, 75, 25, 0, 60, 100, 45, //  2
-      55, 25, 60, 80, 30, 50, 30, //  3
-      65, 100, 40, 80, 0, 60, 25, //  4
-      45, 60, 100, 80, 40, 60, 20, //  5
-      35, 100, 50, 90, 0, 80, 100, //  6
-      35, 100, 20, 60, 0, 50, 25, //  7
-      40, 80, 100, 60, 50, 25, 50, //  8
-      60, 80, 100, 25, 40, 60, 35, //  9
-      65, 60, 100, 80, 50, 30, 25, //  10
-      60, 80, 100, 40, 50, 60, 35, //  11
-      50, 50, 60, 0, 20, 100, 25, //  12
-      50, 0, 60, 0, 100, 80, 0, //  13
-      60, 0, 50, 0, 100, 80, 0  //  14
-    };
+      {
+        65, 60, 40, 25, 10, 100, 40, //  0
+        70, 35, 80, 50, 0, 20, 100, //  1
+        60, 75, 25, 0, 60, 100, 45, //  2
+        55, 25, 60, 80, 30, 50, 30, //  3
+        65, 100, 40, 80, 0, 60, 25, //  4
+        45, 60, 100, 80, 40, 60, 20, //  5
+        35, 100, 50, 90, 0, 80, 100, //  6
+        35, 100, 20, 60, 0, 50, 25, //  7
+        40, 80, 100, 60, 50, 25, 50, //  8
+        60, 80, 100, 25, 40, 60, 35, //  9
+        65, 60, 100, 80, 50, 30, 25, //  10
+        60, 80, 100, 40, 50, 60, 35, //  11
+        50, 50, 60, 0, 20, 100, 25, //  12
+        50, 0, 60, 0, 100, 80, 0, //  13
+        60, 0, 50, 0, 100, 80, 0  //  14
+      };
     // rows are actors, columns are reform items
 
     const KMatrix utils = KMatrix::arrayInit(uArray, numA, numItm);
@@ -636,8 +636,8 @@ namespace RfrmPri {
       // I do not actually use prevMP, but it is still an example for std::set
       auto prevMP = [](const MtchPstn & mp1, const MtchPstn & mp2) {
         bool r = std::lexicographical_compare(
-          mp1.match.begin(), mp1.match.end(),
-          mp2.match.begin(), mp2.match.end());
+                                              mp1.match.begin(), mp1.match.end(),
+                                              mp2.match.begin(), mp2.match.end());
         return r;
       };
       std::set<MtchPstn, bool(*)(const MtchPstn &, const MtchPstn &)> mpSet(prevMP);
@@ -703,9 +703,9 @@ namespace RfrmPri {
       ghc->show = sfn;
 
       auto rslt = ghc->run(*ph, // start from h's current positions
-        ReportingLevel::Silent,
-        100, // iter max
-        3, 0.001); // stable-max, stable-tol
+                           ReportingLevel::Silent,
+                           100, // iter max
+                           3, 0.001); // stable-max, stable-tol
 
       if (ReportingLevel::Low < rl) {
         printf("---------------------------------------- \n");
@@ -750,16 +750,22 @@ namespace RfrmPri {
       return;
     };
 
+    const bool par = true;
     auto ts = vector<thread>();
     // Each actor, h, finds the position which maximizes their EU in this situation.
     for (unsigned int h = 0; h < numA; h++) {
-      ts.push_back(thread([newPosFn, h]() { newPosFn(h); return; })); // launch all, concurrent
-      //newPosFn(h); // do each, sequential
+      if (par) { // launch all, concurrent
+        ts.push_back(thread([newPosFn, h]() { newPosFn(h); return; }));
+      }
+      else { // do each, sequential
+        newPosFn(h);
+      }
     }
 
-    // now join them all before continuing
-    for (auto& t : ts) {
-      t.join();
+    if (par) { // now join them all before continuing
+      for (auto& t : ts) {
+        t.join();
+      }
     }
 
     assert(nullptr != s2);
