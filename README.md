@@ -26,7 +26,7 @@ KTAB is written in portable, cross-platform C++11. It was developed and tested o
   * Windows 10 Professional with Visual Studio 2015 Community,
 * Linux
   * Fedora 22 with gcc/g++ 5.1,
-  * openSUSE 13.2 with gcc/g++ 4.8,
+  * openSUSE 13.2 with clang/clang++ 3.5,
   * Debian 8.1 with gcc/g++ 4.9.
 
 Because no platform-specific code is allowed, porting to Mac or other platforms should be feasible.
