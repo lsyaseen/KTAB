@@ -21,9 +21,9 @@ These are merely illustrative examples.  For rigorous work, one could make whate
 KTAB is written in portable, cross-platform C++11. It was developed and tested on 64-bit Windows and Linux platforms, including the following:
 
 * Windows 
-  * Windows 7 Pro with Visual Studio 2010 Express,
+  * Windows 7 Professional with Visual Studio 2010 Express,
   * Windows 8 with Visual Studio 2013 Express,
-  * Windows 10 with Visual Studio 2015 Community,
+  * Windows 10 Professional with Visual Studio 2015 Community,
 * Linux
   * Fedora 22 with gcc/g++ 5.1,
   * openSUSE 13.2 with gcc/g++ 4.8,
