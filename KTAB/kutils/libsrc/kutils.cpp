@@ -57,7 +57,15 @@ void displayProgramEnd(std::chrono::time_point<std::chrono::system_clock> st) {
   return;
 }
 
-// -------------------------------------------------
+
+char* newChars(unsigned int len) {
+  auto rslt = new char[len];
+  for (unsigned int i = 0; i < len; i++) {
+    rslt[i] = ((char)0);
+  }
+  return rslt;
+};
+
 double rescale(double x, double x0, double x1, double y0, double y1) {
     assert ((x0 < x1) ||( x1 < x0));
     const double f = (x-x0)/(x1-x0);

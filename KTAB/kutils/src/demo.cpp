@@ -34,6 +34,7 @@
 
 #include "demo.h"
 
+using KBase::newChars;
 using KBase::PRNG;
 using KBase::KMatrix;
 using KBase::VHCSearch;
@@ -1877,6 +1878,7 @@ void parallelMatrixMult(PRNG * rng) {
 int main(int ac, char **av) {
     using UDemo::TargetedBV;
     auto sTime = KBase::displayProgramStart();
+
     uint64_t dSeed = 0xD67CC16FE69C2868; // arbitrary
     uint64_t seed = dSeed;
     bool matrixP = false;

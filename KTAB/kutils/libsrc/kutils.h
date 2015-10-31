@@ -63,6 +63,9 @@ enum class ReportingLevel {
 std::chrono::time_point<std::chrono::system_clock>  displayProgramStart();
 void displayProgramEnd(std::chrono::time_point<std::chrono::system_clock> st);
 
+// return a string of '0' chars
+char* newChars(unsigned int len);
+
 // linearly (actually, affine) rescale the [x0,x1] range into the [y0,y1] range
 double rescale(double x, double x0, double x1, double y0, double y1);
 

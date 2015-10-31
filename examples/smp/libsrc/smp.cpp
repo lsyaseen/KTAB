@@ -48,13 +48,6 @@ using KBase::VotingRule;
 using KBase::ReportingLevel;
 
 
-char* newChars (unsigned int len) {
-    auto rslt = new char[len];
-    for (unsigned int i = 0; i < len; i++) {
-        rslt[i] = ((char)0);
-    }
-    return rslt;
-};
 
 
 BargainSMP::BargainSMP(const SMPActor* ai, const SMPActor* ar, const VctrPstn & pi, const VctrPstn & pr) {
@@ -824,6 +817,15 @@ SMPModel::SMPModel(PRNG * r) : Model(r) {
     numDim = 0;
     posTol = 0.001;
     dimName = vector<string>();
+
+    // Record the UTC time so it can be used as the default scenario name
+    std::chrono::time_point<std::chrono::system_clock> st;
+    st = std::chrono::system_clock::now();
+    std::time_t start_time = std::chrono::system_clock::to_time_t(st);
+    auto utcBuff = newChars(200);
+    std::strftime(utcBuff, 150, "UTC-%Y-%m-%d-%H%M-%S", gmtime(&start_time));
+    cout << "Default scenario name is UTC start time: |" << utcBuff << "|" << endl << flush;
+
 
     // just a test to get linkages correct
 

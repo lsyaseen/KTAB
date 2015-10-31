@@ -38,6 +38,7 @@ using std::shared_ptr;
 using std::string;
 using std::tuple;
 using std::vector;
+using KBase::newChars;
 using KBase::KMatrix;
 using KBase::PRNG;
 using KBase::Actor;
@@ -53,8 +54,6 @@ class SMPState;
 class SMPModel;
 
 const string appVersion = "0.1";
-
-char* newChars(unsigned int len);
 
 // -------------------------------------------------
 // Plain-Old-Data
