@@ -166,6 +166,7 @@ public:
     virtual tuple< KMatrix, vector<unsigned int>> pDist(int persp) const;
     void showBargains(const vector < vector < BargainSMP* > > & brgns) const;
 
+
 protected:
     KMatrix diff;
     static KMatrix bigRfromProb(const KMatrix & p, BigRRange rr);
@@ -206,11 +207,18 @@ public:
 
     static double stateDist(const SMPState* s1 , const SMPState* s2 );
 
+    virtual void sqlAUtil(unsigned int t);
+
 protected:
-    void addDim(string dn);
-    sqlite3 *smpDB;
-    
+    sqlite3 *smpDB; // keep this protected, to ease multi-threading
+    string scenName;
+
+    void sqlTest();
+    // note that the function to write to table #k must be kept
+    // synchronized with the result of createTableSQL(k) !
     string createTableSQL(unsigned int tn);
+
+    void addDim(string dn);
 
 private:
 };

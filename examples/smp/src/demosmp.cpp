@@ -262,6 +262,8 @@ void demoEUSpatial(unsigned int numA, unsigned int sDim, uint64_t s, PRNG* rng) 
     md0->run();
 
     cout << "Completed model run" << endl << endl;
+    const unsigned int nState = md0->history.size();
+    printf("There were %i states, with %i steps between them\n", nState, nState - 1);
 
     cout << "History of actor positions over time" << endl;
     md0->showVPHistory();
@@ -324,6 +326,7 @@ int main(int ac, char **av) {
     };
 
     // tmp args
+    euSmpP = true;
 
     if (ac > 1) {
         for (int i = 1; i < ac; i++) {
