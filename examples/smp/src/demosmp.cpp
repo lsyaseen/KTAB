@@ -260,9 +260,14 @@ void demoEUSpatial(unsigned int numA, unsigned int sDim, uint64_t s, PRNG* rng) 
 
     cout << "Starting model run" << endl << flush;
     md0->run();
+    
+    // record the last actor posUtil table
+    const unsigned int nState = md0->history.size();
+    auto lastState = ((SMPState*) (md0->history[nState-1]));
+    lastState->setAUtil(ReportingLevel::Low);
+    md0->sqlAUtil(nState-1); 
 
     cout << "Completed model run" << endl << endl;
-    const unsigned int nState = md0->history.size();
     printf("There were %i states, with %i steps between them\n", nState, nState - 1);
 
     cout << "History of actor positions over time" << endl;

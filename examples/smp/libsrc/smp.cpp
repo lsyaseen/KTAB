@@ -443,7 +443,9 @@ namespace SMPLib {
     assert(0 <= myT);
     auto sMod = ((SMPModel*)model);
     sMod->sqlAUtil(myT);
-
+    // Notice that this does not record the next state.
+    // That gets recorded upon the next state - but it
+    // therefore misses the very last state.
 
     auto s2 = doBCN();
     s2->step = [s2]() {
