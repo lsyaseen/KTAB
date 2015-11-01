@@ -74,20 +74,24 @@ set (FLUID_DIR
 # --------------------------------------------------------
 # See "Findkutils.cmake" in cmakemodules to figure
 # out where it looks and what variables it sets
-
 find_package(kutils)
 if(NOT KUTILS_FOUND)
   message(FATAL_ERROR "Could not find kutils")
 endif(NOT KUTILS_FOUND)
 
 
-# See "Findkmodel.cmake" in cmakemodules to figure
-# out where it looks and what variables it sets
-
+# Ditto for "Findkmodel.cmake"
 find_package(kmodel)
 if(NOT KMODEL_FOUND)
   message(FATAL_ERROR "Could not find kmodel")
 endif(NOT KMODEL_FOUND)
+
+
+# Ditto for "Findkgraph.cmake"
+find_package(kgraph)
+if(NOT KGRAPH_FOUND)
+  message(FATAL_ERROR "Could not find kgraph")
+endif(NOT KGRAPH_FOUND)
 
 # -------------------------------------------------
 # files to be built into a library go in libsrc/
@@ -100,6 +104,7 @@ set (CSVPARSER_DIR
 include_directories (
   ${KUTILS_INCLUDE_DIR}
   ${KMODEL_INCLUDE_DIR}
+  ${KGRAPH_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}/libsrc/
   ${PROJECT_SOURCE_DIR}/src/
   ${FLUID_DIR}
@@ -136,6 +141,7 @@ set (SMPG_SRCS
 
 set (SMPG_LIBS
   ${FLTK_LIBRARIES}
+  ${KGRAPH_LIBRARIES}
   smpGUI
   ${SMP_XLIBS}
   )

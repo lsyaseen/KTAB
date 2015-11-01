@@ -2,8 +2,18 @@
 version 1.0302 
 header_name {.h} 
 code_name {.cpp}
-class SMPMainW {open
-} {
+comment {===========================================
+Copyright KAPSARC. Open Source MIT License 
+===========================================} {in_source in_header
+} 
+
+decl {\#include "kutils.h"} {selected public local
+} 
+
+decl {\#include "kgraph.h"} {public local
+} 
+
+class SMPMainW {} {
   Function {SMPMainW()} {open
   } {
     Fl_Window mainWindow {open
@@ -103,7 +113,7 @@ return;}
             xywh {895 530 115 90} box THIN_DOWN_BOX align 5
           } {
             Fl_Round_Button {} {
-              label Initiator selected
+              label Initiator
               xywh {905 540 95 20} type Radio box THIN_DOWN_BOX down_box ROUND_DOWN_BOX
             }
             Fl_Round_Button {} {
@@ -137,4 +147,9 @@ return;} {}
     code {mainWindow->hide();
 return;} {}
   }
+} 
+
+comment {===========================================
+Copyright KAPSARC. Open Source MIT License 
+===========================================} {in_source in_header
 } 
