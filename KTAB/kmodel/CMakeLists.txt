@@ -107,6 +107,7 @@ install(
     libsrc/kmodel.h  
   DESTINATION
     ${KTAB_INSTALL_DIR}/include)  
+
 # -------------------------------------------------
 # demo programs
 
