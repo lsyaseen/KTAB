@@ -4,7 +4,7 @@
 # before using this script. CMake is the recommended was to do so.
 #
 #------------------------------------------
-FILES="kutils  kmodel"
+FILES="kutils  kmodel  kgraph"
 
 for d in $FILES
 do
