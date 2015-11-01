@@ -327,7 +327,7 @@ int main(int ac, char **av) {
         printf("--csv <f>         read a scenario from CSV\n");
         printf("--seed <n>        set a 64bit seed\n");
         printf("                  0 means truly random\n");
-        printf("                  default: %020lu \n", dSeed);
+        printf("                  default: %020llu \n", dSeed);
     };
 
     // tmp args

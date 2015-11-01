@@ -172,7 +172,7 @@ int main(int ac, char **av) {
         printf("--help            print this message and exit \n");
         printf("--seed <n>        set a 64bit seed \n");
         printf("                  0 means truly random \n");
-        printf("                  default: %020lu \n", dSeed);
+        printf("                  default: %020llu \n", dSeed);
         printf("--sNum <n>        choose a scenario nnumber \n");
         printf("                  default: %i \n", sNum);
     };
@@ -220,8 +220,8 @@ int main(int ac, char **av) {
 
     PRNG * rng = new PRNG();
     seed = rng->setSeed(seed); // 0 == get a random number
-    printf("Using PRNG seed:  %020lu \n", seed);
-    printf("Same seed in hex:   0x%016lX \n", seed);
+    printf("Using PRNG seed:  %020llu \n", seed);
+    printf("Same seed in hex:   0x%016llX \n", seed);
     // Unix correctly prints all digits with lu, lX, llu, and llX.
     // Windows only prints part, with lu, lX, llu, and llX.
 
