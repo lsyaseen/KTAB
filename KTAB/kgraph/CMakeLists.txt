@@ -68,7 +68,7 @@ IF(UNIX)
   IF(NOT X11_FOUND)
     MESSAGE(FATAL_ERROR "Couldn't find X11: required for building kgraph")
   ENDIF(NOT X11_FOUND)
-  set (KG_XLIBS  Xaw Xmu Xpm Xt Xft X11 Xinerama dl fontconfig)
+  set (KG_XLIBS  Xaw Xmu Xpm Xt Xft X11 dl fontconfig)
 ENDIF (UNIX)
 
 
