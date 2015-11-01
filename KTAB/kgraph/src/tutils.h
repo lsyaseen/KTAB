@@ -23,7 +23,7 @@
 #include <tuple>
 #include <vector>
 
-#include <Fl/Enumerations.H>
+#include <FL/Enumerations.H>
 #include "kutils.h"
 #include "prng.h"
 #include "kgraph.h" 
