@@ -1032,7 +1032,7 @@ int main(int ac, char **av) {
     printf("--mtchSUSN        SUSN bargaining over division of sweets\n");
     printf("--seed <n>        set a 64bit seed\n");
     printf("                  0 means truly random\n");
-    printf("                  default: %020lu \n", dSeed);
+    printf("                  default: %020llu \n", dSeed);
   };
 
   // tmp args
@@ -1071,8 +1071,8 @@ int main(int ac, char **av) {
 
   PRNG * rng = new PRNG();
   seed = rng->setSeed(seed); // 0 == get a random number
-  printf("Using PRNG seed:  %020lu \n", seed);
-  printf("Same seed in hex:   0x%016lX \n", seed);
+  printf("Using PRNG seed:  %020llu \n", seed);
+  printf("Same seed in hex:   0x%016llX \n", seed);
 
   // note that we reset the seed every time, so that in case something 
   // goes wrong, we need not scroll back too far to find the
