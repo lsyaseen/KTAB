@@ -44,7 +44,7 @@ vector<vector<unsigned int>> scanPositions(const RPModel * rpm) {
     unsigned int numRefItem = rpm->numItm;
     assert(numRefItem == rpm->numCat);
 
-    printf("There are %i actors and %i reform items \n", numA, numRefItem);
+    printf("There are %u actors and %u reform items \n", numA, numRefItem);
 
     cout << "Computing positions ... " << endl;
     vector<vector<unsigned int>> positions; // list of all positions
@@ -62,7 +62,7 @@ vector<vector<unsigned int>> scanPositions(const RPModel * rpm) {
 
     cout << "Computing utilities of positions ... " << endl;
     cout << "Effective gov costs:" << endl;
-    (rpm->govCost).printf("%.3f ");
+    (rpm->govCost).mPrintf("%.3f ");
     cout << endl;
     KMatrix uij = KMatrix(numA, numPos);
     for (unsigned int ai = 0; ai < numA; ai++) {
@@ -85,7 +85,7 @@ vector<vector<unsigned int>> scanPositions(const RPModel * rpm) {
                 bestV = uij(ai,pj);
             }
         }
-        printf("Best for %02i is ", ai);
+        printf("Best for %02u is ", ai);
         printPerm(positions[bestJ]);
         cout << endl;
         bestAP.push_back(positions[bestJ]);
@@ -131,7 +131,7 @@ vector<vector<unsigned int>> scanPositions(const RPModel * rpm) {
         double zi = get<1>(pri);
         vector<unsigned int> pi = get<2>(pri);
 
-        printf("%3i: %4i  %.2f  ", i, ni, zi);
+        printf("%3u: %4u  %.2f  ", i, ni, zi);
         printPerm(pi);
         cout << endl << flush;
     }
@@ -174,7 +174,7 @@ int main(int ac, char **av) {
         printf("                  0 means truly random \n");
         printf("                  default: %020llu \n", dSeed);
         printf("--sNum <n>        choose a scenario nnumber \n");
-        printf("                  default: %i \n", sNum);
+        printf("                  default: %u \n", sNum);
     };
 
 
@@ -270,14 +270,14 @@ int main(int ac, char **av) {
     rpm->stop = [maxIter,rpm](unsigned int iter, const KBase::State * s) {
         bool doneP = iter > maxIter;
         if (doneP) {
-            printf("Max iteration limit of %i exceeded \n", maxIter);
+            printf("Max iteration limit of %u exceeded \n", maxIter);
         }
         auto s2 = ((const RPState *)(rpm->history[iter]));
         for (unsigned int i = 0; i < iter; i++) {
             auto s1 = ((const RPState *)(rpm->history[i]));
             if (RPModel::equivStates(s1, s2)) {
                 doneP = true;
-                printf("State number %i matched state number %i \n", iter, i);
+                printf("State number %u matched state number %u \n", iter, i);
             }
         }
 

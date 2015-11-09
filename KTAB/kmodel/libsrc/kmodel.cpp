@@ -109,8 +109,8 @@ namespace KBase {
 
 
   int Model::addState(State* s) {
-    assert(this == s->model);
     assert(nullptr != s);
+    assert(this == s->model);
     s->model = this;
     history.push_back(s);
     return history.size();
@@ -182,16 +182,16 @@ namespace KBase {
 
   double Model::vote(VotingRule vr, double wi, double uij, double uik) {
     double v = 0.0;
-    double du = uij - uik;
+    const double du = uij - uik;
 
     double rBin = 0; // binary response
     const double sTol = 1E-8;
-    rBin = (uij - uik) / sTol;
+    rBin = du / sTol;
     rBin = (rBin > +1) ? +1 : rBin;
     rBin = (rBin < -1) ? -1 : rBin;
 
-    double rProp = uij - uik; // proportional response
-    double rCubic = rProp * rProp * rProp; // cubic reponse
+    double rProp = du; // proportional response
+    double rCubic = du * du * du; // cubic reponse
 
     // the following weights determine how much the hybrids deviate from proportional
     const double rbp = 0.8;
@@ -308,7 +308,7 @@ namespace KBase {
   KMatrix Model::probCE(const KMatrix & pv) {
     const double pTol = 1E-6;
     unsigned int numOpt = pv.numR();
-    assert(numOpt = pv.numC()); // must be square
+    assert(numOpt == pv.numC()); // must be square
     auto test = [&pv, pTol](unsigned int i, unsigned int j) {
       assert(0 <= pv(i, j));
       assert(fabs(pv(i, j) + pv(j, i) - 1.0) < pTol);
@@ -358,8 +358,7 @@ namespace KBase {
 
   // Given square matrix of Prob[i>j] returns a column vector for Prob[i].
   // Uses 1-step conditional probabilities, not Markov process
-  KMatrix Model::condPCE(const KMatrix & pv) {
-    const double pTol = 1E-6;
+  KMatrix Model::condPCE(const KMatrix & pv) { 
     unsigned int numOpt = pv.numR();
     auto p = KMatrix(numOpt, 1); 
     for (unsigned int i = 0; i < numOpt; i++) {
@@ -393,13 +392,13 @@ namespace KBase {
 
       if ((numAct <= 20) && (numOpt <= 20)) {
         cout << "Actor strengths: " << endl;
-        w.printf(" %6.2f ");
+        w.mPrintf(" %6.2f ");
         cout << endl << flush;
         cout << "Voting rule: " << KBase::vrName(vr) << endl;
         // printf("         aka %s \n", KBase::vrName(vr).c_str());
         cout << flush;
         cout << "Utility to actors of options: " << endl;
-        u.printf(" %+8.3f ");
+        u.mPrintf(" %+8.3f ");
         cout << endl;
 
         auto vfn = [vr, &w, &u](unsigned int k, unsigned int i, unsigned int j) {
@@ -411,15 +410,15 @@ namespace KBase {
         KMatrix p2 = vProb(vpm, c);  // p(i,j) = prob Ai defeats Aj
 
         cout << "Coalition strengths of (i:j): " << endl;
-        c.printf(" %8.3f ");
+        c.mPrintf(" %8.3f ");
         cout << endl;
 
         assert(norm(pv - p2) < 1E-8); // better be close
 
         cout << "Probability Opt_i > Opt_j" << endl;
-        pv.printf(" %.4f ");
+        pv.mPrintf(" %.4f ");
         cout << "Probability Opt_i" << endl;
-        p.printf(" %.4f ");
+        p.mPrintf(" %.4f ");
       }
       cout << "Found stable PCE distribution" << endl << flush;
     }
@@ -514,7 +513,7 @@ namespace KBase {
       assert(0 < cnj);
     }
     double pin = cni / (cni + cnj);
-    double pjn = cnj / (cni + cnj);
+    //double pjn = cnj / (cni + cnj); // FYI
     return pin;
   }
 

@@ -202,33 +202,33 @@ namespace DemoWaterMin {
 
     if (ReportingLevel::Silent < rl) {
       cout << "Actor-cap matrix" << endl;
-      w.printf(" %8.1f ");
+      w.mPrintf(" %8.1f ");
       cout << endl << flush;
 
       if (ReportingLevel::Low < rl) {
         cout << "Raw actor-pos util matrix" << endl;
-        uInit.printf(" %.4f ");
+        uInit.mPrintf(" %.4f ");
         cout << endl << flush;
 
         cout << "Coalition strength matrix" << endl;
-        c1.printf(" %+9.3f ");
+        c1.mPrintf(" %+9.3f ");
         cout << endl << flush;
 
         cout << "Probability Opt_i > Opt_j" << endl;
-        pv1.printf(" %.4f ");
+        pv1.mPrintf(" %.4f ");
         cout << endl;
       }
 
       cout << "Estimated prior probability Opt_i" << endl;
       for (unsigned int i = 0; i < pr0.numR(); i++) {
-        printf("%2i , %6.4f \n", i, pr0(i, 0));
+        printf("%2u , %6.4f \n", i, pr0(i, 0));
       }
       //pr0.printf(" %.4f ");
       cout << endl << flush;
 
       cout << "Estimated posterior probability Opt_i" << endl;
       for (unsigned int i = 0; i < pr1.numR(); i++) {
-        printf("%2i , %6.4f \n", i, pr1(i, 0));
+        printf("%2u , %6.4f \n", i, pr1(i, 0));
       }
       //pr1.printf(" %.4f ");
       cout << endl << flush;
@@ -262,7 +262,7 @@ namespace DemoWaterMin {
     vhc->nghbrs = VHCSearch::vn1;
     auto p0 = KMatrix(numA, 1); // all zeros
     cout << "Initial point: ";
-    trans(p0).printf(" %+.4f ");
+    trans(p0).mPrintf(" %+.4f ");
     cout << endl;
     auto rslt = vhc->run(p0,
       100, 10, 1E-5, // iMax, sMax, sTol
@@ -274,10 +274,10 @@ namespace DemoWaterMin {
     unsigned int sn = get<3>(rslt);
     delete vhc;
     vhc = nullptr;
-    printf("Iter: %i  Stable: %i \n", in, sn);
+    printf("Iter: %u  Stable: %u \n", in, sn);
     printf("Best value: %+.4f \n", vBest);
     cout << "Best point:    ";
-    trans(pBest).printf(" %+.4f ");
+    trans(pBest).mPrintf(" %+.4f ");
     cout << endl;
     return;
   }
@@ -320,7 +320,7 @@ namespace DemoWaterMin {
     const unsigned int nameLen = 20;
     for (unsigned int i = 0; i < numPd; i++) {
       auto nameBuff = new char[nameLen];
-      sprintf(nameBuff, "Prod-%02i", i);
+      sprintf(nameBuff, "Prod-%02u", i);
       rmlp->pNames.push_back(nameBuff);
     }
 
@@ -365,7 +365,7 @@ namespace DemoWaterMin {
     setUInit(scenQuant);
 
     cout << "uInit: " << endl;
-    uInit.printf(" %.3f ");
+    uInit.mPrintf(" %.3f ");
     cout << endl << flush;
 
     setLikelyScenarios(scenQuant);
@@ -382,7 +382,7 @@ namespace DemoWaterMin {
 
     auto pfn = [](string lbl, string f, KMatrix m) {
       cout << lbl << endl;
-      m.printf(f);
+      m.mPrintf(f);
       cout << endl << flush;
       return;
     };
@@ -517,12 +517,12 @@ namespace DemoWaterMin {
       KMatrix u = get<0>(r);
       unsigned int iter = get<1>(r);
       KMatrix res = get<2>(r);
-      printf("After %i iterations  \n", iter);
+      printf("After %u iterations  \n", iter);
       cout << "  LCP solution u:  ";
-      trans(u).printf(" %+.3f ");
+      trans(u).mPrintf(" %+.3f ");
       cout << endl << flush;
       cout << "  LCP residual r:  ";
-      trans(res).printf(" %+.3f ");
+      trans(res).mPrintf(" %+.3f ");
       cout << endl << flush;
       cout << "Dimensions: " << res.numR() << endl << flush;
       KMatrix v = matM*u + matQ;
@@ -538,7 +538,7 @@ namespace DemoWaterMin {
       };
       auto x = KMatrix::map(sFn, N, 1);
       cout << "  LP solution x:  ";
-      trans(x).printf(" %+.3f ");
+      trans(x).mPrintf(" %+.3f ");
       cout << endl << flush;
       return x;
     };

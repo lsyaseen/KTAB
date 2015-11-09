@@ -108,13 +108,13 @@ void demoPCE(uint64_t s, PRNG* rng) {
 
     auto show = [](const KMatrix & cMat, const KMatrix & pMat, const KMatrix & pVec) {
         cout << "Coalitions matrix:" << endl;
-        cMat.printf(" %6.3f ");
+        cMat.mPrintf(" %6.3f ");
         cout << endl;
         cout << "prob[i>j] Markov transitions matrix:" << endl;
-        pMat.printf(" %.4f ");
+        pMat.mPrintf(" %.4f ");
         cout << endl;
         cout << "limiting stable prob[i] vector:" << endl;
-        pVec.printf(" %.4f ");
+        pVec.mPrintf(" %.4f ");
         cout << endl;
         return;
     };
@@ -158,7 +158,7 @@ void demoSpVSR(uint64_t s, PRNG* rng) {
 
     auto sp1 = make_shared<int>(42); // shared pointer to an integer
     printf("Use count sp1: %li \n", sp1.use_count());
-    int* p1 = sp1.get(); // gets the  pointer
+    //int* p1 = sp1.get(); // gets the  pointer
     cout << "The shared integer is " << *sp1.get() << endl;
     {   // create another reference
         auto sp2 = sp1;
@@ -173,7 +173,7 @@ void demoSpVSR(uint64_t s, PRNG* rng) {
         auto m1 = KMatrix::uniform(rng, nr, nc, -10, +50);
         auto d = KBase::norm(m1);
         cout << "Inside lambda:" << endl;
-        m1.printf(fs);
+        m1.mPrintf(fs);
         shared_ptr<void> rslt = make_shared<tuple<double, KMatrix>>(d, m1); // shared_ptr version of (void*)
         return rslt;
     };
@@ -187,7 +187,7 @@ void demoSpVSR(uint64_t s, PRNG* rng) {
     // cast it to tuple<...>*,
     // then dereference that pointer.
     cout << endl << "As retrieved:" << endl;
-    get<1>(r53).printf(fs);
+    get<1>(r53).mPrintf(fs);
 
     return;
 }

@@ -51,7 +51,7 @@ public:
 
 class TApp {
 public:
-    TApp(uint64_t s);
+    explicit TApp(uint64_t s);
     void run();
     virtual ~TApp();
 

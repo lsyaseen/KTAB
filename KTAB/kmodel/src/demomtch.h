@@ -118,7 +118,7 @@ private:
 
 class MtchState : public State {
 public:
-    MtchState(Model* mod);
+    explicit MtchState(Model* mod);
     ~MtchState();
 
     KMatrix actrCaps() const;
@@ -148,7 +148,7 @@ private:
 
 class MtchModel : public Model {
 public:
-    MtchModel(PRNG* rng);
+    explicit MtchModel(PRNG* rng);
     virtual ~MtchModel();
 
     static MtchModel* randomMS(unsigned int numA, unsigned int numI, VotingRule vr, MtchActor::PropModel pMod, PRNG * rng);

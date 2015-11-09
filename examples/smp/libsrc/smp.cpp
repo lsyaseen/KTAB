@@ -62,8 +62,8 @@ namespace SMPLib {
   BargainSMP::~BargainSMP() {
     actInit = nullptr;
     actRcvr = nullptr;
-    posInit = KMatrix(0, 0);
-    posRcvr = KMatrix(0, 0);
+    posInit = VctrPstn(KMatrix(0, 0));
+    posRcvr = VctrPstn(KMatrix(0, 0));
   }
 
   SMPActor::SMPActor(string n, string d) : Actor(n, d) {
@@ -312,7 +312,7 @@ namespace SMPLib {
 
     if (ReportingLevel::Silent < rl) {
       cout << "Raw actor-pos value matrix (risk neutral)" << endl;
-      rnUtil_ij.printf(" %+.3f ");
+      rnUtil_ij.mPrintf(" %+.3f ");
       cout << endl << flush;
     }
 
@@ -323,7 +323,7 @@ namespace SMPLib {
 
     if (ReportingLevel::Silent < rl) {
       cout << "Inferred risk attitudes: " << endl;
-      nra.printf(" %+.3f ");
+      nra.mPrintf(" %+.3f ");
       cout << endl << flush;
     }
 
@@ -331,7 +331,7 @@ namespace SMPLib {
 
     if (ReportingLevel::Silent < rl) {
       cout << "Risk-aware actor-pos utility matrix (objective):" << endl;
-      raUtil_ij.printf(" %+.4f ");
+      raUtil_ij.mPrintf(" %+.4f ");
       cout << endl;
       cout << "RMS change in value vs utility: " << norm(rnUtil_ij - raUtil_ij) / na << endl << flush;
     }
@@ -373,7 +373,7 @@ namespace SMPLib {
 
       if (ReportingLevel::Silent < rl) {
         cout << "Estimate by " << h << " of risk-aware utility matrix:" << endl;
-        u_h_ij.printf(" %+.4f ");
+        u_h_ij.mPrintf(" %+.4f ");
         cout << endl;
 
         cout << "RMS change in util^h vs utility: " << norm(u_h_ij - raUtil_ij) / na << endl;
@@ -388,7 +388,7 @@ namespace SMPLib {
 
   void SMPState::showBargains(const vector < vector < BargainSMP* > > & brgns) const {
     for (unsigned int i = 0; i < brgns.size(); i++) {
-      printf("Bargains involving actor %i: ", i);
+      printf("Bargains involving actor %u: ", i);
       for (unsigned int j = 0; j < brgns[i].size(); j++) {
         BargainSMP* bij = brgns[i][j];
         if (nullptr != bij) {
@@ -475,7 +475,7 @@ namespace SMPLib {
       if (0 < bestEU) {
         assert(0 <= bestJ);
 
-        printf("Actor %i has most advantageous target %i worth %.3f\n", i, bestJ, bestEU);
+        printf("Actor %u has most advantageous target %i worth %.3f\n", i, bestJ, bestEU);
 
         auto ai = ((const SMPActor*)(model->actrs[i]));
         auto aj = ((const SMPActor*)(model->actrs[bestJ]));
@@ -489,12 +489,12 @@ namespace SMPLib {
         brgns[bestJ].push_back(brgnIJ); // receiver's copy, just null it out later
 
         printf(" %2i proposes %2i adopt: ", nai, nai);
-        KBase::trans(brgnIJ->posInit).printf(" %.3f ");
+        KBase::trans(brgnIJ->posInit).mPrintf(" %.3f ");
         printf(" %2i proposes %2i adopt: ", nai, naj);
-        KBase::trans(brgnIJ->posRcvr).printf(" %.3f ");
+        KBase::trans(brgnIJ->posRcvr).mPrintf(" %.3f ");
       }
       else {
-        printf("Actor %i has no advantageous targets \n", i);
+        printf("Actor %u has no advantageous targets \n", i);
       }
     }
 
@@ -504,7 +504,7 @@ namespace SMPLib {
 
     auto w = actrCaps();
     cout << "w:" << endl;
-    w.printf(" %6.2f ");
+    w.mPrintf(" %6.2f ");
 
     // of course, you  can change these two parameters
     auto vr = VotingRule::Proportional;
@@ -585,7 +585,7 @@ namespace SMPLib {
       auto u_im = KMatrix::map(buk, na, nb);
 
       cout << "u_im: " << endl;
-      u_im.printf(" %.5f ");
+      u_im.mPrintf(" %.5f ");
 
       cout << "Doing probCE for the " << nb << " bargains of actor " << k << " ... " << flush;
       auto p = Model::scalarPCE(na, nb, w, u_im, vr, vpm, ReportingLevel::Medium);
@@ -648,8 +648,8 @@ namespace SMPLib {
     }
 
     for (auto b : uBrgns) {
-      int aI = model->actrNdx(b->actInit);
-      int aR = model->actrNdx(b->actRcvr);
+      //int aI = model->actrNdx(b->actInit);
+      //int aR = model->actrNdx(b->actRcvr);
       //printf("Delete bargain [%2i:%2i] \n", aI, aR);
       delete b;
     }
@@ -940,7 +940,7 @@ namespace SMPLib {
     for (unsigned int i = 0; i < numAct; i++) {
       for (unsigned int k = 0; k < numDim; k++) {
         cout << actrs[i]->name << commaSep;
-        printf("Dim-%02i %s", k, commaSep.c_str());
+        printf("Dim-%02u %s", k, commaSep.c_str());
         //cout << "Dim-"<< k << commaSep;
         for (unsigned int t = 0; t < history.size(); t++) {
           State* st = history[t];
@@ -1012,7 +1012,7 @@ namespace SMPLib {
     unsigned int numActor = atoi(numActorString.c_str());
     string numDimString = csv.get_value(1, 4);
     int numDim = atoi(numDimString.c_str());
-    printf("Number of actors: %i \n", numActor);
+    printf("Number of actors: %u \n", numActor);
     printf("Number of dimensions: %i \n", numDim);
     cout << endl << flush;
 
@@ -1036,17 +1036,17 @@ namespace SMPLib {
       string nis = csv.get_value(3 + i, 1);
       assert(0 < nis.length());
       actorNames.push_back(nis);
-      printf("Actor %3i name: %s \n", i, actorNames[i].c_str());
+      printf("Actor %3u name: %s \n", i, actorNames[i].c_str());
 
       // get long descriptions
       string descsi = csv.get_value(3 + i, 2);
       actorDescs.push_back(descsi);
-      printf("Actor %3i desc: %s \n", i, actorDescs[i].c_str());
+      printf("Actor %3u desc: %s \n", i, actorDescs[i].c_str());
 
       // get capability/power, often on 0-100 scale
       string psi = csv.get_value(3 + i, 3);
       double pi = atof(psi.c_str());
-      printf("Actor %3i power: %5.1f \n", i, pi);
+      printf("Actor %3u power: %5.1f \n", i, pi);
       assert(0 <= pi); // zero weight is pointless, but not incorrect
       assert(pi < 1E8); // no real upper limit, so this is just a sanity-check
       cap(i, 0) = pi;
@@ -1062,7 +1062,7 @@ namespace SMPLib {
     for (unsigned int j = 0; j < numDim; j++) {
       string insi = csv.get_value(2, 4 + 2 * j);
       dNames.push_back(insi);
-      printf("Dimension %2i: %s \n", j, dNames[j].c_str());
+      printf("Dimension %2u: %s \n", j, dNames[j].c_str());
     }
     cout << endl;
 
@@ -1074,11 +1074,11 @@ namespace SMPLib {
       for (unsigned int j = 0; j < numDim; j++) {
         string posSIJ = csv.get_value(3 + i, 4 + 2 * j);
         double posIJ = atof(posSIJ.c_str());
-        printf("pos[%3i , %3i] =  %5.3f \n", i, j, posIJ);
+        printf("pos[%3u , %3u] =  %5.3f \n", i, j, posIJ);
         cout << flush;
         if ((posIJ < 0.0) || (+100.0 < posIJ)) { // lower and upper limit
           errBuff = newChars(100);
-          sprintf(errBuff, "SMPModel::readCSV: Out-of-bounds position for actor %i on dimension %i:  %f",
+          sprintf(errBuff, "SMPModel::readCSV: Out-of-bounds position for actor %u on dimension %u:  %f",
             i, j, posIJ);
           throw(KException(errBuff));
         }
@@ -1092,7 +1092,7 @@ namespace SMPLib {
         //cout << flush;
         if ((salIJ < 0.0) || (+100.0 < salIJ)) { // lower and upper limit
           errBuff = newChars(100);
-          sprintf(errBuff, "SMPModel::readCSV: Out-of-bounds salience for actor %i on dimension %i:  %f",
+          sprintf(errBuff, "SMPModel::readCSV: Out-of-bounds salience for actor %u on dimension %u:  %f",
             i, j, salIJ);
           throw(KException(errBuff));
         }
@@ -1103,7 +1103,7 @@ namespace SMPLib {
         if (+100.0 < salI) { // upper limit: no more than 100% of attention to all issues
           errBuff = newChars(100);
           sprintf(errBuff,
-            "SMPModel::readCSV: Out-of-bounds total salience for actor %i:  %f",
+            "SMPModel::readCSV: Out-of-bounds total salience for actor %u:  %f",
             i, salI);
           throw(KException(errBuff));
         }
@@ -1114,10 +1114,10 @@ namespace SMPLib {
     }
 
     cout << "Position matrix:" << endl;
-    pos.printf("%5.1f  ");
+    pos.mPrintf("%5.1f  ");
     cout << endl << endl << flush;
     cout << "Salience matrix:" << endl;
-    sal.printf("%5.1f  ");
+    sal.mPrintf("%5.1f  ");
     cout << endl << flush;
 
     // get them into the proper internal scale:

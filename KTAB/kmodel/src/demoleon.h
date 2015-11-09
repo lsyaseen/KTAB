@@ -150,7 +150,7 @@ namespace DemoLeon {
 
   class LeonState : public State {
   public:
-    LeonState(LeonModel * em);
+   explicit LeonState(LeonModel * em);
     ~LeonState();
     const LeonModel * eMod = nullptr; // saves a lot of type-casting
 
@@ -183,7 +183,7 @@ namespace DemoLeon {
   class LeonModel : public Model {
     friend class LeonActor;
   public:
-    LeonModel(PRNG * r);
+    explicit LeonModel(PRNG * r);
     virtual ~LeonModel();
 
     // syntheize random, but not-ridiculous, data for a base year

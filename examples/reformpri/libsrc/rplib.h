@@ -116,13 +116,13 @@ private:
 
 class RPModel : public Model {
 public:
-    RPModel(PRNG* rng);
+    explicit RPModel(PRNG* rng);
     virtual ~RPModel();
 
     static RPModel* randomMS(unsigned int numA, unsigned int numI,
                              VotingRule vr, RPActor::PropModel pMod, PRNG * rng);
 
-    double utilActorPos(unsigned int ai, const vector<unsigned int> pstn) const;
+    double utilActorPos(unsigned int ai, const vector<unsigned int> &pstn) const;
 
     unsigned int govBudget = 0;
     KMatrix  govCost = KMatrix();
@@ -149,7 +149,7 @@ private:
 
 class RPState : public State {
 public:
-    RPState(Model* mod);
+    explicit RPState(Model* mod);
     ~RPState();
     //KMatrix actrCaps() const;
 

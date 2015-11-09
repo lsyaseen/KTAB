@@ -55,7 +55,7 @@ namespace KBase {
   template <class GAP>
   class GAOpt {
   public:
-    GAOpt(unsigned int s);
+    explicit GAOpt(unsigned int s);
     virtual ~GAOpt();
 
     void init(vector < GAP* > ipop); 
@@ -144,8 +144,8 @@ namespace KBase {
     assert(equiv != nullptr);
     iter = 0;
     sIter = 0;
-    double oldBest = 0.0;
-    double newBest = 0.0;
+    //double oldBest = 0.0;
+    //double newBest = 0.0;
     bool runP = true;
 
     assert((0 <= c) && (0 <= m) && (0 < c + m));
@@ -163,10 +163,10 @@ namespace KBase {
     sortPop();
     while (runP) {
       auto pri = getNth(0);
-      oldBest = get<0>(pri);
+      double oldBest = get<0>(pri);
       step();
       pri = getNth(0);
-      newBest = get<0>(pri);
+      double newBest = get<0>(pri);
       double dv = newBest - oldBest;
       assert(0.0 <= dv);
 
@@ -175,7 +175,7 @@ namespace KBase {
       runP = (iter < maxI) && (sIter < maxS);
 
       if (ReportingLevel::Low < srl) {
-        printf("%i/%i iterations    %i/%i stable \n", iter, maxI, sIter, maxS);
+        printf("%u/%u iterations    %u/%u stable \n", iter, maxI, sIter, maxS);
         printf("newBest value: %+.4f up %+.4f  \n", newBest, dv);
         cout << "newBest gene: ";
         showGene(get<1>(pri));
@@ -188,7 +188,7 @@ namespace KBase {
     }
     if (ReportingLevel::Silent < srl) {
       auto pri = getNth(0);
-      printf("Search completed after %i/%i iterations    %i/%i stable \n", iter, maxI, sIter, maxS);
+      printf("Search completed after %u/%u iterations    %u/%u stable \n", iter, maxI, sIter, maxS);
       printf("best value: %+.4f  \n", get<0>(pri));
       cout << "best gene: ";
       showGene(get<1>(pri));
@@ -342,7 +342,7 @@ namespace KBase {
       auto pri = gpool[i];
       auto vi = get<0>(pri);
       auto gi = get<1>(pri);
-      printf("%4i  %8.3f   ", i, vi);
+      printf("%4u  %8.3f   ", i, vi);
       cout << flush;
       assert(nullptr != gi);
       showGene(gi);
@@ -370,7 +370,7 @@ namespace KBase {
     assert(makeGene != nullptr);
     assert(nullptr != r);
     rng = r;
-    const unsigned int ps = gpool.size();
+    //const unsigned int ps = gpool.size();
     for (unsigned int i = 0; i < gpool.size(); i++) {
       auto pri = gpool[i];
       if (nullptr == get<1>(pri)) {

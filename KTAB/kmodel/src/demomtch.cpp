@@ -58,8 +58,7 @@ namespace DemoMtch {
     return p;
   }
 
-  void showMtchPstn(const MtchPstn & mp) {
-    const unsigned int n = mp.match.size();
+  void showMtchPstn(const MtchPstn & mp) { 
     cout << "[MtchPstn ";
     for (auto m : mp.match) {
       cout << m << " ";
@@ -84,7 +83,7 @@ namespace DemoMtch {
       }
     }
 
-    printf("Number of changed matchings: %i \n", numC);
+    printf("Number of changed matchings: %u \n", numC);
 
     return (!earlyP && (0 == numC));
   }
@@ -278,7 +277,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
       md0->addActor(ai);
       st0->addPstn(pi);
 
-      printf("%2i: %s,  %s \n", i, ai->name.c_str(), ai->desc.c_str());
+      printf("%2u: %s,  %s \n", i, ai->name.c_str(), ai->desc.c_str());
       printf("Scalar capability: %.2f \n", ai->sCap);
       printf("Voting rule: %s \n", KBase::vrName(ai->vr).c_str());
       printf("Values assigned to each sweet: \n");
@@ -309,12 +308,12 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
   // -------------------------------------------------
   void demoDivideSweets(uint64_t s, PRNG* rng) {
 
-    printf("Using PRNG seed: %020lu \n", s);
+    printf("Using PRNG seed: %020llu \n", s);
     rng->setSeed(s);
 
     const unsigned int numI = 25;
     const unsigned int numA = 7;
-    printf("Dividing %i sweets between %i actors \n", numI, numA);
+    printf("Dividing %u sweets between %u actors \n", numI, numA);
 
     double minCap = 50;
     double maxCap = 100;
@@ -328,7 +327,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
       as.push_back(ai);
 
 
-      printf("%2i: %s , %s \n", i, ai->name.c_str(), ai->desc.c_str());
+      printf("%2u: %s , %s \n", i, ai->name.c_str(), ai->desc.c_str());
       printf("Capability: %.2f \n", ai->sCap);
       cout << "Voting rule: " << KBase::vrName(ai->vr) << endl;
       cout << "Valuation of each sweet: ";
@@ -351,7 +350,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
     auto u = KMatrix::map(uFn1, numA, numA);
 
     cout << "Raw actor-pos util matrix" << endl;
-    u.printf(" %.4f ");
+    u.mPrintf(" %.4f ");
     cout << endl << flush;
 
     auto vfn = [as, ps](unsigned int k, unsigned int i, unsigned int j) {
@@ -362,7 +361,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
 
     auto c = Model::coalitions(vfn, as.size(), ps.size());
     cout << "Coalition strength matrix" << endl;
-    c.printf(" %+9.3f ");
+    c.mPrintf(" %+9.3f ");
     cout << endl << flush;
 
     auto vpm = Model::VPModel::Linear;
@@ -370,15 +369,15 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
     auto pv = Model::vProb(vpm, c);
 
     cout << "Probability Opt_i > Opt_j" << endl;
-    pv.printf(" %.4f ");
+    pv.mPrintf(" %.4f ");
     cout << endl;
 
     auto p = Model::probCE(pv);
     cout << "Probability Opt_i" << endl;
-    p.printf(" %.4f ");
+    p.mPrintf(" %.4f ");
 
     cout << "Expected utility to actors: " << endl;
-    (u*p).printf(" %+8.3f ");
+    (u*p).mPrintf(" %+8.3f ");
     cout << endl << flush;
 
     for (auto a : as) { delete a; }
@@ -388,7 +387,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
 
   // ------------------------------------------------- 
   void demoMaxSupport(uint64_t s, PRNG* rng) {
-    printf("Using PRNG seed: %020lu \n", s);
+    printf("Using PRNG seed: %020llu \n", s);
     rng->setSeed(s);
 
     const unsigned int numA = 7;
@@ -460,7 +459,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
 
     for (unsigned int i = 0; i < numA; i++) {
       auto ai = (MtchActor*)as[i];
-      printf("%2i: %s , %s \n", i, ai->name.c_str(), ai->desc.c_str());
+      printf("%2u: %s , %s \n", i, ai->name.c_str(), ai->desc.c_str());
       printf("Capability: %.2f \n", ai->sCap);
       cout << "Voting rule: " << KBase::vrName(ai->vr) << endl;
       cout << "Valuation of each sweet: ";
@@ -482,7 +481,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
 
     auto u = KMatrix::map(uFn1, numA, numA);
     cout << "Raw actor-pos util matrix" << endl;
-    u.printf(" %.4f ");
+    u.mPrintf(" %.4f ");
     cout << endl << flush;
     // end: cut-n-paste creation and display code from above
 
@@ -498,12 +497,12 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
 
 
     for (unsigned int i = 0; i < ps.size(); i++){
-      printf("zeta[%i] = %7.3f \n", i, zeta(as, ps[i]));
+      printf("zeta[%u] = %7.3f \n", i, zeta(as, ps[i]));
     }
 
     // Now we setup a GAOpt to look for the position which maximizes zeta.
     unsigned int gps = 20;
-    printf("gpool: %i   \n", gps);
+    printf("gpool: %u   \n", gps);
     auto gOpt = new KBase::GAOpt<MtchGene>(gps);
 
     gOpt->cross = [](const MtchGene* g1, const MtchGene* g2, PRNG* rng) {
@@ -595,7 +594,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
 
   void demoMtchSUSN(uint64_t s, PRNG* rng) {
 
-    printf("Using PRNG seed: %020lu \n", s);
+    printf("Using PRNG seed: %020llu \n", s);
     rng->setSeed(s);
 
 
@@ -645,17 +644,17 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
     auto u = st0->aUtil[0]; // everyone got the same perspective, in this demo
 
     cout << "Util matrix for U(actor_r, pstn_c) in random initial state: " << endl;
-    u.printf(" %.4f ");
+    u.mPrintf(" %.4f ");
 
     auto pn = st0->pDist(-1);
     auto p = std::get<0>(pn);
 
     cout << "Probability of outcomes in random initial state: " << endl;
-    p.printf(" %.4f ");
+    p.mPrintf(" %.4f ");
     cout << endl << flush;
 
     cout << "Expected utility to actors in random initial state: " << endl;
-    (u*p).printf(" %.4f "); //TODO: may need to modify this to use only unique positions
+    (u*p).mPrintf(" %.4f "); //TODO: may need to modify this to use only unique positions
     cout << endl << flush;
 
     md0->run();
@@ -665,14 +664,14 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
 
   void multiMtchSUSN(uint64_t s, PRNG* rng) {
 
-    printf("Using PRNG seed: %020lu \n", s);
+    printf("Using PRNG seed: %020llu \n", s);
     rng->setSeed(s);
     unsigned int numTrial = 3;
     unsigned int numStbl = 0;
     for (unsigned int i = 1; i <= numTrial; i++) {
       if (oneMtchSUSN(s, rng))
         numStbl++;
-      printf("Stabilized: %i in %i / %i runs\n", numStbl, i, numTrial);
+      printf("Stabilized: %u in %u / %u runs\n", numStbl, i, numTrial);
     }
 
     return;
@@ -713,17 +712,17 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
     auto u = st0->aUtil[0]; // everyone gets the same perspective, in this demo
 
     cout << "Util matrix for U(actor_r, pstn_c) in random initial state: " << endl;
-    u.printf(" %.4f ");
+    u.mPrintf(" %.4f ");
 
     auto pn = st0->pDist(-1);
     auto p = std::get<0>(pn);
 
     cout << "Probability of outcomes in random initial state: " << endl;
-    p.printf(" %.4f ");
+    p.mPrintf(" %.4f ");
     cout << endl << flush;
 
     cout << "Expected utility to actors in random initial state: " << endl;
-    (u*p).printf(" %.4f "); // TODO: may need to modify this to use only unique positions
+    (u*p).mPrintf(" %.4f "); // TODO: may need to modify this to use only unique positions
     cout << endl << flush;
 
     auto newPstns = vector<Position*>();
@@ -740,13 +739,13 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
 
         switch (ah->pMod) {
         case MtchActor::PropModel::ExpUtil:
-          printf("maxEU search for actor %i ... \n", ih);
+          printf("maxEU search for actor %u ... \n", ih);
           break;
         case MtchActor::PropModel::Probability:
-          printf("maxProb search for actor %i ... \n", ih);
+          printf("maxProb search for actor %u ... \n", ih);
           break;
         case MtchActor::PropModel::AgreeUtil:
-          printf("maxAgU search for actor %i ... \n", ih);
+          printf("maxAgU search for actor %u ... \n", ih);
           break;
         }
 
@@ -772,8 +771,8 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
         MtchPstn* npi = new MtchPstn(get<1>(evmp));
         newPstns.push_back(npi);
 
-        printf("Old position %2i, %4i: ", ih, iter); showMtchPstn(*opi); cout << endl;
-        printf("New position %2i, %4i: ", ih, iter); showMtchPstn(*npi); cout << endl;
+        printf("Old position %2u, %4u: ", ih, iter); showMtchPstn(*opi); cout << endl;
+        printf("New position %2u, %4u: ", ih, iter); showMtchPstn(*npi); cout << endl;
 
         bool ei = equivMtchPstn(*npi, *opi);
         if (!ei) {
@@ -801,17 +800,17 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
       cout << " done" << endl;
 
       cout << "Util matrix for U(actor_r, pstn_c): " << endl;
-      u2.printf(" %.4f ");
+      u2.mPrintf(" %.4f ");
 
       auto pn2 = st0->pDist(-1);
       auto p2 = std::get<0>(pn2);
 
       cout << "Probability of outcomes: " << endl;
-      p2.printf(" %.4f ");
+      p2.mPrintf(" %.4f ");
       cout << endl << flush;
 
       cout << "Expected utility to actors: " << endl;
-      (u2*p2).printf(" %.4f "); // TODO: may need to modify this to use only unique positions
+      (u2*p2).mPrintf(" %.4f "); // TODO: may need to modify this to use only unique positions
       cout << endl << flush;
 
 
@@ -884,8 +883,9 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
 
     double bestEU = get<0>(r0);
     MtchPstn bestMP = get<1>(r0);
-    unsigned int iNum = get<2>(r0);
-    unsigned int sNum = get<3>(r0);
+    // iteration number and stability count currently ignored
+    //unsigned int iNum = get<2>(r0);
+    //unsigned int sNum = get<3>(r0);
 
     auto r1 = tuple<double, MtchPstn>(bestEU, bestMP);
     return r1;
@@ -931,13 +931,13 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
       if (ReportingLevel::Low < rl) {
         switch (ah->pMod) {
         case MtchActor::PropModel::ExpUtil:
-          printf("maxEU search for actor %i ... \n", ih);
+          printf("maxEU search for actor %u ... \n", ih);
           break;
         case MtchActor::PropModel::Probability:
-          printf("maxProb search for actor %i ... \n", ih);
+          printf("maxProb search for actor %u ... \n", ih);
           break;
         case MtchActor::PropModel::AgreeUtil:
-          printf("maxAgU search for actor %i ... \n", ih);
+          printf("maxAgU search for actor %u ... \n", ih);
           break;
         }
       }
@@ -964,8 +964,8 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
       s2->addPstn(newPi);
 
       if (ReportingLevel::Low < rl) {
-        printf("Old position %2i: ", ih); showMtchPstn(*oldPi); cout << endl;
-        printf("New position %2i: ", ih); showMtchPstn(*newPi); cout << endl;
+        printf("Old position %2u: ", ih); showMtchPstn(*oldPi); cout << endl;
+        printf("New position %2u: ", ih); showMtchPstn(*newPi); cout << endl;
       }
     } // end of loop over ih, actors
 
@@ -977,14 +977,14 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
       auto pn2 = pDist(-1); // objective perspective
       auto p2 = std::get<0>(pn2);
       cout << "Util matrix for U(actor_r, pstn_c) in new state: " << endl;
-      u2.printf(" %.4f ");
+      u2.mPrintf(" %.4f ");
 
       cout << "Probability of outcomes in new state: " << endl;
-      p2.printf(" %.4f ");
+      p2.mPrintf(" %.4f ");
       cout << endl << flush;
 
       cout << "Expected utility to actors in new state: " << endl;
-      (u2*p2).printf(" %.4f "); // TODO: may need to modify this to use only unique positions
+      (u2*p2).mPrintf(" %.4f "); // TODO: may need to modify this to use only unique positions
       cout << endl << flush;
     }
 

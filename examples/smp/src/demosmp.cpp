@@ -69,11 +69,11 @@ void demoActorUtils(uint64_t s, PRNG* rng) {
     unsigned int sDim = 3;
     auto sp1 = new VctrPstn(KMatrix::uniform(rng, sDim, 1, 0.0, 1.0));
     cout << "Random spatial position, sp1:" << endl;
-    sp1->printf(" %.3f ");
+    sp1->mPrintf(" %.3f ");
     cout << endl << flush;
     auto sp2 = new VctrPstn(KMatrix::uniform(rng, sDim, 1, 0.0, 1.0));
     cout << "Random spatial position, sp2:" << endl;
-    sp2->printf(" %.3f ");
+    sp2->mPrintf(" %.3f ");
     cout << endl << flush;
     auto alice = new SMPActor("Alice", "first cryptographer");
     alice->randomize(rng, sDim);
@@ -84,14 +84,14 @@ void demoActorUtils(uint64_t s, PRNG* rng) {
     md0->addActor(alice);
     st0->addPstn(iPos);
     cout << "Alice's position is (2*sp1 + sp2)/3:" << endl;
-    iPos->printf(" %.3f ");
+    iPos->mPrintf(" %.3f ");
     cout << endl << flush;
     printf("Alice's scalar capability: %.3f \n", alice->sCap);
     cout << "Alice's voting rule (overall): " << vrName(alice->vr) << endl;
     printf("Alice's risk attitude: %.3f \n", st0->nra(0, 0));
     printf("Alice's total salience %.4f \n", sum(alice->vSal));
     printf("Alice's vector salience: \n");
-    alice->vSal.printf(" %.3f ");
+    alice->vSal.mPrintf(" %.3f ");
 
 
     double va = alice->vote(sp1, sp2, st0);
@@ -120,8 +120,8 @@ void demoEUSpatial(unsigned int numA, unsigned int sDim, uint64_t s, PRNG* rng) 
     rng->setSeed(s);
 
     cout << "EU State for SMP actors with scalar capabilities" << endl;
-    printf("Number of actors; %i \n", numA);
-    printf("Number of SMP dimensions %i \n", sDim);
+    printf("Number of actors; %u \n", numA);
+    printf("Number of SMP dimensions %u \n", sDim);
 
     // note that because all actors use the same scale for capability, utility, etc,
     // their 'votes' are on the same scale and influence can be added up meaningfully
@@ -179,7 +179,7 @@ void demoEUSpatial(unsigned int numA, unsigned int sDim, uint64_t s, PRNG* rng) 
         for (unsigned int j = 0; j < nbSize; j++) {
             nameBuff[j] = (char)0;
         }
-        sprintf(nameBuff, "SActor-%02i", i);
+        sprintf(nameBuff, "SActor-%02u", i);
         auto ni = string(nameBuff);
         delete nameBuff;
         nameBuff = nullptr;
@@ -197,13 +197,13 @@ void demoEUSpatial(unsigned int numA, unsigned int sDim, uint64_t s, PRNG* rng) 
     for (unsigned int i = 0; i < numA; i++) {
         auto ai = ((SMPActor*)(md0->actrs[i]));
         auto ri = st0->nra(i, 0);
-        printf("%2i: %s , %s \n", i, ai->name.c_str(), ai->desc.c_str());
+        printf("%2u: %s , %s \n", i, ai->name.c_str(), ai->desc.c_str());
         cout << "voting rule: " << vrName(ai->vr) << endl;
         cout << "Pos vector: ";
         VctrPstn * pi = ((VctrPstn*)(st0->pstns[i]));
-        trans(*pi).printf(" %+7.4f ");
+        trans(*pi).mPrintf(" %+7.4f ");
         cout << "Sal vector: ";
-        trans(ai->vSal).printf(" %+7.4f ");
+        trans(ai->vSal).mPrintf(" %+7.4f ");
         printf("Capability: %.3f \n", ai->sCap);
         printf("Risk attitude: %+.4f \n", ri);
         cout << endl;
@@ -221,7 +221,7 @@ void demoEUSpatial(unsigned int numA, unsigned int sDim, uint64_t s, PRNG* rng) 
 
     auto u = KMatrix::map(uFn1, numA, numA);
     cout << "Raw actor-pos util matrix" << endl;
-    u.printf(" %.4f ");
+    u.mPrintf(" %.4f ");
     cout << endl << flush;
 
     auto w = st0->actrCaps(); //  KMatrix::map(wFn, 1, numA);
@@ -236,11 +236,11 @@ void demoEUSpatial(unsigned int numA, unsigned int sDim, uint64_t s, PRNG* rng) 
     KMatrix p = Model::scalarPCE(numA, numA, w, u, vr, vpm, ReportingLevel::Medium);
 
     cout << "Expected utility to actors: " << endl;
-    (u*p).printf(" %.3f ");
+    (u*p).mPrintf(" %.3f ");
     cout << endl << flush;
 
     cout << "Net support for positions: " << endl;
-    (w*u).printf(" %.3f ");
+    (w*u).mPrintf(" %.3f ");
     cout << endl << flush;
 
     auto aCorr = [](const KMatrix & x, const KMatrix & y) {
@@ -268,7 +268,7 @@ void demoEUSpatial(unsigned int numA, unsigned int sDim, uint64_t s, PRNG* rng) 
     md0->sqlAUtil(nState-1); 
 
     cout << "Completed model run" << endl << endl;
-    printf("There were %i states, with %i steps between them\n", nState, nState - 1);
+    printf("There were %u states, with %i steps between them\n", nState, nState - 1);
 
     cout << "History of actor positions over time" << endl;
     md0->showVPHistory();

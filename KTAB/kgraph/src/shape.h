@@ -17,7 +17,7 @@ namespace Tetris {
   public:
     static unsigned int shapeCounter;
     Shape() { idNum = shapeCounter++; setShape(TCode::N); }
-    Shape(TCode p) { idNum = shapeCounter++; setShape(p); }
+    explicit Shape(TCode p) { idNum = shapeCounter++; setShape(p); }
     void setShape(TCode p);
     void setRandomShape();
     TCode getShape() const { return tName; }

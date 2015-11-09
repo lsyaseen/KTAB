@@ -44,43 +44,43 @@
 #include "prng.h"
 
 namespace KBase {
-using std::shared_ptr;
-using std::tuple;
-using KBase::KMatrix;
-using KBase::ReportingLevel;
+  using std::shared_ptr;
+  using std::tuple;
+  using KBase::KMatrix;
+  using KBase::ReportingLevel;
 
-class KMatrix;
-class PRNG;
-class Model;
-class Actor;
-class Position;
-class State;
+  class KMatrix;
+  class PRNG;
+  class Model;
+  class Actor;
+  class Position;
+  class State;
 
-class VctrPstn;
-class MtchPstn;
-class MtchGene;
+  class VctrPstn;
+  class MtchPstn;
+  class MtchGene;
 
-// How much influence to exert (vote) given a difference in [0,1] utility
-enum class VotingRule : char {
+  // How much influence to exert (vote) given a difference in [0,1] utility
+  enum class VotingRule : char {
     Binary, PropBin, Proportional, PropCbc, Cubic
-};
-// No more than 256 distinct voting rules
+  };
+  // No more than 256 distinct voting rules
 
-string vrName(VotingRule vr);
-
-
-vector <MtchPstn> uniqueMP(vector <MtchPstn> mps);
+  string vrName(VotingRule vr);
 
 
-enum class ThirdPartyCommit {
+  vector <MtchPstn> uniqueMP(vector <MtchPstn> mps);
+
+
+  enum class ThirdPartyCommit {
     None, Semi, Full
-};
-// third parties have the same range of voting rules as in VotingRule enum.
-string tpcName(ThirdPartyCommit tpc);
+  };
+  // third parties have the same range of voting rules as in VotingRule enum.
+  string tpcName(ThirdPartyCommit tpc);
 
-class Model {
-public:
-    Model(PRNG * r);
+  class Model {
+  public:
+    explicit Model(PRNG * r);
     virtual ~Model();
 
     // In the abstract, you run a model by stepping it until it is time to stop.
@@ -102,7 +102,7 @@ public:
 
     // calculate strength of coalitions for general actors and options.
     static KMatrix coalitions(function<double(unsigned int ak, unsigned int pi, unsigned int pj)> vfn,
-                              unsigned int numAct, unsigned int numOpt);
+      unsigned int numAct, unsigned int numOpt);
 
     // whether you consider the probability of a coalition winning to go up linearly
     // or quadratically in strength-compared-to-opponent:
@@ -110,7 +110,7 @@ public:
     // Square law says 2:1 advantage gives pv = 4/5, and 3:1 gives 9/10
     //
     enum class VPModel {
-        Linear, Square
+      Linear, Square
     };
     static string VPMName(VPModel vpm);
 
@@ -127,7 +127,7 @@ public:
     static KMatrix condPCE(const KMatrix & pv);
 
     static KMatrix scalarPCE(unsigned int numAct, unsigned int numOpt, const KMatrix & w,
-                             const KMatrix & u, VotingRule vr, VPModel vpm, ReportingLevel rl);
+      const KMatrix & u, VotingRule vr, VPModel vpm, ReportingLevel rl);
 
     virtual unsigned int addActor(Actor* a);
     int actrNdx(const Actor* a) const;
@@ -142,12 +142,12 @@ public:
     unsigned int numAct = 0;
     PRNG * rng = nullptr;
     vector<State*> history = {};
-};
+  };
 
 
-class State {
-public:
-    State(Model* mod);
+  class State {
+  public:
+    explicit State(Model* mod);
     virtual ~State();
 
 
@@ -167,39 +167,39 @@ public:
     vector<KMatrix> aUtil = {}; // aUtil[h](i,j) is h's estimate of the utility to A_i of Pos_j
     vector<Position*> pstns = {};
 
-protected:
+  protected:
 
     virtual bool equivNdx(unsigned int i, unsigned int j) const = 0;
-    vector<unsigned int> testUniqueNdx( function <bool(unsigned int, unsigned int)> tfn) const;
+    vector<unsigned int> testUniqueNdx(function <bool(unsigned int, unsigned int)> tfn) const;
     vector<unsigned int> uniqueNdx() const;
 
-private:
-};
+  private:
+  };
 
 
-// In the abstract, we can not say much about actors.
-// Different utility models might assume different parameters
-// in the utility function - and the associated actor
-// would have to have their own value for those parameters.
-// For example, their capability may change over time,
-// so an actor like that would have to have a history of capabilities
-// into  which the State could look.
-// An actor in multi-dimensional issues might have different
-// capabilities on different issues.
-// They do not have fixed positions, but change over time.
-// And so on.
-class Actor {
-public:
+  // In the abstract, we can not say much about actors.
+  // Different utility models might assume different parameters
+  // in the utility function - and the associated actor
+  // would have to have their own value for those parameters.
+  // For example, their capability may change over time,
+  // so an actor like that would have to have a history of capabilities
+  // into  which the State could look.
+  // An actor in multi-dimensional issues might have different
+  // capabilities on different issues.
+  // They do not have fixed positions, but change over time.
+  // And so on.
+  class Actor {
+  public:
     Actor(string n, string d);
     virtual ~Actor();
 
     static double thirdPartyVoteSU(double wk, VotingRule vr, ThirdPartyCommit comm,
-                                   double pik, double pjk, double uki, double ukj, double ukk);
+      double pik, double pjk, double uki, double ukj, double ukk);
 
     static double vProbLittle(VotingRule vr, double wn, double uni, double unj, double contrib_i_ij, double contrib_j_ij);
 
-    string name="GA"; // a short name, usually 2-5 characters
-    string desc="Generic Actor"; // short description, like a line or two.
+    string name = "GA"; // a short name, usually 2-5 characters
+    string desc = "Generic Actor"; // short description, like a line or two.
 
 
     // the most common kinds of votes for actors are the following:
@@ -231,46 +231,46 @@ public:
     // double vote(const Position * ap1, const Position * ap2) const = 0;
 
 
-protected:
-};
+  protected:
+  };
 
 
-// -------------------------------------------------
-// Similarly, there is not much to say about abstract positions.
-class Position {
-public:
+  // -------------------------------------------------
+  // Similarly, there is not much to say about abstract positions.
+  class Position {
+  public:
     Position();
     virtual ~Position();
-};
+  };
 
 
 
-// -------------------------------------------------
+  // -------------------------------------------------
 
-// Basic vector position: just a column-vector of numbers.
-// They could be interpretted in many ways, as policies
-// are often described by a vector of numbers (e.g. tax/subsidy rates).
-class VctrPstn : public Position, public KMatrix {
-public:
+  // Basic vector position: just a column-vector of numbers.
+  // They could be interpretted in many ways, as policies
+  // are often described by a vector of numbers (e.g. tax/subsidy rates).
+  class VctrPstn : public Position, public KMatrix {
+  public:
     VctrPstn();
     VctrPstn(unsigned int nr, unsigned int nc);
-    VctrPstn(const KMatrix & m); // copy constructor
+    explicit VctrPstn(const KMatrix & m); // copy constructor
 
     virtual ~VctrPstn();
-};
+  };
 
-// -------------------------------------------------
-// this is a matching of N items to M categories.
-// Note that this is intended to be independent of MtchState, MtchActor, etc.
-// Each category is a bucket into which 0, 1, or more items can be put.
-// Each item goes in exactly one category. A Matching states, for each of N items,
-// which of M categories it goes into. Thus, there are M^N possible matchings.
-// Examples are items = pieces of candy, categories = which actor gets them,
-// or items = projects to fund, categories = {High, Medium, Low} priority, actors = interest groups
-// or items = cabinet seats, categories = parties, actors = interest groups
-// or ....
-class MtchPstn : public Position {
-public:
+  // -------------------------------------------------
+  // this is a matching of N items to M categories.
+  // Note that this is intended to be independent of MtchState, MtchActor, etc.
+  // Each category is a bucket into which 0, 1, or more items can be put.
+  // Each item goes in exactly one category. A Matching states, for each of N items,
+  // which of M categories it goes into. Thus, there are M^N possible matchings.
+  // Examples are items = pieces of candy, categories = which actor gets them,
+  // or items = projects to fund, categories = {High, Medium, Low} priority, actors = interest groups
+  // or items = cabinet seats, categories = parties, actors = interest groups
+  // or ....
+  class MtchPstn : public Position {
+  public:
     MtchPstn();
     virtual ~MtchPstn();
     virtual vector<MtchPstn> neighbors(unsigned int nVar) const;
@@ -281,12 +281,12 @@ public:
     unsigned int numItm = 0;
     unsigned int numCat = 0;
     vector<unsigned int> match = {}; // must be of length numItm
-};
+  };
 
 
-// bundle up methods relevant to GA over MtchPstn
-class MtchGene : public MtchPstn {
-public:
+  // bundle up methods relevant to GA over MtchPstn
+  class MtchGene : public MtchPstn {
+  public:
     MtchGene();
     ~MtchGene();
 
@@ -298,12 +298,12 @@ public:
 
     void setState(vector<Actor*> as, vector<MtchPstn*> ps);
 
-protected:
+  protected:
     void copySelf(MtchGene*) const;
     // links to the State are necessary to evaluate the net support, EU, etc.
     vector<Actor*> actrs = {};
     vector<MtchPstn*> pstns = {};
-};
+  };
 
 
 }; // end of namespace

@@ -155,7 +155,7 @@ namespace KBase {
   }
 
 
-  void KMatrix::printf(string fs) const {
+  void KMatrix::mPrintf(string fs) const {
     const char * fc = fs.c_str();
     auto pf = [fc, this](unsigned int i, unsigned int j) {
       std::printf(fc, (*this)(i, j));

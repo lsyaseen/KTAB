@@ -136,7 +136,7 @@ namespace SMPLib {
     enum class BigRAdjust {
       None, Half, Full
         };
-    SMPState(Model * m);
+    explicit SMPState(Model * m);
     virtual ~SMPState();
 
     virtual void setDiff();
@@ -185,7 +185,7 @@ namespace SMPLib {
 
   class SMPModel : public Model {
   public:
-    SMPModel(PRNG * rng);
+    explicit SMPModel(PRNG * rng);
     virtual ~SMPModel();
 
     static double bsUtil(double d, double R);

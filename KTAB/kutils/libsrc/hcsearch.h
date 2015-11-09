@@ -135,7 +135,7 @@ namespace KBase {
       iter++;
 
       if (ReportingLevel::Low < srl) {
-        printf("%i/%i iterations    %i/%i stable \n", iter, iMax, sIter, sMax);
+        printf("%u/%u iterations    %u/%u stable \n", iter, iMax, sIter, sMax);
         printf("newBest value: %+.4f up %+.4f \n", vBest, dv);
         printf("newBest point: ");
         show(p0);

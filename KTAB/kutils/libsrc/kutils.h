@@ -83,7 +83,7 @@ template<typename T> T popBack(vector<T> & v) {
 
 class KException {  // just something to throw around
 public:
-    KException(string m);
+    explicit KException(string m);
     virtual ~KException();
     string msg="";
 };

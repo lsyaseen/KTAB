@@ -207,8 +207,7 @@ namespace SMPLib {
 
     smpDB = nullptr;
     sqlite3 * db; // I don't like passing 'this' into lambda-functions
-    char* zErrMsg = nullptr;
-    int  rc;
+    char* zErrMsg = nullptr; 
     string sql;
 
     auto sOpen = [&db](unsigned int n) {
@@ -249,9 +248,9 @@ namespace SMPLib {
     // Create & execute SQL statements
     for (unsigned int i = 0; i < 12; i++) {
       auto buff = newChars(50);
-      sprintf(buff, "Created table %i successfully \n", i);
+      sprintf(buff, "Created table %u successfully \n", i);
       sql = createTableSQL(i);
-      rc = sExec(sql, buff);
+      sExec(sql, buff); // ignore return-code
       buff = nullptr;
       cout << flush;
     }
@@ -304,7 +303,7 @@ namespace SMPLib {
       }
     }
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
-    printf("Stored SQL for turn %i of all estimators, actors, and positions \n", t);
+    printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 
     delete sqlBuff;
     sqlBuff = nullptr;

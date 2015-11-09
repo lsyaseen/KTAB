@@ -210,14 +210,13 @@ namespace Tetris {
     char* buff = nullptr;
 
     buff = newChar(20);
-    sprintf(buff, "%i", lineCount);
+    sprintf(buff, "%u", lineCount);
     TetrisUI::theUI->outputLines->value(std::string(buff).c_str());
     delete buff;
-    buff = nullptr;
 
 
     buff = newChar(20);
-    sprintf(buff, "%i", score);
+    sprintf(buff, "%u", score);
     TetrisUI::theUI->outputScore->value(std::string(buff).c_str());
     delete buff;
     buff = nullptr;
