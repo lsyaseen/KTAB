@@ -125,6 +125,10 @@ namespace KBase {
     zeroFillVec(0, 0); // totally empty
   }
 
+  KMatrix::~KMatrix() {
+    zeroFillVec(0, 0); // totally empty
+  }
+
 
   KMatrix::KMatrix(unsigned int nr, unsigned int nc) {
     zeroFillVec(nr, nc);

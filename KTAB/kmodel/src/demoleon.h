@@ -81,8 +81,8 @@ namespace DemoLeon {
     virtual double vote(const Position * ap1, const Position * ap2) const;
     double posUtil(const Position * ap1) const;
 
-    LeonModel * eMod;
-    unsigned int idNum;
+    const LeonModel * eMod = nullptr;
+    unsigned int idNum = 0;
     // econ model returns results as a row-vector of [factor | sector],
     // so it needs to know its ID to specify which column.
 
@@ -128,8 +128,8 @@ namespace DemoLeon {
     // bargaining or vector-capabilities, because this one certainly is not,
     // but to show that we are not locked into either SMP or scalar-capabilities. 
     //
-    KMatrix vCap;
-    VotingRule vr;
+    KMatrix vCap = KMatrix();
+    VotingRule vr = VotingRule::Proportional; // plausible default
 
 
     // with the Cubic voting rule, you can get very skewed results
@@ -137,10 +137,10 @@ namespace DemoLeon {
     // interval. By construction, the minimum possible (and achievable)
     // is zero, but we still need to work out the scale factor
     // for this actor to convert "raw" utilities to [0,1];
-    double minS;
-    double refS;
-    double refU;
-    double maxS;
+    double minS = 0;
+    double refS = 0.5;
+    double refU = 0.5;
+    double maxS = 1;
 
     void randomize(PRNG* rng);
     void setShareUtilScale(const KMatrix & runs);
@@ -152,7 +152,7 @@ namespace DemoLeon {
   public:
     LeonState(LeonModel * em);
     ~LeonState();
-    const LeonModel * eMod; // saves a lot of type-casting
+    const LeonModel * eMod = nullptr; // saves a lot of type-casting
 
     
     // use the parameters of your state to compute the relative probability of each actor's position
@@ -213,42 +213,42 @@ namespace DemoLeon {
     static double stateDist (const LeonState* s1 , const LeonState* s2 );
 
     /// how close together positions must be to be considered equivalent
-    double posTol;
+    double posTol = 1E-5;
 
   protected:
-    unsigned int L; // factors of production
-    unsigned int M; // consumption groups
-    unsigned int N; // economic sectors
+    unsigned int L = 0; // factors of production
+    unsigned int M = 0; // consumption groups
+    unsigned int N = 0; // economic sectors
     // a subsidy of 0.5 cuts price in half, a subsidy of 0.90 cuts it by a factor 10, and a subsidy of 1 makes it free.
     // Hence 0 <= maxSub < 1
-    double maxSub;
+    double maxSub = 0.5;
 
     // a tax of 0.5 raises the price 50%, a tax of 9 raises by a factor of 10.
     // Hence 0 <= maxTax
-    double maxTax;
+    double maxTax = 0.5;
 
     // x0: column-vecttor of base year (zero tax) exports
-    KMatrix  x0;
+    KMatrix  x0 = KMatrix();
 
     // eps: column-vector of price-elasticities of export
-    KMatrix  eps;
+    KMatrix  eps = KMatrix();
 
     // aL: Leontief matrix, inv(I-A), taking no account of future growth and investment
     //     aL * X = qClm
     //     used by factors to estimate impact.
-    KMatrix  aL;
+    KMatrix  aL = KMatrix();
 
     // bL: Leontief matrix, taking into account future growth and investment
     //     bL * X == betaQX
     //     used by sectors to estimate impact
-    KMatrix  bL;
+    KMatrix  bL = KMatrix();
 
     // rho: matrix mapping output to factor VA/budgets: budgetL == rho x qClm:
     //      with dimensions [L, 1] = [L,N] * [N,1]
-    KMatrix  rho;
+    KMatrix  rho = KMatrix();
 
     // vas: row-vector of fractional value-added shares per sector (i.e. rho added over factors)
-    KMatrix  vas;
+    KMatrix  vas = KMatrix();
 
   private:
 

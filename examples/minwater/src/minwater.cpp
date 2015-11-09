@@ -615,7 +615,7 @@ int main(int ac, char **av) {
 
   bool waterMinP = false;
   bool rmlpP = false;
-  uint64_t dSeed = 0xD67CC16FE69C2868; // arbitrary
+  uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary
   uint64_t seed = dSeed;
   bool run = true;
 

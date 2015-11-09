@@ -96,12 +96,14 @@ namespace KBase {
     vector<double>::const_iterator begin() const { return vals.begin(); };
     vector<double>::const_iterator end() const { return vals.end(); };
     
+    virtual ~KMatrix();
+
   private:
     void zeroFillVec(unsigned int nr, unsigned int nv);
     void pivot(unsigned int r, unsigned int c);
-    unsigned int rows;
-    unsigned int clms;
-    vector<double> vals;
+    unsigned int rows = 0;
+    unsigned int clms = 0;
+    vector<double> vals = vector<double>();
     inline unsigned int nFromRC(const unsigned int r, const unsigned int c) const;
     void rcFromN(const unsigned int n, unsigned int & r, unsigned int &c) const;
   };

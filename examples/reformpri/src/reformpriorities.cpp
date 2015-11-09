@@ -155,7 +155,7 @@ int main(int ac, char **av) {
     using RfrmPri::printPerm;
 
     auto sTime = KBase::displayProgramStart();
-    uint64_t dSeed = 0xD67CC16FE69C2868; // arbitrary
+    uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary
     uint64_t seed = dSeed;
     bool siP = false;
     bool cpP = false;

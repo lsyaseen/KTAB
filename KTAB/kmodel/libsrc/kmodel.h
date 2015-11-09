@@ -134,13 +134,14 @@ public:
 
     int addState(State* s);
 
-    function <bool(unsigned int iter, const State* s)> stop; // you have to provide this λ-fn
+    function <bool(unsigned int iter, const State* s)> stop = nullptr;
+    // you have to provide this λ-fn
 
     // these should probably be less public and more protected
-    vector<Actor*> actrs;
-    unsigned int numAct;
-    PRNG * rng;
-    vector<State*> history;
+    vector<Actor*> actrs = {};
+    unsigned int numAct = 0;
+    PRNG * rng = nullptr;
+    vector<State*> history = {};
 };
 
 
@@ -161,10 +162,10 @@ public:
     // it is tricky to make a single function to do this.
     virtual tuple< KMatrix, vector<unsigned int>> pDist(int persp) const = 0;
 
-    Model * model;
-    function <State* () > step; // you have to provide this λ-fn
-    vector<KMatrix> aUtil; // aUtil[h](i,j) is h's estimate of the utility to A_i of Pos_j
-    vector<Position*> pstns;
+    Model * model = nullptr;
+    function <State* ()> step = nullptr; // you have to provide this λ-fn
+    vector<KMatrix> aUtil = {}; // aUtil[h](i,j) is h's estimate of the utility to A_i of Pos_j
+    vector<Position*> pstns = {};
 
 protected:
 
@@ -197,8 +198,8 @@ public:
 
     static double vProbLittle(VotingRule vr, double wn, double uni, double unj, double contrib_i_ij, double contrib_j_ij);
 
-    string name; // a short name, usually 2-5 characters
-    string desc; // short description, like a line or two.
+    string name="GA"; // a short name, usually 2-5 characters
+    string desc="Generic Actor"; // short description, like a line or two.
 
 
     // the most common kinds of votes for actors are the following:
@@ -254,6 +255,7 @@ public:
     VctrPstn();
     VctrPstn(unsigned int nr, unsigned int nc);
     VctrPstn(const KMatrix & m); // copy constructor
+
     virtual ~VctrPstn();
 };
 
@@ -276,9 +278,9 @@ public:
 
 
 
-    unsigned int numItm;
-    unsigned int numCat;
-    vector<unsigned int> match; // must be of length numItm
+    unsigned int numItm = 0;
+    unsigned int numCat = 0;
+    vector<unsigned int> match = {}; // must be of length numItm
 };
 
 
@@ -299,8 +301,8 @@ public:
 protected:
     void copySelf(MtchGene*) const;
     // links to the State are necessary to evaluate the net support, EU, etc.
-    vector<Actor*> actrs;
-    vector<MtchPstn*> pstns;
+    vector<Actor*> actrs = {};
+    vector<MtchPstn*> pstns = {};
 };
 
 

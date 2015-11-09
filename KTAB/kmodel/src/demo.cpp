@@ -200,7 +200,7 @@ int main(int ac, char **av) {
     using std::endl;
 
     auto sTime = KBase::displayProgramStart();
-    uint64_t dSeed = 0xD67CC16FE69C2868; // arbitrary
+    uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary
     uint64_t seed = dSeed;
     bool run = true;
     bool pceP = false;

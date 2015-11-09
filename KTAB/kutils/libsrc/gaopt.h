@@ -68,12 +68,12 @@ namespace KBase {
     void show();   
 
     // lambda functions that must be supplied to define your particular problem
-    function <tuple<GAP*, GAP*>(const GAP* g1, const GAP* g2, PRNG* rng)> cross;
-    function <GAP* (const GAP* g1, PRNG* rng)> mutate;
-    function <double(const GAP* g1)> eval;
-    function <void(const GAP*)> showGene;
-    function <GAP* (PRNG* rng)> makeGene;
-    function <bool(const GAP* g1, const GAP* g2)> equiv;
+    function <tuple<GAP*, GAP*>(const GAP* g1, const GAP* g2, PRNG* rng)> cross = nullptr;
+    function <GAP* (const GAP* g1, PRNG* rng)> mutate = nullptr;
+    function <double(const GAP* g1)> eval = nullptr;
+    function <void(const GAP*)> showGene = nullptr;
+    function <GAP* (PRNG* rng)> makeGene = nullptr;
+    function <bool(const GAP* g1, const GAP* g2)> equiv = nullptr;
 
     // If you provide the appropriate methods in a GAP class,
     // the lambdas can be quite simple:
@@ -91,14 +91,14 @@ namespace KBase {
     void crossPop();
     void dropDups();
     void selectPop();
-    vector < tuple<double, GAP* >> gpool;
-    unsigned int pSize;
-    double cFrac;
-    double mFrac;
+    vector < tuple<double, GAP* >> gpool = {};
+    unsigned int pSize = 0;
+    double cFrac = 1.0;
+    double mFrac = 0.5;
     GAP* mutateOne(const GAP* g1, PRNG* rng);
     tuple<GAP*, GAP*> crossPair(const GAP* g1, const GAP* g2, PRNG* rng);
     void cyclicApply(function <void(unsigned int i)> fn, double f);
-    PRNG* rng;
+    PRNG* rng = nullptr;
   };
 
   template<class GAP>

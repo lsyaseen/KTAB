@@ -42,8 +42,8 @@ const double TolIFD = 1E-6;
 
 LeonActor::LeonActor(string n, string d, LeonModel* em, unsigned int id) : Actor(n, d) {
     assert(nullptr != em);
-    vr = VotingRule::Proportional; // just a default
-    eMod = em;
+    vr = VotingRule::Proportional; 
+    eMod = ((const LeonModel*) em);
     idNum = id;
     minS = 0;
     refS = 0.5;
@@ -1620,7 +1620,7 @@ int main(int ac, char **av) {
     using std::flush;
 
     auto sTime = KBase::displayProgramStart();
-    uint64_t dSeed = 0xD67CC16FE69C2868; // arbitrary
+    uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary
     uint64_t seed = dSeed;
     bool run = true;
     bool euEconP = false;

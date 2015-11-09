@@ -85,10 +85,10 @@ class KException {  // just something to throw around
 public:
     KException(string m);
     virtual ~KException();
-    string msg;
+    string msg="";
 };
 
-
+/*
 class CoordMap {
     /// map back and forth between screen and domain coords
 public:
@@ -99,16 +99,17 @@ public:
     double s2d (int s);
 
 protected:
-    double as;
-    double bs;
+    double as=0;
+    double bs=0;
 
-    double ad;
-    double bd;
+    double ad=0;
+    double bd=0;
 
 private:
     const bool testMap = true; // for a while
     int cmRound(double x);
 };
+*/
 
 }; // namespace
 // -------------------------------------------------

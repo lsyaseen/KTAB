@@ -56,6 +56,9 @@ using std::thread;
 
 using KBase::ReportingLevel;
 
+
+  /*
+
 void demoCoords(PRNG* rng) {
     using KBase::CoordMap;
 
@@ -110,6 +113,8 @@ void demoCoords(PRNG* rng) {
     return;
 }
 
+*/
+  
 void show(string str, const KMatrix & m, string fs) {
     cout << str << endl;
     m.printf(fs.c_str());
@@ -224,8 +229,8 @@ void demoThreadSynch (unsigned int n) {
     };
 
     struct CCounter {
-        Counter * c;
-        mutex m; // one mutex per concurrent-counter object
+        Counter * c = 0;
+      mutex m; // one mutex per concurrent-counter object
 
         CCounter (Counter * c0) {
             c = c0;
@@ -1879,7 +1884,7 @@ int main(int ac, char **av) {
     using UDemo::TargetedBV;
     auto sTime = KBase::displayProgramStart();
 
-    uint64_t dSeed = 0xD67CC16FE69C2868; // arbitrary
+    uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary 
     uint64_t seed = dSeed;
     bool matrixP = false;
     bool goptP = false;
@@ -1988,7 +1993,7 @@ int main(int ac, char **av) {
     // Windows only prints part, with lu, lX, llu, and llX.
 
 
-    UDemo::demoCoords(rng);
+    //    UDemo::demoCoords(rng);
 
     if (threadP) {
         UDemo::demoThreadLambda(10);
