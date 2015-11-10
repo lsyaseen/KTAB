@@ -50,8 +50,8 @@ public:
     virtual void update(Canvas * c) const; //  set the state of the canvas to whatever is needed
 
     // row 0 is the top, clm 0 is the left
-    unsigned int rows;
-    unsigned int clms;
+    unsigned int rows = 0;
+    unsigned int clms = 0;
 
     unsigned int nFromIJ(int i, int j) const;
     
@@ -74,10 +74,10 @@ public:
 
     // current shape and location,
     // as well as the next shape.
-    Shape currShape;
-    int currI;
-    int currJ;
-    Shape nextShape;
+    Shape currShape = Shape();
+    int currI = 0;
+    int currJ = 0;
+    Shape nextShape = Shape();
 protected:
     void drawBackground(Canvas * c) const;
     void drawCurrShape(Canvas * c) const;
@@ -93,7 +93,7 @@ protected:
     
 
 private:
-    vector<TCode> frags; // fragments of old shapes
+    vector<TCode> frags = {}; // fragments of old shapes
 };
 
 }; // end of namespace

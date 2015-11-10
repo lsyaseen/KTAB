@@ -84,7 +84,7 @@ namespace KBase {
     
     auto showFn = [this](string preface, const KMatrix & p,double v) {
       printf("%s point: \n", preface.c_str());
-      trans(p).printf(" %+0.4f ");
+      trans(p).mPrintf(" %+0.4f ");
       printf("%s value: %+.6f \n", preface.c_str(), v);
       if (nullptr != report) {
           report(p);
@@ -125,7 +125,7 @@ namespace KBase {
       
         
       if (ReportingLevel::Medium <= rl) {
-        printf ("After iteration %i \n", iter);
+        printf ("After iteration %u \n", iter);
 	showFn("Best current", p0, v0);
         if (nullptr != report) {
           report(p0);

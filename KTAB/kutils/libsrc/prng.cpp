@@ -39,7 +39,7 @@ namespace KBase {
 
 
   PRNG::PRNG() {
-    uint64_t seed_val = 0xE891B1146F39EA59; // one of my favorite integers
+    uint64_t seed_val = 0xD67CC16FE69C185C; // one of my favorite integers
     mt.seed(seed_val);
   }
 

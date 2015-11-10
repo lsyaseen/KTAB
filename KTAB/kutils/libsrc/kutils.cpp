@@ -82,6 +82,7 @@ KException::~KException() { }
 
 
 // -------------------------------------------------
+  /*
 CoordMap::CoordMap(int s1, double d1, int s2, double d2) {
     ad = (d2 - d1)/((double)(s2 - s1));
     bd = ((s2*d1) - (s1*d2))/((double)(s2 - s1));
@@ -137,6 +138,7 @@ int CoordMap::cmRound(double x) {
     }
     return y;
 }
+  */
 
 }; // namespace
 

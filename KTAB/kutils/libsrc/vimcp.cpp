@@ -116,10 +116,10 @@ namespace KBase {
     KMatrix u0, const double eps, const unsigned int iMax) {
     if (false) {
       cout << "Received M:" << endl;
-      M.printf("%+.4f  ");
+      M.mPrintf("%+.4f  ");
       cout << endl;
       cout << "Received q:" << endl;
-      trans(q).printf("%+.4f  ");
+      trans(q).mPrintf("%+.4f  ");
       cout << endl << endl << flush;
     }
 

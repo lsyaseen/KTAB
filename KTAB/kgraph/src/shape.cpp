@@ -77,7 +77,7 @@ namespace Tetris {
   }
 
   void Shape::showCoords() const { 
-    printf("[%c %05i ", name, idNum);
+    printf("[%c %05u ", name, idNum);
     for (unsigned int k = 0; k < 4; k++){ 
       printf("(%+i, %+i)", x(k), y(k));
       if (3 != k) { printf(" "); }

@@ -95,20 +95,20 @@ public:
 
     tuple<double, MtchPstn> maxProbEUPstn(PropModel pm, const MtchState * mst) const;
 
-    unsigned int idNum;
+    unsigned int idNum = 0;
 
-    VotingRule vr;
-    PropModel pMod;
+    VotingRule vr =  VotingRule::Proportional;;
+    PropModel pMod = PropModel::ExpUtil;
 
     // scalar capacity, positive
-    double sCap;
+    double sCap = 0;
 
     // Similar to the LeonActor, this is a listing of how
     // much this actor values each item.
     // The values are all non-negative and sum to 1:
     // lowest utility, 0, to get nothing, and
     // highest utility, 1, to get everything.
-    vector<double> vals;
+    vector<double> vals = {};
 
 protected:
 
@@ -118,7 +118,7 @@ private:
 
 class MtchState : public State {
 public:
-    MtchState(Model* mod);
+    explicit MtchState(Model* mod);
     ~MtchState();
 
     KMatrix actrCaps() const;
@@ -148,13 +148,13 @@ private:
 
 class MtchModel : public Model {
 public:
-    MtchModel(PRNG* rng);
+    explicit MtchModel(PRNG* rng);
     virtual ~MtchModel();
 
     static MtchModel* randomMS(unsigned int numA, unsigned int numI, VotingRule vr, MtchActor::PropModel pMod, PRNG * rng);
 
-    unsigned int numItm;
-    unsigned int numCat;  // happens to equal numAct, in this demo
+    unsigned int numItm = 0;
+    unsigned int numCat = 0;  // happens to equal numAct, in this demo
 
 protected:
 

@@ -210,14 +210,13 @@ namespace Tetris {
     char* buff = nullptr;
 
     buff = newChar(20);
-    sprintf(buff, "%i", lineCount);
+    sprintf(buff, "%u", lineCount);
     TetrisUI::theUI->outputLines->value(std::string(buff).c_str());
     delete buff;
-    buff = nullptr;
 
 
     buff = newChar(20);
-    sprintf(buff, "%i", score);
+    sprintf(buff, "%u", score);
     TetrisUI::theUI->outputScore->value(std::string(buff).c_str());
     delete buff;
     buff = nullptr;
@@ -412,12 +411,17 @@ namespace Tetris {
 
 
   void TApp::processKey(int x, int y, int k) {
+    //    printf( "TApp::processKey %i  %i   %i ", x, y, k);
+    //    cout << endl << flush;
+    
     switch (k) {
 
     case 49:    // 1
     case 65457: // num-1
+    case 65367: // num-1
     case 55:    // 7
     case 65463: // num-7
+    case 65360: // num-7
     case 122:   // z
       if (!paused) {
         //printf("Try CCW/LRot on current piece\n");
@@ -436,7 +440,9 @@ namespace Tetris {
 
     case 51:    // 3
     case 65459: // num-3
+    case 65366: // num-3
     case 57:    // 9
+    case 65365: // num-9
     case 65465: // num-9
     case 120:   // x
       if (!paused) {
@@ -469,7 +475,7 @@ namespace Tetris {
 
     case 53:    // 5, p/r toggle
     case 65461: // num-5, p/r toggle
-    case 112:   // 'p' for pause
+    case 65291: // num-5, p/r toggle
       if (paused) {
         resume(0.001);
       }
@@ -477,7 +483,11 @@ namespace Tetris {
         pause();
       }
       break;
-
+      
+    case 112:   // 'p' for pause
+      pause();
+      break;
+      
     case 113:   // 'q' for quit
       quit();
       break;
@@ -494,6 +504,7 @@ namespace Tetris {
     case 32:    // space
     case 56:    // 8
     case 65464: // num-8
+    case 65362: // up arrow
       if (!paused) {
         //printf("Try HDrop on current piece \n");
         board->tryHDrop();

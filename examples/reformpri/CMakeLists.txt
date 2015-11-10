@@ -33,6 +33,10 @@ set(CMAKE_MODULE_PATH
 set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
+if (UNIX)
+  set (ENABLE_EFFCPP false CACHE  BOOL "Check Effective C++ Guidelines")
+endif(UNIX)
+
 # -------------------------------------------------
 set (ENABLE_EFENCE false CACHE  BOOL "Use Electric Femce memory debugger")
 
@@ -113,6 +117,9 @@ message(STATUS "Using PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
 # Also on Unix, the C++11 thread library relies on pthreads
 if (UNIX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 ")
+  if (ENABLE_EFFCPP)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++ ")
+  endif (ENABLE_EFFCPP)
 endif(UNIX)
 
 # --------------------------------------------

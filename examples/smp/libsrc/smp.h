@@ -32,55 +32,55 @@
 #include "kmodel.h"
 
 namespace SMPLib {
-// namespace to which KBase has no access
-using std::function;
-using std::shared_ptr;
-using std::string;
-using std::tuple;
-using std::vector;
-using KBase::newChars;
-using KBase::KMatrix;
-using KBase::PRNG;
-using KBase::Actor;
-using KBase::Position;
-using KBase::State;
-using KBase::Model;
-using KBase::VotingRule;
-using KBase::ReportingLevel;
-using KBase::VctrPstn;
+  // namespace to which KBase has no access
+  using std::function;
+  using std::shared_ptr;
+  using std::string;
+  using std::tuple;
+  using std::vector;
+  using KBase::newChars;
+  using KBase::KMatrix;
+  using KBase::PRNG;
+  using KBase::Actor;
+  using KBase::Position;
+  using KBase::State;
+  using KBase::Model;
+  using KBase::VotingRule;
+  using KBase::ReportingLevel;
+  using KBase::VctrPstn;
 
-class SMPActor;
-class SMPState;
-class SMPModel;
+  class SMPActor;
+  class SMPState;
+  class SMPModel;
 
-const string appVersion = "0.1";
+  const string appVersion = "0.1";
 
-// -------------------------------------------------
-// Plain-Old-Data
-struct BargainSMP {
+  // -------------------------------------------------
+  // Plain-Old-Data
+  struct BargainSMP {
     BargainSMP(const SMPActor* ai, const SMPActor* ar, const VctrPstn & pi, const VctrPstn & pr);
     ~BargainSMP();
 
 
-    const SMPActor* actInit;
-    const SMPActor* actRcvr;
-    VctrPstn posInit;
-    VctrPstn posRcvr;
-};
+    const SMPActor* actInit = nullptr;
+    const SMPActor* actRcvr = nullptr;
+    VctrPstn posInit = VctrPstn();
+    VctrPstn posRcvr = VctrPstn();
+  };
 
-// -------------------------------------------------
-// Trivial, SMP-like actor with fixed attributes
-// the old smp.cpp file, SpatialState::developTwoPosBargain, for a discussion of
-// the interpolative bargaining rule used there. Note that the demoutil
-// results indicate that weighting by (P^2 * S^2) better approximates the NBS
-// does weighting by (P * S)
-class SMPActor : public Actor {
+  // -------------------------------------------------
+  // Trivial, SMP-like actor with fixed attributes
+  // the old smp.cpp file, SpatialState::developTwoPosBargain, for a discussion of
+  // the interpolative bargaining rule used there. Note that the demoutil
+  // results indicate that weighting by (P^2 * S^2) better approximates the NBS
+  // does weighting by (P * S)
+  class SMPActor : public Actor {
 
-public:
+  public:
 
     enum class InterVecBrgn {
-        S1P1, S2P2, S2PMax
-    };
+      S1P1, S2P2, S2PMax
+        };
     // See the documentation in kutils/doc: eS2P2, dS2P2, and eS1P1 were the best, in that order.
     // Both estimators involving PMax were the least accurate.
 
@@ -103,10 +103,10 @@ public:
     // The distance is curved with risk attitude to get utility.
     // Their vote is determined by applying their scalar capacity
     // to differences in utility
-    double sCap;
+    double sCap = 0;
     //double bigR;
-    KMatrix vSal;
-    VotingRule vr;
+    KMatrix vSal = KMatrix();
+    VotingRule vr = VotingRule::Proportional; // reasonable default
 
     // the attributes used in this method are not generally part of
     // other actors, and not all positions can be represented as a list of doubles.
@@ -115,7 +115,7 @@ public:
                                        double prbI, double prbJ, InterVecBrgn ivb);
 
 
-protected:
+  protected:
     static void interpBrgnSnPm(unsigned int n, unsigned int m,
                                double tik, double sik, double prbI,
                                double tjk, double sjk, double prbJ,
@@ -125,18 +125,18 @@ protected:
                                  double & bik, double & bjk);
 
 
-};
+  };
 
-class SMPState : public State {
+  class SMPState : public State {
 
-public:
+  public:
     enum class BigRRange {
-        Min, Mid, Max
-    };
+      Min, Mid, Max
+        };
     enum class BigRAdjust {
-        None, Half, Full
-    };
-    SMPState(Model * m);
+      None, Half, Full
+        };
+    explicit SMPState(Model * m);
     virtual ~SMPState();
 
     virtual void setDiff();
@@ -148,7 +148,7 @@ public:
     // returns row-vector of actor's capabilities
     KMatrix actrCaps() const;
 
-    KMatrix nra;
+    KMatrix nra = KMatrix();
     SMPState* stepBCN();
 
     double  posProb(unsigned int i, vector<unsigned int> unq, const KMatrix & pdt) const;
@@ -157,8 +157,8 @@ public:
     // and then to develop a Bargain (possibly nullptr if no bargain is mutually preferable
     // to conflict)
     // you have to provide λ-fn for both of the following
-    function<shared_ptr<void>(const Actor* ai, const State* s)> bestTarget;
-    function<shared_ptr<void>(const Actor* aInit, const Actor* aRcvr, shared_ptr<void> btData, const State* s)> bargain;
+    function<shared_ptr<void>(const Actor* ai, const State* s)> bestTarget = nullptr;
+    function<shared_ptr<void>(const Actor* aInit, const Actor* aRcvr, shared_ptr<void> btData, const State* s)> bargain = nullptr;
 
     virtual void addPstn(Position* p);
 
@@ -167,8 +167,8 @@ public:
     void showBargains(const vector < vector < BargainSMP* > > & brgns) const;
 
 
-protected:
-    KMatrix diff;
+  protected:
+    KMatrix diff = KMatrix();
     static KMatrix bigRfromProb(const KMatrix & p, BigRRange rr);
 
 
@@ -181,11 +181,11 @@ protected:
     // return best j, p[i>j], edu[i->j]
     tuple<int, double, double> bestChallenge(unsigned int i) const;
 
-};
+  };
 
-class SMPModel : public Model {
-public:
-    SMPModel(PRNG * rng);
+  class SMPModel : public Model {
+  public:
+    explicit SMPModel(PRNG * rng);
     virtual ~SMPModel();
 
     static double bsUtil(double d, double R);
@@ -201,17 +201,17 @@ public:
     void showVPHistory() const;
 
     // number of spatial dimensions in this SMP
-    unsigned int numDim;
-    vector<string> dimName;
-    double posTol;
+    unsigned int numDim = 0;
+    vector<string> dimName = {};
+    double posTol = 1E-5;
 
     static double stateDist(const SMPState* s1 , const SMPState* s2 );
 
     virtual void sqlAUtil(unsigned int t);
 
-protected:
-    sqlite3 *smpDB; // keep this protected, to ease multi-threading
-    string scenName;
+  protected:
+    sqlite3 *smpDB = nullptr; // keep this protected, to ease multi-threading
+    string scenName = "Scen";
 
     void sqlTest();
     // note that the function to write to table #k must be kept
@@ -220,8 +220,8 @@ protected:
 
     void addDim(string dn);
 
-private:
-};
+  private:
+  };
 
 
 

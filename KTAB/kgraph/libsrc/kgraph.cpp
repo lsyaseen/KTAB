@@ -24,7 +24,8 @@ namespace KGraph {
       const double dTol = fabs(d2 - d1) / 1.0E6;
 
       auto s2dTest = [dTol, this](double dA, int sA) {
-        assert(fabs(dA - s2d(sA)) < dTol);
+        const double da2 = s2d(sA);
+        assert(fabs(dA - da2) < dTol);
         return;
       };
 
@@ -32,7 +33,8 @@ namespace KGraph {
       s2dTest(d2, s2);
 
       auto d2sTest = [this](int sA, double dA) {
-        assert(sA == d2s(dA));
+        const int sa2 = d2s(dA);
+        assert(sA == sa2);
         return;
       };
 
@@ -173,14 +175,11 @@ namespace KGraph {
     assert(pict->minX <= pict->maxX);
     assert(pict->minY <= pict->maxY);
 
-    int s1, s2 = 0;
-    double d1, d2 = 0.0;
-
     // left of screen is lowest domain coordinate
-    s1 = x();
-    d1 = pict->minX;
-    s2 = x() + w();
-    d2 = pict->maxX + pict->minW;
+    int s1 = x();
+    double d1 = pict->minX;
+    int s2 = x() + w();
+    double d2 = pict->maxX + pict->minW;
     xMap = new CoordMap(s1, d1, s2, d2);
 
     // BOTTOM of screen is lowest domain coordinate

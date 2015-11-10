@@ -78,7 +78,7 @@ namespace KBase {
     // default copy constructor, copy assigment, etc. are sufficient 
     double operator() (unsigned int i, unsigned int j) const;  // readable rvalue
     double& operator() (unsigned int i, unsigned int j);       // assignable lvalue
-    void printf(string) const;
+    void mPrintf(string) const;
     unsigned int numR() const;
     unsigned int numC() const;
     static KMatrix uniform(PRNG* rng, unsigned int nr, unsigned int nc, double a, double b);
@@ -96,12 +96,14 @@ namespace KBase {
     vector<double>::const_iterator begin() const { return vals.begin(); };
     vector<double>::const_iterator end() const { return vals.end(); };
     
+    virtual ~KMatrix();
+
   private:
     void zeroFillVec(unsigned int nr, unsigned int nv);
     void pivot(unsigned int r, unsigned int c);
-    unsigned int rows;
-    unsigned int clms;
-    vector<double> vals;
+    unsigned int rows = 0;
+    unsigned int clms = 0;
+    vector<double> vals = vector<double>();
     inline unsigned int nFromRC(const unsigned int r, const unsigned int c) const;
     void rcFromN(const unsigned int n, unsigned int & r, unsigned int &c) const;
   };

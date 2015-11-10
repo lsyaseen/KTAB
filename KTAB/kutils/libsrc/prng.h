@@ -44,7 +44,7 @@ namespace KBase {
     vector<bool> bits(unsigned int nb);
     uint64_t setSeed(uint64_t);
   protected:
-    mt19937_64 mt;
+    mt19937_64 mt = mt19937_64();
   };
 
 };

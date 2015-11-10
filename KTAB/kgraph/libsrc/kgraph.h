@@ -60,10 +60,10 @@ namespace KGraph {
     double s2d(int s);
 
   protected:
-    double as;
-    double bs;
-    double ad;
-    double bd;
+    double as = 0;
+    double bs = 0;
+    double ad = 0;
+    double bd = 0;
 
   private:
     const bool testMap = true; // for a while
@@ -97,9 +97,9 @@ namespace KGraph {
     virtual void onRelease(int x, int y, int b);
     virtual void onKeyDown(int x, int y, int k);
 
-    Picture* pict;
-    CoordMap* xMap;
-    CoordMap* yMap;
+    Picture* pict = nullptr;
+    CoordMap* xMap = nullptr;
+    CoordMap* yMap = nullptr;
 
   protected:
 
@@ -110,7 +110,7 @@ namespace KGraph {
   class Picture  {
   public:
     Picture();
-    ~Picture();
+    virtual ~Picture();
 
     void add(Canvas * c); // just adds to list
     void update() const; // just walks down the list
@@ -119,15 +119,15 @@ namespace KGraph {
     virtual void connect(Canvas * c); //  initial configuration of the canvas
     virtual void update(Canvas * c) const; //  set the state of the canvas to whatever is needed
 
-    double minX;
-    double maxX;
-    double minW; // deal with minX == maxX
-    double minY;
-    double maxY;
-    double minH; // deal with minY == mxaY
+    double minX = 0;
+    double maxX = 1;
+    double minW = 1E-6; // deal with minX == maxX
+    double minY = 0;
+    double maxY = 1;
+    double minH = 1E-6; // deal with minY == mxaY
 
   protected:
-    vector<Canvas*> canvases; // all the views 
+    vector<Canvas*> canvases = {}; // all the views 
 
   };
 

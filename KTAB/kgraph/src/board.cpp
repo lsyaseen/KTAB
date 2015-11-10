@@ -27,8 +27,8 @@ Board::Board(unsigned int r, unsigned int c) : Picture() {
     minY = 0; // BOTTOM of screen
     maxY = r; // TOP of screen
     frags = emptyBoard();
-    currShape = N;
-    nextShape = N;
+    currShape = Shape(N);
+    nextShape = Shape(N);
     resetCurrPiece();
 }
 
@@ -39,8 +39,8 @@ Board::~Board() {
 
 void Board::randomizeFragments(double f) {
     frags = emptyBoard();
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < clms; j++) {
+    for (unsigned int i = 0; i < rows; i++) {
+        for (unsigned int j = 0; j < clms; j++) {
             double x = TApp::theApp->rng->uniform(0.0, 1.0);
             TCode tij = N;
             if (x < f) {
@@ -57,7 +57,7 @@ void Board::randomizeFragments(double f) {
 void Board::randomizeRow(unsigned int i) {
     unsigned int maxInt = 8; // the higher, the more blank spaces
     //maxInt = 400; // good to keep whole pieces separate
-    maxInt = 8;  // good for individual squares
+  //    maxInt = 8;  // good for individual squares
     PRNG* rng = Tetris::TApp::theApp->rng;
     int j = rng->uniform() % clms;
     auto k = nFromIJ(i, j);
@@ -100,13 +100,13 @@ void Board::placeShape(Shape s, int i, int j) {
 }
 
 unsigned int Board::stepGame() {
-    bool ok1 = trySDrop(); // if possible, do it
+    trySDrop(); // if possible, do it
     bool ok2 = testSDrop(); // test if more dropping is possible
     unsigned int clc = 0;
     bool spaceInBox = true;
     if (!ok2) { // Current shape reached bottom
         placeShape(currShape, currI, currJ);
-        currShape = N;
+        currShape = Shape(N);
         spaceInBox = resetCurrPiece();
     }
     if ((!spaceInBox) || (TetrisUI::theUI->timeProgress->value() >= 1.0)) {
@@ -399,12 +399,6 @@ void Board::drawShape(int i, int j, Canvas * cnvs) const {
 void Board::drawUnitSquare(Fl_Color clr1, int i, int j, bool dotP, Fl_Color clr2, Canvas * cnvs) const {
     // i is the row, so it controls y
     // j is the clm, so it controls x
-    const int cx = cnvs->x();
-    const int cy = cnvs->y();
-    const int cw = cnvs->w();
-    const int ch = cnvs->h();
-    //const int x1 = cx + (j*cw) / clms;
-    //const int x2 = cx + ((j + 1)*cw) / clms;
 
     // the edges of the box in column zero are at domain coords 0.0 and 1.0
     assert(nullptr != cnvs->xMap);
@@ -412,9 +406,6 @@ void Board::drawUnitSquare(Fl_Color clr1, int i, int j, bool dotP, Fl_Color clr2
     int x2 = cnvs->xMap->d2s(j + 1);
     const int stripeW = x2 - x1;
     assert(0 < stripeW);
-
-    //const int y1 = cy + (i*ch) / rows;
-    //const int y2 = cy + ((i + 1)*ch) / rows;
 
     // the edges of the box in row zero are at domain coords 0.0 and 1.
     // The screen coords are small at the top, and large at the bottom.
@@ -428,7 +419,6 @@ void Board::drawUnitSquare(Fl_Color clr1, int i, int j, bool dotP, Fl_Color clr2
     // To leave one pixel empty on each side, and a 2-pixel stripe
     // between two squares, we offset by 1/20 and make the square 18/20
     // of the stripe-width.
-    const int sqrO = stripeW / 20;
     const int sqrW = (18 * stripeW) / 20;
     const int sqrH = (18 * stripeH) / 20;
 

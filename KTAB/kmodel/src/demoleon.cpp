@@ -42,8 +42,8 @@ const double TolIFD = 1E-6;
 
 LeonActor::LeonActor(string n, string d, LeonModel* em, unsigned int id) : Actor(n, d) {
     assert(nullptr != em);
-    vr = VotingRule::Proportional; // just a default
-    eMod = em;
+    vr = VotingRule::Proportional; 
+    eMod = ((const LeonModel*) em);
     idNum = id;
     minS = 0;
     refS = 0.5;
@@ -229,9 +229,6 @@ LeonState* LeonState::doSUSN(ReportingLevel rl) const {
     using std::flush;
     using std::get;
     LeonState* s2 = nullptr;
-    const unsigned int numA = model->numAct;
-    assert(numA == eMod->actrs.size());
-    const unsigned int numP = pstns.size();
     // TODO: filter out essentially-duplicate positions
 
     auto assertSimilar = [](const KMatrix & x, const KMatrix & y) {
@@ -243,8 +240,10 @@ LeonState* LeonState::doSUSN(ReportingLevel rl) const {
     const KMatrix u = aUtil[0]; // all have same beliefs in this demo
 
 
+    const unsigned int numA = model->numAct;
+    assert(numA == eMod->actrs.size());
     auto vpm = Model::VPModel::Linear;
-
+    const unsigned int numP = pstns.size();
     auto euMat = [rl, numA, numP, vpm, this](const KMatrix & uMat) {
 
         // again, I could do a complex vote, but I'll do the easy one.
@@ -264,23 +263,23 @@ LeonState* LeonState::doSUSN(ReportingLevel rl) const {
 
         if (ReportingLevel::Low < rl) {
             cout << "Assessing EU from util matrix: " << endl;
-            uMat.printf(" %.6f ");
+            uMat.mPrintf(" %.6f ");
             cout << endl << flush;
 
             cout << "Coalition strength matrix" << endl;
-            c.printf(" %12.6f ");
+            c.mPrintf(" %12.6f ");
             cout << endl << flush;
 
             cout << "Probability Opt_i > Opt_j" << endl;
-            pv.printf(" %.6f ");
+            pv.mPrintf(" %.6f ");
             cout << endl << flush;
 
             cout << "Probability Opt_i" << endl;
-            p.printf(" %.6f ");
+            p.mPrintf(" %.6f ");
             cout << endl << flush;
 
             cout << "Expected utility to actors: " << endl;
-            eu.printf(" %.6f ");
+            eu.mPrintf(" %.6f ");
             cout << endl << flush;
         }
 
@@ -292,8 +291,8 @@ LeonState* LeonState::doSUSN(ReportingLevel rl) const {
         printf("Assessing utility of actual state to all actors \n");
         for (unsigned int h = 0; h < numA; h++) {
             auto aPos = ((VctrPstn*)(pstns[h]));
-            printf("Actual vector-position (possibly non-neutral) of actor %2i: ", h);
-            trans(*aPos).printf(" %+.6f ");
+            printf("Actual vector-position (possibly non-neutral) of actor %2u: ", h);
+            trans(*aPos).mPrintf(" %+.6f ");
         }
         cout << endl << flush;
     }
@@ -322,11 +321,11 @@ LeonState* LeonState::doSUSN(ReportingLevel rl) const {
         if (ReportingLevel::Low < rl) {
             printf("--------------------------------------- \n");
             printf("Assessing utility to %2i of hypo-pos: ", h);
-            trans(hPos).printf(" %+.6f ");
+            trans(hPos).mPrintf(" %+.6f ");
             cout << endl << flush;
 
             printf("Hypo-util minus base util: \n");
-            (uh - uh0).printf(" %+.4E ");
+            (uh - uh0).mPrintf(" %+.4E ");
             cout << endl << flush;
         }
 
@@ -347,7 +346,7 @@ LeonState* LeonState::doSUSN(ReportingLevel rl) const {
 
         auto aPos = ((VctrPstn*)(pstns[h]));
         printf("---------------------------------------- \n");
-        printf("Search for best next-position of actor %2i \n", h);
+        printf("Search for best next-position of actor %2u \n", h);
         //printf("Search for best next-position of actor %2i starting from ", h);
         //trans(*aPos).printf(" %+.6f ");
         cout << flush;
@@ -369,24 +368,24 @@ LeonState* LeonState::doSUSN(ReportingLevel rl) const {
 
         delete vhc;
         vhc = nullptr;
-        printf("Iter: %i  Stable: %i \n", in, sn);
-        printf("Best value for %2i: %+.6f \n", h, vBest);
+        printf("Iter: %u  Stable: %u \n", in, sn);
+        printf("Best value for %2u: %+.6f \n", h, vBest);
         cout << "Best point:    ";
-        trans(pBest).printf(" %+.6f ");
+        trans(pBest).mPrintf(" %+.6f ");
         KMatrix rBest = eMod->makeFTax(pBest);
-        printf("Best rates for %2i: ", h);
-        trans(rBest).printf(" %+.6f ");
+        printf("Best rates for %2u: ", h);
+        trans(rBest).mPrintf(" %+.6f ");
 
         VctrPstn * posBest = new VctrPstn(rBest);
         s2->pstns.push_back(posBest);
 
         double du = vBest - eu0(h, 0);
-        printf("EU improvement for %2i of %+.4E \n", h, du);
+        printf("EU improvement for %2u of %+.4E \n", h, du);
         //printf("  vBest = %+.6f \n", vBest);
         //printf("  eu0(%i, 0) for %i = %+.6f \n", h, h, eu0(h,0));
         //cout << endl << flush;
         // Logically, du should always be non-negative, as VHC never returns a worse value than the starting point.
-        const double eps = 0; // 1E-5 ;
+        //const double eps = 0; // 1E-5 ;
         assert(0 <= du);
     }
 
@@ -425,21 +424,21 @@ LeonState* LeonState::doSUSN(ReportingLevel rl) const {
     KMatrix acMat = KMatrix::map(acFn, numA, numA);
     cout << endl << endl;
     cout << "Absolute correlation of policies" << endl;
-    acMat.printf(" %+0.4f ");
+    acMat.mPrintf(" %+0.4f ");
 
     cout << "Mean policy" << endl;
-    trans(meanP).printf(" %+0.4f ");
+    trans(meanP).mPrintf(" %+0.4f ");
 
     cout << "Euclidean distance to mean policy: " << endl;
     for (unsigned int i = 0; i < numA; i++) {
         const auto iPos = ((VctrPstn*)(pstns[i]));
         const auto y = *iPos;
-        printf("  %2i  %0.4f \n", i, KBase::norm(y - meanP));
+        printf("  %2u  %0.4f \n", i, KBase::norm(y - meanP));
     }
 
     KMatrix rcMat = KMatrix::map(rcFn, numA, numA);
     cout << "Correlation of policies relative to mean policy" << endl;
-    rcMat.printf(" %+0.4f ");
+    rcMat.mPrintf(" %+0.4f ");
 
 
 
@@ -464,7 +463,7 @@ void LeonState::setAUtil(ReportingLevel rl) {
     auto u = KMatrix::map(uFn1, numA, numA);
     if (KBase::ReportingLevel::Low < rl) {
         cout << "Raw actor-pos util matrix" << endl;
-        u.printf(" %.4f ");
+        u.mPrintf(" %.4f ");
         cout << endl << flush;
         cout << flush;
     }
@@ -619,7 +618,7 @@ tuple<KMatrix, KMatrix, KMatrix, KMatrix> LeonModel::makeBaseYear(unsigned int n
     for (unsigned int i = 0; i < N; i++) {
         while (f[i] * sumClmR[i] < 1.1*sumRowT[i] - sumClmT[i]) {
             f[i] = 1.15 * f[i];
-            printf("Raised f[%i] to %.3f \n", i, f[i]);
+            printf("Raised f[%u] to %.3f \n", i, f[i]);
         }
         for (unsigned int l = 0; l < L; l++) {
             rev(l, i) = f[i] * rev(l, i);
@@ -628,11 +627,11 @@ tuple<KMatrix, KMatrix, KMatrix, KMatrix> LeonModel::makeBaseYear(unsigned int n
     }
 
     cout << "Transactions:" << endl;
-    trns.printf(" %7.1f ");
+    trns.mPrintf(" %7.1f ");
     cout << endl;
 
     cout << "Value-added revenue:" << endl;
-    rev.printf(" %7.1f ");
+    rev.mPrintf(" %7.1f ");
     cout << endl;
 
     for (unsigned int i = 0; i < N; i++) {
@@ -652,11 +651,11 @@ tuple<KMatrix, KMatrix, KMatrix, KMatrix> LeonModel::makeBaseYear(unsigned int n
     }
 
     cout << "Cons:" << endl;
-    cons.printf(" %7.1f ");
+    cons.mPrintf(" %7.1f ");
     cout << endl;
 
     cout << "eXports:" << endl;
-    xprt.printf(" %7.1f ");
+    xprt.mPrintf(" %7.1f ");
     cout << endl;
 
     auto rslt = tuple<KMatrix, KMatrix, KMatrix, KMatrix>(trns, rev, xprt, cons);
@@ -684,7 +683,7 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
     assert(L == rev.numR());
     assert(N == rev.numC());
 
-    assert(M = cons.numC());
+    assert(M == cons.numC());
     assert(N == cons.numR());
 
     assert(N == xprt.numR());
@@ -781,15 +780,15 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
     }
 
     cout << "sumVARows" << endl;
-    sumVARows.printf(" %.1f ");
+    sumVARows.mPrintf(" %.1f ");
     cout << endl;
 
     cout << "sumConsClm" << endl;
-    sumConsClm.printf(" %.1f ");
+    sumConsClm.mPrintf(" %.1f ");
     cout << endl;
 
     cout << "expenditure matrix" << endl;
-    expnd.printf(" %.2f ");
+    expnd.mPrintf(" %.2f ");
     cout << endl;
 
     cout << "check (sumConsClm = expnd * sumVARows) ... " << flush;
@@ -808,7 +807,7 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
     }
 
     printf("export elasticities \n");
-    eps.printf(" %.2f ");
+    eps.mPrintf(" %.2f ");
     cout << endl;
 
     auto capReq = KMatrix(N, N);
@@ -821,7 +820,7 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
     }
 
     printf("Capital Requirements, B \n");
-    capReq.printf(" %.4f ");
+    capReq.mPrintf(" %.4f ");
     cout << endl;
 
     // ------------------------------------------------------------
@@ -843,7 +842,7 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
     }
 
     printf("Column vector of total outputs (export+trans+cons) \n");
-    qClm.printf(" %.1f ");
+    qClm.mPrintf(" %.1f ");
     cout << endl;
 
     // row matrix of column-sums
@@ -878,7 +877,7 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
         }
     }
     cout << "A matrix:" << endl;
-    A.printf(" %.4f  ");
+    A.mPrintf(" %.4f  ");
     cout << endl;
 
 
@@ -904,7 +903,7 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
     cout << "Shares of GDP to VA factors (labor groups)" << endl;
     cout << " check budgetL == rho x qClm:" << endl;
     auto budgetL = rho * qClm;
-    budgetL.printf(" %.2f "); //  these are the VA to factors
+    budgetL.mPrintf(" %.2f "); //  these are the VA to factors
     assert(mDelta(sumVARows, budgetL) < tol);
     cout << "ok" << endl;
     cout << endl;
@@ -916,13 +915,13 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
     }
     cout << "Shares of GDP to industry sectors (using Alpha, not Beta)" << endl;
     cout << "budgetS:" << endl;
-    budgetS.printf(" %.2f ");
+    budgetS.mPrintf(" %.2f ");
     assert(mDelta(sumVAClms, budgetS) < tol);
     cout << "ok" << endl;
     cout << endl;
 
     cout << "GDP: " << endl;
-    (vas*qClm).printf(" %.2f ");
+    (vas*qClm).mPrintf(" %.2f ");
     cout << endl;
 
 
@@ -936,7 +935,7 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
         budgetC(k, 0) = bk;
     }
     cout << "budgetC" << endl << flush;
-    budgetC.printf(" %.4f ");
+    budgetC.mPrintf(" %.4f ");
     assert(mDelta(budgetC, sumConsClm) < tol);
     cout << "ok" << endl;
     cout << endl;
@@ -951,30 +950,30 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
         }
     }
     cout << "zeta" << endl << flush;
-    zeta.printf(" %.4f "); // OK
+    zeta.mPrintf(" %.4f "); // OK
     cout << endl;
 
     cout << "cons" << endl << flush;
-    (zeta * budgetC).printf("%.4f  "); // OK
+    (zeta * budgetC).mPrintf("%.4f  "); // OK
     cout << endl;
 
     cout << "expnd" << endl << flush;
-    expnd.printf(" %.4f ");
+    expnd.mPrintf(" %.4f ");
     cout << endl;
 
     cout << "budgetL" << endl << flush;
-    budgetL.printf(" %.4f ");
+    budgetL.mPrintf(" %.4f ");
     cout << endl;
 
     cout << "check budgetC == expnd x budgetL" << endl << flush;
-    (expnd*budgetL).printf("%.4f  ");
+    (expnd*budgetL).mPrintf("%.4f  ");
     assert(mDelta(budgetC, expnd*budgetL) < tol);
     cout << "ok" << endl;
     cout << endl;
 
     auto alpha = A + (zeta * expnd * rho);
     cout << "alpha " << endl << flush;
-    alpha.printf(" %.4f ");
+    alpha.mPrintf(" %.4f ");
     for (auto a : alpha) {
         assert(0.0 < a);
     }
@@ -984,7 +983,7 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
     aL = inv(id - alpha);
 
     cout << "check aL * X == qClm" << endl << flush;
-    (aL*xprt).printf(" %.4f ");
+    (aL*xprt).mPrintf(" %.4f ");
     assert(mDelta(aL*xprt, qClm) < tol);
     for (auto x : aL) {
         assert(0.0 < x);
@@ -994,13 +993,13 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
 
     auto beta = alpha + (dpr + grw)*capReq;
     cout << "beta " << endl << flush;
-    beta.printf(" %.4f ");
+    beta.mPrintf(" %.4f ");
     cout << endl;
 
     bL = inv(id - beta);
     auto betaQX = bL*xprt;
     cout << "check bL * X == betaQX" << endl << flush;
-    betaQX.printf(" %.4f ");
+    betaQX.mPrintf(" %.4f ");
     for (auto x : bL) {
         assert(0.0 < x);
     }
@@ -1014,7 +1013,7 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
     }
     cout << "Shares of GDP to industry sectors (using Beta, not Alpha)" << endl;
     cout << "budgetBS:" << endl;
-    budgetBS.printf(" %.2f ");
+    budgetBS.mPrintf(" %.2f ");
     cout << endl;
 
     // A more numerically stable expression for aL: I + a + a^2 + a^3 + ...
@@ -1100,7 +1099,7 @@ KMatrix LeonModel::randomFTax(PRNG* rng) {
             // finally, adjust that including demand effects:
             ftax = makeFTax(t3);
         }
-        catch (KBase::KException ke)  {
+        catch (KBase::KException& )  {
             retry = true;
         }
     }
@@ -1123,7 +1122,7 @@ KMatrix LeonModel::makeFTax(const KMatrix & tax) const {
 
     if (ReportingLevel::Silent < srl) {
         cout << "Raw Tax: ";
-        trans(tax).printf(" %+0.6f ");
+        trans(tax).mPrintf(" %+0.6f ");
         cout << endl;
         cout << flush;
     }
@@ -1168,7 +1167,7 @@ KMatrix LeonModel::makeFTax(const KMatrix & tax) const {
         d = infsDegree(tau);
         iter = iter + 1;
         if (ReportingLevel::Low < srl) {
-            printf("%3i/%3i: %.3E \n", iter, iterMax, d);
+            printf("%3u/%3u: %.3E \n", iter, iterMax, d);
         }
         if (iter > iterMax) {
             if (ReportingLevel::Silent < srl) {
@@ -1287,17 +1286,17 @@ KMatrix LeonModel::monteCarloShares(unsigned int nRuns, PRNG* rng) {
         }
 
         if (KBase::ReportingLevel::Medium <= rl) {
-            printf("MC tax policy %4i \n", i);
-            tau.printf(" %+.4f ");
+            printf("MC tax policy %4u \n", i);
+            tau.mPrintf(" %+.4f ");
             cout << endl << flush;
-            printf("MC shares %4i \n", i);
-            shr.printf(" %+.4f ");
+            printf("MC shares %4u \n", i);
+            shr.mPrintf(" %+.4f ");
             cout << endl << flush;
             for (unsigned int j = 0; j < L + N; j++) {
                 if (L <= j) {
                     // as they are in [factor |sector] order,
                     // we have L factors to skip then N sectors to show
-                    printf("for MC tax policy %4i, actor %2i taxed %+.4f has share %+.4f \n",
+                    printf("for MC tax policy %4u, actor %2u taxed %+.4f has share %+.4f \n",
                            i, j, tau(j - L, 0), shr(0, j));
                     cout << flush;
                 }
@@ -1399,8 +1398,8 @@ LeonModel* demoSetup(unsigned int numFctr, unsigned int numCGrp, unsigned int nu
     cout << "EU State for Econ actors with vector capabilities" << endl;
     const unsigned int numA = numSect + numFctr;
     const unsigned int eDim = numSect;
-    printf("Number of actors %i \n", numA);
-    printf("Number of econ policy factors %i \n", eDim);
+    printf("Number of actors %u \n", numA);
+    printf("Number of econ policy factors %u \n", eDim);
     // Note that if eDim < numA, then they do not have enough degrees of freedom to
     // precisely target benefits. If eDim > numA, then they do.
 
@@ -1463,12 +1462,12 @@ LeonModel* demoSetup(unsigned int numFctr, unsigned int numCGrp, unsigned int nu
     for (unsigned int i = 0; i < numA; i++) {
         auto ai = (const LeonActor*)eMod0->actrs[i];
         auto pi = (const VctrPstn*)eSt0->pstns[i];
-        printf("%2i: %s , %s \n", i, ai->name.c_str(), ai->desc.c_str());
+        printf("%2u: %s , %s \n", i, ai->name.c_str(), ai->desc.c_str());
         cout << "voting rule: " << vrName(ai->vr) << endl;
         cout << "Pos vector: ";
-        trans(*pi).printf(" %+7.3f ");
+        trans(*pi).mPrintf(" %+7.3f ");
         cout << "Cap vector: ";
-        trans(ai->vCap).printf(" %7.2f ");
+        trans(ai->vCap).mPrintf(" %7.2f ");
         printf("minS: %.3f \n", ai->minS);
         printf("refS: %.3f \n", ai->refS);
         printf("maxS: %.3f \n", ai->maxS);
@@ -1488,23 +1487,23 @@ LeonModel* demoSetup(unsigned int numFctr, unsigned int numCGrp, unsigned int nu
 
     KMatrix c = Model::coalitions(vfn, eMod0->actrs.size(), eSt0->pstns.size());
     cout << "Coalition strength matrix" << endl;
-    c.printf(" %9.3f ");
+    c.mPrintf(" %9.3f ");
     cout << endl << flush;
 
     auto vpm = Model::VPModel::Linear;
 
     auto pv = Model::vProb(vpm, c);
     cout << "Probability Opt_i > Opt_j" << endl;
-    pv.printf(" %.4f ");
+    pv.mPrintf(" %.4f ");
     cout << endl;
 
     auto p = Model::probCE(pv);
     cout << "Probability Opt_i" << endl;
-    p.printf(" %.4f ");
+    p.mPrintf(" %.4f ");
 
     auto eu0 = u*p;
     cout << "Expected utility to actors: " << endl;
-    eu0.printf(" %.4f ");
+    eu0.mPrintf(" %.4f ");
     cout << endl << flush;
     return eMod0;
 } // end of demoSetup
@@ -1566,7 +1565,7 @@ void demoMaxEcon(uint64_t s,  unsigned int numF, unsigned int numG, unsigned int
         KMatrix r = eMod0->makeFTax(m);
         assert(eMod0->infsDegree(r) < TolIFD); // make sure it is a feasible tax
         printf("Rates: ");
-        trans(r).printf(" %+.6f ");
+        trans(r).mPrintf(" %+.6f ");
         return;
     };
 
@@ -1594,13 +1593,13 @@ void demoMaxEcon(uint64_t s,  unsigned int numF, unsigned int numG, unsigned int
 
     delete vhc;
     vhc = nullptr;
-    printf("Iter: %i  Stable: %i \n", in, sn);
+    printf("Iter: %u  Stable: %u \n", in, sn);
     printf("Best value : %+.6f \n", vBest);
     cout << "Best point:    ";
-    trans(pBest).printf(" %+.6f ");
+    trans(pBest).mPrintf(" %+.6f ");
     KMatrix rBest = eMod0->makeFTax(pBest);
     printf("Best rates: ");
-    trans(rBest).printf(" %+.6f ");
+    trans(rBest).mPrintf(" %+.6f ");
 
     delete vhc;
     vhc = nullptr;
@@ -1620,7 +1619,7 @@ int main(int ac, char **av) {
     using std::flush;
 
     auto sTime = KBase::displayProgramStart();
-    uint64_t dSeed = 0xD67CC16FE69C2868; // arbitrary
+    uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary
     uint64_t seed = dSeed;
     bool run = true;
     bool euEconP = false;

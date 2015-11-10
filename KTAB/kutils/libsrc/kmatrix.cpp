@@ -125,6 +125,10 @@ namespace KBase {
     zeroFillVec(0, 0); // totally empty
   }
 
+  KMatrix::~KMatrix() {
+    zeroFillVec(0, 0); // totally empty
+  }
+
 
   KMatrix::KMatrix(unsigned int nr, unsigned int nc) {
     zeroFillVec(nr, nc);
@@ -151,7 +155,7 @@ namespace KBase {
   }
 
 
-  void KMatrix::printf(string fs) const {
+  void KMatrix::mPrintf(string fs) const {
     const char * fc = fs.c_str();
     auto pf = [fc, this](unsigned int i, unsigned int j) {
       std::printf(fc, (*this)(i, j));

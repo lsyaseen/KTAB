@@ -40,6 +40,10 @@ set(CMAKE_MODULE_PATH
 set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
+if (UNIX)
+  set (ENABLE_EFFCPP false CACHE  BOOL "Check Effective C++ Guidelines")
+endif(UNIX)
+
 # -------------------------------------------------
 set (BUILD_тетрис false CACHE  BOOL "Change executable from 'ftetris' to 'тетрис'")
 
@@ -195,6 +199,9 @@ message (STATUS "KUTILS_INCLUDE_DIR: " ${KUTILS_INCLUDE_DIR})
 
 if (UNIX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 ")
+  if (ENABLE_EFFCPP)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++ ")
+  endif (ENABLE_EFFCPP)
 endif(UNIX)
 
 # --------------------------------------------

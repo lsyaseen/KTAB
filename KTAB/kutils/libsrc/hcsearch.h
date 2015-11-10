@@ -57,23 +57,23 @@ namespace KBase {
     virtual ~VHCSearch();
     tuple<double, KMatrix, unsigned int, unsigned int>
       run(KMatrix p0,
-      unsigned int iMax, unsigned int sMax, double sTol,
-      double s0, double shrink, double grow, double minStep,
-      ReportingLevel rl
-      );
+          unsigned int iMax, unsigned int sMax, double sTol,
+          double s0, double shrink, double grow, double minStep,
+          ReportingLevel rl
+          );
 
     static vector<KMatrix> vn1(const KMatrix & m0, double s);
     static vector<KMatrix> vn2(const KMatrix & m0, double s);
 
-    function <double(const KMatrix &)> eval; // maximize this function
-    function < vector<KMatrix>(const KMatrix &, double)> nghbrs;
-    function <void (const KMatrix &)> report; 
+    function <double(const KMatrix &)> eval = nullptr; // maximize this function
+    function < vector<KMatrix>(const KMatrix &, double)> nghbrs = nullptr;
+    function <void (const KMatrix &)> report = nullptr; 
   };
 
 
   // maximize
   template <class HCP>
-  class GHCSearch {
+    class GHCSearch {
   public:
     GHCSearch();
     virtual ~GHCSearch();
@@ -81,25 +81,29 @@ namespace KBase {
     tuple<double, HCP, unsigned int, unsigned int>
       run(HCP p0, ReportingLevel srl, unsigned int iMax, unsigned int sMax, double sTol);
 
-    function <double(const HCP)> eval;
-    function <vector<HCP>(const HCP)> nghbrs;
-    function <void(const HCP)> show;
+    function <double(const HCP)> eval = nullptr;
+    function <vector<HCP>(const HCP)> nghbrs = nullptr;
+    function <void(const HCP)> show = nullptr;
   };
 
   template<class HCP>
-  GHCSearch<HCP>::GHCSearch() {
+    GHCSearch<HCP>::GHCSearch() {
     eval = nullptr;
     nghbrs = nullptr;
     show = nullptr;
   }
 
   template<class HCP>
-  GHCSearch<HCP>::~GHCSearch() { }
+    GHCSearch<HCP>::~GHCSearch() {
+    eval = nullptr;
+    nghbrs = nullptr;
+    show = nullptr;
+  }
 
   template<class HCP>
-  tuple<double, HCP, unsigned int, unsigned int>
+    tuple<double, HCP, unsigned int, unsigned int>
     GHCSearch<HCP>::run(HCP p0, ReportingLevel srl,
-    unsigned int iMax, unsigned int sMax, double sTol) {
+                        unsigned int iMax, unsigned int sMax, double sTol) {
     assert(eval != nullptr);
     assert(nghbrs != nullptr);
     unsigned int iter = 0;
@@ -131,7 +135,7 @@ namespace KBase {
       iter++;
 
       if (ReportingLevel::Low < srl) {
-        printf("%i/%i iterations    %i/%i stable \n", iter, iMax, sIter, sMax);
+        printf("%u/%u iterations    %u/%u stable \n", iter, iMax, sIter, sMax);
         printf("newBest value: %+.4f up %+.4f \n", vBest, dv);
         printf("newBest point: ");
         show(p0);

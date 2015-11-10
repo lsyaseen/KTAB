@@ -93,20 +93,21 @@ public:
 
     tuple<double, MtchPstn> maxProbEUPstn(PropModel pm, const RPState * rpst) const;
 
-    unsigned int idNum;
+    unsigned int idNum = 0;
 
-    VotingRule vr;
-    PropModel pMod;
+    VotingRule vr = VotingRule::Proportional;
+    PropModel pMod = PropModel::ExpUtil;
 
     // scalar capacity, positive
-    double sCap;
+    double sCap = 0;
 
     // Similar to the LeonActor, this is a listing of how
     // much this actor values each reform item.
     // The values are all non-negative
-    vector<double> riVals;
+    vector<double> riVals {};
 
-    const RPModel *rpMod; // these particular actors need model-parameters to compute utility.
+    const RPModel *rpMod = nullptr;
+    // these particular actors need model-parameters to compute utility.
 
 protected:
 private:
@@ -115,22 +116,22 @@ private:
 
 class RPModel : public Model {
 public:
-    RPModel(PRNG* rng);
+    explicit RPModel(PRNG* rng);
     virtual ~RPModel();
 
     static RPModel* randomMS(unsigned int numA, unsigned int numI,
                              VotingRule vr, RPActor::PropModel pMod, PRNG * rng);
 
-    double utilActorPos(unsigned int ai, const vector<unsigned int> pstn) const;
+    double utilActorPos(unsigned int ai, const vector<unsigned int> &pstn) const;
 
-    unsigned int govBudget;
-    KMatrix  govCost;
-    vector<double> prob;
-    double obFactor;
-    unsigned int numItm; // number of reform items
-    vector<string> rpNames;
+    unsigned int govBudget = 0;
+    KMatrix  govCost = KMatrix();
+    vector<double> prob = {};
+    double obFactor = 0.1;
+    unsigned int numItm = 0; // number of reform items
+    vector<string> rpNames = {};
 
-    unsigned int numCat;  // happens to equal numItm, in this demo, at the categories are 1, 2, ... numItm.
+    unsigned int numCat = 0;  // happens to equal numItm, in this demo, at the categories are 1, 2, ... numItm.
 
     void initScen(unsigned int ns);
     void showHist() const;
@@ -148,7 +149,7 @@ private:
 
 class RPState : public State {
 public:
-    RPState(Model* mod);
+    explicit RPState(Model* mod);
     ~RPState();
     //KMatrix actrCaps() const;
 
@@ -166,7 +167,7 @@ protected:
     RPState * doSUSN(ReportingLevel rl) const;
     RPState * doBCN(ReportingLevel rl) const;
     // bool stableRPState(unsigned int iter, const State* s);
-    const RPModel * rpMod; // saves a lot of type-casting later
+    const RPModel * rpMod = nullptr; // saves a lot of type-casting later
 
     virtual bool equivNdx(unsigned int i, unsigned int j) const;
 

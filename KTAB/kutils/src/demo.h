@@ -69,7 +69,7 @@ public:
     double evaluate();
     double tblEval(double minD, vector<double> weights, vector<BVec> tbl) const;
     unsigned int hDist(BVec bv) const;
-    BVec bits;
+    BVec bits = BVec();
     static BVec target; // it is only a one-shot demo, so this can be static
 };
 

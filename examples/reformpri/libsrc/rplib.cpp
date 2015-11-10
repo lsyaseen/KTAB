@@ -119,7 +119,7 @@ namespace RfrmPri {
       initScen1();
       break;
     default:
-      printf("Unrecognized scenario number, %i \n", ns);
+      printf("Unrecognized scenario number, %u \n", ns);
       break;
     }
 
@@ -270,7 +270,7 @@ namespace RfrmPri {
     return;
   }
 
-  double RPModel::utilActorPos(unsigned int ai, const vector<unsigned int> pstn) const {
+  double RPModel::utilActorPos(unsigned int ai, const vector<unsigned int> &pstn) const {
     assert(ai < numAct);
     assert(numAct == actrs.size());
     auto rai = ((const RPActor*)(actrs[ai]));
@@ -294,7 +294,7 @@ namespace RfrmPri {
   void RPModel::showHist() const {
     for (unsigned int i = 0; i < history.size(); i++) {
       auto si = ((const RPState *)(history[i]));
-      printf("\n State %02i \n", i);
+      printf("\n State %02u \n", i);
       si->show();
 
       cout << endl << flush;
@@ -390,7 +390,6 @@ namespace RfrmPri {
     RPState* s2 = nullptr;
     const unsigned int numA = model->numAct;
     assert(numA == rpMod->actrs.size());
-    const unsigned int numP = pstns.size();
     // TODO: filter out essentially-duplicate positions
     //printf("RPState::doSUSN: numA %i \n", numA);
     //printf("RPState::doSUSN: numP %i \n", numP);
@@ -399,7 +398,7 @@ namespace RfrmPri {
     const KMatrix u = aUtil[0]; // all have same beliefs in this demo
 
     auto vpm = Model::VPModel::Linear;
-
+    const unsigned int numP = pstns.size();
     // Given the utility matrix, uMat, calculate the expected utility to each actor,
     // as a column-vector. Again, this is from the perspective of whoever developed uMat.
     auto euMat = [rl, numA, numP, vpm, this](const KMatrix & uMat) {
@@ -428,23 +427,23 @@ namespace RfrmPri {
       if (ReportingLevel::Low < rl) {
         printf("Util matrix is %i x %i \n", uMat.numR(), uMat.numC());
         cout << "Assessing EU from util matrix: " << endl;
-        uMat.printf(" %.6f ");
+        uMat.mPrintf(" %.6f ");
         cout << endl << flush;
 
         cout << "Coalition strength matrix" << endl;
-        c.printf(" %12.6f ");
+        c.mPrintf(" %12.6f ");
         cout << endl << flush;
 
         cout << "Probability Opt_i > Opt_j" << endl;
-        pv.printf(" %.6f ");
+        pv.mPrintf(" %.6f ");
         cout << endl << flush;
 
         cout << "Probability Opt_i" << endl;
-        p.printf(" %.6f ");
+        p.mPrintf(" %.6f ");
         cout << endl << flush;
 
         cout << "Expected utility to actors: " << endl;
-        eu.printf(" %.6f ");
+        eu.mPrintf(" %.6f ");
         cout << endl << flush;
       }
 
@@ -499,7 +498,7 @@ namespace RfrmPri {
     const unsigned int numU = uNdx0.size();
 
     if (ReportingLevel::Low < rl) {
-      printf("Out of %i positions, %i were unique: ", numA, numU);
+      printf("Out of %u positions, %u were unique: ", numA, numU);
       cout << flush;
       for (auto i : uNdx0) {
         printf("%2i ", i);
@@ -603,7 +602,7 @@ namespace RfrmPri {
 
         if (false) {
           cout << "constructed hypUtil matrix:" << endl << flush;
-          hypUtil.printf(" %8.2f ");
+          hypUtil.mPrintf(" %8.2f ");
           cout << endl << flush;
         }
 
@@ -615,7 +614,7 @@ namespace RfrmPri {
           printPerm(mph.match);
           cout << endl << flush;
           printf("Hypo-util minus base util: \n");
-          (uh - uh0).printf(" %+.4E ");
+          (uh - uh0).mPrintf(" %+.4E ");
           cout << endl << flush;
         }
         const KMatrix eu = euMat(hypUtil); // uh or hypUtil
@@ -723,7 +722,7 @@ namespace RfrmPri {
       delete ghc;
       ghc = nullptr;
       if (ReportingLevel::Medium < rl) {
-        printf("Iter: %i  Stable: %i \n", iterN, stblN);
+        printf("Iter: %u  Stable: %u \n", iterN, stblN);
         printf("Best value for %2i: %+.6f \n", h, vBest);
         cout << "Best position:    " << endl;
         cout << "numCat: " << pBest.numCat << endl;
@@ -783,7 +782,7 @@ namespace RfrmPri {
     /// and this function calculates those matrices. Note that for this demo,
     /// all actors have the same perception.
     unsigned int numA = rpMod->numAct;
-    unsigned int numR = rpMod->numItm;;
+    //unsigned int numR = rpMod->numItm;;
     auto uFn1 = [this](unsigned int i, unsigned int j) {
       auto ai = ((RPActor*)(rpMod->actrs[i]));
       auto pi = pstns[j];
@@ -800,7 +799,7 @@ namespace RfrmPri {
     auto u = KMatrix::map(uFn1, numA, numA);
     if (KBase::ReportingLevel::Low < rl) {
       cout << "Raw actor-pos util matrix" << endl;
-      u.printf(" %.4f ");
+      u.mPrintf(" %.4f ");
       cout << endl << flush;
       cout << flush;
 
@@ -823,7 +822,7 @@ namespace RfrmPri {
     const unsigned int numA = rpMod->numAct;
     for (unsigned int i = 0; i < numA; i++) {
       auto pi = ((MtchPstn*)(pstns[i]));
-      printf("Position %02i: ", i);
+      printf("Position %02u: ", i);
       printPerm(pi->match);
       cout << endl << flush;
     }
@@ -833,7 +832,7 @@ namespace RfrmPri {
     printf("There are %i unique positions \n", uNdx.size());
     for (unsigned int i1 = 0; i1 < uNdx.size(); i1++) {
       unsigned int i2 = uNdx[i1];
-      printf("  %2i:  %.4f \n", i2, p(i1, 0));
+      printf("  %2u:  %.4f \n", i2, p(i1, 0));
     }
     cout << endl;
 
