@@ -123,6 +123,13 @@ namespace SMPLib {
     double tik, double sik, double prbI,
     double tjk, double sjk, double prbJ,
     double & bik, double & bjk) {
+
+    auto round4 = [](const double x1) {
+      const double s = 10000.0;
+      const int y = ((int)(0.5 + (x1*s)));
+       double x2 = ((double)y) / s;
+      return x2;
+    };
     assert((1 == n) || (2 == n));
     assert((1 == m) || (2 == m));
 
@@ -136,9 +143,12 @@ namespace SMPLib {
 
     // imagine that either neither actor cares, or neither actor can coerce the other,
     // so that wik = 0 = wjk. We need to avoid 0/0 error, and have bi=ti and bj=tj.
+    // Thus, the asymmetry is intentional when wik = 0 = wjk.
+    // to avoid spurious asymmetry in other cases, and spurious precision always, round to 4 decimals
     const double minW = 1e-6;
-    bik = ((wik + minW)*tik + wjk*tjk) / (wik + minW + wjk);
-    bjk = (wik*tik + (minW + wjk)*tjk) / (wik + minW + wjk);
+    bik = round4( ((wik + minW)*tik + wjk*tjk) / (wik + minW + wjk));
+    bjk = round4 ((wik*tik + (minW + wjk)*tjk) / (wik + minW + wjk));
+
     return;
   }
 
