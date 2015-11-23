@@ -27,6 +27,10 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Button.H>
 //-----------------------------------------------------
+#include "csv_parser.hpp"
+#include "kutils.h"
+#include "kmodel.h"
+#include "smp.h"
 #include "mainw.h"
 //-----------------------------------------------------
 

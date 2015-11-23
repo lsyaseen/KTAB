@@ -60,7 +60,7 @@ using SMPLib::SMPState;
 // -------------------------------------------------
 void demoActorUtils(uint64_t s, PRNG* rng) {
 
-    printf("Using PRNG seed: %020lu \n", s);
+    printf("Using PRNG seed: %020llu \n", s);
     rng->setSeed(s);
 
     cout << "Demonstrate simple voting by spatial actors (scalar capability)" << endl;
@@ -113,15 +113,21 @@ void demoActorUtils(uint64_t s, PRNG* rng) {
 
 
 void demoEUSpatial(unsigned int numA, unsigned int sDim, uint64_t s, PRNG* rng) {
-    assert(0 < sDim);
-    assert(2 < numA);
-
-    printf("Using PRNG seed: %020lu \n", s);
+    printf("Using PRNG seed: %020llu \n", s);
     rng->setSeed(s);
+    if (0 == numA) {
+      numA = 5 + (rng->uniform() % 6); // i.e. [5,10] inclusive
+    }
+    if (0 == sDim) {
+      sDim = 3 + (rng->uniform() % 3); // i.e. [3,5] inclusive
+    }
 
     cout << "EU State for SMP actors with scalar capabilities" << endl;
     printf("Number of actors; %u \n", numA);
     printf("Number of SMP dimensions %u \n", sDim);
+
+    assert(0 < sDim);
+    assert(2 < numA);
 
     // note that because all actors use the same scale for capability, utility, etc,
     // their 'votes' are on the same scale and influence can be added up meaningfully
@@ -181,7 +187,7 @@ void demoEUSpatial(unsigned int numA, unsigned int sDim, uint64_t s, PRNG* rng) 
         }
         sprintf(nameBuff, "SActor-%02u", i);
         auto ni = string(nameBuff);
-        delete nameBuff;
+        delete[] nameBuff;
         nameBuff = nullptr;
         string di = "Random spatial actor";
 
@@ -332,6 +338,7 @@ int main(int ac, char **av) {
 
     // tmp args
     euSmpP = true;
+    seed = 0;
 
     if (ac > 1) {
         for (int i = 1; i < ac; i++) {
@@ -372,7 +379,7 @@ int main(int ac, char **av) {
     // seed required to reproduce the bug.
     if (euSmpP) {
         cout << "-----------------------------------" << endl;
-        DemoSMP::demoEUSpatial(7, 3, seed, rng);
+        DemoSMP::demoEUSpatial(0, 0, seed, rng);
     }
     if (csvP) {
         cout << "-----------------------------------" << endl;
