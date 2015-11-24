@@ -146,8 +146,8 @@ namespace SMPLib {
     // Thus, the asymmetry is intentional when wik = 0 = wjk.
     // to avoid spurious asymmetry in other cases, and spurious precision always, round to 4 decimals
     const double minW = 1e-6;
-    bik = round4( ((wik + minW)*tik + wjk*tjk) / (wik + minW + wjk));
-    bjk = round4 ((wik*tik + (minW + wjk)*tjk) / (wik + minW + wjk));
+    bik = round4(((wik + minW)*tik + wjk*tjk) / (wik + minW + wjk));
+    bjk = round4((wik*tik + (minW + wjk)*tjk) / (wik + minW + wjk));
 
     return;
   }
@@ -673,6 +673,7 @@ namespace SMPLib {
   // Note that the  aUtil vector of KMatrix must be set before starting this.
   // TODO: offer a choice the different ways of estimating value-of-a-state: even sum or expected value.
   // TODO: we may need to separate euConflict from this at some point
+  // TODO: add a boolean flag to record this is SQLite, which touches at least three tables
   tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsigned int i, unsigned int j) const {
 
     // you could make other choices for these two sub-models
@@ -745,6 +746,8 @@ namespace SMPLib {
       }
     }
 
+    // UtilContest, ProbVict, UtilChlg
+    // UtilSQ, UtilVict
     const double phij = chij / (chij + chji);
     const double phji = chji / (chij + chji);
 

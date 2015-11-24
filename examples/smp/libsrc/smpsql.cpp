@@ -95,6 +95,8 @@ namespace SMPLib {
       break;
 
     case 4:
+      // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
+      // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
       sql = "create table UtilContest ("  \
         "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
         "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
@@ -107,6 +109,8 @@ namespace SMPLib {
       break;
 
     case 5:
+      // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
+      // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
       sql = "create table UtilChlg ("  \
         "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
         "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
@@ -119,6 +123,8 @@ namespace SMPLib {
       break;
 
     case 6:
+      // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
+      // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
       sql = "create table UtilVict ("  \
         "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
         "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
@@ -131,6 +137,7 @@ namespace SMPLib {
       break;
 
     case 7:
+      // h's estimate that i will defeat j, including third party contributions
       sql = "create table ProbVict ("  \
         "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
         "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
@@ -142,6 +149,9 @@ namespace SMPLib {
       break;
 
     case 8:
+      // h's estimate of utility to k of status quo.
+      // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
+      // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
       sql = "create table UtilSQ ("  \
         "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
         "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
@@ -164,6 +174,8 @@ namespace SMPLib {
       break;
 
     case 10: // utility to k of ik>j
+    // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
+    // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
       sql = "create table UtilTPVict ("  \
         "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
         "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
@@ -176,6 +188,8 @@ namespace SMPLib {
       break;
 
     case 11: // utility to k of i>jk
+    // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
+    // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
       sql = "create table UtilTPLoss ("  \
         "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
         "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
@@ -207,7 +221,7 @@ namespace SMPLib {
 
     smpDB = nullptr;
     sqlite3 * db; // I don't like passing 'this' into lambda-functions
-    char* zErrMsg = nullptr; 
+    char* zErrMsg = nullptr;
     string sql;
 
     auto sOpen = [&db](unsigned int n) {
@@ -282,14 +296,14 @@ namespace SMPLib {
     sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
     // Prepared statements cache the execution plan for a query after the query optimizer has
     // found the best plan, so there is no big gain with simple insertions.
-    // What makes a huge difference is bundling them up in one atomic "transaction".
+    // What makes a huge difference is bundling a few hundred into one atomic "transaction".
     // For this case, runtime droped from 62-65 seconds to 0.5-0.6 (vs. 0.30-0.33 with no SQL at all).
-    
-    sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg); 
+
+    sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
     for (unsigned int h = 0; h < numAct; h++) { // estimator is h
       KMatrix uij = st->aUtil[h]; // utility to actor i of the position held by actor j
-      for (unsigned int i = 0; i < numAct; i++){
-        for (unsigned int j = 0; j < numAct; j++){
+      for (unsigned int i = 0; i < numAct; i++) {
+        for (unsigned int j = 0; j < numAct; j++) {
           int rslt = 0;
           rslt = sqlite3_bind_int(insStmt, 1, t); assert(SQLITE_OK == rslt);
           rslt = sqlite3_bind_int(insStmt, 2, h); assert(SQLITE_OK == rslt);
