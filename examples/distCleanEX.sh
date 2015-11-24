@@ -5,7 +5,7 @@
 # rebuild them
 #
 #------------------------------------------
-FILES="minwater  reformpri  smp"
+FILES="minwater  reformpri  smp  agenda"
 
 for d in $FILES
 do

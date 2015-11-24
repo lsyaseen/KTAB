@@ -4,7 +4,7 @@
 # before using this script. CMake is the recommended was to do so.
 #
 #------------------------------------------
-FILES="minwater  reformpri  smp"
+FILES="minwater  reformpri  smp  agenda"
 
 for d in $FILES
 do
