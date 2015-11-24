@@ -24,12 +24,7 @@
 #ifndef SMP_DEMO_H
 #define SMP_DEMO_H
 
-
-#include "kutils.h"
-#include "prng.h"
-#include "kmatrix.h"
-#include "gaopt.h"
-#include "kmodel.h"
+#include "smp.h"
 
 namespace DemoSMP {
 // namespace to which KBase has no access

@@ -27,10 +27,19 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Button.H>
 //-----------------------------------------------------
+
+
 #include "csv_parser.hpp"
+#include "sqlite3.h"
 #include "kutils.h"
+#include "prng.h"
+#include "kmatrix.h"
+#include "gaopt.h"
+
 #include "kmodel.h"
-#include "smp.h"
+
+
+//#include "smp.h"
 #include "mainw.h"
 //-----------------------------------------------------
 

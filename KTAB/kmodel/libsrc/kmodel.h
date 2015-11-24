@@ -45,7 +45,9 @@
 
 namespace KBase {
   using std::shared_ptr;
+  using std::string;
   using std::tuple;
+  using std::vector;
   using KBase::KMatrix;
   using KBase::ReportingLevel;
 
@@ -72,9 +74,8 @@ namespace KBase {
   vector <MtchPstn> uniqueMP(vector <MtchPstn> mps);
 
 
-  enum class ThirdPartyCommit {
-    None, Semi, Full
-  };
+  enum class ThirdPartyCommit { NoCommit, SemiCommit, FullCommit };
+  
   // third parties have the same range of voting rules as in VotingRule enum.
   string tpcName(ThirdPartyCommit tpc);
 

@@ -677,7 +677,7 @@ namespace SMPLib {
 
     // you could make other choices for these two sub-models
     auto vr = VotingRule::Proportional;
-    auto tpc = KBase::ThirdPartyCommit::Semi;
+    auto tpc = KBase::ThirdPartyCommit::SemiCommit;
 
     double uii = aUtil[h](i, i);
     double uij = aUtil[h](i, j);

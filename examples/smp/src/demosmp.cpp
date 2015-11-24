@@ -25,12 +25,8 @@
 //
 // --------------------------------------------
 
-
-#include "kutils.h"
-#include "kmodel.h"
 #include "smp.h"
 #include "demosmp.h"
-#include "csv_parser.hpp"
 
 
 using KBase::PRNG;

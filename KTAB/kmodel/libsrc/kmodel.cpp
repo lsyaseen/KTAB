@@ -161,14 +161,14 @@ namespace KBase {
   string tpcName(ThirdPartyCommit tpc) {
     string tpcn;
     switch (tpc) {
-    case ThirdPartyCommit::Full:
-      tpcn = "Full";
+    case ThirdPartyCommit::FullCommit:
+      tpcn = "FullCommit";
       break;
-    case ThirdPartyCommit::Semi:
-      tpcn = "Semi";
+    case ThirdPartyCommit::SemiCommit:
+      tpcn = "SemiCommit";
       break;
-    case ThirdPartyCommit::None:
-      tpcn = "None";
+    case ThirdPartyCommit::NoCommit:
+      tpcn = "NoCommit";
       break;
 
     default:
@@ -464,19 +464,19 @@ namespace KBase {
     // Therefore, we can drop those terms as long we make sure all comparisons use the sum 
     // of three position-utilities, and we obviously do so.
     switch (comm) {
-    case ThirdPartyCommit::Full:
+    case ThirdPartyCommit::FullCommit:
       u_ik_def_j = uki + uki + uki;
       u_j_def_ik = ukj + ukj + ukj;
       u_i_def_jk = uki + uki + uki;
       u_jk_def_i = ukj + ukj + ukj;
       break;
-    case ThirdPartyCommit::Semi:
+    case ThirdPartyCommit::SemiCommit:
       u_ik_def_j = uki + uki + ukk;
       u_j_def_ik = ukj + ukj + ukj;
       u_i_def_jk = uki + uki + uki;
       u_jk_def_i = ukj + ukj + ukk;
       break;
-    case ThirdPartyCommit::None:
+    case ThirdPartyCommit::NoCommit:
       u_ik_def_j = uki + uki + ukk;
       u_j_def_ik = ukj + ukj + ukk;
       u_i_def_jk = uki + uki + ukk;
