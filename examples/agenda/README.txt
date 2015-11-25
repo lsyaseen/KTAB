@@ -18,9 +18,7 @@ Suppose there are five options, 0, 1, 2, 3, and 4.
 Then [[2:3]:[[0:1]:4]] represents the following agenda:
 
 First, the group votes on {2,3} : {0,1,4}
-
 If {2,3} wins, then the next and final vote is {2}:{3}.
-
 If {0,1,4} wins, then the next vote is on {0,1}:{4}
 If {4} wins, then that is the final choice.
 If {0,1} wins, then the final vote is {0}:{1}
@@ -31,9 +29,10 @@ or binary voting. Second, the chairman could be free to
 set any agenda it wants, limited to somewhat balanced agendas, 
 or limited to balanced agendas. In the moderately-balanced case,
 an initial vote like {0,1,2,3,4}:{5} would not be allowed.
-The balance rule requires that with n<=5 items,
+The moderate-balance rule requires that with n<=5 items,
 the smaller set has to be at least n/2, and with 6<=n the
-smaller set has to have at least n/3
+smaller set has to have at least n/3. Fully-balanced
+requires that the smaller set has to be at least n/2.
 
 ---------------------------------------------
 
