@@ -4,6 +4,7 @@
 #ifndef AGENDA_H
 #define AGENDA_H
 
+#include <algorithm>
 #include "kutils.h"
 #include "kmatrix.h"
 #include "prng.h"
@@ -11,9 +12,10 @@
 
 // ------------------------------------------
 namespace AgendaControl {
-  using std::vector;
   using std::function;
   using std::ostream;
+  using std::vector;
+  using std::tuple;
   using KBase::KMatrix;
   using KBase::Model;
   using KBase::PRNG;
@@ -22,6 +24,18 @@ namespace AgendaControl {
   class Agenda;
   class Choice;
   class Terminal;
+  
+  uint64_t fact(unsigned int n);
+  uint64_t numSets(unsigned int n, unsigned int m);
+  uint64_t numAgenda(unsigned int n);
+  
+  // returns the list of all lists that have m integers out of the first n integers,  {0, 1, 2, ... n-1}
+  vector< vector <unsigned int> > chooseSet(const unsigned int n, const unsigned int m);
+  
+  // pick out the indicated subset
+  tuple<vector<unsigned int>, vector<unsigned int>> indexedSet(const vector<unsigned int> xs, const vector<unsigned int> is);
+
+  vector<Agenda*> agendaSet (const vector<unsigned int> xs);
 
   class Agenda {
   public:

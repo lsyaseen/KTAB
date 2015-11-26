@@ -10,6 +10,176 @@ using std::flush;
 
 namespace AgendaControl {
 
+uint64_t fact(unsigned int n) {
+    uint64_t f = 0;
+    switch (n) {
+    case 0:
+    case 1:
+        f = 1;
+        break;
+    case 2:
+        f = 2;
+        break;
+    default:
+        f = n * fact(n-1);
+        break;
+    }
+    return f;
+}
+
+
+uint64_t numSets(unsigned int n, unsigned int m) {
+    assert (0 < n);
+    assert (0 < m);
+    uint64_t ns = fact(n)/(fact(m)*fact(n-m));
+    return ns;
+}
+
+uint64_t numAgenda(unsigned int n) {
+    assert (0 < n);
+    uint64_t cn = 0;
+    switch(n) {
+    case 1:
+    case 2:
+        cn = 1;
+        break;
+
+    case 3:
+        cn = 3;
+        break;
+
+    default:
+        for (unsigned int i=1; i<= (n/2); i++) {
+            unsigned int j = n-i;
+            uint64_t splits = numSets(n,i);
+            uint64_t lC = numAgenda(i);
+            uint64_t rC = numAgenda(j);
+            cn = cn + splits*lC*rC;
+        }
+        break;
+    }
+    return cn;
+}
+
+vector< vector <unsigned int> > chooseSet(const unsigned int n, const unsigned int m) {
+    assert (0 < n);
+    assert (0 < m);
+    auto csnm = vector< vector <unsigned int> >();
+
+    if (1 == m) {
+        for (unsigned int i=0; i<n; i++) {
+            vector<unsigned int> ci = {i};
+            csnm.push_back(ci);
+        }
+    }
+    else {
+        auto cLess = chooseSet(n, m-1);
+        for (auto lst : cLess) {
+            unsigned int len = lst.size();
+            unsigned int maxEl = lst[len-1];
+            for (unsigned int j = maxEl + 1; j<n; j++) {
+                vector<unsigned int> ls = lst;
+                ls.push_back(j);
+                csnm.push_back(ls);
+            }
+        }
+    }
+
+    return csnm;
+}
+
+
+tuple<vector<unsigned int>, vector<unsigned int>> indexedSet(const vector<unsigned int> xs, 
+							     const vector<unsigned int> is) {
+    vector<unsigned int> rslt = {};
+    for (auto i : is) {
+        rslt.push_back( xs[i] );
+    }
+    vector<unsigned int> comp = {};
+    for (unsigned int i=0; i<xs.size()-rslt.size(); i++) {
+      comp.push_back(0);
+    }
+    std::set_difference(xs.begin(), xs.end(),
+                        rslt.begin(), rslt.end(),
+                        comp.begin()
+                       );
+    auto pr = tuple<vector<unsigned int>, vector<unsigned int>> (rslt, comp);
+    return pr;
+}
+
+
+vector<Agenda*> agendaSet (const vector<unsigned int> xs) {
+    unsigned int n = xs.size();
+    assert (0 < n);
+    
+    vector<Agenda*> as = {} ;
+    switch (n) {
+      case 1: {
+	Agenda* a = new Terminal(xs[0]);
+	as.push_back(a);
+      }
+	break;
+      case 2:{
+	Agenda* la = new Terminal(xs[0]);
+	Agenda* ra = new Terminal(xs[1]);
+	Agenda* a = new Choice(la, ra);
+	as.push_back(a);
+      }
+	break;
+    }
+
+    auto showA = [] (const vector<unsigned int> &as) {
+      printf("[");
+        for (auto a : as) {
+            printf(" %u ", a);
+        }
+      printf("]");
+        return;
+    };
+
+    for (unsigned int k=1; k <= (n/2); k++) {
+        vector<vector<unsigned int>> leftIndices ={};
+	
+	leftIndices = chooseSet(n,k);
+	if ((2 == n) && (1 == k)) {
+	  //vector<unsigned int> lhi = leftIndices[0];
+	  leftIndices ={};
+	  //leftIndices.push_back(lhi);
+	} 
+
+        for (auto lhi : leftIndices) {
+            //showA(lhi);
+            //cout << " -- ";
+            auto pr = indexedSet(xs, lhi);
+            vector<unsigned int> lhs = std::get<0>(pr);
+            vector<unsigned int> rhs = std::get<1>(pr);
+	    
+	    auto lAgendas = agendaSet(lhs);
+	    auto rAgendas = agendaSet(rhs);
+	    for (auto la : lAgendas) {
+	      for (auto ra : rAgendas) {
+		Agenda* a = new Choice(la, ra);
+		as.push_back(a);
+	      }
+	    }
+
+           // showA(lhs);
+           // cout << " : ";
+           // showA(rhs);
+           // cout << endl;
+        }
+    }
+
+   // printf("Found %i agendas \n", as.size());
+   // for (auto a : as) {
+   //   cout << *a << endl;
+   // }
+   // cout << endl << flush;
+    
+    return as;
+}
+
+// ------------------------------------------
 Agenda* Agenda::makeRandom(unsigned int n, PartitionRule pr, PRNG* rng) {
     auto xs = vector<int>();
     for (unsigned int i = 0; i < n; i++) {
@@ -153,7 +323,7 @@ double Terminal::eval(const KMatrix& val, const KMatrix&, VotingRule, unsigned i
 
 
 void Terminal::showProbs(double pArrive) {
-  printf("%.4f", pArrive); 
+    printf("%.4f", pArrive);
     return;
 }
 
