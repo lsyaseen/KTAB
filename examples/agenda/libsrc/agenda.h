@@ -34,16 +34,18 @@ namespace AgendaControl {
       a.print(os);
       return os;
     };
-    static Agenda* makeRandom(unsigned int n, PRNG* rng);
+    static Agenda* makeRandom(unsigned int n, PartitionRule pr, PRNG* rng);
+    virtual void clearProbs() = 0;
+    virtual void showProbs(double pArrive) = 0;
   private:
-    static Agenda* makeAgenda(vector<int> xs, PRNG* rng);
+    static Agenda* makeAgenda(vector<int> xs, PartitionRule pr, PRNG* rng);
     static unsigned int minAgendaSize(PartitionRule pr, unsigned int n);
   };
 
 
   class Choice : public Agenda {
   public:
-    Choice( Agenda* la,  Agenda* ra) : Agenda() {
+  Choice( Agenda* la,  Agenda* ra) : Agenda() {
       lhs = la;
       rhs = ra;
     };
@@ -57,9 +59,13 @@ namespace AgendaControl {
       return os;
     };
     virtual double eval(const KMatrix& val, const KMatrix& cap, VotingRule vr, unsigned int i) ;
+    void clearProbs();
+    void showProbs(double pArrive);
   protected:
-     Agenda* lhs;
-     Agenda* rhs;
+    void assertProbs();
+    void setProbs(const KMatrix& val, const KMatrix& cap, VotingRule vr);
+    Agenda* lhs = nullptr;
+    Agenda* rhs = nullptr;
     double lProb = -1.0;
     double rProb = -1.0;
   };
@@ -78,8 +84,10 @@ namespace AgendaControl {
       return os;
     };
     virtual double eval(const KMatrix& val, const KMatrix& cap, VotingRule vr, unsigned int i) ;
+    void clearProbs() { return; }
+    void showProbs(double pArrive);
   protected:
-    unsigned int item;
+    unsigned int item=0;
   };
 
 

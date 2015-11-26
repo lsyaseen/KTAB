@@ -185,7 +185,7 @@ namespace KBase {
     const double du = uij - uik;
 
     double rBin = 0; // binary response
-    const double sTol = 1E-8;
+    const double sTol = 1E-10;
     rBin = du / sTol;
     rBin = (rBin > +1) ? +1 : rBin;
     rBin = (rBin < -1) ? -1 : rBin;
