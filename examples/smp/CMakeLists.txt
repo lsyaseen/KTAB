@@ -152,7 +152,15 @@ target_link_libraries(smpg
   ${SQLITE_LIBRARIES}
   ${EFENCE_LIBRARIES}
   )
-
+  
+# suppress the console window under Windows
+if (WIN32)  
+  if (MSVC)  
+    set_target_properties(smpg PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:WINDOWS")
+    set_target_properties(smpg PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS")
+    message (STATUS "Using /SUBSYSTEM:WINDOWS") 
+  endif(MSVC) 
+endif(WIN32)
 
 # -------------------------------------------------
 

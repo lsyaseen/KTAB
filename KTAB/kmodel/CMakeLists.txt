@@ -32,6 +32,25 @@ set(CMAKE_MODULE_PATH
 set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
+# -------------------------------------------------
+# basic check that this is a supported compiler/OS
+# -------------------------------------------------
+if (WIN32)
+  message (STATUS "OS: WIN32 (generic Windows)")
+  if (MSVC)
+    message (STATUS "Compiler: MSVC")
+  elseif(CMAKE_COMPILER_IS_GNUCXX)
+    message (STATUS "Compiler: GCC")
+  else(MSVC)
+    message(SEND_ERROR "Unsupported Windows compiler")
+  endif()
+elseif(UNIX)
+  message (STATUS "OS: UNIX (generic *nix)")
+else()
+  message(SEND_ERROR "Unsupported OS")
+endif(WIN32)
+# -------------------------------------------------
+
 if (UNIX)
   set (ENABLE_EFFCPP false CACHE  BOOL "Check Effective C++ Guidelines")
 endif(UNIX)
