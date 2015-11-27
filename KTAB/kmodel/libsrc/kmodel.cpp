@@ -32,6 +32,8 @@ namespace KBase {
   using std::cout;
   using std::endl;
   using std::flush;
+  using std::get;
+  using std::tuple;
 
   Position::Position() {}
   Position::~Position() {}
@@ -90,6 +92,12 @@ namespace KBase {
       break;
     case Model::VPModel::Square:
       s = "Square";
+      break;
+    case Model::VPModel::Quartic:
+      s = "Quartic";
+      break;
+    case Model::VPModel::Binary:
+      s = "Binary";
       break;
     default:
       cout << "Model::VPMName: unrecognized VPModel" << endl;
@@ -227,9 +235,58 @@ namespace KBase {
     return v;
   }
 
+  tuple<double, double> Model::vProb(VPModel vpm, const double s1, const double s2) {
+    const double tol = 1E-8;
+    const double minX = 1E-6;
+    double x1 = 0;
+    double x2 = 0;
+    switch (vpm) {
+    case VPModel::Linear:
+      x1 = s1;
+      x2 = s2;
+      break;
+    case VPModel::Square:
+      x1 = KBase::sqr(s1);
+      x2 = KBase::sqr(s2);
+      break;
+    case VPModel::Quartic:
+      x1 = KBase::qrtc(s1);
+      x2 = KBase::qrtc(s2);
+      break;
+    case VPModel::Binary:
+    {
+    // this is setup so that 10% or more advantage either way gives a guaranteed
+    // result. As with binary voting, it is necessary to have interpolation between
+    // to avoid weird round-off effects.
+      const double thresh = 1.10; 
+      if (s1 > thresh*s2){
+        x1 = 1.0;
+        x2 = minX;
+      }
+      else if (s2 > thresh*s1){
+        x1 = minX;
+        x2 = 1.0;
+      }
+      else { // less than the threshold difference
+        x1 = s1;
+        x2 = s2;
+      }
+    }
+    break;
+    }
+    double p1 = x1 / (x1 + x2);
+    double p2 = x2 / (x1 + x2);
 
-  // note that while the C_ij can be any arbitrary positive matrix,
-  // the p_ij matrix has the symmetry pij + pji = 1,
+    assert(0 <= p1);
+    assert(0 <= p2);
+    assert(fabs(p1 + p2 - 1.0) < tol);
+
+    return tuple<double, double>(p1, p2);
+  }
+
+  // note that while the C_ij can be any arbitrary positive matrix
+  // with C_kk = 0, the p_ij matrix has the symmetry pij + pji = 1
+  // (and hence pkk = 1/2).
   KMatrix Model::vProb(VPModel vpm, const KMatrix & c) {
     unsigned int numOpt = c.numR();
     assert(numOpt == c.numC());
@@ -241,17 +298,9 @@ namespace KBase {
         double cji = c(j, i);
         assert(0 <= cji);
         assert((0 < cij) || (0 < cji));
-        switch (vpm) {
-        case VPModel::Linear:
-          // no change
-          break;
-        case VPModel::Square:
-          cij = cij*cij;
-          cji = cji*cji;
-          break;
-        }
-        p(i, j) = cij / (cij + cji);  // set the lower left probability
-        p(j, i) = cji / (cij + cji);  // set the upper right probability
+        auto ppr = vProb(vpm, cij, cji);
+        p(i, j) = get<0>(ppr); // set the lower left  probability: if Linear, cij / (cij + cji)
+        p(j, i) = get<1>(ppr); // set the upper right probability: if Linear, cji / (cij + cji)
       }
       p(i, i) = 0.5; // set the diagonal probability
     }
@@ -317,8 +366,8 @@ namespace KBase {
     KMatrix::mapV(test, numOpt, numOpt); // catch gross errors 
 
     // TODO: add a switch between markovPCE and condPCE?
-    //KMatrix p = markovPCE(pv); 
-    KMatrix p = condPCE(pv); 
+    KMatrix p = markovPCE(pv); 
+    //KMatrix p = condPCE(pv);
 
     assert(fabs(sum(p) - 1.0) < pTol);
     return p;
@@ -358,16 +407,16 @@ namespace KBase {
 
   // Given square matrix of Prob[i>j] returns a column vector for Prob[i].
   // Uses 1-step conditional probabilities, not Markov process
-  KMatrix Model::condPCE(const KMatrix & pv) { 
+  KMatrix Model::condPCE(const KMatrix & pv) {
     unsigned int numOpt = pv.numR();
-    auto p = KMatrix(numOpt, 1); 
+    auto p = KMatrix(numOpt, 1);
     for (unsigned int i = 0; i < numOpt; i++) {
       double pi = 1.0;
       for (unsigned int j = 0; j < numOpt; j++) {
         pi = pi * pv(i, j);
       }
       // double-check
-      assert(0 <= pi); 
+      assert(0 <= pi);
       assert(pi <= 1);
       p(i, 0) = pi; // probability that i beats all alternatives
     }

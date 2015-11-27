@@ -49,8 +49,12 @@ namespace AgendaControl {
       return os;
     };
     static Agenda* makeRandom(unsigned int n, PartitionRule pr, PRNG* rng);
+    static vector<Agenda*> enumerateAgendas(unsigned int n, PartitionRule pr);
     virtual void clearProbs() = 0;
     virtual void showProbs(double pArrive) = 0;
+    virtual unsigned int length() const = 0;
+    virtual bool balanced(PartitionRule pr) const = 0;
+
   private:
     static Agenda* makeAgenda(vector<int> xs, PartitionRule pr, PRNG* rng);
     static unsigned int minAgendaSize(PartitionRule pr, unsigned int n);
@@ -63,7 +67,7 @@ namespace AgendaControl {
       lhs = la;
       rhs = ra;
     };
-    virtual  ~Choice() { delete lhs; delete rhs; }; 
+    virtual  ~Choice() { }; // delete lhs; delete rhs; }; 
     virtual void print(ostream& os) const {
       os << "[" << *lhs << ":" << *rhs << "]";
       return;
@@ -75,6 +79,9 @@ namespace AgendaControl {
     virtual double eval(const KMatrix& val, const KMatrix& cap, VotingRule vr, unsigned int i) ;
     void clearProbs();
     void showProbs(double pArrive);
+    virtual unsigned int length() const { return (lhs->length() + rhs->length()); }
+    bool balanced(PartitionRule pr) const;
+
   protected:
     void assertProbs();
     void setProbs(const KMatrix& val, const KMatrix& cap, VotingRule vr);
@@ -100,6 +107,9 @@ namespace AgendaControl {
     virtual double eval(const KMatrix& val, const KMatrix& cap, VotingRule vr, unsigned int i) ;
     void clearProbs() { return; }
     void showProbs(double pArrive);
+    virtual unsigned int length() const { return 1; }
+    bool balanced(PartitionRule pr) const { return true; }
+
   protected:
     unsigned int item=0;
   };

@@ -62,12 +62,27 @@ void demoPCE(uint64_t s, PRNG* rng) {
     cout << "Demonstrate minimal PCE" << endl << endl;
 
     Model::VPModel vpm;
-    if (0 == (rng->uniform() % 2)) {
+    switch (rng->uniform() % 5) {
+      case 0:
+      case 1:
         vpm = Model::VPModel::Linear;
-    }
-    else {
+      break;
+      case 2:
         vpm = Model::VPModel::Square;
-    }
+      break;
+      case 3:
+        vpm = Model::VPModel::Quartic;
+      break;
+      case 4:
+        vpm = Model::VPModel::Binary;
+      break;
+      default:
+        cout << "Unrecognized VPModel option"<< endl << flush;
+        assert(false);
+        break;
+    } 
+
+    cout << "Using VPModel " << Model::VPMName(vpm) << endl;
 
     cout << "First, stable distrib is exactly as expected in bilateral conflict" << endl;
 
@@ -86,17 +101,9 @@ void demoPCE(uint64_t s, PRNG* rng) {
     double w10 = c(1, 0);
 
     auto p1 = KMatrix(2, 1);
-    switch (vpm) {
-    case  Model::VPModel::Linear:
-        // no change
-        break;
-    case Model::VPModel::Square:
-        w01 = w01*w01;
-        w10 = w10*w10;
-        break;
-    }
-    p1(0, 0) = w01 / (w01 + w10);
-    p1(1, 0) = w10 / (w01 + w10);
+    auto ppr = Model::vProb(vpm, w01, w10);
+    p1(0, 0) = get<0>(ppr); // if Linear, w01 / (w01 + w10);
+    p1(1, 0) = get<1>(ppr); // if Linear, w10 / (w01 + w10);
 
     cout << "By simple " << Model::VPMName(vpm) << " ratios ..." << endl;
     printf("Prob[0>1] = %.4f \n", p1(0, 0));
@@ -127,10 +134,13 @@ void demoPCE(uint64_t s, PRNG* rng) {
     c = KMatrix::map(cFn, 3, 3);
     pv = Model::vProb(vpm, c);
     p2 = Model::probCE(pv);
-    cout << " Markov model: " << endl;
+    cout << endl;
+    cout << "Markov model: " << endl;
     show(c, pv, p2);
     p2 = Model::condPCE(pv);
-    cout << " CondProb model: " << endl;
+
+    cout << endl;
+    cout << "CondProb model: " << endl;
     show(c, pv, p2);
 
     return;
@@ -220,7 +230,6 @@ int main(int ac, char **av) {
     };
 
     // tmp args
-
 
     if (ac > 1) {
         for (int i = 1; i < ac; i++) {

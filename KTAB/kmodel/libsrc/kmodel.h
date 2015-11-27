@@ -106,17 +106,30 @@ namespace KBase {
       unsigned int numAct, unsigned int numOpt);
 
     // whether you consider the probability of a coalition winning to go up linearly
-    // or quadratically in strength-compared-to-opponent:
+    // quadratically, quartically, or even discontinuously with strength ratios:
     // Linear law says 2:1 advantage gives pv = 2/3, and 3:1 gives 3/4
+    //            and that 11:10 advantage gives 52.4%
     // Square law says 2:1 advantage gives pv = 4/5, and 3:1 gives 9/10
+    //            and that 11:10 advantage gives 54.8%
+    // Quartic law says 2:1 advantage gives pv = 16/17, and 3:1 gives 81/82
+    //            and that 11:10 advantage gives 59.4%
+    // Binary law says that any percentage difference over a small threshold gives
+    //            guaranteed success (or loss), with linear interpolation between
+    //            to avoid weird round-off effects.
     //
     enum class VPModel {
-      Linear, Square
+      Linear,  // first power
+      Square,  // second power
+      Quartic, // fourth power
+      Binary
     };
     static string VPMName(VPModel vpm);
 
     // calculate pv[i>j] from coalitions
     static KMatrix vProb(VPModel vpm, const KMatrix & c);
+
+    // this is the basic model of victory dependent on strength-ratio
+    static tuple<double, double> vProb(VPModel vpm, const double s1, const double s2);
 
     // assumes simple voting over those options with that utility matrix,
     // builds coalitions, and return pv[i>j]

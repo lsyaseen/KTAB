@@ -127,9 +127,11 @@ void demoEUSpatial(unsigned int numA, unsigned int sDim, uint64_t s, PRNG* rng) 
 
     // note that because all actors use the same scale for capability, utility, etc,
     // their 'votes' are on the same scale and influence can be added up meaningfully
-
-    const unsigned int maxIter = 5000;
-    double qf = 100.0;
+    const unsigned int maxIter = 500;
+    double qf = 20.0;
+    // suppose that, on a [0,100] scale, the first move was the most extreme possible,
+    // i.e. 100 points. One twentieth of that is just 5, which seems to about the limit
+    // of what people consider significant.
     auto md0 = new SMPModel(rng);
     md0->stop = [maxIter] (unsigned int iter, const State * s) {
         return (maxIter <= iter);

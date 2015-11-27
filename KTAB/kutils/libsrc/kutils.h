@@ -88,28 +88,9 @@ public:
     string msg="";
 };
 
-/*
-class CoordMap {
-    /// map back and forth between screen and domain coords
-public:
-    CoordMap(int s1, double d1, int s2, double d2);
-    virtual ~CoordMap();
 
-    int d2s (double d);
-    double s2d (int s);
-
-protected:
-    double as=0;
-    double bs=0;
-
-    double ad=0;
-    double bd=0;
-
-private:
-    const bool testMap = true; // for a while
-    int cmRound(double x);
-};
-*/
+double sqr(const double x); // second power
+double qrtc(const double x); // fourth power
 
 }; // namespace
 // -------------------------------------------------
