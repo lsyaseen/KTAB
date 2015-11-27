@@ -36,27 +36,49 @@ uint64_t numSets(unsigned int n, unsigned int m) {
 }
 
 uint64_t numAgenda(unsigned int n) {
+    // how many distinct agendas are there for n items?
+    // Crucially, [x:y] == [y:x]
     assert (0 < n);
     uint64_t cn = 0;
     switch(n) {
     case 1:
+        cn = 1;
+        // only [a]
+        break;
     case 2:
         cn = 1;
+        // only [a:b]
         break;
 
     case 3:
         cn = 3;
+        // [a:[b:c]]
+        // [b:[a:c]]
+        // [c:[a:b]]
         break;
 
-    default:
-        for (unsigned int i=1; i<= (n/2); i++) {
+    default: {
+        // the agenda of n>3 items can only be a choice between sub-agendas.
+        // Suppose the left has i items and the right has j=n-i items.
+        // There are choose(n,i) ways to choose a unique, unordered set for the left,
+        // and for each such choice there is only one possible right (all the others).
+        // Because the LHS and RHS are distinct, any agendas addressing them are distinct,
+        // so there are C(i) ways to address the LHS, C(j) ways to address the RHS,
+        // and C(i)*C(j) combinations.
+        // We then sum those up for 1 <= i < n. This does double count, as each (i,n-i)
+        // division is matched by a (n-i, i) division.
+        uint64_t cm = 0;
+        for (unsigned int i=1; i <n; i++) {
             unsigned int j = n-i;
             uint64_t splits = numSets(n,i);
             uint64_t lC = numAgenda(i);
             uint64_t rC = numAgenda(j);
-            cn = cn + splits*lC*rC;
+            cm = cm + splits*lC*rC;
         }
-        break;
+        cn = cm/2;
+        assert (cm == (2*cn));
+    }
+    break;
     }
     return cn;
 }
@@ -89,15 +111,15 @@ vector< vector <unsigned int> > chooseSet(const unsigned int n, const unsigned i
 }
 
 
-tuple<vector<unsigned int>, vector<unsigned int>> indexedSet(const vector<unsigned int> xs, 
-							     const vector<unsigned int> is) {
+tuple<vector<unsigned int>, vector<unsigned int>> indexedSet(const vector<unsigned int> xs,
+const vector<unsigned int> is) {
     vector<unsigned int> rslt = {};
     for (auto i : is) {
         rslt.push_back( xs[i] );
     }
     vector<unsigned int> comp = {};
     for (unsigned int i=0; i<xs.size()-rslt.size(); i++) {
-      comp.push_back(0);
+        comp.push_back(0);
     }
     std::set_difference(xs.begin(), xs.end(),
                         rslt.begin(), rslt.end(),
@@ -111,41 +133,41 @@ tuple<vector<unsigned int>, vector<unsigned int>> indexedSet(const vector<unsign
 vector<Agenda*> agendaSet (const vector<unsigned int> xs) {
     unsigned int n = xs.size();
     assert (0 < n);
-    
+
     vector<Agenda*> as = {} ;
     switch (n) {
-      case 1: {
-	Agenda* a = new Terminal(xs[0]);
-	as.push_back(a);
-      }
-	break;
-      case 2:{
-	Agenda* la = new Terminal(xs[0]);
-	Agenda* ra = new Terminal(xs[1]);
-	Agenda* a = new Choice(la, ra);
-	as.push_back(a);
-      }
-	break;
+    case 1: {
+        Agenda* a = new Terminal(xs[0]);
+        as.push_back(a);
+    }
+    break;
+    case 2: {
+        Agenda* la = new Terminal(xs[0]);
+        Agenda* ra = new Terminal(xs[1]);
+        Agenda* a = new Choice(la, ra);
+        as.push_back(a);
+    }
+    break;
     }
 
     auto showA = [] (const vector<unsigned int> &as) {
-      printf("[");
+        printf("[");
         for (auto a : as) {
             printf(" %u ", a);
         }
-      printf("]");
+        printf("]");
         return;
     };
 
     for (unsigned int k=1; k <= (n/2); k++) {
-        vector<vector<unsigned int>> leftIndices ={};
-	
-	leftIndices = chooseSet(n,k);
-	if ((2 == n) && (1 == k)) {
-	  //vector<unsigned int> lhi = leftIndices[0];
-	  leftIndices ={};
-	  //leftIndices.push_back(lhi);
-	} 
+        vector<vector<unsigned int>> leftIndices = {};
+
+        leftIndices = chooseSet(n,k);
+        if ((2 == n) && (1 == k)) {
+            //vector<unsigned int> lhi = leftIndices[0];
+            leftIndices = {};
+            //leftIndices.push_back(lhi);
+        }
 
         for (auto lhi : leftIndices) {
             //showA(lhi);
@@ -153,29 +175,29 @@ vector<Agenda*> agendaSet (const vector<unsigned int> xs) {
             auto pr = indexedSet(xs, lhi);
             vector<unsigned int> lhs = std::get<0>(pr);
             vector<unsigned int> rhs = std::get<1>(pr);
-	    
-	    auto lAgendas = agendaSet(lhs);
-	    auto rAgendas = agendaSet(rhs);
-	    for (auto la : lAgendas) {
-	      for (auto ra : rAgendas) {
-		Agenda* a = new Choice(la, ra);
-		as.push_back(a);
-	      }
-	    }
 
-           // showA(lhs);
-           // cout << " : ";
-           // showA(rhs);
-           // cout << endl;
+            auto lAgendas = agendaSet(lhs);
+            auto rAgendas = agendaSet(rhs);
+            for (auto la : lAgendas) {
+                for (auto ra : rAgendas) {
+                    Agenda* a = new Choice(la, ra);
+                    as.push_back(a);
+                }
+            }
+
+            // showA(lhs);
+            // cout << " : ";
+            // showA(rhs);
+            // cout << endl;
         }
     }
 
-   // printf("Found %i agendas \n", as.size());
-   // for (auto a : as) {
-   //   cout << *a << endl;
-   // }
-   // cout << endl << flush;
-    
+    // printf("Found %i agendas \n", as.size());
+    // for (auto a : as) {
+    //   cout << *a << endl;
+    // }
+    // cout << endl << flush;
+
     return as;
 }
 

@@ -83,6 +83,55 @@ void bestAgendaChair(vector<Agenda*> ars, const KMatrix& vals, const KMatrix& ca
     return;
 }
 
+void demoCounting() {
+    cout << endl << flush;
+    unsigned int n=9;
+    unsigned int m=4;
+    auto cat = AgendaControl::chooseSet(n,m);
+    for (auto lst : cat) {
+        for (auto i : lst) {
+            // printf("%i ", i);
+        }
+        //cout << endl << flush;
+    }
+    printf("Found |chooseSet(%u, %u)| = %llu \n", n, m, cat.size());
+    assert (cat.size() == AgendaControl::numSets(n,m));
+
+    cout << endl;
+    cout << "For 4 items, the agenda [[10:20]:[30:40]] is repeated as [[30:40]:[10:20]]"<<endl;
+    cout << endl;
+    
+    unsigned int numI = 4;
+    vector<unsigned int> testI = {};
+    for (unsigned int i=0; i<numI; i++) {
+        testI.push_back(10*(1+i));
+    }
+
+
+    for (unsigned int i=1; i<=numI+2; i++) {
+        auto n = AgendaControl::numAgenda(i);
+        printf("%i -> %llu \n", i, n);
+    }
+    cout << endl << flush;
+
+    printf("Using %i items: ", numI);
+    for (unsigned int i : testI) {
+        printf("%i ", i);
+    }
+    cout << endl << flush;
+
+    auto testA = AgendaControl::agendaSet(testI);
+    printf("For %i items, found %i agendas \n", numI, testA.size());
+    for (auto a : testA) {
+        cout << *a << endl;
+    }
+    cout << endl << flush;
+
+    assert (testA.size() == AgendaControl::numAgenda(numI));
+
+    return;
+}
+
 }; // end of namespace
 
 int main(int ac, char **av) {
@@ -98,12 +147,14 @@ int main(int ac, char **av) {
     auto sTime = KBase::displayProgramStart();
     uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary
     uint64_t seed = dSeed;
+    bool enumP = false;
     bool run = true;
 
     auto showHelp = [dSeed]() {
         printf("\n");
         printf("Usage: specify one or more of these options\n");
         printf("--help            print this message\n");
+	printf("--enum            enumerate agendas\n");
         printf("--seed <n>        set a 64bit seed\n");
         printf("                  0 means truly random\n");
         printf("                  default: %020llu \n", dSeed);
@@ -118,6 +169,9 @@ int main(int ac, char **av) {
             if (strcmp(av[i], "--seed") == 0) {
                 i++;
                 seed = std::stoull(av[i]);
+            }
+            else if (strcmp(av[i], "--enum") == 0) {
+               enumP = true;
             }
             else if (strcmp(av[i], "--help") == 0) {
                 run = false;
@@ -138,6 +192,12 @@ int main(int ac, char **av) {
     seed = rng->setSeed(seed); // 0 == get a random number
     printf("Using PRNG seed:  %020llu \n", seed);
     printf("Same seed in hex:   0x%016llX \n", seed);
+    
+    if (enumP) {
+      AgendaControl::demoCounting();
+    }
+    
+    
     const unsigned int numAgenda = 8000;
     // with 100K random agendas and 7 items, I bayesian-ly estimated
     // that the probability the optimum appears within x trials is
@@ -156,47 +216,6 @@ int main(int ac, char **av) {
     }
 
 
-
-    cout << endl << flush;
-    {
-        unsigned int n=9;
-        unsigned int m=4;
-        auto cat = AgendaControl::chooseSet(n,m);
-        for (auto lst : cat) {
-            for (auto i : lst) {
-                // printf("%i ", i);
-            }
-            //cout << endl << flush;
-        }
-        printf("Found |chooseSet(%u, %u)| = %llu \n", n, m, cat.size());
-        assert (cat.size() == AgendaControl::numSets(n,m));
-    }
-
-    unsigned int numI = 5;
-    vector<unsigned int> testI = {};
-    for (unsigned int i=0; i<numI; i++) {
-      testI.push_back(10*(1+i));
-    }
-
-
-    for (unsigned int i=1; i<=numI+2; i++) {
-        auto n = AgendaControl::numAgenda(i);
-        printf("%i -> %llu \n", i, n);
-    }
-    cout << endl << flush;
-    
-    printf("Using %i items: ", numI);
-    for (unsigned int i : testI) {printf("%i ", i); }
-    cout << endl << flush;
-
-    auto testA = AgendaControl::agendaSet(testI);
-    printf("For %i items, found %i agendas \n", numI, testA.size());
-    for (auto a : testA) {
-        cout << *a << endl;
-    }
-    cout << endl << flush;
-
-    assert (testA.size() == AgendaControl::numAgenda(numI));
 
     // find what's best for agenda-setting actor 0
     caps(0, 0) = caps(0, 0) / 25.0; // agenda-setter has little voting power
