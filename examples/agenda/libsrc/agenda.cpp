@@ -351,7 +351,7 @@ namespace AgendaControl {
       }
       assert(0 < sL);
       assert(0 < sR);
-      auto ppr = Model::vProb(Model::VPModel::Linear, sL, sR);
+      auto ppr = Model::vProb(Model::VPModel::Quartic, sL, sR);
       lProb = std::get<0>(ppr); // if Linear, sL / (sL + sR);
       rProb = std::get<1>(ppr); // if Linear, sR / (sL + sR); 
     }

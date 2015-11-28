@@ -259,24 +259,42 @@ namespace KBase {
     // result. As with binary voting, it is necessary to have interpolation between
     // to avoid weird round-off effects.
       const double thresh = 1.10; 
-      if (s1 > thresh*s2){
+      if (s1 >= thresh*s2){
         x1 = 1.0;
         x2 = minX;
       }
-      else if (s2 > thresh*s1){
-        x1 = minX;
+      else if (s2 >= thresh*s1){
+        x1 = minX; 
         x2 = 1.0;
       }
       else { // less than the threshold difference
-        x1 = s1;
-        x2 = s2;
+	double r12 = s1/(s1+s2);
+	// We now need a linear rescaling so that
+	// when s1/s2 = t, or r12 = t/(t+1), p12 = 1, and 
+	// when s2/s1 = t, or r12 = 1/(1+t), p12 =0.
+	// We can work out (a,b) so that
+	// a*(t/(t+1)) + b = 1, and 
+	// a*(1/(1+t)) + b = 0, then
+	// verify that a*(1/(1+1))+b = 1/2.
+	//
+	double p12 = (r12*(thresh+1.0)-1.0)/(thresh-1.0);
+        x1 = p12;
+        x2 = 1-p12;
       }
     }
     break;
     }
     double p1 = x1 / (x1 + x2);
     double p2 = x2 / (x1 + x2);
-
+    /*
+    printf("s1: %+.4f \n", s1);
+    printf("s2: %+.4f \n", s2);
+    printf("x1: %+.4f \n", x1);
+    printf("x2: %+.4f \n", x2);
+    printf("p1: %+.4f \n", p1);
+    printf("p2: %+.4f \n", p2);
+    cout << endl << flush;
+    */
     assert(0 <= p1);
     assert(0 <= p2);
     assert(fabs(p1 + p2 - 1.0) < tol);

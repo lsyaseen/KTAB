@@ -13,12 +13,15 @@ namespace AgendaControl {
   // These are the "Payoffs in Dollars in the Plott-Levine Experiment"
   // from ""Liberalism Against Populism", W. H. Riker, chapter 7.B.
   // There are only five distinct payoff structures for twenty-one
-  // subjects; the repetition was not explained.
-  // I added actor 0 to represent the agenda-manipulating chairperson
+  // subjects; the repetition was not explained. Note that, with
+  // traditional deterministic 1P1V, option 0 (PL's #1) is the deterministic
+  // Condorcet Winner, while option 4 (PL's #5) is defeated by all alternatives.
+  // 
+  // I added actor 0 to represent the weak but agenda-manipulating chairperson
   
   const double plpA[] = {
     // 0     1     2     3     4
-    0.00, 0.00, 1.00, 0.00, 0.00, // 00
+    0.00, 0.00, 0.00, 0.00, 1.00, // 00
     
     6.00, 7.00, 5.00, 8.00, 0.50, // 01
     6.00, 7.00, 5.00, 8.00, 0.50, // 02
@@ -48,7 +51,7 @@ namespace AgendaControl {
   };
   
   const double plwA[] = {
-    1.00, // 00
+    1.00, // 00, to be divided by 25 during setup
     1.00, // 01
     1.00, // 02
     1.00, // 03
