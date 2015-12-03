@@ -229,10 +229,11 @@ void demoCoords(PRNG* rng) {
     };
 
     struct CCounter {
-      Counter * c = 0;
+      Counter* c = nullptr;
       mutex m; // one mutex per concurrent-counter object
 
-      explicit CCounter(Counter * c0) {
+      explicit CCounter(Counter* c0) {
+        assert (nullptr != c0);
         c = c0;
       };
 
