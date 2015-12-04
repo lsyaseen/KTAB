@@ -26,108 +26,95 @@
 #include <iostream>
 #include <stdio.h>
 #include <sqlite3.h>
+#include "sqlitedemo.h"
 
-using std::string;
 using std::cout;
 using std::endl;
 using std::flush;
+using std::string;
+using std::vector;
 
 // ------------------------------------------------------------------------------------
 
 namespace MDemo {
-void demoSQLite () {
 
-    auto callBack = [] (void *NotUsed, int argc, char **argv, char **azColName) {
-        for(int i=0; i<argc; i++) {
-            printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+  SQLDB::SQLDB(char* filename) {
+    database = NULL;
+    dbOpen = open(filename);
+  }
+
+  SQLDB::~SQLDB() {
+    if (dbOpen && (nullptr != database)) {
+      close();
+    }
+    database = nullptr;
+  }
+
+  bool SQLDB::open(char* filename) {
+    if (sqlite3_open(filename, &database) == SQLITE_OK) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  vector<vector<string> > SQLDB::query(char* query) {
+    assert(nullptr != database);
+    assert(dbOpen);
+    sqlite3_stmt *statement = nullptr;
+    vector<vector<string> > results = {};
+    if (sqlite3_prepare_v2(database, query, -1, &statement, 0) == SQLITE_OK) {
+      int cols = sqlite3_column_count(statement);
+      int result = 0;
+      while (true) {
+        result = sqlite3_step(statement);
+        if (result == SQLITE_ROW) {
+          vector<string> values;
+          for (int col = 0; col < cols; col++) {
+            values.push_back((char*)sqlite3_column_text(statement, col));
+          }
+          results.push_back(values);
         }
-        printf("\n");
-        return ((int) 0);
-    };
-
-    sqlite3 *db;
-    char* zErrMsg = nullptr;
-    int  rc;
-    string sql;
-
-    auto sOpen = [&db] (unsigned int n) {
-        int rc = sqlite3_open("test.db", &db);
-        if( rc != SQLITE_OK ) {
-            fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-            exit(0);
-        } else {
-            fprintf(stderr, "Opened database successfully (%i)\n", n);
+        else {
+          break; // end the loop
         }
-        return;
-    };
+      }
+      sqlite3_finalize(statement);
+    }
+    string error = sqlite3_errmsg(database);
+    if (error != "not an error") {
+      cout << query << " " << error << endl;
+    }
+    return results;
+  }
 
-    auto sExec = [callBack, &db, &zErrMsg] (string sql, string msg) {
-        int rc = sqlite3_exec(db, sql.c_str(), callBack, nullptr, &zErrMsg);
-        if( rc != SQLITE_OK ) {
-            fprintf(stderr, "SQL error: %s\n", zErrMsg);
-            sqlite3_free(zErrMsg);
-        } else {
-            fprintf(stdout, msg.c_str());
-        }
-        return rc;
-    };
-
-
-
-
-    // Open database
-    cout << endl << flush;
-    sOpen(1);
-
-    // Create SQL statement
-    sql = "create table PETS("  \
-          "ID INT PRIMARY KEY     NOT NULL," \
-          "NAME           text    NOT NULL," \
-          "AGE            int     NOT NULL," \
-          "BREED         char(50)," \
-          "COLOR         char(50) );";
-
-    // Execute SQL statement
-    rc = sExec(sql, "Created table successfully \n");
-    sqlite3_close(db);
-
-    
-    cout << endl << flush;
-    sOpen(2);
-
-    // This SQL statement has one deliberate error.
-    sql = "INSERT INTO PETS (ID, NAME, AGE, BREED, COLOR) "   \
-          "VALUES (1, 'Alice', 6, 'Greyhound', 'Grey' ); "    \
-          "INSERT INTO PETS (ID, NAME, AGE, BREED, COLOR) "   \
-          "VALUES (2, 'Bob', 4, 'Newfoundland', 'Black' ); "  \
-          "INSERT INTO PETS (ID, NAME, AGE, BREED, COLOR) "   \
-          "VALUES (3, 'Carol', 7, 'Chihuahua', 'Tan' );"      \
-          "INSERT INTO PETS (ID, NAME, AGE, SPECIES, COLOR) " \
-          "VALUES (4, 'David', 5, 'Alsation', 'Mixed' );";    \
-          "INSERT INTO PETS (ID, NAME, AGE, SPECIES, COLOR) " \
-          "VALUES (5, 'Ellie', 8, 'Rhodesian', 'Red' );";
-
-    cout << "NB: This should get one planned SQL error" << endl << flush;
-    rc = sExec(sql, "Records inserted successfully \n"); 
-    sqlite3_close(db);
- 
-    
-    cout << endl << flush;
-    sOpen(3); 
-    sql = "SELECT * from PETS where AGE>5;"; 
-    rc = sExec(sql, "Records selected successfully\n"); 
-    cout << "NB: ID=5 was never inserted due to planned SQL error" << endl;
-    sqlite3_close(db);
-
- 
-    cout << endl << flush;
-    sOpen(4); 
-    sql = "DROP TABLE PETS;"; 
-    rc = sExec(sql, "Dropped table successfully \n"); 
-    sqlite3_close(db);
-
+  void SQLDB::close() {
+    if (dbOpen) {
+      sqlite3_close(database);
+      dbOpen = false;
+    }
     return;
-}
+  }
+
+  void demoDBObject() {
+    auto db = new SQLDB("myDB.db");
+    db->query("CREATE TABLE ta (a INTEGER, b INTEGER, c INTEGER);");
+    db->query("INSERT INTO ta VALUES(1, 2, 3);");
+    db->query("INSERT INTO ta VALUES(5, 4, 6);");
+    vector<vector<string> > result = db->query("SELECT * FROM ta WHERE c>5;");
+    for (vector<vector<string> >::iterator it = result.begin(); it < result.end(); ++it) {
+      vector<string> row = *it;
+      cout << "Values: (A=" << row.at(0) << ", B=" << row.at(1) << ", C=" << row.at(2) << ")" << endl;
+    }
+
+    //db->close();
+    delete db;
+    db = nullptr;
+    return;
+  }
+
+
 } // end of namespace
 
 // --------------------------------------------

@@ -32,6 +32,7 @@
 #include "demo.h"
 #include "demomtch.h"
 #include "demoleon.h"
+#include "sqlitedemo.h"
 
 
 using KBase::PRNG;
@@ -48,14 +49,14 @@ using KBase::GAOpt;
 using KBase::GHCSearch;
 
 namespace MDemo { // a namespace of which M, A, P, S know nothing
-using std::cout;
-using std::endl;
-using std::flush;
-using std::get;
-using KBase::ReportingLevel;
+  using std::cout;
+  using std::endl;
+  using std::flush;
+  using std::get;
+  using KBase::ReportingLevel;
 
 
-void demoPCE(uint64_t s, PRNG* rng) {
+  void demoPCE(uint64_t s, PRNG* rng) {
     printf("Using PRNG seed: %020llu \n", s);
     rng->setSeed(s);
 
@@ -63,37 +64,37 @@ void demoPCE(uint64_t s, PRNG* rng) {
 
     Model::VPModel vpm;
     switch (rng->uniform() % 5) {
-      case 0:
-      case 1:
-        vpm = Model::VPModel::Linear;
+    case 0:
+    case 1:
+      vpm = Model::VPModel::Linear;
       break;
-      case 2:
-        vpm = Model::VPModel::Square;
+    case 2:
+      vpm = Model::VPModel::Square;
       break;
-      case 3:
-        vpm = Model::VPModel::Quartic;
+    case 3:
+      vpm = Model::VPModel::Quartic;
       break;
-      case 4:
-        vpm = Model::VPModel::Binary;
+    case 4:
+      vpm = Model::VPModel::Binary;
       break;
-      default:
-        cout << "Unrecognized VPModel option"<< endl << flush;
-        assert(false);
-        break;
-    } 
+    default:
+      cout << "Unrecognized VPModel option" << endl << flush;
+      assert(false);
+      break;
+    }
 
     cout << "Using VPModel " << Model::VPMName(vpm) << endl;
 
     cout << "First, stable distrib is exactly as expected in bilateral conflict" << endl;
 
     auto cFn = [rng](unsigned int i, unsigned int j) {
-        if (i == j) {
-            return 0.0;
-        }
-        else {
-            double c = rng->uniform(1.0, 10.0);
-            return (c*c);
-        }
+      if (i == j) {
+        return 0.0;
+      }
+      else {
+        double c = rng->uniform(1.0, 10.0);
+        return (c*c);
+      }
     };
 
     auto c = KMatrix::map(cFn, 2, 2);
@@ -114,16 +115,16 @@ void demoPCE(uint64_t s, PRNG* rng) {
     auto p2 = Model::probCE(pv);
 
     auto show = [](const KMatrix & cMat, const KMatrix & pMat, const KMatrix & pVec) {
-        cout << "Coalitions matrix:" << endl;
-        cMat.mPrintf(" %6.3f ");
-        cout << endl;
-        cout << "prob[i>j] Markov transitions matrix:" << endl;
-        pMat.mPrintf(" %.4f ");
-        cout << endl;
-        cout << "limiting stable prob[i] vector:" << endl;
-        pVec.mPrintf(" %.4f ");
-        cout << endl;
-        return;
+      cout << "Coalitions matrix:" << endl;
+      cMat.mPrintf(" %6.3f ");
+      cout << endl;
+      cout << "prob[i>j] Markov transitions matrix:" << endl;
+      pMat.mPrintf(" %.4f ");
+      cout << endl;
+      cout << "limiting stable prob[i] vector:" << endl;
+      pVec.mPrintf(" %.4f ");
+      cout << endl;
+      return;
     };
 
     show(c, pv, p2);
@@ -144,11 +145,11 @@ void demoPCE(uint64_t s, PRNG* rng) {
     show(c, pv, p2);
 
     return;
-}
+  }
 
 
 
-void demoSpVSR(uint64_t s, PRNG* rng) {
+  void demoSpVSR(uint64_t s, PRNG* rng) {
     using std::function;
     using std::get;
     using std::make_shared;
@@ -171,21 +172,21 @@ void demoSpVSR(uint64_t s, PRNG* rng) {
     //int* p1 = sp1.get(); // gets the  pointer
     cout << "The shared integer is " << *sp1.get() << endl;
     {   // create another reference
-        auto sp2 = sp1;
-        printf("Use count sp1: %li \n", sp1.use_count());
-        // let it go out-of-scope
+      auto sp2 = sp1;
+      printf("Use count sp1: %li \n", sp1.use_count());
+      // let it go out-of-scope
     }
     printf("Use count sp1: %li \n", sp1.use_count());
     cout << endl;
     const string fs = " %+6.2f ";
     // function<shared_ptr<void>(unsigned int, unsigned int)> fn
     auto fn = [rng, &fs](unsigned int nr, unsigned int nc) {
-        auto m1 = KMatrix::uniform(rng, nr, nc, -10, +50);
-        auto d = KBase::norm(m1);
-        cout << "Inside lambda:" << endl;
-        m1.mPrintf(fs);
-        shared_ptr<void> rslt = make_shared<tuple<double, KMatrix>>(d, m1); // shared_ptr version of (void*)
-        return rslt;
+      auto m1 = KMatrix::uniform(rng, nr, nc, -10, +50);
+      auto d = KBase::norm(m1);
+      cout << "Inside lambda:" << endl;
+      m1.mPrintf(fs);
+      shared_ptr<void> rslt = make_shared<tuple<double, KMatrix>>(d, m1); // shared_ptr version of (void*)
+      return rslt;
     };
 
 
@@ -200,92 +201,94 @@ void demoSpVSR(uint64_t s, PRNG* rng) {
     get<1>(r53).mPrintf(fs);
 
     return;
-}
+  }
 } // namespace
 // -------------------------------------------------
 
 
 int main(int ac, char **av) {
-    using std::cout;
-    using std::endl;
+  using std::cout;
+  using std::endl;
 
-    auto sTime = KBase::displayProgramStart();
-    uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary
-    uint64_t seed = dSeed;
-    bool run = true;
-    bool pceP = false;
-    bool spvsrP = false;
-    bool sqlP = false;
+  auto sTime = KBase::displayProgramStart();
+  uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary
+  uint64_t seed = dSeed;
+  bool run = true;
+  bool pceP = false;
+  bool spvsrP = false;
+  bool sqlP = false;
 
-    auto showHelp = [dSeed]() {
-        printf("\n");
-        printf("Usage: specify one or more of these options\n");
-        printf("--help            print this message\n");
-        printf("--pce             simple PCE\n");
-        printf("--spvsr           demonstrated shared_ptr<void> return\n");
-        printf("--sql             demo SQLite \n"); 
-        printf("--seed <n>        set a 64bit seed\n");
-        printf("                  0 means truly random\n");
-        printf("                  default: %020llu \n", dSeed);
-    };
+  auto showHelp = [dSeed]() {
+    printf("\n");
+    printf("Usage: specify one or more of these options\n");
+    printf("--help            print this message\n");
+    printf("--pce             simple PCE\n");
+    printf("--spvsr           demonstrated shared_ptr<void> return\n");
+    printf("--sql             demo SQLite \n");
+    printf("--seed <n>        set a 64bit seed\n");
+    printf("                  0 means truly random\n");
+    printf("                  default: %020llu \n", dSeed);
+  };
 
-    // tmp args
+  // tmp args
+  sqlP = true;
 
-    if (ac > 1) {
-        for (int i = 1; i < ac; i++) {
-            if (strcmp(av[i], "--seed") == 0) {
-                i++;
-                seed = std::stoull(av[i]);
-            }
-            else if (strcmp(av[i], "--pce") == 0) {
-                pceP = true;
-            }
-            else if (strcmp(av[i], "--spvsr") == 0) {
-                spvsrP = true;
-            }
-            else if (strcmp(av[i], "--sql") == 0) {
-                sqlP = true;
-            }
-            else {
-                run = false;
-                printf("Unrecognized argument %s\n", av[i]);
-            }
-        }
+  if (ac > 1) {
+    for (int i = 1; i < ac; i++) {
+      if (strcmp(av[i], "--seed") == 0) {
+        i++;
+        seed = std::stoull(av[i]);
+      }
+      else if (strcmp(av[i], "--pce") == 0) {
+        pceP = true;
+      }
+      else if (strcmp(av[i], "--spvsr") == 0) {
+        spvsrP = true;
+      }
+      else if (strcmp(av[i], "--sql") == 0) {
+        sqlP = true;
+      }
+      else {
+        run = false;
+        printf("Unrecognized argument %s\n", av[i]);
+      }
     }
+  }
 
-    if (!run) {
-        showHelp();
-        return 0;
-    }
-
-    PRNG * rng = new PRNG();
-    seed = rng->setSeed(seed); // 0 == get a random number
-    printf("Using PRNG seed:  %020llu \n", seed);
-    printf("Same seed in hex:   0x%016llX \n", seed);
-
-
-    // note that we reset the seed every time, so that in case something
-    // goes wrong, we need not scroll back too far to find the
-    // seed required to reproduce the bug.
-    if (pceP) {
-        cout << "-----------------------------------" << endl;
-        MDemo::demoPCE(seed, rng);
-    }
-    if (spvsrP) {
-        cout << "-----------------------------------" << endl;
-        MDemo::demoSpVSR(seed, rng);
-    }
-
-    if (sqlP) {
-        MDemo::demoSQLite();
-    }
-
-
-    cout << "-----------------------------------" << endl;
-
-    delete rng;
-    KBase::displayProgramEnd(sTime);
+  if (!run) {
+    showHelp();
     return 0;
+  }
+
+  PRNG * rng = new PRNG();
+  seed = rng->setSeed(seed); // 0 == get a random number
+  printf("Using PRNG seed:  %020llu \n", seed);
+  printf("Same seed in hex:   0x%016llX \n", seed);
+
+
+  // note that we reset the seed every time, so that in case something
+  // goes wrong, we need not scroll back too far to find the
+  // seed required to reproduce the bug.
+  if (pceP) {
+    cout << "-----------------------------------" << endl;
+    MDemo::demoPCE(seed, rng);
+  }
+  if (spvsrP) {
+    cout << "-----------------------------------" << endl;
+    MDemo::demoSpVSR(seed, rng);
+  }
+
+  if (sqlP) {
+    Model::demoSQLite();
+    MDemo::demoDBObject();
+  }
+
+
+  cout << "-----------------------------------" << endl;
+
+  delete rng;
+  KBase::displayProgramEnd(sTime);
+  return 0;
 }
 
 

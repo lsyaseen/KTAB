@@ -48,7 +48,7 @@ namespace SMPLib {
   using KBase::VotingRule;
   using KBase::ReportingLevel;
 
-
+  /*
   string SMPModel::createTableSQL(unsigned int tn) {
     string sql = "";
     switch (tn) {
@@ -207,6 +207,7 @@ namespace SMPLib {
 
     return sql;
   }
+  */
 
   void SMPModel::sqlTest() {
     // just a test to get linkages correct
@@ -273,13 +274,14 @@ namespace SMPLib {
     smpDB = db;
     return;
   }
-
+  
+  /*
   void SMPModel::sqlAUtil(unsigned int t) {
-    // output the actor util table to sqlite 
+    // output the actor util table, for the given turn, to SQLite 
 
     assert(nullptr != smpDB);
     assert(t < history.size());
-    auto st = ((SMPState*)(history[t]));
+    State* st = history[t];
     assert(nullptr != st);
     assert(numAct == st->aUtil.size());
 
@@ -326,7 +328,7 @@ namespace SMPLib {
     return;
   }
 
-
+  */
 
 }; // end of namespace
 

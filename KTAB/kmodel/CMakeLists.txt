@@ -153,6 +153,7 @@ TARGET_LINK_LIBRARIES(leonApp
   kmodel
   ${KUTILS_LIBRARY}
   ${EFENCE_LIBRARIES}
+  ${SQLITE_LIBRARIES}
   )
 
 # -------------------------------------------------
@@ -165,6 +166,7 @@ TARGET_LINK_LIBRARIES(mtchApp
   kmodel
   ${KUTILS_LIBRARY}
   ${EFENCE_LIBRARIES}
+  ${SQLITE_LIBRARIES}
   )
 
 # -------------------------------------------------

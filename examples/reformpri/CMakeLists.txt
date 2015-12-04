@@ -49,7 +49,14 @@ endif (ENABLE_EFENCE)
 
 # -------------------------------------------------
 # find libraries on which this project depends
+# ------------------------------------------------- 
+ 
+find_package(Sqlite)
+if (NOT SQLITE_FOUND)
+  message(FATAL_ERROR "Could not find SQLite")
+endif (NOT SQLITE_FOUND) 
 
+# -------------------------------------------------
 # See "Findkutils.cmake" in cmakemodules to figure
 # out where it looks and what variables it sets
 
@@ -76,6 +83,7 @@ include_directories(
   ${KUTILS_INCLUDE_DIR}
   ${KMODEL_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}/libsrc/
+  ${SQLITE_INCLUDE_DIR}
 )
 
 set(RPLIB_SRCS 
@@ -91,6 +99,7 @@ add_library(rplib STATIC ${RPLIB_SRCS})
 include_directories(
   ${PROJECT_SOURCE_DIR}/libsrc/
   ${PROJECT_SOURCE_DIR}/src/
+  ${SQLITE_INCLUDE_DIR}
 )
 
 set(RPDEMO_SRCS
@@ -106,6 +115,7 @@ target_link_libraries(rpdemo
   ${KMODEL_LIBRARY}
   ${KUTILS_LIBRARY}
   ${EFENCE_LIBRARIES}
+  ${SQLITE_LIBRARIES}
   )
 
 # -------------------------------------------------

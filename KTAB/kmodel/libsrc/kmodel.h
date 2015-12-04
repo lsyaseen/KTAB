@@ -39,6 +39,8 @@
 #ifndef KTAB_MODEL_H
 #define KTAB_MODEL_H
 
+#include <sqlite3.h>
+
 #include "kutils.h"
 #include "kmatrix.h"
 #include "prng.h"
@@ -156,6 +158,21 @@ namespace KBase {
     unsigned int numAct = 0;
     PRNG * rng = nullptr;
     vector<State*> history = {};
+
+
+    // output an existing actor util table, for the given turn, to SQLite 
+    void sqlAUtil(unsigned int t);
+
+
+    static void demoSQLite();
+  protected:
+    static string createTableSQL(unsigned int tn);
+    // note that the function to write to table #k must be kept
+    // synchronized with the result of createTableSQL(k) !
+
+    sqlite3 *smpDB = nullptr; // keep this protected, to ease later multi-threading
+    string scenName = "Scen";
+  private:
   };
 
 

@@ -141,6 +141,8 @@ namespace SMPLib {
     virtual ~SMPState();
 
     virtual void setDiff();
+
+    // this sets the values in the AUtil matrices
     virtual void setAUtil(ReportingLevel rl);
 
     // returns h's estimate of i's risk attitude, using the risk-adjustment-rule
@@ -208,16 +210,19 @@ namespace SMPLib {
 
     static double stateDist(const SMPState* s1 , const SMPState* s2 );
 
-    virtual void sqlAUtil(unsigned int t);
+    // this does not set AUtil, just output it to SQLite
+    //virtual void sqlAUtil(unsigned int t);
 
   protected:
-    sqlite3 *smpDB = nullptr; // keep this protected, to ease multi-threading
-    string scenName = "Scen";
+    //sqlite3 *smpDB = nullptr; // keep this protected, to ease multi-threading
+    //string scenName = "Scen";
 
     void sqlTest();
+
+
     // note that the function to write to table #k must be kept
     // synchronized with the result of createTableSQL(k) !
-    string createTableSQL(unsigned int tn);
+    // string createTableSQL(unsigned int tn);
 
     void addDim(string dn);
 
