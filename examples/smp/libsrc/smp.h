@@ -24,6 +24,9 @@
 #ifndef SMP_LIB_H
 #define SMP_LIB_H
 
+#include <iostream>
+#include <string>
+
 #include "csv_parser.hpp"
 #include "sqlite3.h"
 #include "kutils.h"
@@ -188,7 +191,7 @@ namespace SMPLib {
 
   class SMPModel : public Model {
   public:
-    explicit SMPModel(PRNG * rng);
+    explicit SMPModel(PRNG * rng, string desc="");
     virtual ~SMPModel();
 
     static double bsUtil(double d, double R);

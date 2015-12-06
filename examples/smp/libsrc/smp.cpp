@@ -127,7 +127,7 @@ namespace SMPLib {
     auto round4 = [](const double x1) {
       const double s = 10000.0;
       const int y = ((int)(0.5 + (x1*s)));
-       double x2 = ((double)y) / s;
+      double x2 = ((double)y) / s;
       return x2;
     };
     assert((1 == n) || (2 == n));
@@ -174,7 +174,7 @@ namespace SMPLib {
 
   BargainSMP* SMPActor::interpolateBrgn(const SMPActor* ai, const SMPActor* aj,
     const VctrPstn* posI, const VctrPstn * posJ,
-    double prbI, double prbJ, InterVecBrgn ivb)  {
+    double prbI, double prbJ, InterVecBrgn ivb) {
     assert((1 == posI->numC()) && (1 == posJ->numC()));
     unsigned int numD = posI->numR();
     assert(numD == posJ->numR());
@@ -212,7 +212,7 @@ namespace SMPLib {
   }
 
 
-  KMatrix SMPState::bigRfromProb(const KMatrix& p, BigRRange rr)   {
+  KMatrix SMPState::bigRfromProb(const KMatrix& p, BigRRange rr) {
     double pMin = 1.0;
     double pMax = 0.0;
     for (double pi : p) {
@@ -444,9 +444,9 @@ namespace SMPLib {
   // estimate Ri, and set all the aUtil[h] matrices
   SMPState* SMPState::stepBCN() {
     setAUtil(ReportingLevel::Low);
-     int myT = -1;
-    for (unsigned int t = 0; t < model->history.size(); t++){
-      if (this == model->history[t]){
+    int myT = -1;
+    for (unsigned int t = 0; t < model->history.size(); t++) {
+      if (this == model->history[t]) {
         myT = t;
       }
     }
@@ -839,19 +839,10 @@ namespace SMPLib {
   // -------------------------------------------------
 
 
-  SMPModel::SMPModel(PRNG * r) : Model(r) {
+  SMPModel::SMPModel(PRNG * r, string desc) : Model(r, desc) {
     numDim = 0;
     posTol = 0.001;
     dimName = vector<string>();
-
-    // Record the UTC time so it can be used as the default scenario name
-    std::chrono::time_point<std::chrono::system_clock> st;
-    st = std::chrono::system_clock::now();
-    std::time_t start_time = std::chrono::system_clock::to_time_t(st);
-    auto utcBuff = newChars(200);
-    std::strftime(utcBuff, 150, "UTC-%Y-%m-%d-%H%M-%S", gmtime(&start_time));
-    cout << "Scenario assigned a default name from UTC start time: -|" << utcBuff << "|-" << endl << flush;
-    scenName = utcBuff;
 
     sqlTest();
   }

@@ -112,10 +112,10 @@ include_directories (
   ${SQLITE_INCLUDE_DIR}
   )
 
-
+# note that we do not put the csv_parser into smp lib.
 set(SMPLIB_SRCS
   ${PROJECT_SOURCE_DIR}/libsrc/smp.cpp
-  ${PROJECT_SOURCE_DIR}/libsrc/smpsql.cpp
+  ${PROJECT_SOURCE_DIR}/libsrc/smpsql.cpp 
   )
 
 add_library(smp STATIC ${SMPLIB_SRCS})

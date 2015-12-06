@@ -183,7 +183,7 @@ namespace DemoLeon {
   class LeonModel : public Model {
     friend class LeonActor;
   public:
-    explicit LeonModel(PRNG * r);
+    explicit LeonModel(PRNG * r, string d="");
     virtual ~LeonModel();
 
     // syntheize random, but not-ridiculous, data for a base year

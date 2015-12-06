@@ -295,7 +295,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
 
 
   // -------------------------------------------------
-  MtchModel::MtchModel(PRNG* rng) : Model(rng) {
+  MtchModel::MtchModel(PRNG* rng, string d) : Model(rng, d) {
     numCat = 0;
     numItm = 0;
   }

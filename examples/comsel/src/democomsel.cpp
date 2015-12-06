@@ -36,6 +36,7 @@
 #include "prng.h"
 #include "kmodel.h"
 
+#include "smp.h"
 #include "comsel.h"
 #include "csmain.h"
 #include "democomsel.h"
@@ -151,6 +152,17 @@ int main(int ac, char **av) {
   seed = rng->setSeed(seed); // 0 == get a random number
   printf("Using PRNG seed: %020llu \n", seed);
   printf("Same seed in hex: 0x%016llX \n", seed);
+
+
+  cout << "Creating objects from SMPLib ... " <<endl << flush;
+  auto sm = new SMPLib::SMPModel(rng); // , "SMPScen-010101"
+  auto sa = new SMPLib::SMPActor("Bob", "generic spatial actor");
+  delete sm;
+  sm = nullptr;
+  delete sa;
+  sa = nullptr;
+  cout << endl;
+  cout << "Done creating objects from SMPLib." << endl << flush;
 
   // note that we reset the seed every time, so that in case something
   // goes wrong, we need not scroll back too far to find the

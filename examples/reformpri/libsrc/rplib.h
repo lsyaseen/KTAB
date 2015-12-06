@@ -116,7 +116,7 @@ private:
 
 class RPModel : public Model {
 public:
-    explicit RPModel(PRNG* rng);
+    explicit RPModel(PRNG* rng, string d="");
     virtual ~RPModel();
 
     static RPModel* randomMS(unsigned int numA, unsigned int numI,

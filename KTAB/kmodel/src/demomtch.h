@@ -148,7 +148,7 @@ private:
 
 class MtchModel : public Model {
 public:
-    explicit MtchModel(PRNG* rng);
+    explicit MtchModel(PRNG* rng, string d="");
     virtual ~MtchModel();
 
     static MtchModel* randomMS(unsigned int numA, unsigned int numI, VotingRule vr, MtchActor::PropModel pMod, PRNG * rng);

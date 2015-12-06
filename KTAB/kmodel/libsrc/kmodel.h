@@ -152,7 +152,7 @@ namespace KBase {
   // -------------------------------------------------
   class Model {
   public:
-    explicit Model(PRNG * r);
+    explicit Model(PRNG * r, string d);
     virtual ~Model();
 
     // In the abstract, you run a model by stepping it until it is time to stop.
@@ -240,7 +240,7 @@ namespace KBase {
     // synchronized with the result of createTableSQL(k) !
 
     sqlite3 *smpDB = nullptr; // keep this protected, to ease later multi-threading
-    string scenName = "Scen";
+    string scenName = "Scen"; // default is set from UTC time
   private:
   };
 

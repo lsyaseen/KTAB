@@ -39,18 +39,34 @@ namespace KBase {
   Position::~Position() {}
 
 
-  Model::Model(PRNG * r) {
+  Model::Model(PRNG * r, string desc) {
     history = vector<State*>();
     actrs = vector<Actor*>();
     numAct = 0;
     stop = nullptr;
     assert(nullptr != r);
     rng = r;
+
+    // Record the UTC time so it can be used as the default scenario name
+    std::chrono::time_point<std::chrono::system_clock> st;
+    st = std::chrono::system_clock::now();
+    std::time_t start_time = std::chrono::system_clock::to_time_t(st);
+    if (0 == desc.length()) {
+      auto utcBuff = newChars(200);
+      std::strftime(utcBuff, 150, "Scenario-UTC-%Y-%m-%d-%H%M-%S", gmtime(&start_time));
+      cout << "Generating default name from UTC start time" << endl << flush;
+      scenName = utcBuff;
+    }
+    else
+    {
+      scenName = desc;
+    }
+    cout << "Scenario assigned name: -|" << scenName.c_str() << "|-" << endl << flush;
   }
 
 
   Model::~Model() {
-    while (0 < history.size()){
+    while (0 < history.size()) {
       State* s = history[history.size() - 1];
       delete s;
       history.pop_back();
@@ -126,8 +142,8 @@ namespace KBase {
 
 
   void Model::demoSQLite() {
-    cout << endl << "Starting basic demo of SQLite in Model class"<<endl;
-    
+    cout << endl << "Starting basic demo of SQLite in Model class" << endl;
+
     auto callBack = [](void *data, int numCol, char **stringFields, char **colNames) {
       for (int i = 0; i < numCol; i++) {
         printf("%s = %s\n", colNames[i], stringFields[i] ? stringFields[i] : "NULL");
@@ -399,7 +415,7 @@ namespace KBase {
     // mission-critical RDBMS, rather than a 1-off record of this run,
     // doing so might be disasterous in case the system crashed before
     // things were cleaned up.
-    sqlite3 * db = smpDB; 
+    sqlite3 * db = smpDB;
     smpDB = nullptr;
 
     char* zErrMsg = nullptr;
@@ -439,7 +455,7 @@ namespace KBase {
     sqlBuff = nullptr;
 
     smpDB = db; // give it the new pointer
-    
+
     return;
   }
 
@@ -573,31 +589,31 @@ namespace KBase {
       break;
     case VPModel::Binary:
     {
-    // this is setup so that 10% or more advantage either way gives a guaranteed
-    // result. As with binary voting, it is necessary to have interpolation between
-    // to avoid weird round-off effects.
-      const double thresh = 1.10; 
-      if (s1 >= thresh*s2){
+      // this is setup so that 10% or more advantage either way gives a guaranteed
+      // result. As with binary voting, it is necessary to have interpolation between
+      // to avoid weird round-off effects.
+      const double thresh = 1.10;
+      if (s1 >= thresh*s2) {
         x1 = 1.0;
         x2 = minX;
       }
-      else if (s2 >= thresh*s1){
-        x1 = minX; 
+      else if (s2 >= thresh*s1) {
+        x1 = minX;
         x2 = 1.0;
       }
       else { // less than the threshold difference
-	double r12 = s1/(s1+s2);
-	// We now need a linear rescaling so that
-	// when s1/s2 = t, or r12 = t/(t+1), p12 = 1, and 
-	// when s2/s1 = t, or r12 = 1/(1+t), p12 =0.
-	// We can work out (a,b) so that
-	// a*(t/(t+1)) + b = 1, and 
-	// a*(1/(1+t)) + b = 0, then
-	// verify that a*(1/(1+1))+b = 1/2.
-	//
-	double p12 = (r12*(thresh+1.0)-1.0)/(thresh-1.0);
+        double r12 = s1 / (s1 + s2);
+        // We now need a linear rescaling so that
+        // when s1/s2 = t, or r12 = t/(t+1), p12 = 1, and 
+        // when s2/s1 = t, or r12 = 1/(1+t), p12 =0.
+        // We can work out (a,b) so that
+        // a*(t/(t+1)) + b = 1, and 
+        // a*(1/(1+t)) + b = 0, then
+        // verify that a*(1/(1+1))+b = 1/2.
+        //
+        double p12 = (r12*(thresh + 1.0) - 1.0) / (thresh - 1.0);
         x1 = p12;
-        x2 = 1-p12;
+        x2 = 1 - p12;
       }
     }
     break;
@@ -702,7 +718,7 @@ namespace KBase {
     KMatrix::mapV(test, numOpt, numOpt); // catch gross errors 
 
     // TODO: add a switch between markovPCE and condPCE?
-    KMatrix p = markovPCE(pv); 
+    KMatrix p = markovPCE(pv);
     //KMatrix p = condPCE(pv);
 
     assert(fabs(sum(p) - 1.0) < pTol);
@@ -722,7 +738,7 @@ namespace KBase {
     double change = 1.0;
     while (pTol < change) {
       change = 0;
-      for (unsigned int i = 0; i < numOpt; i++){
+      for (unsigned int i = 0; i < numOpt; i++) {
         double pi = 0.0;
         for (unsigned int j = 0; j < numOpt; j++) {
           pi = pi + pv(i, j)*(p(i, 0) + p(j, 0));
@@ -730,7 +746,7 @@ namespace KBase {
         assert(0 <= pi); // double-check
         q(i, 0) = pi / numOpt;
         double c = fabs(q(i, 0) - p(i, 0));
-        change = (c>change) ? c : change;
+        change = (c > change) ? c : change;
       }
       p = q;
       iter++;
@@ -881,10 +897,10 @@ namespace KBase {
 
     // the primary actors are assigned at least the minisucle
     // minimum influence contribution, to avoid 0/0 errors.
-    if (0 < contrib_i_ij){
+    if (0 < contrib_i_ij) {
       assert(0 < contrib_i_ij);
     }
-    if (0 < contrib_j_ij){
+    if (0 < contrib_j_ij) {
       assert(0 < contrib_j_ij);
     }
 

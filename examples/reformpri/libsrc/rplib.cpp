@@ -86,7 +86,7 @@ namespace RfrmPri {
 
   // --------------------------------------------
 
-  RPModel::RPModel(PRNG* rng) : Model(rng) {
+  RPModel::RPModel(PRNG* rng, string d) : Model(rng, d) {
     // nothing yet
   }
 

@@ -26,7 +26,7 @@
 namespace ComSelLib {
 
 
-  CSModel::CSModel(unsigned int np, unsigned int nd, PRNG* r) : Model(r) {
+  CSModel::CSModel(unsigned int np, unsigned int nd, PRNG* r, string d) : Model(r, d) {
 
     assert (np > 1);
     assert (nd > 0);

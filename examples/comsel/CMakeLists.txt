@@ -92,6 +92,12 @@ if(NOT KGRAPH_FOUND)
   message(FATAL_ERROR "Could not find kgraph")
 endif(NOT KGRAPH_FOUND)
 
+
+# Ditto for "Findsmp.cmake"
+find_package(smp)
+if(NOT SMP_FOUND)
+  message(FATAL_ERROR "Could not find smp")
+endif(NOT SMP_FOUND)
 # -------------------------------------------------
 # files to be built into a library go in libsrc/
 # any application or testing code goes in src
@@ -104,6 +110,7 @@ include_directories (
   ${KUTILS_INCLUDE_DIR}
   ${KMODEL_INCLUDE_DIR}
   ${KGRAPH_INCLUDE_DIR}
+  ${SMP_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}/libsrc/
   ${PROJECT_SOURCE_DIR}/src/
   ${FLUID_DIR}
@@ -144,12 +151,16 @@ set (CSG_LIBS
   ${COMSEL_XLIBS}
   )
 
-add_executable (csg ${CSG_SRCS})
+add_executable (csg 
+  ${CSG_SRCS}
+  ${CSVPARSER_DIR}/csv_parser.cpp
+)
 target_link_libraries(csg
   comsel
   ${CSG_LIBS}
   ${KMODEL_LIBRARY}
   ${KUTILS_LIBRARY}
+  ${SMP_LIBRARIES}
   ${SQLITE_LIBRARIES}
   ${EFENCE_LIBRARIES}
   )
@@ -167,6 +178,7 @@ endif(WIN32)
 message (STATUS "Using PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
 message (STATUS "KUTILS_INCLUDE_DIR: " ${KUTILS_INCLUDE_DIR})
 message (STATUS "KMODEL_INCLUDE_DIR: " ${KMODEL_INCLUDE_DIR})
+message (STATUS "SMP_INCLUDE_DIR: " ${SMP_INCLUDE_DIR})
 
 message (STATUS "FLTK_INCLUDE_DIR: " ${FLTK_INCLUDE_DIR})
 

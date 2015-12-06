@@ -32,6 +32,8 @@
 #include "gaopt.h"
 #include "kmodel.h"
 
+#include "smp.h"
+
 namespace ComSelLib {
   // namespace to which KBase has no access
   using std::function;
@@ -54,7 +56,7 @@ namespace ComSelLib {
 
   class CSModel : public Model {
   public:
-    CSModel(unsigned int np, unsigned int nd, PRNG* r);
+    CSModel(unsigned int np, unsigned int nd, PRNG* r, string d="");
     virtual ~CSModel();
     
   protected:

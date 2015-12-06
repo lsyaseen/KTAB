@@ -487,7 +487,7 @@ void LeonState::setAUtil(ReportingLevel rl) {
 
 // -------------------------------------------------
 
-LeonModel::LeonModel(PRNG * r) : Model(r) {
+LeonModel::LeonModel(PRNG * r, string d) : Model(r, d) {
     // some arbitrary yet plausible default values
     maxSub = 0.50;
     maxTax = 1.00;
