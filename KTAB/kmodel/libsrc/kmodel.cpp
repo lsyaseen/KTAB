@@ -126,6 +126,8 @@ namespace KBase {
 
 
   void Model::demoSQLite() {
+    cout << endl << "Starting basic demo of SQLite in Model class"<<endl;
+    
     auto callBack = [](void *data, int numCol, char **stringFields, char **colNames) {
       for (int i = 0; i < numCol; i++) {
         printf("%s = %s\n", colNames[i], stringFields[i] ? stringFields[i] : "NULL");

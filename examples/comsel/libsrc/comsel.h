@@ -21,51 +21,65 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // --------------------------------------------
 
-#ifndef DEMO_SQLITE_H
-#define DEMO_SQLITE_H
+#ifndef COMSEL_LIB_H
+#define COMSEL_LIB_H
 
-#include <cstdlib>
-#include <iostream>
-#include <stdio.h>
-#include <string>
-#include <sqlite3.h> 
-#include <tuple>
-#include <vector>
-
+#include "csv_parser.hpp"
+#include "sqlite3.h"
 #include "kutils.h"
 #include "prng.h"
 #include "kmatrix.h"
+#include "gaopt.h"
+#include "kmodel.h"
 
-namespace MDemo {
+namespace ComSelLib {
+  // namespace to which KBase has no access
+  using std::function;
+  using std::shared_ptr;
   using std::string;
   using std::tuple;
   using std::vector;
+  using KBase::newChars;
+  using KBase::KMatrix;
+  using KBase::PRNG;
+  using KBase::Actor;
+  using KBase::Position;
+  using KBase::State;
+  using KBase::Model;
+  using KBase::VotingRule;
+  using KBase::ReportingLevel;
+  using KBase::MtchPstn;
 
+  const string appVersion = "0.1";
 
-  void demoDBObject();
-
-  class SQLDB {
+  class CSModel : public Model {
   public:
-    SQLDB(char* filename);
-    virtual ~SQLDB();
-    bool open(char* filename);
-
-    // returns a vector of rows, where each row is a vector of (string) values
-    tuple<unsigned int, vector<vector<string>>> query(const char* query);
-
-    void close();
-
+    CSModel(unsigned int np, unsigned int nd, PRNG* r);
+    virtual ~CSModel();
+    
+  protected:
+    unsigned int numPrty = 0;
+    unsigned int numDims = 0;
   private:
-    sqlite3 *database = nullptr;
-    bool dbOpen = false;
   };
 
+  class CSActor : public Actor  {
+  public:
+    CSActor();
+    virtual ~CSActor();
+  protected:
+  private:
+  };
 
-}; // end of namespace
+  class CSState : public State  {
+  public:
+  protected:
+  private:
+  };
 
-// -------------------------------------------------
-#endif
+};// end of namespace
 
 // --------------------------------------------
+#endif
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------

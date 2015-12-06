@@ -55,14 +55,8 @@ namespace KBase {
 
   class KMatrix;
   class PRNG;
-  class Model;
-  class Actor;
-  class Position;
   class State;
-
-  class VctrPstn;
-  class MtchPstn;
-  class MtchGene;
+  class Actor;
 
   // How much influence to exert (vote) given a difference in [0,1] utility
   enum class VotingRule : char {
@@ -73,14 +67,89 @@ namespace KBase {
   string vrName(VotingRule vr);
 
 
-  vector <MtchPstn> uniqueMP(vector <MtchPstn> mps);
-
-
   enum class ThirdPartyCommit { NoCommit, SemiCommit, FullCommit };
   
   // third parties have the same range of voting rules as in VotingRule enum.
   string tpcName(ThirdPartyCommit tpc);
+  
+  
+  // -------------------------------------------------
+  // There is not much to say about abstract positions, even
+  // though the set of possible positions/outcomes is key
+  // to defining each particular problem.
+  class Position {
+  public:
+    Position();
+    virtual ~Position();
+  };
 
+
+
+  // -------------------------------------------------
+
+  // Basic vector position: just a column-vector of numbers.
+  // They could be interpretted in many ways, as policies
+  // are often described by a vector of numbers (e.g. tax/subsidy rates).
+  class VctrPstn : public Position, public KMatrix {
+  public:
+    VctrPstn();
+    VctrPstn(unsigned int nr, unsigned int nc);
+    explicit VctrPstn(const KMatrix & m); // copy constructor
+
+    virtual ~VctrPstn();
+  };
+
+  // -------------------------------------------------
+  // this is a matching of N items to M categories.
+  // Note that this is intended to be independent of MtchState, MtchActor, etc.
+  // Each category is a bucket into which 0, 1, or more items can be put.
+  // Each item goes in exactly one category. A Matching states, for each of N items,
+  // which of M categories it goes into. Thus, there are M^N possible matchings.
+  // Examples are items = pieces of candy, categories = which actor gets them,
+  // or items = projects to fund, categories = {High, Medium, Low} priority, actors = interest groups
+  // or items = cabinet seats, categories = parties, actors = interest groups
+  // or ....
+  class MtchPstn : public Position {
+  public:
+    MtchPstn();
+    virtual ~MtchPstn();
+    virtual vector<MtchPstn> neighbors(unsigned int nVar) const;
+    // assumes no interaction between items (permutation requires interaction)
+
+
+
+    unsigned int numItm = 0;
+    unsigned int numCat = 0;
+    vector<unsigned int> match = {}; // must be of length numItm
+  };
+
+
+  vector <MtchPstn> uniqueMP(vector <MtchPstn> mps);
+  
+  
+  // bundle up methods relevant to GA over MtchPstn
+  class MtchGene : public MtchPstn {
+  public:
+    MtchGene();
+    ~MtchGene();
+
+    void randomize(PRNG* rng);
+    MtchGene * mutate(PRNG * rng) const;
+    tuple<MtchGene*, MtchGene*> cross(const MtchGene * g2, PRNG * rng) const;
+    void show() const;
+    bool equiv(const MtchGene * g2) const;
+
+    void setState(vector<Actor*> as, vector<MtchPstn*> ps);
+
+  protected:
+    void copySelf(MtchGene*) const;
+    // links to the State are necessary to evaluate the net support, EU, etc.
+    vector<Actor*> actrs = {};
+    vector<MtchPstn*> pstns = {};
+  };
+
+
+  // -------------------------------------------------
   class Model {
   public:
     explicit Model(PRNG * r);
@@ -176,6 +245,7 @@ namespace KBase {
   };
 
 
+  // -------------------------------------------------
   class State {
   public:
     explicit State(Model* mod);
@@ -247,7 +317,7 @@ namespace KBase {
     // be very expensive to evaluate. Evaluating one policy position yields
     // a predicted state to which all the actors react with their differing utility fns.
     // Thus, we can get a whole column of the U_ij matrix from one CGE evaluation;
-    // it would be very slow to evaluate the model once for each actor.
+    // it would be very slow to re-evaluate the same model (Pj) once for each actor (Ai).
     // Of course, if every actor has a completely different model to predict the
     // states that will result from a policy, then you have no choice but to
     // run each model separately for each actor - so it's best to keep them simple.
@@ -265,76 +335,6 @@ namespace KBase {
   protected:
   };
 
-
-  // -------------------------------------------------
-  // Similarly, there is not much to say about abstract positions.
-  class Position {
-  public:
-    Position();
-    virtual ~Position();
-  };
-
-
-
-  // -------------------------------------------------
-
-  // Basic vector position: just a column-vector of numbers.
-  // They could be interpretted in many ways, as policies
-  // are often described by a vector of numbers (e.g. tax/subsidy rates).
-  class VctrPstn : public Position, public KMatrix {
-  public:
-    VctrPstn();
-    VctrPstn(unsigned int nr, unsigned int nc);
-    explicit VctrPstn(const KMatrix & m); // copy constructor
-
-    virtual ~VctrPstn();
-  };
-
-  // -------------------------------------------------
-  // this is a matching of N items to M categories.
-  // Note that this is intended to be independent of MtchState, MtchActor, etc.
-  // Each category is a bucket into which 0, 1, or more items can be put.
-  // Each item goes in exactly one category. A Matching states, for each of N items,
-  // which of M categories it goes into. Thus, there are M^N possible matchings.
-  // Examples are items = pieces of candy, categories = which actor gets them,
-  // or items = projects to fund, categories = {High, Medium, Low} priority, actors = interest groups
-  // or items = cabinet seats, categories = parties, actors = interest groups
-  // or ....
-  class MtchPstn : public Position {
-  public:
-    MtchPstn();
-    virtual ~MtchPstn();
-    virtual vector<MtchPstn> neighbors(unsigned int nVar) const;
-    // assumes no interaction between items (permutation requires interaction)
-
-
-
-    unsigned int numItm = 0;
-    unsigned int numCat = 0;
-    vector<unsigned int> match = {}; // must be of length numItm
-  };
-
-
-  // bundle up methods relevant to GA over MtchPstn
-  class MtchGene : public MtchPstn {
-  public:
-    MtchGene();
-    ~MtchGene();
-
-    void randomize(PRNG* rng);
-    MtchGene * mutate(PRNG * rng) const;
-    tuple<MtchGene*, MtchGene*> cross(const MtchGene * g2, PRNG * rng) const;
-    void show() const;
-    bool equiv(const MtchGene * g2) const;
-
-    void setState(vector<Actor*> as, vector<MtchPstn*> ps);
-
-  protected:
-    void copySelf(MtchGene*) const;
-    // links to the State are necessary to evaluate the net support, EU, etc.
-    vector<Actor*> actrs = {};
-    vector<MtchPstn*> pstns = {};
-  };
 
 
 }; // end of namespace

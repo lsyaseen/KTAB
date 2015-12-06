@@ -20,52 +20,47 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // --------------------------------------------
+#ifndef COMSEL_DEMO_H
+#define COMSEL_DEMO_H
+// --------------------------------------------
 
-#ifndef DEMO_SQLITE_H
-#define DEMO_SQLITE_H
+#include "comsel.h"
+#include <FL/Fl.H>
+#include <FL/Fl_Window.H>
+#include <FL/Fl_Tabs.H>
+#include <FL/Fl_Group.H>
+#include <FL/Fl_Button.H>
 
-#include <cstdlib>
-#include <iostream>
-#include <stdio.h>
-#include <string>
-#include <sqlite3.h> 
-#include <tuple>
-#include <vector>
+// --------------------------------------------
 
-#include "kutils.h"
-#include "prng.h"
-#include "kmatrix.h"
+namespace DemoComSel {
+// namespace to which KBase has no access
+using std::function;
+using std::shared_ptr;
+using std::string;
+using std::tuple;
+using std::vector;
+using KBase::KMatrix;
+using KBase::PRNG;
+using KBase::Actor;
+using KBase::Position;
+using KBase::State;
+using KBase::Model;
+using KBase::VotingRule;
+using KBase::ReportingLevel;
+using KBase::VctrPstn;
 
-namespace MDemo {
-  using std::string;
-  using std::tuple;
-  using std::vector;
 
+const string appVersion = "0.1";
+// -------------------------------------------------
 
-  void demoDBObject();
-
-  class SQLDB {
-  public:
-    SQLDB(char* filename);
-    virtual ~SQLDB();
-    bool open(char* filename);
-
-    // returns a vector of rows, where each row is a vector of (string) values
-    tuple<unsigned int, vector<vector<string>>> query(const char* query);
-
-    void close();
-
-  private:
-    sqlite3 *database = nullptr;
-    bool dbOpen = false;
-  };
 
 
 }; // end of namespace
 
-// -------------------------------------------------
-#endif
 
+// --------------------------------------------
+#endif
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------

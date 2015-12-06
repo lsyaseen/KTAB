@@ -21,50 +21,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // --------------------------------------------
 
-#ifndef DEMO_SQLITE_H
-#define DEMO_SQLITE_H
+#include "comsel.h"
 
-#include <cstdlib>
-#include <iostream>
-#include <stdio.h>
-#include <string>
-#include <sqlite3.h> 
-#include <tuple>
-#include <vector>
-
-#include "kutils.h"
-#include "prng.h"
-#include "kmatrix.h"
-
-namespace MDemo {
-  using std::string;
-  using std::tuple;
-  using std::vector;
+namespace ComSelLib {
 
 
-  void demoDBObject();
+  CSModel::CSModel(unsigned int np, unsigned int nd, PRNG* r) : Model(r) {
 
-  class SQLDB {
-  public:
-    SQLDB(char* filename);
-    virtual ~SQLDB();
-    bool open(char* filename);
+    assert (np > 1);
+    assert (nd > 0);
 
-    // returns a vector of rows, where each row is a vector of (string) values
-    tuple<unsigned int, vector<vector<string>>> query(const char* query);
+    numPrty = np;
+    numDims = nd;
+  }
 
-    void close();
+  
+  CSModel::~CSModel(){
+    // nothing yet
+  }
 
-  private:
-    sqlite3 *database = nullptr;
-    bool dbOpen = false;
-  };
-
-
-}; // end of namespace
-
-// -------------------------------------------------
-#endif
+};
+// end of namespace
 
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.

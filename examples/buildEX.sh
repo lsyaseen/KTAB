@@ -6,7 +6,7 @@
 # This script just builds them all in order, as a shortcut
 # after you have set it up.
 #------------------------------------------
-FILES="minwater  reformpri  smp  agenda"
+FILES="minwater  reformpri  smp  agenda  comsel"
 
 for d in $FILES
 do
