@@ -158,9 +158,9 @@ add_executable (csg
 target_link_libraries(csg
   comsel
   ${CSG_LIBS}
-  ${KMODEL_LIBRARY}
-  ${KUTILS_LIBRARY}
   ${SMP_LIBRARIES}
+  ${KMODEL_LIBRARIES}
+  ${KUTILS_LIBRARIES}
   ${SQLITE_LIBRARIES}
   ${EFENCE_LIBRARIES}
   )
@@ -176,9 +176,13 @@ endif(WIN32)
 # -------------------------------------------------
 # show some useful status/debugging information
 message (STATUS "Using PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
-message (STATUS "KUTILS_INCLUDE_DIR: " ${KUTILS_INCLUDE_DIR})
-message (STATUS "KMODEL_INCLUDE_DIR: " ${KMODEL_INCLUDE_DIR})
 message (STATUS "SMP_INCLUDE_DIR: " ${SMP_INCLUDE_DIR})
+message (STATUS "KMODEL_INCLUDE_DIR: " ${KMODEL_INCLUDE_DIR})
+message (STATUS "KUTILS_INCLUDE_DIR: " ${KUTILS_INCLUDE_DIR})
+
+#message (STATUS "SMP_LIBRARIES: " ${SMP_LIBRARIES})
+#message (STATUS "KMODEL_LIBRARIES: " ${KMODEL_LIBRARIES})
+#message (STATUS "KUTILS_LIBRARIES: " ${KUTILS_LIBRARIES})
 
 message (STATUS "FLTK_INCLUDE_DIR: " ${FLTK_INCLUDE_DIR})
 

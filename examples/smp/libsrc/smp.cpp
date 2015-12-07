@@ -43,6 +43,7 @@ namespace SMPLib {
   using KBase::Actor;
   using KBase::Model;
   using KBase::Position;
+  using KBase::VctrPstn;
   using KBase::State;
   using KBase::VotingRule;
   using KBase::ReportingLevel;
@@ -280,13 +281,13 @@ namespace SMPLib {
     double ri = nra(i, 0);
     double rhi = 0.0;
     switch (ra) {
-    case SMPState::BigRAdjust::Full:
+    case SMPState::BigRAdjust::FullRA:
       rhi = ri;
       break;
-    case SMPState::BigRAdjust::Half:
+    case SMPState::BigRAdjust::HalfRA:
       rhi = (rh + ri) / 2;
       break;
-    case SMPState::BigRAdjust::None:
+    case SMPState::BigRAdjust::NoRA:
       rhi = rh;
       break;
     }
@@ -306,7 +307,7 @@ namespace SMPLib {
   void SMPState::setAUtil(ReportingLevel rl) {
     // you can change these parameters
     auto vr = VotingRule::Proportional;
-    auto ra = SMPState::BigRAdjust::Half;
+    auto ra = SMPState::BigRAdjust::HalfRA;
     auto rr = BigRRange::Mid; // use [-0.5, +1.0] scale
     auto vpm = Model::VPModel::Linear;
 
@@ -352,13 +353,13 @@ namespace SMPLib {
 
     if (ReportingLevel::Silent < rl) {
       switch (ra) {
-      case SMPState::BigRAdjust::Full:
+      case SMPState::BigRAdjust::FullRA:
         cout << "Using Full adjustment of ra, r^h_i = ri" << endl;
         break;
-      case SMPState::BigRAdjust::Half:
+      case SMPState::BigRAdjust::HalfRA:
         cout << "Using Half adjustment of ra, r^h_i = (rh + ri)/2" << endl;
         break;
-      case SMPState::BigRAdjust::None:
+      case SMPState::BigRAdjust::NoRA:
         cout << "Using None adjustment of ra, r^h_i = rh " << endl;
         break;
       default:

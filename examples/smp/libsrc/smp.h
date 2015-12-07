@@ -138,7 +138,7 @@ namespace SMPLib {
       Min, Mid, Max
         };
     enum class BigRAdjust {
-      None, Half, Full
+      NoRA, HalfRA, FullRA
         };
     explicit SMPState(Model * m);
     virtual ~SMPState();
