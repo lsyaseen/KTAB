@@ -275,7 +275,7 @@ void demoEUSpatial(unsigned int numA, unsigned int sDim, uint64_t s, PRNG* rng) 
     printf("There were %u states, with %i steps between them\n", nState, nState - 1);
 
     cout << "History of actor positions over time" << endl;
-    md0->showVPHistory();
+    md0->showVPHistory(true);
 
     cout << endl;
     cout << "Delete model (actors, states, positions, etc.)" << endl << flush;
@@ -299,7 +299,7 @@ void readEUSpatial(uint64_t seed, string inputCSV, PRNG* rng) {
     cout << "Completed model run" << endl << endl;
 
     cout << "History of actor positions over time" << endl;
-    md0->showVPHistory();
+    md0->showVPHistory(true);
 
     delete md0;
     return;

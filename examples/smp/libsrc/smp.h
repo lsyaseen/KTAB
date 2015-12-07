@@ -204,12 +204,12 @@ namespace SMPLib {
                                  KMatrix cap, KMatrix pos, KMatrix sal, PRNG * rng);
 
     // print history of each actor in CSV (might want to generalize to arbitrary VctrPstn)
-    void showVPHistory() const;
+    void showVPHistory(bool sqlP) const;
 
     // number of spatial dimensions in this SMP
     unsigned int numDim = 0;
     vector<string> dimName = {};
-    double posTol = 1E-5;
+    double posTol = 5E-3; // on a scale of 0 to 100, this is a difference of just 0.5
 
     static double stateDist(const SMPState* s1 , const SMPState* s2 );
 
@@ -219,6 +219,10 @@ namespace SMPLib {
   protected:
     //sqlite3 *smpDB = nullptr; // keep this protected, to ease multi-threading
     //string scenName = "Scen";
+  protected:
+    static string createSMPTableSQL(unsigned int tn);
+    // note that the function to write to table #k must be kept
+    // synchronized with the result of createTableSQL(k) !
 
     void sqlTest();
 

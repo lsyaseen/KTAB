@@ -231,9 +231,8 @@ namespace KBase {
 
     // output an existing actor util table, for the given turn, to SQLite 
     void sqlAUtil(unsigned int t);
-
-
     static void demoSQLite();
+    
   protected:
     static string createTableSQL(unsigned int tn);
     // note that the function to write to table #k must be kept

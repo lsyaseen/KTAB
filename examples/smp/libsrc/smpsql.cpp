@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // --------------------------------------------
 //
-// Demonstrate a very basic, but highly parameterized, Spatial Model of Politics.
+// Demonstrate a very basic SQLite database for the Spatial Model of Politics.
 //
 // --------------------------------------------
 
@@ -31,193 +31,76 @@
 
 
 namespace SMPLib {
-  using std::cout;
-  using std::endl;
-  using std::flush;
-  using std::function;
-  using std::get;
-  using std::string;
+using std::cout;
+using std::endl;
+using std::flush;
+using std::function;
+using std::get;
+using std::string;
 
-  using KBase::PRNG;
-  using KBase::KMatrix;
-  using KBase::KException;
-  using KBase::Actor;
-  using KBase::Model;
-  using KBase::Position;
-  using KBase::State;
-  using KBase::VotingRule;
-  using KBase::ReportingLevel;
+using KBase::PRNG;
+using KBase::KMatrix;
+using KBase::KException;
+using KBase::Actor;
+using KBase::Model;
+using KBase::Position;
+using KBase::State;
+using KBase::VotingRule;
+using KBase::ReportingLevel;
 
-  /*
-  string SMPModel::createTableSQL(unsigned int tn) {
+// --------------------------------------------
+
+string SMPModel::createSMPTableSQL(unsigned int tn)  {
     string sql = "";
     switch (tn) {
-    case 0: // position-utility table
-      sql = "create table PosUtil ("  \
-        "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
-        "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-        "Est_h	INTEGER NOT NULL DEFAULT 0, "\
-        "Act_i	INTEGER NOT NULL DEFAULT 0, "\
-        "Pos_j	INTEGER NOT NULL DEFAULT 0, "\
-        "Util	REAL"\
-        ");";
-      break;
+    case 0:
+        // coordinates of each actor's position
+        sql = "create table VectorPosition ("  \
+              "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
+              "Turn_t		INTEGER NOT NULL DEFAULT 0, "\
+              "Act_i		INTEGER NOT NULL DEFAULT 0, "\
+              "Dim_k		INTEGER NOT NULL DEFAULT 0, "\
+              "Coord		REAL"\
+              ");";
+        break;
 
-    case 1: // pos-vote table
-      sql = "create table PosVote ("  \
-        "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
-        "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-        "Est_h	INTEGER NOT NULL DEFAULT 0, "\
-        "Voter_k	INTEGER NOT NULL DEFAULT 0, "\
-        "Pos_i	INTEGER NOT NULL DEFAULT 0, "\
-        "Pos_j	INTEGER NOT NULL DEFAULT 0, "\
-        "Vote	REAL"\
-        ");";
-      break;
+    case 1:
+        // salience to each actor of each dimension
+        sql = "create table SpatialSalience ("  \
+              "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
+              "Turn_t		INTEGER NOT NULL DEFAULT 0, "\
+              "Act_i		INTEGER NOT NULL DEFAULT 0, "\
+              "Dim_k		INTEGER NOT NULL DEFAULT 0, "\
+              "Sal		REAL"\
+              ");";
+        break;
 
-    case 2: // pos-prob table. Note that there may be duplicates, unless we limit it to unique positions
-      sql = "create table PosProb ("  \
-        "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
-        "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-        "Est_h	INTEGER NOT NULL DEFAULT 0, "\
-        "Pos_i	INTEGER NOT NULL DEFAULT 0, "\
-        "Prob	REAL"\
-        ");";
-      break;
-
-    case 3: // pos-equiv table. E(i)= lowest j s.t. Pos(i) ~ Pos(j). if j < i, it is not unique.
-      sql = "create table PosEquiv ("  \
-        "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
-        "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-        "Pos_i	INTEGER NOT NULL DEFAULT 0, "\
-        "Eqv_j	INTEGER NOT NULL DEFAULT 0 "\
-        ");";
-      break;
-
-    case 4:
-      // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
-      // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-      sql = "create table UtilContest ("  \
-        "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
-        "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-        "Est_h	INTEGER NOT NULL DEFAULT 0, "\
-        "Aff_k	INTEGER NOT NULL DEFAULT 0, "\
-        "Init_i	INTEGER NOT NULL DEFAULT 0, "\
-        "Rcvr_j	INTEGER NOT NULL DEFAULT 0, "\
-        "Util	REAL"\
-        ");";
-      break;
-
-    case 5:
-      // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
-      // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-      sql = "create table UtilChlg ("  \
-        "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
-        "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-        "Est_h	INTEGER NOT NULL DEFAULT 0, "\
-        "Aff_k	INTEGER NOT NULL DEFAULT 0, "\
-        "Init_i	INTEGER NOT NULL DEFAULT 0, "\
-        "Rcvr_j	INTEGER NOT NULL DEFAULT 0, "\
-        "Util	REAL"\
-        ");";
-      break;
-
-    case 6:
-      // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
-      // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-      sql = "create table UtilVict ("  \
-        "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
-        "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-        "Est_h	INTEGER NOT NULL DEFAULT 0, "\
-        "Aff_k	INTEGER NOT NULL DEFAULT 0, "\
-        "Init_i	INTEGER NOT NULL DEFAULT 0, "\
-        "Rcvr_j	INTEGER NOT NULL DEFAULT 0, "\
-        "Util	REAL"\
-        ");";
-      break;
-
-    case 7:
-      // h's estimate that i will defeat j, including third party contributions
-      sql = "create table ProbVict ("  \
-        "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
-        "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-        "Est_h	INTEGER NOT NULL DEFAULT 0, "\
-        "Init_i	INTEGER NOT NULL DEFAULT 0, "\
-        "Rcvr_j	INTEGER NOT NULL DEFAULT 0, "\
-        "Prob	REAL"\
-        ");";
-      break;
-
-    case 8:
-      // h's estimate of utility to k of status quo.
-      // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
-      // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-      sql = "create table UtilSQ ("  \
-        "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
-        "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-        "Est_h	INTEGER NOT NULL DEFAULT 0, "\
-        "Aff_k	INTEGER NOT NULL DEFAULT 0, "\
-        "Util	REAL"\
-        ");";
-      break;
-
-    case 9:  // probability ik > j
-      sql = "create table ProbTPVict ("  \
-        "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
-        "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-        "Est_h	INTEGER NOT NULL DEFAULT 0, "\
-        "Init_i	INTEGER NOT NULL DEFAULT 0, "\
-        "ThrdP_k	INTEGER NOT NULL DEFAULT 0, "\
-        "Rcvr_j	INTEGER NOT NULL DEFAULT 0, "\
-        "Prob	REAL"\
-        ");";
-      break;
-
-    case 10: // utility to k of ik>j
-    // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
-    // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-      sql = "create table UtilTPVict ("  \
-        "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
-        "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-        "Est_h	INTEGER NOT NULL DEFAULT 0, "\
-        "Init_i	INTEGER NOT NULL DEFAULT 0, "\
-        "ThrdP_k	INTEGER NOT NULL DEFAULT 0, "\
-        "Rcvr_j	INTEGER NOT NULL DEFAULT 0, "\
-        "Util	REAL"\
-        ");";
-      break;
-
-    case 11: // utility to k of i>jk
-    // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
-    // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-      sql = "create table UtilTPLoss ("  \
-        "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
-        "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-        "Est_h	INTEGER NOT NULL DEFAULT 0, "\
-        "Init_i	INTEGER NOT NULL DEFAULT 0, "\
-        "ThrdP_k	INTEGER NOT NULL DEFAULT 0, "\
-        "Rcvr_j	INTEGER NOT NULL DEFAULT 0, "\
-        "Util	REAL"\
-        ");";
-      break;
+    case 2:
+        // scalar capability of each actor
+        sql = "create table SpatialCapability ("  \
+              "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
+              "Turn_t		INTEGER NOT NULL DEFAULT 0, "\
+              "Act_i		INTEGER NOT NULL DEFAULT 0, "\
+              "Cap		REAL"\
+              ");";
+        break;
 
     default:
-      throw(KException("SMPModel::createTableSQL unrecognized table number"));
+        throw(KException("SMPModel::createSMPTableSQL unrecognized table number"));
     }
-
     return sql;
-  }
-  */
+}
 
-  void SMPModel::sqlTest() {
+
+void SMPModel::sqlTest() {
     // just a test to get linkages correct
 
     auto callBack = [](void *NotUsed, int argc, char **argv, char **azColName) {
-      for (int i = 0; i < argc; i++) {
-        printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
-      }
-      printf("\n");
-      return ((int)0);
+        for (int i = 0; i < argc; i++) {
+            printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+        }
+        printf("\n");
+        return ((int)0);
     };
 
     smpDB = nullptr;
@@ -226,28 +109,28 @@ namespace SMPLib {
     string sql;
 
     auto sOpen = [&db](unsigned int n) {
-      int rc = sqlite3_open("test.db", &db);
-      if (rc != SQLITE_OK) {
-        fprintf(stdout, "Can't open database: %s\n", sqlite3_errmsg(db));
-        exit(0);
-      }
-      else {
-        fprintf(stdout, "Successfully opened database #%i\n", n);
-      }
-      cout << endl << flush;
-      return;
+        int rc = sqlite3_open("test.db", &db);
+        if (rc != SQLITE_OK) {
+            fprintf(stdout, "Can't open database: %s\n", sqlite3_errmsg(db));
+            exit(0);
+        }
+        else {
+            fprintf(stdout, "Successfully opened database #%i\n", n);
+        }
+        cout << endl << flush;
+        return;
     };
 
     auto sExec = [&db, callBack, &zErrMsg](string sql, string msg) {
-      int rc = sqlite3_exec(db, sql.c_str(), callBack, nullptr, &zErrMsg);
-      if (rc != SQLITE_OK) {
-        fprintf(stdout, "SQL error: %s\n", zErrMsg);
-        sqlite3_free(zErrMsg);
-      }
-      else {
-        fprintf(stdout, msg.c_str());
-      }
-      return rc;
+        int rc = sqlite3_exec(db, sql.c_str(), callBack, nullptr, &zErrMsg);
+        if (rc != SQLITE_OK) {
+            fprintf(stdout, "SQL error: %s\n", zErrMsg);
+            sqlite3_free(zErrMsg);
+        }
+        else {
+            fprintf(stdout, msg.c_str());
+        }
+        return rc;
     };
 
     // Open database
@@ -262,73 +145,27 @@ namespace SMPLib {
 
     // Create & execute SQL statements
     for (unsigned int i = 0; i < 12; i++) {
-      auto buff = newChars(50);
-      sprintf(buff, "Created table %u successfully \n", i);
-      sql = createTableSQL(i);
-      sExec(sql, buff); // ignore return-code
-      buff = nullptr;
-      cout << flush;
+        auto buff = newChars(50);
+        sprintf(buff, "Created Model table %u successfully \n", i);
+        sql = createTableSQL(i);
+        sExec(sql, buff); // ignore return-code
+        buff = nullptr;
+        cout << flush;
+    }
+    cout << endl << flush;
+    for (unsigned int i = 0; i < 3; i++) {
+        auto buff = newChars(50);
+        sprintf(buff, "Created SMPModel table %u successfully \n", i);
+        sql = createSMPTableSQL(i);
+        sExec(sql, buff); // ignore return-code
+        buff = nullptr;
+        cout << flush;
     }
     cout << endl << flush;
 
     smpDB = db;
     return;
-  }
-  
-  /*
-  void SMPModel::sqlAUtil(unsigned int t) {
-    // output the actor util table, for the given turn, to SQLite 
-
-    assert(nullptr != smpDB);
-    assert(t < history.size());
-    State* st = history[t];
-    assert(nullptr != st);
-    assert(numAct == st->aUtil.size());
-
-    sqlite3 * db = smpDB; // I don't like passing 'this' into lambda-functions
-    smpDB = nullptr;
-
-    char* zErrMsg = nullptr;
-    auto sqlBuff = newChars(200);
-    sprintf(sqlBuff,
-      "INSERT INTO PosUtil (Scenario, Turn_t, Est_h, Act_i, Pos_j, Util) VALUES ('%s', ?1, ?2, ?3, ?4, ?5)",
-      scenName.c_str());
-    const char* insStr = sqlBuff;
-    sqlite3_stmt *insStmt;
-    sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
-    // Prepared statements cache the execution plan for a query after the query optimizer has
-    // found the best plan, so there is no big gain with simple insertions.
-    // What makes a huge difference is bundling a few hundred into one atomic "transaction".
-    // For this case, runtime droped from 62-65 seconds to 0.5-0.6 (vs. 0.30-0.33 with no SQL at all).
-
-    sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
-    for (unsigned int h = 0; h < numAct; h++) { // estimator is h
-      KMatrix uij = st->aUtil[h]; // utility to actor i of the position held by actor j
-      for (unsigned int i = 0; i < numAct; i++) {
-        for (unsigned int j = 0; j < numAct; j++) {
-          int rslt = 0;
-          rslt = sqlite3_bind_int(insStmt, 1, t); assert(SQLITE_OK == rslt);
-          rslt = sqlite3_bind_int(insStmt, 2, h); assert(SQLITE_OK == rslt);
-          rslt = sqlite3_bind_int(insStmt, 3, i); assert(SQLITE_OK == rslt);
-          rslt = sqlite3_bind_int(insStmt, 4, j); assert(SQLITE_OK == rslt);
-          rslt = sqlite3_bind_double(insStmt, 5, uij(i, j)); assert(SQLITE_OK == rslt);
-          rslt = sqlite3_step(insStmt); assert(SQLITE_DONE == rslt);
-          sqlite3_clear_bindings(insStmt); assert(SQLITE_DONE == rslt);
-          rslt = sqlite3_reset(insStmt); assert(SQLITE_OK == rslt);
-        }
-      }
-    }
-    sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
-    printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
-
-    delete sqlBuff;
-    sqlBuff = nullptr;
-
-    smpDB = db; // give it the new pointer
-    return;
-  }
-
-  */
+}
 
 }; // end of namespace
 

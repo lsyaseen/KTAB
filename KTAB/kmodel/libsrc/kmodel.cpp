@@ -214,7 +214,7 @@ namespace KBase {
       "INSERT INTO PETS (ID, NAME, AGE, SPECIES, COLOR) " \
       "VALUES (5, 'Ellie', 8, 'Rhodesian', 'Red' );";
 
-    cout << "NB: This should get one planned SQL error" << endl << flush;
+    cout << "NB: This should get one planned SQL error at ID=4" << endl << flush;
     rc = sExec(sql, "Records inserted successfully \n");
     sqlite3_close(db);
 
@@ -223,7 +223,7 @@ namespace KBase {
     sOpen(3);
     sql = "SELECT * from PETS where AGE>5;";
     rc = sExec(sql, "Records selected successfully\n");
-    cout << "NB: ID=5 was never inserted due to planned SQL error" << endl;
+    cout << "NB: ID=5 was never inserted due to planned SQL error at ID=4" << endl;
     sqlite3_close(db);
 
 
