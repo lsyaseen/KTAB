@@ -787,13 +787,15 @@ namespace SMPLib {
 
 
   tuple< KMatrix, vector<unsigned int>> SMPState::pDist(int persp) const {
-    auto na = model->numAct;
-    auto w = actrCaps();
-    auto vr = VotingRule::Proportional;
-    auto rl = ReportingLevel::Silent;
-    auto vpm = Model::VPModel::Linear;
+    const VotingRule vr = VotingRule::Proportional;
+    const ReportingLevel rl = ReportingLevel::Silent;
+    const Model::VPModel vpm = Model::VPModel::Linear;
+    
+    const unsigned int na = model->numAct;
+    const KMatrix w = actrCaps();
+    
     auto uij = KMatrix(na, na); // full utility matrix, including duplicate columns
-
+    assert (na == aUtil.size()); // must have been filled in
     if ((0 <= persp) && (persp < na)) {
       uij = aUtil[persp];
     }
@@ -809,15 +811,9 @@ namespace SMPLib {
       cout << "SMPState::pDist: unrecognized perspective, " << persp << endl << flush;
       assert(false);
     }
-    auto pd = Model::scalarPCE(na, na, w, uij, vr, vpm, rl);
-    auto uNdx = vector<unsigned int>();
-    for (unsigned int i = 0; i < na; i++) {
-      uNdx.push_back(i);
-    }
 
-
-    auto uNdx2 = uniqueNdx();
-    printf("Unique positions %i/%i ", uNdx2.size(), uNdx.size());
+    auto uNdx2 = uniqueNdx(); // get the indices to unique positions
+    printf("Unique positions %i/%i ", uNdx2.size(), na);
     cout << "[ ";
     for (auto i : uNdx2) {
       printf(" %i ", i);
@@ -829,11 +825,7 @@ namespace SMPLib {
     auto uUij = KMatrix::map(uufn, na, uNdx2.size());
     auto upd = Model::scalarPCE(na, uNdx2.size(), w, uUij, vr, vpm, rl);
 
-    //assert (uNdx.size() == uNdx2.size());
-
-    //return tuple< KMatrix, vector<unsigned int>> (pd, uNdx);
     return tuple< KMatrix, vector<unsigned int>>(upd, uNdx2);
-    //    return pd;
   }
 
 
@@ -948,9 +940,9 @@ namespace SMPLib {
         printf("Dim-%02u %s", k, commaSep.c_str());
         //cout << "Dim-"<< k << commaSep;
         for (unsigned int t = 0; t < history.size(); t++) {
-          State* st = history[t];
-          Position* pit = st->pstns[i];
-          VctrPstn* vpit = (VctrPstn*)pit;
+          auto st = history[t];
+          auto pit = st->pstns[i];
+          auto vpit = (const VctrPstn*)pit;
           assert(1 == vpit->numC());
           assert(numDim == vpit->numR());
           printf("%7.3f %s", 100 * (*vpit)(k, 0), commaSep.c_str());
@@ -959,6 +951,7 @@ namespace SMPLib {
       }
     }
     cout << endl;
+    
     // show probabilities over time.
     // Note that we have to set the aUtil matrices for the last one.
     auto prbHist = vector<KMatrix>();
@@ -969,7 +962,7 @@ namespace SMPLib {
         sst->setAUtil(ReportingLevel::Silent);
       }
       auto pn = sst->pDist(-1);
-      auto pdt = std::get<0>(pn); // TODO: check for equivalent positions
+      auto pdt = std::get<0>(pn); // note that these are unique positions
       auto unq = std::get<1>(pn);
       prbHist.push_back(pdt);
       unqHist.push_back(unq);
@@ -978,7 +971,7 @@ namespace SMPLib {
     auto probIT = [this, prbHist, unqHist](unsigned int i, unsigned int t) {
       auto pdt = prbHist[t];
       auto unq = unqHist[t];
-      auto sst = ((SMPState*)(history[t]));
+      auto sst = ((const SMPState*)(history[t]));
       double pr = sst->posProb(i, unq, pdt);
       return pr;
     };
