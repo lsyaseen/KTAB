@@ -93,6 +93,7 @@ include_directories(
   )
 set(KTABMODEL_SRCS
   libsrc/kmodel.cpp
+  libsrc/emodel.cpp
   libsrc/kstate.cpp
   libsrc/kposition.cpp
   )
@@ -172,6 +173,7 @@ TARGET_LINK_LIBRARIES(mtchApp
 # -------------------------------------------------
 ADD_EXECUTABLE(demomodel
   src/demo.cpp
+  src/edemo.cpp
   src/sqlitedemo.cpp
   src/zactor.cpp
   csvparser/csv_parser.cpp

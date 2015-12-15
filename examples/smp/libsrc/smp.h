@@ -84,7 +84,7 @@ namespace SMPLib {
 
     enum class InterVecBrgn {
       S1P1, S2P2, S2PMax
-        };
+    };
     // See the documentation in kutils/doc: eS2P2, dS2P2, and eS1P1 were the best, in that order.
     // Both estimators involving PMax were the least accurate.
 
@@ -115,18 +115,18 @@ namespace SMPLib {
     // the attributes used in this method are not generally part of
     // other actors, and not all positions can be represented as a list of doubles.
     static BargainSMP* interpolateBrgn(const SMPActor* ai, const SMPActor* aj,
-                                       const VctrPstn* posI, const VctrPstn * posJ,
-                                       double prbI, double prbJ, InterVecBrgn ivb);
+      const VctrPstn* posI, const VctrPstn * posJ,
+      double prbI, double prbJ, InterVecBrgn ivb);
 
 
   protected:
     static void interpBrgnSnPm(unsigned int n, unsigned int m,
-                               double tik, double sik, double prbI,
-                               double tjk, double sjk, double prbJ,
-                               double & bik, double & bjk);
+      double tik, double sik, double prbI,
+      double tjk, double sjk, double prbJ,
+      double & bik, double & bjk);
     static void interpBrgnS2PMax(double tik, double sik, double prbI,
-                                 double tjk, double sjk, double prbJ,
-                                 double & bik, double & bjk);
+      double tjk, double sjk, double prbJ,
+      double & bik, double & bjk);
 
 
   };
@@ -136,10 +136,10 @@ namespace SMPLib {
   public:
     enum class BigRRange {
       Min, Mid, Max
-        };
+    };
     enum class BigRAdjust {
-      NoRA, HalfRA, FullRA
-        };
+      NoRA, OneThirdRA, HalfRA, TwoThirdsRA, FullRA
+    };
     explicit SMPState(Model * m);
     virtual ~SMPState();
 
@@ -157,7 +157,7 @@ namespace SMPLib {
     KMatrix nra = KMatrix();
     SMPState* stepBCN();
 
-    double  posProb(unsigned int i, vector<unsigned int> unq, const KMatrix & pdt) const;
+    double  posProb(unsigned int i, const vector<unsigned int> & unq, const KMatrix & pdt) const;
 
     // The key steps of BCN are to identify a target (and perhaps other target-relevant info)
     // and then to develop a Bargain (possibly nullptr if no bargain is mutually preferable
@@ -191,7 +191,7 @@ namespace SMPLib {
 
   class SMPModel : public Model {
   public:
-    explicit SMPModel(PRNG * rng, string desc="");
+    explicit SMPModel(PRNG * rng, string desc = "");
     virtual ~SMPModel();
 
     static double bsUtil(double d, double R);
@@ -201,17 +201,18 @@ namespace SMPLib {
     static SMPModel * readCSV(string fName, PRNG * rng);
 
     static  SMPModel * initModel(vector<string> aName, vector<string> aDesc, vector<string> dName,
-                                 KMatrix cap, KMatrix pos, KMatrix sal, PRNG * rng);
+      KMatrix cap, KMatrix pos, KMatrix sal, PRNG * rng);
 
     // print history of each actor in CSV (might want to generalize to arbitrary VctrPstn)
     void showVPHistory(bool sqlP) const;
 
     // number of spatial dimensions in this SMP
+    void addDim(string dn);
     unsigned int numDim = 0;
     vector<string> dimName = {};
-    double posTol = 5E-3; // on a scale of 0 to 100, this is a difference of just 0.5
+    double posTol = 1E-3; // on a scale of 0 to 100, this is a difference of just 0.1
 
-    static double stateDist(const SMPState* s1 , const SMPState* s2 );
+    static double stateDist(const SMPState* s1, const SMPState* s2);
 
     // this does not set AUtil, just output it to SQLite
     //virtual void sqlAUtil(unsigned int t);
@@ -231,7 +232,6 @@ namespace SMPLib {
     // synchronized with the result of createTableSQL(k) !
     // string createTableSQL(unsigned int tn);
 
-    void addDim(string dn);
 
   private:
   };

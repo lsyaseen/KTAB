@@ -1,11 +1,30 @@
-// ------------------------------------------
-// Copyright KAPSARC. Open Source MIT License
-// ------------------------------------------
+// --------------------------------------------
+// Copyright KAPSARC. Open source MIT License.
+// --------------------------------------------
+// The MIT License (MIT)
+// 
+// Copyright (c) 2015 King Abdullah Petroleum Studies and Research Center
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+// and associated documentation files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom 
+// the Software is furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all copies or
+// substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
+// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// --------------------------------------------
 
-#include <assert.h>
-#include <algorithm>
+#include <assert.h> 
 
-#include "kmodel.h"
+#include "kutils.h"
+//#include "kmodel.h"
 #include "agenda.h"
 #include "demo.h"
 using std::cout;
@@ -21,7 +40,9 @@ namespace AgendaControl {
     KMatrix &vals, KMatrix &caps, PRNG* rng) {
 
     numActor = 15;
-    numItems = 7;
+    if (0 == numItems) {
+      numItems = 7;
+    }
     vals = KMatrix::uniform(rng, numActor, numItems, 0.01, 0.99);
     caps = KMatrix::uniform(rng, numActor, 1, 10.0, 99.99);
     return;
@@ -60,7 +81,7 @@ namespace AgendaControl {
     return;
   }
 
-  void bestAgendaChair(vector<Agenda*> ars, const KMatrix& vals, const KMatrix& caps, VotingRule vr) {
+  void bestAgendaChair(vector<Agenda*> ars, const KMatrix& vals, const KMatrix& caps) {
     unsigned int bestK = 0;
     double bestV = -1.0;
     const double sigDiff = 1E-5; // utility is on [0,1] scale, differences less than this are insignificant
@@ -68,7 +89,7 @@ namespace AgendaControl {
     for (unsigned int ai = 0; ai < numAgenda; ai++) {
       auto ar = ars[ai];
       ars.push_back(ar);
-      double v0 = ar->eval(vals, caps, vr, 0); //
+      double v0 = ar->eval(vals, 0); //
       assert(0.0 <= v0);
       assert(v0 <= 1.0);
 
@@ -80,11 +101,11 @@ namespace AgendaControl {
     }
     printf("Best option for agenda-setting actor 0 is %u with value %.4f  is  ", bestK, bestV);
     cout << *(ars[bestK]) << endl << flush;
-    ars[bestK]->showProbs(1.0);
+    //ars[bestK]->showProbs(1.0);
     return;
   }
 
-  void demoCounting(unsigned int numI) {
+  void demoCounting(unsigned int numI, unsigned int maxU, unsigned int maxS, unsigned int maxB) {
     cout << endl << flush;
     unsigned int n = 5;
     unsigned int m = 2;
@@ -118,7 +139,7 @@ namespace AgendaControl {
     }
     cout << endl << flush;
 
-    auto enumAg = [numI](Agenda::PartitionRule pr, std::string s){
+    auto enumAg = [numI](Agenda::PartitionRule pr, std::string s) {
       vector<Agenda*> testA = Agenda::enumerateAgendas(numI, pr);
       printf("For %i items, found %i distinct %s agendas \n", numI, testA.size(), s.c_str());
       for (auto a : testA) {
@@ -131,9 +152,16 @@ namespace AgendaControl {
       return;
     };
 
-    enumAg(Agenda::PartitionRule::FreePR, "unconstrained");
-    enumAg(Agenda::PartitionRule::ModBalancedPR, "semi-balanced");
-    enumAg(Agenda::PartitionRule::FullBalancedPR, "balanced"); 
+    if (numI <= maxU) {
+      enumAg(Agenda::PartitionRule::FreePR, "unconstrained");
+      enumAg(Agenda::PartitionRule::SeqPR, "sequential");
+    }
+    if (numI <= maxS) {
+      enumAg(Agenda::PartitionRule::ModBalancedPR, "semi-balanced");
+    }
+    if (numI <= maxB) {
+      enumAg(Agenda::PartitionRule::FullBalancedPR, "balanced");
+    }
 
     return;
   }
@@ -145,7 +173,7 @@ int main(int ac, char **av) {
   using std::endl;
   using std::flush;
   using std::function;
-  using KBase::VotingRule;
+  //  using KBase::VotingRule;
   using AgendaControl::Agenda;
   using AgendaControl::Choice;
   using AgendaControl::Terminal;
@@ -160,16 +188,16 @@ int main(int ac, char **av) {
   auto showHelp = [dSeed]() {
     printf("\n");
     printf("Usage: specify one or more of these options\n");
-    printf("--help            print this message\n");
-    printf("--enum            enumerate agendas\n");
-    printf("--seed <n>        set a 64bit seed\n");
+    printf("--help            print this message \n");
+    printf("--enum <n>        enumerate various agendas over N items \n");
+    printf("--seed <n>        set 64bit seed to N \n");
     printf("                  0 means truly random\n");
     printf("                  default: %020llu \n", dSeed);
   };
 
   // tmp args
-  //enumP = true;
-  //enumN = 5;
+  enumP = true;
+  enumN = 6;
 
 
   if (ac > 1) {
@@ -202,23 +230,19 @@ int main(int ac, char **av) {
   seed = rng->setSeed(seed); // 0 == get a random number
   printf("Using PRNG seed:  %020llu \n", seed);
   printf("Same seed in hex:   0x%016llX \n", seed);
-
+  unsigned int maxU = 8;
+  unsigned int maxS = 10;
+  unsigned int maxB = 10;
   if (enumP) {
-    AgendaControl::demoCounting(enumN);
+    AgendaControl::demoCounting(enumN, maxU, maxS, maxB);
   }
 
-
-  const unsigned int numAgenda = 8000;
-  // with 100K random agendas and 7 items, I bayesian-ly estimated
-  // that the probability the optimum appears within x trials is
-  // P[X<x] = 1-exp(-x/A), where A=1681.75
-  // So we need 7745 to get a 99% of seeing the true optimum.
   unsigned int numActor = 0;
-  unsigned int numItems = 0;
+  unsigned int numItems = enumN;
   auto vals = KMatrix();
   auto caps = KMatrix();
 
-  if (false) {
+  if (true) {
     AgendaControl::setupScenario0(numActor, numItems, vals, caps, rng);
   }
   else {
@@ -239,60 +263,24 @@ int main(int ac, char **av) {
   caps.mPrintf(" %5.2f ");
   cout << endl << flush;
 
-  auto threeVotes = [vals, caps](vector<Agenda*> ars) {
-    cout << "Binary" << endl;
+  auto enumA = [numItems, vals, caps](Agenda::PartitionRule pr, std::string name) {
+    cout << endl;
+    cout << "Enumerating all agendas ("<<name<<") over " << numItems << " items ... ";
+    auto ars = Agenda::enumerateAgendas(numItems, pr);
+    printf("found %i agendas \n", ars.size());
+    AgendaControl::bestAgendaChair(ars, vals, caps); 
     for (auto ar : ars) {
-      ar->clearProbs();
-    }
-    AgendaControl::bestAgendaChair(ars, vals, caps, VotingRule::Binary);
-    cout << endl << flush << "Proportional" << endl;
-    for (auto ar : ars) {
-      ar->clearProbs();
-    }
-    AgendaControl::bestAgendaChair(ars, vals, caps, VotingRule::Proportional);
-    cout << endl << flush << "Cubic" << endl;
-    for (auto ar : ars) {
-      ar->clearProbs();
-    }
-    AgendaControl::bestAgendaChair(ars, vals, caps, VotingRule::Cubic);
-    cout << endl << flush;
-    for (auto ar : ars) {
-      ar->clearProbs();
       delete ar;
+      ar = nullptr;
     }
     return;
   };
 
+  enumA(Agenda::PartitionRule::FreePR, "FreePR");
+  enumA(Agenda::PartitionRule::SeqPR, "SeqPR");
+  enumA(Agenda::PartitionRule::ModBalancedPR, "MBPR");
+  enumA(Agenda::PartitionRule::FullBalancedPR , "FBPR");
 
-  auto ars = vector<Agenda*>();
-  /*
-  cout << "Making " << numAgenda << " random agendas (FreePR) over " << numItems << " items ... ";
-  for (unsigned int ai = 0; ai < numAgenda; ai++) {
-    auto ar = Agenda::makeRandom(numItems, Agenda::PartitionRule::FreePR, rng);
-    ars.push_back(ar);
-  }
-  cout << "done" << endl;
-  */
-  cout << endl;
-  cout << "Enumerating all agendas (FreePR) over " << numItems << " items ... ";
-  ars = Agenda::enumerateAgendas(numItems, Agenda::PartitionRule::FreePR);
-  printf("found %i agendas \n", ars.size()); 
-  threeVotes(ars);
-
-  ars = vector<Agenda*>();
-  /*
-  cout << "Making " << numAgenda << " random agendas (FullBalancedPR) over " << numItems << " items ... ";
-  for (unsigned int ai = 0; ai < numAgenda; ai++) {
-    auto ar = Agenda::makeRandom(numItems, Agenda::PartitionRule::FullBalancedPR, rng);
-    ars.push_back(ar);
-  }
-  cout << "done" << endl;
-  */
-  cout << endl;
-  cout << "Enumerating all agendas (FullBalancedPR) over " << numItems << " items ... ";
-  ars = Agenda::enumerateAgendas(numItems, Agenda::PartitionRule::FullBalancedPR);
-  printf("found %i agendas \n", ars.size());
-  threeVotes(ars);
 
   delete rng;
   KBase::displayProgramEnd(sTime);

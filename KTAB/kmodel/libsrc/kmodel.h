@@ -66,6 +66,7 @@ namespace KBase {
 
   string vrName(VotingRule vr);
 
+  enum class PCEModel { MarkovPCM, ConditionalPCM };
 
   enum class ThirdPartyCommit { NoCommit, SemiCommit, FullCommit };
   
@@ -196,6 +197,7 @@ namespace KBase {
     };
     static string VPMName(VPModel vpm);
 
+
     // calculate pv[i>j] from coalitions
     static KMatrix vProb(VPModel vpm, const KMatrix & c);
 
@@ -238,6 +240,9 @@ namespace KBase {
     // note that the function to write to table #k must be kept
     // synchronized with the result of createTableSQL(k) !
 
+
+    // TODO: rename this from 'smpDB' to 'modelDB', or even 'scenarioDB'
+    // Note that, with composite models, there many be dozens interacting.
     sqlite3 *smpDB = nullptr; // keep this protected, to ease later multi-threading
     string scenName = "Scen"; // default is set from UTC time
   private:
@@ -264,8 +269,10 @@ namespace KBase {
 
     Model * model = nullptr;
     function <State* ()> step = nullptr; // you have to provide this λ-fn
-    vector<KMatrix> aUtil = {}; // aUtil[h](i,j) is h's estimate of the utility to A_i of Pos_j
     vector<Position*> pstns = {};
+
+    vector<KMatrix> aUtil = {}; // aUtil[h](i,j) is h's estimate of the utility to A_i of Pos_j
+    virtual void setAUtil(ReportingLevel rl) = 0;
 
   protected:
 

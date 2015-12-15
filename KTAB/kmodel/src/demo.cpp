@@ -27,12 +27,14 @@
 
 #include "kutils.h"
 #include "kmodel.h"
+#include "emodel.h"
 #include "gaopt.h"
 #include "hcsearch.h"
 #include "demo.h"
 #include "demomtch.h"
 #include "demoleon.h"
 #include "sqlitedemo.h"
+#include "edemo.h"
 
 
 using KBase::PRNG;
@@ -53,6 +55,7 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
   using std::endl;
   using std::flush;
   using std::get;
+  using std::tuple;
   using KBase::ReportingLevel;
 
 
@@ -148,7 +151,6 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
   }
 
 
-
   void demoSpVSR(uint64_t s, PRNG* rng) {
     using std::function;
     using std::get;
@@ -217,12 +219,14 @@ int main(int ac, char **av) {
   bool pceP = false;
   bool spvsrP = false;
   bool sqlP = false;
+  bool emodP = false;
 
   auto showHelp = [dSeed]() {
     printf("\n");
     printf("Usage: specify one or more of these options\n");
     printf("--help            print this message\n");
     printf("--pce             simple PCE\n");
+    printf("--emod            simple enumerated model \n");
     printf("--spvsr           demonstrated shared_ptr<void> return\n");
     printf("--sql             demo SQLite \n");
     printf("--seed <n>        set a 64bit seed\n");
@@ -231,7 +235,7 @@ int main(int ac, char **av) {
   };
 
   // tmp args
-  sqlP = true;
+  emodP = true;
 
   if (ac > 1) {
     for (int i = 1; i < ac; i++) {
@@ -244,6 +248,9 @@ int main(int ac, char **av) {
       }
       else if (strcmp(av[i], "--spvsr") == 0) {
         spvsrP = true;
+      }
+      else if (strcmp(av[i], "--emod") == 0) {
+        emodP = true;
       }
       else if (strcmp(av[i], "--sql") == 0) {
         sqlP = true;
@@ -278,7 +285,13 @@ int main(int ac, char **av) {
     MDemo::demoSpVSR(seed, rng);
   }
 
+  if (emodP) {
+    cout << "-----------------------------------" << endl;
+    MDemo::demoEMod(seed, rng);
+  }
+
   if (sqlP) {
+    cout << "-----------------------------------" << endl;
     Model::demoSQLite();
     MDemo::demoDBObject();
   }

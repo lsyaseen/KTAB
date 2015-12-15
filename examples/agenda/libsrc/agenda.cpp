@@ -1,8 +1,28 @@
-// ------------------------------------------
-// Copyright KAPSARC. Open Source MIT License
-// ------------------------------------------
+// --------------------------------------------
+// Copyright KAPSARC. Open source MIT License.
+// --------------------------------------------
+// The MIT License (MIT)
+// 
+// Copyright (c) 2015 King Abdullah Petroleum Studies and Research Center
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+// and associated documentation files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom 
+// the Software is furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all copies or
+// substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
+// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// --------------------------------------------
+// Implement a simple agenda-object, independent of kmodel.h
+// --------------------------------------------
 #include "agenda.h"
-
 
 using std::cout;
 using std::endl;
@@ -130,7 +150,7 @@ namespace AgendaControl {
   }
 
 
-  vector<Agenda*> agendaSet(const vector<unsigned int> xs) {
+  vector<Agenda*> Agenda::agendaSet(PartitionRule pr, const vector<unsigned int> xs) {
     unsigned int n = xs.size();
     assert(0 < n);
     auto showA = [](const vector<unsigned int> &as) {
@@ -177,7 +197,7 @@ namespace AgendaControl {
           unsigned int m = leftIndices.size();
           assert(m == 2 * (m / 2));
           vector<vector<unsigned int>> shortIndices = {};
-          for (unsigned int i = 0; i < (m / 2); i++){
+          for (unsigned int i = 0; i < (m / 2); i++) {
             shortIndices.push_back(leftIndices[i]);
           }
           leftIndices = shortIndices;
@@ -186,66 +206,55 @@ namespace AgendaControl {
         for (auto lhi : leftIndices) {
           //showA(lhi);
           //cout << " -- ";
-          auto pr = indexedSet(xs, lhi);
-          vector<unsigned int> lhs = std::get<0>(pr);
-          vector<unsigned int> rhs = std::get<1>(pr);
+          auto lrPairs = indexedSet(xs, lhi);
+          vector<unsigned int> lhs = std::get<0>(lrPairs);
+          vector<unsigned int> rhs = std::get<1>(lrPairs);
 
-          auto lAgendas = agendaSet(lhs);
-          auto rAgendas = agendaSet(rhs);
-          for (auto la : lAgendas) {
-            for (auto ra : rAgendas) {
-              Agenda* a = new Choice(la, ra);
-              as.push_back(a);
+          bool ok = Choice::balancedLR(pr, lhs.size(), rhs.size());
+          if (ok) {
+            auto lAgendas = agendaSet(pr, lhs);
+            auto rAgendas = agendaSet(pr, rhs);
+            for (auto la : lAgendas) {
+              for (auto ra : rAgendas) {
+                Agenda* a = new Choice(la, ra);
+                as.push_back(a);
+              }
             }
           }
-
-          // showA(lhs);
-          // cout << " : ";
-          // showA(rhs);
-          // cout << endl;
         }
       }
       break;
     }
 
-    // printf("Found %i agendas \n", as.size());
-    // for (auto a : as) {
-    //   cout << *a << endl;
-    // }
-    // cout << endl << flush;
 
-    assert(numAgenda(n) == as.size());
-
+    if (PartitionRule::FreePR == pr) {
+      assert(as.size() == numAgenda(n));
+    }
+    if ((2 <= n) && (PartitionRule::SeqPR == pr)) {
+      // just a sorted list, of which there are n!,
+      // except that the two orders of the last pair are equivalent 
+      auto fn = fact(n); 
+      assert(as.size() == (fn/2));
+    }
     return as;
   }
 
   // ------------------------------------------
-  Agenda* Agenda::makeRandom(unsigned int n, PartitionRule pr, PRNG* rng) {
-    auto xs = vector<int>();
-    for (unsigned int i = 0; i < n; i++) {
-      xs.push_back(i);
-    }
-    for (unsigned int i = 0; i < n; i++) {
-      unsigned int j = rng->uniform() % n;
-      auto xi = xs[i];
-      auto xj = xs[j];
-      xs[i] = xj;
-      xs[j] = xi;
-    }
-    Agenda* ap = makeAgenda(xs, pr, rng);
-    return ap;
-  }
-
 
   vector<Agenda*> Agenda::enumerateAgendas(unsigned int n, PartitionRule pr) {
     vector<unsigned int> items = {};
     for (unsigned int i = 0; i < n; i++) {
       items.push_back(i);
     }
-    vector<Agenda*> as1 = agendaSet(items);
+
+
+    vector<Agenda*> as1 = agendaSet(pr, items);
+
     vector<Agenda*> as2 = {};
-    for (auto a : as1){
-      if (a->balanced(pr)) {
+    for (auto a : as1) {
+      bool ok = a->balanced(pr);
+      assert(ok); // should be true by construction
+      if (ok) {
         as2.push_back(a);
       }
     }
@@ -270,6 +279,7 @@ namespace AgendaControl {
       break;
 
     case PartitionRule::FreePR:
+    case PartitionRule::SeqPR:
       if (1 == n) {
         minM = 0;
       }
@@ -304,6 +314,7 @@ namespace AgendaControl {
       for (unsigned int i = m; i < n; i++) {
         zs.push_back(xs[i]);
       }
+      bool ok = Agenda::balancedLR(pr, ys.size(), zs.size());
       assert(minM <= ys.size());
       assert(minM <= zs.size());
       auto a1 = makeAgenda(ys, pr, rng);
@@ -315,73 +326,24 @@ namespace AgendaControl {
 
   // ------------------------------------------
 
-  double Choice::eval(const KMatrix& val, const KMatrix& cap, VotingRule vr, unsigned int i) {
-    setProbs(val, cap, vr);
-    double valL = lhs->eval(val, cap, vr, i);
-    double valR = rhs->eval(val, cap, vr, i);
-    double ev = (lProb*valL) + (rProb*valR);
-    //cout << "Eval " << i << " of " << *this << " using " << vrName(vr) << " = " << ev << endl << flush;
+  double Choice::eval(const KMatrix& val, unsigned int i) {
+    double valL = lhs->eval(val, i);
+    double valR = rhs->eval(val, i);
+    double valMin = (valL < valR) ? valL : valR;
+    double valMax = (valL > valR) ? valL : valR;
+    double ev = (4.0*valMin + 3.0*valMax) / 7.0;
+    //cout << "Eval " << i << " of " << *this << " = " << ev << endl << flush;
     return ev;
-  };
+  }; 
 
-  void Choice::clearProbs()  {
-    lProb = -1.0;
-    rProb = -1.0;
-    return;
-  };
-
-  void Choice::assertProbs()  {
-    assert(0.0 <= lProb);
-    assert(0.0 <= rProb);
-    assert(fabs(lProb + rProb - 1.0) < 1E-8);
-    return;
-  };
-
-  void Choice::setProbs(const KMatrix& val, const KMatrix& cap, VotingRule vr) {
-    if ((lProb < 0) || (rProb < 0)) {
-      const unsigned int numA = val.numR();
-      double sL = 1E-10;
-      double sR = 1E-10;
-      for (unsigned int k = 0; k < numA; k++) {
-        double lv = lhs->eval(val, cap, vr, k);
-        double rv = rhs->eval(val, cap, vr, k);
-        double voteLR = Model::vote(vr, cap(k, 0), lv, rv);
-        sL = (voteLR > 0) ? (sL + voteLR) : sL;
-        sR = (voteLR < 0) ? (sR - voteLR) : sR;
-      }
-      assert(0 < sL);
-      assert(0 < sR);
-      auto ppr = Model::vProb(Model::VPModel::Quartic, sL, sR);
-      lProb = std::get<0>(ppr); // if Linear, sL / (sL + sR);
-      rProb = std::get<1>(ppr); // if Linear, sR / (sL + sR); 
-    }
-    return;
-  }
-
-  void Choice::showProbs(double pArrive) {
-    assertProbs();
-    //cout << pArrive << endl;
-    double pl = pArrive * lProb;
-    double pr = pArrive * rProb;
-    cout << "[";
-    lhs->showProbs(pl);
-    cout << ":";
-    rhs->showProbs(pr);
-    cout << "]";
-    return;
-  }
-
-  bool Choice::balanced(PartitionRule pr) const {
-    const unsigned int n = length();
-    // every choice is between two items, and the shortest possible sub-agenda
-    // is a Terminal of length 1, so this must be at least 2 long
+  bool Agenda::balancedLR(PartitionRule pr, unsigned int numL, unsigned int numR) {
+    const unsigned int n = numL + numR;
     assert(2 <= n);
-    unsigned int lN = lhs->length();
-    unsigned int rN = rhs->length();
-    unsigned int minN = n;
 
+    unsigned int minN = 1;
     switch (pr) {
     case PartitionRule::FreePR:
+    case PartitionRule::SeqPR:
       minN = 1;
       break;
 
@@ -398,21 +360,34 @@ namespace AgendaControl {
       minN = n / 2;
       break;
     };
-    bool ok = (minN <= lN) && (minN <= rN) && (lhs->balanced(pr)) && (rhs->balanced(pr));
+    bool ok = (minN <= numL) && (minN <= numR);
+    if (PartitionRule::SeqPR == pr) {
+      ok = (1 == numL);
+    }
+    return ok;
+  }
+
+  bool Choice::balanced(PartitionRule pr) const {
+    const unsigned int n = length();
+    // every choice is between two items, and the shortest possible sub-agenda
+    // is a Terminal of length 1, so this must be at least 2 long
+    assert(2 <= n);
+    unsigned int lN = lhs->length();
+    unsigned int rN = rhs->length();
+    bool okTop = balancedLR(pr, lN, rN);
+
+    bool ok = okTop;
+    if (okTop) {
+      ok = (lhs->balanced(pr)) && (rhs->balanced(pr));
+    }
     return ok;
   }
   // ------------------------------------------
-  double Terminal::eval(const KMatrix& val, const KMatrix&, VotingRule, unsigned int i) {
+  double Terminal::eval(const KMatrix& val, unsigned int i) {
     double ev = val(i, item);
     //cout << "Eval " << i << " of " << *this << " = " << ev << endl << flush;
     return ev;
-  };
-
-
-  void Terminal::showProbs(double pArrive) {
-    printf("%.4f", pArrive);
-    return;
-  }
+  }; 
 
 }; // end of namespace
 
