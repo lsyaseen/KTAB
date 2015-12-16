@@ -50,8 +50,7 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
   // --------------------------------------------
 
   TwoDPoint::TwoDPoint() {
-    x = 0;
-    y = 0;
+    // default is set in class definition: (0,0)
   }
 
   TwoDPoint::TwoDPoint(unsigned int a, unsigned int b) {

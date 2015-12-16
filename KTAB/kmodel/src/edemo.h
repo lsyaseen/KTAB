@@ -60,8 +60,8 @@ namespace MDemo {
     TwoDPoint( );
     TwoDPoint(unsigned int a, unsigned int b);
     virtual ~TwoDPoint();
-    unsigned int x;
-    unsigned int y;
+    unsigned int x = 0;
+    unsigned int y = 0;
   };
 
 };
