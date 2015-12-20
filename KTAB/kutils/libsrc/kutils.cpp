@@ -48,7 +48,16 @@ namespace KBase {
   double qrtc(const double x) {
     return (x*x*x*x);
   }
-
+  
+vector<unsigned int> uiSeq(const unsigned int n1, const unsigned int n2, const unsigned int ns) {
+    vector<unsigned int> uis = {};
+    assert (n1 <= n2);
+    assert (0 < ns);
+    for (unsigned int i = n1; i <= n2; i=i+ns) 
+      uis.push_back(i);
+    return uis;
+  }
+  
   // -------------------------------------------------
 
   std::chrono::time_point<std::chrono::system_clock>  displayProgramStart() {

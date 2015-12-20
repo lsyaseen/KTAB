@@ -32,29 +32,29 @@
 #include "vimcp.h"
 
 namespace UDemo {
-// avoid namespace pollution by keeping all this demo stuff in its own namespace.
-using std::tuple;
-using std::vector;
-using KBase::PRNG;
-using KBase::KMatrix;
+  // avoid namespace pollution by keeping all this demo stuff in its own namespace.
+  using std::tuple;
+  using std::vector;
+  using KBase::PRNG;
+  using KBase::KMatrix;
 
-typedef vector<bool> BVec;
+  typedef vector<bool> BVec;
 
-// -------------------------------------------------
-double eNorm(const KMatrix & a, const KMatrix & x);
-KMatrix eUnitize(const KMatrix & a, const KMatrix & x);
-KMatrix projEllipse(const KMatrix & a, const KMatrix & w);
-void demoEllipseLVI(PRNG* rng, unsigned int n);
-void demoAntiLemke(PRNG* rng, unsigned int n);
+  // -------------------------------------------------
+  double eNorm(const KMatrix & a, const KMatrix & x);
+  KMatrix eUnitize(const KMatrix & a, const KMatrix & x);
+  KMatrix projEllipse(const KMatrix & a, const KMatrix & w);
+  void demoEllipseLVI(PRNG* rng, unsigned int n);
+  void demoAntiLemke(PRNG* rng, unsigned int n);
 
 
-// -------------------------------------------------
-// define a simple class of boolean vectors that
-// get evaluated by how close they are to a target
-// Note: we re-define this behavior via lambda-fns later.
+  // -------------------------------------------------
+  // define a simple class of boolean vectors that
+  // get evaluated by how close they are to a target
+  // Note: we re-define this behavior via lambda-fns later.
 
-class TargetedBV {
-public:
+  class TargetedBV {
+  public:
     TargetedBV();
     virtual ~TargetedBV();
     static void setTarget(BVec trgt);
@@ -71,7 +71,7 @@ public:
     unsigned int hDist(BVec bv) const;
     BVec bits = BVec();
     static BVec target; // it is only a one-shot demo, so this can be static
-};
+  };
 
 }; // namespace
 

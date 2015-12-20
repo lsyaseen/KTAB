@@ -12,15 +12,7 @@
 
 
 namespace Tetris {
-
-  char * newChar(unsigned int buffLen) {
-    char * buff1 = new char[buffLen]; //"000, 000";
-    for (unsigned int i = 0; i < buffLen; i++) {
-      buff1[i] = 0;
-    }
-    return buff1;
-  }
-
+ 
   void tetrisTimer(void*) {
     unsigned int lvl = TApp::theApp->level;
     assert(1 <= lvl);
@@ -209,13 +201,13 @@ namespace Tetris {
 
     char* buff = nullptr;
 
-    buff = newChar(20);
+    buff = KBase::newChars(20);
     sprintf(buff, "%u", lineCount);
     TetrisUI::theUI->outputLines->value(std::string(buff).c_str());
     delete buff;
 
 
-    buff = newChar(20);
+    buff = KBase::newChars(20);
     sprintf(buff, "%u", score);
     TetrisUI::theUI->outputScore->value(std::string(buff).c_str());
     delete buff;
@@ -534,6 +526,63 @@ namespace Tetris {
   }
 
 
+  
+
+void demoCoords(PRNG* rng) {
+    using KGraph::CoordMap;
+
+    const unsigned int iterLim = 500 * 1000;
+    cout << "Testing CoordMap "<< iterLim <<" times ... " << flush;
+
+    auto make = [rng] () {
+        int s1 = ((int) (rng->uniform(-1000, +1000)));
+        int s2 = s1;
+        while (s1 == s2) {
+            s2 = ((int) (rng->uniform(-1000, +1000)));
+        }
+
+        double d1 = rng->uniform(-1000, +1000);
+        double d2 = rng->uniform(-1000, +1000);
+
+        auto cm1 = new CoordMap(s1, d1, s2, d2);
+    // this tests the end points internally.
+
+    // this must be exact, s->d does not lose information.
+    int s3A = ((int) (rng->uniform(s1, s2)));
+    double d3 = cm1->s2d(s3A);
+    int s3B = cm1->d2s(d3);
+    assert (s3A == s3B);
+
+    // Because we lose information going from d->s,
+    // we have to show that we do not lose too much.
+    double d4A = rng->uniform(d1, d2);
+    int s4A = cm1->d2s(d4A);
+    double d4B = cm1->s2d(s4A);
+    // now d4A and db4 are not necessarily the same, as everything within 1 pixel rounds to the center.
+    // But they will be closer to each other than to the center of the adjoining pixels.
+
+    // check the left pixel
+    int s5 = s4A-1;
+    double d5 = cm1->s2d(s5);
+    assert (fabs(d4A-d4B) < fabs(d4A - d5));
+
+    // check the right pixel
+    int s6 = s4A+1;
+    double d6 = cm1->s2d(s6);
+    assert (fabs(d4A-d4B) < fabs(d4A - d6));
+        delete cm1;
+        return;
+    };
+
+    for (unsigned int i=0; i<iterLim; i++) {
+        make();
+    }
+
+    cout << "done"<<endl<<flush;
+    return;
+}
+ 
+
 
 }; // end of namespace
 
@@ -553,11 +602,13 @@ int main(int ac, char ** av) {
   auto sTime = KBase::displayProgramStart();
   const uint64_t dSeed = 0; // default is to be random and irrepeatable
   uint64_t seed = dSeed;
+  bool testP = false;
   bool run = true;
   auto showHelp = [dSeed]() {
     printf("\n");
     printf("Usage: specify one or more of these options\n");
     printf("--help            print this message\n");
+    printf("--test            test some basic utilities\n");
     printf("--seed <n>        set a 64bit seed\n");
     printf("                  0 means truly random\n");
     printf("                  default: %020llu \n", dSeed);
@@ -567,6 +618,9 @@ int main(int ac, char ** av) {
       if (strcmp(av[i], "--seed") == 0) {
         i++;
         seed = std::stoull(av[i]);
+      }
+      else if (strcmp(av[i], "--test") == 0) {
+        testP = true;
       }
       else if (strcmp(av[i], "--help") == 0) {
         run = false;
@@ -588,6 +642,10 @@ int main(int ac, char ** av) {
   printf("Using PRNG seed:  %020llu \n", seed);
   printf("Same seed in hex:   0x%016llX \n", seed);
 
+  if (testP) {
+    Tetris::demoCoords(rng);
+  }
+  
   auto t = new Tetris::TApp(seed);
   t->run();
 

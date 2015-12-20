@@ -587,7 +587,17 @@ namespace RfrmPri {
           return rslt;
         };
 
-        auto uNdx = testUniqueNdx(equivHNdx);
+ //       auto uNdx0 = testUniqueNdx(equivHNdx);
+	
+	
+    
+    auto ns = KBase::uiSeq(0, model->numAct - 1);
+    auto uNdx = KBase::uIndices<unsigned int>(ns, equivHNdx);
+   // assert(uNdx.size() == uNdx0.size());
+   // for (unsigned int i=0; i<uNdx0.size(); i++) {
+   //   assert(uNdx[i] == uNdx0[i]);
+   // }
+    
         const unsigned int numU = uNdx.size();
 
         auto hypUtil = KMatrix(rpMod->numAct, numU);

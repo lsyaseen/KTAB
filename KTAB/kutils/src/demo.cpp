@@ -56,64 +56,30 @@ namespace UDemo {
 
   using KBase::ReportingLevel;
 
-
-  /*
-
-void demoCoords(PRNG* rng) {
-    using KBase::CoordMap;
-
-    const unsigned int iterLim = 500 * 1000;
-    cout << "Testing CoordMap "<< iterLim <<" times ... " << flush;
-
-    auto make = [rng] () {
-        int s1 = ((int) (rng->uniform(-1000, +1000)));
-        int s2 = s1;
-        while (s1 == s2) {
-            s2 = ((int) (rng->uniform(-1000, +1000)));
-        }
-
-        double d1 = rng->uniform(-1000, +1000);
-        double d2 = rng->uniform(-1000, +1000);
-
-        auto cm1 = new CoordMap(s1, d1, s2, d2);
-    // this tests the end points internally.
-
-    // this must be exact, s->d does not lose information.
-    int s3A = ((int) (rng->uniform(s1, s2)));
-    double d3 = cm1->s2d(s3A);
-    int s3B = cm1->d2s(d3);
-    assert (s3A == s3B);
-
-    // Because we lose information going from d->s,
-    // we have to show that we do not lose too much.
-    double d4A = rng->uniform(d1, d2);
-    int s4A = cm1->d2s(d4A);
-    double d4B = cm1->s2d(s4A);
-    // now d4A and db4 are not necessarily the same, as everything within 1 pixel rounds to the center.
-    // But they will be closer to each other than to the center of the adjoining pixels.
-
-    // check the left pixel
-    int s5 = s4A-1;
-    double d5 = cm1->s2d(s5);
-    assert (fabs(d4A-d4B) < fabs(d4A - d5));
-
-    // check the right pixel
-    int s6 = s4A+1;
-    double d6 = cm1->s2d(s6);
-    assert (fabs(d4A-d4B) < fabs(d4A - d6));
-        delete cm1;
-        return;
+  void demoUIndices () {
+    auto showIS = [] (vector<unsigned int> is) {
+      for (unsigned int i=0; i<is.size(); i++) {
+        printf("%2i: %2i \n", i, is[i]);
+      }
+      return;
     };
-
-    for (unsigned int i=0; i<iterLim; i++) {
-        make();
-    }
-
-    cout << "done"<<endl<<flush;
+    auto is1 = KBase::uiSeq(10, 19);
+    cout << "Space by 1:"<<endl;
+    showIS(is1);
+    auto is2 = KBase::uiSeq(10, 19, 2);
+    cout << "Space by 2:"<<endl;
+    showIS(is2);
+    
+    vector<int> xs = {10, 11, 20, 12, 30, 11, 25, 35, 40, 22, 43};
+    auto eFn = [] (const int &a, const int &b) {
+      return (abs(a-b)<10);
+    };
+    auto uns = KBase::uIndices<int>(xs, eFn);
+    
+    cout << "Indices of unique items:"<<endl;
+    showIS(uns);
     return;
-}
-
-*/
+  }
 
   void show(string str, const KMatrix & m, string fs) {
     cout << str << endl;
@@ -189,16 +155,16 @@ void demoCoords(PRNG* rng) {
 
     for (int i = 0; i < n; ++i) {
       ts.push_back(std::thread([i, ifn]() {
-        cout << "Hello ";
-        assert(0 < ifn(i, 500000000));
-        cout << "from ";
-        assert(0 < ifn(i, 500000000));
-        cout << "thread ";
-        assert(0 < ifn(i, 500000000));
-        cout << i << endl;
-        assert(0 < ifn(i, 500000000));
-        return;
-      }));
+            cout << "Hello ";
+            assert(0 < ifn(i, 500000000));
+            cout << "from ";
+            assert(0 < ifn(i, 500000000));
+            cout << "thread ";
+            assert(0 < ifn(i, 500000000));
+            cout << i << endl;
+            assert(0 < ifn(i, 500000000));
+            return;
+          }));
     }
 
     for (auto& t : ts) {
@@ -256,10 +222,10 @@ void demoCoords(PRNG* rng) {
     vector<thread> ts;
     for (int i = 0; i < n; ++i) {
       ts.push_back(thread([&cc]() {
-        for (int i = 0; i < 100; ++i) {
-          cc.increment();
-        }
-      }));
+            for (int i = 0; i < 100; ++i) {
+              cc.increment();
+            }
+          }));
     }
 
     for (auto& t : ts) {
@@ -991,9 +957,9 @@ void demoCoords(PRNG* rng) {
     trans(p0).mPrintf(" %+.4f ");
     cout << endl;
     auto rslt = vhc->run(p0,
-      1000, 10, 1E-10,
-      1.0, 0.618, 1.25, 1e-8,
-      ReportingLevel::Low);
+                         1000, 10, 1E-10,
+                         1.0, 0.618, 1.25, 1e-8,
+                         ReportingLevel::Low);
     double vBest = get<0>(rslt);
     KMatrix pBest = get<1>(rslt);
     unsigned int in = get<2>(rslt);
@@ -1068,9 +1034,9 @@ void demoCoords(PRNG* rng) {
     cout << "NP 1: " << eFn(d0ij) << endl << flush;
 
     auto rslt = vc->run(d0ij,
-      1000, 20, 1e-16,
-      0.01, 0.618, 1.25, 1e-8, // NP already multiplied by 1000
-      ReportingLevel::Low);
+                        1000, 20, 1e-16,
+                        0.01, 0.618, 1.25, 1e-8, // NP already multiplied by 1000
+                        ReportingLevel::Low);
     double vBest = get<0>(rslt);
     KMatrix pBest = get<1>(rslt);
     unsigned int in = get<2>(rslt);
@@ -1352,9 +1318,9 @@ void demoCoords(PRNG* rng) {
     sfn("Initial point: ", p0);
 
     auto rslt = vc->run(p0,
-      1000, 20, 1e-16,
-      0.01, 0.618, 1.25, 1e-8, // NP already multiplied by 1000
-      ReportingLevel::Low);
+                        1000, 20, 1e-16,
+                        0.01, 0.618, 1.25, 1e-8, // NP already multiplied by 1000
+                        ReportingLevel::Low);
 
     double vBest = get<0>(rslt);
     KMatrix pBest = get<1>(rslt);  // an [8,1] column-vector
@@ -1408,10 +1374,10 @@ void demoCoords(PRNG* rng) {
       printf("3:7  %.4f \n", fabs(pBest(3, 0) - pBest(7, 0)));
 
       double mb[] = {
-          (pBest(0, 0) + pBest(4, 0)) / 2,
-          (pBest(1, 0) + pBest(5, 0)) / 2,
-          (pBest(2, 0) + pBest(6, 0)) / 2,
-          (pBest(3, 0) + pBest(7, 0)) / 2
+        (pBest(0, 0) + pBest(4, 0)) / 2,
+        (pBest(1, 0) + pBest(5, 0)) / 2,
+        (pBest(2, 0) + pBest(6, 0)) / 2,
+        (pBest(3, 0) + pBest(7, 0)) / 2
       }; // position
       auto b = KMatrix::arrayInit(mb, 4, 1);
       // now if b = p*ti + (1-p)*tj
@@ -1466,8 +1432,8 @@ void demoCoords(PRNG* rng) {
       printf("%7.4f  %7.4f  ", joinedRMS(dBS1P2), joinedRMS(dBS2P2));
 
       printf("%7.4f  %7.4f  %7.4f  %7.4f  %7.4f  %7.4f  ",
-        rms(fS1P0 - pBest), rms(fS1P1 - pBest), rms(fS1P2 - pBest),
-        rms(fS2P0 - pBest), rms(fS2P1 - pBest), rms(fS2P2 - pBest));
+             rms(fS1P0 - pBest), rms(fS1P1 - pBest), rms(fS1P2 - pBest),
+             rms(fS2P0 - pBest), rms(fS2P1 - pBest), rms(fS2P2 - pBest));
       cout << endl << endl << flush;
 
       printf("Resulting MaxAbs estimation error: \n");
@@ -1627,9 +1593,9 @@ void demoCoords(PRNG* rng) {
     sfn("Initial point: ", p0);
 
     auto rslt = vc->run(p0,
-      1000, 20, 1e-16,
-      0.01, 0.618, 1.25, 1e-8, // NP already multiplied by 1000
-      ReportingLevel::Low);
+                        1000, 20, 1e-16,
+                        0.01, 0.618, 1.25, 1e-8, // NP already multiplied by 1000
+                        ReportingLevel::Low);
 
     double vBest = get<0>(rslt);
     KMatrix pBest = get<1>(rslt);  // an [8,1] column-vector
@@ -1845,8 +1811,8 @@ void demoCoords(PRNG* rng) {
       double s = 0.0;
       for (unsigned int j = 0; j < cr; j++) {
         if (0 == (j%m)) { // force interleaving
-            //printf("Thread %3i,%3i sleeping %2i milliseconds \n", i, k, st);
-            //cout << flush;
+          //printf("Thread %3i,%3i sleeping %2i milliseconds \n", i, k, st);
+          //cout << flush;
           std::this_thread::sleep_for(std::chrono::milliseconds(st));
         }
         s = s + m1(i, j)*m2(j, k);
@@ -1861,9 +1827,9 @@ void demoCoords(PRNG* rng) {
     for (unsigned int i = 0; i < r1; i++) {
       for (unsigned int k = 0; k < c2; k++) {
         pfs.push_back(thread([mik, i, k]() {
-          mik(i, k);
-          return;
-        }));
+              mik(i, k);
+              return;
+            }));
         cout << flush; // again, help "tail -f"
       }
     }
@@ -2063,7 +2029,8 @@ int main(int ac, char **av) {
     }
   }
 
-
+  UDemo::demoUIndices ();
+  
   delete rng;
   KBase::displayProgramEnd(sTime);
   return 0;

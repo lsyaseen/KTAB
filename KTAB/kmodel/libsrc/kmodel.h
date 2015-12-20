@@ -277,7 +277,7 @@ namespace KBase {
   protected:
 
     virtual bool equivNdx(unsigned int i, unsigned int j) const = 0;
-    vector<unsigned int> testUniqueNdx(function <bool(unsigned int, unsigned int)> tfn) const;
+//    vector<unsigned int> testUniqueNdx(function <bool(unsigned int, unsigned int)> tfn) const;
     vector<unsigned int> uniqueNdx() const;
 
   private:

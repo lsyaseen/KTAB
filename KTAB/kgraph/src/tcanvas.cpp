@@ -26,7 +26,7 @@ void TCanvas::onMove(int x, int y) {
     auto tui = TetrisUI::theUI;
     if (nullptr != tui) {
         tui->playW->take_focus(); // at least try to get the keyboard events
-        auto buff1 = newChar(20);
+        auto buff1 = KBase::newChars(20); //newChar(20);
         sprintf(buff1, "%3i, %3i", x, y);
         std::string buff2 = buff1;
         tui->textCoordXY->value(buff2.c_str());

@@ -69,6 +69,7 @@ void State::randomizeUtils(double minU, double maxU, double uNoise) {
     return;
 }
 
+/*
 vector<unsigned int> State::testUniqueNdx(function <bool(unsigned int, unsigned int)> tfn) const {
     /// Given an equivalency-test, return a vector of indices to unique positions.
     /// The test might compare only the actual positions, or it might mix actual and hypothetical.
@@ -100,15 +101,26 @@ vector<unsigned int> State::testUniqueNdx(function <bool(unsigned int, unsigned 
     }
     return uNdx;
 }
-
+*/
 
 vector<unsigned int> State::uniqueNdx() const {
-    /// Looking only at actual current positions, return a vector of indices of unique positions
+  /// Looking only at actual current positions, return a vector of indices of unique positions.
+  // Note that we have to lambda-bind 'this'. Otherwise, we'd need a 'static' function
+  // to give to uIndices.
     auto efn = [this](unsigned int i, unsigned int j) {
         return equivNdx(i,j);
     };
-    auto uNdx = testUniqueNdx(efn);
-    return uNdx;
+    
+    //auto uNdx0 = testUniqueNdx(efn);
+    
+    auto ns = KBase::uiSeq(0, model->numAct - 1);
+    auto uNdx1 = KBase::uIndices<unsigned int>(ns, efn);
+   // assert(uNdx0.size() == uNdx1.size());
+   // for (unsigned int i=0; i<uNdx1.size(); i++) {
+   //   assert(uNdx0[i] == uNdx1[i]);
+   // }
+ 
+    return uNdx1;
 }
 
 } // end of namespace
