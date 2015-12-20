@@ -70,13 +70,13 @@ namespace UDemo {
     cout << "Space by 2:"<<endl;
     showIS(is2);
     
-    vector<int> xs = {10, 11, 20, 12, 30, 11, 25, 35, 40, 22, 43};
+    vector<int> xs = {10, 11, 20, 12, 30,  9, 23, 29, 40, 22, 43};
     auto eFn = [] (const int &a, const int &b) {
-      return (abs(a-b)<10);
+      return (abs(a-b)<5); // so 10 is equivalent to [6 ... 14]
     };
     auto uns = KBase::uIndices<int>(xs, eFn);
     
-    cout << "Indices of unique items:"<<endl;
+    cout << "Indices of unique items:"<<endl; // should be [0,2,4,8]
     showIS(uns);
     return;
   }

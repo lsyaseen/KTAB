@@ -77,7 +77,7 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
   // --------------------------------------------
 
 
-
+  // lambda-bind the parameters and return a function that enumerates the options
   function < vector<BVec*>()> tbv(unsigned int nAct, unsigned int nBits, PRNG* rng) {
 
     const double fc = exp(log(2.0)*nBits);
@@ -172,7 +172,7 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
     // we create a completely random matrix of utilities, then add
     // structure by averaging each point with its n neighbors twice
     auto uMat1 = KMatrix::uniform(rng, nAct, ic, 0.0, 1.0);
-    auto uMat2 = smooth(uMat1);
+    auto uMat2 = smooth(smooth(uMat1));
     uMat2.mPrintf("%.4f ");
     cout << endl;
     return rfn;
