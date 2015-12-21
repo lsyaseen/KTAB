@@ -106,6 +106,7 @@ namespace KBase {
     return uns;
   }
 
+  // the unsigned ints in order from n1 to n2, inclusive.
   vector<unsigned int> uiSeq(const unsigned int n1, const unsigned int n2, const unsigned int ns = 1);
   
   class KException {  // just something to throw around

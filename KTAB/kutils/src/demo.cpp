@@ -72,7 +72,7 @@ namespace UDemo {
     
     vector<int> xs = {10, 11, 20, 12, 30,  9, 23, 29, 40, 22, 43};
     auto eFn = [] (const int &a, const int &b) {
-      return (abs(a-b)<5); // so 10 is equivalent to [6 ... 14]
+      return (abs(a-b)<=3); // so 10 is equivalent to anything in [7 ... 13]
     };
     auto uns = KBase::uIndices<int>(xs, eFn);
     
