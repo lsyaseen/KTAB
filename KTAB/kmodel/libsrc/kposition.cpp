@@ -149,7 +149,7 @@ namespace KBase {
     assert(0 == numItm);
     actrs = vector<Actor*>();
     pstns = vector<MtchPstn*>();
-    match = vector<unsigned int>();
+    match = VUI();
   }
 
   MtchGene::~MtchGene() {};
@@ -157,7 +157,7 @@ namespace KBase {
   void MtchGene::randomize(PRNG* rng) {
     assert(0 < numCat);
     assert(0 < numItm);
-    match = vector<unsigned int>();
+    match = VUI();
     for (unsigned int i = 0; i < numItm; i++){
       unsigned int aID = ((unsigned int)(rng->uniform() % numCat));
       match.push_back(aID);

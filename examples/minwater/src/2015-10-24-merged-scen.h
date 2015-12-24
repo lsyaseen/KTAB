@@ -35,6 +35,9 @@
 
 namespace DemoWaterMin {
   using KBase::KMatrix;
+  using KBase::VUI;
+  
+  
   // 38 rows, 27 columns
   //0 , 1 , 2 , 3 , 4 , 5 , 6 , 7 , 8 , 9 , 10 , 11 , 12 , 13 , 14 , 15 , 16 , 17 , 18 , 19 , 20 , 21 , 22 , 23 , 24 , 25 , 26
   const double scenQuantArray[] = {
@@ -87,7 +90,7 @@ namespace DemoWaterMin {
   // So scenarios with at least 75% cut to water and at most 5% cut to dates
   // are those with date_i/date_0 >= 0.9499 and wheat_i/wheat_0 <= 0.2501
 
-  vector<unsigned int> likelyScenarios;
+  VUI likelyScenarios;
   void setLikelyScenarios(const KMatrix & scen);
 
   KMatrix uInit;

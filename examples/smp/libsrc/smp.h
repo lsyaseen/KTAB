@@ -36,32 +36,33 @@
 #include "kmodel.h"
 
 namespace SMPLib {
-  // namespace to which KBase has no access
-  using std::function;
-  using std::shared_ptr;
-  using std::string;
-  using std::tuple;
-  using std::vector;
-  using KBase::newChars;
-  using KBase::KMatrix;
-  using KBase::PRNG;
-  using KBase::Actor;
-  using KBase::Position;
-  using KBase::State;
-  using KBase::Model;
-  using KBase::VotingRule;
-  using KBase::ReportingLevel;
-  using KBase::VctrPstn;
+// namespace to which KBase has no access
+using std::function;
+using std::shared_ptr;
+using std::string;
+using std::tuple;
+using std::vector;
+using KBase::newChars;
+using KBase::KMatrix;
+using KBase::PRNG;
+using KBase::Actor;
+using KBase::Position;
+using KBase::State;
+using KBase::Model;
+using KBase::VotingRule;
+using KBase::ReportingLevel;
+using KBase::VctrPstn;
+using KBase::VUI;
 
-  class SMPActor;
-  class SMPState;
-  class SMPModel;
+class SMPActor;
+class SMPState;
+class SMPModel;
 
-  const string appVersion = "0.1";
+const string appVersion = "0.1";
 
-  // -------------------------------------------------
-  // Plain-Old-Data
-  struct BargainSMP {
+// -------------------------------------------------
+// Plain-Old-Data
+struct BargainSMP {
     BargainSMP(const SMPActor* ai, const SMPActor* ar, const VctrPstn & pi, const VctrPstn & pr);
     ~BargainSMP();
 
@@ -70,20 +71,20 @@ namespace SMPLib {
     const SMPActor* actRcvr = nullptr;
     VctrPstn posInit = VctrPstn();
     VctrPstn posRcvr = VctrPstn();
-  };
+};
 
-  // -------------------------------------------------
-  // Trivial, SMP-like actor with fixed attributes
-  // the old smp.cpp file, SpatialState::developTwoPosBargain, for a discussion of
-  // the interpolative bargaining rule used there. Note that the demoutil
-  // results indicate that weighting by (P^2 * S^2) better approximates the NBS
-  // does weighting by (P * S)
-  class SMPActor : public Actor {
+// -------------------------------------------------
+// Trivial, SMP-like actor with fixed attributes
+// the old smp.cpp file, SpatialState::developTwoPosBargain, for a discussion of
+// the interpolative bargaining rule used there. Note that the demoutil
+// results indicate that weighting by (P^2 * S^2) better approximates the NBS
+// does weighting by (P * S)
+class SMPActor : public Actor {
 
-  public:
+public:
 
     enum class InterVecBrgn {
-      S1P1, S2P2, S2PMax
+        S1P1, S2P2, S2PMax
     };
     // See the documentation in kutils/doc: eS2P2, dS2P2, and eS1P1 were the best, in that order.
     // Both estimators involving PMax were the least accurate.
@@ -115,49 +116,42 @@ namespace SMPLib {
     // the attributes used in this method are not generally part of
     // other actors, and not all positions can be represented as a list of doubles.
     static BargainSMP* interpolateBrgn(const SMPActor* ai, const SMPActor* aj,
-      const VctrPstn* posI, const VctrPstn * posJ,
-      double prbI, double prbJ, InterVecBrgn ivb);
+                                       const VctrPstn* posI, const VctrPstn * posJ,
+                                       double prbI, double prbJ, InterVecBrgn ivb);
 
 
-  protected:
+protected:
     static void interpBrgnSnPm(unsigned int n, unsigned int m,
-      double tik, double sik, double prbI,
-      double tjk, double sjk, double prbJ,
-      double & bik, double & bjk);
+                               double tik, double sik, double prbI,
+                               double tjk, double sjk, double prbJ,
+                               double & bik, double & bjk);
     static void interpBrgnS2PMax(double tik, double sik, double prbI,
-      double tjk, double sjk, double prbJ,
-      double & bik, double & bjk);
+                                 double tjk, double sjk, double prbJ,
+                                 double & bik, double & bjk);
 
 
-  };
+};
 
-  class SMPState : public State {
+class SMPState : public State {
 
-  public:
-    enum class BigRRange {
-      Min, Mid, Max
-    };
-    enum class BigRAdjust {
-      NoRA, OneThirdRA, HalfRA, TwoThirdsRA, FullRA
-    };
+public:
     explicit SMPState(Model * m);
     virtual ~SMPState();
 
-    virtual void setDiff();
+    virtual void setVDiff();
 
     // this sets the values in the AUtil matrices
     virtual void setAUtil(ReportingLevel rl);
 
     // returns h's estimate of i's risk attitude, using the risk-adjustment-rule
-    double estNRA(unsigned int h, unsigned int i, SMPState::BigRAdjust ra) const;
+    double estNRA(unsigned int h, unsigned int i, Model::BigRAdjust ra) const;
 
     // returns row-vector of actor's capabilities
     KMatrix actrCaps() const;
 
-    KMatrix nra = KMatrix();
     SMPState* stepBCN();
 
-    double  posProb(unsigned int i, const vector<unsigned int> & unq, const KMatrix & pdt) const;
+    double  posProb(unsigned int i, const VUI & unq, const KMatrix & pdt) const;
 
     // The key steps of BCN are to identify a target (and perhaps other target-relevant info)
     // and then to develop a Bargain (possibly nullptr if no bargain is mutually preferable
@@ -169,13 +163,20 @@ namespace SMPLib {
     virtual void addPstn(Position* p);
 
     // use the parameters of your state to compute the relative probability of each actor's position
-    virtual tuple< KMatrix, vector<unsigned int>> pDist(int persp) const;
+    virtual tuple< KMatrix, VUI> pDist(int persp) const;
     void showBargains(const vector < vector < BargainSMP* > > & brgns) const;
 
+    // return actor's normalized risk attitude (if set)
+    double aNRA(unsigned int i) const;
 
-  protected:
-    KMatrix diff = KMatrix();
-    static KMatrix bigRfromProb(const KMatrix & p, BigRRange rr);
+protected:
+    KMatrix vDiff = KMatrix(); // vDiff(i,j) = difference between pos[i] and pos[j], using actor i's saliences as weights
+    KMatrix rnProb = KMatrix(); // probability of each Unique state, when actors are treated as risk-neutral
+    VUI uIndices = {};
+    VUI eIndices = {};
+    
+    
+    KMatrix nra = KMatrix();
 
 
     SMPState* doBCN() const;
@@ -187,21 +188,21 @@ namespace SMPLib {
     // return best j, p[i>j], edu[i->j]
     tuple<int, double, double> bestChallenge(unsigned int i) const;
 
-  };
+};
 
-  class SMPModel : public Model {
-  public:
+class SMPModel : public Model {
+public:
     explicit SMPModel(PRNG * rng, string desc = "");
     virtual ~SMPModel();
 
-    static double bsUtil(double d, double R);
-    static double bvDiff(const KMatrix & d, const  KMatrix & s);
-    static double bvUtil(const KMatrix & d, const  KMatrix & s, double R);
+    static double bsUtil(double sd, double R);
+    static double bvDiff(const KMatrix & vd, const  KMatrix & vs);
+    static double bvUtil(const KMatrix & vd, const  KMatrix & vs, double R);
 
     static SMPModel * readCSV(string fName, PRNG * rng);
 
     static  SMPModel * initModel(vector<string> aName, vector<string> aDesc, vector<string> dName,
-      KMatrix cap, KMatrix pos, KMatrix sal, PRNG * rng);
+                                 KMatrix cap, KMatrix pos, KMatrix sal, PRNG * rng);
 
     // print history of each actor in CSV (might want to generalize to arbitrary VctrPstn)
     void showVPHistory(bool sqlP) const;
@@ -217,24 +218,23 @@ namespace SMPLib {
     // this does not set AUtil, just output it to SQLite
     //virtual void sqlAUtil(unsigned int t);
 
-  protected:
+protected:
     //sqlite3 *smpDB = nullptr; // keep this protected, to ease multi-threading
     //string scenName = "Scen";
-  protected:
-    static string createSMPTableSQL(unsigned int tn);
+protected:
     // note that the function to write to table #k must be kept
     // synchronized with the result of createTableSQL(k) !
-
     void sqlTest();
 
-
     // note that the function to write to table #k must be kept
     // synchronized with the result of createTableSQL(k) !
-    // string createTableSQL(unsigned int tn);
+    static string createSMPTableSQL(unsigned int tn);
 
+    // compute several useful items implied by the risk attitudes, saliences, and the matrix of differences
+    static void setUtilProb(const KMatrix& vR, const KMatrix& vS, const KMatrix& vD, KBase::VotingRule vr);
 
-  private:
-  };
+private:
+};
 
 
 

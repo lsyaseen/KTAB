@@ -60,6 +60,7 @@ using KBase::State;
 using KBase::Model;
 using KBase::VotingRule;
 using KBase::ReportingLevel;
+using KBase::VUI;
 
 using KBase::MtchPstn;
 using KBase::MtchGene;
@@ -122,7 +123,7 @@ public:
     static RPModel* randomMS(unsigned int numA, unsigned int numI,
                              VotingRule vr, RPActor::PropModel pMod, PRNG * rng);
 
-    double utilActorPos(unsigned int ai, const vector<unsigned int> &pstn) const;
+    double utilActorPos(unsigned int ai, const VUI &pstn) const;
 
     unsigned int govBudget = 0;
     KMatrix  govCost = KMatrix();
@@ -156,7 +157,7 @@ public:
     // use the parameters of your state to compute the relative probability of
     // each actor's position. persp = -1 means use everyone's separate perspectives
     //(i.e. get actual probabilities, not one actor's beliefs)
-    tuple <KMatrix, vector<unsigned int>> pDist(int persp) const;
+    tuple <KMatrix, VUI> pDist(int persp) const;
     void setAUtil(ReportingLevel rl);
     RPState * stepSUSN();
     RPState * stepBCN();

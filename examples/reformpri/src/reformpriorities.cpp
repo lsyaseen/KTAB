@@ -34,12 +34,13 @@ using namespace std;
 
 using KBase::KMatrix;
 using KBase::PRNG;
+using KBase::VUI;
 
 // -------------------------------------------------
 // function definitions
 
 
-vector<vector<unsigned int>> scanPositions(const RPModel * rpm) {
+vector<VUI> scanPositions(const RPModel * rpm) {
     unsigned int numA = rpm->numAct;
     unsigned int numRefItem = rpm->numItm;
     assert(numRefItem == rpm->numCat);
@@ -47,8 +48,8 @@ vector<vector<unsigned int>> scanPositions(const RPModel * rpm) {
     printf("There are %u actors and %u reform items \n", numA, numRefItem);
 
     cout << "Computing positions ... " << endl;
-    vector<vector<unsigned int>> positions; // list of all positions
-    vector<unsigned int> pstn;
+    vector<VUI> positions; // list of all positions
+    VUI pstn;
     // build the first permutation: 1,2,3,...
     for (unsigned int i = 0; i < numRefItem; i++) {
         pstn.push_back(i);
@@ -75,7 +76,7 @@ vector<vector<unsigned int>> scanPositions(const RPModel * rpm) {
     }
 
     cout << "Computing best position for each actor"<<endl;
-    vector<vector<unsigned int>> bestAP; // list of each actor's best position (followed by CP)
+    vector<VUI> bestAP; // list of each actor's best position (followed by CP)
     for (unsigned int ai = 0; ai < numA; ai++) {
         unsigned int bestJ = 0;
         double bestV = 0;
@@ -103,17 +104,17 @@ vector<vector<unsigned int>> scanPositions(const RPModel * rpm) {
 
     cout << "Sorting positions from most to least net support ..." << endl << flush;
 
-    auto betterPR = [](tuple<unsigned int, double, vector<unsigned int>> pr1,
-    tuple<unsigned int, double, vector<unsigned int>> pr2) {
+    auto betterPR = [](tuple<unsigned int, double, VUI> pr1,
+    tuple<unsigned int, double, VUI> pr2) {
         double v1 = get<1>(pr1);
         double v2 = get<1>(pr2);
         bool better = (v1 > v2);
         return better;
     };
 
-    auto pairs = vector<tuple<unsigned int, double, vector<unsigned int>>>();
+    auto pairs = vector<tuple<unsigned int, double, VUI>>();
     for (unsigned int i = 0; i < numPos; i++) {
-        auto pri = tuple<unsigned int, double, vector<unsigned int>>(i, zeta(0, i), positions[i]);
+        auto pri = tuple<unsigned int, double, VUI>(i, zeta(0, i), positions[i]);
         pairs.push_back(pri);
     }
 
@@ -129,14 +130,14 @@ vector<vector<unsigned int>> scanPositions(const RPModel * rpm) {
         auto pri = pairs[i];
         unsigned int ni = get<0>(pri);
         double zi = get<1>(pri);
-        vector<unsigned int> pi = get<2>(pri);
+        VUI pi = get<2>(pri);
 
         printf("%3u: %4u  %.2f  ", i, ni, zi);
         printPerm(pi);
         cout << endl << flush;
     }
 
-    vector<unsigned int> bestPerm = get<2>(pairs[0]);
+    VUI bestPerm = get<2>(pairs[0]);
 
     bestAP.push_back(bestPerm);
     return bestAP;
@@ -244,7 +245,7 @@ int main(int ac, char **av) {
     rpm->addState(rps0);
 
     auto pstns = RfrmPri::scanPositions(rpm);
-    vector<unsigned int> bestPerm = pstns[numA];
+    KBase::VUI bestPerm = pstns[numA];
     assert(numR == bestPerm.size());
 
     // Either start them all at the CP or have each to choose an initial position which

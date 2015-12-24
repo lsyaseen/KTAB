@@ -192,11 +192,11 @@ namespace DemoLeon {
 
 
   // TODO: see SMPState::pDist or RPState::pDist for a model which must be adapted to use vector-capabilities
-  tuple <KMatrix, vector<unsigned int>> LeonState::pDist(int persp) const {
+  tuple <KMatrix, VUI> LeonState::pDist(int persp) const {
     KMatrix pd;
-    auto un = vector<unsigned int>();
+    auto un = VUI();
     assert(false);
-    return tuple <KMatrix, vector<unsigned int>>(pd, un);
+    return tuple <KMatrix, VUI>(pd, un);
   }
 
 

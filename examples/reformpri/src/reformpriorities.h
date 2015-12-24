@@ -41,8 +41,8 @@ namespace RfrmPri {
   // -------------------------------------------------
   // function declarations
 
-  void printPerm(const vector<unsigned int>& n);
-  vector<vector<unsigned int>> scanPositions(const RPModel * rpm);
+  void printPerm(const VUI& n);
+  vector<VUI> scanPositions(const RPModel * rpm);
 
 
   // -------------------------------------------------

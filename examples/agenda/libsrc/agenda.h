@@ -42,6 +42,7 @@ namespace AgendaControl {
   using std::tuple;
   using KBase::KMatrix; 
   using KBase::PRNG; 
+  using KBase::VUI; 
 
   class Agenda;
   class Choice;
@@ -55,7 +56,7 @@ namespace AgendaControl {
   vector< vector <unsigned int> > chooseSet(const unsigned int n, const unsigned int m);
   
   // pick out the indicated subset
-  tuple<vector<unsigned int>, vector<unsigned int>> indexedSet(const vector<unsigned int> xs, const vector<unsigned int> is);
+  tuple<VUI, VUI> indexedSet(const VUI xs, const VUI is);
 
 
   class Agenda {
@@ -79,7 +80,7 @@ namespace AgendaControl {
     static bool balancedLR(PartitionRule pr, unsigned int numL, unsigned int numR);
 
     // list all agendas of the given type, over the given items
-    static vector<Agenda*> agendaSet(PartitionRule pr, const vector<unsigned int> xs);
+    static vector<Agenda*> agendaSet(PartitionRule pr, const VUI xs);
 
   private:
     static Agenda* makeAgenda(vector<int> xs, PartitionRule pr, PRNG* rng);

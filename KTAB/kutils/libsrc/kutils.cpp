@@ -49,8 +49,8 @@ namespace KBase {
     return (x*x*x*x);
   }
   
-vector<unsigned int> uiSeq(const unsigned int n1, const unsigned int n2, const unsigned int ns) {
-    vector<unsigned int> uis = {};
+VUI uiSeq(const unsigned int n1, const unsigned int n2, const unsigned int ns) {
+    VUI uis = {};
     assert (n1 <= n2);
     assert (0 < ns);
     for (unsigned int i = n1; i <= n2; i=i+ns) 

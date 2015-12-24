@@ -161,7 +161,7 @@ namespace DemoMtch {
     MtchPstn* p = new MtchPstn();
     p->numItm = numI;
     p->numCat = numC;
-    p->match = vector<unsigned int>();
+    p->match = VUI();
     for (unsigned int i = 0; i < numI; i++){
       unsigned int aID = rng->uniform() % numC;
       p->match.push_back(aID);
@@ -187,7 +187,7 @@ namespace DemoMtch {
     //
   }
  
-  tuple <KMatrix, vector<unsigned int>> MtchState::pDist(int persp) const {
+  tuple <KMatrix, VUI> MtchState::pDist(int persp) const {
     auto na = model->numAct;
     auto w = actrCaps();
     auto vr = VotingRule::Proportional;
@@ -213,11 +213,11 @@ namespace DemoMtch {
     auto pd = Model::scalarPCE(na, na, w, uij, vr, vpm, rl);
     
     // TODO: test whether all positions are unique or not, see RPState::pDist for an example
-    auto uNdx = vector<unsigned int>();
+    auto uNdx = VUI();
     for (unsigned int i = 0; i < na; i++) {
       uNdx.push_back(i);
     }
-    return tuple< KMatrix, vector<unsigned int>> (pd, uNdx); 
+    return tuple< KMatrix, VUI> (pd, uNdx); 
   }
 
 

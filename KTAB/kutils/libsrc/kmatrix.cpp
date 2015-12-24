@@ -122,16 +122,16 @@ namespace KBase {
 
 
   KMatrix::KMatrix() {
-    zeroFillVec(0, 0); // totally empty
+    vFillVec(0, 0, 0.0); // totally empty
   }
 
   KMatrix::~KMatrix() {
-    zeroFillVec(0, 0); // totally empty
+    vFillVec(0, 0, 0.0); // totally empty
   }
 
 
-  KMatrix::KMatrix(unsigned int nr, unsigned int nc) {
-    zeroFillVec(nr, nc);
+  KMatrix::KMatrix(unsigned int nr, unsigned int nc, double iv) {
+    vFillVec(nr, nc, iv);
   }
 
 
@@ -169,14 +169,14 @@ namespace KBase {
   }
 
 
-  void KMatrix::zeroFillVec(unsigned int nr, unsigned int nc) {
+  void KMatrix::vFillVec(unsigned int nr, unsigned int nc, double iv) {
     rows = nr;
     clms = nc;
     const unsigned int n = nr*nc;
-    vals = vector<double>();
+    vals = {}; // 0-length vector
     vals.resize(n);
     for (unsigned int i = 0; i < n; i++) {
-      vals[i] = 0.0;
+      vals[i] = iv;
     }
     return;
   }

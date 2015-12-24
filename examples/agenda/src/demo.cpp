@@ -121,7 +121,7 @@ namespace AgendaControl {
     assert(cat.size() == AgendaControl::numSets(n, m));
     cout << endl;
 
-    vector<unsigned int> testI = {};
+    VUI testI = {};
     for (unsigned int i = 0; i < numI; i++) {
       testI.push_back(10 * (1 + i));
     }

@@ -58,9 +58,9 @@ namespace KBase {
     KMatrix u0, const double eps, const unsigned int iMax);
 
 }; // namespace
+
 // -------------------------------------------------
 #endif
-
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------

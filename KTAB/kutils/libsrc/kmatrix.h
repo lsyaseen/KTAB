@@ -74,7 +74,7 @@ namespace KBase {
   public:
 
     KMatrix();
-    KMatrix(unsigned int nr, unsigned int nc);
+    KMatrix(unsigned int nr, unsigned int nc, double iv=0.0);
     // default copy constructor, copy assigment, etc. are sufficient 
     double operator() (unsigned int i, unsigned int j) const;  // readable rvalue
     double& operator() (unsigned int i, unsigned int j);       // assignable lvalue
@@ -99,7 +99,7 @@ namespace KBase {
     virtual ~KMatrix();
 
   private:
-    void zeroFillVec(unsigned int nr, unsigned int nv);
+    void vFillVec(unsigned int nr, unsigned int nv, double iv);
     void pivot(unsigned int r, unsigned int c);
     unsigned int rows = 0;
     unsigned int clms = 0;
@@ -111,9 +111,9 @@ namespace KBase {
 
 
 };
+
 // -------------------------------------------------
 #endif
-
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------

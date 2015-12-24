@@ -54,59 +54,7 @@ namespace DemoSMP {
   using SMPLib::SMPState;
 
   // -------------------------------------------------
-  void demoActorUtils(uint64_t s, PRNG* rng) {
-
-    printf("Using PRNG seed: %020llu \n", s);
-    rng->setSeed(s);
-
-    cout << "Demonstrate simple voting by spatial actors (scalar capability)" << endl;
-    cout << "and by economic actors (vector capability)" << endl;
-
-    unsigned int sDim = 3;
-    auto sp1 = new VctrPstn(KMatrix::uniform(rng, sDim, 1, 0.0, 1.0));
-    cout << "Random spatial position, sp1:" << endl;
-    sp1->mPrintf(" %.3f ");
-    cout << endl << flush;
-    auto sp2 = new VctrPstn(KMatrix::uniform(rng, sDim, 1, 0.0, 1.0));
-    cout << "Random spatial position, sp2:" << endl;
-    sp2->mPrintf(" %.3f ");
-    cout << endl << flush;
-    auto alice = new SMPActor("Alice", "first cryptographer");
-    alice->randomize(rng, sDim);
-    auto md0 = new SMPModel(rng);
-    auto st0 = new SMPState(md0);
-    st0->nra = KMatrix(1, 1); //
-    auto iPos = new VctrPstn((2 * (*sp1) + (*sp2)) / 3);
-    md0->addActor(alice);
-    st0->addPstn(iPos);
-    cout << "Alice's position is (2*sp1 + sp2)/3:" << endl;
-    iPos->mPrintf(" %.3f ");
-    cout << endl << flush;
-    printf("Alice's scalar capability: %.3f \n", alice->sCap);
-    cout << "Alice's voting rule (overall): " << vrName(alice->vr) << endl;
-    printf("Alice's risk attitude: %.3f \n", st0->nra(0, 0));
-    printf("Alice's total salience %.4f \n", sum(alice->vSal));
-    printf("Alice's vector salience: \n");
-    alice->vSal.mPrintf(" %.3f ");
-
-
-    double va = alice->vote(sp1, sp2, st0);
-    printf("A's vote on [sp1:sp2] is %+.3f \n", va);
-    printf("Her vote should always be positive \n");
-    cout << flush;
-    assert(va > 0); // by construction
-    cout << endl << flush;
-
-    delete sp1;
-    delete sp2;
-    delete alice;
-    delete st0;
-    delete md0;
-
-
-    return;
-  }
-
+  
 
   void demoEUSpatial(unsigned int numA, unsigned int sDim, uint64_t s, PRNG* rng) {
     printf("Using PRNG seed: %020llu \n", s);
@@ -198,11 +146,13 @@ namespace DemoSMP {
       md0->addActor(ai);
       st0->addPstn(iPos);
     }
-    st0->nra = KMatrix::uniform(rng, numA, 1, -0.5, 1.0);
+    
+    // TODO: simple setting of NRA
+    //st0->nra = KMatrix::uniform(rng, numA, 1, -0.5, 1.0);
 
     for (unsigned int i = 0; i < numA; i++) {
       auto ai = ((SMPActor*)(md0->actrs[i]));
-      auto ri = st0->nra(i, 0);
+      double ri = 0.0; // st0->aNRA(i);
       printf("%2u: %s , %s \n", i, ai->name.c_str(), ai->desc.c_str());
       cout << "voting rule: " << vrName(ai->vr) << endl;
       cout << "Pos vector: ";

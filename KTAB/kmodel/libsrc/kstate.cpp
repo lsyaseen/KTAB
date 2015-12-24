@@ -24,6 +24,11 @@
 #include "kmodel.h"
 
 namespace KBase {
+using std::cout;
+using std::endl;
+using std::flush;
+using std::get;
+using std::tuple;
 using KBase::PRNG;
 using KBase::KMatrix;
 
@@ -69,57 +74,20 @@ void State::randomizeUtils(double minU, double maxU, double uNoise) {
     return;
 }
 
-/*
-vector<unsigned int> State::testUniqueNdx(function <bool(unsigned int, unsigned int)> tfn) const {
-    /// Given an equivalency-test, return a vector of indices to unique positions.
-    /// The test might compare only the actual positions, or it might mix actual and hypothetical.
-    const unsigned int numA = model->numAct;
-    auto firstEquivNdx = [this, tfn, numA](const unsigned int i) {
-        // fen(i) is the lowest j s.t. Pi==Pj.
-        // If fen(i)==i, then i is the first occurance of Pi, and its column should be copied.
-        // if fen(i) <i, then i is not the first occurance, and its column should not be copied.
 
-        assert(i < numA);
-        unsigned int ej = numA + 1; // impossibly high
-        assert(i < numA);
-        for (unsigned int j = 0; ((j <= i) && (numA < ej)); j++) {
-            if (tfn(i, j)) {
-                ej = j;
-            }
-        }
-        assert(ej < numA);
-        assert(ej <= i);
-        return ej;
-    };
-
-    auto uNdx = vector<unsigned int>();
-    for (unsigned int i = 0; i < numA; i++) {
-        unsigned int fen = firstEquivNdx(i);
-        if (fen == i) {
-            uNdx.push_back(i);
-        }
-    }
-    return uNdx;
-}
-*/
-
-vector<unsigned int> State::uniqueNdx() const {
-  /// Looking only at actual current positions, return a vector of indices of unique positions.
-  // Note that we have to lambda-bind 'this'. Otherwise, we'd need a 'static' function
-  // to give to uIndices.
+VUI State::uniqueNdx() const {
+    /// Looking only at the positions in this state, return a vector of indices of unique positions.
+    // Note that we have to lambda-bind 'this'. Otherwise, we'd need a 'static' function
+    // to give to uIndices.
     auto efn = [this](unsigned int i, unsigned int j) {
         return equivNdx(i,j);
     };
-    
-    //auto uNdx0 = testUniqueNdx(efn);
-    
+
     auto ns = KBase::uiSeq(0, model->numAct - 1);
-    auto uNdx1 = KBase::uIndices<unsigned int>(ns, efn);
-   // assert(uNdx0.size() == uNdx1.size());
-   // for (unsigned int i=0; i<uNdx1.size(); i++) {
-   //   assert(uNdx0[i] == uNdx1[i]);
-   // }
- 
+    auto uePair = KBase::ueIndices<unsigned int>(ns, efn);
+    VUI uNdx1 = get<0>(uePair);
+    VUI eNdx1 = get<1>(uePair);
+
     return uNdx1;
 }
 

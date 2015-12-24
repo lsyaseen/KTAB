@@ -111,7 +111,7 @@ namespace AgendaControl {
     auto csnm = vector< vector <unsigned int> >();
     if (1 == m) {
       for (unsigned int i = 0; i < n; i++) {
-        vector<unsigned int> ci = { i };
+        VUI ci = { i };
         csnm.push_back(ci);
       }
     }
@@ -121,7 +121,7 @@ namespace AgendaControl {
         unsigned int len = lst.size();
         unsigned int maxEl = lst[len - 1];
         for (unsigned int j = maxEl + 1; j < n; j++) {
-          vector<unsigned int> ls = lst;
+          VUI ls = lst;
           ls.push_back(j);
           csnm.push_back(ls);
         }
@@ -131,13 +131,13 @@ namespace AgendaControl {
   }
 
 
-  tuple<vector<unsigned int>, vector<unsigned int>> indexedSet(const vector<unsigned int> xs,
-    const vector<unsigned int> is) {
-    vector<unsigned int> rslt = {};
+  tuple<VUI, VUI> indexedSet(const VUI xs,
+    const VUI is) {
+    VUI rslt = {};
     for (auto i : is) {
       rslt.push_back(xs[i]);
     }
-    vector<unsigned int> comp = {};
+    VUI comp = {};
     for (unsigned int i = 0; i < xs.size() - rslt.size(); i++) {
       comp.push_back(0);
     }
@@ -145,15 +145,15 @@ namespace AgendaControl {
       rslt.begin(), rslt.end(),
       comp.begin()
       );
-    auto pr = tuple<vector<unsigned int>, vector<unsigned int>>(rslt, comp);
+    auto pr = tuple<VUI, VUI>(rslt, comp);
     return pr;
   }
 
 
-  vector<Agenda*> Agenda::agendaSet(PartitionRule pr, const vector<unsigned int> xs) {
+  vector<Agenda*> Agenda::agendaSet(PartitionRule pr, const VUI xs) {
     unsigned int n = xs.size();
     assert(0 < n);
-    auto showA = [](const vector<unsigned int> &as) {
+    auto showA = [](const VUI &as) {
       printf("[");
       for (auto a : as) {
         printf(" %u ", a);
@@ -180,7 +180,7 @@ namespace AgendaControl {
 
     default: // n>2, odd or even
       for (unsigned int k = 1; k <= (n / 2); k++) {
-        vector<vector<unsigned int>> leftIndices = {};
+        vector<VUI> leftIndices = {};
 
         leftIndices = chooseSet(n, k);
         // if n is odd, then when k= (n/2), we have k < n-k, so the
@@ -196,7 +196,7 @@ namespace AgendaControl {
         if (n == (2 * k)) {
           unsigned int m = leftIndices.size();
           assert(m == 2 * (m / 2));
-          vector<vector<unsigned int>> shortIndices = {};
+          vector<VUI> shortIndices = {};
           for (unsigned int i = 0; i < (m / 2); i++) {
             shortIndices.push_back(leftIndices[i]);
           }
@@ -207,8 +207,8 @@ namespace AgendaControl {
           //showA(lhi);
           //cout << " -- ";
           auto lrPairs = indexedSet(xs, lhi);
-          vector<unsigned int> lhs = std::get<0>(lrPairs);
-          vector<unsigned int> rhs = std::get<1>(lrPairs);
+          VUI lhs = std::get<0>(lrPairs);
+          VUI rhs = std::get<1>(lrPairs);
 
           bool ok = Choice::balancedLR(pr, lhs.size(), rhs.size());
           if (ok) {
@@ -242,7 +242,7 @@ namespace AgendaControl {
   // ------------------------------------------
 
   vector<Agenda*> Agenda::enumerateAgendas(unsigned int n, PartitionRule pr) {
-    vector<unsigned int> items = {};
+    VUI items = {};
     for (unsigned int i = 0; i < n; i++) {
       items.push_back(i);
     }

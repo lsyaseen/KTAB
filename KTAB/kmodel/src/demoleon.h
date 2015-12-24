@@ -51,6 +51,7 @@ namespace DemoLeon {
   using KBase::KMatrix;
   using KBase::PRNG;
   using KBase::ReportingLevel;
+ using KBase::VUI;
 
   using KBase::Actor;
   using KBase::Position;
@@ -156,7 +157,7 @@ namespace DemoLeon {
 
     
     // use the parameters of your state to compute the relative probability of each actor's position
-    virtual tuple <KMatrix, vector<unsigned int>>  pDist(int persp) const ;
+    virtual tuple <KMatrix, VUI>  pDist(int persp) const ;
     
     virtual void setAUtil(ReportingLevel rl);
     
