@@ -29,12 +29,35 @@
 
 namespace KBase {
 
-  uint64_t qTrans(uint64_t s) {
-    uint64_t n = 2; // even, != 0
-    uint64_t c = 3; // odd
-    uint64_t a = 0xF1FF7B8227A447F5; // any number
-    uint64_t r = (s + a) * ((n*s) + c);
+  W64 qTrans(W64 s) {
+    W64 n = 2; // even, != 0
+    W64 c = 3; // odd
+    W64 a = 0xF1FF7B8227A447F5; // any number
+    W64 r = (s + a) * ((n*s) + c);
     return r;
+  }
+
+  W64 rotl(const W64 x, unsigned int n) {
+    W64 z = x;
+    n = n % WordLength; // drop excessive loops
+    if (0 != n) {
+      z = (x << n) | (x >> (WordLength - n));
+    }
+
+    assert(z == (z & MASK64)); // just double-check 
+    assert(x == rotr(z, n)); // just double-check 
+    return z;
+  }
+
+  W64 rotr(const W64 x, unsigned int n) {
+    W64 z = x;
+    n = n % WordLength; // drop excessive loops
+    if (0 != n) {
+      z = (x >> n) | (x << (WordLength - n));
+    }
+
+    assert(z == (z & MASK64)); // just double-check 
+    return z;
   }
 
 

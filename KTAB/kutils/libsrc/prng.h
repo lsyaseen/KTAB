@@ -33,7 +33,16 @@
 namespace KBase {
   using std::mt19937_64;
 
-  uint64_t qTrans(uint64_t s);
+
+  typedef uint64_t W64; // 64 bits
+  const unsigned int WordLength = 64;
+
+  const W64 MASK64 = 0xffffffffffffffff; // obviously 2^64 - 1
+  const W64 MASK32 = 0xffffffff; // obviously 2^32 - 1
+
+  W64 qTrans(W64 s);
+  W64 rotl(const W64 x, unsigned int n);
+  W64 rotr(const W64 x, unsigned int n);
 
   class PRNG {
   public:
