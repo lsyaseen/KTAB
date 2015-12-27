@@ -588,7 +588,7 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
             };
 
             auto ns = KBase::uiSeq(0, model->numAct - 1);
-            VUI uNdx = get<0>(KBase::ueIndices<unsigned int>(ns, equivHNdx));
+            const VUI uNdx = get<0>(KBase::ueIndices<unsigned int>(ns, equivHNdx));
             const unsigned int numU = uNdx.size();
             auto hypUtil = KMatrix(rpMod->numAct, numU);
             // we need now to go through 'uh', copying column J the first time
