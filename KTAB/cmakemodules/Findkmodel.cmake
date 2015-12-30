@@ -26,12 +26,12 @@ set(KMODEL_PREFIX
 
   # Note Well the locations in and order of search
 set(KMODEL_POSSIBLE_PATHS
-  ${KMODEL_PREFIX}/include/
-  ${KMODEL_PREFIX}/lib/
   ${CMAKE_CURRENT_SOURCE_DIR}/../kmodel/
   ${CMAKE_CURRENT_SOURCE_DIR}/../build/kmodel/
   ${CMAKE_CURRENT_SOURCE_DIR}/../../kmodel/
   ${CMAKE_CURRENT_SOURCE_DIR}/../../KTAB/kmodel/ 
+  ${KMODEL_PREFIX}/include/
+  ${KMODEL_PREFIX}/lib/
   )
 
 # try to find a key header

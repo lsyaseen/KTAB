@@ -25,12 +25,12 @@ set(SMP_PREFIX
 
 # Note Well the locations in and order of search
 set(SMP_POSSIBLE_PATHS
-  ${SMP_PREFIX}/include/
-  ${SMP_PREFIX}/lib/
   ${CMAKE_CURRENT_SOURCE_DIR}/../smp/
   ${CMAKE_CURRENT_SOURCE_DIR}/../build/smp/
   ${CMAKE_CURRENT_SOURCE_DIR}/../../smp/
   ${CMAKE_CURRENT_SOURCE_DIR}/../../examples/libsrc/smp/
+  ${SMP_PREFIX}/include/
+  ${SMP_PREFIX}/lib/
   )
 
 # try to find a key header

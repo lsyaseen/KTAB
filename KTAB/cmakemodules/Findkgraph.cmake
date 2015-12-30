@@ -25,12 +25,12 @@ set(KGRAPH_PREFIX
 
 # Note Well the locations in and order of search
 set(KGRAPH_POSSIBLE_PATHS
-  ${KGRAPH_PREFIX}/include/
-  ${KGRAPH_PREFIX}/lib/
   ${CMAKE_CURRENT_SOURCE_DIR}/../kgraph/
   ${CMAKE_CURRENT_SOURCE_DIR}/../build/kgraph/
   ${CMAKE_CURRENT_SOURCE_DIR}/../../kgraph/
   ${CMAKE_CURRENT_SOURCE_DIR}/../../KTAB/kgraph/
+  ${KGRAPH_PREFIX}/include/
+  ${KGRAPH_PREFIX}/lib/
   )
 
 # try to find a key header

@@ -61,6 +61,7 @@ endif(WIN32)
 
 if (UNIX)
   set (ENABLE_EFFCPP true CACHE  BOOL "Check Effective C++ Guidelines")
+  set (ENABLE_EFENCE false CACHE  BOOL "Use Electric Fence memory debugger")
 endif(UNIX)
 # -------------------------------------------------
 set (BUILD_тетрис false CACHE  BOOL "Change executable from 'ftetris' to 'тетрис'")
@@ -73,7 +74,6 @@ set (BUILD_тетрис false CACHE  BOOL "Change executable from 'ftetris' to '
 # to the Professional, Ultimate, Enterprise, or whatever edition.
 # -------------------------------------------------
 
-set (ENABLE_EFENCE false CACHE  BOOL "Use Electric Fence memory debugger")
 
 if (ENABLE_EFENCE)
   find_package(efence)

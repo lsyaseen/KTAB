@@ -25,12 +25,12 @@ set(KUTILS_PREFIX
 
 # Note Well the locations in and order of search
 set(KUTILS_POSSIBLE_PATHS
-  ${KUTILS_PREFIX}/include/
-  ${KUTILS_PREFIX}/lib/
   ${CMAKE_CURRENT_SOURCE_DIR}/../kutils/
   ${CMAKE_CURRENT_SOURCE_DIR}/../build/kutils/
   ${CMAKE_CURRENT_SOURCE_DIR}/../../kutils/
   ${CMAKE_CURRENT_SOURCE_DIR}/../../KTAB/kutils/
+  ${KUTILS_PREFIX}/include/
+  ${KUTILS_PREFIX}/lib/
   )
 
 # try to find a key header
