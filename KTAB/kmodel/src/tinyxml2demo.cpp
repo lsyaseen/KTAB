@@ -21,51 +21,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // --------------------------------------------
 
-#ifndef DEMO_SQLITE_H
-#define DEMO_SQLITE_H
+#include "tinyxml2demo.h"
 
-#include <cstdlib>
-#include <iostream>
-#include <stdio.h>
-#include <string>
-#include <sqlite3.h> 
-#include <tuple>
-#include <vector>
- 
+using std::cout;
+using std::endl;
+using std::flush;
+using std::string;
+using std::vector;
 
-#include "kutils.h"
-#include "prng.h"
-#include "kmatrix.h"
+// ------------------------------------------------------------------------------------
 
-namespace MDemo {
+namespace TXDemo {
   using std::string;
   using std::tuple;
   using std::vector;
 
 
-  void demoDBObject();
-
-  class SQLDB {
-  public:
-    SQLDB(char* filename);
-    virtual ~SQLDB();
-    bool open(char* filename);
-
-    // returns a vector of rows, where each row is a vector of (string) values
-    tuple<unsigned int, vector<vector<string>>> query(const char* query);
-
-    void close();
-
-  private:
-    sqlite3 *database = nullptr;
-    bool dbOpen = false;
-  };
-
 
 }; // end of namespace
-
-// -------------------------------------------------
-#endif
 
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.

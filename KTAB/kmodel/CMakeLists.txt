@@ -68,6 +68,13 @@ endif (ENABLE_EFENCE)
 
 # ------------------------------------------------- 
  
+find_package(TinyXML2)
+if (NOT TINYXML2_FOUND)
+  message(FATAL_ERROR "Could not find TinyXML2")
+endif (NOT TINYXML2_FOUND) 
+
+# ------------------------------------------------- 
+ 
 find_package(Sqlite)
 if (NOT SQLITE_FOUND)
   message(FATAL_ERROR "Could not find SQLite")
@@ -176,6 +183,7 @@ ADD_EXECUTABLE(demomodel
   src/demo.cpp
   src/edemo.cpp
   src/sqlitedemo.cpp
+  src/tinyxml2demo.cpp
   src/zactor.cpp
   csvparser/csv_parser.cpp
   )

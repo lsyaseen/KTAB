@@ -21,11 +21,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // --------------------------------------------
 
-#include <cstdlib>   // get 'exit' function
-#include <string>
-#include <iostream>
-#include <stdio.h>
-#include <sqlite3.h>
 #include "sqlitedemo.h"
 
 using std::cout;
