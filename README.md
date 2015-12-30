@@ -35,6 +35,8 @@ KTAB uses CMake for configuration; downloads and instructions can be obtained fr
 
 A graphical front end is under development. It will use the open source, cross-platform, C++ toolkit [FLTK](http://www.fltk.org). The source code and build instructions for the most recent stable version can be obtained  [here](http://www.fltk.org/software.php). FLTK also uses CMake for configuration, then your favorite IDE to build.
 
+To read and write XML data files, KTAB uses the [TinyXML2] (https://github.com/leethomason/tinyxml2) library, which is available on [GitHub] (https://github.com/).
+
 KTAB is released under The MIT License (Expat).
 For details, see the following URLs:
 
