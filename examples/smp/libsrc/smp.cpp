@@ -446,10 +446,10 @@ void SMPState::setAllAUtil(ReportingLevel rl) {
 
 
 void SMPState::setOneAUtil(unsigned int perspH, ReportingLevel rl) {
-  cout << "SMPState::setOneAUtil - not yet implemented"<<endl<<flush;
-  
-  
-  return;
+    cout << "SMPState::setOneAUtil - not yet implemented"<<endl<<flush;
+
+
+    return;
 }
 
 void SMPState::showBargains(const vector < vector < BargainSMP* > > & brgns) const {
@@ -512,21 +512,29 @@ bool SMPState::equivNdx(unsigned int i, unsigned int j) const {
 // set the diff matrix, do probCE for risk neutral,
 // estimate Ri, and set all the aUtil[h] matrices
 SMPState* SMPState::stepBCN() {
-    if (0 == aUtil.size()) {
-        setAUtil(-1, ReportingLevel::Low);
-    }
+    auto gSetup = [] (SMPState* s) {
+        if ((0 == s->uIndices.size())|| (0 == s->eIndices.size())) {
+            s->setUENdx();
+        }
+        if (0 == s->aUtil.size()) {
+            s->setAUtil(-1, ReportingLevel::Low);
+        }
+        return;
+    };
+    gSetup(this);
     int myT = -1;
     for (unsigned int t = 0; t < model->history.size(); t++) {
         if (this == model->history[t]) {
             myT = t;
         }
     }
-    assert(0 <= myT); 
+    assert(0 <= myT);
     model->sqlAUtil(myT);
     // Notice that this does not record the next state.
     // That gets recorded upon the next state - but it
     // therefore misses the very last state.
     auto s2 = doBCN();
+    gSetup(s2);
     s2->step = [s2]() {
         return s2->stepBCN();
     };

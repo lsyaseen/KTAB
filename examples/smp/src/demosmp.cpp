@@ -224,7 +224,6 @@ namespace DemoSMP {
     // record the last actor posUtil table
     const unsigned int nState = md0->history.size();
     auto lastState = ((SMPState*)(md0->history[nState - 1]));
-    lastState->setAUtil(-1, ReportingLevel::Low);
     md0->sqlAUtil(nState - 1);
 
     cout << "Completed model run" << endl << endl;
