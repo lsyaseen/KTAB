@@ -130,7 +130,6 @@ public:
     tuple <KMatrix, VUI>  pDist(int persp) const;
 
 
-    void setAUtil(ReportingLevel rl);
     MtchState * stepSUSN();
 
     MtchState * stepBCN();
@@ -141,6 +140,8 @@ protected:
 
     bool equivNdx(unsigned int i, unsigned int j) const;
     // bool stableMtchState(unsigned int iter, const State* s);
+    
+    void setAllAUtil(ReportingLevel rl);
 
 private:
 

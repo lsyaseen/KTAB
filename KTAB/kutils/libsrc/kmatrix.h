@@ -98,12 +98,14 @@ namespace KBase {
     
     virtual ~KMatrix();
 
-  private:
-    void vFillVec(unsigned int nr, unsigned int nv, double iv);
-    void pivot(unsigned int r, unsigned int c);
+  protected:
     unsigned int rows = 0;
     unsigned int clms = 0;
     vector<double> vals = vector<double>();
+    
+  private:
+    void vFillVec(unsigned int nr, unsigned int nv, double iv);
+    void pivot(unsigned int r, unsigned int c);
     inline unsigned int nFromRC(const unsigned int r, const unsigned int c) const;
     void rcFromN(const unsigned int n, unsigned int & r, unsigned int &c) const;
   };

@@ -56,14 +56,11 @@ namespace KBase {
 
   typedef vector<unsigned int> VUI;
 
-  class PRNG;
-  class KMatrix;
+  enum class ReportingLevel : uint8_t {  Silent = 0, Low, Medium, High, Debugging  }; 
 
-  enum class ReportingLevel {
-    Silent, Low, Medium, High, Debugging
-      };
-
-
+  double sqr(const double& x);  // second power
+  double qrtc(const double& x); // fourth power
+  
   std::chrono::time_point<std::chrono::system_clock>  displayProgramStart();
   void displayProgramEnd(std::chrono::time_point<std::chrono::system_clock> st);
 
@@ -133,16 +130,13 @@ namespace KBase {
   // the unsigned ints in order from n1 to n2, inclusive.
   VUI uiSeq(const unsigned int n1, const unsigned int n2, const unsigned int ns = 1);
 
-  class KException {  // just something to throw around
+  class KException {
   public:
     explicit KException(string m);
     virtual ~KException();
     string msg="";
   };
 
-
-  double sqr(const double x); // second power
-  double qrtc(const double x); // fourth power
 
 }; // end of namespace
 

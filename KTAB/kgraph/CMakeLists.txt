@@ -60,7 +60,7 @@ endif(WIN32)
 # -------------------------------------------------
 
 if (UNIX)
-  set (ENABLE_EFFCPP false CACHE  BOOL "Check Effective C++ Guidelines")
+  set (ENABLE_EFFCPP true CACHE  BOOL "Check Effective C++ Guidelines")
 endif(UNIX)
 # -------------------------------------------------
 set (BUILD_тетрис false CACHE  BOOL "Change executable from 'ftetris' to 'тетрис'")

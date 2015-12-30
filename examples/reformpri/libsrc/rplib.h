@@ -20,7 +20,7 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // -------------------------------------------------
-//
+// Simple model of negotiating over the order of reform priorities
 // -------------------------------------------------
 #ifndef REF_PRI_LIB
 #define REF_PRI_LIB
@@ -46,6 +46,8 @@ using namespace std;
 namespace RfrmPri {
 // namespace to hold everything related to the
 // "priority of reforms" CDMP. Note that KBase has no access.
+
+const string appVersion = "0.1";
 
 using std::string;
 using std::tuple;
@@ -158,13 +160,15 @@ public:
     // each actor's position. persp = -1 means use everyone's separate perspectives
     //(i.e. get actual probabilities, not one actor's beliefs)
     tuple <KMatrix, VUI> pDist(int persp) const;
-    void setAUtil(ReportingLevel rl);
     RPState * stepSUSN();
     RPState * stepBCN();
 
     void show() const;
 
 protected:
+    virtual void setAllAUtil(ReportingLevel rl);
+    void setOneAUtil(unsigned int perspH, ReportingLevel rl);
+    
     RPState * doSUSN(ReportingLevel rl) const;
     RPState * doBCN(ReportingLevel rl) const;
     // bool stableRPState(unsigned int iter, const State* s);

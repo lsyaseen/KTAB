@@ -34,7 +34,10 @@ using KBase::Actor;
 using KBase::Model;
 using KBase::Position;
 using KBase::State;
+
+using KBase::PCEModel;
 using KBase::VotingRule;
+using KBase::VPModel;
 
 
 namespace DemoLeon {
@@ -214,7 +217,7 @@ namespace DemoLeon {
 
 
   LeonState* LeonState::stepSUSN() {
-    setAUtil(ReportingLevel::Medium);
+    setAUtil(-1, ReportingLevel::Medium);
     auto s2 = doSUSN(ReportingLevel::Silent);
     s2->step = [s2]() {
       return s2->stepSUSN();
@@ -242,7 +245,7 @@ namespace DemoLeon {
 
     const unsigned int numA = model->numAct;
     assert(numA == eMod->actrs.size());
-    auto vpm = Model::VPModel::Linear;
+    auto vpm = VPModel::Linear;
     const unsigned int numP = pstns.size();
     auto euMat = [rl, numA, numP, vpm, this](const KMatrix & uMat) {
 
@@ -257,7 +260,7 @@ namespace DemoLeon {
 
       const KMatrix c = Model::coalitions(vkij, numA, numP);
       const KMatrix pv = Model::vProb(vpm, c);
-      const KMatrix p = Model::probCE(pv);
+      const KMatrix p = Model::probCE(PCEModel::ConditionalPCM, pv);
       const KMatrix eu = uMat*p;
 
 
@@ -449,7 +452,7 @@ namespace DemoLeon {
   }
   // end of doSUSN
 
-  void LeonState::setAUtil(ReportingLevel rl) {
+  void LeonState::setAllAUtil(ReportingLevel rl) {
     using std::cout;
     using std::endl;
     using std::flush;
@@ -1463,7 +1466,7 @@ namespace DemoLeon {
       auto ai = (const LeonActor*)eMod0->actrs[i];
       auto pi = (const VctrPstn*)eSt0->pstns[i];
       printf("%2u: %s , %s \n", i, ai->name.c_str(), ai->desc.c_str());
-      cout << "voting rule: " << vrName(ai->vr) << endl;
+      cout << "voting rule: " << ai->vr << endl;
       cout << "Pos vector: ";
       trans(*pi).mPrintf(" %+7.3f ");
       cout << "Cap vector: ";
@@ -1474,7 +1477,7 @@ namespace DemoLeon {
       cout << endl << flush;
     }
 
-    eSt0->setAUtil(KBase::ReportingLevel::Low);
+    eSt0->setAUtil(-1, KBase::ReportingLevel::Low);
     auto u = eSt0->aUtil[0];
     assert(numA == eSt0->model->numAct);
 
@@ -1490,14 +1493,14 @@ namespace DemoLeon {
     c.mPrintf(" %9.3f ");
     cout << endl << flush;
 
-    auto vpm = Model::VPModel::Linear;
+    auto vpm = VPModel::Linear;
 
     auto pv = Model::vProb(vpm, c);
     cout << "Probability Opt_i > Opt_j" << endl;
     pv.mPrintf(" %.4f ");
     cout << endl;
 
-    auto p = Model::probCE(pv);
+    auto p = Model::probCE(PCEModel::ConditionalPCM, pv);
     cout << "Probability Opt_i" << endl;
     p.mPrintf(" %.4f ");
 

@@ -46,6 +46,7 @@
 #include "prng.h"
 
 namespace KBase {
+using std::ostream;
 using std::shared_ptr;
 using std::string;
 using std::tuple;
@@ -59,24 +60,57 @@ class State;
 class Actor;
 
 // How much influence to exert (vote) given a difference in [0,1] utility
-enum class VotingRule : char {
-    Binary, PropBin, Proportional, PropCbc, Cubic
-};
-// No more than 256 distinct voting rules
+enum class VotingRule { Binary, PropBin, Proportional, PropCbc, Cubic };
+string vrName(const VotingRule& vr);
+ostream& operator<< (ostream& os, const VotingRule& vr);
 
-string vrName(VotingRule vr);
 
-enum class PCEModel {
-    MarkovPCM, ConditionalPCM
+enum class PCEModel { MarkovPCM, ConditionalPCM };
+string pcmName(const PCEModel& pcm);
+ostream& operator<< (ostream& os, const PCEModel& pcm);
+
+
+// whether you consider the probability of a coalition winning to go up linearly
+// quadratically, quartically, or even discontinuously with strength ratios
+enum class VPModel {
+    // Linear law says 2:1 advantage gives pv = 2/3, and 3:1 gives 3/4
+    //            and that 11:10 advantage gives 52.4%
+    // Square law says 2:1 advantage gives pv = 4/5, and 3:1 gives 9/10
+    //            and that 11:10 advantage gives 54.8%
+    // Quartic law says 2:1 advantage gives pv = 16/17, and 3:1 gives 81/82
+    //            and that 11:10 advantage gives 59.4%
+    // Binary law says that any percentage difference over a small threshold gives
+    //            guaranteed success (or loss), with linear interpolation between
+    //            to avoid weird round-off effects.
+
+    Linear,  // first power
+    Square,  // second power
+    Quartic, // fourth power
+    Binary
 };
+string vpmName(const VPModel& vpm);
+ostream& operator<< (ostream& os, const VPModel& vpm);
+
 
 enum class ThirdPartyCommit {
     NoCommit, SemiCommit, FullCommit
 };
+string tpcName(const ThirdPartyCommit& tpc);
+ostream& operator<< (ostream& os, const ThirdPartyCommit& tpc);
 
-// third parties have the same range of voting rules as in VotingRule enum.
-string tpcName(ThirdPartyCommit tpc);
 
+// estimating risk attitudes from probabilities might have use outside the SMP
+enum class BigRRange {
+    Min, Mid, Max
+};
+string bigRRName(const BigRRange & rRng);
+ostream& operator << (ostream& os, const BigRRange& rRng);
+
+enum class BigRAdjust {
+    NoRA, OneThirdRA, HalfRA, TwoThirdsRA, FullRA
+};
+string bigRAName(const BigRAdjust & rAdj);
+ostream& operator << (ostream& os, const BigRAdjust& rAdj);
 
 // -------------------------------------------------
 // There is not much to say about abstract positions, even
@@ -86,12 +120,22 @@ class Position {
 public:
     Position();
     virtual ~Position();
+
+    friend ostream& operator<< (ostream& os, const Position& p) {
+        p.print(os);
+        return os;
+    }
+
+protected:
+    virtual void print(ostream& os) const = 0;
+
+private:
 };
 
+ostream& operator<< (ostream& os, const Position& p);
 
 
 // -------------------------------------------------
-
 // Basic vector position: just a column-vector of numbers.
 // They could be interpretted in many ways, as policies
 // are often described by a vector of numbers (e.g. tax/subsidy rates).
@@ -100,8 +144,10 @@ public:
     VctrPstn();
     VctrPstn(unsigned int nr, unsigned int nc);
     explicit VctrPstn(const KMatrix & m); // copy constructor
-
     virtual ~VctrPstn();
+protected:
+    virtual void print(ostream& os) const;
+private:
 };
 
 // -------------------------------------------------
@@ -121,15 +167,15 @@ public:
     virtual vector<MtchPstn> neighbors(unsigned int nVar) const;
     // assumes no interaction between items (permutation requires interaction)
 
-
-
     unsigned int numItm = 0;
     unsigned int numCat = 0;
     VUI match = {}; // must be of length numItm
+
+protected:
+    virtual void print(ostream& os) const;
+
+private:
 };
-
-
-vector <MtchPstn> uniqueMP(vector <MtchPstn> mps);
 
 
 // bundle up methods relevant to GA over MtchPstn
@@ -141,12 +187,13 @@ public:
     void randomize(PRNG* rng);
     MtchGene * mutate(PRNG * rng) const;
     tuple<MtchGene*, MtchGene*> cross(const MtchGene * g2, PRNG * rng) const;
-    void show() const;
+    //void show() const;
     bool equiv(const MtchGene * g2) const;
 
     void setState(vector<Actor*> as, vector<MtchPstn*> ps);
 
 protected:
+    virtual void print(ostream& os) const;
     void copySelf(MtchGene*) const;
     // links to the State are necessary to evaluate the net support, EU, etc.
     vector<Actor*> actrs = {};
@@ -169,7 +216,7 @@ public:
 
     static double nProd(double x, double y);
 
-    // simple voting based on the differrence in utility.
+    // simple voting based on the difference in utility.
     static double vote(VotingRule vr, double wi, double uij, double uik);
 
     // The voting function can index into only occupied states, or a mix of occupied and hypothetical states,
@@ -181,41 +228,18 @@ public:
     static KMatrix coalitions(function<double(unsigned int ak, unsigned int pi, unsigned int pj)> vfn,
                               unsigned int numAct, unsigned int numOpt);
 
-    // whether you consider the probability of a coalition winning to go up linearly
-    // quadratically, quartically, or even discontinuously with strength ratios:
-    // Linear law says 2:1 advantage gives pv = 2/3, and 3:1 gives 3/4
-    //            and that 11:10 advantage gives 52.4%
-    // Square law says 2:1 advantage gives pv = 4/5, and 3:1 gives 9/10
-    //            and that 11:10 advantage gives 54.8%
-    // Quartic law says 2:1 advantage gives pv = 16/17, and 3:1 gives 81/82
-    //            and that 11:10 advantage gives 59.4%
-    // Binary law says that any percentage difference over a small threshold gives
-    //            guaranteed success (or loss), with linear interpolation between
-    //            to avoid weird round-off effects.
-    //
-    enum class VPModel {
-        Linear,  // first power
-        Square,  // second power
-        Quartic, // fourth power
-        Binary
-    };
-    static string VPMName(VPModel vpm);
+
 
 
     // calculate pv[i>j] from coalitions
     static KMatrix vProb(VPModel vpm, const KMatrix & c);
-
-    // this is the basic model of victory dependent on strength-ratio
-    static tuple<double, double> vProb(VPModel vpm, const double s1, const double s2);
 
     // assumes simple voting over those options with that utility matrix,
     // builds coalitions, and return pv[i>j]
     static KMatrix vProb(VotingRule vr, VPModel vpm, const KMatrix & w, const KMatrix & u);
 
     // calculate column vector P[i] from square matrix pv[i>j]
-    static KMatrix probCE(const KMatrix & pv);
-    static KMatrix markovPCE(const KMatrix & pv);
-    static KMatrix condPCE(const KMatrix & pv);
+    static KMatrix probCE(PCEModel pcm, const KMatrix & pv);
 
     static KMatrix scalarPCE(unsigned int numAct, unsigned int numOpt, const KMatrix & w,
                              const KMatrix & u, VotingRule vr, VPModel vpm, ReportingLevel rl);
@@ -239,15 +263,6 @@ public:
     void sqlAUtil(unsigned int t);
     static void demoSQLite();
 
-
-    // estimating risk attitudes from probabilities might have use outside the SMP
-    enum class BigRRange {
-        Min, Mid, Max
-    };
-    enum class BigRAdjust {
-        NoRA, OneThirdRA, HalfRA, TwoThirdsRA, FullRA
-    };
-
     static KMatrix bigRfromProb(const KMatrix & p, BigRRange rr);
 
     // returns h's estimate of i's risk attitude, using the risk-adjustment-rule
@@ -259,10 +274,16 @@ protected:
     // synchronized with the result of createTableSQL(k) !
 
 
-    // TODO: rename this from 'smpDB' to 'modelDB', or even 'scenarioDB'
+    // TODO: rename this from 'smpDB' to 'scenarioDB'
     // Note that, with composite models, there many be dozens interacting.
     sqlite3 *smpDB = nullptr; // keep this protected, to ease later multi-threading
     string scenName = "Scen"; // default is set from UTC time
+
+    // this is the basic model of victory dependent on strength-ratio
+    static tuple<double, double> vProb(VPModel vpm, const double s1, const double s2);
+    
+    static KMatrix markovPCE(const KMatrix & pv);
+    static KMatrix condPCE(const KMatrix & pv);
 private:
 };
 
@@ -290,13 +311,24 @@ public:
     vector<Position*> pstns = {};
 
     vector<KMatrix> aUtil = {}; // aUtil[h](i,j) is h's estimate of the utility to A_i of Pos_j
-    virtual void setAUtil(ReportingLevel rl) = 0;
+
+    // This sets the actor/position utility matrix as estimated by H.
+    // If H == -1, then set them all.
+    void setAUtil(int perspH = -1, ReportingLevel rl = ReportingLevel::Silent);
+
+    void setUENdx();
 
 protected:
+    VUI uIndices = {}; // which positions occupied postions are unique, generated by KBase::ueIndices
+    VUI eIndices = {}; // to which unique position each occupied postions matches, generated by KBase::ueIndices
+
+    KMatrix uProb = KMatrix(); // probability of each Unique state
 
     virtual bool equivNdx(unsigned int i, unsigned int j) const = 0;
-//    VUI testUniqueNdx(function <bool(unsigned int, unsigned int)> tfn) const;
-    VUI uniqueNdx() const;
+    
+    virtual void setAllAUtil(ReportingLevel rl) = 0;
+    
+    virtual void setOneAUtil(unsigned int perspH, ReportingLevel rl); // TODO: make this non-dummy
 
 private:
 };

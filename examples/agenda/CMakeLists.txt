@@ -22,11 +22,11 @@ set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
 if (UNIX)
-  set (ENABLE_EFFCPP false CACHE  BOOL "Check Effective C++ Guidelines")
+  set (ENABLE_EFFCPP true CACHE  BOOL "Check Effective C++ Guidelines")
 endif(UNIX) 
 
 # -------------------------------------------------
-set (ENABLE_EFENCE false CACHE  BOOL "Use Electric Femce memory debugger")
+set (ENABLE_EFENCE false CACHE  BOOL "Use Electric Fence memory debugger")
 
 if (ENABLE_EFENCE)
   find_package(efence)

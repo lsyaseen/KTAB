@@ -105,7 +105,7 @@ EState<PT>::~EState() {
 }
 
 template <class PT>
-void EState<PT>::setAUtil(ReportingLevel rl) {
+void EState<PT>::setAllAUtil(ReportingLevel rl) {
     // nothing yet
     return;
 }

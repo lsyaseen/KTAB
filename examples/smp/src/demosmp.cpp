@@ -36,6 +36,7 @@ using KBase::Model;
 using KBase::Position;
 using KBase::State;
 using KBase::VotingRule;
+using KBase::VPModel;
 
 
 namespace DemoSMP {
@@ -139,7 +140,6 @@ namespace DemoSMP {
       nameBuff = nullptr;
       string di = "Random spatial actor";
 
-
       auto ai = new SMPActor(ni, di);
       ai->randomize(rng, sDim);
       auto iPos = new VctrPstn(KMatrix::uniform(rng, sDim, 1, 0.0, 1.0)); // SMP is always on [0,1] scale
@@ -147,8 +147,6 @@ namespace DemoSMP {
       st0->addPstn(iPos);
     }
     
-    // TODO: simple setting of NRA
-    //st0->nra = KMatrix::uniform(rng, numA, 1, -0.5, 1.0);
 
     for (unsigned int i = 0; i < numA; i++) {
       auto ai = ((SMPActor*)(md0->actrs[i]));
@@ -165,6 +163,11 @@ namespace DemoSMP {
       cout << endl;
     }
 
+    
+    st0->setUENdx();
+    st0->setAUtil(-1, ReportingLevel::Silent);
+    st0->setNRA(); // TODO: simple setting of NRA
+    
     // with SMP actors, we can always read their ideal position.
     // with strategic voting, they might want to advocate positions
     // separate from their ideal, but this simple demo skips that.
@@ -190,7 +193,7 @@ namespace DemoSMP {
     auto vr = VotingRule::Binary;
     cout << "Using voting rule " << vrName(vr) << endl;
 
-    auto vpm = Model::VPModel::Linear;
+    auto vpm = VPModel::Linear;
 
     KMatrix p = Model::scalarPCE(numA, numA, w, u, vr, vpm, ReportingLevel::Medium);
 
@@ -221,7 +224,7 @@ namespace DemoSMP {
     // record the last actor posUtil table
     const unsigned int nState = md0->history.size();
     auto lastState = ((SMPState*)(md0->history[nState - 1]));
-    lastState->setAUtil(ReportingLevel::Low);
+    lastState->setAUtil(-1, ReportingLevel::Low);
     md0->sqlAUtil(nState - 1);
 
     cout << "Completed model run" << endl << endl;

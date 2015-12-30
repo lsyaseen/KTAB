@@ -44,8 +44,12 @@ using KBase::Actor;
 using KBase::Model;
 using KBase::Position;
 using KBase::VctrPstn;
+using KBase::BigRAdjust;
+using KBase::BigRRange;
+using KBase::VPModel;
 using KBase::State;
 using KBase::VotingRule;
+using KBase::PCEModel;
 using KBase::ReportingLevel;
 
 
@@ -225,14 +229,20 @@ SMPState::~SMPState() {
 
 
 
-void SMPState::setVDiff() {
-    auto dfn = [this](unsigned int i, unsigned int j) {
+void SMPState::setVDiff(const vector<VctrPstn> & vpos) {
+    auto dfn = [vpos, this](unsigned int i, unsigned int j) {
         auto ai = ((const SMPActor*)(model->actrs[i]));
         KMatrix si = ai->vSal;
-        auto pi = ((const VctrPstn*)(pstns[i]));
         auto pj = ((const VctrPstn*)(pstns[j]));
-        const double d = SMPModel::bvDiff((*pi) - (*pj), si);
-        return d;
+        double dij = 0.0;
+        if (0 == vpos.size()) {
+            auto pi = ((const VctrPstn*)(pstns[i]));
+            dij = SMPModel::bvDiff((*pi) - (*pj), si);
+        } else {
+            auto vpi = vpos[i];
+            dij = SMPModel::bvDiff(vpi - (*pj), si);
+        }
+        return dij;
     };
 
     const unsigned int na = model->numAct;
@@ -290,7 +300,7 @@ void SMPModel::setUtilProb(const KMatrix& vR, const KMatrix& vS, const KMatrix& 
     }
 
     // calculate pairwise victory probabilities
-    auto vpm = Model::VPModel::Linear;
+    auto vpm = VPModel::Linear;
     auto vP = KMatrix(na,na);
     for (unsigned int i=0; i<na; i++) {
         for (unsigned int j=0; j<i; j++ ) {
@@ -312,7 +322,7 @@ void SMPModel::setUtilProb(const KMatrix& vR, const KMatrix& vS, const KMatrix& 
 
 
 
-double SMPState::estNRA(unsigned int h, unsigned int i, Model::BigRAdjust ra) const {
+double SMPState::estNRA(unsigned int h, unsigned int i, BigRAdjust ra) const {
     double rh = nra(h, 0);
     double ri = nra(i, 0);
     double rhi = Model::estNRA(rh, ri, ra);
@@ -329,14 +339,21 @@ KMatrix SMPState::actrCaps() const {
     return w;
 }
 
-void SMPState::setAUtil(ReportingLevel rl) {
+void SMPState::setAllAUtil(ReportingLevel rl) {
     // you can change these parameters
     auto vr = VotingRule::Proportional;
-    auto ra = Model::BigRAdjust::OneThirdRA;
-    auto rr = Model::BigRRange::Mid; // use [-0.5, +1.0] scale
-    auto vpm = Model::VPModel::Linear;
+    auto ra = BigRAdjust::OneThirdRA;
+    auto rr = BigRRange::Mid; // use [-0.5, +1.0] scale
+    auto vpm = VPModel::Linear;
+
 
     const unsigned int na = model->numAct;
+
+    // make sure prerequisities are at least somewhat setup
+    assert (na == eIndices.size());
+    assert (0 < uIndices.size());
+    assert (uIndices.size() <= na);
+
     auto w_j = actrCaps();
     setVDiff();
     nra = KMatrix(na, 1); // zero-filled, i.e. risk neutral
@@ -353,7 +370,7 @@ void SMPState::setAUtil(ReportingLevel rl) {
     }
 
     auto pv_ij = Model::vProb(vr, vpm, w_j, rnUtil_ij);
-    auto p_i = Model::probCE(pv_ij);
+    auto p_i = Model::probCE(PCEModel::ConditionalPCM, pv_ij);
     nra = Model::bigRfromProb(p_i, rr);
 
 
@@ -378,23 +395,23 @@ void SMPState::setAUtil(ReportingLevel rl) {
 
     if (ReportingLevel::Silent < rl) {
         switch (ra) {
-        case Model::BigRAdjust::FullRA:
-            cout << "Using Full adjustment of ra, r^h_i = ri" << endl;
+        case BigRAdjust::FullRA:
+            cout << "Using " << ra <<": r^h_i = ri" << endl;
             break;
-        case Model::BigRAdjust::TwoThirdsRA:
-            cout << "Using 2/3 adjustment of ra, r^h_i = (rh + 2*ri)/3" << endl;
+        case BigRAdjust::TwoThirdsRA:
+            cout << "Using " << ra <<": r^h_i = (rh + 2*ri)/3" << endl;
             break;
-        case Model::BigRAdjust::HalfRA:
-            cout << "Using Half adjustment of ra, r^h_i = (rh + ri)/2" << endl;
+        case BigRAdjust::HalfRA:
+            cout << "Using " << ra <<": r^h_i = (rh + ri)/2" << endl;
             break;
-        case Model::BigRAdjust::OneThirdRA:
-            cout << "Using 1/3 adjustment of ra, r^h_i = (2*rh + ri)/3" << endl;
+        case BigRAdjust::OneThirdRA:
+            cout << "Using " << ra <<": r^h_i = (2*rh + ri)/3" << endl;
             break;
-        case Model::BigRAdjust::NoRA:
-            cout << "Using None adjustment of ra, r^h_i = rh " << endl;
+        case BigRAdjust::NoRA:
+            cout << "Using " << ra <<": r^h_i = rh " << endl;
             break;
         default:
-            cout << "Unrecognized Model::BigRAdjust" << endl;
+            cout << "Unrecognized BigRAdjust" << endl;
             assert(false);
             break;
         }
@@ -428,6 +445,13 @@ void SMPState::setAUtil(ReportingLevel rl) {
 }
 
 
+void SMPState::setOneAUtil(unsigned int perspH, ReportingLevel rl) {
+  cout << "SMPState::setOneAUtil - not yet implemented"<<endl<<flush;
+  
+  
+  return;
+}
+
 void SMPState::showBargains(const vector < vector < BargainSMP* > > & brgns) const {
     for (unsigned int i = 0; i < brgns.size(); i++) {
         printf("Bargains involving actor %u: ", i);
@@ -447,12 +471,19 @@ void SMPState::showBargains(const vector < vector < BargainSMP* > > & brgns) con
     return;
 }
 
+void SMPState::setNRA() {
+    const unsigned int nr = nra.numR();
+    nra = KMatrix(nr, 1);
+    return ;
+}
 
-    double SMPState::aNRA(unsigned int i) const {
-      assert (0 < nra.numR());
-      const double ri = nra(i,0);
-      return ri;
-    }
+double SMPState::aNRA(unsigned int i) const {
+    const unsigned int nr = nra.numR();
+    assert (nr == model->numAct);
+    assert (i < nr);
+    const double ri = nra(i,0);
+    return ri;
+}
 
 void SMPState::addPstn(Position* ap) {
     auto sp = (VctrPstn*)ap;
@@ -481,20 +512,20 @@ bool SMPState::equivNdx(unsigned int i, unsigned int j) const {
 // set the diff matrix, do probCE for risk neutral,
 // estimate Ri, and set all the aUtil[h] matrices
 SMPState* SMPState::stepBCN() {
-    setAUtil(ReportingLevel::Low);
+    if (0 == aUtil.size()) {
+        setAUtil(-1, ReportingLevel::Low);
+    }
     int myT = -1;
     for (unsigned int t = 0; t < model->history.size(); t++) {
         if (this == model->history[t]) {
             myT = t;
         }
     }
-    assert(0 <= myT);
-    //auto sMod = ((SMPModel*)model);
+    assert(0 <= myT); 
     model->sqlAUtil(myT);
     // Notice that this does not record the next state.
     // That gets recorded upon the next state - but it
     // therefore misses the very last state.
-
     auto s2 = doBCN();
     s2->step = [s2]() {
         return s2->stepBCN();
@@ -556,7 +587,7 @@ SMPState* SMPState::doBCN() const {
 
     // of course, you  can change these two parameters
     auto vr = VotingRule::Proportional;
-    auto vpm = Model::VPModel::Linear;
+    auto vpm = VPModel::Linear;
 
     auto ndxMaxProb = [](const KMatrix & cv) {
 
@@ -702,6 +733,8 @@ SMPState* SMPState::doBCN() const {
         delete b;
     }
 
+    // TODO: this really should do all the assessment: ueIndices, rnProb, all U^h_{ij}, raProb
+    s2->setUENdx();
     return s2;
 }
 
@@ -824,9 +857,12 @@ tuple<int, double, double> SMPState::bestChallenge(unsigned int i) const {
 
 
 tuple< KMatrix, VUI> SMPState::pDist(int persp) const {
+    /// Calculate the probability distribution over states from this perspective
+
+    // TODO: convert this to a single, commonly used setup function
     const VotingRule vr = VotingRule::Proportional;
     const ReportingLevel rl = ReportingLevel::Silent;
-    const Model::VPModel vpm = Model::VPModel::Linear;
+    const VPModel vpm = VPModel::Linear;
 
     const unsigned int na = model->numAct;
     const KMatrix w = actrCaps();
@@ -849,20 +885,21 @@ tuple< KMatrix, VUI> SMPState::pDist(int persp) const {
         assert(false);
     }
 
-    auto uNdx2 = uniqueNdx(); // get the indices to unique positions
-    printf("Unique positions %i/%i ", uNdx2.size(), na);
+    assert (0 < uIndices.size()); // should have been set with setUENdx();
+    //auto uNdx2 = uniqueNdx(); // get the indices to unique positions
+    printf("Unique positions %i/%i ", uIndices.size(), na);
     cout << "[ ";
-    for (auto i : uNdx2) {
+    for (auto i : uIndices) {
         printf(" %i ", i);
     }
     cout << " ] " << endl << flush;
-    auto uufn = [uij, uNdx2](unsigned int i, unsigned int j) {
-        return uij(i, uNdx2[j]);
+    auto uufn = [uij, this](unsigned int i, unsigned int j) {
+        return uij(i, uIndices[j]);
     };
-    auto uUij = KMatrix::map(uufn, na, uNdx2.size());
-    auto upd = Model::scalarPCE(na, uNdx2.size(), w, uUij, vr, vpm, rl);
+    auto uUij = KMatrix::map(uufn, na, uIndices.size());
+    auto upd = Model::scalarPCE(na, uIndices.size(), w, uUij, vr, vpm, rl);
 
-    return tuple< KMatrix, VUI>(upd, uNdx2);
+    return tuple< KMatrix, VUI>(upd, uIndices);
 }
 
 
@@ -970,8 +1007,6 @@ double SMPState::posProb(unsigned int i, const VUI & unq, const KMatrix & pdt) c
 }
 
 void SMPModel::showVPHistory(bool sqlP) const {
-    //const string commaSep = " , ";
-
     assert(numAct == actrs.size());
     assert(numDim == dimName.size());
 
@@ -1031,13 +1066,11 @@ void SMPModel::showVPHistory(bool sqlP) const {
 
     // show probabilities over time.
     // Note that we have to set the aUtil matrices for the last one.
-    auto prbHist = vector<KMatrix>();
-    auto unqHist = vector< VUI>();
+    vector<KMatrix> prbHist = {};
+    vector<VUI> unqHist = {};
     for (unsigned int t = 0; t < history.size(); t++) {
         auto sst = (SMPState*)history[t];
-        if (t == history.size() - 1) {
-            sst->setAUtil(ReportingLevel::Silent);
-        }
+        assert(numAct ==  sst->aUtil.size()); // should be fully initialized
         auto pn = sst->pDist(-1);
         auto pdt = std::get<0>(pn); // note that these are unique positions
         auto unq = std::get<1>(pn);

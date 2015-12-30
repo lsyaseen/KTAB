@@ -159,13 +159,13 @@ namespace DemoLeon {
     // use the parameters of your state to compute the relative probability of each actor's position
     virtual tuple <KMatrix, VUI>  pDist(int persp) const ;
     
-    virtual void setAUtil(ReportingLevel rl);
-    
     LeonState* stepSUSN();
     
   protected:
     LeonState * doSUSN(ReportingLevel rl) const;
     virtual bool equivNdx(unsigned int i, unsigned int j) const;
+    
+    void setAllAUtil(ReportingLevel rl);
     
   private:
   };

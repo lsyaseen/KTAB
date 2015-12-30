@@ -10,6 +10,6 @@ FILES="kutils  kmodel  kgraph"
 for d in $FILES
 do
 pushd $d/build; make clean; popd
-pushd $d; rm -rf build ; mkdir build; sleep 1; popd
+pushd $d; rm -rf build ; sleep 1; popd
 done
 #------------------------------------------

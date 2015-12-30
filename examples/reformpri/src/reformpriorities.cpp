@@ -285,6 +285,7 @@ int main(int ac, char **av) {
         return doneP;
     };
 
+    rps0->setUENdx();
     rpm->run();
 
     // we already displayed each state as it was processed,

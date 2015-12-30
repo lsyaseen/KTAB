@@ -43,7 +43,9 @@ namespace DemoMtch {
   using KBase::Model;
   using KBase::Position;
   using KBase::State;
+  using KBase::PCEModel;
   using KBase::VotingRule;
+  using KBase::VPModel;
   using KBase::GHCSearch;
   using KBase::ReportingLevel;
 
@@ -192,7 +194,7 @@ namespace DemoMtch {
     auto w = actrCaps();
     auto vr = VotingRule::Proportional;
     auto rl = KBase::ReportingLevel::Silent;
-    auto vpm = Model::VPModel::Linear;
+    auto vpm = VPModel::Linear;
     auto uij = KMatrix(na, na);
 
     if ((0 <= persp) && (persp < na)) {
@@ -263,7 +265,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
     // not look like an improvement to I under *his* beliefs.
     //
     // So I avoid this correct-but-confusing behavior by using the same VR for all.
-    cout << "Using voting rule " << vrName(vr) << endl;
+    cout << "Using voting rule " << vr << endl;
 
     cout << "Randomly generated actors with random positions: " << endl;
     auto md0 = new MtchModel(rng);
@@ -329,7 +331,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
 
       printf("%2u: %s , %s \n", i, ai->name.c_str(), ai->desc.c_str());
       printf("Capability: %.2f \n", ai->sCap);
-      cout << "Voting rule: " << KBase::vrName(ai->vr) << endl;
+      cout << "Voting rule: " << ai->vr << endl;
       cout << "Valuation of each sweet: ";
       for (auto v : ai->vals) {
         printf("%5.3f  ", v);
@@ -364,7 +366,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
     c.mPrintf(" %+9.3f ");
     cout << endl << flush;
 
-    auto vpm = Model::VPModel::Linear;
+    auto vpm = VPModel::Linear;
 
     auto pv = Model::vProb(vpm, c);
 
@@ -372,7 +374,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
     pv.mPrintf(" %.4f ");
     cout << endl;
 
-    auto p = Model::probCE(pv);
+    auto p = Model::probCE(PCEModel::ConditionalPCM, pv);
     cout << "Probability Opt_i" << endl;
     p.mPrintf(" %.4f ");
 
@@ -400,8 +402,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
     mg1->numItm = numI;
     mg1->randomize(rng);
     cout << "Random matching of " << numI << " items to " << numA << " actors" << endl;
-    mg1->show();
-    cout << endl;
+    cout << (*mg1) << endl; 
     delete mg1;
     mg1 = nullptr;
 
@@ -461,7 +462,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
       auto ai = (MtchActor*)as[i];
       printf("%2u: %s , %s \n", i, ai->name.c_str(), ai->desc.c_str());
       printf("Capability: %.2f \n", ai->sCap);
-      cout << "Voting rule: " << KBase::vrName(ai->vr) << endl;
+      cout << "Voting rule: " << ai->vr << endl;
       cout << "Valuation of each sweet: ";
       for (unsigned int j = 0; j < numI; j++){
         printf("%5.3f  ", ai->vals[j]);
@@ -520,8 +521,8 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
       return z;
     };
 
-    gOpt->showGene = [](const MtchGene* mg){
-      mg->show();
+    gOpt->showGene = [](const MtchGene* mg){ 
+      cout << (*mg);
       return;
     };
 
@@ -640,7 +641,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
     cout << "When it does stabilze, the positions of utility-maximizers stabilize but do not converge, while" << endl;
     cout << "the positions of probability-maximizers do converge." << endl;
 
-    st0->setAUtil(ReportingLevel::Low);
+    st0->setAUtil(-1, ReportingLevel::Low);
     auto u = st0->aUtil[0]; // everyone got the same perspective, in this demo
 
     cout << "Util matrix for U(actor_r, pstn_c) in random initial state: " << endl;
@@ -656,6 +657,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
     cout << "Expected utility to actors in random initial state: " << endl;
     (u*p).mPrintf(" %.4f "); //TODO: may need to modify this to use only unique positions
     cout << endl << flush;
+//    st0->setAUtil();
 
     md0->run();
 
@@ -708,7 +710,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
     cout << "When it does stabilze, the positions of utility-maximizers stabilize but do not converge, while" << endl;
     cout << "the positions of probability-maximizers do converge." << endl;
 
-    st0->setAUtil(ReportingLevel::Low);
+    st0->setAUtil(-1, ReportingLevel::Low);
     auto u = st0->aUtil[0]; // everyone gets the same perspective, in this demo
 
     cout << "Util matrix for U(actor_r, pstn_c) in random initial state: " << endl;
@@ -794,7 +796,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
       }
 
       // update the u_h_ij matrices
-      st0->setAUtil(ReportingLevel::Low);
+      st0->setAUtil(-1, ReportingLevel::Low);
       auto u2 = st0->aUtil[0]; // everyone got the same perspective
 
       cout << " done" << endl;
@@ -848,7 +850,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
     };
 
 
-    auto vpm = Model::VPModel::Linear;
+    auto vpm = VPModel::Linear;
 
     // Note that, for demo purposes, each actor assess the expected utility or the
     // probability-of-adoptions of their proposal under the assumption that everyone
@@ -893,7 +895,9 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
 
 
   MtchState * MtchState::stepSUSN() {
-    setAUtil(ReportingLevel::Medium);
+    if (0 == aUtil.size()) {
+      setAUtil(-1, ReportingLevel::Medium);
+    }
     auto s2 = doSUSN(ReportingLevel::Medium);
     s2->step = [s2]() {return s2->stepSUSN(); };
     return s2;
@@ -902,7 +906,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
 
 
 
-  void MtchState::setAUtil(ReportingLevel rl) {
+  void MtchState::setAllAUtil(ReportingLevel rl) {
     unsigned int numA = model->numAct;
 
     auto uFn = [this](unsigned int i, unsigned int j) {
@@ -971,7 +975,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
 
 
     if (ReportingLevel::Low < rl) {
-      s2->setAUtil(ReportingLevel::Silent);
+      s2->setAUtil(-1, ReportingLevel::Silent);
       auto u2 = s2->aUtil[0]; // they all have the same aUtil matrix, in this demo.
 
       auto pn2 = pDist(-1); // objective perspective
@@ -995,7 +999,7 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
 
 
   MtchState * MtchState::stepBCN() {
-    setAUtil(ReportingLevel::Medium);
+    setAUtil(-1, ReportingLevel::Medium);
     auto s2 = doBCN(ReportingLevel::Medium);
     s2->step = [s2]() {return s2->stepBCN(); };
     return s2;

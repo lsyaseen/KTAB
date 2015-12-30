@@ -52,7 +52,7 @@ endif(WIN32)
 # -------------------------------------------------
 
 if (UNIX)
-  set (ENABLE_EFFCPP false CACHE  BOOL "Check Effective C++ Guidelines")
+  set (ENABLE_EFFCPP true CACHE  BOOL "Check Effective C++ Guidelines")
 endif(UNIX)
 # -------------------------------------------------
 # find libraries on which this project depends
@@ -93,6 +93,7 @@ include_directories(
   )
 set(KTABMODEL_SRCS
   libsrc/kmodel.cpp
+  libsrc/kmodelsql.cpp
   libsrc/emodel.cpp
   libsrc/kstate.cpp
   libsrc/kposition.cpp

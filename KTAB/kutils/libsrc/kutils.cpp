@@ -40,12 +40,12 @@ namespace KBase {
   // -------------------------------------------------
 
   // for historical reasons, the second, quadratic power is called "square"
-  double sqr(const double x) {
+  double sqr(const double& x) {
     return (x*x);
   }
 
   // the fourth power is the quartic
-  double qrtc(const double x) {
+  double qrtc(const double& x) {
     return (x*x*x*x);
   }
   
@@ -99,67 +99,10 @@ namespace KBase {
     msg = m;
   }
 
-  KException::~KException() { }
+  KException::~KException() { 
+    msg = "";
+  }
 
-
-  // -------------------------------------------------
-  /*
-    CoordMap::CoordMap(int s1, double d1, int s2, double d2) {
-    ad = (d2 - d1)/((double)(s2 - s1));
-    bd = ((s2*d1) - (s1*d2))/((double)(s2 - s1));
-
-    as = ((double)(s2 - s1))/(d2 - d1);
-    bs = ((s1*d2)-(s2*d1))/(d2-d1);
-
-    if (testMap) {
-    // quickly test the transforms
-    const double dTol = fabs(d2-d1) / 1.0E6;
-
-    auto s2dTest = [dTol, this] (double dA, int sA) {
-    assert (fabs(dA - s2d(sA)) < dTol);
-    return;
-    };
-
-    s2dTest(d1, s1);
-    s2dTest(d2, s2);
-
-    auto d2sTest = [this] (int sA, double dA) {
-    assert (sA == d2s(dA));
-    return;
-    };
-
-    d2sTest(s1, d1);
-    d2sTest(s2, d2);
-    }
-    }
-
-
-    CoordMap::~CoordMap() {
-    as = 0;
-    bs = 0;
-    ad = 0;
-    bd = 0;
-    }
-
-    int CoordMap::d2s (double d) {
-    int s = cmRound(as*d + bs);
-    return s;
-    }
-
-    double CoordMap::s2d (int s) {
-    double d = ad*s + bd;
-    return d;
-    }
-
-
-    int CoordMap::cmRound(double x) {
-    int y = ((int) (x+0.5));
-    if (x < 0.0) {
-    y = - cmRound(-x);
-    }
-    return y;
-    }
-  */
 
 }; // namespace
 

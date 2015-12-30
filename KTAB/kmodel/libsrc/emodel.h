@@ -107,10 +107,12 @@ class EState : public State {
 public:
     EState(EModel<PT>* mod);
     virtual ~EState();
-    void setAUtil(ReportingLevel rl);
     void setValues();
 
 protected:
+    
+    void setAllAUtil(ReportingLevel rl);
+    
     // you have to provide these λ-fns.
 
     // probably using the EModel's raw-value matrix, actorVFn,

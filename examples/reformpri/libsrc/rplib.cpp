@@ -24,9 +24,6 @@
 
 #include "rplib.h"
 
-using namespace std;
-
-
 namespace RfrmPri {
 // namespace to hold everything related to the
 // "priority of reforms" CDMP. Note that KBase has no access.
@@ -38,6 +35,8 @@ using std::get;
 using KBase::lCorr;
 using KBase::VctrPstn;
 using KBase::MtchPstn;
+using KBase::VPModel;
+using KBase::PCEModel;
 
 // -------------------------------------------------
 // function definitions
@@ -327,24 +326,29 @@ bool RPState::equivNdx(unsigned int i, unsigned int j) const {
 
 tuple <KMatrix, VUI> RPState::pDist(int persp) const {
     /// Calculate the probability distribution over states from this perspective
+  
+  // TODO: convert this to a single, commonly used setup function
+  
     const unsigned int numA = model->numAct;
     const unsigned int numP = numA; // for this demo, the number of positions is exactly the number of actors
 
     // get unique indices and their probability
-    auto uNdx = uniqueNdx();
-    const unsigned int numU = uNdx.size();
+    assert (0 < uIndices.size()); // should have been set with setUENdx();
+    //auto uNdx2 = uniqueNdx(); // get the indices to unique positions
+    
+    const unsigned int numU = uIndices.size();
     assert(numU <= numP); // might have dropped some duplicates
 
     cout << "Number of aUtils: " << aUtil.size() << endl << flush;
 
     const KMatrix u = aUtil[0]; // all have same beliefs in this demo
 
-    auto uufn = [u, uNdx](unsigned int i, unsigned int j1) {
-        return u(i, uNdx[j1]);
+    auto uufn = [u, this](unsigned int i, unsigned int j1) {
+        return u(i, uIndices[j1]);
     };
 
     auto uMat = KMatrix::map(uufn, numA, numU);
-    auto vpm = Model::VPModel::Linear;
+    auto vpm = VPModel::Linear;
     assert(uMat.numR() == numA); // must include all actors
     assert(uMat.numC() == numU);
 
@@ -359,23 +363,25 @@ tuple <KMatrix, VUI> RPState::pDist(int persp) const {
     // which may or may not be square
     const KMatrix c = Model::coalitions(vkij, uMat.numR(), uMat.numC());
     const KMatrix pv = Model::vProb(vpm, c); // square
-    const KMatrix p = Model::probCE(pv); // column
+    const KMatrix p = Model::probCE(PCEModel::ConditionalPCM, pv); // column
     const KMatrix eu = uMat*p; // column
 
     assert(numA == eu.numR());
     assert(1 == eu.numC());
 
-    return tuple <KMatrix, VUI>(p, uNdx);
+    return tuple <KMatrix, VUI>(p, uIndices);
 }
 
 
 
 RPState* RPState::stepSUSN() {
-    setAUtil(ReportingLevel::Silent);
-
     cout << endl << flush;
     cout << "State number " << model->history.size() - 1 << endl << flush;
-    show(); // have to setAUtil first
+    if ((0 == uIndices.size()) || (0 == eIndices.size())) {
+    setUENdx();
+    }
+    setAUtil(-1, ReportingLevel::Silent);
+    show();
 
     auto s2 = doSUSN(ReportingLevel::Silent);
     s2->step = [s2]() {
@@ -390,6 +396,11 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
     RPState* s2 = nullptr;
     const unsigned int numA = model->numAct;
     assert(numA == rpMod->actrs.size());
+    
+    const unsigned int numU = uIndices.size();
+    assert ((0 < numU) && (numU <= numA));
+    assert (numA == eIndices.size());
+    
     // TODO: filter out essentially-duplicate positions
     //printf("RPState::doSUSN: numA %i \n", numA);
     //printf("RPState::doSUSN: numP %i \n", numP);
@@ -397,7 +408,7 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
 
     const KMatrix u = aUtil[0]; // all have same beliefs in this demo
 
-    auto vpm = Model::VPModel::Linear;
+    auto vpm = VPModel::Linear;
     const unsigned int numP = pstns.size();
     // Given the utility matrix, uMat, calculate the expected utility to each actor,
     // as a column-vector. Again, this is from the perspective of whoever developed uMat.
@@ -417,7 +428,7 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
         // which may or may not be square
         const KMatrix c = Model::coalitions(vkij, uMat.numR(), uMat.numC());
         const KMatrix pv = Model::vProb(vpm, c); // square
-        const KMatrix p = Model::probCE(pv); // column
+        const KMatrix p = Model::probCE(PCEModel::ConditionalPCM, pv); // column
         const KMatrix eu = uMat*p; // column
 
         assert(numA == eu.numR());
@@ -458,49 +469,9 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
             cout << "not available" << endl;
         }
         cout << endl << flush;
-    }
-
-
-    auto equivNdx0 = [this](const unsigned int i, const unsigned int j) {
-        auto mpi = ((const MtchPstn *)(pstns[i]));
-        auto mpj = ((const MtchPstn *)(pstns[j]));
-        assert(mpi != nullptr);
-        assert(mpj != nullptr);
-        bool rslt = ((*mpi) == (*mpj));
-        return rslt;
-    };
-    auto firstEquivNdx0 = [this, equivNdx0](const unsigned int i) {
-        // fen(i) is the lowest j s.t. Pi==Pj.
-        // If fen(i)==i, then i is the first occurance of Pi, and its column should be copied.
-        // if fen(i) <i, then i is not the first occurance, and its column should not be copied.
-        const unsigned int na = rpMod->numAct;
-        assert(i < na);
-        unsigned int ej = na + 1; // impossibly high
-        assert(i < na);
-        for (unsigned int j = 0; ((j <= i) && (na < ej)); j++) {
-            if (equivNdx0(i, j)) {
-                ej = j;
-            }
-        }
-        assert(ej < na);
-        assert(ej <= i);
-        return ej;
-    };
-
-    auto uNdx0 = VUI();
-    for (unsigned int i = 0; i < numA; i++) {
-        unsigned int fen = firstEquivNdx0(i);
-        if (fen == i) {
-            //printf("found unique index %2i \n", i);
-            uNdx0.push_back(i);
-        }
-    }
-    const unsigned int numU = uNdx0.size();
-
-    if (ReportingLevel::Low < rl) {
         printf("Out of %u positions, %u were unique: ", numA, numU);
         cout << flush;
-        for (auto i : uNdx0) {
+        for (auto i : uIndices) {
             printf("%2i ", i);
         }
         cout << endl;
@@ -508,8 +479,8 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
     }
 
 
-    auto uufn = [u, uNdx0](unsigned int i, unsigned int j1) {
-        return u(i, uNdx0[j1]);
+    auto uufn = [u, this](unsigned int i, unsigned int j1) {
+        return u(i, uIndices[j1]);
     };
     auto uUnique = KMatrix::map(uufn, numA, numU);
 
@@ -524,7 +495,12 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
         s2->pstns.push_back(nullptr);
     }
 
-    // TODO: clean up the nesting of lambda-functions
+    // TODO: clean up the nesting of lambda-functions.
+    // need to create a hypothetical state and run setOneAUtil(h,Silent) on it
+    //
+    // The newPosFn does a GA optimization to find the best next position for actor h,
+    // and stores it in s2. To do that, it defines three functions for evaluation, neighbors, and show:
+    // efn, nfn, and sfn.
     auto newPosFn = [this, rl, euMat, u, eu0, s2](const unsigned int h) {
         s2->pstns[h] = nullptr;
 
@@ -629,8 +605,9 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
             //cout << endl << flush;
             //cout << flush;
             return euh;
-        };
-
+        }; // end of efn
+        
+/*
         // I do not actually use prevMP, but it is still an example for std::set
         auto prevMP = [](const MtchPstn & mp1, const MtchPstn & mp2) {
             bool r = std::lexicographical_compare(
@@ -639,6 +616,7 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
             return r;
         };
         std::set<MtchPstn, bool(*)(const MtchPstn &, const MtchPstn &)> mpSet(prevMP);
+*/
 
         // return vector of neighboring 1-permutations
         auto nfn = [](const MtchPstn & mp0) {
@@ -687,7 +665,7 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
             //cout << mvs << endl << flush;
             //cout << flush;
             return mpVec;
-        };
+        }; // end of nfn
 
         // show some representation of this position on cout
         auto sfn = [](const MtchPstn & mp0) {
@@ -746,17 +724,14 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
         const double eps = 1E-8; // enough to avoid problems with round-off error
         assert(-eps <= du);
         return;
-    };
+    }; // end of newPosFn
 
     const bool par = true;
     auto ts = vector<thread>();
     // Each actor, h, finds the position which maximizes their EU in this situation.
     for (unsigned int h = 0; h < numA; h++) {
         if (par) { // launch all, concurrent
-            ts.push_back(thread([newPosFn, h]() {
-                newPosFn(h);
-                return;
-            }));
+            ts.push_back(thread([newPosFn, h]() {newPosFn(h); return;}));
         }
         else { // do each, sequential
             newPosFn(h);
@@ -764,9 +739,7 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
     }
 
     if (par) { // now join them all before continuing
-        for (auto& t : ts) {
-            t.join();
-        }
+        for (auto& t : ts) { t.join(); }
     }
 
     assert(nullptr != s2);
@@ -775,11 +748,19 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
     for (auto p : s2->pstns) {
         assert(nullptr != p);
     }
+    s2->setUENdx();
     return s2;
 }
 // end of doSUSN
 
-void RPState::setAUtil(ReportingLevel rl) {
+void RPState::setAllAUtil(ReportingLevel rl) {
+    const unsigned int na = model->numAct;
+    
+    // make sure prerequisities are at least somewhat setup
+    assert (na == eIndices.size());
+    assert (0 < uIndices.size());
+    assert (uIndices.size() <= na);
+
     /// For all states aUtil[h](i,j) is h's estimate of the utility to A_i of Pos_j,
     /// and this function calculates those matrices. Note that for this demo,
     /// all actors have the same perception.
@@ -818,6 +799,27 @@ void RPState::setAUtil(ReportingLevel rl) {
         aUtil.push_back(u);
     }
     return;
+}
+
+
+
+
+void RPState::setOneAUtil(unsigned int perspH, ReportingLevel rl) {
+  cout << "RPState::setOneAUtil - not yet implemented"<<endl<<flush;
+  const unsigned int numAct = model->numAct;
+  const unsigned int numUnq = uIndices.size();
+  
+  assert (perspH < numAct);
+  assert (numAct == aUtil.size());
+  assert ((0 == aUtil[perspH].numR()) && (0 == aUtil[perspH].numC()));
+  assert (numAct == eIndices.size());
+  assert (0 < numUnq);
+  assert (numUnq < numAct);
+  
+  auto uh = KMatrix(numAct, numUnq);
+  
+  
+  return;
 }
 
 void RPState::show() const {

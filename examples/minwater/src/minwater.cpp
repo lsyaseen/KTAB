@@ -44,6 +44,8 @@ using std::get;
 using std::string;
 using std::tuple;
 
+using KBase::VUI;
+
 using KBase::KMatrix;
 using KBase::PRNG;
 using KBase::dot;
@@ -58,7 +60,7 @@ using KBase::Model;
 using KBase::Position;
 using KBase::State;
 using KBase::VotingRule;
-using KBase::VUI;
+using KBase::PCEModel;
 
 
 // -------------------------------------------------
@@ -161,7 +163,7 @@ double waterMinProb(ReportingLevel rl, const KMatrix & p0) {
 
     double pRMS = KBase::norm(p0) / sqrt(p0.numC() * p0.numR()); // RMS of p0;
 
-    auto vpm = Model::VPModel::Linear;
+    auto vpm = KBase::VPModel::Linear;
 
     // voting in base-year scenario
     auto v0fn = [w, p0](unsigned int k, unsigned int i, unsigned int j) {
@@ -174,7 +176,7 @@ double waterMinProb(ReportingLevel rl, const KMatrix & p0) {
     };
     auto c0 = Model::coalitions(v0fn, numA, numP); // [numP, numP]
     auto pv0 = Model::vProb(vpm, c0); // [numP, numP]
-    auto pr0 = Model::condPCE(pv0); // [numP,1]
+    auto pr0 = Model::probCE(PCEModel::ConditionalPCM, pv0); // [numP,1]
     auto priorBase = pr0(0, 0);
     double err0 = trgtP0 - priorBase; // shortfall if positive
     if (err0 < 0.0) {
@@ -188,7 +190,7 @@ double waterMinProb(ReportingLevel rl, const KMatrix & p0) {
     };
     auto c1 = Model::coalitions(v1fn, numA, numP); // [numP, numP]
     auto pv1 = Model::vProb(vpm, c1); // [numP, numP]
-    auto pr1 = Model::condPCE(pv1); // [numP,1]
+    auto pr1 = Model::probCE(PCEModel::ConditionalPCM, pv1); // [numP,1]
     double postNom = 0.0;
     for (auto i : likelyScenarios) {
         postNom = postNom + pr1(i, 0);

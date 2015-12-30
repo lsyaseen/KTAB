@@ -53,6 +53,8 @@ using KBase::VotingRule;
 using KBase::ReportingLevel;
 using KBase::VctrPstn;
 using KBase::VUI;
+using KBase::BigRAdjust;
+using KBase::BigRRange;
 
 class SMPActor;
 class SMPState;
@@ -138,13 +140,12 @@ public:
     explicit SMPState(Model * m);
     virtual ~SMPState();
 
-    virtual void setVDiff();
-
-    // this sets the values in the AUtil matrices
-    virtual void setAUtil(ReportingLevel rl);
+    // Calculate the weighted-Euclidean distance matrix, compared to the given positions.
+    // If none are provided, it will compare to the positions in this state.
+    virtual void setVDiff(const vector<VctrPstn> & vpos = {});
 
     // returns h's estimate of i's risk attitude, using the risk-adjustment-rule
-    double estNRA(unsigned int h, unsigned int i, Model::BigRAdjust ra) const;
+    double estNRA(unsigned int h, unsigned int i, BigRAdjust ra) const;
 
     // returns row-vector of actor's capabilities
     KMatrix actrCaps() const;
@@ -166,15 +167,22 @@ public:
     virtual tuple< KMatrix, VUI> pDist(int persp) const;
     void showBargains(const vector < vector < BargainSMP* > > & brgns) const;
 
+    
+    void setNRA(); // TODO: this just sets risk neutral, for now
     // return actor's normalized risk attitude (if set)
     double aNRA(unsigned int i) const;
 
 protected:
+
+    // this sets the values in all the AUtil matrices
+    virtual void setAllAUtil(ReportingLevel rl);
+    
+    virtual void setOneAUtil(unsigned int perspH, ReportingLevel rl); 
+    
     KMatrix vDiff = KMatrix(); // vDiff(i,j) = difference between pos[i] and pos[j], using actor i's saliences as weights
     KMatrix rnProb = KMatrix(); // probability of each Unique state, when actors are treated as risk-neutral
-    VUI uIndices = {};
-    VUI eIndices = {};
-    
+
+    // risk-aware probabilities are uProb
     
     KMatrix nra = KMatrix();
 
