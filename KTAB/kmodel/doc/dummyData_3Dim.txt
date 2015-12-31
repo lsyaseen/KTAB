@@ -1,0 +1,41 @@
+The file 'dummyData_3Dim.csv" was SAVED AS an "XML Spreadsheet 2003" to get it into XML.
+
+
+The resulting XML had this as its first three lines:
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+
+However, the second line <?mso-application ... ?> caused TinyXML2 to crash.
+Therefore, I had to remove that line so that the file started as follows:
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+
+Then it worked just fine. The top-level structure is simple:
+
+<?xml version="1.0"?>
+<Workbook >
+ <DocumentProperties ...>
+ <OfficeDocumentSettings ...>
+ <ExcelWorkbook ...>
+ <Styles ...>
+ <Worksheet>
+  <Table >
+   <Row>
+    <Cell ...>
+    <Cell ...>
+    <Cell ...>
+    <Cell ...>
+    <Cell ...>
+  </Row>
+  <Row>
+    ...
+  </Row>
+  ...
+ </Worksheet>
+ <WorksheetOptions ...>
+</Workbook>
+
+Because of the way TinyXML2's FirstChildElement function works,
+we could skip the properties, settings, styles, etc. when generating
+data files and it would still be alright.

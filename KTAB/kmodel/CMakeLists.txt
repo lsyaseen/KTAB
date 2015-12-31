@@ -149,6 +149,7 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/csvparser/
   ${EFENCE_INCLUDE_DIR}
   ${SQLITE_INCLUDE_DIR}
+  ${TINYXML2_INCLUDE_DIR}
   )
 
 
@@ -193,6 +194,7 @@ TARGET_LINK_LIBRARIES(demomodel
   ${KUTILS_LIBRARY}
   ${EFENCE_LIBRARIES}
   ${SQLITE_LIBRARIES}
+  ${TINYXML2_LIBRARIES}
   )
 # -------------------------------------------------
 # show some useful status/debugging information

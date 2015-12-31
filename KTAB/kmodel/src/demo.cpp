@@ -35,6 +35,7 @@
 #include "demoleon.h"
 #include "sqlitedemo.h"
 #include "edemo.h"
+#include "tinyxml2demo.h"
 
 
 using std::cout;
@@ -214,6 +215,7 @@ int main(int ac, char **av) {
     bool spvsrP = false;
     bool sqlP = false;
     bool emodP = false;
+    bool tx2P = false;
 
     auto showHelp = [dSeed]() {
         printf("\n");
@@ -223,13 +225,13 @@ int main(int ac, char **av) {
         printf("--emod            simple enumerated model \n");
         printf("--spvsr           demonstrated shared_ptr<void> return\n");
         printf("--sql             demo SQLite \n");
+        printf("--tx2             demo TinyXML2 \n");
         printf("--seed <n>        set a 64bit seed\n");
         printf("                  0 means truly random\n");
         printf("                  default: %020llu \n", dSeed);
     };
 
-    // tmp args
-    emodP = true;
+    // tmp args 
 
     if (ac > 1) {
         for (int i = 1; i < ac; i++) {
@@ -242,6 +244,9 @@ int main(int ac, char **av) {
             }
             else if (strcmp(av[i], "--spvsr") == 0) {
                 spvsrP = true;
+            }
+            else if (strcmp(av[i], "--tx2") == 0) {
+                tx2P = true;
             }
             else if (strcmp(av[i], "--emod") == 0) {
                 emodP = true;
@@ -290,6 +295,10 @@ int main(int ac, char **av) {
         MDemo::demoDBObject();
     }
 
+    if (tx2P)  {
+        cout << "-----------------------------------" << endl;
+        TXDemo::demoTX2("dummyData_3Dim.xml"); 
+    }
 
     cout << "-----------------------------------" << endl;
 

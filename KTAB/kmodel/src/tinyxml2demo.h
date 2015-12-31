@@ -37,11 +37,11 @@
 #include "kmatrix.h"
 
 namespace TXDemo {
-  using std::string;
-  using std::tuple;
-  using std::vector;
+using std::string;
+using std::tuple;
+using std::vector;
 
-
+void demoTX2(string fileName);
 
 }; // end of namespace
 
