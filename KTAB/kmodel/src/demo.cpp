@@ -43,6 +43,8 @@ using std::endl;
 using std::flush;
 using std::get;
 using std::tuple;
+using std::string;
+
 using KBase::PRNG;
 using KBase::KMatrix;
 
@@ -106,7 +108,7 @@ void demoPCE(uint64_t s, PRNG* rng) {
 
     auto c = KMatrix::map(cFn, 2, 2);
     double w01 = c(0, 1);
-    double w10 = c(1, 0); 
+    double w10 = c(1, 0);
 
     cout << "By simple " << vpm << " ratios ..." << endl;
     auto pv = Model::vProb(vpm, c);
@@ -132,8 +134,8 @@ void demoPCE(uint64_t s, PRNG* rng) {
     cout << "But not so clear with tri-lateral conflict ..." << endl;
     c = KMatrix::map(cFn, 3, 3);
     pv = Model::vProb(vpm, c);
-    
-    
+
+
     cout << endl<< "Markov PCE model: " << endl;
     p2 = Model::probCE(PCEModel::MarkovPCM, pv);
     show(c, pv, p2);
@@ -216,6 +218,7 @@ int main(int ac, char **av) {
     bool sqlP = false;
     bool emodP = false;
     bool tx2P = false;
+    string inputXML = "";
 
     auto showHelp = [dSeed]() {
         printf("\n");
@@ -231,7 +234,7 @@ int main(int ac, char **av) {
         printf("                  default: %020llu \n", dSeed);
     };
 
-    // tmp args 
+    // tmp args
 
     if (ac > 1) {
         for (int i = 1; i < ac; i++) {
@@ -247,6 +250,8 @@ int main(int ac, char **av) {
             }
             else if (strcmp(av[i], "--tx2") == 0) {
                 tx2P = true;
+                i++;
+                inputXML = av[i];
             }
             else if (strcmp(av[i], "--emod") == 0) {
                 emodP = true;
@@ -297,7 +302,7 @@ int main(int ac, char **av) {
 
     if (tx2P)  {
         cout << "-----------------------------------" << endl;
-        TXDemo::demoTX2("dummyData_3Dim.xml"); 
+        TXDemo::demoTX2(inputXML);
     }
 
     cout << "-----------------------------------" << endl;
