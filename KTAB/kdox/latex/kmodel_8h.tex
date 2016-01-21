@@ -1,0 +1,112 @@
+\hypertarget{kmodel_8h}{\section{kmodel.\-h File Reference}
+\label{kmodel_8h}\index{kmodel.\-h@{kmodel.\-h}}
+}
+{\ttfamily \#include $<$sqlite3.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}kutils.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}kmatrix.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}prng.\-h\char`\"{}}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{class_k_base_1_1_position}{K\-Base\-::\-Position}
+\item 
+class \hyperlink{class_k_base_1_1_vctr_pstn}{K\-Base\-::\-Vctr\-Pstn}
+\item 
+class \hyperlink{class_k_base_1_1_mtch_pstn}{K\-Base\-::\-Mtch\-Pstn}
+\item 
+class \hyperlink{class_k_base_1_1_mtch_gene}{K\-Base\-::\-Mtch\-Gene}
+\item 
+class \hyperlink{class_k_base_1_1_model}{K\-Base\-::\-Model}
+\item 
+class \hyperlink{class_k_base_1_1_state}{K\-Base\-::\-State}
+\item 
+class \hyperlink{class_k_base_1_1_actor}{K\-Base\-::\-Actor}
+\end{DoxyCompactItemize}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespace_k_base}{K\-Base}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3}{K\-Base\-::\-Voting\-Rule} \{ \\*
+\hyperlink{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3a6ce976e8f061b2b5cfe4d0c50c3405dd}{K\-Base\-::\-Voting\-Rule\-::\-Binary}, 
+\hyperlink{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3a960321e2a4bfda404d33114ae3d0872d}{K\-Base\-::\-Voting\-Rule\-::\-Prop\-Bin}, 
+\hyperlink{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3aac13b33ebc8ea372dfb07e5ed4d9655f}{K\-Base\-::\-Voting\-Rule\-::\-Proportional}, 
+\hyperlink{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3a5e15ea0df19eefc1ad3b8c5cc8b8576a}{K\-Base\-::\-Voting\-Rule\-::\-Prop\-Cbc}, 
+\\*
+\hyperlink{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3aec6b5414eb175379ff9efc9b3eef5814}{K\-Base\-::\-Voting\-Rule\-::\-Cubic}
+ \}
+\item 
+enum \hyperlink{namespace_k_base_a498a929a17ac96ff70afee8eb4e17cd0}{K\-Base\-::\-P\-C\-E\-Model} \{ \hyperlink{namespace_k_base_a498a929a17ac96ff70afee8eb4e17cd0a9eae233fc331b4eff34732e0733a30ca}{K\-Base\-::\-P\-C\-E\-Model\-::\-Markov\-P\-C\-M}, 
+\hyperlink{namespace_k_base_a498a929a17ac96ff70afee8eb4e17cd0a768e3b180662caca78eb3396dbc8cd71}{K\-Base\-::\-P\-C\-E\-Model\-::\-Conditional\-P\-C\-M}
+ \}
+\item 
+enum \hyperlink{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71}{K\-Base\-::\-V\-P\-Model} \{ \hyperlink{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71a32a843da6ea40ab3b17a3421ccdf671b}{K\-Base\-::\-V\-P\-Model\-::\-Linear}, 
+\hyperlink{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71aceb46ca115d05c51aa5a16a8867c3304}{K\-Base\-::\-V\-P\-Model\-::\-Square}, 
+\hyperlink{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71a884b16485227c5da72c09b668fd7e1da}{K\-Base\-::\-V\-P\-Model\-::\-Quartic}, 
+\hyperlink{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71a6ce976e8f061b2b5cfe4d0c50c3405dd}{K\-Base\-::\-V\-P\-Model\-::\-Binary}
+ \}
+\item 
+enum \hyperlink{namespace_k_base_aca1021042b887fdf10cc3d6b0f9cef06}{K\-Base\-::\-Third\-Party\-Commit} \{ \hyperlink{namespace_k_base_aca1021042b887fdf10cc3d6b0f9cef06ac4cc4977453ba95b09b99c55ae960a63}{K\-Base\-::\-Third\-Party\-Commit\-::\-No\-Commit}, 
+\hyperlink{namespace_k_base_aca1021042b887fdf10cc3d6b0f9cef06afae7a8b68beff6a21c500b876e58db0c}{K\-Base\-::\-Third\-Party\-Commit\-::\-Semi\-Commit}, 
+\hyperlink{namespace_k_base_aca1021042b887fdf10cc3d6b0f9cef06a1e95f5f14b87d3682d6159293f5152bf}{K\-Base\-::\-Third\-Party\-Commit\-::\-Full\-Commit}
+ \}
+\item 
+enum \hyperlink{namespace_k_base_ad1033118c8842a9ee6ff4d01651a2640}{K\-Base\-::\-Big\-R\-Range} \{ \hyperlink{namespace_k_base_ad1033118c8842a9ee6ff4d01651a2640a78d811e98514cd165dda532286610fd2}{K\-Base\-::\-Big\-R\-Range\-::\-Min}, 
+\hyperlink{namespace_k_base_ad1033118c8842a9ee6ff4d01651a2640a55c6b09cbca39ef0cdb728eb112a5049}{K\-Base\-::\-Big\-R\-Range\-::\-Mid}, 
+\hyperlink{namespace_k_base_ad1033118c8842a9ee6ff4d01651a2640a6a061313d22e51e0f25b7cd4dc065233}{K\-Base\-::\-Big\-R\-Range\-::\-Max}
+ \}
+\item 
+enum \hyperlink{namespace_k_base_abb184480a342df4bda049658b7a0a251}{K\-Base\-::\-Big\-R\-Adjust} \{ \\*
+\hyperlink{namespace_k_base_abb184480a342df4bda049658b7a0a251a70485a2c3c83af1a1bf50995e185a496}{K\-Base\-::\-Big\-R\-Adjust\-::\-No\-R\-A}, 
+\hyperlink{namespace_k_base_abb184480a342df4bda049658b7a0a251ac34f8a9b3a517b071ae184c0d544dac2}{K\-Base\-::\-Big\-R\-Adjust\-::\-One\-Third\-R\-A}, 
+\hyperlink{namespace_k_base_abb184480a342df4bda049658b7a0a251ad707a458f9e110cc394a46aaa2d080b2}{K\-Base\-::\-Big\-R\-Adjust\-::\-Half\-R\-A}, 
+\hyperlink{namespace_k_base_abb184480a342df4bda049658b7a0a251a7b814e96863d300955db9d990c310497}{K\-Base\-::\-Big\-R\-Adjust\-::\-Two\-Thirds\-R\-A}, 
+\\*
+\hyperlink{namespace_k_base_abb184480a342df4bda049658b7a0a251a344bbf6c431eff8ab656436cf555d686}{K\-Base\-::\-Big\-R\-Adjust\-::\-Full\-R\-A}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+string \hyperlink{namespace_k_base_a06f9f2afead202780f5f09826b6c2de8}{K\-Base\-::vr\-Name} (const Voting\-Rule \&vr)
+\item 
+ostream \& \hyperlink{namespace_k_base_af59dc55c9762a3446701309d6b6716ba}{K\-Base\-::operator$<$$<$} (ostream \&os, const Voting\-Rule \&vr)
+\item 
+string \hyperlink{namespace_k_base_a93f654671ca9491f43fdbf279a8dfae1}{K\-Base\-::pcm\-Name} (const P\-C\-E\-Model \&pcm)
+\item 
+ostream \& \hyperlink{namespace_k_base_a8a51fa62609f14a7d4925b90555d66ac}{K\-Base\-::operator$<$$<$} (ostream \&os, const P\-C\-E\-Model \&pcm)
+\item 
+string \hyperlink{namespace_k_base_a0c8eba6be396a754f747b5778ed98a28}{K\-Base\-::vpm\-Name} (const V\-P\-Model \&vpm)
+\item 
+ostream \& \hyperlink{namespace_k_base_a08fabe46c3b55eabe44b44fa86afeadc}{K\-Base\-::operator$<$$<$} (ostream \&os, const V\-P\-Model \&vpm)
+\item 
+string \hyperlink{namespace_k_base_a21e183ec07b0c63a5a93b59056c76c44}{K\-Base\-::tpc\-Name} (const Third\-Party\-Commit \&tpc)
+\item 
+ostream \& \hyperlink{namespace_k_base_ac7e7fd7c25cdf6c213df3cc7e2a36cd6}{K\-Base\-::operator$<$$<$} (ostream \&os, const Third\-Party\-Commit \&tpc)
+\item 
+string \hyperlink{namespace_k_base_a9a94fd7f98b5622120584fcb870fcf4c}{K\-Base\-::big\-R\-R\-Name} (const Big\-R\-Range \&r\-Rng)
+\item 
+ostream \& \hyperlink{namespace_k_base_a3fe2153236311782e7608a72bbe06af6}{K\-Base\-::operator$<$$<$} (ostream \&os, const Big\-R\-Range \&r\-Rng)
+\item 
+string \hyperlink{namespace_k_base_a536b2b2ffe14301d09921444479d22bc}{K\-Base\-::big\-R\-A\-Name} (const Big\-R\-Adjust \&r\-Adj)
+\item 
+ostream \& \hyperlink{namespace_k_base_af018f57e0217110c3ea93e0a94c94c92}{K\-Base\-::operator$<$$<$} (ostream \&os, const Big\-R\-Adjust \&r\-Adj)
+\item 
+ostream \& \hyperlink{namespace_k_base_a49ebe418e2f42461961f56f2fcf96157}{K\-Base\-::operator$<$$<$} (ostream \&os, const Position \&p)
+\item 
+bool \hyperlink{kmodel_8h_a1a03715a49a06a3a092a2953b9078dce}{operator==} (const \hyperlink{class_k_base_1_1_mtch_pstn}{K\-Base\-::\-Mtch\-Pstn} \&mp1, const \hyperlink{class_k_base_1_1_mtch_pstn}{K\-Base\-::\-Mtch\-Pstn} \&mp2)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{kmodel_8h_a1a03715a49a06a3a092a2953b9078dce}{\index{kmodel.\-h@{kmodel.\-h}!operator==@{operator==}}
+\index{operator==@{operator==}!kmodel.h@{kmodel.\-h}}
+\subsubsection[{operator==}]{\setlength{\rightskip}{0pt plus 5cm}bool operator== (
+\begin{DoxyParamCaption}
+\item[{const {\bf K\-Base\-::\-Mtch\-Pstn} \&}]{mp1, }
+\item[{const {\bf K\-Base\-::\-Mtch\-Pstn} \&}]{mp2}
+\end{DoxyParamCaption}
+)}}\label{kmodel_8h_a1a03715a49a06a3a092a2953b9078dce}

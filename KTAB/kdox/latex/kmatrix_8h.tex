@@ -1,0 +1,65 @@
+\hypertarget{kmatrix_8h}{\section{kmatrix.\-h File Reference}
+\label{kmatrix_8h}\index{kmatrix.\-h@{kmatrix.\-h}}
+}
+{\ttfamily \#include $<$cstdint$>$}\\*
+{\ttfamily \#include $<$functional$>$}\\*
+{\ttfamily \#include $<$tuple$>$}\\*
+{\ttfamily \#include $<$vector$>$}\\*
+{\ttfamily \#include \char`\"{}kutils.\-h\char`\"{}}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{class_k_base_1_1_k_matrix}{K\-Base\-::\-K\-Matrix}
+\end{DoxyCompactItemize}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespace_k_base}{K\-Base}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+K\-Matrix \hyperlink{namespace_k_base_af76d55e885f062f41939b4d8802a552f}{K\-Base\-::trans} (const K\-Matrix \&m1)
+\item 
+double \hyperlink{namespace_k_base_ac04eb4ecf7a4427f95aec552d4ba3b21}{K\-Base\-::norm} (const K\-Matrix \&m1)
+\item 
+double \hyperlink{namespace_k_base_a2b6e9528c70ddd70032df696150ff015}{K\-Base\-::sum} (const K\-Matrix \&m1)
+\item 
+double \hyperlink{namespace_k_base_aa492d98b388ebd6d2edd0bfe6ae16024}{K\-Base\-::mean} (const K\-Matrix \&m1)
+\item 
+double \hyperlink{namespace_k_base_a082c1f9b23d177af71847da7edd2d550}{K\-Base\-::stdv} (const K\-Matrix \&m1)
+\item 
+double \hyperlink{namespace_k_base_a5f0d9a675a0d3542811b34bccaf9c652}{K\-Base\-::max\-Abs} (const K\-Matrix \&m)
+\item 
+tuple$<$ unsigned int, unsigned int $>$ \hyperlink{namespace_k_base_a0e6f01b377066ff486b45ba37993ba88}{K\-Base\-::ndx\-Max\-Abs} (const K\-Matrix \&m)
+\item 
+double \hyperlink{namespace_k_base_a866d8730819523ee14b6f8766468a120}{K\-Base\-::dot} (const K\-Matrix \&m1, const K\-Matrix \&m2)
+\item 
+double \hyperlink{namespace_k_base_a2aa608b4caec20c1e5004e6318475371}{K\-Base\-::l\-Corr} (const K\-Matrix \&m1, const K\-Matrix \&m2)
+\item 
+K\-Matrix \hyperlink{namespace_k_base_a51871fc212c85456613b0400a23b65b5}{K\-Base\-::inv} (const K\-Matrix \&m)
+\item 
+K\-Matrix \hyperlink{namespace_k_base_a0077eeff20727c6d51dab5e9652dd72c}{K\-Base\-::i\-Mat} (unsigned int n)
+\item 
+K\-Matrix \hyperlink{namespace_k_base_a4851e8a724ef8136aefd7c3e5cb3ced7}{K\-Base\-::make\-Perp} (const K\-Matrix \&x, const K\-Matrix \&p)
+\item 
+K\-Matrix \hyperlink{namespace_k_base_ad49fdc489f8538844d01c49392634081}{K\-Base\-::join\-H} (const K\-Matrix \&m\-L, const K\-Matrix \&m\-R)
+\item 
+K\-Matrix \hyperlink{namespace_k_base_a796ab044ec4f63b9391d2a3989965e1c}{K\-Base\-::join\-V} (const K\-Matrix \&m\-T, const K\-Matrix \&m\-B)
+\item 
+K\-Matrix \hyperlink{namespace_k_base_a7734f1e897f145bba23366bd973c0263}{K\-Base\-::operator+} (const K\-Matrix \&m1, const K\-Matrix \&m2)
+\item 
+K\-Matrix \hyperlink{namespace_k_base_ac2f6fb159524c6aac11862ca87f92e38}{K\-Base\-::operator+} (const K\-Matrix \&m1, double x)
+\item 
+K\-Matrix \hyperlink{namespace_k_base_a9d58d169c4a4e5efff74c172b82c4706}{K\-Base\-::operator-\/} (const K\-Matrix \&m1, const K\-Matrix \&m2)
+\item 
+K\-Matrix \hyperlink{namespace_k_base_adb518e5ec363db77bedda0c18e1fd64a}{K\-Base\-::operator-\/} (const K\-Matrix \&m1, double x)
+\item 
+K\-Matrix \hyperlink{namespace_k_base_a372e3be66ffb5cd9e50b3200ba97f380}{K\-Base\-::operator$\ast$} (double x, const K\-Matrix \&m1)
+\item 
+K\-Matrix \hyperlink{namespace_k_base_a58ef09420d60415eaceff0b5ee327816}{K\-Base\-::operator/} (const K\-Matrix \&m1, double x)
+\item 
+bool \hyperlink{namespace_k_base_a15fc032589db73d1d60588d47ffd9b05}{K\-Base\-::same\-Shape} (const K\-Matrix \&m1, const K\-Matrix \&m2)
+\item 
+K\-Matrix \hyperlink{namespace_k_base_a23533e6ca4a878e4c7cda5c2a8f64b8c}{K\-Base\-::operator$\ast$} (const K\-Matrix \&m1, const K\-Matrix \&m2)
+\end{DoxyCompactItemize}

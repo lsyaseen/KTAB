@@ -1,0 +1,39 @@
+\hypertarget{prng_8h}{\section{prng.\-h File Reference}
+\label{prng_8h}\index{prng.\-h@{prng.\-h}}
+}
+{\ttfamily \#include $<$cstdint$>$}\\*
+{\ttfamily \#include $<$random$>$}\\*
+{\ttfamily \#include \char`\"{}kutils.\-h\char`\"{}}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{class_k_base_1_1_p_r_n_g}{K\-Base\-::\-P\-R\-N\-G}
+\end{DoxyCompactItemize}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespace_k_base}{K\-Base}
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef uint64\-\_\-t \hyperlink{namespace_k_base_ad560ba73f29a481837375dfda23dca0d}{K\-Base\-::\-W64}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+W64 \hyperlink{namespace_k_base_a0cc3f4cfaee8cdf53185d4be5ba8ee32}{K\-Base\-::q\-Trans} (W64 s)
+\item 
+W64 \hyperlink{namespace_k_base_ad60eea0f8cc6b41083e6ccee641a5191}{K\-Base\-::rotl} (const W64 x, unsigned int n)
+\item 
+W64 \hyperlink{namespace_k_base_a6c305ecb009d6de80a3b2c33c3df4b18}{K\-Base\-::rotr} (const W64 x, unsigned int n)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const unsigned int \hyperlink{namespace_k_base_a66b407b6bd1ef4be60f9beaf91321774}{K\-Base\-::\-Word\-Length} = 64
+\item 
+const W64 \hyperlink{namespace_k_base_a2325d5f438383f4f982a23e21ad5c524}{K\-Base\-::\-M\-A\-S\-K64} = 0xffffffffffffffff
+\item 
+const W64 \hyperlink{namespace_k_base_a656a0fe5ef8ff4cb32763dd983906a66}{K\-Base\-::\-M\-A\-S\-K32} = 0xffffffff
+\end{DoxyCompactItemize}

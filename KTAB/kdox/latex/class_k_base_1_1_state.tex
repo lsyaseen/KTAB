@@ -1,0 +1,87 @@
+\hypertarget{class_k_base_1_1_state}{\section{K\-Base\-:\-:State Class Reference}
+\label{class_k_base_1_1_state}\index{K\-Base\-::\-State@{K\-Base\-::\-State}}
+}
+Inheritance diagram for K\-Base\-:\-:State\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_k_base_1_1_state}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_k_base_1_1_state_a3df4aff41e3a45a940118eb3b5eb9e7f}{{\bfseries State} (\hyperlink{class_k_base_1_1_model}{Model} $\ast$mod)}\label{class_k_base_1_1_state_a3df4aff41e3a45a940118eb3b5eb9e7f}
+
+\item 
+\hypertarget{class_k_base_1_1_state_a707cd5aa36380ed9857006f1bd94ac82}{void {\bfseries randomize\-Utils} (double min\-U, double max\-U, double u\-Noise)}\label{class_k_base_1_1_state_a707cd5aa36380ed9857006f1bd94ac82}
+
+\item 
+\hypertarget{class_k_base_1_1_state_abbe1359b24e0bb85f3864b263642d7c7}{void {\bfseries clear} ()}\label{class_k_base_1_1_state_abbe1359b24e0bb85f3864b263642d7c7}
+
+\item 
+\hypertarget{class_k_base_1_1_state_ae2ca6cade9e2eebc0ae92f4d538cb7c3}{virtual void {\bfseries add\-Pstn} (\hyperlink{class_k_base_1_1_position}{Position} $\ast$p)}\label{class_k_base_1_1_state_ae2ca6cade9e2eebc0ae92f4d538cb7c3}
+
+\item 
+\hypertarget{class_k_base_1_1_state_ad0b47f5cba11043c02d16a6a51819c02}{virtual tuple$<$ \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix}, V\-U\-I $>$ {\bfseries p\-Dist} (int persp) const =0}\label{class_k_base_1_1_state_ad0b47f5cba11043c02d16a6a51819c02}
+
+\item 
+\hypertarget{class_k_base_1_1_state_a47fa7e79885216bb1bd2185aa54c935e}{void {\bfseries set\-A\-Util} (int persp\-H=-\/1, Reporting\-Level rl=Reporting\-Level\-::\-Silent)}\label{class_k_base_1_1_state_a47fa7e79885216bb1bd2185aa54c935e}
+
+\item 
+void \hyperlink{class_k_base_1_1_state_a263291175cbf35293c09784af03a480d}{set\-U\-E\-Ndx} ()
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_k_base_1_1_state_a026ba4c3e63a9f7e574f748a43e40161}{\hyperlink{class_k_base_1_1_model}{Model} $\ast$ {\bfseries model} = nullptr}\label{class_k_base_1_1_state_a026ba4c3e63a9f7e574f748a43e40161}
+
+\item 
+\hypertarget{class_k_base_1_1_state_a37dd53c90270aceee8c0b873994d1ac7}{function$<$ \hyperlink{class_k_base_1_1_state}{State} $\ast$()$>$ {\bfseries step} = nullptr}\label{class_k_base_1_1_state_a37dd53c90270aceee8c0b873994d1ac7}
+
+\item 
+\hypertarget{class_k_base_1_1_state_a574d781488537e4aee8499cb0d31dcfc}{vector$<$ \hyperlink{class_k_base_1_1_position}{Position} $\ast$ $>$ {\bfseries pstns} = \{\}}\label{class_k_base_1_1_state_a574d781488537e4aee8499cb0d31dcfc}
+
+\item 
+\hypertarget{class_k_base_1_1_state_a99361c58b6e1351fd621cf16be4d7bb7}{vector$<$ \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} $>$ {\bfseries a\-Util} = \{\}}\label{class_k_base_1_1_state_a99361c58b6e1351fd621cf16be4d7bb7}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_k_base_1_1_state_a28b1863bc2f9c58e4b83ac33abbb0632}{virtual bool {\bfseries equiv\-Ndx} (unsigned int i, unsigned int j) const =0}\label{class_k_base_1_1_state_a28b1863bc2f9c58e4b83ac33abbb0632}
+
+\item 
+\hypertarget{class_k_base_1_1_state_a914af3a6cef478619b59eadb24e00d3c}{virtual void {\bfseries set\-All\-A\-Util} (Reporting\-Level rl)=0}\label{class_k_base_1_1_state_a914af3a6cef478619b59eadb24e00d3c}
+
+\item 
+\hypertarget{class_k_base_1_1_state_a5e498c150c69d964de4984c61c41439f}{virtual void {\bfseries set\-One\-A\-Util} (unsigned int persp\-H, Reporting\-Level rl)}\label{class_k_base_1_1_state_a5e498c150c69d964de4984c61c41439f}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_k_base_1_1_state_a47d133368b216e8a357902cccaec69e1}{V\-U\-I {\bfseries u\-Indices} = \{\}}\label{class_k_base_1_1_state_a47d133368b216e8a357902cccaec69e1}
+
+\item 
+\hypertarget{class_k_base_1_1_state_a9c97b8f310790e0546dbe4499dcfdbfa}{V\-U\-I {\bfseries e\-Indices} = \{\}}\label{class_k_base_1_1_state_a9c97b8f310790e0546dbe4499dcfdbfa}
+
+\item 
+\hypertarget{class_k_base_1_1_state_a3fb0b1431b94bc82fd45ce9fb8f9fad2}{\hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} {\bfseries u\-Prob} = \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix}()}\label{class_k_base_1_1_state_a3fb0b1431b94bc82fd45ce9fb8f9fad2}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_k_base_1_1_state_a263291175cbf35293c09784af03a480d}{\index{K\-Base\-::\-State@{K\-Base\-::\-State}!set\-U\-E\-Ndx@{set\-U\-E\-Ndx}}
+\index{set\-U\-E\-Ndx@{set\-U\-E\-Ndx}!KBase::State@{K\-Base\-::\-State}}
+\subsubsection[{set\-U\-E\-Ndx}]{\setlength{\rightskip}{0pt plus 5cm}void K\-Base\-::\-State\-::set\-U\-E\-Ndx (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{class_k_base_1_1_state_a263291175cbf35293c09784af03a480d}
+Looking only at the positions in this state, return a vector of indices of unique positions. 
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+kmodel.\-h\item 
+kstate.\-cpp\end{DoxyCompactItemize}

@@ -1,0 +1,71 @@
+\hypertarget{class_demo_mtch_1_1_mtch_actor}{\section{Demo\-Mtch\-:\-:Mtch\-Actor Class Reference}
+\label{class_demo_mtch_1_1_mtch_actor}\index{Demo\-Mtch\-::\-Mtch\-Actor@{Demo\-Mtch\-::\-Mtch\-Actor}}
+}
+Inheritance diagram for Demo\-Mtch\-:\-:Mtch\-Actor\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_demo_mtch_1_1_mtch_actor}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum {\bfseries Prop\-Model} \{ {\bfseries Exp\-Util}, 
+{\bfseries Probability}, 
+{\bfseries Agree\-Util}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_demo_mtch_1_1_mtch_actor_ab88051b8646350e53e422cc6803db997}{{\bfseries Mtch\-Actor} (string n, string d)}\label{class_demo_mtch_1_1_mtch_actor_ab88051b8646350e53e422cc6803db997}
+
+\item 
+\hypertarget{class_demo_mtch_1_1_mtch_actor_a14bfaf0d6e9a5d767f46855ef206738a}{double {\bfseries vote} (unsigned int p1, unsigned int p2, const \hyperlink{class_k_base_1_1_state}{State} $\ast$st) const }\label{class_demo_mtch_1_1_mtch_actor_a14bfaf0d6e9a5d767f46855ef206738a}
+
+\item 
+\hypertarget{class_demo_mtch_1_1_mtch_actor_aa1414cdffb187a2d14ae3b30ce5686d8}{virtual double {\bfseries vote} (const \hyperlink{class_k_base_1_1_position}{Position} $\ast$ap1, const \hyperlink{class_k_base_1_1_position}{Position} $\ast$ap2) const }\label{class_demo_mtch_1_1_mtch_actor_aa1414cdffb187a2d14ae3b30ce5686d8}
+
+\item 
+\hypertarget{class_demo_mtch_1_1_mtch_actor_a124d78dfcb5499dc900206db5dd80753}{double {\bfseries pos\-Util} (const \hyperlink{class_k_base_1_1_position}{Position} $\ast$ap1) const }\label{class_demo_mtch_1_1_mtch_actor_a124d78dfcb5499dc900206db5dd80753}
+
+\item 
+\hypertarget{class_demo_mtch_1_1_mtch_actor_adfa057a20bf1245dadc78ba2b1c034c5}{void {\bfseries randomize} (\hyperlink{class_k_base_1_1_p_r_n_g}{P\-R\-N\-G} $\ast$rng, double min\-Cap, double max\-Cap, unsigned int id, unsigned int num\-I)}\label{class_demo_mtch_1_1_mtch_actor_adfa057a20bf1245dadc78ba2b1c034c5}
+
+\item 
+\hypertarget{class_demo_mtch_1_1_mtch_actor_a2a6a0273d00b2ccc996ccf0c959d4742}{tuple$<$ double, \hyperlink{class_k_base_1_1_mtch_pstn}{Mtch\-Pstn} $>$ {\bfseries max\-Prob\-E\-U\-Pstn} (Prop\-Model pm, const \hyperlink{class_demo_mtch_1_1_mtch_state}{Mtch\-State} $\ast$mst) const }\label{class_demo_mtch_1_1_mtch_actor_a2a6a0273d00b2ccc996ccf0c959d4742}
+
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_demo_mtch_1_1_mtch_actor_afdccb60bbf9b804a6ffe6ab07d666752}{static \hyperlink{class_k_base_1_1_mtch_pstn}{Mtch\-Pstn} $\ast$ {\bfseries r\-Pos} (unsigned int num\-I, unsigned int num\-A, \hyperlink{class_k_base_1_1_p_r_n_g}{P\-R\-N\-G} $\ast$rng)}\label{class_demo_mtch_1_1_mtch_actor_afdccb60bbf9b804a6ffe6ab07d666752}
+
+\item 
+\hypertarget{class_demo_mtch_1_1_mtch_actor_af613e5a133e782ae62cf3b5b26c1fc45}{static \hyperlink{class_demo_mtch_1_1_mtch_actor}{Mtch\-Actor} $\ast$ {\bfseries r\-Act} (unsigned int num\-I, double min\-Cap, double max\-Cap, \hyperlink{class_k_base_1_1_p_r_n_g}{P\-R\-N\-G} $\ast$rng, unsigned int i)}\label{class_demo_mtch_1_1_mtch_actor_af613e5a133e782ae62cf3b5b26c1fc45}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_demo_mtch_1_1_mtch_actor_a6620ce7762057a59fc3a1a98218a6fcf}{unsigned int {\bfseries id\-Num} = 0}\label{class_demo_mtch_1_1_mtch_actor_a6620ce7762057a59fc3a1a98218a6fcf}
+
+\item 
+\hypertarget{class_demo_mtch_1_1_mtch_actor_a98229798fc76627c2bf2a630a9ae45d7}{Voting\-Rule {\bfseries vr} = Voting\-Rule\-::\-Proportional}\label{class_demo_mtch_1_1_mtch_actor_a98229798fc76627c2bf2a630a9ae45d7}
+
+\item 
+\hypertarget{class_demo_mtch_1_1_mtch_actor_a1adca2569c4a1ecfa133addad09937e7}{Prop\-Model {\bfseries p\-Mod} = Prop\-Model\-::\-Exp\-Util}\label{class_demo_mtch_1_1_mtch_actor_a1adca2569c4a1ecfa133addad09937e7}
+
+\item 
+\hypertarget{class_demo_mtch_1_1_mtch_actor_aa61012a0056831027648d2a0e03f04f9}{double {\bfseries s\-Cap} = 0}\label{class_demo_mtch_1_1_mtch_actor_aa61012a0056831027648d2a0e03f04f9}
+
+\item 
+\hypertarget{class_demo_mtch_1_1_mtch_actor_a8949d6d327fc75b24f53e010bc24537d}{vector$<$ double $>$ {\bfseries vals} = \{\}}\label{class_demo_mtch_1_1_mtch_actor_a8949d6d327fc75b24f53e010bc24537d}
+
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+demomtch.\-h\item 
+demomtch.\-cpp\end{DoxyCompactItemize}

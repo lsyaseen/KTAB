@@ -1,0 +1,768 @@
+\hypertarget{namespace_k_base}{\section{K\-Base Namespace Reference}
+\label{namespace_k_base}\index{K\-Base@{K\-Base}}
+}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{class_k_base_1_1_e_model}{E\-Model}
+\item 
+class \hyperlink{class_k_base_1_1_e_position}{E\-Position}
+\item 
+class \hyperlink{class_k_base_1_1_e_state}{E\-State}
+\item 
+class \hyperlink{class_k_base_1_1_position}{Position}
+\item 
+class \hyperlink{class_k_base_1_1_vctr_pstn}{Vctr\-Pstn}
+\item 
+class \hyperlink{class_k_base_1_1_mtch_pstn}{Mtch\-Pstn}
+\item 
+class \hyperlink{class_k_base_1_1_mtch_gene}{Mtch\-Gene}
+\item 
+class \hyperlink{class_k_base_1_1_model}{Model}
+\item 
+class \hyperlink{class_k_base_1_1_state}{State}
+\item 
+class \hyperlink{class_k_base_1_1_actor}{Actor}
+\item 
+class \hyperlink{class_k_base_1_1_g_a_opt}{G\-A\-Opt}
+\item 
+class \hyperlink{class_k_base_1_1_v_h_c_search}{V\-H\-C\-Search}
+\item 
+class \hyperlink{class_k_base_1_1_g_h_c_search}{G\-H\-C\-Search}
+\item 
+class \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix}
+\item 
+class \hyperlink{class_k_base_1_1_k_exception}{K\-Exception}
+\item 
+class \hyperlink{class_k_base_1_1_p_r_n_g}{P\-R\-N\-G}
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef vector$<$ unsigned int $>$ \hyperlink{namespace_k_base_ad8d970208cc99c612b207d7bbbad4434}{V\-U\-I}
+\item 
+typedef uint64\-\_\-t \hyperlink{namespace_k_base_ad560ba73f29a481837375dfda23dca0d}{W64}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3}{Voting\-Rule} \{ \\*
+\hyperlink{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3a6ce976e8f061b2b5cfe4d0c50c3405dd}{Voting\-Rule\-::\-Binary}, 
+\hyperlink{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3a960321e2a4bfda404d33114ae3d0872d}{Voting\-Rule\-::\-Prop\-Bin}, 
+\hyperlink{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3aac13b33ebc8ea372dfb07e5ed4d9655f}{Voting\-Rule\-::\-Proportional}, 
+\hyperlink{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3a5e15ea0df19eefc1ad3b8c5cc8b8576a}{Voting\-Rule\-::\-Prop\-Cbc}, 
+\\*
+\hyperlink{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3aec6b5414eb175379ff9efc9b3eef5814}{Voting\-Rule\-::\-Cubic}
+ \}
+\item 
+enum \hyperlink{namespace_k_base_a498a929a17ac96ff70afee8eb4e17cd0}{P\-C\-E\-Model} \{ \hyperlink{namespace_k_base_a498a929a17ac96ff70afee8eb4e17cd0a9eae233fc331b4eff34732e0733a30ca}{P\-C\-E\-Model\-::\-Markov\-P\-C\-M}, 
+\hyperlink{namespace_k_base_a498a929a17ac96ff70afee8eb4e17cd0a768e3b180662caca78eb3396dbc8cd71}{P\-C\-E\-Model\-::\-Conditional\-P\-C\-M}
+ \}
+\item 
+enum \hyperlink{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71}{V\-P\-Model} \{ \hyperlink{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71a32a843da6ea40ab3b17a3421ccdf671b}{V\-P\-Model\-::\-Linear}, 
+\hyperlink{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71aceb46ca115d05c51aa5a16a8867c3304}{V\-P\-Model\-::\-Square}, 
+\hyperlink{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71a884b16485227c5da72c09b668fd7e1da}{V\-P\-Model\-::\-Quartic}, 
+\hyperlink{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71a6ce976e8f061b2b5cfe4d0c50c3405dd}{V\-P\-Model\-::\-Binary}
+ \}
+\item 
+enum \hyperlink{namespace_k_base_aca1021042b887fdf10cc3d6b0f9cef06}{Third\-Party\-Commit} \{ \hyperlink{namespace_k_base_aca1021042b887fdf10cc3d6b0f9cef06ac4cc4977453ba95b09b99c55ae960a63}{Third\-Party\-Commit\-::\-No\-Commit}, 
+\hyperlink{namespace_k_base_aca1021042b887fdf10cc3d6b0f9cef06afae7a8b68beff6a21c500b876e58db0c}{Third\-Party\-Commit\-::\-Semi\-Commit}, 
+\hyperlink{namespace_k_base_aca1021042b887fdf10cc3d6b0f9cef06a1e95f5f14b87d3682d6159293f5152bf}{Third\-Party\-Commit\-::\-Full\-Commit}
+ \}
+\item 
+enum \hyperlink{namespace_k_base_ad1033118c8842a9ee6ff4d01651a2640}{Big\-R\-Range} \{ \hyperlink{namespace_k_base_ad1033118c8842a9ee6ff4d01651a2640a78d811e98514cd165dda532286610fd2}{Big\-R\-Range\-::\-Min}, 
+\hyperlink{namespace_k_base_ad1033118c8842a9ee6ff4d01651a2640a55c6b09cbca39ef0cdb728eb112a5049}{Big\-R\-Range\-::\-Mid}, 
+\hyperlink{namespace_k_base_ad1033118c8842a9ee6ff4d01651a2640a6a061313d22e51e0f25b7cd4dc065233}{Big\-R\-Range\-::\-Max}
+ \}
+\item 
+enum \hyperlink{namespace_k_base_abb184480a342df4bda049658b7a0a251}{Big\-R\-Adjust} \{ \\*
+\hyperlink{namespace_k_base_abb184480a342df4bda049658b7a0a251a70485a2c3c83af1a1bf50995e185a496}{Big\-R\-Adjust\-::\-No\-R\-A}, 
+\hyperlink{namespace_k_base_abb184480a342df4bda049658b7a0a251ac34f8a9b3a517b071ae184c0d544dac2}{Big\-R\-Adjust\-::\-One\-Third\-R\-A}, 
+\hyperlink{namespace_k_base_abb184480a342df4bda049658b7a0a251ad707a458f9e110cc394a46aaa2d080b2}{Big\-R\-Adjust\-::\-Half\-R\-A}, 
+\hyperlink{namespace_k_base_abb184480a342df4bda049658b7a0a251a7b814e96863d300955db9d990c310497}{Big\-R\-Adjust\-::\-Two\-Thirds\-R\-A}, 
+\\*
+\hyperlink{namespace_k_base_abb184480a342df4bda049658b7a0a251a344bbf6c431eff8ab656436cf555d686}{Big\-R\-Adjust\-::\-Full\-R\-A}
+ \}
+\item 
+enum \hyperlink{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485c}{Reporting\-Level} \-: uint8\-\_\-t \{ \\*
+\hyperlink{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485ca1e3332b2cd20d2d3db407a20f6913d0d}{Reporting\-Level\-::\-Silent} = 0, 
+\hyperlink{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485ca28d0edd045e05cf5af64e35ae0c4c6ef}{Reporting\-Level\-::\-Low}, 
+\hyperlink{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485ca87f8a6ab85c9ced3702b4ea641ad4bb5}{Reporting\-Level\-::\-Medium}, 
+\hyperlink{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485ca655d20c1ca69519ca647684edbb2db35}{Reporting\-Level\-::\-High}, 
+\\*
+\hyperlink{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485cada7d763aac39b294c7453c77c10d8239}{Reporting\-Level\-::\-Debugging}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+string \hyperlink{namespace_k_base_a0c8eba6be396a754f747b5778ed98a28}{vpm\-Name} (const \hyperlink{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71}{V\-P\-Model} \&vpm)
+\item 
+ostream \& \hyperlink{namespace_k_base_a08fabe46c3b55eabe44b44fa86afeadc}{operator$<$$<$} (ostream \&os, const \hyperlink{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71}{V\-P\-Model} \&vpm)
+\item 
+string \hyperlink{namespace_k_base_a06f9f2afead202780f5f09826b6c2de8}{vr\-Name} (const \hyperlink{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3}{Voting\-Rule} \&vr)
+\item 
+ostream \& \hyperlink{namespace_k_base_af59dc55c9762a3446701309d6b6716ba}{operator$<$$<$} (ostream \&os, const \hyperlink{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3}{Voting\-Rule} \&vr)
+\item 
+string \hyperlink{namespace_k_base_a93f654671ca9491f43fdbf279a8dfae1}{pcm\-Name} (const \hyperlink{namespace_k_base_a498a929a17ac96ff70afee8eb4e17cd0}{P\-C\-E\-Model} \&pcm)
+\item 
+ostream \& \hyperlink{namespace_k_base_a8a51fa62609f14a7d4925b90555d66ac}{operator$<$$<$} (ostream \&os, const \hyperlink{namespace_k_base_a498a929a17ac96ff70afee8eb4e17cd0}{P\-C\-E\-Model} \&pcm)
+\item 
+string \hyperlink{namespace_k_base_a21e183ec07b0c63a5a93b59056c76c44}{tpc\-Name} (const \hyperlink{namespace_k_base_aca1021042b887fdf10cc3d6b0f9cef06}{Third\-Party\-Commit} \&tpc)
+\item 
+ostream \& \hyperlink{namespace_k_base_ac7e7fd7c25cdf6c213df3cc7e2a36cd6}{operator$<$$<$} (ostream \&os, const \hyperlink{namespace_k_base_aca1021042b887fdf10cc3d6b0f9cef06}{Third\-Party\-Commit} \&tpc)
+\item 
+string \hyperlink{namespace_k_base_a9a94fd7f98b5622120584fcb870fcf4c}{big\-R\-R\-Name} (const \hyperlink{namespace_k_base_ad1033118c8842a9ee6ff4d01651a2640}{Big\-R\-Range} \&r\-Rng)
+\item 
+ostream \& \hyperlink{namespace_k_base_a3fe2153236311782e7608a72bbe06af6}{operator$<$$<$} (ostream \&os, const \hyperlink{namespace_k_base_ad1033118c8842a9ee6ff4d01651a2640}{Big\-R\-Range} \&r\-Rng)
+\item 
+string \hyperlink{namespace_k_base_a536b2b2ffe14301d09921444479d22bc}{big\-R\-A\-Name} (const \hyperlink{namespace_k_base_abb184480a342df4bda049658b7a0a251}{Big\-R\-Adjust} \&r\-Adj)
+\item 
+ostream \& \hyperlink{namespace_k_base_af018f57e0217110c3ea93e0a94c94c92}{operator$<$$<$} (ostream \&os, const \hyperlink{namespace_k_base_abb184480a342df4bda049658b7a0a251}{Big\-R\-Adjust} \&r\-Adj)
+\item 
+ostream \& \hyperlink{namespace_k_base_a49ebe418e2f42461961f56f2fcf96157}{operator$<$$<$} (ostream \&os, const \hyperlink{class_k_base_1_1_position}{Position} \&p)
+\item 
+unsigned int \hyperlink{namespace_k_base_ae424dcaa73dce0a50383c89a87da7907}{cross\-Site} (\hyperlink{class_k_base_1_1_p_r_n_g}{P\-R\-N\-G} $\ast$rng, unsigned int nc)
+\item 
+\hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \hyperlink{namespace_k_base_af76d55e885f062f41939b4d8802a552f}{trans} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m1)
+\item 
+double \hyperlink{namespace_k_base_ac04eb4ecf7a4427f95aec552d4ba3b21}{norm} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m1)
+\item 
+double \hyperlink{namespace_k_base_a2b6e9528c70ddd70032df696150ff015}{sum} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m1)
+\item 
+double \hyperlink{namespace_k_base_aa492d98b388ebd6d2edd0bfe6ae16024}{mean} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m1)
+\item 
+double \hyperlink{namespace_k_base_a082c1f9b23d177af71847da7edd2d550}{stdv} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m1)
+\item 
+double \hyperlink{namespace_k_base_a5f0d9a675a0d3542811b34bccaf9c652}{max\-Abs} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m)
+\item 
+tuple$<$ unsigned int, unsigned int $>$ \hyperlink{namespace_k_base_a0e6f01b377066ff486b45ba37993ba88}{ndx\-Max\-Abs} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m)
+\item 
+double \hyperlink{namespace_k_base_a2aa608b4caec20c1e5004e6318475371}{l\-Corr} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m1, const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m2)
+\item 
+double \hyperlink{namespace_k_base_a866d8730819523ee14b6f8766468a120}{dot} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m1, const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m2)
+\item 
+\hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \hyperlink{namespace_k_base_ac2f6fb159524c6aac11862ca87f92e38}{operator+} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m1, double x)
+\item 
+\hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \hyperlink{namespace_k_base_adb518e5ec363db77bedda0c18e1fd64a}{operator-\/} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m1, double x)
+\item 
+bool \hyperlink{namespace_k_base_a15fc032589db73d1d60588d47ffd9b05}{same\-Shape} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m1, const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m2)
+\item 
+\hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \hyperlink{namespace_k_base_a7734f1e897f145bba23366bd973c0263}{operator+} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m1, const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m2)
+\item 
+\hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \hyperlink{namespace_k_base_a9d58d169c4a4e5efff74c172b82c4706}{operator-\/} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m1, const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m2)
+\item 
+\hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \hyperlink{namespace_k_base_a372e3be66ffb5cd9e50b3200ba97f380}{operator$\ast$} (double x, const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m1)
+\item 
+\hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \hyperlink{namespace_k_base_a58ef09420d60415eaceff0b5ee327816}{operator/} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m1, double x)
+\item 
+\hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \hyperlink{namespace_k_base_a23533e6ca4a878e4c7cda5c2a8f64b8c}{operator$\ast$} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m1, const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m2)
+\item 
+\hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \hyperlink{namespace_k_base_a51871fc212c85456613b0400a23b65b5}{inv} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m)
+\item 
+\hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \hyperlink{namespace_k_base_a0077eeff20727c6d51dab5e9652dd72c}{i\-Mat} (unsigned int n)
+\item 
+\hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \hyperlink{namespace_k_base_a4851e8a724ef8136aefd7c3e5cb3ced7}{make\-Perp} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&x, const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&p)
+\item 
+\hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \hyperlink{namespace_k_base_ad49fdc489f8538844d01c49392634081}{join\-H} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m\-L, const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m\-R)
+\item 
+\hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \hyperlink{namespace_k_base_a796ab044ec4f63b9391d2a3989965e1c}{join\-V} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m\-T, const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&m\-B)
+\item 
+double \hyperlink{namespace_k_base_a607c35cb43f1585397c32fd47fade103}{sqr} (const double \&x)
+\item 
+double \hyperlink{namespace_k_base_aff58e584fe9ce53e400c08f797813591}{qrtc} (const double \&x)
+\item 
+\hyperlink{namespace_k_base_ad8d970208cc99c612b207d7bbbad4434}{V\-U\-I} \hyperlink{namespace_k_base_a01bdf949b6054d843e90d10042322d96}{ui\-Seq} (const unsigned int n1, const unsigned int n2, const unsigned int ns)
+\item 
+std\-::chrono\-::time\-\_\-point\\*
+$<$ std\-::chrono\-::system\-\_\-clock $>$ \hyperlink{namespace_k_base_ab0871faf9fbf11d9beff0474855e243b}{display\-Program\-Start} ()
+\item 
+void \hyperlink{namespace_k_base_aad5a0bacc5ed657a4a2de3016aed6f80}{display\-Program\-End} (std\-::chrono\-::time\-\_\-point$<$ std\-::chrono\-::system\-\_\-clock $>$ st)
+\item 
+char $\ast$ \hyperlink{namespace_k_base_a843419e4dec80d9ebf59a2d94f8b82a4}{new\-Chars} (unsigned int len)
+\item 
+double \hyperlink{namespace_k_base_a7e301a845f68b92c24e79647021f0044}{rescale} (double x, double x0, double x1, double y0, double y1)
+\item 
+{\footnotesize template$<$typename T $>$ }\\T \hyperlink{namespace_k_base_a0a4af5da8318344e8a67e011a20bed87}{pop\-Back} (vector$<$ T $>$ \&v)
+\item 
+{\footnotesize template$<$typename T $>$ }\\tuple$<$ \hyperlink{namespace_k_base_ad8d970208cc99c612b207d7bbbad4434}{V\-U\-I}, \hyperlink{namespace_k_base_ad8d970208cc99c612b207d7bbbad4434}{V\-U\-I} $>$ \hyperlink{namespace_k_base_ad1d95e80b1482815cc304e66c3440ae8}{ue\-Indices} (const vector$<$ T $>$ \&xs, function$<$ bool(const T \&a, const T \&b)$>$ eqv)
+\item 
+\hyperlink{namespace_k_base_ad560ba73f29a481837375dfda23dca0d}{W64} \hyperlink{namespace_k_base_a0cc3f4cfaee8cdf53185d4be5ba8ee32}{q\-Trans} (\hyperlink{namespace_k_base_ad560ba73f29a481837375dfda23dca0d}{W64} s)
+\item 
+\hyperlink{namespace_k_base_ad560ba73f29a481837375dfda23dca0d}{W64} \hyperlink{namespace_k_base_ad60eea0f8cc6b41083e6ccee641a5191}{rotl} (const \hyperlink{namespace_k_base_ad560ba73f29a481837375dfda23dca0d}{W64} x, unsigned int n)
+\item 
+\hyperlink{namespace_k_base_ad560ba73f29a481837375dfda23dca0d}{W64} \hyperlink{namespace_k_base_a6c305ecb009d6de80a3b2c33c3df4b18}{rotr} (const \hyperlink{namespace_k_base_ad560ba73f29a481837375dfda23dca0d}{W64} x, unsigned int n)
+\item 
+\hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \hyperlink{namespace_k_base_a6fb95714179551a7090ad6a283ea3a1d}{proj\-Pos} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&w)
+\item 
+\hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \hyperlink{namespace_k_base_a7bdad0fb3ffd7c94d1fefc8fde46f469}{proj\-Box} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&lb, const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&ub, const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&w)
+\item 
+tuple$<$ \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix}, unsigned int, \\*
+\hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} $>$ \hyperlink{namespace_k_base_a3947603d5e5f173f2538227da29abe9e}{vi\-A\-B\-G} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&x\-Init, function$<$ \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix}(const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&x)$>$ F, function$<$ \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix}(const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&x)$>$ P, double beta, double thresh, unsigned int i\-Max, bool extra)
+\item 
+tuple$<$ \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix}, unsigned int, \\*
+\hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} $>$ \hyperlink{namespace_k_base_aacba76ea7b307a0249430feb7c0a5e99}{vi\-B\-S\-He96} (const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&M, const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&q, function$<$ \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix}(const \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} \&)$>$ p\-K, \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} u0, const double eps, const unsigned int i\-Max)
+\item 
+tuple$<$ \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix}, \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix}, \\*
+\hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix}, \hyperlink{class_k_base_1_1_k_matrix}{K\-Matrix} $>$ \hyperlink{namespace_k_base_adab8fcddf092266a086d7d4b35665047}{anti\-Lemke} (unsigned int n)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const unsigned int \hyperlink{namespace_k_base_a66b407b6bd1ef4be60f9beaf91321774}{Word\-Length} = 64
+\item 
+const \hyperlink{namespace_k_base_ad560ba73f29a481837375dfda23dca0d}{W64} \hyperlink{namespace_k_base_a2325d5f438383f4f982a23e21ad5c524}{M\-A\-S\-K64} = 0xffffffffffffffff
+\item 
+const \hyperlink{namespace_k_base_ad560ba73f29a481837375dfda23dca0d}{W64} \hyperlink{namespace_k_base_a656a0fe5ef8ff4cb32763dd983906a66}{M\-A\-S\-K32} = 0xffffffff
+\end{DoxyCompactItemize}
+
+
+\subsection{Typedef Documentation}
+\hypertarget{namespace_k_base_ad8d970208cc99c612b207d7bbbad4434}{\index{K\-Base@{K\-Base}!V\-U\-I@{V\-U\-I}}
+\index{V\-U\-I@{V\-U\-I}!KBase@{K\-Base}}
+\subsubsection[{V\-U\-I}]{\setlength{\rightskip}{0pt plus 5cm}typedef vector$<$unsigned int$>$ {\bf K\-Base\-::\-V\-U\-I}}}\label{namespace_k_base_ad8d970208cc99c612b207d7bbbad4434}
+\hypertarget{namespace_k_base_ad560ba73f29a481837375dfda23dca0d}{\index{K\-Base@{K\-Base}!W64@{W64}}
+\index{W64@{W64}!KBase@{K\-Base}}
+\subsubsection[{W64}]{\setlength{\rightskip}{0pt plus 5cm}typedef uint64\-\_\-t {\bf K\-Base\-::\-W64}}}\label{namespace_k_base_ad560ba73f29a481837375dfda23dca0d}
+
+
+\subsection{Enumeration Type Documentation}
+\hypertarget{namespace_k_base_abb184480a342df4bda049658b7a0a251}{\index{K\-Base@{K\-Base}!Big\-R\-Adjust@{Big\-R\-Adjust}}
+\index{Big\-R\-Adjust@{Big\-R\-Adjust}!KBase@{K\-Base}}
+\subsubsection[{Big\-R\-Adjust}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf K\-Base\-::\-Big\-R\-Adjust}\hspace{0.3cm}{\ttfamily [strong]}}}\label{namespace_k_base_abb184480a342df4bda049658b7a0a251}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{No\-R\-A@{No\-R\-A}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!No\-R\-A@{No\-R\-A}}\item[{\em 
+\hypertarget{namespace_k_base_abb184480a342df4bda049658b7a0a251a70485a2c3c83af1a1bf50995e185a496}{No\-R\-A}\label{namespace_k_base_abb184480a342df4bda049658b7a0a251a70485a2c3c83af1a1bf50995e185a496}
+}]\index{One\-Third\-R\-A@{One\-Third\-R\-A}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!One\-Third\-R\-A@{One\-Third\-R\-A}}\item[{\em 
+\hypertarget{namespace_k_base_abb184480a342df4bda049658b7a0a251ac34f8a9b3a517b071ae184c0d544dac2}{One\-Third\-R\-A}\label{namespace_k_base_abb184480a342df4bda049658b7a0a251ac34f8a9b3a517b071ae184c0d544dac2}
+}]\index{Half\-R\-A@{Half\-R\-A}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Half\-R\-A@{Half\-R\-A}}\item[{\em 
+\hypertarget{namespace_k_base_abb184480a342df4bda049658b7a0a251ad707a458f9e110cc394a46aaa2d080b2}{Half\-R\-A}\label{namespace_k_base_abb184480a342df4bda049658b7a0a251ad707a458f9e110cc394a46aaa2d080b2}
+}]\index{Two\-Thirds\-R\-A@{Two\-Thirds\-R\-A}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Two\-Thirds\-R\-A@{Two\-Thirds\-R\-A}}\item[{\em 
+\hypertarget{namespace_k_base_abb184480a342df4bda049658b7a0a251a7b814e96863d300955db9d990c310497}{Two\-Thirds\-R\-A}\label{namespace_k_base_abb184480a342df4bda049658b7a0a251a7b814e96863d300955db9d990c310497}
+}]\index{Full\-R\-A@{Full\-R\-A}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Full\-R\-A@{Full\-R\-A}}\item[{\em 
+\hypertarget{namespace_k_base_abb184480a342df4bda049658b7a0a251a344bbf6c431eff8ab656436cf555d686}{Full\-R\-A}\label{namespace_k_base_abb184480a342df4bda049658b7a0a251a344bbf6c431eff8ab656436cf555d686}
+}]\end{description}
+\end{Desc}
+\hypertarget{namespace_k_base_ad1033118c8842a9ee6ff4d01651a2640}{\index{K\-Base@{K\-Base}!Big\-R\-Range@{Big\-R\-Range}}
+\index{Big\-R\-Range@{Big\-R\-Range}!KBase@{K\-Base}}
+\subsubsection[{Big\-R\-Range}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf K\-Base\-::\-Big\-R\-Range}\hspace{0.3cm}{\ttfamily [strong]}}}\label{namespace_k_base_ad1033118c8842a9ee6ff4d01651a2640}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{Min@{Min}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Min@{Min}}\item[{\em 
+\hypertarget{namespace_k_base_ad1033118c8842a9ee6ff4d01651a2640a78d811e98514cd165dda532286610fd2}{Min}\label{namespace_k_base_ad1033118c8842a9ee6ff4d01651a2640a78d811e98514cd165dda532286610fd2}
+}]\index{Mid@{Mid}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Mid@{Mid}}\item[{\em 
+\hypertarget{namespace_k_base_ad1033118c8842a9ee6ff4d01651a2640a55c6b09cbca39ef0cdb728eb112a5049}{Mid}\label{namespace_k_base_ad1033118c8842a9ee6ff4d01651a2640a55c6b09cbca39ef0cdb728eb112a5049}
+}]\index{Max@{Max}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Max@{Max}}\item[{\em 
+\hypertarget{namespace_k_base_ad1033118c8842a9ee6ff4d01651a2640a6a061313d22e51e0f25b7cd4dc065233}{Max}\label{namespace_k_base_ad1033118c8842a9ee6ff4d01651a2640a6a061313d22e51e0f25b7cd4dc065233}
+}]\end{description}
+\end{Desc}
+\hypertarget{namespace_k_base_a498a929a17ac96ff70afee8eb4e17cd0}{\index{K\-Base@{K\-Base}!P\-C\-E\-Model@{P\-C\-E\-Model}}
+\index{P\-C\-E\-Model@{P\-C\-E\-Model}!KBase@{K\-Base}}
+\subsubsection[{P\-C\-E\-Model}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf K\-Base\-::\-P\-C\-E\-Model}\hspace{0.3cm}{\ttfamily [strong]}}}\label{namespace_k_base_a498a929a17ac96ff70afee8eb4e17cd0}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{Markov\-P\-C\-M@{Markov\-P\-C\-M}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Markov\-P\-C\-M@{Markov\-P\-C\-M}}\item[{\em 
+\hypertarget{namespace_k_base_a498a929a17ac96ff70afee8eb4e17cd0a9eae233fc331b4eff34732e0733a30ca}{Markov\-P\-C\-M}\label{namespace_k_base_a498a929a17ac96ff70afee8eb4e17cd0a9eae233fc331b4eff34732e0733a30ca}
+}]\index{Conditional\-P\-C\-M@{Conditional\-P\-C\-M}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Conditional\-P\-C\-M@{Conditional\-P\-C\-M}}\item[{\em 
+\hypertarget{namespace_k_base_a498a929a17ac96ff70afee8eb4e17cd0a768e3b180662caca78eb3396dbc8cd71}{Conditional\-P\-C\-M}\label{namespace_k_base_a498a929a17ac96ff70afee8eb4e17cd0a768e3b180662caca78eb3396dbc8cd71}
+}]\end{description}
+\end{Desc}
+\hypertarget{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485c}{\index{K\-Base@{K\-Base}!Reporting\-Level@{Reporting\-Level}}
+\index{Reporting\-Level@{Reporting\-Level}!KBase@{K\-Base}}
+\subsubsection[{Reporting\-Level}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf K\-Base\-::\-Reporting\-Level} \-: uint8\-\_\-t\hspace{0.3cm}{\ttfamily [strong]}}}\label{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485c}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{Silent@{Silent}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Silent@{Silent}}\item[{\em 
+\hypertarget{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485ca1e3332b2cd20d2d3db407a20f6913d0d}{Silent}\label{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485ca1e3332b2cd20d2d3db407a20f6913d0d}
+}]\index{Low@{Low}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Low@{Low}}\item[{\em 
+\hypertarget{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485ca28d0edd045e05cf5af64e35ae0c4c6ef}{Low}\label{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485ca28d0edd045e05cf5af64e35ae0c4c6ef}
+}]\index{Medium@{Medium}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Medium@{Medium}}\item[{\em 
+\hypertarget{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485ca87f8a6ab85c9ced3702b4ea641ad4bb5}{Medium}\label{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485ca87f8a6ab85c9ced3702b4ea641ad4bb5}
+}]\index{High@{High}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!High@{High}}\item[{\em 
+\hypertarget{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485ca655d20c1ca69519ca647684edbb2db35}{High}\label{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485ca655d20c1ca69519ca647684edbb2db35}
+}]\index{Debugging@{Debugging}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Debugging@{Debugging}}\item[{\em 
+\hypertarget{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485cada7d763aac39b294c7453c77c10d8239}{Debugging}\label{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485cada7d763aac39b294c7453c77c10d8239}
+}]\end{description}
+\end{Desc}
+\hypertarget{namespace_k_base_aca1021042b887fdf10cc3d6b0f9cef06}{\index{K\-Base@{K\-Base}!Third\-Party\-Commit@{Third\-Party\-Commit}}
+\index{Third\-Party\-Commit@{Third\-Party\-Commit}!KBase@{K\-Base}}
+\subsubsection[{Third\-Party\-Commit}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf K\-Base\-::\-Third\-Party\-Commit}\hspace{0.3cm}{\ttfamily [strong]}}}\label{namespace_k_base_aca1021042b887fdf10cc3d6b0f9cef06}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{No\-Commit@{No\-Commit}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!No\-Commit@{No\-Commit}}\item[{\em 
+\hypertarget{namespace_k_base_aca1021042b887fdf10cc3d6b0f9cef06ac4cc4977453ba95b09b99c55ae960a63}{No\-Commit}\label{namespace_k_base_aca1021042b887fdf10cc3d6b0f9cef06ac4cc4977453ba95b09b99c55ae960a63}
+}]\index{Semi\-Commit@{Semi\-Commit}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Semi\-Commit@{Semi\-Commit}}\item[{\em 
+\hypertarget{namespace_k_base_aca1021042b887fdf10cc3d6b0f9cef06afae7a8b68beff6a21c500b876e58db0c}{Semi\-Commit}\label{namespace_k_base_aca1021042b887fdf10cc3d6b0f9cef06afae7a8b68beff6a21c500b876e58db0c}
+}]\index{Full\-Commit@{Full\-Commit}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Full\-Commit@{Full\-Commit}}\item[{\em 
+\hypertarget{namespace_k_base_aca1021042b887fdf10cc3d6b0f9cef06a1e95f5f14b87d3682d6159293f5152bf}{Full\-Commit}\label{namespace_k_base_aca1021042b887fdf10cc3d6b0f9cef06a1e95f5f14b87d3682d6159293f5152bf}
+}]\end{description}
+\end{Desc}
+\hypertarget{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3}{\index{K\-Base@{K\-Base}!Voting\-Rule@{Voting\-Rule}}
+\index{Voting\-Rule@{Voting\-Rule}!KBase@{K\-Base}}
+\subsubsection[{Voting\-Rule}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf K\-Base\-::\-Voting\-Rule}\hspace{0.3cm}{\ttfamily [strong]}}}\label{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{Binary@{Binary}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Binary@{Binary}}\item[{\em 
+\hypertarget{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3a6ce976e8f061b2b5cfe4d0c50c3405dd}{Binary}\label{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3a6ce976e8f061b2b5cfe4d0c50c3405dd}
+}]\index{Prop\-Bin@{Prop\-Bin}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Prop\-Bin@{Prop\-Bin}}\item[{\em 
+\hypertarget{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3a960321e2a4bfda404d33114ae3d0872d}{Prop\-Bin}\label{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3a960321e2a4bfda404d33114ae3d0872d}
+}]\index{Proportional@{Proportional}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Proportional@{Proportional}}\item[{\em 
+\hypertarget{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3aac13b33ebc8ea372dfb07e5ed4d9655f}{Proportional}\label{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3aac13b33ebc8ea372dfb07e5ed4d9655f}
+}]\index{Prop\-Cbc@{Prop\-Cbc}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Prop\-Cbc@{Prop\-Cbc}}\item[{\em 
+\hypertarget{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3a5e15ea0df19eefc1ad3b8c5cc8b8576a}{Prop\-Cbc}\label{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3a5e15ea0df19eefc1ad3b8c5cc8b8576a}
+}]\index{Cubic@{Cubic}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Cubic@{Cubic}}\item[{\em 
+\hypertarget{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3aec6b5414eb175379ff9efc9b3eef5814}{Cubic}\label{namespace_k_base_a6430bae9b90b42e1301bb4eee587bbf3aec6b5414eb175379ff9efc9b3eef5814}
+}]\end{description}
+\end{Desc}
+\hypertarget{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71}{\index{K\-Base@{K\-Base}!V\-P\-Model@{V\-P\-Model}}
+\index{V\-P\-Model@{V\-P\-Model}!KBase@{K\-Base}}
+\subsubsection[{V\-P\-Model}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf K\-Base\-::\-V\-P\-Model}\hspace{0.3cm}{\ttfamily [strong]}}}\label{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{Linear@{Linear}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Linear@{Linear}}\item[{\em 
+\hypertarget{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71a32a843da6ea40ab3b17a3421ccdf671b}{Linear}\label{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71a32a843da6ea40ab3b17a3421ccdf671b}
+}]\index{Square@{Square}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Square@{Square}}\item[{\em 
+\hypertarget{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71aceb46ca115d05c51aa5a16a8867c3304}{Square}\label{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71aceb46ca115d05c51aa5a16a8867c3304}
+}]\index{Quartic@{Quartic}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Quartic@{Quartic}}\item[{\em 
+\hypertarget{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71a884b16485227c5da72c09b668fd7e1da}{Quartic}\label{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71a884b16485227c5da72c09b668fd7e1da}
+}]\index{Binary@{Binary}!K\-Base@{K\-Base}}\index{K\-Base@{K\-Base}!Binary@{Binary}}\item[{\em 
+\hypertarget{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71a6ce976e8f061b2b5cfe4d0c50c3405dd}{Binary}\label{namespace_k_base_a7dac0bfa8a690bf0b88dc620a7ac2d71a6ce976e8f061b2b5cfe4d0c50c3405dd}
+}]\end{description}
+\end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{namespace_k_base_adab8fcddf092266a086d7d4b35665047}{\index{K\-Base@{K\-Base}!anti\-Lemke@{anti\-Lemke}}
+\index{anti\-Lemke@{anti\-Lemke}!KBase@{K\-Base}}
+\subsubsection[{anti\-Lemke}]{\setlength{\rightskip}{0pt plus 5cm}tuple$<${\bf K\-Matrix}, {\bf K\-Matrix}, {\bf K\-Matrix}, {\bf K\-Matrix}$>$ K\-Base\-::anti\-Lemke (
+\begin{DoxyParamCaption}
+\item[{unsigned int}]{n}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_adab8fcddf092266a086d7d4b35665047}
+\hypertarget{namespace_k_base_a536b2b2ffe14301d09921444479d22bc}{\index{K\-Base@{K\-Base}!big\-R\-A\-Name@{big\-R\-A\-Name}}
+\index{big\-R\-A\-Name@{big\-R\-A\-Name}!KBase@{K\-Base}}
+\subsubsection[{big\-R\-A\-Name}]{\setlength{\rightskip}{0pt plus 5cm}string K\-Base\-::big\-R\-A\-Name (
+\begin{DoxyParamCaption}
+\item[{const Big\-R\-Adjust \&}]{r\-Adj}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a536b2b2ffe14301d09921444479d22bc}
+\hypertarget{namespace_k_base_a9a94fd7f98b5622120584fcb870fcf4c}{\index{K\-Base@{K\-Base}!big\-R\-R\-Name@{big\-R\-R\-Name}}
+\index{big\-R\-R\-Name@{big\-R\-R\-Name}!KBase@{K\-Base}}
+\subsubsection[{big\-R\-R\-Name}]{\setlength{\rightskip}{0pt plus 5cm}string K\-Base\-::big\-R\-R\-Name (
+\begin{DoxyParamCaption}
+\item[{const Big\-R\-Range \&}]{r\-Rng}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a9a94fd7f98b5622120584fcb870fcf4c}
+\hypertarget{namespace_k_base_ae424dcaa73dce0a50383c89a87da7907}{\index{K\-Base@{K\-Base}!cross\-Site@{cross\-Site}}
+\index{cross\-Site@{cross\-Site}!KBase@{K\-Base}}
+\subsubsection[{cross\-Site}]{\setlength{\rightskip}{0pt plus 5cm}unsigned int K\-Base\-::cross\-Site (
+\begin{DoxyParamCaption}
+\item[{P\-R\-N\-G $\ast$}]{rng, }
+\item[{unsigned int}]{nc}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_ae424dcaa73dce0a50383c89a87da7907}
+\hypertarget{namespace_k_base_aad5a0bacc5ed657a4a2de3016aed6f80}{\index{K\-Base@{K\-Base}!display\-Program\-End@{display\-Program\-End}}
+\index{display\-Program\-End@{display\-Program\-End}!KBase@{K\-Base}}
+\subsubsection[{display\-Program\-End}]{\setlength{\rightskip}{0pt plus 5cm}void K\-Base\-::display\-Program\-End (
+\begin{DoxyParamCaption}
+\item[{std\-::chrono\-::time\-\_\-point$<$ std\-::chrono\-::system\-\_\-clock $>$}]{st}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_aad5a0bacc5ed657a4a2de3016aed6f80}
+\hypertarget{namespace_k_base_ab0871faf9fbf11d9beff0474855e243b}{\index{K\-Base@{K\-Base}!display\-Program\-Start@{display\-Program\-Start}}
+\index{display\-Program\-Start@{display\-Program\-Start}!KBase@{K\-Base}}
+\subsubsection[{display\-Program\-Start}]{\setlength{\rightskip}{0pt plus 5cm}std\-::chrono\-::time\-\_\-point$<$ std\-::chrono\-::system\-\_\-clock $>$ K\-Base\-::display\-Program\-Start (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_ab0871faf9fbf11d9beff0474855e243b}
+\hypertarget{namespace_k_base_a866d8730819523ee14b6f8766468a120}{\index{K\-Base@{K\-Base}!dot@{dot}}
+\index{dot@{dot}!KBase@{K\-Base}}
+\subsubsection[{dot}]{\setlength{\rightskip}{0pt plus 5cm}double K\-Base\-::dot (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{m1, }
+\item[{const K\-Matrix \&}]{m2}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a866d8730819523ee14b6f8766468a120}
+\hypertarget{namespace_k_base_a0077eeff20727c6d51dab5e9652dd72c}{\index{K\-Base@{K\-Base}!i\-Mat@{i\-Mat}}
+\index{i\-Mat@{i\-Mat}!KBase@{K\-Base}}
+\subsubsection[{i\-Mat}]{\setlength{\rightskip}{0pt plus 5cm}{\bf K\-Matrix} K\-Base\-::i\-Mat (
+\begin{DoxyParamCaption}
+\item[{unsigned int}]{n}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a0077eeff20727c6d51dab5e9652dd72c}
+\hypertarget{namespace_k_base_a51871fc212c85456613b0400a23b65b5}{\index{K\-Base@{K\-Base}!inv@{inv}}
+\index{inv@{inv}!KBase@{K\-Base}}
+\subsubsection[{inv}]{\setlength{\rightskip}{0pt plus 5cm}{\bf K\-Matrix} K\-Base\-::inv (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{m}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a51871fc212c85456613b0400a23b65b5}
+\hypertarget{namespace_k_base_ad49fdc489f8538844d01c49392634081}{\index{K\-Base@{K\-Base}!join\-H@{join\-H}}
+\index{join\-H@{join\-H}!KBase@{K\-Base}}
+\subsubsection[{join\-H}]{\setlength{\rightskip}{0pt plus 5cm}{\bf K\-Matrix} K\-Base\-::join\-H (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{m\-L, }
+\item[{const K\-Matrix \&}]{m\-R}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_ad49fdc489f8538844d01c49392634081}
+\hypertarget{namespace_k_base_a796ab044ec4f63b9391d2a3989965e1c}{\index{K\-Base@{K\-Base}!join\-V@{join\-V}}
+\index{join\-V@{join\-V}!KBase@{K\-Base}}
+\subsubsection[{join\-V}]{\setlength{\rightskip}{0pt plus 5cm}{\bf K\-Matrix} K\-Base\-::join\-V (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{m\-T, }
+\item[{const K\-Matrix \&}]{m\-B}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a796ab044ec4f63b9391d2a3989965e1c}
+\hypertarget{namespace_k_base_a2aa608b4caec20c1e5004e6318475371}{\index{K\-Base@{K\-Base}!l\-Corr@{l\-Corr}}
+\index{l\-Corr@{l\-Corr}!KBase@{K\-Base}}
+\subsubsection[{l\-Corr}]{\setlength{\rightskip}{0pt plus 5cm}double K\-Base\-::l\-Corr (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{m1, }
+\item[{const K\-Matrix \&}]{m2}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a2aa608b4caec20c1e5004e6318475371}
+\hypertarget{namespace_k_base_a4851e8a724ef8136aefd7c3e5cb3ced7}{\index{K\-Base@{K\-Base}!make\-Perp@{make\-Perp}}
+\index{make\-Perp@{make\-Perp}!KBase@{K\-Base}}
+\subsubsection[{make\-Perp}]{\setlength{\rightskip}{0pt plus 5cm}{\bf K\-Matrix} K\-Base\-::make\-Perp (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{x, }
+\item[{const K\-Matrix \&}]{p}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a4851e8a724ef8136aefd7c3e5cb3ced7}
+\hypertarget{namespace_k_base_a5f0d9a675a0d3542811b34bccaf9c652}{\index{K\-Base@{K\-Base}!max\-Abs@{max\-Abs}}
+\index{max\-Abs@{max\-Abs}!KBase@{K\-Base}}
+\subsubsection[{max\-Abs}]{\setlength{\rightskip}{0pt plus 5cm}double K\-Base\-::max\-Abs (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{m}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a5f0d9a675a0d3542811b34bccaf9c652}
+\hypertarget{namespace_k_base_aa492d98b388ebd6d2edd0bfe6ae16024}{\index{K\-Base@{K\-Base}!mean@{mean}}
+\index{mean@{mean}!KBase@{K\-Base}}
+\subsubsection[{mean}]{\setlength{\rightskip}{0pt plus 5cm}double K\-Base\-::mean (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{m1}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_aa492d98b388ebd6d2edd0bfe6ae16024}
+\hypertarget{namespace_k_base_a0e6f01b377066ff486b45ba37993ba88}{\index{K\-Base@{K\-Base}!ndx\-Max\-Abs@{ndx\-Max\-Abs}}
+\index{ndx\-Max\-Abs@{ndx\-Max\-Abs}!KBase@{K\-Base}}
+\subsubsection[{ndx\-Max\-Abs}]{\setlength{\rightskip}{0pt plus 5cm}tuple$<$ unsigned int, unsigned int $>$ K\-Base\-::ndx\-Max\-Abs (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{m}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a0e6f01b377066ff486b45ba37993ba88}
+\hypertarget{namespace_k_base_a843419e4dec80d9ebf59a2d94f8b82a4}{\index{K\-Base@{K\-Base}!new\-Chars@{new\-Chars}}
+\index{new\-Chars@{new\-Chars}!KBase@{K\-Base}}
+\subsubsection[{new\-Chars}]{\setlength{\rightskip}{0pt plus 5cm}char $\ast$ K\-Base\-::new\-Chars (
+\begin{DoxyParamCaption}
+\item[{unsigned int}]{len}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a843419e4dec80d9ebf59a2d94f8b82a4}
+\hypertarget{namespace_k_base_ac04eb4ecf7a4427f95aec552d4ba3b21}{\index{K\-Base@{K\-Base}!norm@{norm}}
+\index{norm@{norm}!KBase@{K\-Base}}
+\subsubsection[{norm}]{\setlength{\rightskip}{0pt plus 5cm}double K\-Base\-::norm (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{m1}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_ac04eb4ecf7a4427f95aec552d4ba3b21}
+\hypertarget{namespace_k_base_a372e3be66ffb5cd9e50b3200ba97f380}{\index{K\-Base@{K\-Base}!operator$\ast$@{operator$\ast$}}
+\index{operator$\ast$@{operator$\ast$}!KBase@{K\-Base}}
+\subsubsection[{operator$\ast$}]{\setlength{\rightskip}{0pt plus 5cm}{\bf K\-Matrix} K\-Base\-::operator$\ast$ (
+\begin{DoxyParamCaption}
+\item[{double}]{x, }
+\item[{const K\-Matrix \&}]{m1}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a372e3be66ffb5cd9e50b3200ba97f380}
+\hypertarget{namespace_k_base_a23533e6ca4a878e4c7cda5c2a8f64b8c}{\index{K\-Base@{K\-Base}!operator$\ast$@{operator$\ast$}}
+\index{operator$\ast$@{operator$\ast$}!KBase@{K\-Base}}
+\subsubsection[{operator$\ast$}]{\setlength{\rightskip}{0pt plus 5cm}{\bf K\-Matrix} K\-Base\-::operator$\ast$ (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{m1, }
+\item[{const K\-Matrix \&}]{m2}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a23533e6ca4a878e4c7cda5c2a8f64b8c}
+\hypertarget{namespace_k_base_ac2f6fb159524c6aac11862ca87f92e38}{\index{K\-Base@{K\-Base}!operator+@{operator+}}
+\index{operator+@{operator+}!KBase@{K\-Base}}
+\subsubsection[{operator+}]{\setlength{\rightskip}{0pt plus 5cm}{\bf K\-Matrix} K\-Base\-::operator+ (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{m1, }
+\item[{double}]{x}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_ac2f6fb159524c6aac11862ca87f92e38}
+\hypertarget{namespace_k_base_a7734f1e897f145bba23366bd973c0263}{\index{K\-Base@{K\-Base}!operator+@{operator+}}
+\index{operator+@{operator+}!KBase@{K\-Base}}
+\subsubsection[{operator+}]{\setlength{\rightskip}{0pt plus 5cm}{\bf K\-Matrix} K\-Base\-::operator+ (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{m1, }
+\item[{const K\-Matrix \&}]{m2}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a7734f1e897f145bba23366bd973c0263}
+\hypertarget{namespace_k_base_adb518e5ec363db77bedda0c18e1fd64a}{\index{K\-Base@{K\-Base}!operator-\/@{operator-\/}}
+\index{operator-\/@{operator-\/}!KBase@{K\-Base}}
+\subsubsection[{operator-\/}]{\setlength{\rightskip}{0pt plus 5cm}{\bf K\-Matrix} K\-Base\-::operator-\/ (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{m1, }
+\item[{double}]{x}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_adb518e5ec363db77bedda0c18e1fd64a}
+\hypertarget{namespace_k_base_a9d58d169c4a4e5efff74c172b82c4706}{\index{K\-Base@{K\-Base}!operator-\/@{operator-\/}}
+\index{operator-\/@{operator-\/}!KBase@{K\-Base}}
+\subsubsection[{operator-\/}]{\setlength{\rightskip}{0pt plus 5cm}{\bf K\-Matrix} K\-Base\-::operator-\/ (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{m1, }
+\item[{const K\-Matrix \&}]{m2}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a9d58d169c4a4e5efff74c172b82c4706}
+\hypertarget{namespace_k_base_a58ef09420d60415eaceff0b5ee327816}{\index{K\-Base@{K\-Base}!operator/@{operator/}}
+\index{operator/@{operator/}!KBase@{K\-Base}}
+\subsubsection[{operator/}]{\setlength{\rightskip}{0pt plus 5cm}{\bf K\-Matrix} K\-Base\-::operator/ (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{m1, }
+\item[{double}]{x}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a58ef09420d60415eaceff0b5ee327816}
+\hypertarget{namespace_k_base_a08fabe46c3b55eabe44b44fa86afeadc}{\index{K\-Base@{K\-Base}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!KBase@{K\-Base}}
+\subsubsection[{operator$<$$<$}]{\setlength{\rightskip}{0pt plus 5cm}ostream \& K\-Base\-::operator$<$$<$ (
+\begin{DoxyParamCaption}
+\item[{ostream \&}]{os, }
+\item[{const V\-P\-Model \&}]{vpm}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a08fabe46c3b55eabe44b44fa86afeadc}
+\hypertarget{namespace_k_base_a49ebe418e2f42461961f56f2fcf96157}{\index{K\-Base@{K\-Base}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!KBase@{K\-Base}}
+\subsubsection[{operator$<$$<$}]{\setlength{\rightskip}{0pt plus 5cm}ostream\& K\-Base\-::operator$<$$<$ (
+\begin{DoxyParamCaption}
+\item[{ostream \&}]{os, }
+\item[{const Position \&}]{p}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a49ebe418e2f42461961f56f2fcf96157}
+\hypertarget{namespace_k_base_af59dc55c9762a3446701309d6b6716ba}{\index{K\-Base@{K\-Base}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!KBase@{K\-Base}}
+\subsubsection[{operator$<$$<$}]{\setlength{\rightskip}{0pt plus 5cm}ostream \& K\-Base\-::operator$<$$<$ (
+\begin{DoxyParamCaption}
+\item[{ostream \&}]{os, }
+\item[{const Voting\-Rule \&}]{vr}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_af59dc55c9762a3446701309d6b6716ba}
+\hypertarget{namespace_k_base_a8a51fa62609f14a7d4925b90555d66ac}{\index{K\-Base@{K\-Base}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!KBase@{K\-Base}}
+\subsubsection[{operator$<$$<$}]{\setlength{\rightskip}{0pt plus 5cm}ostream \& K\-Base\-::operator$<$$<$ (
+\begin{DoxyParamCaption}
+\item[{ostream \&}]{os, }
+\item[{const P\-C\-E\-Model \&}]{pcm}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a8a51fa62609f14a7d4925b90555d66ac}
+\hypertarget{namespace_k_base_ac7e7fd7c25cdf6c213df3cc7e2a36cd6}{\index{K\-Base@{K\-Base}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!KBase@{K\-Base}}
+\subsubsection[{operator$<$$<$}]{\setlength{\rightskip}{0pt plus 5cm}ostream \& K\-Base\-::operator$<$$<$ (
+\begin{DoxyParamCaption}
+\item[{ostream \&}]{os, }
+\item[{const Third\-Party\-Commit \&}]{tpc}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_ac7e7fd7c25cdf6c213df3cc7e2a36cd6}
+\hypertarget{namespace_k_base_a3fe2153236311782e7608a72bbe06af6}{\index{K\-Base@{K\-Base}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!KBase@{K\-Base}}
+\subsubsection[{operator$<$$<$}]{\setlength{\rightskip}{0pt plus 5cm}ostream \& K\-Base\-::operator$<$$<$ (
+\begin{DoxyParamCaption}
+\item[{ostream \&}]{os, }
+\item[{const Big\-R\-Range \&}]{r\-Rng}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a3fe2153236311782e7608a72bbe06af6}
+\hypertarget{namespace_k_base_af018f57e0217110c3ea93e0a94c94c92}{\index{K\-Base@{K\-Base}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!KBase@{K\-Base}}
+\subsubsection[{operator$<$$<$}]{\setlength{\rightskip}{0pt plus 5cm}ostream \& K\-Base\-::operator$<$$<$ (
+\begin{DoxyParamCaption}
+\item[{ostream \&}]{os, }
+\item[{const Big\-R\-Adjust \&}]{r\-Adj}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_af018f57e0217110c3ea93e0a94c94c92}
+\hypertarget{namespace_k_base_a93f654671ca9491f43fdbf279a8dfae1}{\index{K\-Base@{K\-Base}!pcm\-Name@{pcm\-Name}}
+\index{pcm\-Name@{pcm\-Name}!KBase@{K\-Base}}
+\subsubsection[{pcm\-Name}]{\setlength{\rightskip}{0pt plus 5cm}string K\-Base\-::pcm\-Name (
+\begin{DoxyParamCaption}
+\item[{const P\-C\-E\-Model \&}]{pcm}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a93f654671ca9491f43fdbf279a8dfae1}
+\hypertarget{namespace_k_base_a0a4af5da8318344e8a67e011a20bed87}{\index{K\-Base@{K\-Base}!pop\-Back@{pop\-Back}}
+\index{pop\-Back@{pop\-Back}!KBase@{K\-Base}}
+\subsubsection[{pop\-Back}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T $>$ T K\-Base\-::pop\-Back (
+\begin{DoxyParamCaption}
+\item[{vector$<$ T $>$ \&}]{v}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a0a4af5da8318344e8a67e011a20bed87}
+\hypertarget{namespace_k_base_a7bdad0fb3ffd7c94d1fefc8fde46f469}{\index{K\-Base@{K\-Base}!proj\-Box@{proj\-Box}}
+\index{proj\-Box@{proj\-Box}!KBase@{K\-Base}}
+\subsubsection[{proj\-Box}]{\setlength{\rightskip}{0pt plus 5cm}{\bf K\-Matrix} K\-Base\-::proj\-Box (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{lb, }
+\item[{const K\-Matrix \&}]{ub, }
+\item[{const K\-Matrix \&}]{w}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a7bdad0fb3ffd7c94d1fefc8fde46f469}
+\hypertarget{namespace_k_base_a6fb95714179551a7090ad6a283ea3a1d}{\index{K\-Base@{K\-Base}!proj\-Pos@{proj\-Pos}}
+\index{proj\-Pos@{proj\-Pos}!KBase@{K\-Base}}
+\subsubsection[{proj\-Pos}]{\setlength{\rightskip}{0pt plus 5cm}{\bf K\-Matrix} K\-Base\-::proj\-Pos (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{w}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a6fb95714179551a7090ad6a283ea3a1d}
+\hypertarget{namespace_k_base_aff58e584fe9ce53e400c08f797813591}{\index{K\-Base@{K\-Base}!qrtc@{qrtc}}
+\index{qrtc@{qrtc}!KBase@{K\-Base}}
+\subsubsection[{qrtc}]{\setlength{\rightskip}{0pt plus 5cm}double K\-Base\-::qrtc (
+\begin{DoxyParamCaption}
+\item[{const double \&}]{x}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_aff58e584fe9ce53e400c08f797813591}
+\hypertarget{namespace_k_base_a0cc3f4cfaee8cdf53185d4be5ba8ee32}{\index{K\-Base@{K\-Base}!q\-Trans@{q\-Trans}}
+\index{q\-Trans@{q\-Trans}!KBase@{K\-Base}}
+\subsubsection[{q\-Trans}]{\setlength{\rightskip}{0pt plus 5cm}{\bf W64} K\-Base\-::q\-Trans (
+\begin{DoxyParamCaption}
+\item[{W64}]{s}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a0cc3f4cfaee8cdf53185d4be5ba8ee32}
+\hypertarget{namespace_k_base_a7e301a845f68b92c24e79647021f0044}{\index{K\-Base@{K\-Base}!rescale@{rescale}}
+\index{rescale@{rescale}!KBase@{K\-Base}}
+\subsubsection[{rescale}]{\setlength{\rightskip}{0pt plus 5cm}double K\-Base\-::rescale (
+\begin{DoxyParamCaption}
+\item[{double}]{x, }
+\item[{double}]{x0, }
+\item[{double}]{x1, }
+\item[{double}]{y0, }
+\item[{double}]{y1}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a7e301a845f68b92c24e79647021f0044}
+\hypertarget{namespace_k_base_ad60eea0f8cc6b41083e6ccee641a5191}{\index{K\-Base@{K\-Base}!rotl@{rotl}}
+\index{rotl@{rotl}!KBase@{K\-Base}}
+\subsubsection[{rotl}]{\setlength{\rightskip}{0pt plus 5cm}{\bf W64} K\-Base\-::rotl (
+\begin{DoxyParamCaption}
+\item[{const W64}]{x, }
+\item[{unsigned int}]{n}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_ad60eea0f8cc6b41083e6ccee641a5191}
+\hypertarget{namespace_k_base_a6c305ecb009d6de80a3b2c33c3df4b18}{\index{K\-Base@{K\-Base}!rotr@{rotr}}
+\index{rotr@{rotr}!KBase@{K\-Base}}
+\subsubsection[{rotr}]{\setlength{\rightskip}{0pt plus 5cm}{\bf W64} K\-Base\-::rotr (
+\begin{DoxyParamCaption}
+\item[{const W64}]{x, }
+\item[{unsigned int}]{n}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a6c305ecb009d6de80a3b2c33c3df4b18}
+\hypertarget{namespace_k_base_a15fc032589db73d1d60588d47ffd9b05}{\index{K\-Base@{K\-Base}!same\-Shape@{same\-Shape}}
+\index{same\-Shape@{same\-Shape}!KBase@{K\-Base}}
+\subsubsection[{same\-Shape}]{\setlength{\rightskip}{0pt plus 5cm}bool K\-Base\-::same\-Shape (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{m1, }
+\item[{const K\-Matrix \&}]{m2}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a15fc032589db73d1d60588d47ffd9b05}
+\hypertarget{namespace_k_base_a607c35cb43f1585397c32fd47fade103}{\index{K\-Base@{K\-Base}!sqr@{sqr}}
+\index{sqr@{sqr}!KBase@{K\-Base}}
+\subsubsection[{sqr}]{\setlength{\rightskip}{0pt plus 5cm}double K\-Base\-::sqr (
+\begin{DoxyParamCaption}
+\item[{const double \&}]{x}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a607c35cb43f1585397c32fd47fade103}
+\hypertarget{namespace_k_base_a082c1f9b23d177af71847da7edd2d550}{\index{K\-Base@{K\-Base}!stdv@{stdv}}
+\index{stdv@{stdv}!KBase@{K\-Base}}
+\subsubsection[{stdv}]{\setlength{\rightskip}{0pt plus 5cm}double K\-Base\-::stdv (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{m1}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a082c1f9b23d177af71847da7edd2d550}
+\hypertarget{namespace_k_base_a2b6e9528c70ddd70032df696150ff015}{\index{K\-Base@{K\-Base}!sum@{sum}}
+\index{sum@{sum}!KBase@{K\-Base}}
+\subsubsection[{sum}]{\setlength{\rightskip}{0pt plus 5cm}double K\-Base\-::sum (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{m1}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a2b6e9528c70ddd70032df696150ff015}
+\hypertarget{namespace_k_base_a21e183ec07b0c63a5a93b59056c76c44}{\index{K\-Base@{K\-Base}!tpc\-Name@{tpc\-Name}}
+\index{tpc\-Name@{tpc\-Name}!KBase@{K\-Base}}
+\subsubsection[{tpc\-Name}]{\setlength{\rightskip}{0pt plus 5cm}string K\-Base\-::tpc\-Name (
+\begin{DoxyParamCaption}
+\item[{const Third\-Party\-Commit \&}]{tpc}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a21e183ec07b0c63a5a93b59056c76c44}
+\hypertarget{namespace_k_base_af76d55e885f062f41939b4d8802a552f}{\index{K\-Base@{K\-Base}!trans@{trans}}
+\index{trans@{trans}!KBase@{K\-Base}}
+\subsubsection[{trans}]{\setlength{\rightskip}{0pt plus 5cm}{\bf K\-Matrix} K\-Base\-::trans (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{m1}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_af76d55e885f062f41939b4d8802a552f}
+\hypertarget{namespace_k_base_ad1d95e80b1482815cc304e66c3440ae8}{\index{K\-Base@{K\-Base}!ue\-Indices@{ue\-Indices}}
+\index{ue\-Indices@{ue\-Indices}!KBase@{K\-Base}}
+\subsubsection[{ue\-Indices}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T $>$ tuple$<${\bf V\-U\-I}, {\bf V\-U\-I}$>$ K\-Base\-::ue\-Indices (
+\begin{DoxyParamCaption}
+\item[{const vector$<$ T $>$ \&}]{xs, }
+\item[{function$<$ bool(const T \&a, const T \&b)$>$}]{eqv}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_ad1d95e80b1482815cc304e66c3440ae8}
+\hypertarget{namespace_k_base_a01bdf949b6054d843e90d10042322d96}{\index{K\-Base@{K\-Base}!ui\-Seq@{ui\-Seq}}
+\index{ui\-Seq@{ui\-Seq}!KBase@{K\-Base}}
+\subsubsection[{ui\-Seq}]{\setlength{\rightskip}{0pt plus 5cm}{\bf V\-U\-I} K\-Base\-::ui\-Seq (
+\begin{DoxyParamCaption}
+\item[{const unsigned int}]{n1, }
+\item[{const unsigned int}]{n2, }
+\item[{const unsigned int}]{ns}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a01bdf949b6054d843e90d10042322d96}
+\hypertarget{namespace_k_base_a3947603d5e5f173f2538227da29abe9e}{\index{K\-Base@{K\-Base}!vi\-A\-B\-G@{vi\-A\-B\-G}}
+\index{vi\-A\-B\-G@{vi\-A\-B\-G}!KBase@{K\-Base}}
+\subsubsection[{vi\-A\-B\-G}]{\setlength{\rightskip}{0pt plus 5cm}tuple$<$ {\bf K\-Matrix}, unsigned int, {\bf K\-Matrix} $>$ K\-Base\-::vi\-A\-B\-G (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{x\-Init, }
+\item[{function$<$ K\-Matrix(const K\-Matrix \&x)$>$}]{F, }
+\item[{function$<$ K\-Matrix(const K\-Matrix \&x)$>$}]{P, }
+\item[{double}]{beta, }
+\item[{double}]{thresh, }
+\item[{unsigned int}]{i\-Max, }
+\item[{bool}]{extra}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a3947603d5e5f173f2538227da29abe9e}
+\hypertarget{namespace_k_base_aacba76ea7b307a0249430feb7c0a5e99}{\index{K\-Base@{K\-Base}!vi\-B\-S\-He96@{vi\-B\-S\-He96}}
+\index{vi\-B\-S\-He96@{vi\-B\-S\-He96}!KBase@{K\-Base}}
+\subsubsection[{vi\-B\-S\-He96}]{\setlength{\rightskip}{0pt plus 5cm}tuple$<$ {\bf K\-Matrix}, unsigned int, {\bf K\-Matrix} $>$ K\-Base\-::vi\-B\-S\-He96 (
+\begin{DoxyParamCaption}
+\item[{const K\-Matrix \&}]{M, }
+\item[{const K\-Matrix \&}]{q, }
+\item[{function$<$ K\-Matrix(const K\-Matrix \&)$>$}]{p\-K, }
+\item[{K\-Matrix}]{u0, }
+\item[{const double}]{eps, }
+\item[{const unsigned int}]{i\-Max}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_aacba76ea7b307a0249430feb7c0a5e99}
+\hypertarget{namespace_k_base_a0c8eba6be396a754f747b5778ed98a28}{\index{K\-Base@{K\-Base}!vpm\-Name@{vpm\-Name}}
+\index{vpm\-Name@{vpm\-Name}!KBase@{K\-Base}}
+\subsubsection[{vpm\-Name}]{\setlength{\rightskip}{0pt plus 5cm}string K\-Base\-::vpm\-Name (
+\begin{DoxyParamCaption}
+\item[{const V\-P\-Model \&}]{vpm}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a0c8eba6be396a754f747b5778ed98a28}
+\hypertarget{namespace_k_base_a06f9f2afead202780f5f09826b6c2de8}{\index{K\-Base@{K\-Base}!vr\-Name@{vr\-Name}}
+\index{vr\-Name@{vr\-Name}!KBase@{K\-Base}}
+\subsubsection[{vr\-Name}]{\setlength{\rightskip}{0pt plus 5cm}string K\-Base\-::vr\-Name (
+\begin{DoxyParamCaption}
+\item[{const Voting\-Rule \&}]{vr}
+\end{DoxyParamCaption}
+)}}\label{namespace_k_base_a06f9f2afead202780f5f09826b6c2de8}
+
+
+\subsection{Variable Documentation}
+\hypertarget{namespace_k_base_a656a0fe5ef8ff4cb32763dd983906a66}{\index{K\-Base@{K\-Base}!M\-A\-S\-K32@{M\-A\-S\-K32}}
+\index{M\-A\-S\-K32@{M\-A\-S\-K32}!KBase@{K\-Base}}
+\subsubsection[{M\-A\-S\-K32}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf W64} K\-Base\-::\-M\-A\-S\-K32 = 0xffffffff}}\label{namespace_k_base_a656a0fe5ef8ff4cb32763dd983906a66}
+\hypertarget{namespace_k_base_a2325d5f438383f4f982a23e21ad5c524}{\index{K\-Base@{K\-Base}!M\-A\-S\-K64@{M\-A\-S\-K64}}
+\index{M\-A\-S\-K64@{M\-A\-S\-K64}!KBase@{K\-Base}}
+\subsubsection[{M\-A\-S\-K64}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf W64} K\-Base\-::\-M\-A\-S\-K64 = 0xffffffffffffffff}}\label{namespace_k_base_a2325d5f438383f4f982a23e21ad5c524}
+\hypertarget{namespace_k_base_a66b407b6bd1ef4be60f9beaf91321774}{\index{K\-Base@{K\-Base}!Word\-Length@{Word\-Length}}
+\index{Word\-Length@{Word\-Length}!KBase@{K\-Base}}
+\subsubsection[{Word\-Length}]{\setlength{\rightskip}{0pt plus 5cm}const unsigned int K\-Base\-::\-Word\-Length = 64}}\label{namespace_k_base_a66b407b6bd1ef4be60f9beaf91321774}

@@ -1,0 +1,70 @@
+\hypertarget{kutils_8h}{\section{kutils.\-h File Reference}
+\label{kutils_8h}\index{kutils.\-h@{kutils.\-h}}
+}
+{\ttfamily \#include $<$assert.\-h$>$}\\*
+{\ttfamily \#include $<$chrono$>$}\\*
+{\ttfamily \#include $<$cstdint$>$}\\*
+{\ttfamily \#include $<$cstdlib$>$}\\*
+{\ttfamily \#include $<$cstring$>$}\\*
+{\ttfamily \#include $<$ctime$>$}\\*
+{\ttfamily \#include $<$iomanip$>$}\\*
+{\ttfamily \#include $<$iostream$>$}\\*
+{\ttfamily \#include $<$functional$>$}\\*
+{\ttfamily \#include $<$future$>$}\\*
+{\ttfamily \#include $<$math.\-h$>$}\\*
+{\ttfamily \#include $<$memory$>$}\\*
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include $<$stdlib.\-h$>$}\\*
+{\ttfamily \#include $<$string$>$}\\*
+{\ttfamily \#include $<$thread$>$}\\*
+{\ttfamily \#include $<$tuple$>$}\\*
+{\ttfamily \#include $<$vector$>$}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{class_k_base_1_1_k_exception}{K\-Base\-::\-K\-Exception}
+\end{DoxyCompactItemize}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespace_k_base}{K\-Base}
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef vector$<$ unsigned int $>$ \hyperlink{namespace_k_base_ad8d970208cc99c612b207d7bbbad4434}{K\-Base\-::\-V\-U\-I}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485c}{K\-Base\-::\-Reporting\-Level} \-: uint8\-\_\-t \{ \\*
+\hyperlink{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485ca1e3332b2cd20d2d3db407a20f6913d0d}{K\-Base\-::\-Reporting\-Level\-::\-Silent} = 0, 
+\hyperlink{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485ca28d0edd045e05cf5af64e35ae0c4c6ef}{K\-Base\-::\-Reporting\-Level\-::\-Low}, 
+\hyperlink{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485ca87f8a6ab85c9ced3702b4ea641ad4bb5}{K\-Base\-::\-Reporting\-Level\-::\-Medium}, 
+\hyperlink{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485ca655d20c1ca69519ca647684edbb2db35}{K\-Base\-::\-Reporting\-Level\-::\-High}, 
+\\*
+\hyperlink{namespace_k_base_aa0dcd758ffc6d403489fc15487ad485cada7d763aac39b294c7453c77c10d8239}{K\-Base\-::\-Reporting\-Level\-::\-Debugging}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+double \hyperlink{namespace_k_base_a607c35cb43f1585397c32fd47fade103}{K\-Base\-::sqr} (const double \&x)
+\item 
+double \hyperlink{namespace_k_base_aff58e584fe9ce53e400c08f797813591}{K\-Base\-::qrtc} (const double \&x)
+\item 
+std\-::chrono\-::time\-\_\-point\\*
+$<$ std\-::chrono\-::system\-\_\-clock $>$ \hyperlink{namespace_k_base_ab0871faf9fbf11d9beff0474855e243b}{K\-Base\-::display\-Program\-Start} ()
+\item 
+void \hyperlink{namespace_k_base_aad5a0bacc5ed657a4a2de3016aed6f80}{K\-Base\-::display\-Program\-End} (std\-::chrono\-::time\-\_\-point$<$ std\-::chrono\-::system\-\_\-clock $>$ st)
+\item 
+char $\ast$ \hyperlink{namespace_k_base_a843419e4dec80d9ebf59a2d94f8b82a4}{K\-Base\-::new\-Chars} (unsigned int len)
+\item 
+double \hyperlink{namespace_k_base_a7e301a845f68b92c24e79647021f0044}{K\-Base\-::rescale} (double x, double x0, double x1, double y0, double y1)
+\item 
+{\footnotesize template$<$typename T $>$ }\\T \hyperlink{namespace_k_base_a0a4af5da8318344e8a67e011a20bed87}{K\-Base\-::pop\-Back} (vector$<$ T $>$ \&v)
+\item 
+{\footnotesize template$<$typename T $>$ }\\tuple$<$ V\-U\-I, V\-U\-I $>$ \hyperlink{namespace_k_base_ad1d95e80b1482815cc304e66c3440ae8}{K\-Base\-::ue\-Indices} (const vector$<$ T $>$ \&xs, function$<$ bool(const T \&a, const T \&b)$>$ eqv)
+\item 
+V\-U\-I \hyperlink{namespace_k_base_a01bdf949b6054d843e90d10042322d96}{K\-Base\-::ui\-Seq} (const unsigned int n1, const unsigned int n2, const unsigned int ns)
+\end{DoxyCompactItemize}
