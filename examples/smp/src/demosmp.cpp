@@ -77,7 +77,7 @@ namespace DemoSMP {
     // note that because all actors use the same scale for capability, utility, etc,
     // their 'votes' are on the same scale and influence can be added up meaningfully
     const unsigned int maxIter = 500;
-    double qf = 20.0;
+    double qf = 50.0;
     // suppose that, on a [0,100] scale, the first move was the most extreme possible,
     // i.e. 100 points. One twentieth of that is just 5, which seems to about the limit
     // of what people consider significant.
@@ -290,7 +290,7 @@ int main(int ac, char **av) {
   };
 
   // tmp args
-  euSmpP = true;
+  //euSmpP = true;
 
   if (ac > 1) {
     for (int i = 1; i < ac; i++) {
