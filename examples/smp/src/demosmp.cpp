@@ -101,11 +101,13 @@ namespace DemoSMP {
         auto sy = ((const SMPState*)(s->model->history[iter - 1]));
         auto dxy = SMPModel::stateDist(sx, sy);
         sf(iter - 0, iter - 1, dxy);
-        quiet = (dxy < d01 / qf);
+        const double aRatio = dxy / d01;
+        const double tRatio = 1.0 / qf;
+        quiet = (aRatio < tRatio);
         if (quiet)
-          printf("Quiet \n");
+          printf("Quiet: %.4f vs. %.4f \n", aRatio, tRatio);
         else
-          printf("Not Quiet \n");
+          printf("Not quiet %.4f vs %.4f \n", aRatio, tRatio);
         cout << endl << flush;
       }
       return tooLong || quiet;
