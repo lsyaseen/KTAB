@@ -120,6 +120,38 @@ set(SMPLIB_SRCS
 
 add_library(smp STATIC ${SMPLIB_SRCS})
 
+
+ 
+# -------------------------------------------------
+# Under Linux, default start of DESTINATION path is /usr/local/ 
+# so "ktab/lib" denotes destination /usr/local/ktab/lib
+# Under Windows, default start of DESTINATION path is "C:\Program Files\kutils\"
+# so "ktab/lib" denotes destination C:\Program Files\kutils\ktab\lib
+
+set (SMP_INSTALL_DIR)
+if (WIN32)
+  set (SMP_INSTALL_DIR
+  c:/local/ktab
+  )
+endif(WIN32)
+if (UNIX)
+  set (SMP_INSTALL_DIR
+  /usr/local/ktab
+  )
+endif(UNIX)
+
+install(
+  TARGETS
+    smp
+  DESTINATION 
+    ${SMP_INSTALL_DIR}/lib) 
+
+install(
+  FILES
+    libsrc/smp.h  
+  DESTINATION
+    ${SMP_INSTALL_DIR}/include)  
+    
 # -------------------------------------------------
 # define a little library of smp GUI stuff
 
