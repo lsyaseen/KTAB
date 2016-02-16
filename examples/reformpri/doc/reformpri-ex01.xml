@@ -15,24 +15,25 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:noNamespaceSchemaLocation="reformpri.xsd"> 
 <name string="RP-Scen-00"/>
 <desc string="A very simple scenario"/>
-<Items  listOfStrings="Edu Def Fin Jst" />
-<Categories listOfStrings="First Second Third" />
-  <govCost listOfIntegers='32 41 27 45'/>
+<Items  listOfStrings="Edu Def Soc Fin Jst" />
+<Categories listOfStrings="First Second Third Fourth Fifth" />
+  <govCost listOfIntegers='48  32  41  27  45'/>
    <govBudget integer="100" />
-  <obFactor float="0.10"/>
+  <outOfBudgetFactor float="0.10"/>
+  <orderFactor float="0.999"/>
 
     <Actor>
     <name string="Alice" />
     <description string="One of the RP actors" />
     <capability float="72.2" />
-    <itemValues listOfIntegers='65 60 40 40'/>
+    <itemValues listOfIntegers='26  65  60  40  40'/>
     </Actor>
   
     <Actor>
     <name string="Bob" />
     <description string="One of the RP actors" />
-    <capability float="84.2" />
-    <itemValues listOfIntegers='76 22 32 81'/>
+    <capability float="48.2" />
+    <itemValues listOfIntegers='76  22  32  81  34'/>
     </Actor>
     
   
@@ -40,7 +41,15 @@ xsi:noNamespaceSchemaLocation="reformpri.xsd">
     <name string="Carol" />
     <description string="One of the RP actors" />
     <capability float="73.7" />
-    <itemValues listOfIntegers='21  55  92  46'/>
+    <itemValues listOfIntegers='21  55  92  46  78'/>
+    </Actor>
+    
+  
+    <Actor>
+    <name string="David" />
+    <description string="One of the RP actors" />
+    <capability float="57.8" />
+    <itemValues listOfIntegers=' 67  40  79  28  74'/>
     </Actor>
 
 </Scenario>
