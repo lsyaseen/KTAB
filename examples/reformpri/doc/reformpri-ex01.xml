@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="UTF-8"  ?>
+
+<!--
+     Copyright (c) 2016, Copyright KAPSARC. Open Source MIT License.
+     All rights reserved. This program and the accompanying materials
+     are made available under the terms of the MIT Public License v1.0
+     which accompanies this distribution, and is available at
+     https://opensource.org/licenses/MIT
+    
+     Contributors:
+         KAPSARC - initial API and implementation
+ -->
+<Scenario 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:noNamespaceSchemaLocation="reformpri.xsd"> 
+<name string="RP-Scen-00"/>
+<desc string="A very simple scenario"/>
+<Items  listOfStrings="Edu Def Fin Jst" />
+<Categories listOfStrings="First Second Third" />
+  <govCost listOfIntegers='32 41 27 45'/>
+   <govBudget integer="100" />
+  <obFactor float="0.10"/>
+
+    <Actor>
+    <name string="Alice" />
+    <description string="One of the RP actors" />
+    <capability float="72.2" />
+    <itemValues listOfIntegers='65 60 40 40'/>
+    </Actor>
+  
+    <Actor>
+    <name string="Bob" />
+    <description string="One of the RP actors" />
+    <capability float="84.2" />
+    <itemValues listOfIntegers='76 22 32 81'/>
+    </Actor>
+    
+  
+    <Actor>
+    <name string="Carol" />
+    <description string="One of the RP actors" />
+    <capability float="73.7" />
+    <itemValues listOfIntegers='21  55  92  46'/>
+    </Actor>
+
+</Scenario>

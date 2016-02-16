@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="Scenario">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="name"/>
+        <xs:element ref="desc"/>
+        <xs:element ref="Items"/>
+        <xs:element ref="Categories"/>
+        <xs:element ref="govCost"/>
+        <xs:element ref="govBudget"/>
+        <xs:element ref="obFactor"/>
+        <xs:element ref="Actor" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="name">
+    <xs:complexType>
+      <xs:attribute name="string" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="desc">
+    <xs:complexType>
+      <xs:attribute name="string" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Items">
+    <xs:complexType>
+      <xs:attribute name="listOfStrings" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Categories">
+    <xs:complexType>
+      <xs:attribute name="listOfStrings" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="govCost">
+    <xs:complexType>
+      <xs:attribute name="listOfIntegers" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="govBudget">
+    <xs:complexType>
+      <xs:attribute name="integer" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="obFactor">
+    <xs:complexType>
+      <xs:attribute name="float" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Actor">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="name"/>
+        <xs:element ref="description"/>
+        <xs:element ref="capability"/>
+        <xs:element ref="itemValues"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="description">
+    <xs:complexType>
+      <xs:attribute name="string" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="capability">
+    <xs:complexType>
+      <xs:attribute name="float" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="itemValues">
+    <xs:complexType>
+      <xs:attribute name="listOfIntegers" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
