@@ -1,6 +1,8 @@
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #!/bin/bash
-#
+# -----------------------------------------
+# clean up existing builds
+# -----------------------------------------
 
 pushd KTAB/ ; ./cleanKTAB.sh ; popd
 pushd examples/ ; ./cleanEX.sh ; popd
