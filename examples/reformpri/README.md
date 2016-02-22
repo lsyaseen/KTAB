@@ -6,9 +6,11 @@ This treats reform as a collective decision making process (CDMP) over discrete 
 
 ## Problem Representation ##
 
-This is an example of a CDMP over matching items into categories (aka "buckets"). Every item goes into exactly one category, and categories can hold zero, one, or several items (like a bucket of items). 
+This is an example of a CDMP over matching items into categories (aka "buckets"). Every item goes into exactly one category, and categories can hold zero, one, or several items (like a bucket of items). The software uses a library for "matching problems" which is actually more general than the particular problem of prioritizing reform proposals.
 
 A common example of matching problems are the subset selection problems (SSP). If there are just two categories, "selected" and "rejected", then an SSP can be used to analyze problems as diverse as choosing which government projects to implement (or not), which lobbyist provisions to incorporate into a proposed law (or not), which job applicants to hire (or not), and so on.
+
+More general matching problems can have more categories. For example, the problem of three friends dividing a bag of sweets might have three categories: "given to Alice", "given to Bob", and "given to Carol". Similarly, the problem of hiring jobs applicants might be refined to include the decision as to which project they join. With three projects, there would be four categories, such as "Project A", "Project B", "Project C", and "Not Hired".
 
 
 In the case of reform items, the position of each actor is simply an ordering of the items. Thus, the categories are just the highest to lowest priorities, and the
