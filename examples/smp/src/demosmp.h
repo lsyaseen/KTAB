@@ -44,6 +44,7 @@ using KBase::ReportingLevel;
 using KBase::VctrPstn;
 
 
+const string appName = "smpc";
 const string appVersion = "0.1";
 // -------------------------------------------------
 

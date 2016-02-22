@@ -18,6 +18,24 @@ reform items get assigned a priority. With three items, there would be three cat
 
 More detail on this particular analysis and on the underlying theory is available from the KTAB [homepage](https://www.kapsarc.org/openkapsarc/kapsarc-toolkit-for-behavioral-analysis-ktab/) at [KAPSARC](https://www.kapsarc.org).
 
+
+
+
+## Build Instructions ##
+
+To build `rplib` and `rpdemo`, the following must also be built and installed first: 
+- tinyxml2
+- sqlite3
+- kutils
+- kmodel 
+
+Under Windows, we recommend using [CMake](https://cmake.org/) to build  `tinyxml2`  and `sqlite3` from source and install them into C:/local. Under Linux, the standard package managers will install them in the standard locations, where CMake will find them.
+
+Build `kutils` and `kmodel`  according to their README files. Each has an INSTALL build target. Under Windows, this will install them to C:/local; under Linux, this will install them to /usr/local.
+
+One can configure and build `rpdemo` using CMake in the same way as for `kutils` and `kmodel`. 
+
+
 ## Software Architecture ##
 
 To be written.

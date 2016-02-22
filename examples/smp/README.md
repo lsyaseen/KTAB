@@ -9,21 +9,21 @@ There are three components:
 * `spmg`: this is a stand-alone GUI application. 
 
 
-The `smpc` application accepts a "--help" argument to display the help menu: 
+The `smpc` application accepts a "--help" argument to display the help menu. It displays the current time, the software version, and the options, similar to the following:
 
-	smpApp version 0.1
+	Software version: smpc 0.1
 	Usage: specify one or more of these options
 		--help            print this message
 		--euSMP           exp. util. of spatial model of politics
 		--csv <f>         read a scenario from CSV
 		--seed <n>        set a 64bit seed
 		                  0 means truly random
-		                  default: 00000000000829961074
+		                  default:  15455440707583219804
 
 
 The --euSMP option generates a random multi-dimensional dataset and simulates bargaining until the actor positions stabilize. They are considered stable when the RMS change is 1/100-th of the RMS change on the first turn. As the simulation generates a great deal of text output, it is recommended that one pipe the output to a text file with a command such as the following:
 
-	smpApp --seed 31416 --euSMP  > tmp.txt
+	smpc --seed 31416 --euSMP  > tmp.txt
 
 The "--csv" option reads in the named file and simulates bargaining until the actor positions stabilize.
 An example of the expected format is in kmodel/doc/dummyData_3Dim.csv
@@ -63,7 +63,7 @@ but only 18% in the final state. By contrast, SActor-06 rises from 8.6% to 19% p
 
 ## Build Instructions ##
 
-To build `smp`, the following must also be built and installed first:
+To build `smplib`, `smpc`, and `smpg`, the following must also be built and installed first:
 - fltk
 - tinyxml2
 - sqlite3

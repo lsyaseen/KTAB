@@ -278,7 +278,7 @@ int main(int ac, char **av) {
   bool csvP = false;
   string inputCSV = "";
 
-  cout << "smpApp version " << DemoSMP::appVersion << endl << endl;
+  cout << "Software version: " << DemoSMP::appName << " " << DemoSMP::appVersion << endl << endl;
 
   auto showHelp = [dSeed]() {
     printf("\n");
