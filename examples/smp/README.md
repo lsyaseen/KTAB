@@ -63,12 +63,26 @@ but only 18% in the final state. By contrast, SActor-06 rises from 8.6% to 19% p
 
 ## Build Instructions ##
 
+To build `smp`, the following must also be built and installed first:
+- fltk
+- tinyxml2
+- sqlite3
+- kutils
+- kmodel
+- kgraph
+
+Under Windows, we recommend using [CMake](https://cmake.org/) to build `fltk`, `tinyxml2`, and `sqlite3` from source and install them into C:/local. Under Linux, the standard package managers will install them in the standard locations, where CMake will find them.
+
+Build `kutils`, `kmodel`, and `kgraph` according to their README files. Each has an INSTALL build target. Under Windows, this will install them to C:/local; under Linux, this will install them to /usr/local.
+
+One can configure and build `smp` using CMake in the same way as for `kutils`, `kmodel`, and `kgraph`. The `smp` library has an INSTALL build target which will install it into C:/local under Windows and into /usr/local under Linux.
 
 For the `smpc` command-line application, the default behavior of Visual Studio to produce a console application is useful.
 The cmake-gui tool builds a project file for a 
 'Console' application by default, not a 'Windows' application.
 Thus, the application creates a black terminal window whenever it runs.
- For the `smpg` GUI application, one might wish to suppress the console and use the FLTK window alone. This is done by resetting the application type. While the basic logic is the same for each version of Visual Studio, the details depend on the version and year.
+
+For the `smpg` GUI application, one might wish to suppress the console and use the FLTK window alone. This is done by resetting the application type. While the basic logic is the same for each version of Visual Studio, the details of the linker depend on the version and year.
 
 
 To fix this in Visual Studio 2008, you can select the executable target,
