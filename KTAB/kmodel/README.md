@@ -20,24 +20,34 @@ On Windows, the KTAB build has been verified with Visual Studio 12 2013 Win64
 On Linux, the build has been verified with KDevelop 3 and plain Unix makefiles,
 using both g++ 4.8 and clang++ 3.4.
 
-KUTILS uses [SQLite3](https://www.sqlite.org/). Under Linux, simply install the sqlite3 package,
+The kmodel library and examples use [SQLite3](https://www.sqlite.org/). Under Linux, simply install the sqlite3 package,
 and everything will be where CMake expects it.
 
-Under Windows, the simplest and most reliable way is to compile it and put the library and header into C:/local/sqlite. In fact, the CMake files of KTAB expect all the libraries to be in C:/local for Windows: flkt, kmodel, sqlite, tinyxml, kutil. There is no need to modify your PATH under either Linux or Windows. Details are in the kutils [README](../kutils/README.md).
+Under Windows, the simplest and most reliable way is to compile it and put the library and header into C:/local/sqlite. In fact, the CMake files of KTAB expect all the libraries to be in C:/local for Windows: fltk, kmodel, sqlite, tinyxml, kutil. Under Linux, the kutils, kmodel files will be installed to /usr/local. There is no need to modify your PATH under either Linux or Windows.
  
+First, download the source code "amalgamation" from the SQLite3
+ [download](https://www.sqlite.org/download.html) page. The amalgamation contains the complete source code as a single
+"sqlite3.c" file, as well as a simple shell demo (shell.c). Use Visual Studio to make a solution which contains two projects. The first project should build a static library, sqlite3.lib, 
+using only sqlite3.c. The second project should build a console program using the library and shell.c in order to test/demo functionality.
+
+Then, copy sqlite3.h, sqlite3ext.h and sqlite3.lib into 
+C:/local/sqlite. This is where CMake expects to find them.
 
 We will assume you have checked out or unpacked the KTAB
 sources into /home/KTAB/, so that the top of the directory
 tree appears like this:
-  /home/KTAB/examples
-  /home/KTAB/KTAB/cmakemodules
-  /home/KTAB/KTAB/kmodel
-  /home/KTAB/KTAB/kutils
-  ...
 
-Before attempting to build kmodel, you must configure and build kutils, as kmodel relies on that library. It is strongly advised that you run the "demoutils" program to test the functionality. When you build the INSTALL target, it will copy the kutils library and header to where CMake expects to find them. Under Windows, this will be C:/local/; under Linux, it will be /usr/local.
+	/home/KTAB/examples
+	/home/KTAB/KTAB/cmakemodules
+	/home/KTAB/KTAB/kmodel
+	/home/KTAB/KTAB/kutils
+	...
+  
 
-After building and installing kutils, start cmake-gui.
+
+Before attempting to build kmodel, you must configure and build kutils, as kmodel relies on that library. Build instructions are in the kutils [README](../kutils/README.md). It is strongly advised that you run the "demoutils" program to test the functionality. When you build the INSTALL target, it will copy the kutils library and header to where CMake expects to find them. Under Windows, this will be C:/local/; under Linux, it will be /usr/local.
+
+After building and installing kutils, the first step in building kmodel is to start  CMake. We recommend using the GUI version, not the command-line version.
 
 In the CMake GUI, you should answer "Where is the source code"
 with the location of the CMake source file CMakeLists.txt,
