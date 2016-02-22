@@ -69,6 +69,9 @@ or /home/KTAB/KTAB/kutils/build/Makefile for Linux and make.
 Open the kutils project with your IDE; it should display two targets: kutils and demoutils. The former is the library of utility functions; the latter is a simple command-line demonstration
 of some of the utility functions.
 
+The INSTALL  target for kutils will install it into  C:/local for Windows and /usr/local for Linux.
+ In fact, the CMake files of KTAB expect all the libraries to be in C:/local for Windows: fltk, kmodel, sqlite, tinyxml, kutil. Under Linux, the kutils, kmodel files will be installed to /usr/local. There is no need to modify your PATH under either Linux or Windows.
+
 The demonstration program provides a help menu, as follows:
 
 
