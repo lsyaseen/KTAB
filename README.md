@@ -5,13 +5,15 @@ KTAB is an open-source toolkit for assembling agent-based models of negotiation 
 
 All KTAB models represent stochastic decision-making among comparatively small numbers of stakeholder groups (roughly 5 to 50), within the paradigm of "Probabilistic Condorcet Elections". PCEs are used to estimate the likelihood of different outcomes from a collective decision making process, depending on what kinds of options each agent has or can generate, how they value those options, and what kinds of coalitions they can form to support or oppose each option. Details can be found in the online documentation as well as the main KTAB  [page](https://www.kapsarc.org/openkapsarc/kapsarc-toolkit-for-behavioral-analysis-ktab/).
 
+## Examples ##
+
 Examples are provided to illustrate the range of modeling which can be done in the framework and to provide templates for further work. Examples in the kmodel directory include the following:
 
 - Using an input/output economic model to bargain over tax/subsidy rates,
 - Simple discrete matching 
 
 
-- A simple but highly parameterizable version of the spatial model of politics. The command line version is *smpc*; a GUI version will be called *smpg*. Dummy data is provided to illustrate the format for CSV input files.
+- A simple but highly parameterizable version of the [spatial model of politics](examples/smp/README.md). The command line version is `smpc`; a GUI version will be called `smpg`. Dummy data is provided to illustrate the format for CSV input files.
 
 
 - A simple model of bargaining over the order in which projects should be addressed, taking into account budget limits. Dummy data is provided.
@@ -27,10 +29,10 @@ KTAB is written in portable, cross-platform C++11.
 
 KTAB uses CMake for configuration; downloads and instructions can be obtained from [www.cmake.org](http://www.cmake.org). The basic procedure is to configure kutils with CMake, then build the library and examples with your favorite IDE. Then configure kmodel with CMake and build it. Detailed build instructions can be found in the subdirectories, starting with kutils' [README](KTAB/kutils/README.md). After building kutils, you can follow kmodel's [README](KTAB/kmodel/README.md). Following these instructions, under both Windows and Linux, it is not necessary to modify your PATH at any point of the installation.
 
-Example of how to build models outside the main library structure, as one would do for a custom model, are in the examples directories; see the README files for each. 
+Example of how to build models outside the main library structure, as one would do for a custom model, are in the examples directories; see the overall [README](examples/README.md) and the README files for each. 
 
-Because no platform-specific code is allowed, porting to Mac or other platforms should be feasible.
-It was developed and tested on 64-bit Windows and Linux platforms, including the following:
+
+The code is compiled, linked, and tested with absolutely no modification, simultaneously on both Windows and Linux: there is one single body of cross-platform code, not  separate versions for each OS. Because no platform-specific code is allowed, porting to Mac or other platforms should be feasible. It was developed and tested on 64-bit Windows and Linux platforms, including the following:
 
 * Windows 
   * Windows 7 Professional with Visual Studio 2010 Express,
@@ -41,15 +43,18 @@ It was developed and tested on 64-bit Windows and Linux platforms, including the
   * openSUSE 13.2 with clang/clang++ 3.5,
   * Debian 8.1 with gcc/g++ 4.9.
 
+## User Interfaces ##
 
+A graphical front end is under development. The current plan is that it will use the open source, cross-platform, C++ toolkit [FLTK](http://www.fltk.org). The source code and build instructions for the most recent stable version can be obtained  [here](http://www.fltk.org/software.php). FLTK also uses CMake for configuration, then your favorite IDE to build.
 
-A graphical front end is under development. It will use the open source, cross-platform, C++ toolkit [FLTK](http://www.fltk.org). The source code and build instructions for the most recent stable version can be obtained  [here](http://www.fltk.org/software.php). FLTK also uses CMake for configuration, then your favorite IDE to build.
+The current preference for FLTK is based simply on the fact that it was the easiest to build, install, and use across multiple OS. Because the libraries that analyze negotiation are completely separate from the applications that use them, developers are perfectly free to write command line applications or use other GUI toolkits. Along these lines, the GUI work is expected to diversify into  other toolkits, such as [Qt](https://www.qt.io/), [WxWidgets](https://www.wxwidgets.org/), or even a web interface such as [Wt](http://www.webtoolkit.eu/wt).
+
+## Data Input Formats ##
 
 To read and write XML data files, KTAB is being converted to use the [TinyXML2](https://github.com/leethomason/tinyxml2) library, which is available on [GitHub](https://github.com/).
 
 
 ## Contributing and License Information ##
-
 
 
 If you are interested in contributing code, ideas, or
