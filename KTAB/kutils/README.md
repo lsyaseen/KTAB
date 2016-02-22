@@ -35,7 +35,7 @@ obtain and install [CMake](www.cmake.org).
 
 You must have a working C++11 development environment.
 On Windows, the KTAB build has been verified with Visual Studio 12 2013 Win64 (Community edition) using the default native compilers.
-On Linux, the build has been verified with KDevelop 3 and plain Unix makefiles, using both g++ 4.8 and clang++ 3.4.
+On Linux, the build has been verified with KDevelop 3 and plain Unix makefiles, using both g++ 4.8 and clang++ 3.4. Please note that at no point in the build process of any part of KTAB is it necessary to modify your PATH under either Windows or Linux (if you follow these instructions).
 
 The first step is to start CMake; we recommend using the GUI version, not the command-line version.
 In the CMake GUI, you should answer "Where is the source code"
