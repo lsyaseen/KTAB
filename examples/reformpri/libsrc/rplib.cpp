@@ -149,6 +149,14 @@ void RPModel::initScen0() {
     return;
 }
 
+
+void RPModel::readXML(string fileName) {
+  // read XML file with tinyXML2 then do equivalent of
+  // initScen and configScen
+  assert(false);
+  return;
+}
+
 void RPModel::initScen1() {
     // Notionally, we have 15 actors who are negotiating over what the government's
     // priorities will be. There are seven kinds reforms contemplated.

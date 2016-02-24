@@ -137,6 +137,7 @@ public:
     unsigned int numCat = 0;  // happens to equal numItm, in this demo, at the categories are 1, 2, ... numItm.
 
     void initScen(unsigned int ns);
+    void readXML(string fileName);
     void showHist() const;
 
     static bool equivStates(const RPState * rs1, const RPState * rs2);
