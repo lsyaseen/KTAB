@@ -145,6 +145,7 @@ public:
 protected:
     void initScen0(); // random
     void initScen1(); // fixed, but dummy data
+    void initScen2(); // unfinished
     void configScen(unsigned int numA, const double aCap[], const KMatrix & utils);
 
 private:

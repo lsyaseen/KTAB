@@ -233,9 +233,12 @@ int main(int ac, char **av) {
         rpm->initScen(0);
         break;
     case 1:
+      rpm->initScen(1);
+      break;
+
     default:
-        rpm->initScen(1);
-        break;
+      rpm->initScen(0);
+      break;
     }
 
     unsigned int numA = rpm->numAct; // the actors are as yet unnamed

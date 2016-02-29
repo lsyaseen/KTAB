@@ -88,6 +88,7 @@ include_directories(
 
 set(RPLIB_SRCS 
  libsrc/rplib.cpp
+ libsrc/rplib2.cpp
 )
 
 add_library(rplib STATIC ${RPLIB_SRCS})
