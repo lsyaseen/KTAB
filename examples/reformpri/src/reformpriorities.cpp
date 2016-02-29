@@ -174,7 +174,7 @@ int main(int ac, char **av) {
         printf("--seed <n>        set a 64bit seed \n");
         printf("                  0 means truly random \n");
         printf("                  default: %020llu \n", dSeed);
-        printf("--sNum <n>        choose a scenario nnumber \n");
+        printf("--sNum <n>        choose a scenario number \n");
         printf("                  default: %u \n", sNum);
     };
 
@@ -210,7 +210,7 @@ int main(int ac, char **av) {
 
     if (!((siP && !cpP) || (cpP && !siP))) {
         runP = false;
-        printf("Exactly one of either --siP or --cpP must be specified\n");
+        printf("Exactly one of either --si or --cp must be specified\n");
     }
 
     if (!runP) {
@@ -234,6 +234,14 @@ int main(int ac, char **av) {
         break;
     case 1:
       rpm->initScen(1);
+      break;
+
+    case 2:
+      rpm->initScen(2);
+      break;
+
+    case3 :
+      rpm->initScen(3);
       break;
 
     default:

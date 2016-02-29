@@ -145,9 +145,10 @@ public:
 protected:
     void initScen0(); // random
     void initScen1(); // fixed, but dummy data
-    void initScen2(); // unfinished
+    void initScen2Avrg(); // unfinished
+    void initScen3Top4(); // unfinished
     void configScen(unsigned int numA, const double aCap[], const KMatrix & utils);
-
+    
 private:
 };
 

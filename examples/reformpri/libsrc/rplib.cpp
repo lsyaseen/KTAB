@@ -117,6 +117,12 @@ void RPModel::initScen(unsigned int ns) {
     case 1:
         initScen1();
         break;
+    case 2:
+      initScen2Avrg();
+      break;
+    case3:
+      initScen3Top4();
+      break;
     default:
         printf("Unrecognized scenario number, %u \n", ns);
         break;
@@ -267,7 +273,7 @@ void RPModel::configScen(unsigned int numA, const double aCap[], const KMatrix &
 
     prob = vector<double>();
     double pj = 1.0;
-    const double pDecline = 0.80;
+    const double pDecline = 0.95;
     // rate of decline has little effect on the results.
     // this may be due to the high symmmetry of the other data.
     for (unsigned int j = 0; j < numItm; j++) {

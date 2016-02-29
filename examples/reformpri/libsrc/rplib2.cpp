@@ -42,65 +42,16 @@ using KBase::PCEModel;
 // function definitions
 
 
-void RPModel::initScen2() { 
-  // unfinished
-
-    const unsigned int numA = 15;
-    numItm = 7;
-    numCat = numItm;
-
-
-    // Reform items are (A, B, C, D, E, F, G), in that order
-    // Categories are (First, Second, Third, ... Seventh), in that order
-
-    const double gcArray[] = { 32, 38, 29, 15, 18, 41, 27 };
-    govCost = KMatrix::arrayInit(gcArray, 1, numItm);
-    govBudget = 100;
-    obFactor = 0.10;
-
-    const double uArray[] =
-    {
-        65, 60, 40, 25, 10, 100, 40, //  0
-        70, 35, 80, 50, 0, 20, 100, //  1
-        60, 75, 25, 0, 60, 100, 45, //  2
-        55, 25, 60, 80, 30, 50, 30, //  3
-        65, 100, 40, 80, 0, 60, 25, //  4
-        45, 60, 100, 80, 40, 60, 20, //  5
-        35, 100, 50, 90, 0, 80, 100, //  6
-        35, 100, 20, 60, 0, 50, 25, //  7
-        40, 80, 100, 60, 50, 25, 50, //  8
-        60, 80, 100, 25, 40, 60, 35, //  9
-        65, 60, 100, 80, 50, 30, 25, //  10
-        60, 80, 100, 40, 50, 60, 35, //  11
-        50, 50, 60, 0, 20, 100, 25, //  12
-        50, 0, 60, 0, 100, 80, 0, //  13
-        60, 0, 50, 0, 100, 80, 0  //  14
-    };
-    // rows are actors, columns are reform items
-
-    const KMatrix utils = KMatrix::arrayInit(uArray, numA, numItm);
-    // The 'utils' matrix shows the utilities to the actor (row) of each reform item (clm)
+void RPModel::initScen2Avrg() {
+    // unfinished
+    assert(false);
+    return;
+}
 
 
-    const double aCap[] = {
-        40,  //  0
-        30,  //  1
-        15,  //  2
-        30,  //  3
-        20,  //  4
-        10,  //  5
-        20,  //  6
-        5,   //  7
-        15,  //  8
-        25,  //  9
-        20,  // 10
-        10,  // 11
-        5,   // 12
-        5,   // 13
-        10   // 14
-    };
-
-    configScen(numA, aCap, utils);
+void RPModel::initScen3Top4() {
+    // unfinished
+    assert(false);
     return;
 }
 
