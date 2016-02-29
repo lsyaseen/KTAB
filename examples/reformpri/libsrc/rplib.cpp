@@ -120,7 +120,7 @@ void RPModel::initScen(unsigned int ns) {
     case 2:
       initScen2Avrg();
       break;
-    case3:
+    case 3:
       initScen3Top4();
       break;
     default:
@@ -273,7 +273,7 @@ void RPModel::configScen(unsigned int numA, const double aCap[], const KMatrix &
 
     prob = vector<double>();
     double pj = 1.0;
-    const double pDecline = 0.95;
+    const double pDecline = 0.975;
     // rate of decline has little effect on the results.
     // this may be due to the high symmmetry of the other data.
     for (unsigned int j = 0; j < numItm; j++) {

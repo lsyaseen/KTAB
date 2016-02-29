@@ -120,11 +120,9 @@ vector<VUI> scanPositions(const RPModel * rpm) {
 
     sort(pairs.begin(), pairs.end(), betterPR);
 
-    const unsigned int maxDisplayed = 25;
-    unsigned int numPr = pairs.size();
-    if (maxDisplayed < numPr) {
-        numPr = maxDisplayed;
-    }
+    const unsigned int maxDisplayed = 500;
+    unsigned int  numPr = (pairs.size() < maxDisplayed) ? pairs.size() : maxDisplayed;
+
     cout << "Displaying highest " << numPr << endl << flush;
     for (unsigned int i = 0; i < numPr; i++) {
         auto pri = pairs[i];
@@ -132,7 +130,7 @@ vector<VUI> scanPositions(const RPModel * rpm) {
         double zi = get<1>(pri);
         VUI pi = get<2>(pri);
 
-        printf("%3u: %4u  %.2f  ", i, ni, zi);
+        printf(" %3u: %4u  %.2f  ", i, ni, zi);
         printPerm(pi);
         cout << endl << flush;
     }
@@ -163,6 +161,10 @@ int main(int ac, char **av) {
     bool runP = true;
     unsigned int sNum = 1;
 
+    // tmp
+    //siP = true;
+    //sNum = 3;
+
     auto showHelp = [dSeed, sNum]() {
         printf("\n");
         printf("Usage: specify one or more of these options\n");
@@ -177,8 +179,6 @@ int main(int ac, char **av) {
         printf("--sNum <n>        choose a scenario number \n");
         printf("                  default: %u \n", sNum);
     };
-
-
 
     // a list of <keyword, description, lambda-fn>
     // might be enough to do this - except for the arguments to options.
@@ -240,7 +240,7 @@ int main(int ac, char **av) {
       rpm->initScen(2);
       break;
 
-    case3 :
+    case 3 :
       rpm->initScen(3);
       break;
 
