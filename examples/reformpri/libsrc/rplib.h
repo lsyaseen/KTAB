@@ -129,6 +129,7 @@ public:
 
     unsigned int govBudget = 0;
     KMatrix  govCost = KMatrix();
+    double pDecline = 0.850;
     vector<double> prob = {};
     double obFactor = 0.1;
     unsigned int numItm = 0; // number of reform items
