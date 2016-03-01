@@ -273,7 +273,9 @@ void RPModel::configScen(unsigned int numA, const double aCap[], const KMatrix &
 
     prob = vector<double>();
     double pj = 1.0;
-    const double pDecline = 0.975;
+    const double pDecline = 0.800;
+    printf("pDecline factor: %.3f \n", pDecline);
+    printf("obFactor: %.3f \n", obFactor);
     // rate of decline has little effect on the results.
     // this may be due to the high symmmetry of the other data.
     for (unsigned int j = 0; j < numItm; j++) {
