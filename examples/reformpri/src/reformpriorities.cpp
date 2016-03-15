@@ -27,20 +27,20 @@
 #include <tuple>
 
 namespace RfrmPri {
-// namespace to hold everything related to the
-// "priority of reforms" CDMP. Note that KBase has no access.
+  // namespace to hold everything related to the
+  // "priority of reforms" CDMP. Note that KBase has no access.
 
-using namespace std;
+  using namespace std;
 
-using KBase::KMatrix;
-using KBase::PRNG;
-using KBase::VUI;
+  using KBase::KMatrix;
+  using KBase::PRNG;
+  using KBase::VUI;
 
-// -------------------------------------------------
-// function definitions
+  // -------------------------------------------------
+  // function definitions
 
 
-vector<VUI> scanPositions(const RPModel * rpm) {
+  vector<VUI> scanPositions(const RPModel * rpm) {
     unsigned int numA = rpm->numAct;
     unsigned int numRefItem = rpm->numItm;
     assert(numRefItem == rpm->numCat);
@@ -52,11 +52,11 @@ vector<VUI> scanPositions(const RPModel * rpm) {
     VUI pstn;
     // build the first permutation: 1,2,3,...
     for (unsigned int i = 0; i < numRefItem; i++) {
-        pstn.push_back(i);
+      pstn.push_back(i);
     }
     positions.push_back(pstn);
     while (next_permutation(pstn.begin(), pstn.end())) {
-        positions.push_back(pstn);
+      positions.push_back(pstn);
     }
     const unsigned int numPos = positions.size();
     cout << "For " << numRefItem << " reform items there are " << numPos << " positions" << endl;
@@ -65,38 +65,51 @@ vector<VUI> scanPositions(const RPModel * rpm) {
     cout << "Effective gov costs:" << endl;
     (rpm->govCost).mPrintf("%.3f ");
     cout << endl;
-    KMatrix uij = KMatrix(numA, numPos);
-    for (unsigned int ai = 0; ai < numA; ai++) {
-        for (unsigned int pj = 0; pj < numPos; pj++) {
-            auto pstn = positions[pj];
-            double uip = rpm->utilActorPos(ai, pstn);
-            assert(0 < uip);
-            uij(ai, pj) = uip;
-        }
+    auto ruFn = [positions, rpm](unsigned int ai, unsigned int pj) {
+      auto pstn = positions[pj];
+      double uip = rpm->utilActorPos(ai, pstn);
+      return uip;
+    };
+    auto rawUij = KMatrix::map(ruFn, numA, numPos);
+    KMatrix uij = RfrmPri::rescaleRows(rawUij, 0.0, 1.0);
+ 
+    //cout << "Complete utility matrix of actors (rows) versus positions (columns)" << endl << flush;
+    //uij.mPrintf(" %6.4f, ");
+    cout << "Complete utility matrix of positions (rows) versus actors (columns)" << endl << flush;
+    for (unsigned int pj = 0; pj < numPos; pj++) {
+      printf("%3i  ", pj);
+      auto pstn = positions[pj];
+      printPerm(pstn);
+      printf("  ");
+      for (unsigned int ai = 0; ai < numA; ai++) {
+        double uap = uij(ai, pj);
+        printf("%6.4f, ", uap);
+      }
+      cout << endl << flush;
     }
 
-    cout << "Computing best position for each actor"<<endl;
+    cout << endl << "Computing best position for each actor" << endl;
     vector<VUI> bestAP; // list of each actor's best position (followed by CP)
     for (unsigned int ai = 0; ai < numA; ai++) {
-        unsigned int bestJ = 0;
-        double bestV = 0;
-        for (unsigned int pj = 0; pj < numPos; pj++) {
-            if (bestV < uij(ai,pj)) {
-                bestJ = pj;
-                bestV = uij(ai,pj);
-            }
+      unsigned int bestJ = 0;
+      double bestV = 0;
+      for (unsigned int pj = 0; pj < numPos; pj++) {
+        if (bestV < uij(ai, pj)) {
+          bestJ = pj;
+          bestV = uij(ai, pj);
         }
-        printf("Best for %02u is ", ai);
-        printPerm(positions[bestJ]);
-        cout << endl;
-        bestAP.push_back(positions[bestJ]);
+      }
+      printf("Best for %02u is ", ai);
+      printPerm(positions[bestJ]);
+      cout << endl;
+      bestAP.push_back(positions[bestJ]);
     }
 
     cout << "Computing zeta ... " << endl;
     KMatrix aCap = KMatrix(1, numA);
     for (unsigned int i = 0; i < numA; i++) {
-        auto ri = ((const RPActor *)(rpm->actrs[i]));
-        aCap(0, i) = ri->sCap;
+      auto ri = ((const RPActor *)(rpm->actrs[i]));
+      aCap(0, i) = ri->sCap;
     }
     KMatrix zeta = aCap * uij;
     assert((1 == zeta.numR()) && (numPos == zeta.numC()));
@@ -105,17 +118,17 @@ vector<VUI> scanPositions(const RPModel * rpm) {
     cout << "Sorting positions from most to least net support ..." << endl << flush;
 
     auto betterPR = [](tuple<unsigned int, double, VUI> pr1,
-    tuple<unsigned int, double, VUI> pr2) {
-        double v1 = get<1>(pr1);
-        double v2 = get<1>(pr2);
-        bool better = (v1 > v2);
-        return better;
+      tuple<unsigned int, double, VUI> pr2) {
+      double v1 = get<1>(pr1);
+      double v2 = get<1>(pr2);
+      bool better = (v1 > v2);
+      return better;
     };
 
     auto pairs = vector<tuple<unsigned int, double, VUI>>();
     for (unsigned int i = 0; i < numPos; i++) {
-        auto pri = tuple<unsigned int, double, VUI>(i, zeta(0, i), positions[i]);
-        pairs.push_back(pri);
+      auto pri = tuple<unsigned int, double, VUI>(i, zeta(0, i), positions[i]);
+      pairs.push_back(pri);
     }
 
     sort(pairs.begin(), pairs.end(), betterPR);
@@ -125,195 +138,204 @@ vector<VUI> scanPositions(const RPModel * rpm) {
 
     cout << "Displaying highest " << numPr << endl << flush;
     for (unsigned int i = 0; i < numPr; i++) {
-        auto pri = pairs[i];
-        unsigned int ni = get<0>(pri);
-        double zi = get<1>(pri);
-        VUI pi = get<2>(pri);
+      auto pri = pairs[i];
+      unsigned int ni = get<0>(pri);
+      double zi = get<1>(pri);
+      VUI pi = get<2>(pri);
 
-        printf(" %3u: %4u  %.2f  ", i, ni, zi);
-        printPerm(pi);
-        cout << endl << flush;
+      printf(" %3u: %4u  %.2f  ", i, ni, zi);
+      printPerm(pi);
+      cout << endl << flush;
     }
 
     VUI bestPerm = get<2>(pairs[0]);
 
     bestAP.push_back(bestPerm);
     return bestAP;
-}
+  }
 
 } // end of namespace
 
 int main(int ac, char **av) {
-    using KBase::ReportingLevel;
-    using KBase::PRNG;
-    using KBase::MtchPstn;
+  using KBase::ReportingLevel;
+  using KBase::PRNG;
+  using KBase::MtchPstn;
 
-    using RfrmPri::RPModel;
-    using RfrmPri::RPState;
-    using RfrmPri::RPActor;
-    using RfrmPri::printPerm;
+  using RfrmPri::RPModel;
+  using RfrmPri::RPState;
+  using RfrmPri::RPActor;
+  using RfrmPri::printPerm;
 
-    auto sTime = KBase::displayProgramStart();
-    uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary
-    uint64_t seed = dSeed;
-    bool siP = false;
-    bool cpP = false;
-    bool runP = true;
-    unsigned int sNum = 1;
+  auto sTime = KBase::displayProgramStart();
+  uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary
+  uint64_t seed = dSeed;
+  bool siP = false;
+  bool cpP = false;
+  bool runP = true;
+  unsigned int sNum = 1;
 
-    // tmp
-    //siP = true;
-    //sNum = 3;
+  // tmp
+  //siP = true;
+  sNum = 22;
 
-    auto showHelp = [dSeed, sNum]() {
-        printf("\n");
-        printf("Usage: specify one or more of these options\n");
-        printf("\n");
-        printf("--cp              start all actors from the central position \n");
-        printf("--si              start each actor from their most self-interested position \n");
-        printf("                  Note: either CP or SI must be indicated. \n");
-        printf("--help            print this message and exit \n");
-        printf("--seed <n>        set a 64bit seed \n");
-        printf("                  0 means truly random \n");
-        printf("                  default: %020llu \n", dSeed);
-        printf("--sNum <n>        choose a scenario number \n");
-        printf("                  default: %u \n", sNum);
-    };
+  auto showHelp = [dSeed, sNum]() {
+    printf("\n");
+    printf("Usage: specify one or more of these options\n");
+    printf("\n");
+    printf("--cp              start all actors from the central position \n");
+    printf("--si              start each actor from their most self-interested position \n");
+    printf("                  Note: either CP or SI must be indicated. \n");
+    printf("--help            print this message and exit \n");
+    printf("--seed <n>        set a 64bit seed \n");
+    printf("                  0 means truly random \n");
+    printf("                  default: %020llu \n", dSeed);
+    printf("--sNum <n>        choose a scenario number \n");
+    printf("                  default: %u \n", sNum);
+  };
 
-    // a list of <keyword, description, lambda-fn>
-    // might be enough to do this - except for the arguments to options.
-    if (ac > 1) {
-        for (int i = 1; i < ac; i++) {
-            if (strcmp(av[i], "--seed") == 0) {
-                i++;
-                seed = std::stoull(av[i]);
-            }
-            else if (strcmp(av[i], "--sNum") == 0) {
-                i++;
-                sNum = atoi(av[i]);
-            }
-            else if (strcmp(av[i], "--cp") == 0) {
-                cpP = true;
-            }
-            else if (strcmp(av[i], "--si") == 0) {
-                siP = true;
-            }
-            else if (strcmp(av[i], "--help") == 0) {
-                runP = false;
-            }
-            else {
-                runP = false;
-                printf("Unrecognized argument: %s\n", av[i]);
-            }
-        }
-    }
-
-    if (!((siP && !cpP) || (cpP && !siP))) {
+  // a list of <keyword, description, lambda-fn>
+  // might be enough to do this - except for the arguments to options.
+  if (ac > 1) {
+    for (int i = 1; i < ac; i++) {
+      if (strcmp(av[i], "--seed") == 0) {
+        i++;
+        seed = std::stoull(av[i]);
+      }
+      else if (strcmp(av[i], "--sNum") == 0) {
+        i++;
+        sNum = atoi(av[i]);
+      }
+      else if (strcmp(av[i], "--cp") == 0) {
+        cpP = true;
+      }
+      else if (strcmp(av[i], "--si") == 0) {
+        siP = true;
+      }
+      else if (strcmp(av[i], "--help") == 0) {
         runP = false;
-        printf("Exactly one of either --si or --cp must be specified\n");
+      }
+      else {
+        runP = false;
+        printf("Unrecognized argument: %s\n", av[i]);
+      }
     }
+  }
 
-    if (!runP) {
-        showHelp();
-        return 0;
-    }
+  if (!((siP && !cpP) || (cpP && !siP))) {
+    runP = false;
+    printf("Exactly one of either --si or --cp must be specified\n");
+  }
 
-
-    PRNG * rng = new PRNG();
-    seed = rng->setSeed(seed); // 0 == get a random number
-    printf("Using PRNG seed:  %020llu \n", seed);
-    printf("Same seed in hex:   0x%016llX \n", seed);
-    // Unix correctly prints all digits with lu, lX, llu, and llX.
-    // Windows only prints part, with lu, lX, llu, and llX.
-
-
-    auto rpm = new RPModel(rng);
-    switch (sNum) {
-    case 0:
-        rpm->initScen(0);
-        break;
-    case 1:
-      rpm->initScen(1);
-      break;
-
-    case 2:
-      rpm->initScen(2);
-      break;
-
-    case 3 :
-      rpm->initScen(3);
-      break;
-
-    default:
-      rpm->initScen(0);
-      break;
-    }
-
-    unsigned int numA = rpm->numAct; // the actors are as yet unnamed
-    unsigned int numR = rpm->numItm;
-
-    auto rps0 = new RPState(rpm);
-    rpm->addState(rps0);
-
-    auto pstns = RfrmPri::scanPositions(rpm);
-    KBase::VUI bestPerm = pstns[numA];
-    assert(numR == bestPerm.size());
-
-    // Either start them all at the CP or have each to choose an initial position which
-    // maximizes their direct utility, regardless of expected utility.
-    for (unsigned int i = 0; i < numA; i++) {
-        auto pi = new  MtchPstn();
-        pi->numCat = numR;
-        pi->numItm = numR;
-        if (cpP) {
-            pi->match =  bestPerm;
-        }
-        if (siP) {
-            pi->match =  pstns[i];
-        }
-        rps0->addPstn(pi);
-    }
-    assert(numA == rps0->pstns.size());
-
-    rps0->step = [rps0]() {
-        return rps0->stepSUSN();
-    };
-    unsigned int maxIter = 100;
-    rpm->stop = [maxIter,rpm](unsigned int iter, const KBase::State * s) {
-        bool doneP = iter > maxIter;
-        if (doneP) {
-            printf("Max iteration limit of %u exceeded \n", maxIter);
-        }
-        auto s2 = ((const RPState *)(rpm->history[iter]));
-        for (unsigned int i = 0; i < iter; i++) {
-            auto s1 = ((const RPState *)(rpm->history[i]));
-            if (RPModel::equivStates(s1, s2)) {
-                doneP = true;
-                printf("State number %u matched state number %u \n", iter, i);
-            }
-        }
-
-        return doneP;
-    };
-
-    rps0->setUENdx();
-    rpm->run();
-
-    // we already displayed each state as it was processed,
-    // so there is no need to show it again
-    //rpm->showHist();
-
-
-    delete rpm; // and actors, and states
-    rpm = nullptr;
-    rps0 = nullptr;
-
-    delete rng;
-    rng = nullptr;
-
-    KBase::displayProgramEnd(sTime);
-
+  if (!runP) {
+    showHelp();
     return 0;
+  }
+
+
+  PRNG * rng = new PRNG();
+  seed = rng->setSeed(seed); // 0 == get a random number
+  printf("Using PRNG seed:  %020llu \n", seed);
+  printf("Same seed in hex:   0x%016llX \n", seed);
+  // Unix correctly prints all digits with lu, lX, llu, and llX.
+  // Windows only prints part, with lu, lX, llu, and llX.
+
+
+  auto rpm = new RPModel(rng);
+  switch (sNum) {
+  case 0:
+    rpm->initScen(sNum);
+    break;
+  case 1:
+    rpm->initScen(sNum);
+    break;
+
+  case 2:
+  case 20:
+  case 21:
+  case 22:
+  case 23:
+    rpm->initScen(sNum);
+    break;
+
+  case 3:
+  case 30:
+  case 31:
+  case 32:
+  case 33:
+    rpm->initScen(sNum);
+    break;
+
+  default:
+    cout << "Unrecognized scenario number " << sNum << endl << flush;
+    assert(false);
+    break;
+  }
+
+  unsigned int numA = rpm->numAct; // the actors are as yet unnamed
+  unsigned int numR = rpm->numItm;
+
+  auto rps0 = new RPState(rpm);
+  rpm->addState(rps0);
+
+  auto pstns = RfrmPri::scanPositions(rpm);
+  KBase::VUI bestPerm = pstns[numA];
+  assert(numR == bestPerm.size());
+
+  // Either start them all at the CP or have each to choose an initial position which
+  // maximizes their direct utility, regardless of expected utility.
+  for (unsigned int i = 0; i < numA; i++) {
+    auto pi = new  MtchPstn();
+    pi->numCat = numR;
+    pi->numItm = numR;
+    if (cpP) {
+      pi->match = bestPerm;
+    }
+    if (siP) {
+      pi->match = pstns[i];
+    }
+    rps0->addPstn(pi);
+  }
+  assert(numA == rps0->pstns.size());
+
+  rps0->step = [rps0]() {
+    return rps0->stepSUSN();
+  };
+  unsigned int maxIter = 100;
+  rpm->stop = [maxIter, rpm](unsigned int iter, const KBase::State * s) {
+    bool doneP = iter > maxIter;
+    if (doneP) {
+      printf("Max iteration limit of %u exceeded \n", maxIter);
+    }
+    auto s2 = ((const RPState *)(rpm->history[iter]));
+    for (unsigned int i = 0; i < iter; i++) {
+      auto s1 = ((const RPState *)(rpm->history[i]));
+      if (RPModel::equivStates(s1, s2)) {
+        doneP = true;
+        printf("State number %u matched state number %u \n", iter, i);
+      }
+    }
+
+    return doneP;
+  };
+
+  rps0->setUENdx();
+  rpm->run();
+
+  // we already displayed each state as it was processed,
+  // so there is no need to show it again
+  //rpm->showHist();
+
+
+  delete rpm; // and actors, and states
+  rpm = nullptr;
+  rps0 = nullptr;
+
+  delete rng;
+  rng = nullptr;
+
+  KBase::displayProgramEnd(sTime);
+
+  return 0;
 }
 
 

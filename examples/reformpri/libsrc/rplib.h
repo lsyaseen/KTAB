@@ -71,7 +71,9 @@ class RPActor;
 class RPState;
 class RPModel;
 
+// -------------------------------------------------
 
+KMatrix rescaleRows(const KMatrix& m1, const double vMin, const double vMax);
 
 // -------------------------------------------------
 // class declarations
@@ -146,8 +148,8 @@ public:
 protected:
     void initScen0(); // random
     void initScen1(); // fixed, but dummy data
-    void initScen2Avrg(); // unfinished
-    void initScen3Top4(); // unfinished
+    void initScen2Avrg(unsigned int ns); // unfinished
+    void initScen3Top4(unsigned int ns); // unfinished
     void configScen(unsigned int numA, const double aCap[], const KMatrix & utils);
     
 private:

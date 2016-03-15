@@ -41,6 +41,35 @@ using KBase::PCEModel;
 // -------------------------------------------------
 // function definitions
 
+KMatrix rescaleRows(const KMatrix& m1, const double vMin, const double vMax) {
+  assert(vMin < vMax);
+  const unsigned int nr = m1.numR();
+  const unsigned int nc = m1.numC();
+  KMatrix m2 = KMatrix(nr, nc);
+
+  for (unsigned int i = 0; i < nr; i++) {
+    double rowMin = m1(i, 0);
+    double rowMax = m1(i, 0);
+    for (unsigned int j = 0; j < nc; j++) {
+      const double mij = m1(i, j);
+      if (mij < rowMin) { rowMin = mij; }
+      if (mij > rowMax) { rowMax = mij; }
+    }
+    const double rowRange = rowMax - rowMin;
+    assert(0 < rowRange);
+
+    for (unsigned int j = 0; j < nc; j++) {
+      const double mij = m1(i, j);
+      const double nij = (mij - rowMin) / rowRange; // normalize into [0, 1]
+      const double rij = vMin + (vMax - vMin)*nij; // rescale into [vMin, vMax]
+      m2(i, j) = rij;
+    }
+  }
+
+
+  return m2;
+}
+
 void printPerm(const VUI& p) {
     cout << "[Perm ";
     for (auto i : p) {
@@ -118,10 +147,18 @@ void RPModel::initScen(unsigned int ns) {
         initScen1();
         break;
     case 2:
-      initScen2Avrg();
+    case 20:
+    case 21:
+    case 22:
+    case 23:
+      initScen2Avrg(ns);
       break;
     case 3:
-      initScen3Top4();
+    case 30:
+    case 31:
+    case 32:
+    case 33:
+      initScen3Top4(ns);
       break;
     default:
         printf("Unrecognized scenario number, %u \n", ns);
@@ -431,7 +468,18 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
         // BTW, be sure to lambda-bind uMat *after* it is modified.
         assert(uMat.numR() == numA); // must include all actors
         assert(uMat.numC() <= numP); // might have dropped some duplicates
+        auto uRng = [uMat](unsigned int i, unsigned int j) {
+          if ((uMat(i, j) < 0.0) || (1.0 < uMat(i, j))) {
+            printf("%f  %i  %i  \n", uMat(i, j), i, j);
+            cout << flush;
+            cout << flush;
 
+          }
+            assert(0.0 <= uMat(i, j));
+            assert(uMat(i, j) <= 1.0);
+          return;
+        };
+        KMatrix::mapV(uRng, uMat.numR(), uMat.numC());
         // vote_k ( i : j )
         auto vkij = [this, uMat](unsigned int k, unsigned int i, unsigned int j) {
             auto ak = (RPActor*)(rpMod->actrs[k]);
@@ -448,6 +496,12 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
 
         assert(numA == eu.numR());
         assert(1 == eu.numC());
+        auto euRng = [eu](unsigned int i, unsigned int j) {
+          assert(0.0 <= eu(i, j));
+          assert(eu(i, j) <= 1.0);
+          return;
+        };
+        KMatrix::mapV(euRng, eu.numR(), eu.numC());
 
 
         if (ReportingLevel::Low < rl) {
@@ -476,6 +530,10 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
         return eu;
     };
     // end of euMat
+
+    auto euState = euMat(u);
+    cout << "Expected utilities to actors of this state" << endl << flush;
+    KBase::trans(u).mPrintf("%6.4f, ");
 
     if (ReportingLevel::Low < rl) {
         printf("--------------------------------------- \n");
@@ -794,11 +852,11 @@ void RPState::setAllAUtil(ReportingLevel rl) {
         assert(0 < uij);
         return uij;
     };
-    auto u = KMatrix::map(uFn1, numA, numA);
+    auto rawU = KMatrix::map(uFn1, numA, numA);
     if (KBase::ReportingLevel::Low < rl) {
         cout << "Raw actor-pos util matrix" << endl;
-        u.mPrintf(" %.4f ");
-        cout << endl << flush;
+        rawU.mPrintf(" %.4f ");
+        cout << endl << flush; 
         cout << flush;
 
         /// For the purposes of this demo, I consider each actor to know exactly what
@@ -810,8 +868,9 @@ void RPState::setAllAUtil(ReportingLevel rl) {
     }
 
     assert(0 == aUtil.size());
+    auto normU = rescaleRows(rawU, 0.0, 1.0);
     for (unsigned int i = 0; i < numA; i++) {
-        aUtil.push_back(u);
+        aUtil.push_back(normU); 
     }
     return;
 }

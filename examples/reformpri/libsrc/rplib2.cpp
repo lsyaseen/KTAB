@@ -42,14 +42,14 @@ using KBase::PCEModel;
 // function definitions
 
 
-void RPModel::initScen2Avrg() {
+void RPModel::initScen2Avrg(unsigned int ns) {
     // unfinished
     assert(false);
     return;
 }
 
 
-void RPModel::initScen3Top4() {
+void RPModel::initScen3Top4(unsigned int ns) {
     // unfinished
     assert(false);
     return;
