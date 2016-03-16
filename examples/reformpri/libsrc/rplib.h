@@ -111,6 +111,12 @@ public:
     // The values are all non-negative
     vector<double> riVals {};
 
+    // given those riVals, we need to know the minimum and maximum values
+    // of positions so as to normalize utilities to the [0,1] von Neumann scale.
+    // Note that we start with min > max to indicate that they are not initialized.
+    double posValMin = 1.0;
+    double posValMax = 0.0;
+
     const RPModel *rpMod = nullptr;
     // these particular actors need model-parameters to compute utility.
 
@@ -151,7 +157,7 @@ protected:
     void initScen2Avrg(unsigned int ns); // unfinished
     void initScen3Top4(unsigned int ns); // unfinished
     void configScen(unsigned int numA, const double aCap[], const KMatrix & utils);
-    
+
 private:
 };
 
@@ -174,7 +180,7 @@ public:
 protected:
     virtual void setAllAUtil(ReportingLevel rl);
     void setOneAUtil(unsigned int perspH, ReportingLevel rl);
-    
+
     RPState * doSUSN(ReportingLevel rl) const;
     RPState * doBCN(ReportingLevel rl) const;
     // bool stableRPState(unsigned int iter, const State* s);

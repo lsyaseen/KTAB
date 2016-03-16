@@ -313,7 +313,6 @@ void RPModel::configScen(unsigned int numA, const double aCap[], const KMatrix &
     printf("pDecline factor: %.3f \n", pDecline);
     printf("obFactor: %.3f \n", obFactor);
     // rate of decline has little effect on the results.
-    // this may be due to the high symmmetry of the other data.
     for (unsigned int j = 0; j < numItm; j++) {
         prob.push_back(pj);
         pj = pj * pDecline;
@@ -325,6 +324,8 @@ double RPModel::utilActorPos(unsigned int ai, const VUI &pstn) const {
     assert(ai < numAct);
     assert(numAct == actrs.size());
     auto rai = ((const RPActor*)(actrs[ai]));
+    const double pvMin = rai->posValMin;
+    const double pvMax = rai->posValMax;
     assert(nullptr != rai);
     double costSoFar = 0;
     double uip = 0.0;
@@ -337,6 +338,9 @@ double RPModel::utilActorPos(unsigned int ai, const VUI &pstn) const {
         }
         uip = uip + uij;
         costSoFar = costSoFar + cj;
+    }
+    if (pvMin < pvMax) { // normalization is configured
+      uip = (uip - pvMin)/ (pvMax - pvMin);
     }
     return uip;
 }
@@ -532,8 +536,9 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
     // end of euMat
 
     auto euState = euMat(u);
-    cout << "Expected utilities to actors of this state" << endl << flush;
-    KBase::trans(u).mPrintf("%6.4f, ");
+    cout << "Actor expected utilities: ";
+    KBase::trans(euState).mPrintf("%6.4f, ");
+    cout << endl << flush;
 
     if (ReportingLevel::Low < rl) {
         printf("--------------------------------------- \n");
@@ -794,7 +799,8 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
         //printf("  eu0(%i, 0) for %i = %+.6f \n", h, h, eu0(h,0));
         //cout << endl << flush;
         // Logically, du should always be non-negative, as GHC never returns a worse value than the starting point.
-        const double eps = 1E-8; // enough to avoid problems with round-off error
+        // However, actors plan on the assumption that all others do not change - yet they do.
+        const double eps = 0.05; // 0.025; // enough to avoid problems with round-off error
         assert(-eps <= du);
         return;
     }; // end of newPosFn
@@ -844,12 +850,12 @@ void RPState::setAllAUtil(ReportingLevel rl) {
         auto pi = pstns[j];
         auto rp = ((const MtchPstn *)pi);
         double uij = ai->posUtil(pstns[j]);
-        if (!(0 < uij)) {
+        if (!(0.0 <= uij)) {
             cout << i << " " << j << "  " << uij << endl << flush;
             printPerm(rp->match);
             cout << endl << flush;
         }
-        assert(0 < uij);
+        assert(0.0 <= uij);
         return uij;
     };
     auto rawU = KMatrix::map(uFn1, numA, numA);
