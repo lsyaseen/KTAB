@@ -266,20 +266,9 @@ void RPModel::readXML(string fileName) {
             assert (pdf < 1.0);
             pDecline = pdf;
 
-            XMLElement* actorsEl = scenEl->FirstChildElement( "Actors" );
-            assert (nullptr != actorsEl);
-            unsigned int na = 0;
-            XMLElement* aEl = actorsEl->FirstChildElement( "Actor" );
-            assert (nullptr != aEl); // has to be at least one
-            while (nullptr != aEl) {
-                na++;
-                aEl = aEl->NextSiblingElement( "Actor" );
-            }
-            printf("Found %i actors \n", na);
-
             XMLElement* catsEl = scenEl->FirstChildElement( "Categories" );
             assert (nullptr != catsEl);
-            unsigned int nc = 0; 
+            unsigned int nc = 0;
             XMLElement* cEl = catsEl->FirstChildElement( "category" );
             assert (nullptr != cEl); // has to be at least one
             while (nullptr != cEl) {
@@ -287,6 +276,7 @@ void RPModel::readXML(string fileName) {
                 cEl = cEl->NextSiblingElement( "category" );
             }
             printf("Found %i categories \n", nc);
+	    numCat = nc;
 
             XMLElement* itemsEl = scenEl->FirstChildElement( "Items" );
             assert (nullptr != itemsEl);
@@ -298,18 +288,63 @@ void RPModel::readXML(string fileName) {
                 iEl = iEl->NextSiblingElement( "Item" );
             }
             printf("Found %i items \n", ni);
-	    
+            assert (ni == nc); // for this problem, number of items and categories are equal
+	    numItm = ni;
+
             try {
             }
             catch (...) {
                 throw (KException("Error reading Items data"));
             }
+
+            XMLElement* actorsEl = scenEl->FirstChildElement( "Actors" );
+            assert (nullptr != actorsEl);
+            unsigned int na = 0;
+            XMLElement* aEl = actorsEl->FirstChildElement( "Actor" );
+            assert (nullptr != aEl); // has to be at least one
+            while (nullptr != aEl) {
+                const char* aName = aEl->FirstChildElement( "name" )->GetText();
+                const char* aDesc = aEl->FirstChildElement( "description" )->GetText();
+                float cap = 0.0;
+                aEl->FirstChildElement( "capability" )->QueryFloatText(&cap);
+                assert(0.0 < cap);
+
+                auto ri = new RPActor(aName, aDesc, this);
+                ri->sCap = cap;
+                ri->riVals = vector<double>();
+                ri->idNum = na;
+                ri->vr = KBase::VotingRule::Proportional;
+                ri->pMod = RfrmPri::RPActor::PropModel::ExpUtil;
+
+                XMLElement* ivsEl = aEl->FirstChildElement("ItemValues");
+                unsigned int numIVS = 0;
+                XMLElement* ivEl = ivsEl->FirstChildElement("iVal");
+                assert (nullptr != ivEl);
+                while (nullptr != ivEl) {
+                    numIVS++;
+                    float iv = -1.0;
+                    ivEl->QueryFloatText(&iv);
+                    assert (0 <= iv);
+                    ri->riVals.push_back(iv);
+                    ivEl = ivEl->NextSiblingElement("iVal");
+                }
+                assert(ni == numIVS); // must have a value for each item
+                addActor(ri);
+                // move to the next, if any
+                na++;
+                aEl = aEl->NextSiblingElement( "Actor" );
+            }
+            printf("Found %i actors \n", na);
+            assert (minNumActor <= na);
+            assert (na <= maxNumActor);
+
+
         }
     }
     catch (const KException& ke) {
         cout << "Caught KException in readXML: "<< ke.msg <<endl<<flush;
     }
-    catch(...) {
+    catch (...) {
         cout << "Caught unidentified exception in readXML"<<endl<<flush;
     }
 

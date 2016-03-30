@@ -270,6 +270,7 @@ int main(int ac, char **av) {
     auto rpm = new RPModel(rng);
     if (xmlP) {
         rpm->readXML(inputXML);
+        cout << "done reading XML" << endl << flush;
     }
     else {
         switch (sNum) {
@@ -302,12 +303,11 @@ int main(int ac, char **av) {
             break;
         }
     }
-    cout << "done reading XML" << endl << flush;
-    return 0;
-    
+
     unsigned int numA = rpm->numAct; // the actors are as yet unnamed
     unsigned int numR = rpm->numItm;
-
+    unsigned int numC = rpm->numCat;
+   
     auto rps0 = new RPState(rpm);
     rpm->addState(rps0);
 

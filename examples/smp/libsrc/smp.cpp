@@ -1111,8 +1111,6 @@ void SMPModel::showVPHistory(bool sqlP) const {
 
 SMPModel * SMPModel::readCSV(string fName, PRNG * rng) {
     using KBase::KException;
-    const unsigned int minNumActor = 3;
-    const unsigned int maxNumActor = 100; // It's just a demo
     char * errBuff = newChars(100); // as sprintf requires
     csv_parser csv(fName);
     // Get values according to row number and column number.

@@ -30,8 +30,8 @@ The basic elements of the data file are the following:
 	- Cost: a positive decimal between 0 and 100.
 - Categories: a list of names
 - Actors
-	- Name: a short, 2-5 character, e.g. "PF"
-	- Description: a longer description, e.g. "President of the  Federation"
+	- Name: a short, 2-5 character label, e.g. "PF"
+	- Description: a longer description, e.g. "President of the Federation"
 	- Capability: a positive number between 0 and 100.
 	- ItemValues: a list of values for each item, in the same order as the items themselves. Each item value is a decimal between 0 and 100 (possibly zero).
 	 

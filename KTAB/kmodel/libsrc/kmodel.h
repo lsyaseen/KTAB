@@ -207,6 +207,10 @@ public:
     explicit Model(PRNG * r, string d);
     virtual ~Model();
 
+    static const unsigned int minNumActor = 3;
+    static const unsigned int maxNumActor = 250; //quite generous, as we expect 10-30.
+    
+
     // In the abstract, you run a model by stepping it until it is time to stop.
     // In detail, each step is likely to record copious information to
     // a database for analysis, and the stopping criterion is likely to
