@@ -23,7 +23,7 @@
       <ItemValues>
         <iVal>26</iVal>
         <iVal>63</iVal>
-        <iVal>60</iVal>
+        <iVal>16</iVal>
         <iVal>46</iVal>
         <iVal>37</iVal>
       </ItemValues>
@@ -51,7 +51,7 @@
         <iVal>15</iVal>
         <iVal>63</iVal>
         <iVal>34</iVal>
-        <iVal>91</iVal>
+        <iVal>19</iVal>
       </ItemValues>
     </Actor>
     
@@ -76,9 +76,9 @@
       <capability>59.7</capability>
       <ItemValues>
         <iVal>84</iVal>
-        <iVal>62</iVal>
+        <iVal>42</iVal>
         <iVal>100</iVal>
-        <iVal>32</iVal>
+        <iVal>52</iVal>
         <iVal>67</iVal>
       </ItemValues>
     </Actor>
@@ -89,10 +89,10 @@
       <description>One of the RP actors</description>
       <capability>80.9</capability>
       <ItemValues>
-        <iVal>28</iVal>
+        <iVal>78</iVal>
         <iVal>39</iVal>
-        <iVal>76</iVal>
-        <iVal>38</iVal>
+        <iVal>36</iVal>
+        <iVal>68</iVal>
         <iVal>50</iVal>
       </ItemValues>
     </Actor>

@@ -214,14 +214,7 @@ void RPModel::readXML(string fileName) {
         }
         else {
             // missing data causes the missing XMLElement* to come back as nullptr,
-            // so we get a segmentation violation (not a catchable error).
-            // To catch them all, testThrow would have to alternate with "->".
-            auto testThrow = [] (void * pt, string msg) {
-                if (nullptr == pt) {
-                    throw (KException(msg));
-                }
-                return;
-            };
+            // so we get a segmentation violation, which is not catchable.
 
             XMLElement* scenEl = d1.FirstChildElement( "Scenario" );
             XMLElement* scenNameEl = scenEl->FirstChildElement( "name" );
@@ -244,101 +237,134 @@ void RPModel::readXML(string fileName) {
 
             XMLElement* gbEl = scenEl->FirstChildElement( "govBudget" );
             assert (nullptr != gbEl);
-            float gb = 1000.0; // cannot be a double
-            gbEl->QueryFloatText(&gb);
+            double gb = 1000.0; // impossible value
+            gbEl->QueryDoubleText(&gb);
             assert (0.0 < gb);
             assert (gb <= 100.0);
             govBudget = ((unsigned int) (0.5 + gb));
 
             XMLElement* obEl = scenEl->FirstChildElement( "outOfBudgetFactor" );
             assert (nullptr != obEl);
-            float obf = 1000.0; // cannot be a double
-            obEl->QueryFloatText(&obf);
+            double obf = 1000.0; // impossible value
+            obEl->QueryDoubleText(&obf);
             assert (0.0 < obf);
             assert (obf < 1.0);
             obFactor = obf;
 
             XMLElement* pdEl = scenEl->FirstChildElement( "orderFactor" );
             assert (nullptr != pdEl);
-            float pdf = 1000.0; // cannot be a double
-            pdEl->QueryFloatText(&pdf);
+            double pdf = 1000.0; // impossible value
+            pdEl->QueryDoubleText(&pdf);
             assert (0.0 < pdf);
             assert (pdf < 1.0);
             pDecline = pdf;
 
-            XMLElement* catsEl = scenEl->FirstChildElement( "Categories" );
-            assert (nullptr != catsEl);
+            // TODO: read these two parameters from XML
+            KBase::VotingRule vrScen = KBase::VotingRule::Proportional;
+            RfrmPri::RPActor::PropModel pmScen = RfrmPri::RPActor::PropModel::ExpUtil;
+
+            // read all the categories
             unsigned int nc = 0;
-            XMLElement* cEl = catsEl->FirstChildElement( "category" );
-            assert (nullptr != cEl); // has to be at least one
-            while (nullptr != cEl) {
-                nc++;
-                cEl = cEl->NextSiblingElement( "category" );
-            }
-            printf("Found %i categories \n", nc);
-	    numCat = nc;
-
-            XMLElement* itemsEl = scenEl->FirstChildElement( "Items" );
-            assert (nullptr != itemsEl);
-            unsigned int ni = 0;
-            XMLElement* iEl = itemsEl->FirstChildElement( "Item" );
-            assert (nullptr != iEl); // has to be at least one
-            while (nullptr != iEl) {
-                ni++;
-                iEl = iEl->NextSiblingElement( "Item" );
-            }
-            printf("Found %i items \n", ni);
-            assert (ni == nc); // for this problem, number of items and categories are equal
-	    numItm = ni;
-
             try {
+                XMLElement* catsEl = scenEl->FirstChildElement( "Categories" );
+                assert (nullptr != catsEl);
+                XMLElement* cEl = catsEl->FirstChildElement( "category" );
+                assert (nullptr != cEl); // has to be at least one
+                while (nullptr != cEl) {
+                    nc++;
+                    cEl = cEl->NextSiblingElement( "category" );
+                }
+                printf("Found %i categories \n", nc);
+                numCat = nc;
+            }
+            catch (...) {
+                throw (KException("Error reading Categories data"));
+            }
+
+            // In this case, the number of items should equal to the number of categories,
+            // so we can setup the matrix with the following size.
+            govCost = KMatrix(1, numCat);
+            // read all the items
+            unsigned int ni = 0;
+            try {
+                XMLElement* itemsEl = scenEl->FirstChildElement( "Items" );
+                assert (nullptr != itemsEl);
+                XMLElement* iEl = itemsEl->FirstChildElement( "Item" );
+                assert (nullptr != iEl); // has to be at least one
+                while (nullptr != iEl) {
+                    double gci=0.0;
+                    XMLElement* gcEl = iEl->FirstChildElement("cost");
+                    gcEl->QueryDoubleText(&gci);
+                    assert (0.0 < gci);
+                    govCost(0, ni) = gci;
+                    ni++;
+                    iEl = iEl->NextSiblingElement( "Item" );
+                }
+                printf("Found %i items \n", ni);
+                assert (ni == nc); // for this problem, number of items and categories are equal
+                numItm = ni;
             }
             catch (...) {
                 throw (KException("Error reading Items data"));
             }
 
-            XMLElement* actorsEl = scenEl->FirstChildElement( "Actors" );
-            assert (nullptr != actorsEl);
-            unsigned int na = 0;
-            XMLElement* aEl = actorsEl->FirstChildElement( "Actor" );
-            assert (nullptr != aEl); // has to be at least one
-            while (nullptr != aEl) {
-                const char* aName = aEl->FirstChildElement( "name" )->GetText();
-                const char* aDesc = aEl->FirstChildElement( "description" )->GetText();
-                float cap = 0.0;
-                aEl->FirstChildElement( "capability" )->QueryFloatText(&cap);
-                assert(0.0 < cap);
-
-                auto ri = new RPActor(aName, aDesc, this);
-                ri->sCap = cap;
-                ri->riVals = vector<double>();
-                ri->idNum = na;
-                ri->vr = KBase::VotingRule::Proportional;
-                ri->pMod = RfrmPri::RPActor::PropModel::ExpUtil;
-
-                XMLElement* ivsEl = aEl->FirstChildElement("ItemValues");
-                unsigned int numIVS = 0;
-                XMLElement* ivEl = ivsEl->FirstChildElement("iVal");
-                assert (nullptr != ivEl);
-                while (nullptr != ivEl) {
-                    numIVS++;
-                    float iv = -1.0;
-                    ivEl->QueryFloatText(&iv);
-                    assert (0 <= iv);
-                    ri->riVals.push_back(iv);
-                    ivEl = ivEl->NextSiblingElement("iVal");
-                }
-                assert(ni == numIVS); // must have a value for each item
-                addActor(ri);
-                // move to the next, if any
-                na++;
-                aEl = aEl->NextSiblingElement( "Actor" );
+            // We now know numItm and obFactor, so we can fill in prob vector.
+            prob = vector<double>();
+            double pj = 1.0;
+            printf("pDecline factor: %.3f \n", pDecline);
+            printf("obFactor: %.3f \n", obFactor);
+            // rate of decline has little effect on the results.
+            for (unsigned int j = 0; j < numItm; j++) {
+                prob.push_back(pj);
+                pj = pj * pDecline;
             }
-            printf("Found %i actors \n", na);
-            assert (minNumActor <= na);
-            assert (na <= maxNumActor);
 
+            // read all the actors
+            unsigned int na = 0;
+            try {
+                XMLElement* actorsEl = scenEl->FirstChildElement( "Actors" );
+                assert (nullptr != actorsEl);
+                XMLElement* aEl = actorsEl->FirstChildElement( "Actor" );
+                assert (nullptr != aEl); // has to be at least one
+                while (nullptr != aEl) {
+                    const char* aName = aEl->FirstChildElement( "name" )->GetText();
+                    const char* aDesc = aEl->FirstChildElement( "description" )->GetText();
+                    double cap = 0.0; // another impossible value
+                    aEl->FirstChildElement( "capability" )->QueryDoubleText(&cap);
+                    assert(0.0 < cap);
 
+                    auto ri = new RPActor(aName, aDesc, this);
+                    ri->sCap = cap;
+                    ri->riVals = vector<double>();
+                    ri->idNum = na;
+                    ri->vr = vrScen;
+                    ri->pMod = pmScen;
+
+                    XMLElement* ivsEl = aEl->FirstChildElement("ItemValues");
+                    unsigned int numIVS = 0;
+                    XMLElement* ivEl = ivsEl->FirstChildElement("iVal");
+                    assert (nullptr != ivEl);
+                    while (nullptr != ivEl) {
+                        numIVS++;
+                        double iv = -1.0; // impossible value
+                        ivEl->QueryDoubleText(&iv);
+                        assert (0 <= iv);
+                        ri->riVals.push_back(iv);
+                        ivEl = ivEl->NextSiblingElement("iVal");
+                    }
+                    assert(ni == numIVS); // must have a value for each item
+                    addActor(ri);
+                    // move to the next, if any
+                    na++;
+                    aEl = aEl->NextSiblingElement( "Actor" );
+                }
+                printf("Found %i actors \n", na);
+                assert (minNumActor <= na);
+                assert (na <= maxNumActor);
+            }
+            catch (...) {
+                throw (KException("Error reading Actors data"));
+            }
         }
     }
     catch (const KException& ke) {
