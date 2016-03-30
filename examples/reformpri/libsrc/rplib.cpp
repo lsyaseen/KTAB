@@ -42,32 +42,36 @@ using KBase::PCEModel;
 // function definitions
 
 KMatrix rescaleRows(const KMatrix& m1, const double vMin, const double vMax) {
-  assert(vMin < vMax);
-  const unsigned int nr = m1.numR();
-  const unsigned int nc = m1.numC();
-  KMatrix m2 = KMatrix(nr, nc);
+    assert(vMin < vMax);
+    const unsigned int nr = m1.numR();
+    const unsigned int nc = m1.numC();
+    KMatrix m2 = KMatrix(nr, nc);
 
-  for (unsigned int i = 0; i < nr; i++) {
-    double rowMin = m1(i, 0);
-    double rowMax = m1(i, 0);
-    for (unsigned int j = 0; j < nc; j++) {
-      const double mij = m1(i, j);
-      if (mij < rowMin) { rowMin = mij; }
-      if (mij > rowMax) { rowMax = mij; }
+    for (unsigned int i = 0; i < nr; i++) {
+        double rowMin = m1(i, 0);
+        double rowMax = m1(i, 0);
+        for (unsigned int j = 0; j < nc; j++) {
+            const double mij = m1(i, j);
+            if (mij < rowMin) {
+                rowMin = mij;
+            }
+            if (mij > rowMax) {
+                rowMax = mij;
+            }
+        }
+        const double rowRange = rowMax - rowMin;
+        assert(0 < rowRange);
+
+        for (unsigned int j = 0; j < nc; j++) {
+            const double mij = m1(i, j);
+            const double nij = (mij - rowMin) / rowRange; // normalize into [0, 1]
+            const double rij = vMin + (vMax - vMin)*nij; // rescale into [vMin, vMax]
+            m2(i, j) = rij;
+        }
     }
-    const double rowRange = rowMax - rowMin;
-    assert(0 < rowRange);
-
-    for (unsigned int j = 0; j < nc; j++) {
-      const double mij = m1(i, j);
-      const double nij = (mij - rowMin) / rowRange; // normalize into [0, 1]
-      const double rij = vMin + (vMax - vMin)*nij; // rescale into [vMin, vMax]
-      m2(i, j) = rij;
-    }
-  }
 
 
-  return m2;
+    return m2;
 }
 
 void printPerm(const VUI& p) {
@@ -151,15 +155,15 @@ void RPModel::initScen(unsigned int ns) {
     case 21:
     case 22:
     case 23:
-      initScen2Avrg(ns);
-      break;
+        initScen2Avrg(ns);
+        break;
     case 3:
     case 30:
     case 31:
     case 32:
     case 33:
-      initScen3Top4(ns);
-      break;
+        initScen3Top4(ns);
+        break;
     default:
         printf("Unrecognized scenario number, %u \n", ns);
         break;
@@ -194,10 +198,61 @@ void RPModel::initScen0() {
 
 
 void RPModel::readXML(string fileName) {
-  // read XML file with tinyXML2 then do equivalent of
-  // initScen and configScen
-  assert(false);
-  return;
+  using tinyxml2::XMLDocument;
+  using tinyxml2::XMLElement;
+  using KBase::KException;
+    // read XML file with tinyXML2 then do equivalent of
+    // initScen and configScen
+
+    XMLDocument d1;
+    try {
+        d1.LoadFile(fileName.c_str());
+        auto eid = d1.ErrorID();
+        if (0 != eid) {
+            cout << "ErrorID: " << eid  << endl;
+            throw KException(d1.GetErrorStr1());
+        }
+        else {
+            // missing data causes the missing XMLElement* to come back as nullptr,
+            // so we get a segmentation violation (not a catchable error).
+            // To catch them all, testThrow would have to alternate with "->".
+            auto testThrow = [] (void * pt, string msg) {
+                if (nullptr == pt) {
+                    throw (KException(msg));
+                }
+                return;
+            };
+
+            XMLElement* scenNameEl = d1.FirstChildElement( "Scenario" )->FirstChildElement( "name" );
+	    assert (nullptr != scenNameEl);
+            try { 
+                const char * sName = scenNameEl->GetText();
+                printf( "Name of scenario: %s\n", sName );
+            }
+            catch (...) {
+                throw (KException("Error reading file header"));
+            }
+
+           
+            XMLElement* itemNamesEl = d1.FirstChildElement( "Scenario" )->FirstChildElement( "Items" );
+	    assert (nullptr != itemNamesEl);
+            unsigned int numItems = 0;
+
+            try { 
+            }
+            catch (...) {
+                throw (KException("Error reading Items data"));
+            }
+        }
+    }
+    catch (const KException& ke) {
+        cout << "Caught KException in readXML: "<< ke.msg <<endl<<flush;
+    } 
+    catch(...) {
+        cout << "Caught unidentified exception in readXML"<<endl<<flush;
+    }
+
+    return;
 }
 
 void RPModel::initScen1() {
@@ -340,7 +395,7 @@ double RPModel::utilActorPos(unsigned int ai, const VUI &pstn) const {
         costSoFar = costSoFar + cj;
     }
     if (pvMin < pvMax) { // normalization is configured
-      uip = (uip - pvMin)/ (pvMax - pvMin);
+        uip = (uip - pvMin)/ (pvMax - pvMin);
     }
     return uip;
 }
@@ -382,16 +437,16 @@ bool RPState::equivNdx(unsigned int i, unsigned int j) const {
 
 tuple <KMatrix, VUI> RPState::pDist(int persp) const {
     /// Calculate the probability distribution over states from this perspective
-  
-  // TODO: convert this to a single, commonly used setup function
-  
+
+    // TODO: convert this to a single, commonly used setup function
+
     const unsigned int numA = model->numAct;
     const unsigned int numP = numA; // for this demo, the number of positions is exactly the number of actors
 
     // get unique indices and their probability
     assert (0 < uIndices.size()); // should have been set with setUENdx();
     //auto uNdx2 = uniqueNdx(); // get the indices to unique positions
-    
+
     const unsigned int numU = uIndices.size();
     assert(numU <= numP); // might have dropped some duplicates
 
@@ -434,7 +489,7 @@ RPState* RPState::stepSUSN() {
     cout << endl << flush;
     cout << "State number " << model->history.size() - 1 << endl << flush;
     if ((0 == uIndices.size()) || (0 == eIndices.size())) {
-    setUENdx();
+        setUENdx();
     }
     setAUtil(-1, ReportingLevel::Silent);
     show();
@@ -452,11 +507,11 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
     RPState* s2 = nullptr;
     const unsigned int numA = model->numAct;
     assert(numA == rpMod->actrs.size());
-    
+
     const unsigned int numU = uIndices.size();
     assert ((0 < numU) && (numU <= numA));
     assert (numA == eIndices.size());
-    
+
     // TODO: filter out essentially-duplicate positions
     //printf("RPState::doSUSN: numA %i \n", numA);
     //printf("RPState::doSUSN: numP %i \n", numP);
@@ -473,15 +528,15 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
         assert(uMat.numR() == numA); // must include all actors
         assert(uMat.numC() <= numP); // might have dropped some duplicates
         auto uRng = [uMat](unsigned int i, unsigned int j) {
-          if ((uMat(i, j) < 0.0) || (1.0 < uMat(i, j))) {
-            printf("%f  %i  %i  \n", uMat(i, j), i, j);
-            cout << flush;
-            cout << flush;
+            if ((uMat(i, j) < 0.0) || (1.0 < uMat(i, j))) {
+                printf("%f  %i  %i  \n", uMat(i, j), i, j);
+                cout << flush;
+                cout << flush;
 
-          }
+            }
             assert(0.0 <= uMat(i, j));
             assert(uMat(i, j) <= 1.0);
-          return;
+            return;
         };
         KMatrix::mapV(uRng, uMat.numR(), uMat.numC());
         // vote_k ( i : j )
@@ -501,9 +556,9 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
         assert(numA == eu.numR());
         assert(1 == eu.numC());
         auto euRng = [eu](unsigned int i, unsigned int j) {
-          assert(0.0 <= eu(i, j));
-          assert(eu(i, j) <= 1.0);
-          return;
+            assert(0.0 <= eu(i, j));
+            assert(eu(i, j) <= 1.0);
+            return;
         };
         KMatrix::mapV(euRng, eu.numR(), eu.numC());
 
@@ -684,17 +739,17 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
             //cout << flush;
             return euh;
         }; // end of efn
-        
-/*
-        // I do not actually use prevMP, but it is still an example for std::set
-        auto prevMP = [](const MtchPstn & mp1, const MtchPstn & mp2) {
-            bool r = std::lexicographical_compare(
-                         mp1.match.begin(), mp1.match.end(),
-                         mp2.match.begin(), mp2.match.end());
-            return r;
-        };
-        std::set<MtchPstn, bool(*)(const MtchPstn &, const MtchPstn &)> mpSet(prevMP);
-*/
+
+        /*
+                // I do not actually use prevMP, but it is still an example for std::set
+                auto prevMP = [](const MtchPstn & mp1, const MtchPstn & mp2) {
+                    bool r = std::lexicographical_compare(
+                                 mp1.match.begin(), mp1.match.end(),
+                                 mp2.match.begin(), mp2.match.end());
+                    return r;
+                };
+                std::set<MtchPstn, bool(*)(const MtchPstn &, const MtchPstn &)> mpSet(prevMP);
+        */
 
         // return vector of neighboring 1-permutations
         auto nfn = [](const MtchPstn & mp0) {
@@ -810,7 +865,10 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
     // Each actor, h, finds the position which maximizes their EU in this situation.
     for (unsigned int h = 0; h < numA; h++) {
         if (par) { // launch all, concurrent
-            ts.push_back(thread([newPosFn, h]() {newPosFn(h); return;}));
+            ts.push_back(thread([newPosFn, h]() {
+                newPosFn(h);
+                return;
+            }));
         }
         else { // do each, sequential
             newPosFn(h);
@@ -818,7 +876,9 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
     }
 
     if (par) { // now join them all before continuing
-        for (auto& t : ts) { t.join(); }
+        for (auto& t : ts) {
+            t.join();
+        }
     }
 
     assert(nullptr != s2);
@@ -834,7 +894,7 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
 
 void RPState::setAllAUtil(ReportingLevel rl) {
     const unsigned int na = model->numAct;
-    
+
     // make sure prerequisities are at least somewhat setup
     assert (na == eIndices.size());
     assert (0 < uIndices.size());
@@ -862,7 +922,7 @@ void RPState::setAllAUtil(ReportingLevel rl) {
     if (KBase::ReportingLevel::Low < rl) {
         cout << "Raw actor-pos util matrix" << endl;
         rawU.mPrintf(" %.4f ");
-        cout << endl << flush; 
+        cout << endl << flush;
         cout << flush;
 
         /// For the purposes of this demo, I consider each actor to know exactly what
@@ -876,7 +936,7 @@ void RPState::setAllAUtil(ReportingLevel rl) {
     assert(0 == aUtil.size());
     auto normU = rescaleRows(rawU, 0.0, 1.0);
     for (unsigned int i = 0; i < numA; i++) {
-        aUtil.push_back(normU); 
+        aUtil.push_back(normU);
     }
     return;
 }
@@ -885,21 +945,21 @@ void RPState::setAllAUtil(ReportingLevel rl) {
 
 
 void RPState::setOneAUtil(unsigned int perspH, ReportingLevel rl) {
-  cout << "RPState::setOneAUtil - not yet implemented"<<endl<<flush;
-  const unsigned int numAct = model->numAct;
-  const unsigned int numUnq = uIndices.size();
-  
-  assert (perspH < numAct);
-  assert (numAct == aUtil.size());
-  assert ((0 == aUtil[perspH].numR()) && (0 == aUtil[perspH].numC()));
-  assert (numAct == eIndices.size());
-  assert (0 < numUnq);
-  assert (numUnq < numAct);
-  
-  auto uh = KMatrix(numAct, numUnq);
-  
-  
-  return;
+    cout << "RPState::setOneAUtil - not yet implemented"<<endl<<flush;
+    const unsigned int numAct = model->numAct;
+    const unsigned int numUnq = uIndices.size();
+
+    assert (perspH < numAct);
+    assert (numAct == aUtil.size());
+    assert ((0 == aUtil[perspH].numR()) && (0 == aUtil[perspH].numC()));
+    assert (numAct == eIndices.size());
+    assert (0 < numUnq);
+    assert (numUnq < numAct);
+
+    auto uh = KMatrix(numAct, numUnq);
+
+
+    return;
 }
 
 void RPState::show() const {

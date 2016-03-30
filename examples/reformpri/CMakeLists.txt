@@ -47,6 +47,13 @@ if (ENABLE_EFENCE)
   endif (NOT EFENCE_FOUND)
 endif (ENABLE_EFENCE)
 
+# ------------------------------------------------- 
+ 
+find_package(TinyXML2)
+if (NOT TINYXML2_FOUND)
+  message(FATAL_ERROR "Could not find TinyXML2")
+endif (NOT TINYXML2_FOUND) 
+
 # -------------------------------------------------
 # find libraries on which this project depends
 # ------------------------------------------------- 
@@ -84,6 +91,7 @@ include_directories(
   ${KMODEL_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}/libsrc/
   ${SQLITE_INCLUDE_DIR}
+  ${TINYXML2_INCLUDE_DIR}
 )
 
 set(RPLIB_SRCS 
@@ -117,6 +125,7 @@ target_link_libraries(rpdemo
   ${KUTILS_LIBRARY}
   ${EFENCE_LIBRARIES}
   ${SQLITE_LIBRARIES}
+  ${TINYXML2_LIBRARIES}
   )
 
 # -------------------------------------------------

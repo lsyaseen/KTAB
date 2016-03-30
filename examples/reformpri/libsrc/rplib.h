@@ -30,6 +30,7 @@
 #include <iostream>
 #include <set>
 #include <string>
+#include <tinyxml2.h>
 #include <vector>
 
 #include <kutils.h>

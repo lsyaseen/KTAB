@@ -191,10 +191,13 @@ int main(int ac, char **av) {
     bool cpP = false;
     bool runP = true;
     unsigned int sNum = 1;
+    bool xmlP = false;
+    string inputXML = "";
 
     // tmp
-    siP = true;
-    sNum = 30;
+    //siP = true;
+    //xmlP = true;
+    //inputXML = "reformpri-ex01.xml";
 
     auto showHelp = [dSeed, sNum]() {
         printf("\n");
@@ -209,6 +212,7 @@ int main(int ac, char **av) {
         printf("                  default: %020llu \n", dSeed);
         printf("--sNum <n>        choose a scenario number \n");
         printf("                  default: %u \n", sNum);
+        printf("--xml <f>         read XML scenario from a given file \n");
     };
 
     // a list of <keyword, description, lambda-fn>
@@ -222,6 +226,11 @@ int main(int ac, char **av) {
             else if (strcmp(av[i], "--sNum") == 0) {
                 i++;
                 sNum = atoi(av[i]);
+            }
+            else if (strcmp(av[i], "--xml") == 0) {
+                xmlP = true;
+                i++;
+                inputXML = av[i];
             }
             else if (strcmp(av[i], "--cp") == 0) {
                 cpP = true;
@@ -259,36 +268,43 @@ int main(int ac, char **av) {
 
 
     auto rpm = new RPModel(rng);
-    switch (sNum) {
-    case 0:
-        rpm->initScen(sNum);
-        break;
-    case 1:
-        rpm->initScen(sNum);
-        break;
-
-    case 2:
-    case 20:
-    case 21:
-    case 22:
-    case 23:
-        rpm->initScen(sNum);
-        break;
-
-    case 3:
-    case 30:
-    case 31:
-    case 32:
-    case 33:
-        rpm->initScen(sNum);
-        break;
-
-    default:
-        cout << "Unrecognized scenario number " << sNum << endl << flush;
-        assert(false);
-        break;
+    if (xmlP) {
+        rpm->readXML(inputXML);
     }
+    else {
+        switch (sNum) {
+        case 0:
+            rpm->initScen(sNum);
+            break;
+        case 1:
+            rpm->initScen(sNum);
+            break;
 
+        case 2:
+        case 20:
+        case 21:
+        case 22:
+        case 23:
+            rpm->initScen(sNum);
+            break;
+
+        case 3:
+        case 30:
+        case 31:
+        case 32:
+        case 33:
+            rpm->initScen(sNum);
+            break;
+
+        default:
+            cout << "Unrecognized scenario number " << sNum << endl << flush;
+            assert(false);
+            break;
+        }
+    }
+    cout << "done reading XML" << endl << flush;
+    return 0;
+    
     unsigned int numA = rpm->numAct; // the actors are as yet unnamed
     unsigned int numR = rpm->numItm;
 

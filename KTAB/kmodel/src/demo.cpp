@@ -228,8 +228,8 @@ int main(int ac, char **av) {
         printf("--emod            simple enumerated model \n");
         printf("--spvsr           demonstrated shared_ptr<void> return\n");
         printf("--sql             demo SQLite \n");
-        printf("--tx2             demo TinyXML2 \n");
-        printf("--seed <n>        set a 64bit seed\n");
+        printf("--tx2  <file>     demo TinyXML2 \n"); // e.g. dummyData_3Dim.xml
+        printf("--seed <n>        set a 64bit seed \n");
         printf("                  0 means truly random\n");
         printf("                  default: %020llu \n", dSeed);
     };
