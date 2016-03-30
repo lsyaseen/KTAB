@@ -198,9 +198,9 @@ void RPModel::initScen0() {
 
 
 void RPModel::readXML(string fileName) {
-  using tinyxml2::XMLDocument;
-  using tinyxml2::XMLElement;
-  using KBase::KException;
+    using tinyxml2::XMLDocument;
+    using tinyxml2::XMLElement;
+    using KBase::KException;
     // read XML file with tinyXML2 then do equivalent of
     // initScen and configScen
 
@@ -223,9 +223,10 @@ void RPModel::readXML(string fileName) {
                 return;
             };
 
-            XMLElement* scenNameEl = d1.FirstChildElement( "Scenario" )->FirstChildElement( "name" );
-	    assert (nullptr != scenNameEl);
-            try { 
+            XMLElement* scenEl = d1.FirstChildElement( "Scenario" );
+            XMLElement* scenNameEl = scenEl->FirstChildElement( "name" );
+            assert (nullptr != scenNameEl);
+            try {
                 const char * sName = scenNameEl->GetText();
                 printf( "Name of scenario: %s\n", sName );
             }
@@ -233,12 +234,72 @@ void RPModel::readXML(string fileName) {
                 throw (KException("Error reading file header"));
             }
 
-           
-            XMLElement* itemNamesEl = d1.FirstChildElement( "Scenario" )->FirstChildElement( "Items" );
-	    assert (nullptr != itemNamesEl);
-            unsigned int numItems = 0;
+            XMLElement* scenDescEl = scenEl->FirstChildElement( "desc" );
+            assert (nullptr != scenDescEl);
+            const char* sn2 = scenDescEl->GetText();
+            assert (nullptr != sn2);
 
-            try { 
+            // get some top level values from the corresponding Elements (no Attributes)
+
+
+            XMLElement* gbEl = scenEl->FirstChildElement( "govBudget" );
+            assert (nullptr != gbEl);
+            float gb = 1000.0; // cannot be a double
+            gbEl->QueryFloatText(&gb);
+            assert (0.0 < gb);
+            assert (gb <= 100.0);
+            govBudget = ((unsigned int) (0.5 + gb));
+
+            XMLElement* obEl = scenEl->FirstChildElement( "outOfBudgetFactor" );
+            assert (nullptr != obEl);
+            float obf = 1000.0; // cannot be a double
+            obEl->QueryFloatText(&obf);
+            assert (0.0 < obf);
+            assert (obf < 1.0);
+            obFactor = obf;
+
+            XMLElement* pdEl = scenEl->FirstChildElement( "orderFactor" );
+            assert (nullptr != pdEl);
+            float pdf = 1000.0; // cannot be a double
+            pdEl->QueryFloatText(&pdf);
+            assert (0.0 < pdf);
+            assert (pdf < 1.0);
+            pDecline = pdf;
+
+            XMLElement* actorsEl = scenEl->FirstChildElement( "Actors" );
+            assert (nullptr != actorsEl);
+            unsigned int na = 0;
+            XMLElement* aEl = actorsEl->FirstChildElement( "Actor" );
+            assert (nullptr != aEl); // has to be at least one
+            while (nullptr != aEl) {
+                na++;
+                aEl = aEl->NextSiblingElement( "Actor" );
+            }
+            printf("Found %i actors \n", na);
+
+            XMLElement* catsEl = scenEl->FirstChildElement( "Categories" );
+            assert (nullptr != catsEl);
+            unsigned int nc = 0; 
+            XMLElement* cEl = catsEl->FirstChildElement( "category" );
+            assert (nullptr != cEl); // has to be at least one
+            while (nullptr != cEl) {
+                nc++;
+                cEl = cEl->NextSiblingElement( "category" );
+            }
+            printf("Found %i categories \n", nc);
+
+            XMLElement* itemsEl = scenEl->FirstChildElement( "Items" );
+            assert (nullptr != itemsEl);
+            unsigned int ni = 0;
+            XMLElement* iEl = itemsEl->FirstChildElement( "Item" );
+            assert (nullptr != iEl); // has to be at least one
+            while (nullptr != iEl) {
+                ni++;
+                iEl = iEl->NextSiblingElement( "Item" );
+            }
+            printf("Found %i items \n", ni);
+	    
+            try {
             }
             catch (...) {
                 throw (KException("Error reading Items data"));
@@ -247,7 +308,7 @@ void RPModel::readXML(string fileName) {
     }
     catch (const KException& ke) {
         cout << "Caught KException in readXML: "<< ke.msg <<endl<<flush;
-    } 
+    }
     catch(...) {
         cout << "Caught unidentified exception in readXML"<<endl<<flush;
     }

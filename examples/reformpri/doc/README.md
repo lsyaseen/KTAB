@@ -8,7 +8,16 @@ This directory contains some basic documentation:
 
 ## XML Data Format ##
 
-The most precise specification of the format is the `reformpri.xsd` schema. If you are learning the format or developing an XML data file, we suggest using an tool which can check validity with one click, such as  [XML Copy Editor](http://xml-copy-editor.sourceforge.net/). Like many XML editors, it will auto-fill tags as you go, check them for balance, and various other tasks to make writing XML simple and quick.
+The most precise specification of the format is the `reformpri.xsd` schema. 
+If you are learning the format or developing an XML data file, we suggest using an tool which can check validity with 
+one click, such as  [XML Copy Editor](http://xml-copy-editor.sourceforge.net/). Like many XML editors, 
+it will auto-fill tags as you go, check them for balance, and various other tasks to make writing XML simple and quick.
+
+Note that we follow the practice of using only XML Elements, not Attributes. The latter are more compact to write,
+but much more difficult to modify later. We can represent a dog's color as either an Element or an Attribute:
+
+- Elements: `<dog> <color>Black</color> </dog>`
+- Attributes: `<dog color="Black"/>`
 
 The basic elements of the data file are the following:
 
@@ -21,7 +30,7 @@ The basic elements of the data file are the following:
 	- Cost: a positive decimal between 0 and 100.
 - Categories: a list of names
 - Actors
-	- Name: a short, 2-5 character, e.g. "Pres"
+	- Name: a short, 2-5 character, e.g. "PF"
 	- Description: a longer description, e.g. "President of the  Federation"
 	- Capability: a positive number between 0 and 100.
 	- ItemValues: a list of values for each item, in the same order as the items themselves. Each item value is a decimal between 0 and 100 (possibly zero).
