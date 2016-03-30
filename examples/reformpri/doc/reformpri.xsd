@@ -3,81 +3,112 @@
   <xs:element name="Scenario">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="name"/>
-        <xs:element ref="desc"/>
-        <xs:element ref="Items"/>
+        <xs:element name="name" type="xs:string"/>
+        <xs:element name="desc" type="xs:string"/>
+        <xs:element name="govBudget">
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:minExclusive value="0.0"/>
+              <xs:maxInclusive value="100.0"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="outOfBudgetFactor">
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:minExclusive value="0.0"/>
+              <xs:maxExclusive value="1.0"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="orderFactor">
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:minExclusive value="0.0"/>
+              <xs:maxExclusive value="1.0"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element ref="Actors"/>
         <xs:element ref="Categories"/>
-        <xs:element ref="govCost"/>
-        <xs:element ref="govBudget"/>
-        <xs:element ref="outOfBudgetFactor"/>
-        <xs:element ref="orderFactor"/>
-        <xs:element ref="Actor" maxOccurs="unbounded"/>
+        <xs:element ref="Items"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="name">
+  <xs:element name="Actors">
     <xs:complexType>
-      <xs:attribute name="string" type="xs:string" use="required"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="desc">
-    <xs:complexType>
-      <xs:attribute name="string" type="xs:string" use="required"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="Items">
-    <xs:complexType>
-      <xs:attribute name="listOfStrings" type="xs:string" use="required"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="Categories">
-    <xs:complexType>
-      <xs:attribute name="listOfStrings" type="xs:string" use="required"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="govCost">
-    <xs:complexType>
-      <xs:attribute name="listOfIntegers" type="xs:string" use="required"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="govBudget">
-    <xs:complexType>
-      <xs:attribute name="integer" type="xs:string" use="required"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="outOfBudgetFactor">
-    <xs:complexType>
-      <xs:attribute name="float" type="xs:string" use="required"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="orderFactor">
-    <xs:complexType>
-      <xs:attribute name="float" type="xs:string" use="required"/>
+      <xs:sequence>
+        <xs:element ref="Actor" maxOccurs="unbounded"/>
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="Actor">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="name"/>
-        <xs:element ref="description"/>
-        <xs:element ref="capability"/>
-        <xs:element ref="itemValues"/>
+        <xs:element name="name" type="xs:string"/>
+        <xs:element name="description" type="xs:string"/>
+        <xs:element name="capability">
+          <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:minExclusive value="0.0"/>
+              <xs:maxExclusive value="1000.0"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="ItemValues"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="description">
+  <xs:element name="ItemValues">
     <xs:complexType>
-      <xs:attribute name="string" type="xs:string" use="required"/>
+      <xs:sequence>
+        <xs:element ref="iVal" maxOccurs="unbounded"/>
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="capability">
+  <xs:element name="iVal">
+    <xs:simpleType>
+      <xs:restriction base="xs:decimal">
+        <xs:minInclusive value="0.0"/>
+        <xs:maxInclusive value="100.0"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="Categories">
     <xs:complexType>
-      <xs:attribute name="float" type="xs:string" use="required"/>
+      <xs:sequence>
+        <xs:element ref="category" maxOccurs="unbounded"/>
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="itemValues">
+  <xs:element name="category">
     <xs:complexType>
-      <xs:attribute name="listOfIntegers" type="xs:string" use="required"/>
+      <xs:sequence>
+        <xs:element name="name" type="xs:string"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Items">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Item" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Item">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="name" type="xs:string"/>
+        <xs:element name="cost" >
+   <xs:simpleType>
+            <xs:restriction base="xs:decimal">
+              <xs:minExclusive value="0.0"/>
+              <xs:maxInclusive value="100.0"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>        
+        
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
 </xs:schema>

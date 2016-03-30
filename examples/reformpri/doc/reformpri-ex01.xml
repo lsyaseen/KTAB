@@ -1,5 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"  ?>
-
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
      Copyright (c) 2016, Copyright KAPSARC. Open Source MIT License.
      All rights reserved. This program and the accompanying materials
@@ -10,46 +9,133 @@
      Contributors:
          KAPSARC - initial API and implementation
  -->
-<Scenario 
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xsi:noNamespaceSchemaLocation="reformpri.xsd"> 
-<name string="RP-Scen-00"/>
-<desc string="A very simple scenario"/>
-<Items  listOfStrings="Edu Def Soc Fin Jst" />
-<Categories listOfStrings="First Second Third Fourth Fifth" />
-  <govCost listOfIntegers='48  32  41  27  45'/>
-   <govBudget integer="100" />
-  <outOfBudgetFactor float="0.10"/>
-  <orderFactor float="0.999"/>
-
+<Scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="reformpri.xsd">
+  <name>RP-test-00</name>
+  <desc>A very simple test of reform priority, using random numbers</desc>
+  <govBudget>100</govBudget>
+  <outOfBudgetFactor>0.1</outOfBudgetFactor>
+  <orderFactor>0.85</orderFactor>
+  <Actors>
     <Actor>
-    <name string="Alice" />
-    <description string="One of the RP actors" />
-    <capability float="72.2" />
-    <itemValues listOfIntegers='26  65  60  40  40'/>
+      <name>Alice</name>
+      <description>One of the RP actors</description>
+      <capability>72.2</capability>
+      <ItemValues>
+        <iVal>26</iVal>
+        <iVal>63</iVal>
+        <iVal>60</iVal>
+        <iVal>46</iVal>
+        <iVal>37</iVal>
+      </ItemValues>
     </Actor>
-  
     <Actor>
-    <name string="Bob" />
-    <description string="One of the RP actors" />
-    <capability float="48.2" />
-    <itemValues listOfIntegers='76  22  32  81  34'/>
+    
+      <name>Bob</name>
+      <description>One of the RP actors</description>
+      <capability>48.2</capability>
+      <ItemValues>
+        <iVal>76</iVal>
+        <iVal>22</iVal>
+        <iVal>32</iVal>
+        <iVal>81</iVal>
+        <iVal>34</iVal>
+      </ItemValues>
     </Actor>
     
-  
     <Actor>
-    <name string="Carol" />
-    <description string="One of the RP actors" />
-    <capability float="73.7" />
-    <itemValues listOfIntegers='21  55  92  46  78'/>
+      <name>Carol</name>
+      <description>One of the RP actors</description>
+      <capability>78.2</capability>
+      <ItemValues>
+        <iVal>42</iVal>
+        <iVal>15</iVal>
+        <iVal>63</iVal>
+        <iVal>34</iVal>
+        <iVal>91</iVal>
+      </ItemValues>
     </Actor>
     
-  
+    
     <Actor>
-    <name string="David" />
-    <description string="One of the RP actors" />
-    <capability float="57.8" />
-    <itemValues listOfIntegers=' 67  40  79  28  74'/>
+      <name>David</name>
+      <description>One of the RP actors</description>
+      <capability>37.3</capability>
+      <ItemValues>
+        <iVal>69</iVal>
+        <iVal>41</iVal>
+        <iVal>75</iVal>
+        <iVal>63</iVal>
+        <iVal>96</iVal>
+      </ItemValues>
     </Actor>
-
+    
+    
+    <Actor>
+      <name>Elizabeth</name>
+      <description>One of the RP actors</description>
+      <capability>59.7</capability>
+      <ItemValues>
+        <iVal>84</iVal>
+        <iVal>62</iVal>
+        <iVal>100</iVal>
+        <iVal>32</iVal>
+        <iVal>67</iVal>
+      </ItemValues>
+    </Actor>
+    
+    
+    <Actor>
+      <name>Frank</name>
+      <description>One of the RP actors</description>
+      <capability>80.9</capability>
+      <ItemValues>
+        <iVal>28</iVal>
+        <iVal>39</iVal>
+        <iVal>76</iVal>
+        <iVal>38</iVal>
+        <iVal>50</iVal>
+      </ItemValues>
+    </Actor>
+    
+    
+  </Actors>
+  <Categories>
+    <category>
+      <name>First</name>
+    </category>
+    <category>
+      <name>Second</name>
+    </category>
+    <category>
+      <name>Third</name>
+    </category>
+    <category>
+      <name>Fourth</name>
+    </category>
+    <category>
+      <name>Fifth</name>
+    </category>
+  </Categories>
+  <Items>
+    <Item>
+      <name>Ext</name>
+      <cost>48.0</cost>
+    </Item>
+    <Item>
+      <name>Ag</name>
+      <cost>32.0</cost>
+    </Item>
+    <Item>
+      <name>Man</name>
+      <cost>41.0</cost>
+    </Item>
+    <Item>
+      <name>Fin</name>
+      <cost>27.0</cost>
+    </Item>
+    <Item>
+      <name>Trn</name>
+      <cost>45.0</cost>
+    </Item>
+  </Items>
 </Scenario>
