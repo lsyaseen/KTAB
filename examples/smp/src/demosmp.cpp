@@ -258,6 +258,9 @@ namespace DemoSMP {
     cout << "History of actor positions over time" << endl;
     md0->showVPHistory(true);
 
+    // output what R needs for Sankey diagrams
+    md0->sankeyOutput(inputCSV);
+
     delete md0;
     return;
   }

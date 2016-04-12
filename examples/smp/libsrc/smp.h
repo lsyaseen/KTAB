@@ -60,7 +60,7 @@ class SMPActor;
 class SMPState;
 class SMPModel;
 
-const string appVersion = "0.1";
+const string appVersion = "0.1.1";
 
 // -------------------------------------------------
 // Plain-Old-Data
@@ -214,6 +214,9 @@ public:
 
     // print history of each actor in CSV (might want to generalize to arbitrary VctrPstn)
     void showVPHistory(bool sqlP) const;
+
+    // output the two files needed to draw Sankey diagrams
+    void sankeyOutput(string inputCSV) const;
 
     // number of spatial dimensions in this SMP
     void addDim(string dn);
