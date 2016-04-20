@@ -70,7 +70,7 @@ vector<VUI> scanPositions(const RPModel * rpm) {
         double uip = rpm->utilActorPos(ai, pstn);
         return uip;
     };
-    auto rawUij = KMatrix::map(ruFn, numA, numPos);
+    auto rawUij = KMatrix::map(ruFn, numA, numPos); // rows are actors, columns are all possible positions
     for (unsigned int i=0; i<numA; i++) {
         double pvMin = rawUij(i,0);
         double pvMax = rawUij(i,0);
@@ -90,10 +90,8 @@ vector<VUI> scanPositions(const RPModel * rpm) {
         ai->posValMax = pvMax;
     }
     KMatrix uij = RfrmPri::rescaleRows(rawUij, 0.0, 1.0);
-
-    //cout << "Complete utility matrix of actors (rows) versus positions (columns)" << endl << flush;
-    //uij.mPrintf(" %6.4f, ");
-    cout << "Complete utility matrix of positions (rows) versus actors (columns)" << endl << flush;
+ 
+    cout << "Complete (normalized) utility matrix of all possible positions (rows) versus actors (columns)" << endl << flush;
     for (unsigned int pj = 0; pj < numPos; pj++) {
         printf("%3i  ", pj);
         auto pstn = positions[pj];
@@ -196,7 +194,7 @@ int main(int ac, char **av) {
 
     /*
     // temporary settings for testing
-    siP = true;
+    cpP = true;
     sNum = 1;
     xmlP = false;
     inputXML = "reformpri-ex01.xml";

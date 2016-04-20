@@ -518,6 +518,12 @@ double RPModel::utilActorPos(unsigned int ai, const VUI &pstn) const {
     }
     if (pvMin < pvMax) { // normalization is configured
         uip = (uip - pvMin)/ (pvMax - pvMin);
+        //cout << "using normalized utilities for actor " << ai << endl << flush;
+    }
+    else {
+        // using raw utilities is necessary while
+        // determining the normalization parameters.
+        // cout << "using raw utilities for actor " << ai << endl << flush;
     }
     return uip;
 }
@@ -678,8 +684,11 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
         assert(numA == eu.numR());
         assert(1 == eu.numC());
         auto euRng = [eu](unsigned int i, unsigned int j) {
-            assert(0.0 <= eu(i, j));
-            assert(eu(i, j) <= 1.0);
+            // due to round-off error, we must have a tolerance factor
+            const double tol = 1E-10;
+            const double euij = eu(i, j);
+            assert(0.0 <= euij+tol);
+            assert(euij <= 1.0+tol);
             return;
         };
         KMatrix::mapV(euRng, eu.numR(), eu.numC());
@@ -1040,10 +1049,14 @@ void RPState::setAllAUtil(ReportingLevel rl) {
         assert(0.0 <= uij);
         return uij;
     };
-    auto rawU = KMatrix::map(uFn1, numA, numA);
+
+    // Notice that the actors had their pvMin and pvMax correctly configured
+    // using all possible positions during the initial scan.
+    // Therefore, rescaling rows based on only the urrent set of options is unneeded.
+    auto normU = KMatrix::map(uFn1, numA, numA);
     if (KBase::ReportingLevel::Low < rl) {
-        cout << "Raw actor-pos util matrix" << endl;
-        rawU.mPrintf(" %.4f ");
+        cout << "Normalized actor-pos util matrix" << endl;
+        normU.mPrintf(" %.4f ");
         cout << endl << flush;
         cout << flush;
 
@@ -1056,7 +1069,6 @@ void RPState::setAllAUtil(ReportingLevel rl) {
     }
 
     assert(0 == aUtil.size());
-    auto normU = rescaleRows(rawU, 0.0, 1.0);
     for (unsigned int i = 0; i < numA; i++) {
         aUtil.push_back(normU);
     }
