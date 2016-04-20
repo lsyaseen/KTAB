@@ -194,10 +194,13 @@ int main(int ac, char **av) {
     bool xmlP = false;
     string inputXML = "";
 
-    // tmp
-    //siP = true;
-    //xmlP = true;
-    //inputXML = "reformpri-ex01.xml";
+    /*
+    // temporary settings for testing
+    siP = true;
+    sNum = 1;
+    xmlP = false;
+    inputXML = "reformpri-ex01.xml";
+    */
 
     auto showHelp = [dSeed, sNum]() {
         printf("\n");
@@ -213,6 +216,15 @@ int main(int ac, char **av) {
         printf("--sNum <n>        choose a scenario number \n");
         printf("                  default: %u \n", sNum);
         printf("--xml <f>         read XML scenario from a given file \n");
+	printf("\n");
+	printf("For example, rpdemo --si  --xml rpdata.xml, would read the file rpdata.xml \n");
+	printf("and start all actors from self-interested positions.\n");
+	printf("\n");
+	printf("If both scenario number and XML file are specified, it will use only the XML.\n");
+	printf("\n");
+	printf("If neither scenario number nor XML file are specified, \n");
+	printf("it will run a hard-coded example, as if --sNum 1 had been specified.\n");
+	printf("\n");
     };
 
     // a list of <keyword, description, lambda-fn>
