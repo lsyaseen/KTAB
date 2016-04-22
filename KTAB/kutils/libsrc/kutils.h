@@ -61,7 +61,7 @@ namespace KBase {
   double sqr(const double& x);  // second power
   double qrtc(const double& x); // fourth power
   
-  std::chrono::time_point<std::chrono::system_clock>  displayProgramStart();
+  std::chrono::time_point<std::chrono::system_clock>  displayProgramStart(string appName="", string appVersion="");
   void displayProgramEnd(std::chrono::time_point<std::chrono::system_clock> st);
 
   // return a string of '0' chars

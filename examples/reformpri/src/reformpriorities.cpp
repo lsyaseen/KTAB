@@ -182,7 +182,7 @@ int main(int ac, char **av) {
     using RfrmPri::RPActor;
     using RfrmPri::printPerm;
 
-    auto sTime = KBase::displayProgramStart();
+    auto sTime = KBase::displayProgramStart(RfrmPri::appName , RfrmPri::appVersion); 
     uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary
     uint64_t seed = dSeed;
     bool siP = false;

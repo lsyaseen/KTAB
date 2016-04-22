@@ -60,11 +60,12 @@ namespace KBase {
   
   // -------------------------------------------------
 
-  std::chrono::time_point<std::chrono::system_clock>  displayProgramStart() {
+  std::chrono::time_point<std::chrono::system_clock>  displayProgramStart(string appName, string appVersion) {
     std::chrono::time_point<std::chrono::system_clock> st;
     st = std::chrono::system_clock::now();
     std::time_t start_time = std::chrono::system_clock::to_time_t(st);
-    cout << "  Start time: " << std::ctime(&start_time) << endl << flush;
+    cout << "  Software version: " << appName << " " << appVersion <<endl; 
+    cout << "  Start time: " << std::ctime(&start_time) << endl;
     return st;
   }
 

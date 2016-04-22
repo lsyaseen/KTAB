@@ -48,8 +48,6 @@ namespace RfrmPri {
 // namespace to hold everything related to the
 // "priority of reforms" CDMP. Note that KBase has no access.
 
-const string appVersion = "0.1";
-
 using std::string;
 using std::tuple;
 using std::vector;
@@ -71,6 +69,11 @@ using KBase::MtchGene;
 class RPActor;
 class RPState;
 class RPModel;
+
+// -------------------------------------------------
+
+const string appName = "rpdemo";
+const string appVersion = "0.2";
 
 // -------------------------------------------------
 
