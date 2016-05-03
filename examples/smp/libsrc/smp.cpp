@@ -48,6 +48,7 @@ namespace SMPLib {
   using KBase::BigRRange;
   using KBase::VPModel;
   using KBase::State;
+  using KBase::StateTransMode;
   using KBase::VotingRule;
   using KBase::PCEModel;
   using KBase::ReportingLevel;
@@ -587,6 +588,8 @@ namespace SMPLib {
     }
 
 
+    PRNG* rng = model->rng;
+    
     cout << endl << "Bargains to be resolved" << endl << flush;
     showBargains(brgns);
 
@@ -594,18 +597,17 @@ namespace SMPLib {
     cout << "w:" << endl;
     w.mPrintf(" %6.2f ");
 
-    // of course, you  can change these two parameters
+    // of course, you can change these parameters.
+    // ideally, they should be read from the scenario object.
     auto vr = VotingRule::Proportional;
     auto vpm = VPModel::Linear;
+    auto stm = StateTransMode::DeterminsticSTM;
 
     auto ndxMaxProb = [](const KMatrix & cv) {
-
       const double pTol = 1E-8;
       assert(fabs(KBase::sum(cv) - 1.0) < pTol);
-
       assert(0 < cv.numR());
       assert(1 == cv.numC());
-
       auto ndxIJ = ndxMaxAbs(cv);
       unsigned int iMax = get<0>(ndxIJ);
       return iMax;
@@ -680,8 +682,21 @@ namespace SMPLib {
       assert(nb == p.numR());
       assert(1 == p.numC());
       cout << "done" << endl << flush;
-      unsigned int mMax = ndxMaxProb(p); // indexing actors by i, bargains by m
-      cout << "Chosen bargain: " << mMax << endl;
+      unsigned int mMax = nb; // indexing actors by i, bargains by m
+      switch (stm) {
+	case StateTransMode::DeterminsticSTM:
+	  mMax = ndxMaxProb(p); 
+	  break;
+	case StateTransMode::StochasticSTM:
+	  mMax = model->rng->probSel(p); 
+	  break;	  
+	default:
+	  throw KException("SMPState::doBCN - unrecognized StateTransMode");
+	  break;
+      }
+      // 0 <= mMax assured for uint
+      assert (mMax < nb);
+      cout << "Chosen bargain ("<<stm<<"): " << mMax << "/" << nb << endl;
 
 
 

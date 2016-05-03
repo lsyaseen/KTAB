@@ -250,6 +250,31 @@ ostream& operator<< (ostream& os, const VotingRule& vr) {
     return os;
 }
 
+
+string stmName(const StateTransMode& stm) {
+  string stmName = "";
+  switch (stm) {
+    case StateTransMode::DeterminsticSTM:
+      stmName = "DeterminsticSTM";
+      break;
+    case StateTransMode::StochasticSTM:
+      stmName = "StochasticSTM";
+      break;
+    default:
+        throw KException("stmName - Unrecognized StateTransMode");
+        break;
+  }
+  return stmName;
+}
+
+
+ostream& operator<< (ostream& os, const StateTransMode& stm) {
+  os << stmName(stm);
+  return os;
+}
+
+
+// At this point, the LISP keyword 'defmacro' should leap to mind, again.
 string pcmName(const PCEModel& pcm) {
     string s="";
     switch (pcm) {

@@ -64,10 +64,17 @@ enum class VotingRule { Binary, PropBin, Proportional, PropCbc, Cubic };
 string vrName(const VotingRule& vr);
 ostream& operator<< (ostream& os, const VotingRule& vr);
 
+// Will state transitions be in deterministic or stochastic mode
+enum class StateTransMode { DeterminsticSTM, StochasticSTM };
+string stmName(const StateTransMode& stm);
+ostream& operator<< (ostream& os, const StateTransMode& stm);
 
+// At this point, the LISP keyword 'defmacro' should leap to mind.
+// Will this PCE be Markov or Conditional or ...
 enum class PCEModel { MarkovPCM, ConditionalPCM };
 string pcmName(const PCEModel& pcm);
 ostream& operator<< (ostream& os, const PCEModel& pcm);
+
 
 
 // whether you consider the probability of a coalition winning to go up linearly

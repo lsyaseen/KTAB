@@ -29,6 +29,7 @@
 #include <random> 
 
 #include "kutils.h"
+#include "kmatrix.h"
 
 namespace KBase {
   using std::mt19937_64;
@@ -50,6 +51,7 @@ namespace KBase {
     virtual ~PRNG();
     uint64_t uniform();
     double uniform(double a, double b);
+    unsigned int probSel (const KMatrix & cv);
     vector<bool> bits(unsigned int nb);
     uint64_t setSeed(uint64_t);
   protected:
