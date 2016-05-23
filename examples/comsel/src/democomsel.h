@@ -51,6 +51,7 @@ using KBase::ReportingLevel;
 using KBase::VctrPstn;
 
 
+const string appName = "ComSel";
 const string appVersion = "0.1";
 // -------------------------------------------------
 

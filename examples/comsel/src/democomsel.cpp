@@ -52,42 +52,42 @@ using KBase::VotingRule;
 
 
 namespace DemoComSel {
- 
-  using std::cout;
-  using std::endl;
-  using std::flush;
-  using std::function;
-  using std::get;
-  using std::string;
 
-  using KBase::ReportingLevel;
+using std::cout;
+using std::endl;
+using std::flush;
+using std::function;
+using std::get;
+using std::string;
 
-  using ComSelLib::CSModel;
-  using ComSelLib::CSActor;
-  using ComSelLib::CSState;
+using KBase::ReportingLevel;
 
-  // -------------------------------------------------
-  void demoActorUtils(const uint64_t s, PRNG* rng) {
+using ComSelLib::CSModel;
+using ComSelLib::CSActor;
+using ComSelLib::CSState;
+
+// -------------------------------------------------
+void demoActorUtils(const uint64_t s, PRNG* rng) {
     printf("Using PRNG seed: %020llu \n", s);
     rng->setSeed(s);
     return;
-  }
+}
 
 
-  void demoCS(unsigned int nParty, unsigned int nDim, const uint64_t s, PRNG* rng) {
+void demoCS(unsigned int nParty, unsigned int nDim, const uint64_t s, PRNG* rng) {
     printf("Using PRNG seed: %020llu \n", s);
     rng->setSeed(s);
 
     if (0 == nParty) {
-      nParty = 2 + (rng->uniform() % 4); // i.e. [2,6] inclusive
+        nParty = 2 + (rng->uniform() % 4); // i.e. [2,6] inclusive
     }
     if (0 == nDim) {
-      nDim = 1 + (rng->uniform() % 7); // i.e. [1,7] inclusive
+        nDim = 1 + (rng->uniform() % 7); // i.e. [1,7] inclusive
     }
 
     printf("Num parties: %u \n", nParty);
     printf("Num dimensions: %u \n", nDim);
-    
+
     Fl::scheme("standard"); // standard, plastic, gtk+, gleam
 
     auto mw = new CSMain();
@@ -95,83 +95,80 @@ namespace DemoComSel {
     Fl::run();
     delete mw;
     mw = nullptr;
- 
+
     return;
-  }
+}
 
 
 } // end of namespace
 
 
 int main(int ac, char **av) {
-  using std::cout;
-  using std::endl;
-  using std::string;
+    using std::cout;
+    using std::endl;
+    using std::string;
+    auto sTime = KBase::displayProgramStart(DemoComSel::appName, DemoComSel::appVersion);
+    uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary
+    uint64_t seed = dSeed;
+    bool run = true;
 
-  auto sTime = KBase::displayProgramStart();
-  uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary
-  uint64_t seed = dSeed;
-  bool run = true;
+    auto showHelp = [dSeed]() {
+        printf("\n");
+        printf("Usage: specify one or more of these options\n");
+        printf("--help       print this message\n");
+        printf("--seed <n>   set a 64bit seed\n");
+        printf("             0 means truly random\n");
+        printf("             default: %020llu \n", dSeed);
+    };
 
-  cout << "comselApp version " << DemoComSel::appVersion << endl << endl;
+    // tmp args
+    // seed = 0;
 
-  auto showHelp = [dSeed]() {
-    printf("\n");
-    printf("Usage: specify one or more of these options\n");
-    printf("--help       print this message\n");
-    printf("--seed <n>   set a 64bit seed\n");
-    printf("             0 means truly random\n");
-    printf("             default: %020llu \n", dSeed);
-  };
-
-  // tmp args
-  // seed = 0;
-
-  if (ac > 1) {
-    for (int i = 1; i < ac; i++) {
-      if (strcmp(av[i], "--seed") == 0) {
-        i++;
-        seed = std::stoull(av[i]);
-      }
-      else if (strcmp(av[i], "--help") == 0) {
-        run = false;
-      }
-      else {
-        run = false;
-        printf("Unrecognized argument %s\n", av[i]);
-      }
+    if (ac > 1) {
+        for (int i = 1; i < ac; i++) {
+            if (strcmp(av[i], "--seed") == 0) {
+                i++;
+                seed = std::stoull(av[i]);
+            }
+            else if (strcmp(av[i], "--help") == 0) {
+                run = false;
+            }
+            else {
+                run = false;
+                printf("Unrecognized argument %s\n", av[i]);
+            }
+        }
     }
-  }
 
-  if (!run) {
-    showHelp();
+    if (!run) {
+        showHelp();
+        return 0;
+    }
+
+    PRNG * rng = new PRNG();
+    seed = rng->setSeed(seed); // 0 == get a random number
+    printf("Using PRNG seed: %020llu \n", seed);
+    printf("Same seed in hex: 0x%016llX \n", seed);
+
+
+    cout << "Creating objects from SMPLib ... " <<endl << flush;
+    auto sm = new SMPLib::SMPModel(rng); // , "SMPScen-010101"
+    auto sa = new SMPLib::SMPActor("Bob", "generic spatial actor");
+    delete sm;
+    sm = nullptr;
+    delete sa;
+    sa = nullptr;
+    cout << endl;
+    cout << "Done creating objects from SMPLib." << endl << flush;
+
+    // note that we reset the seed every time, so that in case something
+    // goes wrong, we need not scroll back too far to find the
+    // seed required to reproduce the bug.
+    DemoComSel::demoCS(4, 6, seed, rng);
+
+    delete rng;
+    KBase::displayProgramEnd(sTime);
     return 0;
-  }
-
-  PRNG * rng = new PRNG();
-  seed = rng->setSeed(seed); // 0 == get a random number
-  printf("Using PRNG seed: %020llu \n", seed);
-  printf("Same seed in hex: 0x%016llX \n", seed);
-
-
-  cout << "Creating objects from SMPLib ... " <<endl << flush;
-  auto sm = new SMPLib::SMPModel(rng); // , "SMPScen-010101"
-  auto sa = new SMPLib::SMPActor("Bob", "generic spatial actor");
-  delete sm;
-  sm = nullptr;
-  delete sa;
-  sa = nullptr;
-  cout << endl;
-  cout << "Done creating objects from SMPLib." << endl << flush;
-
-  // note that we reset the seed every time, so that in case something
-  // goes wrong, we need not scroll back too far to find the
-  // seed required to reproduce the bug.
-  DemoComSel::demoCS(4, 6, seed, rng);
-
-  delete rng;
-  KBase::displayProgramEnd(sTime);
-  return 0;
 }
 
 // --------------------------------------------
