@@ -191,7 +191,7 @@ namespace DemoComSel {
     for (unsigned int i = 0; i < numA; i++) {
       //auto ri = ((const RPActor *)(rpm->actrs[i]));
       //aCap(0, i) = ri->sCap;
-      aCap(0, i) = exp10(rng->uniform(1.0, 2.0));
+      aCap(0, i) = exp(log(10.0)*rng->uniform(1.0, 2.0)); // 10 to 100, median at 31.6
     }
     
     trans(aCap).mPrintf("%5.2f ");

@@ -1,7 +1,10 @@
 # ===========================================
 # Copyright KAPSARC. Open Source MIT License 
 # ===========================================
-
+# Even though ComSel does not use csv-parser, smplib does.
+# So csv-parser cannot be removed from this until
+# after it is removed from smplib.
+# ===========================================
 
 project(comsel)
 
