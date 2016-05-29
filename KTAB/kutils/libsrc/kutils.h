@@ -56,6 +56,8 @@ namespace KBase {
 
   typedef vector<unsigned int> VUI;
   typedef vector<bool> VBool;
+  
+  void printVUI(const VUI& p);
 
   enum class ReportingLevel : uint8_t {  Silent = 0, Low, Medium, High, Debugging  }; 
 

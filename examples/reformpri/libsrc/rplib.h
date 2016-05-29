@@ -39,7 +39,6 @@
 
 
 #include "kmodel.h"
-#include "hcsearch.h"
 
 using namespace std;
 
@@ -100,11 +99,10 @@ public:
 
     unsigned int idNum = 0;
 
-    VotingRule vr = VotingRule::Proportional;
     PropModel pMod = PropModel::ExpUtil;
-
-    // scalar capacity, positive
-    double sCap = 0;
+    
+    VotingRule vr = VotingRule::PropBin; // fairly arbitrary default
+    double sCap = 0.0; // scalar capacity, which must be positive
 
     // Similar to the LeonActor, this is a listing of how
     // much this actor values each reform item.

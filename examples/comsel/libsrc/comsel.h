@@ -88,6 +88,10 @@ namespace ComSelLib {
   public:
     explicit CSActor();
     virtual ~CSActor();
+    
+    VotingRule vr = VotingRule::PropBin; // fairly arbitrary default
+    double sCap = 0.0; // scalar capacity, which must be positive
+    
   protected:
   private:
   };

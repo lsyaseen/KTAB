@@ -36,7 +36,6 @@ namespace KBase {
   using std::endl;
   using std::flush;
 
-
   // -------------------------------------------------
 
   // for historical reasons, the second, quadratic power is called "square"
@@ -58,6 +57,14 @@ namespace KBase {
     return uis;
   }
   
+  void printVUI(const VUI& p) {
+    cout << "[VUI ";
+    for (auto i : p) {
+        printf("%2i ", i);
+    }
+    cout << "]";
+    return;
+}
   // -------------------------------------------------
 
   std::chrono::time_point<std::chrono::system_clock>  displayProgramStart(string appName, string appVersion) {

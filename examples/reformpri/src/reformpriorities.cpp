@@ -35,6 +35,7 @@ using namespace std;
 using KBase::KMatrix;
 using KBase::PRNG;
 using KBase::VUI;
+using KBase::printVUI;
 
 // -------------------------------------------------
 // function definitions
@@ -95,7 +96,7 @@ vector<VUI> scanPositions(const RPModel * rpm) {
     for (unsigned int pj = 0; pj < numPos; pj++) {
         printf("%3i  ", pj);
         auto pstn = positions[pj];
-        printPerm(pstn);
+        printVUI(pstn);
         printf("  ");
         for (unsigned int ai = 0; ai < numA; ai++) {
             double uap = uij(ai, pj);
@@ -116,7 +117,7 @@ vector<VUI> scanPositions(const RPModel * rpm) {
             }
         }
         printf("Best for %02u is ", ai);
-        printPerm(positions[bestJ]);
+        printVUI(positions[bestJ]);
         cout << endl;
         bestAP.push_back(positions[bestJ]);
     }
@@ -160,7 +161,7 @@ vector<VUI> scanPositions(const RPModel * rpm) {
         VUI pi = get<2>(pri);
 
         printf(" %3u: %4u  %.2f  ", i, ni, zi);
-        printPerm(pi);
+        printVUI(pi);
         cout << endl << flush;
     }
 

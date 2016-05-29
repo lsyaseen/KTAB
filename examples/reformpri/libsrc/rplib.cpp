@@ -23,6 +23,7 @@
 //
 
 #include "rplib.h"
+#include "hcsearch.h"
 
 namespace RfrmPri {
 // namespace to hold everything related to the
@@ -37,20 +38,11 @@ using KBase::VctrPstn;
 using KBase::MtchPstn;
 using KBase::VPModel;
 using KBase::PCEModel;
+using KBase::printVUI;
 
 // -------------------------------------------------
 // function definitions
 
-
-
-void printPerm(const VUI& p) {
-    cout << "[Perm ";
-    for (auto i : p) {
-        printf("%2i ", i);
-    }
-    cout << "]";
-    return;
-}
 
 // -------------------------------------------------
 // class-method definitions
@@ -819,7 +811,7 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
             if (ReportingLevel::Low < rl) {
                 printf("--------------------------------------- \n");
                 printf("Assessing utility to %2i of hypo-pos: ", h);
-                printPerm(mph.match);
+                printVUI(mph.match);
                 cout << endl << flush;
                 printf("Hypo-util minus base util: \n");
                 (uh - uh0).mPrintf(" %+.4E ");
@@ -902,7 +894,7 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
 
         // show some representation of this position on cout
         auto sfn = [](const MtchPstn & mp0) {
-            printPerm(mp0.match);
+            printVUI(mp0.match);
             return;
         };
 
@@ -938,7 +930,7 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
             cout << "numCat: " << pBest.numCat << endl;
             cout << "numItm: " << pBest.numItm << endl;
             cout << "perm: ";
-            printPerm(pBest.match);
+            printVUI(pBest.match);
             cout << endl << flush;
         }
         MtchPstn * posBest = new MtchPstn(pBest);
@@ -1012,7 +1004,7 @@ void RPState::setAllAUtil(ReportingLevel rl) {
         double uij = ai->posUtil(pstns[j]);
         if (!(0.0 <= uij)) {
             cout << i << " " << j << "  " << uij << endl << flush;
-            printPerm(rp->match);
+            printVUI(rp->match);
             cout << endl << flush;
         }
         assert(0.0 <= uij);
@@ -1048,7 +1040,7 @@ void RPState::setAllAUtil(ReportingLevel rl) {
 
 
 void RPState::setOneAUtil(unsigned int perspH, ReportingLevel rl) {
-    cout << "RPState::setOneAUtil - not yet implemented"<<endl<<flush;
+    //cout << "RPState::setOneAUtil - not yet implemented"<<endl<<flush;
     const unsigned int numAct = model->numAct;
     const unsigned int numUnq = uIndices.size();
 
@@ -1066,11 +1058,11 @@ void RPState::setOneAUtil(unsigned int perspH, ReportingLevel rl) {
 }
 
 void RPState::show() const {
-    const unsigned int numA = rpMod->numAct;
+    const unsigned int numA = model->numAct;
     for (unsigned int i = 0; i < numA; i++) {
         auto pi = ((MtchPstn*)(pstns[i]));
         printf("Position %02u: ", i);
-        printPerm(pi->match);
+        printVUI(pi->match);
         cout << endl << flush;
     }
     auto pu = pDist(-1);
@@ -1082,7 +1074,6 @@ void RPState::show() const {
         printf("  %2u:  %.4f \n", i2, p(i1, 0));
     }
     cout << endl;
-
     return;
 } // end of RPState::show()
 

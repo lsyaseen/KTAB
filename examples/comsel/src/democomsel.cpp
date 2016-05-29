@@ -70,7 +70,7 @@ namespace DemoComSel {
   using ComSelLib::CSState;
 
   // -------------------------------------------------
-
+// like printVUI, but with range-checking and boolean output
   void printCS(const VUI& v) {
     unsigned int n = v.size();
     printf("[CS ");

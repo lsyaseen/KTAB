@@ -383,11 +383,14 @@ ostream& operator << (ostream& os, const BigRAdjust& rAdj) {
 
 
 double Model::vote(VotingRule vr, double wi, double uij, double uik) {
+  if (wi <= 0.0 ) { // you can make it really small (10E-10), but never zero or below.
+        throw KException("Model::vote - non-positive voting weight");
+  }
     double v = 0.0;
     const double du = uij - uik;
 
     double rBin = 0; // binary response
-    const double sTol = 1E-10;
+    const double sTol = 1E-8;
     rBin = du / sTol;
     rBin = (rBin > +1) ? +1 : rBin;
     rBin = (rBin < -1) ? -1 : rBin;
@@ -396,11 +399,11 @@ double Model::vote(VotingRule vr, double wi, double uij, double uik) {
     double rCubic = du * du * du; // cubic reponse
 
     // the following weights determine how much the hybrids deviate from proportional
-    const double rbp = 0.8;
-    // rbp = 0.8 makes LHS slope and RHS slope of equal size (0.8 each), and twice the center jump (0.4)
-    const double rpc = 0.5196;
-    // rpc is chosen so max deviation of PropCbc (at 1/sqrt(3)) equals max deviation by PropBin (at 0):
-    // rpc = (3*sqrt(3)*rbp)/2
+    const double rbp = 0.2;
+    // rbp = 0.2 makes LHS slope and RHS slope of equal size (0.8 each), and twice the center jump (0.4)
+    
+    const double rpc = 0.5;
+    
     switch (vr) {
     case VotingRule::Binary:
         v = wi * rBin;
@@ -419,7 +422,7 @@ double Model::vote(VotingRule vr, double wi, double uij, double uik) {
         break;
 
     case VotingRule::Cubic:
-        v = wi* rCubic;
+        v = wi * rCubic;
         break;
 
     default:

@@ -87,11 +87,10 @@ namespace KBase {
     const unsigned int nr = m.numR();
     const unsigned int nc = m.numC();
     
-    printf("ndxMaxAbs : %u %u \n", nr, nc);
-    cout << flush;
+    // mark with obviously wrong values
+    unsigned int ndxI = 1+nr; 
+    unsigned int ndxJ = 1+nc; 
     
-    unsigned int ndxI = 1+nr; // mark with obviously wrong value
-    unsigned int ndxJ = 1+nc; // mark with obviously wrong value
     for (unsigned int i=0; i<nr; i++) { 
       for (unsigned int j=0; j<nc; j++) {
 	double a = fabs(m(i,j));
