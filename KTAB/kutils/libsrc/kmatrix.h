@@ -70,7 +70,7 @@ namespace KBase {
   
   KMatrix rescaleRows(const KMatrix& m1, const double vMin, const double vMax);
 
-// -------------------------------------------------
+  // -------------------------------------------------
 
   class KMatrix {
     friend KMatrix  inv(const KMatrix & m);

@@ -34,6 +34,11 @@
 
 
 namespace KBase {
+  
+  using std::printf;
+  using std::cout;
+  using std::endl;
+  using std::flush;
 
   KMatrix trans(const KMatrix & m1) {
     unsigned int nr2 = m1.numC();
@@ -79,10 +84,16 @@ namespace KBase {
 
   tuple<unsigned int, unsigned int>  ndxMaxAbs(const KMatrix & m) {
     double ma = 0;
-    unsigned int ndxI = 1+m.numR(); // mark with obviously wrong value
-    unsigned int ndxJ = 1+m.numC(); // mark with obviously wrong value
-    for (unsigned int i=0; i<m.numR(); i++) { 
-      for (unsigned int j=0; j<m.numC(); j++) {
+    const unsigned int nr = m.numR();
+    const unsigned int nc = m.numC();
+    
+    printf("ndxMaxAbs : %u %u \n", nr, nc);
+    cout << flush;
+    
+    unsigned int ndxI = 1+nr; // mark with obviously wrong value
+    unsigned int ndxJ = 1+nc; // mark with obviously wrong value
+    for (unsigned int i=0; i<nr; i++) { 
+      for (unsigned int j=0; j<nc; j++) {
 	double a = fabs(m(i,j));
 	if (ma < a) {
 	  ndxI = i;
@@ -91,8 +102,8 @@ namespace KBase {
 	}
       }
     } 
-    assert (ndxI < m.numR());
-    assert (ndxJ < m.numC());
+    assert (ndxI < nr);
+    assert (ndxJ < nc);
     auto ndx = tuple<unsigned int, unsigned int>(ndxI, ndxJ);
     return ndx;
   }
@@ -434,38 +445,38 @@ namespace KBase {
     return m3;
   }
   
-KMatrix rescaleRows(const KMatrix& m1, const double vMin, const double vMax) {
+  KMatrix rescaleRows(const KMatrix& m1, const double vMin, const double vMax) {
     assert(vMin < vMax);
     const unsigned int nr = m1.numR();
     const unsigned int nc = m1.numC();
     KMatrix m2 = KMatrix(nr, nc);
 
     for (unsigned int i = 0; i < nr; i++) {
-        double rowMin = m1(i, 0);
-        double rowMax = m1(i, 0);
-        for (unsigned int j = 0; j < nc; j++) {
-            const double mij = m1(i, j);
-            if (mij < rowMin) {
-                rowMin = mij;
-            }
-            if (mij > rowMax) {
-                rowMax = mij;
-            }
-        }
-        const double rowRange = rowMax - rowMin;
-        assert(0 < rowRange);
+      double rowMin = m1(i, 0);
+      double rowMax = m1(i, 0);
+      for (unsigned int j = 0; j < nc; j++) {
+	const double mij = m1(i, j);
+	if (mij < rowMin) {
+	  rowMin = mij;
+	}
+	if (mij > rowMax) {
+	  rowMax = mij;
+	}
+      }
+      const double rowRange = rowMax - rowMin;
+      assert(0 < rowRange);
 
-        for (unsigned int j = 0; j < nc; j++) {
-            const double mij = m1(i, j);
-            const double nij = (mij - rowMin) / rowRange; // normalize into [0, 1]
-            const double rij = vMin + (vMax - vMin)*nij; // rescale into [vMin, vMax]
-            m2(i, j) = rij;
-        }
+      for (unsigned int j = 0; j < nc; j++) {
+	const double mij = m1(i, j);
+	const double nij = (mij - rowMin) / rowRange; // normalize into [0, 1]
+	const double rij = vMin + (vMax - vMin)*nij; // rescale into [vMin, vMax]
+	m2(i, j) = rij;
+      }
     }
 
 
     return m2;
-}
+  }
 } // end of namespace
 
 // --------------------------------------------
