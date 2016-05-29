@@ -89,7 +89,7 @@ vector<VUI> scanPositions(const RPModel * rpm) {
         ai->posValMin = pvMin;
         ai->posValMax = pvMax;
     }
-    KMatrix uij = RfrmPri::rescaleRows(rawUij, 0.0, 1.0);
+    KMatrix uij = KBase::rescaleRows(rawUij, 0.0, 1.0); // von Neumann utility scale
  
     cout << "Complete (normalized) utility matrix of all possible positions (rows) versus actors (columns)" << endl << flush;
     for (unsigned int pj = 0; pj < numPos; pj++) {

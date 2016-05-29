@@ -49,11 +49,11 @@ namespace MDemo {
   using KBase::State;
   using KBase::Model;
   using KBase::EModel;
+  using KBase::VBool;
 
   // --------------------------------------------
   void demoEMod(uint64_t s, PRNG* rng);
   // --------------------------------------------
-  typedef vector<bool> BVec;
 
   struct TwoDPoint {
   public:

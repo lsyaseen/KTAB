@@ -67,7 +67,10 @@ namespace KBase {
   KMatrix operator/ (const KMatrix & m1, double x);
   bool sameShape(const KMatrix & m1, const KMatrix & m2);
   KMatrix operator* (const KMatrix & m1, const KMatrix & m2);
+  
+  KMatrix rescaleRows(const KMatrix& m1, const double vMin, const double vMax);
 
+// -------------------------------------------------
 
   class KMatrix {
     friend KMatrix  inv(const KMatrix & m);

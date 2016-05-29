@@ -76,10 +76,6 @@ const string appName = "rpdemo";
 const string appVersion = "0.2";
 
 // -------------------------------------------------
-
-KMatrix rescaleRows(const KMatrix& m1, const double vMin, const double vMax);
-
-// -------------------------------------------------
 // class declarations
 
 class RPActor : public Actor {

@@ -44,6 +44,7 @@ namespace KBase {
   using std::get;
   using std::tuple;
   using std::vector;
+  using KBase::VBool;
 
   class PRNG;
   class KMatrix;
@@ -226,7 +227,7 @@ namespace KBase {
   void GAOpt<GAP>::dropDups() {
     using KBase::popBack;
     unsigned int cSize = gpool.size();
-    auto unique = vector<bool>();
+    VBool unique = {};
     unique.resize(cSize);
     for (unsigned int i = 0; i < cSize; i++) {
       unique[i] = true;

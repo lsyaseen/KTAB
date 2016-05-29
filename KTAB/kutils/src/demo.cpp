@@ -770,14 +770,15 @@ void demoGA(PRNG* rng) {
 
     cout << "Target length = " << nb << endl;
     cout << "Set target: " << endl;
-    TargetedBV::setTarget(TargetedBV::randomBV(rng, nb));
+    const KBase::VBool trgt = TargetedBV::randomBV(rng, nb);
+    TargetedBV::setTarget(trgt);
     TargetedBV::showBits(TargetedBV::getTarget());
     cout << endl << endl << flush;
 
     unsigned int tblSize = 20;
     double minD = 0.25;
     auto wghts = vector<double>();
-    auto tbl = vector<vector<bool>>();
+    auto tbl = vector<VBool>();
     auto gs = vector<TargetedBV>();
     for (unsigned int i = 0; i < tblSize; i++) {
         auto gi = TargetedBV();
@@ -786,10 +787,14 @@ void demoGA(PRNG* rng) {
         wghts.push_back(10.0 * i);
         tbl.push_back(gi.bits);
     }
+    gs[tblSize-1] = TargetedBV(trgt);
+    tbl[tblSize-1] = trgt;
 
     cout << "Table eval with minD = " << minD << endl << flush;
     for (unsigned int i = 0; i < tblSize; i++) {
-        printf("%2u  %8.3f  \n", i, gs[i].tblEval(minD, wghts, tbl));
+        printf("%2u  %8.3f  ", i, gs[i].tblEval(minD, wghts, tbl));
+	TargetedBV::showBits(gs[i].bits);
+	cout << endl;
     }
 
     auto compFn = [gs, minD, wghts, tbl](unsigned int i, unsigned int j) {
@@ -838,8 +843,8 @@ void demoGA(PRNG* rng) {
     };
 
 
-    unsigned int pS = 20; // size of the gene pool
-    double cf = 1.0; // everything crosses over exactly once, 1<cf allowed
+    unsigned int pS = 50; // size of the gene pool
+    double cf = 2.0; // everything crosses over exactly twice, 1<cf allowed
     double mf = 1.0; // everything mutates exactly once, 1<mf allowed
 
     printf("Population size: %u \n", pS);
@@ -852,6 +857,10 @@ void demoGA(PRNG* rng) {
     gOpt->makeGene = mgFn;
     gOpt->equiv = eqFn;
 
+    auto ip = vector<TargetedBV*>();
+    ip.push_back(new TargetedBV(TargetedBV::getTarget()));
+//   gOpt->init(ip);
+    
     gOpt->fill(rng);
     cout << "Random basic population:" << endl;
     gOpt->show();
@@ -880,11 +889,11 @@ void demoGA(PRNG* rng) {
 
 void demoGHC(PRNG* rng) {
     unsigned int numBits = 20;
-    const BVec bv0 = rng->bits(numBits);
+    const VBool bv0 = rng->bits(numBits);
     auto wv0 = KMatrix::uniform(rng, numBits, 1, 1.0, 10.0);
     wv0 = 100.0 *(wv0 / sum(wv0));
 
-    auto efn = [bv0, wv0](BVec bv) { // obviously, function<double(BVec)>
+    auto efn = [bv0, wv0](VBool bv) { // obviously, function<double(VBool)>
         double s = 0;
         for (unsigned int i = 0; i < bv0.size(); i++) {
             if (bv[i] == bv0[i]) {
@@ -897,7 +906,7 @@ void demoGHC(PRNG* rng) {
         return s;
     };
 
-    auto sfn = [](BVec bv) {
+    auto sfn = [](VBool bv) {
         for (auto b : bv) {
             if (b) {
                 printf("+");
@@ -909,11 +918,11 @@ void demoGHC(PRNG* rng) {
         return;
     };
 
-    function< vector<BVec>(BVec)> nfn = [](BVec bv0) {
+    function< vector<VBool>(VBool)> nfn = [](VBool bv0) {
         unsigned int nb = bv0.size();
-        auto bvs = vector <BVec>();
+        auto bvs = vector <VBool>();
         for (unsigned int i = 0; i < nb; i++) {
-            auto bv = BVec(bv0);
+            auto bv = VBool(bv0);
             bv[i] = !bv[i];
             bvs.push_back(bv);
         }
@@ -927,13 +936,13 @@ void demoGHC(PRNG* rng) {
     printf("Target value : %+.3f \n\n", efn(bv0));
 
     cout << "Starting general hill-climbing search" << endl;
-    BVec p0 = rng->bits(numBits);
+    VBool p0 = rng->bits(numBits);
     cout << endl << "Initial string: ";
     sfn(p0);
     cout << endl;
     printf("Initial value: %+.3f \n\n", efn(p0));
 
-    auto ghc = GHCSearch<BVec>();
+    auto ghc = GHCSearch<VBool>();
     ghc.eval = efn;
     ghc.nghbrs = nfn;
     ghc.show = sfn;
@@ -1634,14 +1643,21 @@ void demoVHC03(PRNG* rng) {
 
 
 
-vector<bool> TargetedBV::target;
+VBool TargetedBV::target;
+
 TargetedBV::TargetedBV() {
-    bits = vector<bool>();
+    bits = VBool();
     unsigned int n = target.size();
     for (unsigned int i = 0; i < n; i++) {
         bits.push_back(false);
     }
 }
+
+
+TargetedBV::TargetedBV(const VBool & b) {
+      bits = b;
+    }
+    
 TargetedBV::~TargetedBV() {  }
 void TargetedBV::setTarget(vector< bool > trgt)
 {
@@ -1649,12 +1665,12 @@ void TargetedBV::setTarget(vector< bool > trgt)
     target = trgt;
     return;
 }
-vector<bool> TargetedBV::getTarget() {
+VBool TargetedBV::getTarget() {
     return target;
 }
-vector<bool> TargetedBV::randomBV(PRNG* rng, unsigned int nb) {
+VBool TargetedBV::randomBV(PRNG* rng, unsigned int nb) {
     uint64_t b = rng->uniform();
-    auto bv = vector<bool>();
+    auto bv = VBool();
     bv.resize(nb);
     for (unsigned int i = 0; i < nb; i++) {
         bv[i] = (1 == (b & 0x1));
@@ -1702,7 +1718,7 @@ void TargetedBV::show() const {
     showBits(bits);
     return;
 }
-void TargetedBV::showBits(vector<bool> bv) {
+void TargetedBV::showBits(VBool bv) {
     for (unsigned int i = 0; i < bv.size(); i++) {
         bool bi = bv[i];
         if (bi)
@@ -1725,7 +1741,7 @@ double TargetedBV::evaluate() {
     double v = 100.0 - hDist(target);
     return v;
 }
-unsigned int TargetedBV::hDist(vector<bool> bv) const {
+unsigned int TargetedBV::hDist(VBool bv) const {
     assert(bv.size() == target.size());
     unsigned int hd = 0;
     for (unsigned int i = 0; i < bv.size(); i++) {
@@ -1737,12 +1753,12 @@ unsigned int TargetedBV::hDist(vector<bool> bv) const {
     }
     return hd;
 }
-double TargetedBV::tblEval(double minD, vector<double> wght, vector<vector<bool>> tbl) const {
+double TargetedBV::tblEval(double minD, vector<double> wght, vector<VBool> tbl) const {
     assert(0 < minD);
     double num = 0.0;
     double dnm = 0.0;
     for (unsigned int i = 0; i < tbl.size(); i++) {
-        vector<bool> ti = tbl[i];
+        VBool ti = tbl[i];
         double di = minD + hDist(ti);
         num = num + (wght[i] / di);
         dnm = dnm + (1.0 / di);

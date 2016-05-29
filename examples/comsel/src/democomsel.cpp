@@ -42,6 +42,7 @@
 #include "democomsel.h"
 
 
+using KBase::VUI;
 using KBase::PRNG;
 using KBase::KMatrix;
 using KBase::Actor;
@@ -53,36 +54,251 @@ using KBase::VotingRule;
 
 namespace DemoComSel {
 
-using std::cout;
-using std::endl;
-using std::flush;
-using std::function;
-using std::get;
-using std::string;
+  using std::cout;
+  using std::endl;
+  using std::flush;
+  using std::function;
+  using std::get;
+  using std::string;
+  using std::printf;
 
-using KBase::ReportingLevel;
+  using KBase::ReportingLevel;
+  using KBase::MtchPstn;
 
-using ComSelLib::CSModel;
-using ComSelLib::CSActor;
-using ComSelLib::CSState;
+  using ComSelLib::CSModel;
+  using ComSelLib::CSActor;
+  using ComSelLib::CSState;
 
-// -------------------------------------------------
-void demoActorUtils(const uint64_t s, PRNG* rng) {
+  // -------------------------------------------------
+
+  void printCS(const VUI& v) {
+    unsigned int n = v.size();
+    printf("[CS ");
+    for (unsigned int i=0; i<n; i++) {
+      switch (v[i]) {
+      case 0:
+	printf("-");
+	break;
+      case 1:
+	printf("+");
+	break;
+      default:
+	printf("printCS:: unrecognized case");
+	assert (false);
+	break;
+      }
+    }
+    printf("]");
+    return;
+  }
+
+  void demoActorUtils(const uint64_t s, PRNG* rng) {
     printf("Using PRNG seed: %020llu \n", s);
     rng->setSeed(s);
     return;
-}
+  }
+
+  VUI intToVB(unsigned int x, unsigned int n) {
+    VUI vb = {};
+    vb.resize(n);
+    for (unsigned int i=0; i<n; i++) { 
+      vb[i] = (x % 2);
+      x = x / 2;
+    }
+  
+    return vb;
+  }
+
+  void demoCSC(unsigned int numA, unsigned int nDim, 
+	       bool cpP, bool siP,
+	       const uint64_t s, PRNG* rng) {
+    // need a template for ...
+    // position type  (each is a committee)
+    // utility to an actor of a position (committee)
+    // getting actor's scalar capability
+  
+    printf("Using PRNG seed: %020llu \n", s);
+    rng->setSeed(s);
+     
+
+    if (0 == numA) {
+      numA = 2 + (rng->uniform() % 4); // i.e. [2,6] inclusive
+    }
+    if (0 == nDim) {
+      nDim = 1 + (rng->uniform() % 7); // i.e. [1,7] inclusive
+    }
+
+    printf("Num parties: %u \n", numA);
+    printf("Num dimensions: %u \n", nDim);
+    
+    
+    unsigned int numItm = numA;
+    unsigned int numCat = 2; // out or in, respectively
+    unsigned int numPos = exp2(numA); // i.e. numCat ^^ numItm
+    vector<VUI> positions = {};
+    for (unsigned int i = 0; i<numPos; i++) {
+      positions.push_back(intToVB(i,numA));
+    }
+    assert (numPos == positions.size());
+    
+    printf("Num positions: %u \n", numPos);
+    
+    cout << "Computing utilities of positions ... " << endl;
+    cout << "  not yet implemented: randomizing" << endl;
+    auto rawUij = KMatrix::uniform(rng, numA, numPos, 0.0, 10.0); // rows are actors, columns are all possible position
+    for (unsigned int i=0; i<numA; i++) {
+      rawUij(i,0) = 0.0;
+      unsigned int j = exp2(i);
+      rawUij(i,j) = 11.0;
+    }
+
+    
+    auto uij = KBase::rescaleRows(rawUij, 0.0, 1.0); // von Neumann utility scale
+    
+    cout << "Complete (normalized) utility matrix of all possible positions (rows) versus actors (columns)" << endl << flush;
+    for (unsigned int pj = 0; pj < numPos; pj++) {
+      printf("%3i  ", pj);
+      auto pstn = positions[pj];
+      printCS(pstn);
+      printf("  ");
+      for (unsigned int ai = 0; ai < numA; ai++) {
+	double uap = uij(ai, pj);
+	printf("%6.4f, ", uap);
+      }
+      cout << endl << flush;
+    }
+
+    cout << endl << "Computing best position for each actor" << endl;
+    vector<VUI> bestAP = {}; // list of each actor's best position (followed by CP)
+    for (unsigned int ai = 0; ai < numA; ai++) {
+      unsigned int bestJ = 0;
+      double bestV = 0;
+      for (unsigned int pj = 0; pj < numPos; pj++) {
+	if (bestV < uij(ai, pj)) {
+	  bestJ = pj;
+	  bestV = uij(ai, pj);
+	}
+      }
+      printf("Best for %02u is %4u ", ai, bestJ);
+      printCS(positions[bestJ]);
+      cout << endl;
+      bestAP.push_back(positions[bestJ]);
+    }
+
+    cout << "Getting scalar strength of actors ..." << endl;
+    cout << "  not yet implemented: randomizing" << endl;
+    KMatrix aCap = KMatrix(1, numA);
+    for (unsigned int i = 0; i < numA; i++) {
+      //auto ri = ((const RPActor *)(rpm->actrs[i]));
+      //aCap(0, i) = ri->sCap;
+      aCap(0, i) = exp10(rng->uniform(1.0, 2.0));
+    }
+    
+    trans(aCap).mPrintf("%5.2f ");
+    cout << endl << flush;
+    
+    cout << "Computing zeta ... " << endl;
+    KMatrix zeta = aCap * uij;
+    assert((1 == zeta.numR()) && (numPos == zeta.numC()));
 
 
-void demoCS(unsigned int nParty, unsigned int nDim, const uint64_t s, PRNG* rng) {
+    cout << "Sorting positions from most to least net support ..." << endl << flush;
+
+    auto betterPR = [](tuple<unsigned int, double, VUI> pr1,
+		       tuple<unsigned int, double, VUI> pr2) {
+      double v1 = get<1>(pr1);
+      double v2 = get<1>(pr2);
+      bool better = (v1 > v2);
+      return better;
+    };
+    
+    auto pairs = vector<tuple<unsigned int, double, VUI>>();
+    for (unsigned int i = 0; i < numPos; i++) {
+      auto pri = tuple<unsigned int, double, VUI>(i, zeta(0, i), positions[i]);
+      pairs.push_back(pri);
+    }
+
+    sort(pairs.begin(), pairs.end(), betterPR);
+
+    const unsigned int maxDisplayed = 256;
+    unsigned int  numPr = (pairs.size() < maxDisplayed) ? pairs.size() : maxDisplayed;
+
+    cout << "Displaying highest " << numPr << endl << flush;
+    for (unsigned int i = 0; i < numPr; i++) {
+      auto pri = pairs[i];
+      unsigned int ni = get<0>(pri);
+      double zi = get<1>(pri);
+      VUI pi = get<2>(pri);
+
+      printf(" %3u: %4u  %7.2f  ", i, ni, zi);
+      printCS(pi);
+      cout << endl << flush;
+    }
+
+    VUI bestCS = get<2>(pairs[0]);
+
+    bestAP.push_back(bestCS); // last one is the CP
+    
+    
+    auto csm = new CSModel(nDim, rng, "csm0");
+    auto css0 = new CSState(csm);
+    csm->addState(css0);
+
+    // Either start them all at the CP or have each to choose an initial position which
+    // maximizes their direct utility, regardless of expected utility.
+    for (unsigned int i = 0; i < numA; i++) {
+      auto pi = new  MtchPstn();
+      pi->numCat = numCat;
+      pi->numItm = numItm;
+      if (cpP) {
+	pi->match = bestCS;
+      }
+      if (siP) {
+	pi->match = bestAP[i];
+      }
+      css0->addPstn(pi);
+    }
+    assert(numA == css0->pstns.size());
+    
+    css0->step = [css0]() {
+      return css0->stepSUSN();
+    };
+    
+    unsigned int maxIter = 3;
+    csm->stop = [maxIter, csm](unsigned int iter, const KBase::State * s) {
+      bool doneP = iter > maxIter;
+      if (doneP) {
+	printf("Max iteration limit of %u exceeded \n", maxIter);
+      }
+      auto s2 = ((const CSState *)(csm->history[iter]));
+      for (unsigned int i = 0; i < iter; i++) {
+	auto s1 = ((const CSState *)(csm->history[i]));
+	if (CSModel::equivStates(s1, s2)) {
+	  doneP = true;
+	  printf("State number %u matched state number %u \n", iter, i);
+	}
+      }
+
+      return doneP;
+    };
+
+    css0->setUENdx();
+    
+    
+//    csm->run();
+    
+    return;
+  }
+
+  void demoCSG(unsigned int nParty, unsigned int nDim, const uint64_t s, PRNG* rng) {
     printf("Using PRNG seed: %020llu \n", s);
     rng->setSeed(s);
 
     if (0 == nParty) {
-        nParty = 2 + (rng->uniform() % 4); // i.e. [2,6] inclusive
+      nParty = 2 + (rng->uniform() % 4); // i.e. [2,6] inclusive
     }
     if (0 == nDim) {
-        nDim = 1 + (rng->uniform() % 7); // i.e. [1,7] inclusive
+      nDim = 1 + (rng->uniform() % 7); // i.e. [1,7] inclusive
     }
 
     printf("Num parties: %u \n", nParty);
@@ -97,78 +313,105 @@ void demoCS(unsigned int nParty, unsigned int nDim, const uint64_t s, PRNG* rng)
     mw = nullptr;
 
     return;
-}
+  }
 
 
 } // end of namespace
 
 
 int main(int ac, char **av) {
-    using std::cout;
-    using std::endl;
-    using std::string;
-    auto sTime = KBase::displayProgramStart(DemoComSel::appName, DemoComSel::appVersion);
-    uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary
-    uint64_t seed = dSeed;
-    bool run = true;
+  using std::cout;
+  using std::endl;
+  using std::string;
+  auto sTime = KBase::displayProgramStart(DemoComSel::appName, DemoComSel::appVersion);
+  uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary
+  uint64_t seed = dSeed;
+  bool run = true;
+  bool guiP = false;
+  bool cpP = true;
+  bool siP = false;
 
-    auto showHelp = [dSeed]() {
-        printf("\n");
-        printf("Usage: specify one or more of these options\n");
-        printf("--help       print this message\n");
-        printf("--seed <n>   set a 64bit seed\n");
-        printf("             0 means truly random\n");
-        printf("             default: %020llu \n", dSeed);
-    };
+  auto showHelp = [dSeed]() {
+    printf("\n");
+    printf("Usage: specify one or more of these options\n");
+    printf("--gui       show empty GUI \n");
+    printf("--cp        start each actor from the central position \n");
+    printf("--si        start each actor from their most self-interested position \n");
+    printf("            If neither cp nor si are specified, it will use cp \n");
+    printf("            If both cp and si are specified, it will use si \n");
+    printf("--help      print this message \n");
+    printf("--seed <n>  set a 64bit seed \n");
+    printf("            0 means truly random \n");
+    printf("            default: %020llu \n", dSeed);
+  };
 
-    // tmp args
-    // seed = 0;
-
-    if (ac > 1) {
-        for (int i = 1; i < ac; i++) {
-            if (strcmp(av[i], "--seed") == 0) {
-                i++;
-                seed = std::stoull(av[i]);
-            }
-            else if (strcmp(av[i], "--help") == 0) {
-                run = false;
-            }
-            else {
-                run = false;
-                printf("Unrecognized argument %s\n", av[i]);
-            }
-        }
+  // tmp args
+  // seed = 0;
+  
+  if (ac > 1) {
+    for (int i = 1; i < ac; i++) {
+      if (strcmp(av[i], "--seed") == 0) {
+	i++;
+	seed = std::stoull(av[i]);
+      }
+      else if (strcmp(av[i], "--gui") == 0) {
+	guiP = true;
+      }
+      else if (strcmp(av[i], "--cp") == 0) {
+	cpP = true;
+	siP = false;
+      }
+      else if (strcmp(av[i], "--si") == 0) {
+	cpP = false;
+	siP = true;
+      }
+      else if (strcmp(av[i], "--help") == 0) {
+	run = false;
+      }
+      else {
+	run = false;
+	printf("Unrecognized argument %s\n", av[i]);
+      }
     }
+  }
 
-    if (!run) {
-        showHelp();
-        return 0;
-    }
+  if (!run) {
+    showHelp();
+    return 0;
+  }
 
-    PRNG * rng = new PRNG();
-    seed = rng->setSeed(seed); // 0 == get a random number
-    printf("Using PRNG seed: %020llu \n", seed);
-    printf("Same seed in hex: 0x%016llX \n", seed);
+  PRNG * rng = new PRNG();
+  seed = rng->setSeed(seed); // 0 == get a random number
+  printf("Using PRNG seed: %020llu \n", seed);
+  printf("Same seed in hex: 0x%016llX \n", seed);
 
 
-    cout << "Creating objects from SMPLib ... " <<endl << flush;
-    auto sm = new SMPLib::SMPModel(rng); // , "SMPScen-010101"
-    auto sa = new SMPLib::SMPActor("Bob", "generic spatial actor");
-    delete sm;
-    sm = nullptr;
-    delete sa;
-    sa = nullptr;
-    cout << endl;
-    cout << "Done creating objects from SMPLib." << endl << flush;
+  cout << "Creating objects from SMPLib ... " <<endl << flush;
+  auto sm = new SMPLib::SMPModel(rng); // , "SMPScen-010101"
+  auto sa = new SMPLib::SMPActor("Bob", "generic spatial actor");
+  delete sm;
+  sm = nullptr;
+  delete sa;
+  sa = nullptr;
+  cout << endl;
+  cout << "Done creating objects from SMPLib." << endl << flush;
 
+  if (guiP){ // dummy GUI
+    DemoComSel::demoCSG(4, 6, seed, rng);
+  }
+  else {
     // note that we reset the seed every time, so that in case something
     // goes wrong, we need not scroll back too far to find the
     // seed required to reproduce the bug.
-    DemoComSel::demoCS(4, 6, seed, rng);
+    DemoComSel::demoCSC(8, // actors trying to get onto committee
+			6, // issues to be addressed by the committee
+			cpP, siP,
+			seed, rng);
+  }
 
-    delete rng;
-    KBase::displayProgramEnd(sTime);
-    return 0;
+  delete rng;
+  KBase::displayProgramEnd(sTime);
+  return 0;
 }
 
 // --------------------------------------------

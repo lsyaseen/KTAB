@@ -37,8 +37,7 @@ namespace UDemo {
   using std::vector;
   using KBase::PRNG;
   using KBase::KMatrix;
-
-  typedef vector<bool> BVec;
+  using KBase::VBool;
 
   // -------------------------------------------------
   double eNorm(const KMatrix & a, const KMatrix & x);
@@ -56,21 +55,22 @@ namespace UDemo {
   class TargetedBV {
   public:
     TargetedBV();
+    TargetedBV(const VBool & b);
     virtual ~TargetedBV();
-    static void setTarget(BVec trgt);
-    static BVec getTarget();
+    static void setTarget(VBool trgt);
+    static VBool getTarget();
     virtual void randomize(PRNG* rng);
     virtual TargetedBV * mutate(PRNG * rng) const;
     virtual tuple<TargetedBV*, TargetedBV*> cross(const TargetedBV * g2, PRNG * rng) const;
     virtual void show() const;
     virtual bool equiv(const TargetedBV * g2) const;
-    static void showBits(BVec bv);
-    static  BVec randomBV(PRNG* rng, unsigned int nb);
+    static void showBits(VBool bv);
+    static  VBool randomBV(PRNG* rng, unsigned int nb);
     double evaluate();
-    double tblEval(double minD, vector<double> weights, vector<BVec> tbl) const;
-    unsigned int hDist(BVec bv) const;
-    BVec bits = BVec();
-    static BVec target; // it is only a one-shot demo, so this can be static
+    double tblEval(double minD, vector<double> weights, vector<VBool> tbl) const;
+    unsigned int hDist(VBool bv) const;
+    VBool bits = VBool();
+    static VBool target; // it is only a one-shot demo, so this can be static
   };
 
 }; // namespace

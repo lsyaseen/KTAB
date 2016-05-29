@@ -34,26 +34,26 @@
 // --------------------------------------------
 
 namespace DemoComSel {
-// namespace to which KBase has no access
-using std::function;
-using std::shared_ptr;
-using std::string;
-using std::tuple;
-using std::vector;
-using KBase::KMatrix;
-using KBase::PRNG;
-using KBase::Actor;
-using KBase::Position;
-using KBase::State;
-using KBase::Model;
-using KBase::VotingRule;
-using KBase::ReportingLevel;
-using KBase::VctrPstn;
+  // namespace to which KBase has no access
+  using std::function;
+  using std::shared_ptr;
+  using std::string;
+  using std::tuple;
+  using std::vector;
+  using KBase::KMatrix;
+  using KBase::PRNG;
+  using KBase::Actor;
+  using KBase::Position;
+  using KBase::State;
+  using KBase::Model;
+  using KBase::VotingRule;
+  using KBase::ReportingLevel;
+  using KBase::VctrPstn;
 
 
-const string appName = "ComSel";
-const string appVersion = "0.1";
-// -------------------------------------------------
+  const string appName = "ComSel";
+  const string appVersion = "0.1";
+  // -------------------------------------------------
 
 
 

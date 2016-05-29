@@ -41,38 +41,7 @@ using KBase::PCEModel;
 // -------------------------------------------------
 // function definitions
 
-KMatrix rescaleRows(const KMatrix& m1, const double vMin, const double vMax) {
-    assert(vMin < vMax);
-    const unsigned int nr = m1.numR();
-    const unsigned int nc = m1.numC();
-    KMatrix m2 = KMatrix(nr, nc);
 
-    for (unsigned int i = 0; i < nr; i++) {
-        double rowMin = m1(i, 0);
-        double rowMax = m1(i, 0);
-        for (unsigned int j = 0; j < nc; j++) {
-            const double mij = m1(i, j);
-            if (mij < rowMin) {
-                rowMin = mij;
-            }
-            if (mij > rowMax) {
-                rowMax = mij;
-            }
-        }
-        const double rowRange = rowMax - rowMin;
-        assert(0 < rowRange);
-
-        for (unsigned int j = 0; j < nc; j++) {
-            const double mij = m1(i, j);
-            const double nij = (mij - rowMin) / rowRange; // normalize into [0, 1]
-            const double rij = vMin + (vMax - vMin)*nij; // rescale into [vMin, vMax]
-            m2(i, j) = rij;
-        }
-    }
-
-
-    return m2;
-}
 
 void printPerm(const VUI& p) {
     cout << "[Perm ";

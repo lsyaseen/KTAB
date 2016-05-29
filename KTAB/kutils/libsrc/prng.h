@@ -32,6 +32,7 @@
 #include "kmatrix.h"
 
 namespace KBase {
+  using KBase::VBool;
   using std::mt19937_64;
 
 
@@ -52,7 +53,7 @@ namespace KBase {
     uint64_t uniform();
     double uniform(double a, double b);
     unsigned int probSel (const KMatrix & cv);
-    vector<bool> bits(unsigned int nb);
+    VBool bits(unsigned int nb);
     uint64_t setSeed(uint64_t);
   protected:
     mt19937_64 mt = mt19937_64();

@@ -24,6 +24,7 @@
 #ifndef COMSEL_LIB_H
 #define COMSEL_LIB_H
 
+#include <algorithm>
 #include "csv_parser.hpp"
 #include "sqlite3.h"
 #include "kutils.h"
@@ -36,7 +37,7 @@
 
 namespace ComSelLib {
   // namespace to which KBase has no access
-  using std::function;
+  //  using std::function;
   using std::shared_ptr;
   using std::string;
   using std::tuple;
@@ -44,6 +45,7 @@ namespace ComSelLib {
   using KBase::newChars;
   using KBase::KMatrix;
   using KBase::PRNG;
+  using KBase::VUI;
   using KBase::Actor;
   using KBase::Position;
   using KBase::State;
@@ -52,35 +54,74 @@ namespace ComSelLib {
   using KBase::ReportingLevel;
   using KBase::MtchPstn;
 
-  const string appVersion = "0.1";
+
+  class CSActor;
+  class CSState;
+  class CSModel;
+
+  // -------------------------------------------------
+
+  const string appName = "csdemo";
+  const string appVersion = "0.2";
+
+  // -------------------------------------------------
+  // class declarations
 
   class CSModel : public Model {
   public:
-    CSModel(unsigned int np, unsigned int nd, PRNG* r, string d="");
+    explicit CSModel(unsigned int nd, PRNG* r, string d="");
     virtual ~CSModel();
     
+
+    static bool equivStates(const CSState * rs1, const CSState * rs2);
+    
   protected:
-    unsigned int numPrty = 0;
+    // the positions are matchings.
+    // the number of items is the number of actors (e.g. political parties)
+    // the number of categories is 2: out or in, respectively
     unsigned int numDims = 0;
   private:
   };
 
+  
   class CSActor : public Actor  {
   public:
-    CSActor();
+    explicit CSActor();
     virtual ~CSActor();
   protected:
   private:
   };
 
+  
   class CSState : public State  {
   public:
+    explicit CSState(CSModel* mod);
+    virtual ~CSState();
+    
+    // use the parameters of your state to compute the relative probability of each unique position.
+    // persp = -1 means use everyone's separate perspectives (i.e. get actual probabilities, not one actor's beliefs).
+    // Because the voting mechanisms may differ, so v_k(i:j) could differ widely from sub-class to sub-class,
+    // it is tricky to make a single function to do this.
+    virtual tuple< KMatrix, VUI> pDist(int persp) const;
+    
+    CSState * stepSUSN();
+    CSState * stepBCN();
+    
+    void show() const;
+    
   protected:
+    virtual bool equivNdx(unsigned int i, unsigned int j) const;
+    virtual void setAllAUtil(ReportingLevel rl);
+
+    CSState * doSUSN(ReportingLevel rl) const;
+    CSState * doBCN(ReportingLevel rl) const;
+    
   private:
   };
 
 };// end of namespace
 
+  
 // --------------------------------------------
 #endif
 // Copyright KAPSARC. Open source MIT License.

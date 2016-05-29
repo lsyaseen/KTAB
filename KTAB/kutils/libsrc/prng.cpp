@@ -125,8 +125,8 @@ uint64_t PRNG::uniform() {
     return qTrans(n);
 }
 
-vector<bool> PRNG::bits(unsigned int nb) {
-    auto bv = vector<bool>();
+VBool PRNG::bits(unsigned int nb) {
+  VBool bv = {};
     bv.resize(nb);
     uint64_t rNum = uniform(); // random bits
     const int nAvail = 64;

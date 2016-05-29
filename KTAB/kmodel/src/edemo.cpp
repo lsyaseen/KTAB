@@ -78,12 +78,12 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
 
 
   // lambda-bind the parameters and return a function that enumerates the options
-  function < vector<BVec*>()> tbv(unsigned int nAct, unsigned int nBits, PRNG* rng) {
+  function < vector<VBool*>()> tbv(unsigned int nAct, unsigned int nBits, PRNG* rng) {
 
     const double fc = exp(log(2.0)*nBits);
     unsigned int ic = (unsigned int)(0.5 + fc);
 
-    auto nFromBV = [nBits](BVec bv) {
+    auto nFromBV = [nBits](VBool bv) {
       // given a bit vector, treat it as base-2 and calculate the corresponding integer
       unsigned int rm = 0;
       unsigned int m = 1;
@@ -97,9 +97,9 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
     };
 
     auto rfn = [nFromBV, ic, nBits]() {
-      vector<BVec*> rbv = {};
+      vector<VBool*> rbv = {};
       for (unsigned int i = 0; i < ic; i++) {
-        auto vi = new vector<bool>();
+        auto vi = new VBool(); 
         unsigned int m = i;
         for (unsigned int j = 0; j < nBits; j++) {
           vi->push_back(1 == (m & 1));
@@ -180,13 +180,13 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
 
 
 
-  function < vector<BVec*>()> thetaBV(unsigned int n) {
+  function < vector<VBool*>()> thetaBV(unsigned int n) {
     auto rfn = [n]() {
-      vector<BVec*> rbv = {};
+      vector<VBool*> rbv = {};
       const double fc = exp(log(2.0)*n);
       unsigned int ic = (unsigned int)(0.5 + fc);
       for (unsigned int i = 0; i < ic; i++) {
-        auto vi = new vector<bool>();
+        auto vi = new VBool(); 
         unsigned int m = i;
         for (unsigned int j = 0; j < n; j++) {
           if (0 == (m % 2)) {
@@ -223,8 +223,8 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
     em2D->setOptions();
     cout << "Now have " << em2D->numOptions() << endl;
 
-    string nBV = "EModel-BVec";
-    EModel<BVec>* emBV = new EModel<BVec>(rng, nBV);
+    string nBV = "EModel-VBool";
+    EModel<VBool>* emBV = new EModel<VBool>(rng, nBV);
     cout << "Populating " << nBV << endl;
     emBV->enumOptions = tbv(17, 3, rng); //  thetaBV(4);
     emBV->setOptions();
