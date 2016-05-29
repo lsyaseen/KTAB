@@ -54,6 +54,10 @@ namespace ComSelLib {
   using KBase::ReportingLevel;
   using KBase::MtchPstn;
 
+  using KBase::Actor;
+  using KBase::Model;
+  using KBase::Position;
+  using KBase::State;
 
   class CSActor;
   class CSState;
@@ -65,67 +69,77 @@ namespace ComSelLib {
   const string appVersion = "0.2";
 
   // -------------------------------------------------
+  // function declarations
+
+  VUI intToVB(unsigned int x, unsigned int n);
+  unsigned int vbToInt(const VUI & vb);
+
+  // -------------------------------------------------
   // class declarations
 
   class CSModel : public Model {
   public:
-    explicit CSModel(unsigned int nd, PRNG* r, string d="");
+    explicit CSModel(unsigned int nd, PRNG* r, string d = "");
     virtual ~CSModel();
-    
+
 
     static bool equivStates(const CSState * rs1, const CSState * rs2);
-    
-  protected:
+
     // the positions are matchings.
     // the number of items is the number of actors (e.g. political parties)
     // the number of categories is 2: out or in, respectively
+    unsigned int numItm = 0;
+
+  protected:
     unsigned int numDims = 0;
   private:
   };
 
-  
-  class CSActor : public Actor  {
+
+  class CSActor : public Actor {
   public:
-    explicit CSActor();
+    explicit CSActor(string n, string d, const Model* csm);
     virtual ~CSActor();
-    
+
     VotingRule vr = VotingRule::PropBin; // fairly arbitrary default
     double sCap = 0.0; // scalar capacity, which must be positive
-    
+
+    double posUtil(const Position * ap1) const;
+
   protected:
   private:
   };
 
-  
-  class CSState : public State  {
+
+  class CSState : public State {
   public:
     explicit CSState(CSModel* mod);
     virtual ~CSState();
-    
+
     // use the parameters of your state to compute the relative probability of each unique position.
     // persp = -1 means use everyone's separate perspectives (i.e. get actual probabilities, not one actor's beliefs).
     // Because the voting mechanisms may differ, so v_k(i:j) could differ widely from sub-class to sub-class,
     // it is tricky to make a single function to do this.
     virtual tuple< KMatrix, VUI> pDist(int persp) const;
-    
+
     CSState * stepSUSN();
     CSState * stepBCN();
-    
+
     void show() const;
-    
+
   protected:
     virtual bool equivNdx(unsigned int i, unsigned int j) const;
     virtual void setAllAUtil(ReportingLevel rl);
 
     CSState * doSUSN(ReportingLevel rl) const;
     CSState * doBCN(ReportingLevel rl) const;
-    
+
   private:
   };
 
 };// end of namespace
 
-  
+
 // --------------------------------------------
 #endif
 // Copyright KAPSARC. Open source MIT License.

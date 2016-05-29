@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kutils", "..\kutils\build\kutils.vcxproj", "{711A4164-A82E-47B1-A01B-B68FB3853E62}"
 EndProject
@@ -86,28 +86,28 @@ Global
 		{5D701F83-6AD6-4636-A167-43371EB1BE66}.RelWithDebInfo|x64.Build.0 = Debug|x64
 		{A74283BF-758B-416D-A550-487D4C4C850D}.Debug|x64.ActiveCfg = Debug|x64
 		{A74283BF-758B-416D-A550-487D4C4C850D}.Debug|x64.Build.0 = Debug|x64
-		{A74283BF-758B-416D-A550-487D4C4C850D}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
-		{A74283BF-758B-416D-A550-487D4C4C850D}.MinSizeRel|x64.Build.0 = MinSizeRel|x64
-		{A74283BF-758B-416D-A550-487D4C4C850D}.Release|x64.ActiveCfg = Release|x64
-		{A74283BF-758B-416D-A550-487D4C4C850D}.Release|x64.Build.0 = Release|x64
-		{A74283BF-758B-416D-A550-487D4C4C850D}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
-		{A74283BF-758B-416D-A550-487D4C4C850D}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
+		{A74283BF-758B-416D-A550-487D4C4C850D}.MinSizeRel|x64.ActiveCfg = Debug|x64
+		{A74283BF-758B-416D-A550-487D4C4C850D}.MinSizeRel|x64.Build.0 = Debug|x64
+		{A74283BF-758B-416D-A550-487D4C4C850D}.Release|x64.ActiveCfg = Debug|x64
+		{A74283BF-758B-416D-A550-487D4C4C850D}.Release|x64.Build.0 = Debug|x64
+		{A74283BF-758B-416D-A550-487D4C4C850D}.RelWithDebInfo|x64.ActiveCfg = Debug|x64
+		{A74283BF-758B-416D-A550-487D4C4C850D}.RelWithDebInfo|x64.Build.0 = Debug|x64
 		{E85484A5-6E62-4C07-91DC-381634C17EAC}.Debug|x64.ActiveCfg = Debug|x64
 		{E85484A5-6E62-4C07-91DC-381634C17EAC}.Debug|x64.Build.0 = Debug|x64
-		{E85484A5-6E62-4C07-91DC-381634C17EAC}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
-		{E85484A5-6E62-4C07-91DC-381634C17EAC}.MinSizeRel|x64.Build.0 = MinSizeRel|x64
-		{E85484A5-6E62-4C07-91DC-381634C17EAC}.Release|x64.ActiveCfg = Release|x64
-		{E85484A5-6E62-4C07-91DC-381634C17EAC}.Release|x64.Build.0 = Release|x64
-		{E85484A5-6E62-4C07-91DC-381634C17EAC}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
-		{E85484A5-6E62-4C07-91DC-381634C17EAC}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
+		{E85484A5-6E62-4C07-91DC-381634C17EAC}.MinSizeRel|x64.ActiveCfg = Debug|x64
+		{E85484A5-6E62-4C07-91DC-381634C17EAC}.MinSizeRel|x64.Build.0 = Debug|x64
+		{E85484A5-6E62-4C07-91DC-381634C17EAC}.Release|x64.ActiveCfg = Debug|x64
+		{E85484A5-6E62-4C07-91DC-381634C17EAC}.Release|x64.Build.0 = Debug|x64
+		{E85484A5-6E62-4C07-91DC-381634C17EAC}.RelWithDebInfo|x64.ActiveCfg = Debug|x64
+		{E85484A5-6E62-4C07-91DC-381634C17EAC}.RelWithDebInfo|x64.Build.0 = Debug|x64
 		{A50F9914-7614-4C3E-B299-D02406A52969}.Debug|x64.ActiveCfg = Debug|x64
 		{A50F9914-7614-4C3E-B299-D02406A52969}.Debug|x64.Build.0 = Debug|x64
-		{A50F9914-7614-4C3E-B299-D02406A52969}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
-		{A50F9914-7614-4C3E-B299-D02406A52969}.MinSizeRel|x64.Build.0 = MinSizeRel|x64
-		{A50F9914-7614-4C3E-B299-D02406A52969}.Release|x64.ActiveCfg = Release|x64
-		{A50F9914-7614-4C3E-B299-D02406A52969}.Release|x64.Build.0 = Release|x64
-		{A50F9914-7614-4C3E-B299-D02406A52969}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
-		{A50F9914-7614-4C3E-B299-D02406A52969}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
+		{A50F9914-7614-4C3E-B299-D02406A52969}.MinSizeRel|x64.ActiveCfg = Debug|x64
+		{A50F9914-7614-4C3E-B299-D02406A52969}.MinSizeRel|x64.Build.0 = Debug|x64
+		{A50F9914-7614-4C3E-B299-D02406A52969}.Release|x64.ActiveCfg = Debug|x64
+		{A50F9914-7614-4C3E-B299-D02406A52969}.Release|x64.Build.0 = Debug|x64
+		{A50F9914-7614-4C3E-B299-D02406A52969}.RelWithDebInfo|x64.ActiveCfg = Debug|x64
+		{A50F9914-7614-4C3E-B299-D02406A52969}.RelWithDebInfo|x64.Build.0 = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -44,43 +44,43 @@ using namespace std;
 
 
 namespace RfrmPri {
-// namespace to hold everything related to the
-// "priority of reforms" CDMP. Note that KBase has no access.
+  // namespace to hold everything related to the
+  // "priority of reforms" CDMP. Note that KBase has no access.
 
-using std::string;
-using std::tuple;
-using std::vector;
+  using std::string;
+  using std::tuple;
+  using std::vector;
 
-using KBase::KMatrix;
-using KBase::PRNG;
+  using KBase::KMatrix;
+  using KBase::PRNG;
 
-using KBase::Actor;
-using KBase::Position;
-using KBase::State;
-using KBase::Model;
-using KBase::VotingRule;
-using KBase::ReportingLevel;
-using KBase::VUI;
+  using KBase::Actor;
+  using KBase::Position;
+  using KBase::State;
+  using KBase::Model;
+  using KBase::VotingRule;
+  using KBase::ReportingLevel;
+  using KBase::VUI;
 
-using KBase::MtchPstn;
-using KBase::MtchGene;
+  using KBase::MtchPstn;
+  using KBase::MtchGene;
 
-class RPActor;
-class RPState;
-class RPModel;
+  class RPActor;
+  class RPState;
+  class RPModel;
 
-// -------------------------------------------------
+  // -------------------------------------------------
 
-const string appName = "rpdemo";
-const string appVersion = "0.2";
+  const string appName = "rpdemo";
+  const string appVersion = "0.2";
 
-// -------------------------------------------------
-// class declarations
+  // -------------------------------------------------
+  // class declarations
 
-class RPActor : public Actor {
-public:
+  class RPActor : public Actor {
+  public:
     enum class PropModel {
-        ExpUtil, Probability, AgreeUtil
+      ExpUtil, Probability, AgreeUtil
     };
 
     RPActor(string n, string d, const RPModel* rm);
@@ -91,7 +91,7 @@ public:
 
     static MtchPstn* rPos(unsigned int numI, unsigned int numA, PRNG * rng); // make a random position
     static RPActor* rAct(unsigned int numI, double minCap,
-                         double maxCap, PRNG* rng, unsigned int i); // make a random actor
+      double maxCap, PRNG* rng, unsigned int i); // make a random actor
 
     void randomize(PRNG* rng, double minCap, double maxCap, unsigned int id, unsigned int numI); // randomly alter this actor
 
@@ -100,14 +100,14 @@ public:
     unsigned int idNum = 0;
 
     PropModel pMod = PropModel::ExpUtil;
-    
+
     VotingRule vr = VotingRule::PropBin; // fairly arbitrary default
     double sCap = 0.0; // scalar capacity, which must be positive
 
     // Similar to the LeonActor, this is a listing of how
     // much this actor values each reform item.
     // The values are all non-negative
-    vector<double> riVals {};
+    vector<double> riVals{};
 
     // given those riVals, we need to know the minimum and maximum values
     // of positions so as to normalize utilities to the [0,1] von Neumann scale.
@@ -118,18 +118,18 @@ public:
     const RPModel *rpMod = nullptr;
     // these particular actors need model-parameters to compute utility.
 
-protected:
-private:
-};
+  protected:
+  private:
+  };
 
 
-class RPModel : public Model {
-public:
-    explicit RPModel(PRNG* rng, string d="");
+  class RPModel : public Model {
+  public:
+    explicit RPModel(PRNG* rng, string d = "");
     virtual ~RPModel();
 
     static RPModel* randomMS(unsigned int numA, unsigned int numI,
-                             VotingRule vr, RPActor::PropModel pMod, PRNG * rng);
+      VotingRule vr, RPActor::PropModel pMod, PRNG * rng);
 
     double utilActorPos(unsigned int ai, const VUI &pstn) const;
 
@@ -149,19 +149,19 @@ public:
 
     static bool equivStates(const RPState * rs1, const RPState * rs2);
 
-protected:
+  protected:
     void initScen0(); // random
     void initScen1(); // fixed, but dummy data
     void initScen2Avrg(unsigned int ns); // unfinished
     void initScen3Top4(unsigned int ns); // unfinished
     void configScen(unsigned int numA, const double aCap[], const KMatrix & utils);
 
-private:
-};
+  private:
+  };
 
 
-class RPState : public State {
-public:
+  class RPState : public State {
+  public:
     explicit RPState(Model* mod);
     ~RPState();
     //KMatrix actrCaps() const;
@@ -175,7 +175,7 @@ public:
 
     void show() const;
 
-protected:
+  protected:
     virtual void setAllAUtil(ReportingLevel rl);
     void setOneAUtil(unsigned int perspH, ReportingLevel rl);
 
@@ -186,8 +186,8 @@ protected:
 
     virtual bool equivNdx(unsigned int i, unsigned int j) const;
 
-private:
-};
+  private:
+  };
 
 
 
