@@ -885,8 +885,7 @@ namespace SMPLib {
 
     // TODO: convert this to a single, commonly used setup function
     const VotingRule vr = VotingRule::Proportional;
-    const ReportingLevel rl = ReportingLevel::Silent;
-    const VPModel vpm = VPModel::Linear;
+    const ReportingLevel rl = ReportingLevel::Silent; 
 
     const unsigned int na = model->numAct;
     const KMatrix w = actrCaps();
@@ -921,7 +920,7 @@ namespace SMPLib {
       return uij(i, uIndices[j]);
     };
     auto uUij = KMatrix::map(uufn, na, uIndices.size());
-    auto upd = Model::scalarPCE(na, uIndices.size(), w, uUij, vr, vpm, rl);
+    auto upd = Model::scalarPCE(na, uIndices.size(), w, uUij, vr, model->vpm, rl);
 
     return tuple< KMatrix, VUI>(upd, uIndices);
   }

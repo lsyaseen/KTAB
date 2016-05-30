@@ -1620,15 +1620,15 @@ int main(int ac, char **av) {
   using std::cout;
   using std::endl;
   using std::flush;
+  using KBase::dSeed;
 
   auto sTime = KBase::displayProgramStart();
-  uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary
   uint64_t seed = dSeed;
   bool run = true;
   bool euEconP = false;
   bool maxEconP = false;
 
-  auto showHelp = [dSeed]() {
+  auto showHelp = []() {
     printf("\n");
     printf("Usage: specify one or more of these options\n");
     printf("--help            print this message\n");

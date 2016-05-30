@@ -65,7 +65,7 @@ W64 rotr(const W64 x, unsigned int n) {
 
 
 PRNG::PRNG() {
-    uint64_t seed_val = 0xD67CC16FE69C185C; // one of my favorite integers
+    uint64_t seed_val = KBase::dSeed; // one of my favorite integers
     mt.seed(seed_val);
 }
 

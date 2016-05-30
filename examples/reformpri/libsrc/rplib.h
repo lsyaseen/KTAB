@@ -141,7 +141,8 @@ namespace RfrmPri {
     unsigned int numItm = 0; // number of reform items
     vector<string> rpNames = {};
 
-    unsigned int numCat = 0;  // happens to equal numItm, in this demo, at the categories are 1, 2, ... numItm.
+    // happens to equal numItm, in this demo, as the categories are 1, 2, ... numItm.
+    unsigned int numCat = 0;
 
     void initScen(unsigned int ns);
     void readXML(string fileName);

@@ -85,6 +85,8 @@ void State::setUENdx()  {
         return equivNdx(i,j);
     };
     const unsigned int na = model->numAct;
+    assert(Model::minNumActor <= na);
+    assert(na <= Model::maxNumActor);
     auto ns = KBase::uiSeq(0, na - 1);
     auto uePair = KBase::ueIndices<unsigned int>(ns, efn);
 

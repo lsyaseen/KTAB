@@ -154,7 +154,6 @@ namespace ComSelLib {
     };
 
     auto uMat = KMatrix::map(uufn, numA, numU);
-    auto vpm = VPModel::Linear;
     assert(uMat.numR() == numA); // must include all actors
     assert(uMat.numC() == numU);
 
@@ -168,8 +167,8 @@ namespace ComSelLib {
     // the following uses exactly the values in the given euMat,
     // which may or may not be square
     const KMatrix c = Model::coalitions(vkij, uMat.numR(), uMat.numC());
-    const KMatrix pv = Model::vProb(vpm, c); // square
-    const KMatrix p = Model::probCE(PCEModel::ConditionalPCM, pv); // column
+    const KMatrix pv = Model::vProb(model->vpm, c); // square
+    const KMatrix p = Model::probCE(model->pcem, pv); // column
     const KMatrix eu = uMat*p; // column
 
     assert(numA == eu.numR());
@@ -210,30 +209,35 @@ namespace ComSelLib {
 
     const KMatrix u = aUtil[0]; // all have same beliefs in this demo
 
-    auto vpm = VPModel::Linear;
     const unsigned int numP = pstns.size();
 
 
     // Given the utility matrix, uMat, calculate the expected utility to each actor,
     // as a column-vector. Again, this is from the perspective of whoever developed uMat.
-    auto euMat = [rl, numA, numP, vpm, this](const KMatrix & uMat) {
+    auto euMat = [rl, numA, numP, this](const KMatrix & uMat) {
       // BTW, be sure to lambda-bind uMat *after* it is modified.
       assert(uMat.numR() == numA); // must include all actors
       assert(uMat.numC() <= numP); // might have dropped some duplicates
-      auto uRng = [uMat](unsigned int i, unsigned int j) {
-        if ((uMat(i, j) < 0.0) || (1.0 < uMat(i, j))) {
-          printf("%f  %i  %i  \n", uMat(i, j), i, j);
-          cout << flush;
-          cout << flush;
 
+      auto assertRange = [](const KMatrix& m, unsigned int i, unsigned int j) {
+        // due to round-off error, we must have a tolerance factor
+        const double tol = 1E-10;
+        const double mij = m(i, j);
+        if ((mij + tol < 0.0) || (1.0 + tol < mij)) {
+          printf("%f  %i  %i  \n", mij, i, j);
+          cout << flush;
         }
-        assert(0.0 <= uMat(i, j));
-        assert(uMat(i, j) <= 1.0);
+        assert(0.0 <= mij + tol);
+        assert(mij <= 1.0 + tol);
         return;
       };
+
+      // in Haskell, we could just using currying
+      auto uRng = [assertRange, uMat](unsigned int i, unsigned int j) {
+        assertRange(uMat, i, j); return; };
       KMatrix::mapV(uRng, uMat.numR(), uMat.numC());
-      // vote_k ( i : j )
-      auto vkij = [this, uMat](unsigned int k, unsigned int i, unsigned int j) {
+
+      auto vkij = [this, uMat](unsigned int k, unsigned int i, unsigned int j) { // vote_k(i:j)
         auto ak = (CSActor*)(model->actrs[k]);
         auto v_kij = Model::vote(ak->vr, ak->sCap, uMat(k, i), uMat(k, j));
         return v_kij;
@@ -242,20 +246,15 @@ namespace ComSelLib {
       // the following uses exactly the values in the given euMat,
       // which may or may not be square
       const KMatrix c = Model::coalitions(vkij, uMat.numR(), uMat.numC());
-      const KMatrix pv = Model::vProb(vpm, c); // square
-      const KMatrix p = Model::probCE(PCEModel::ConditionalPCM, pv); // column
+      const KMatrix pv = Model::vProb(model->vpm, c); // square
+      const KMatrix p = Model::probCE(model->pcem, pv); // column
       const KMatrix eu = uMat*p; // column
 
       assert(numA == eu.numR());
       assert(1 == eu.numC());
-      auto euRng = [eu](unsigned int i, unsigned int j) {
-        // due to round-off error, we must have a tolerance factor
-        const double tol = 1E-10;
-        const double euij = eu(i, j);
-        assert(0.0 <= euij + tol);
-        assert(euij <= 1.0 + tol);
-        return;
-      };
+      // in Haskell, we could just using currying
+      auto euRng = [assertRange, eu](unsigned int i, unsigned int j) {
+        assertRange(eu, i, j); return; };
       KMatrix::mapV(euRng, eu.numR(), eu.numC());
 
 
@@ -328,12 +327,12 @@ namespace ComSelLib {
     // TODO: clean up the nesting of lambda-functions.
     // need to create a hypothetical state and run setOneAUtil(h,Silent) on it
     //
-    // The newPosFn does a GA optimization to find the best next position for actor h,
-    // and stores it in s2. To do that, it defines three functions for evaluation, neighbors, and show:
+    // The newPosFn does a generic hill climb to find the best next position for actor h,
+    // and stores it in s2.
+    // To do that, it defines three functions for evaluation, neighbors, and show:
     // efn, nfn, and sfn.
     auto newPosFn = [this, rl, euMat, u, eu0, s2](const unsigned int h) {
       s2->pstns[h] = nullptr;
-
       auto ph = ((const MtchPstn *)(pstns[h]));
 
       // Evaluate h's estimate of the expected utility, to h, of
@@ -430,70 +429,19 @@ namespace ComSelLib {
         // the hypothetical drops duplicates but the actual (computed elsewhere) does not.
         // FIX: fix  the 'elsewhere'
         const double euh = eu(h, 0);
-        assert(0 < euh);
-        //cout << euh << endl << flush;
-        //printPerm(mp.match);
-        //cout << endl << flush;
-        //cout << flush;
+        assert(0 < euh); 
         return euh;
       }; // end of efn
 
 
 
-      // return vector of neighboring 1-permutations
+      // return vector of neighboring committees
       auto nfn = [](const MtchPstn & mp0) {
-        const unsigned int numI = mp0.match.size();
-        auto mpVec = vector <MtchPstn>();
-        mpVec.push_back(MtchPstn(mp0));
-
-        // one-permutations
-        for (unsigned int i = 0; i < numI; i++) {
-          for (unsigned int j = i + 1; j < numI; j++) {
-            unsigned int ei = mp0.match[i];
-            unsigned int ej = mp0.match[j];
-
-            auto mij = MtchPstn(mp0);
-            mij.match[i] = ej;
-            mij.match[j] = ei;
-            mpVec.push_back(mij);
-          }
-        }
-
-
-        // two-permutations
-        for (unsigned int i = 0; i < numI; i++) {
-          for (unsigned int j = i + 1; j < numI; j++) {
-            for (unsigned int k = j + 1; k < numI; k++) {
-              unsigned int ei = mp0.match[i];
-              unsigned int ej = mp0.match[j];
-              unsigned int ek = mp0.match[k];
-
-              auto mjki = MtchPstn(mp0);
-              mjki.match[i] = ej;
-              mjki.match[j] = ek;
-              mjki.match[k] = ei;
-              mpVec.push_back(mjki);
-
-              auto mkij = MtchPstn(mp0);
-              mkij.match[i] = ek;
-              mkij.match[j] = ei;
-              mkij.match[k] = ej;
-              mpVec.push_back(mkij);
-
-            }
-          }
-        }
-        //unsigned int mvs = mpVec.size() ;
-        //cout << mvs << endl << flush;
-        //cout << flush;
-        return mpVec;
-      }; // end of nfn
+        auto csVec = mp0.neighbors(2); return csVec;}; 
 
       // show some representation of this position on cout
       auto sfn = [](const MtchPstn & mp0) {
-        printVUI(mp0.match);
-        return;
-      };
+        printVUI(mp0.match); return; };
 
       auto ghc = new KBase::GHCSearch<MtchPstn>();
       ghc->eval = efn;

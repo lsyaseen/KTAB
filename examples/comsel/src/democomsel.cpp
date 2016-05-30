@@ -130,10 +130,12 @@ namespace DemoComSel {
     unsigned int numPos = exp2(numA); // i.e. numCat ^^ numItm
     vector<VUI> positions = {};
     for (unsigned int i = 0; i < numPos; i++) {
-      const VUI vb = intToVB(i, numA);
-      const unsigned int j = vbToInt(vb);
+      const VUI vbi = intToVB(i, numA);
+      const unsigned int j = vbToInt(vbi);
       assert(j == i);
-      positions.push_back(vb);
+      const VUI vbj = intToVB(j, numA);
+      assert(vbj == vbi);
+      positions.push_back(vbi);
     }
     assert(numPos == positions.size());
 
@@ -141,11 +143,12 @@ namespace DemoComSel {
 
     cout << "Computing utilities of positions ... " << endl;
     cout << "  not yet implemented: randomizing" << endl;
-    auto rawUij = KMatrix::uniform(rng, numA, numPos, 0.0, 10.0); // rows are actors, columns are all possible position
+    // rows are actors, columns are all possible position
+    auto rawUij = KMatrix::uniform(rng, numA, numPos, 0.0, 10.0);
     for (unsigned int i = 0; i < numA; i++) {
-      rawUij(i, 0) = 0.0;
+      rawUij(i, 0) = 0.0; // worst outcome for i is no committee at all
       unsigned int j = exp2(i);
-      rawUij(i, j) = 11.0;
+      rawUij(i, j) = 11.0; // best outcome for i is that only i is in the committee
     }
 
 
@@ -197,9 +200,7 @@ namespace DemoComSel {
     KMatrix zeta = aCap * uij;
     assert((1 == zeta.numR()) && (numPos == zeta.numC()));
 
-
     cout << "Sorting positions from most to least net support ..." << endl << flush;
-
     auto betterPR = [](tuple<unsigned int, double, VUI> pr1,
       tuple<unsigned int, double, VUI> pr2) {
       double v1 = get<1>(pr1);
@@ -240,7 +241,7 @@ namespace DemoComSel {
     auto css0 = new CSState(csm);
     csm->addState(css0);
 
-    // Either start them all at the CP or have each to choose an initial position which
+    // Either start them all at the CP or have each choose an initial position which
     // maximizes their direct utility, regardless of expected utility.
     for (unsigned int i = 0; i < numA; i++) {
       auto pi = new  MtchPstn();
@@ -319,15 +320,15 @@ int main(int ac, char **av) {
   using std::cout;
   using std::endl;
   using std::string;
+  using KBase::dSeed;
   auto sTime = KBase::displayProgramStart(DemoComSel::appName, DemoComSel::appVersion);
-  uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary
-  uint64_t seed = dSeed;
+  uint64_t seed = dSeed; // arbitrary
   bool run = true;
   bool guiP = false;
   bool cpP = true;
   bool siP = false;
 
-  auto showHelp = [dSeed]() {
+  auto showHelp = []() {
     printf("\n");
     printf("Usage: specify one or more of these options\n");
     printf("--gui       show empty GUI \n");

@@ -279,6 +279,9 @@ public:
     // returns h's estimate of i's risk attitude, using the risk-adjustment-rule
     static double estNRA(double rh, double  ri, BigRAdjust ra) ;
 
+    VPModel vpm = VPModel::Linear; // arbitrary default
+    PCEModel pcem = PCEModel::ConditionalPCM; // arbitrary default
+
 protected:
     static string createTableSQL(unsigned int tn);
     // note that the function to write to table #k must be kept

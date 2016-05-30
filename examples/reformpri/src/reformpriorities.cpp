@@ -40,7 +40,10 @@ namespace RfrmPri {
   // -------------------------------------------------
   // function definitions
 
-
+  // return the list of the most self-interested position of each actor,
+  // with the CP last.
+  // As a side-affect, set each actor's min/max permutation values so as to
+  // compute normalized utilities later.
   vector<VUI> scanPositions(const RPModel * rpm) {
     unsigned int numA = rpm->numAct;
     unsigned int numRefItem = rpm->numItm;
@@ -62,6 +65,13 @@ namespace RfrmPri {
     const unsigned int numPos = positions.size();
     cout << "For " << numRefItem << " reform items there are " << numPos << " positions" << endl;
 
+    // -------------------------------------------------
+    // The next section sets up actor utilities.
+    // First, we compute the unnormalized, raw utilities. The 'utilActorPos' checks
+    // to see if pvMin/pvMax have been set, and returnst the raw scores if not.
+    // Then we scan across rows to find that actor's pvMin/pvMax, and record that
+    // so utilActorPos can use it in the future. Finally, we normalize the rows and
+    // display the normalized utility matrix.
     cout << "Computing utilities of positions ... " << endl;
     cout << "Effective gov costs:" << endl;
     (rpm->govCost).mPrintf("%.3f ");
@@ -105,6 +115,10 @@ namespace RfrmPri {
       cout << endl << flush;
     }
 
+    // -------------------------------------------------
+    // The next section determines the best self-interested positions for each actor,
+    // as well as the 'central position' over all possible reform priorities
+    // (which 'office seeking politicans' would adopt IF proportional voting).
     cout << endl << "Computing best position for each actor" << endl;
     vector<VUI> bestAP; // list of each actor's best position (followed by CP)
     for (unsigned int ai = 0; ai < numA; ai++) {
@@ -177,37 +191,29 @@ int main(int ac, char **av) {
   using KBase::ReportingLevel;
   using KBase::PRNG;
   using KBase::MtchPstn;
-
+  using KBase::dSeed;
   using RfrmPri::RPModel;
   using RfrmPri::RPState;
   using RfrmPri::RPActor;
   using RfrmPri::printPerm;
-
-  auto sTime = KBase::displayProgramStart(RfrmPri::appName, RfrmPri::appVersion);
-  uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary
-  uint64_t seed = dSeed;
-  bool siP = false;
+  
+  auto sTime = KBase::displayProgramStart(RfrmPri::appName, RfrmPri::appVersion); 
+  uint64_t seed = dSeed; // arbitrary;
+  bool siP = true;
   bool cpP = false;
   bool runP = true;
   unsigned int sNum = 1;
   bool xmlP = false;
-  string inputXML = "";
+  string inputXML = ""; 
 
-  /*
-  // temporary settings for testing
-  cpP = true;
-  sNum = 1;
-  xmlP = false;
-  inputXML = "reformpri-ex01.xml";
-  */
-
-  auto showHelp = [dSeed, sNum]() {
+  auto showHelp = [ sNum]() {
     printf("\n");
     printf("Usage: specify one or more of these options\n");
     printf("\n");
     printf("--cp              start all actors from the central position \n");
     printf("--si              start each actor from their most self-interested position \n");
-    printf("                  Note: either CP or SI must be indicated. \n");
+    printf("                  If neither si nor cp are selected, it will use si. \n");
+    printf("                  If both si and cp are selected, it will use cp. \n");
     printf("--help            print this message and exit \n");
     printf("--seed <n>        set a 64bit seed \n");
     printf("                  0 means truly random \n");
@@ -243,11 +249,13 @@ int main(int ac, char **av) {
         i++;
         inputXML = av[i];
       }
-      else if (strcmp(av[i], "--cp") == 0) {
-        cpP = true;
-      }
       else if (strcmp(av[i], "--si") == 0) {
+        cpP = false;
         siP = true;
+      }
+      else if (strcmp(av[i], "--cp") == 0) {
+        siP = false;
+        cpP = true;
       }
       else if (strcmp(av[i], "--help") == 0) {
         runP = false;
@@ -257,12 +265,7 @@ int main(int ac, char **av) {
         printf("Unrecognized argument: %s\n", av[i]);
       }
     }
-  }
-
-  if (!((siP && !cpP) || (cpP && !siP))) {
-    runP = false;
-    printf("Exactly one of either --si or --cp must be specified\n");
-  }
+  } 
 
   if (!runP) {
     showHelp();

@@ -272,9 +272,8 @@ int main(int ac, char **av) {
   using std::cout;
   using std::endl;
   using std::string;
-
+  using KBase::dSeed;
   auto sTime = KBase::displayProgramStart(DemoSMP::appName, DemoSMP::appVersion);
-  uint64_t dSeed = 0xD67CC16FE69C185C;  // arbitrary
   uint64_t seed = dSeed;
   bool run = true;
   bool euSmpP = false;
@@ -282,7 +281,7 @@ int main(int ac, char **av) {
   string inputCSV = "";
 
 
-  auto showHelp = [dSeed]() {
+  auto showHelp = []() {
     printf("\n");
     printf("Usage: specify one or more of these options\n");
     printf("--help            print this message\n");

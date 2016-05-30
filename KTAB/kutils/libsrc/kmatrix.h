@@ -37,8 +37,8 @@
 
 #include "kutils.h"
 
-namespace KBase { 
-  
+namespace KBase {
+
   using std::function;
   using std::tuple;
 
@@ -67,7 +67,7 @@ namespace KBase {
   KMatrix operator/ (const KMatrix & m1, double x);
   bool sameShape(const KMatrix & m1, const KMatrix & m2);
   KMatrix operator* (const KMatrix & m1, const KMatrix & m2);
-  
+
   KMatrix rescaleRows(const KMatrix& m1, const double vMin, const double vMax);
 
   // -------------------------------------------------
@@ -77,7 +77,7 @@ namespace KBase {
   public:
 
     KMatrix();
-    KMatrix(unsigned int nr, unsigned int nc, double iv=0.0);
+    KMatrix(unsigned int nr, unsigned int nc, double iv = 0.0);
     // default copy constructor, copy assigment, etc. are sufficient 
     double operator() (unsigned int i, unsigned int j) const;  // readable rvalue
     double& operator() (unsigned int i, unsigned int j);       // assignable lvalue
@@ -85,27 +85,30 @@ namespace KBase {
     unsigned int numR() const;
     unsigned int numC() const;
     static KMatrix uniform(PRNG* rng, unsigned int nr, unsigned int nc, double a, double b);
-    static KMatrix map(function<double(unsigned int i, unsigned int j)> f, unsigned int nr, unsigned int nc);
-    static void mapV(function<void(unsigned int i, unsigned int j)> f, unsigned int nr, unsigned int nc);
-    
-    static KMatrix arrayInit(const double mv[], const unsigned int & rows, const unsigned int & clms);
+    static KMatrix map(function<double(unsigned int i, unsigned int j)> f,
+      unsigned int nr, unsigned int nc);
+    static void mapV(function<void(unsigned int i, unsigned int j)> f,
+      unsigned int nr, unsigned int nc);
+
+    static KMatrix arrayInit(const double mv[],
+      const unsigned int & rows, const unsigned int & clms);
 
     // For those rare cases when we do not need explicit indices inside the loop, 
     // the standard C++11 iterators are provided to support range-for
-    vector<double>::iterator begin()  { return vals.begin(); };
+    vector<double>::iterator begin() { return vals.begin(); };
     vector<double>::iterator end() { return vals.end(); };
     vector<double>::const_iterator cbegin() { return vals.cbegin(); };
     vector<double>::const_iterator cend() { return vals.cend(); };
     vector<double>::const_iterator begin() const { return vals.begin(); };
     vector<double>::const_iterator end() const { return vals.end(); };
-    
+
     virtual ~KMatrix();
 
   protected:
     unsigned int rows = 0;
     unsigned int clms = 0;
     vector<double> vals = vector<double>();
-    
+
   private:
     void vFillVec(unsigned int nr, unsigned int nv, double iv);
     void pivot(unsigned int r, unsigned int c);

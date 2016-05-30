@@ -173,19 +173,18 @@ int main(int ac, char **av) {
   using std::endl;
   using std::flush;
   using std::function;
-  //  using KBase::VotingRule;
+  using KBase::dSeed;
   using AgendaControl::Agenda;
   using AgendaControl::Choice;
   using AgendaControl::Terminal;
 
   auto sTime = KBase::displayProgramStart();
-  uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary
   uint64_t seed = dSeed;
   bool enumP = false;
   unsigned int enumN = 0;
   bool run = true;
 
-  auto showHelp = [dSeed]() {
+  auto showHelp = []() {
     printf("\n");
     printf("Usage: specify one or more of these options\n");
     printf("--help            print this message \n");
