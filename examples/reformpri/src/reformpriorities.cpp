@@ -68,7 +68,7 @@ namespace RfrmPri {
     // -------------------------------------------------
     // The next section sets up actor utilities.
     // First, we compute the unnormalized, raw utilities. The 'utilActorPos' checks
-    // to see if pvMin/pvMax have been set, and returnst the raw scores if not.
+    // to see if pvMin/pvMax have been set, and returns the raw scores if not.
     // Then we scan across rows to find that actor's pvMin/pvMax, and record that
     // so utilActorPos can use it in the future. Finally, we normalize the rows and
     // display the normalized utility matrix.
@@ -116,7 +116,7 @@ namespace RfrmPri {
     }
 
     // -------------------------------------------------
-    // The next section determines the best self-interested positions for each actor,
+    // The next section determines the most self-interested positions for each actor,
     // as well as the 'central position' over all possible reform priorities
     // (which 'office seeking politicans' would adopt IF proportional voting).
     cout << endl << "Computing best position for each actor" << endl;
@@ -164,7 +164,7 @@ namespace RfrmPri {
 
     sort(pairs.begin(), pairs.end(), betterPR);
 
-    const unsigned int maxDisplayed = 500;
+    const unsigned int maxDisplayed = 720; // factorial(6)
     unsigned int  numPr = (pairs.size() < maxDisplayed) ? pairs.size() : maxDisplayed;
 
     cout << "Displaying highest " << numPr << endl << flush;
@@ -212,8 +212,8 @@ int main(int ac, char **av) {
     printf("\n");
     printf("--cp              start all actors from the central position \n");
     printf("--si              start each actor from their most self-interested position \n");
-    printf("                  If neither si nor cp are selected, it will use si. \n");
-    printf("                  If both si and cp are selected, it will use cp. \n");
+    printf("                  If neither si nor cp are specified, it will use si. \n");
+    printf("                  If both si and cp are specified, it will use second specified. \n");
     printf("--help            print this message and exit \n");
     printf("--seed <n>        set a 64bit seed \n");
     printf("                  0 means truly random \n");

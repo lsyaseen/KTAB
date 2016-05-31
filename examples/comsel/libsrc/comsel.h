@@ -58,6 +58,7 @@ namespace ComSelLib {
   using KBase::Model;
   using KBase::Position;
   using KBase::State;
+  using KBase::VctrPstn;
 
   class CSActor;
   class CSState;
@@ -87,18 +88,24 @@ namespace ComSelLib {
 
     // the positions are matchings.
     // the number of items is the number of actors (e.g. political parties)
-    // the number of categories is 2: out or in, respectively
+    // the number of categories is always 2: out or in, respectively
     unsigned int numItm = 0;
+    unsigned int numCat = 2;
 
+    double getActorPstnUtil(unsigned int ai, unsigned int pj); // get [0,1] normalized utility to each actor of each position
+    
   protected:
     unsigned int numDims = 0;
+    void setActorPstnUtil();
+    KMatrix * actorPstnUtil = nullptr; // normalized [0,1] utility to each actor (row) of each position (column)
+    
   private:
   };
 
 
   class CSActor : public Actor {
   public:
-    explicit CSActor(string n, string d, const Model* csm);
+    explicit CSActor(string n, string d,  CSModel* csm);
     virtual ~CSActor();
 
     VotingRule vr = VotingRule::PropBin; // fairly arbitrary default
@@ -106,7 +113,19 @@ namespace ComSelLib {
 
     double posUtil(const Position * ap1) const;
 
+    double vote(unsigned int p1, unsigned int p2, const State* st) const;
+    double vote(const Position* ap1, const Position* ap2) const;
+    
+    // the CSActor has a standard vector position, with vector saliences.
+    // This does not change over time as they bargain over committees.
+    VctrPstn vPos = VctrPstn();
+    KMatrix vSal = KMatrix();
+    
+    void randomize(PRNG* rng, unsigned int nDim);
+  
   protected:
+     CSModel* csMod = nullptr;
+    
   private:
   };
 
@@ -128,11 +147,16 @@ namespace ComSelLib {
     void show() const;
 
   protected:
-    virtual bool equivNdx(unsigned int i, unsigned int j) const;
     virtual void setAllAUtil(ReportingLevel rl);
 
     CSState * doSUSN(ReportingLevel rl) const;
     CSState * doBCN(ReportingLevel rl) const;
+    
+    // Given the utility matrix, uMat, calculate the expected utility to each actor,
+    // as a column-vector. Again, this is from the perspective of whoever developed uMat.
+     KMatrix expUtilMat (KBase::ReportingLevel rl, unsigned int numA, unsigned int numP, const KMatrix & uMat) const; 
+     
+    virtual bool equivNdx(unsigned int i, unsigned int j) const;
 
   private:
   };

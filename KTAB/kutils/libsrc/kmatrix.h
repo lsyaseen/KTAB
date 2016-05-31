@@ -86,12 +86,12 @@ namespace KBase {
     unsigned int numC() const;
     static KMatrix uniform(PRNG* rng, unsigned int nr, unsigned int nc, double a, double b);
     static KMatrix map(function<double(unsigned int i, unsigned int j)> f,
-      unsigned int nr, unsigned int nc);
+		       unsigned int nr, unsigned int nc);
     static void mapV(function<void(unsigned int i, unsigned int j)> f,
-      unsigned int nr, unsigned int nc);
+		     unsigned int nr, unsigned int nc);
 
     static KMatrix arrayInit(const double mv[],
-      const unsigned int & rows, const unsigned int & clms);
+			     const unsigned int & rows, const unsigned int & clms);
 
     // For those rare cases when we do not need explicit indices inside the loop, 
     // the standard C++11 iterators are provided to support range-for

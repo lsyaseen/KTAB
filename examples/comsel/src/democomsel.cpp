@@ -25,6 +25,8 @@
 //
 // --------------------------------------------
 
+
+#include <cstdio>
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Tabs.H>
@@ -102,9 +104,7 @@ namespace DemoComSel {
   }
 
 
-  void demoCSC(unsigned int numA, unsigned int nDim,
-    bool cpP, bool siP,
-    const uint64_t s, PRNG* rng) {
+  void demoCSC(unsigned int numA, unsigned int nDim, bool cpP, bool siP, const uint64_t s, PRNG* rng) {
     // need a template for ...
     // position type  (each is a committee)
     // utility to an actor of a position (committee)
@@ -113,13 +113,8 @@ namespace DemoComSel {
     printf("Using PRNG seed: %020llu \n", s);
     rng->setSeed(s);
 
-
-    if (0 == numA) {
-      numA = 2 + (rng->uniform() % 4); // i.e. [2,6] inclusive
-    }
-    if (0 == nDim) {
-      nDim = 1 + (rng->uniform() % 7); // i.e. [1,7] inclusive
-    }
+    if (0 == numA) { numA = 2 + (rng->uniform() % 4); } // i.e. [2,6] inclusive 
+    if (0 == nDim) { nDim = 1 + (rng->uniform() % 7); } // i.e. [1,7] inclusive 
 
     printf("Num parties: %u \n", numA);
     printf("Num dimensions: %u \n", nDim);
@@ -140,20 +135,45 @@ namespace DemoComSel {
     assert(numPos == positions.size());
 
     printf("Num positions: %u \n", numPos);
-
-    cout << "Computing utilities of positions ... " << endl;
-    cout << "  not yet implemented: randomizing" << endl;
-    // rows are actors, columns are all possible position
-    auto rawUij = KMatrix::uniform(rng, numA, numPos, 0.0, 10.0);
+    
+    auto ndfn = [] (string ns, unsigned int i){
+      auto ali = KBase::newChars(10+ ns.length());
+      std::sprintf(ali, "%s%i", ns.c_str(), i);
+      auto s = string(ali);
+      delete ali;
+      ali = nullptr;
+      return s;
+    };
+    
+    // create a model to hold some random actors
+    auto csm = new CSModel(nDim, rng, "csm0");
+    
+    cout << "Configuring actors: randomizing" << endl;
     for (unsigned int i = 0; i < numA; i++) {
-      rawUij(i, 0) = 0.0; // worst outcome for i is no committee at all
-      unsigned int j = exp2(i);
-      rawUij(i, j) = 11.0; // best outcome for i is that only i is in the committee
+      auto ai = new CSActor(ndfn("csa-",i), ndfn("csaDesc-",i), csm);
+      ai->randomize(rng, nDim); 
+      csm->addActor(ai);
+    }
+    assert (csm->numAct == numA);
+    csm->numItm = numA;
+    assert (csm->numCat == 2);
+    
+    cout << "Getting scalar strength of actors ..." << endl;
+    KMatrix aCap = KMatrix(1, csm->numAct);
+    for (unsigned int i = 0; i < csm->numAct; i++) {
+      auto ai = ((const CSActor *)(csm->actrs[i]));  
+      aCap(0, i) = ai->sCap; 
     }
 
-
-    auto uij = KBase::rescaleRows(rawUij, 0.0, 1.0); // von Neumann utility scale
-
+    cout << "Computing utilities of positions ... " << endl;
+    for (unsigned int i=0; i<numA; i++) {
+      double uii = csm->getActorPstnUtil(i,i); // (0,0) causes computation of entire table
+    }
+    
+    // At this point, we have almost a generic enumerated model,
+    // so much of the code below should be easily adaptable to EModel.
+   
+    KMatrix uij = KMatrix(numA, numPos);  // rows are actors, columns are all possible position
     cout << "Complete (normalized) utility matrix of all possible positions (rows) versus actors (columns)" << endl << flush;
     for (unsigned int pj = 0; pj < numPos; pj++) {
       printf("%3i  ", pj);
@@ -161,7 +181,8 @@ namespace DemoComSel {
       printCS(pstn);
       printf("  ");
       for (unsigned int ai = 0; ai < numA; ai++) {
-        double uap = uij(ai, pj);
+        const double uap = csm->getActorPstnUtil(ai, pj);
+        uij(ai, pj) = uap;
         printf("%6.4f, ", uap);
       }
       cout << endl << flush;
@@ -172,7 +193,7 @@ namespace DemoComSel {
     for (unsigned int ai = 0; ai < numA; ai++) {
       unsigned int bestJ = 0;
       double bestV = 0;
-      for (unsigned int pj = 0; pj < numPos; pj++) {
+      for (unsigned int pj = 0; pj < numPos; pj++) { 
         if (bestV < uij(ai, pj)) {
           bestJ = pj;
           bestV = uij(ai, pj);
@@ -184,19 +205,10 @@ namespace DemoComSel {
       bestAP.push_back(positions[bestJ]);
     }
 
-    cout << "Getting scalar strength of actors ..." << endl;
-    cout << "  not yet implemented: randomizing" << endl;
-    KMatrix aCap = KMatrix(1, numA);
-    for (unsigned int i = 0; i < numA; i++) {
-      //auto ri = ((const RPActor *)(rpm->actrs[i]));
-      //aCap(0, i) = ri->sCap;
-      aCap(0, i) = exp(log(10.0)*rng->uniform(1.0, 2.0)); // 10 to 100, median at 31.6
-    }
-
     trans(aCap).mPrintf("%5.2f ");
     cout << endl << flush;
 
-    cout << "Computing zeta ... " << endl;
+    cout << "Computing zeta ... " << endl; // which happens to indicate the PCW *if* proportional voting, when we actually use PropBin
     KMatrix zeta = aCap * uij;
     assert((1 == zeta.numR()) && (numPos == zeta.numC()));
 
@@ -235,9 +247,8 @@ namespace DemoComSel {
     VUI bestCS = get<2>(pairs[0]);
 
     bestAP.push_back(bestCS); // last one is the CP
-
-
-    auto csm = new CSModel(nDim, rng, "csm0");
+    
+    
     auto css0 = new CSState(csm);
     csm->addState(css0);
 
@@ -261,7 +272,7 @@ namespace DemoComSel {
       return css0->stepSUSN();
     };
 
-    unsigned int maxIter = 3;
+    unsigned int maxIter = 50;
     csm->stop = [maxIter, csm](unsigned int iter, const KBase::State * s) {
       bool doneP = iter > maxIter;
       if (doneP) {
@@ -282,7 +293,7 @@ namespace DemoComSel {
     css0->setUENdx();
 
 
-    //    csm->run();
+    csm->run();
 
     return;
   }
@@ -325,8 +336,8 @@ int main(int ac, char **av) {
   uint64_t seed = dSeed; // arbitrary
   bool run = true;
   bool guiP = false;
-  bool cpP = true;
-  bool siP = false;
+  bool cpP = false;
+  bool siP = true;
 
   auto showHelp = []() {
     printf("\n");
@@ -334,8 +345,8 @@ int main(int ac, char **av) {
     printf("--gui       show empty GUI \n");
     printf("--cp        start each actor from the central position \n");
     printf("--si        start each actor from their most self-interested position \n");
-    printf("            If neither cp nor si are specified, it will use cp \n");
-    printf("            If both cp and si are specified, it will use si \n");
+    printf("            If neither cp nor si are specified, it will use si \n");
+    printf("            If both cp and si are specified, it will use the second specified \n");
     printf("--help      print this message \n");
     printf("--seed <n>  set a 64bit seed \n");
     printf("            0 means truly random \n");
@@ -355,8 +366,8 @@ int main(int ac, char **av) {
         guiP = true;
       }
       else if (strcmp(av[i], "--cp") == 0) {
-        cpP = true;
         siP = false;
+        cpP = true;
       }
       else if (strcmp(av[i], "--si") == 0) {
         cpP = false;
@@ -394,14 +405,14 @@ int main(int ac, char **av) {
   cout << "Done creating objects from SMPLib." << endl << flush;
 
   if (guiP) { // dummy GUI
-    DemoComSel::demoCSG(4, 6, seed, rng);
+    DemoComSel::demoCSG(6, 5, seed, rng);
   }
   else {
     // note that we reset the seed every time, so that in case something
     // goes wrong, we need not scroll back too far to find the
     // seed required to reproduce the bug.
-    DemoComSel::demoCSC(4, // actors trying to get onto committee
-      3, // issues to be addressed by the committee
+    DemoComSel::demoCSC(8, // actors trying to get onto committee
+      5, // issues to be addressed by the committee
       cpP, siP,
       seed, rng);
   }

@@ -82,8 +82,12 @@ namespace ComSelLib {
 
 
   CSModel::~CSModel() {
-    // nothing yet
+    if (nullptr != actorPstnUtil) {
+      delete actorPstnUtil;
+      actorPstnUtil = nullptr;
+    }
   }
+  
 
   bool CSModel::equivStates(const CSState * rs1, const CSState * rs2) {
     const unsigned int numA = rs1->pstns.size();
@@ -98,11 +102,46 @@ namespace ComSelLib {
     }
     return rslt;
   }
+  
+  
+   double CSModel::getActorPstnUtil(unsigned int ai, unsigned int pj) {
+     if (nullptr == actorPstnUtil) {
+       setActorPstnUtil();
+     }
+     assert (ai < actorPstnUtil->numR());
+     assert (pj < actorPstnUtil->numC());
+     double uij = (*actorPstnUtil)(ai, pj);
+     return uij;
+   }
+  
+  
+   void CSModel::setActorPstnUtil() {
+     assert (actorPstnUtil == nullptr);
+     cout << "CSModel::setActorPstnUtil - not yet implemented - randomizing" << endl << flush; // TODO: complete this
+     
+     assert (nullptr != rng); 
+     unsigned int numPos = exp2(numAct);
+     
+    auto rawUij = KMatrix::uniform(rng, numAct, numPos, 0.0, 10.0);
+    for (unsigned int i = 0; i < numAct; i++) {
+      rawUij(i, 0) = 0.0; // worst outcome for i is no committee at all
+      unsigned int j = exp2(i);
+      rawUij(i, j) = 11.0; // best outcome for i is that only i is in the committee
+    }
+
+
+    auto uij = KBase::rescaleRows(rawUij, 0.0, 1.0); // von Neumann utility scale
+    actorPstnUtil = new KMatrix(uij);
+     
+     return;
+   }
+  
   // --------------------------------------------
   CSState::CSState(CSModel * m) : State(m) {
     // nothing yet
   }
 
+  
   CSState::~CSState() {
     // nothing yet
   }
@@ -176,45 +215,10 @@ namespace ComSelLib {
 
     return tuple <KMatrix, VUI>(p, uIndices);
   }
-
-  CSState* CSState::stepSUSN() {
-    cout << endl << flush;
-    cout << "State number " << model->history.size() - 1 << endl << flush;
-    if ((0 == uIndices.size()) || (0 == eIndices.size())) {
-      setUENdx();
-    }
-    setAUtil(-1, ReportingLevel::Silent);
-    show();
-
-    auto s2 = doSUSN(ReportingLevel::Silent);
-    s2->step = [s2]() {
-      return s2->stepSUSN();
-    };
-    cout << endl << flush;
-    return s2;
-  }
-
-
-  CSState * CSState::doSUSN(ReportingLevel rl) const {
-    //CSState * s2 = nullptr;
-    cout << "CSState::doSUSN not yet implemented" << endl; // TODO: finish this
-    assert(false);
-
-    const unsigned int numA = model->numAct;
-    assert(numA == model->actrs.size());
-
-    const unsigned int numU = uIndices.size();
-    assert((0 < numU) && (numU <= numA));
-    assert(numA == eIndices.size());
-
-    const KMatrix u = aUtil[0]; // all have same beliefs in this demo
-
-    const unsigned int numP = pstns.size();
-
-
-    // Given the utility matrix, uMat, calculate the expected utility to each actor,
+   
+      // Given the utility matrix, uMat, calculate the expected utility to each actor,
     // as a column-vector. Again, this is from the perspective of whoever developed uMat.
-    auto euMat = [rl, numA, numP, this](const KMatrix & uMat) {
+    KMatrix CSState::expUtilMat (KBase::ReportingLevel rl, unsigned int numA, unsigned int numP, const KMatrix & uMat) const {
       // BTW, be sure to lambda-bind uMat *after* it is modified.
       assert(uMat.numR() == numA); // must include all actors
       assert(uMat.numC() <= numP); // might have dropped some duplicates
@@ -233,8 +237,7 @@ namespace ComSelLib {
       };
 
       // in Haskell, we could just using currying
-      auto uRng = [assertRange, uMat](unsigned int i, unsigned int j) {
-        assertRange(uMat, i, j); return; };
+      auto uRng = [assertRange, uMat](unsigned int i, unsigned int j) { assertRange(uMat, i, j); return; };
       KMatrix::mapV(uRng, uMat.numR(), uMat.numC());
 
       auto vkij = [this, uMat](unsigned int k, unsigned int i, unsigned int j) { // vote_k(i:j)
@@ -253,8 +256,7 @@ namespace ComSelLib {
       assert(numA == eu.numR());
       assert(1 == eu.numC());
       // in Haskell, we could just using currying
-      auto euRng = [assertRange, eu](unsigned int i, unsigned int j) {
-        assertRange(eu, i, j); return; };
+      auto euRng = [assertRange, eu](unsigned int i, unsigned int j) { assertRange(eu, i, j); return; };
       KMatrix::mapV(euRng, eu.numR(), eu.numC());
 
 
@@ -282,9 +284,46 @@ namespace ComSelLib {
       }
 
       return eu;
-    };
-    // end of euMat
+    }; 
 
+
+  CSState* CSState::stepSUSN() {
+    cout << endl << flush;
+    cout << "State number " << model->history.size() - 1 << endl << flush;
+    if ((0 == uIndices.size()) || (0 == eIndices.size())) {
+      setUENdx();
+    }
+    setAUtil(-1, ReportingLevel::Silent);
+    show();
+
+    auto s2 = doSUSN(ReportingLevel::Silent);
+    s2->step = [s2]() {
+      return s2->stepSUSN();
+    };
+    cout << endl << flush;
+    return s2;
+  }
+
+
+  CSState * CSState::doSUSN(ReportingLevel rl) const { 
+   // cout << "CSState::doSUSN not yet implemented" << endl; // TODO: finish this
+   // assert(false);
+
+    const unsigned int numA = model->numAct;
+    assert(numA == model->actrs.size());
+
+    const unsigned int numU = uIndices.size();
+    assert((0 < numU) && (numU <= numA));
+    assert(numA == eIndices.size());
+
+    const KMatrix u = aUtil[0]; // all have same beliefs in this demo
+
+    const unsigned int numP = pstns.size();
+
+
+    // Given the utility matrix, uMat, calculate the expected utility to each actor,
+    // as a column-vector. Again, this is from the perspective of whoever developed uMat.
+    auto euMat = [rl, numA, numP, this](const KMatrix & uMat) { return expUtilMat(rl, numA, numP, uMat);};
     auto euState = euMat(u);
     cout << "Actor expected utilities: ";
     KBase::trans(euState).mPrintf("%6.4f, ");
@@ -307,9 +346,7 @@ namespace ComSelLib {
     }
 
 
-    auto uufn = [u, this](unsigned int i, unsigned int j1) {
-      return u(i, uIndices[j1]);
-    };
+    auto uufn = [u, this](unsigned int i, unsigned int j1) { return u(i, uIndices[j1]); };
     auto uUnique = KMatrix::map(uufn, numA, numU);
 
 
@@ -436,12 +473,10 @@ namespace ComSelLib {
 
 
       // return vector of neighboring committees
-      auto nfn = [](const MtchPstn & mp0) {
-        auto csVec = mp0.neighbors(2); return csVec;}; 
+      auto nfn = [](const MtchPstn & mp0) { auto csVec = mp0.neighbors(2); return csVec;}; 
 
       // show some representation of this position on cout
-      auto sfn = [](const MtchPstn & mp0) {
-        printVUI(mp0.match); return; };
+      auto sfn = [](const MtchPstn & mp0) { printVUI(mp0.match); return; };
 
       auto ghc = new KBase::GHCSearch<MtchPstn>();
       ghc->eval = efn;
@@ -449,9 +484,9 @@ namespace ComSelLib {
       ghc->show = sfn;
 
       auto rslt = ghc->run(*ph, // start from h's current positions
-        ReportingLevel::Silent,
-        100, // iter max
-        3, 0.001); // stable-max, stable-tol
+			   ReportingLevel::Silent,
+			   100, // iter max
+			   3, 0.001); // stable-max, stable-tol
 
       if (ReportingLevel::Low < rl) {
         printf("---------------------------------------- \n");
@@ -497,16 +532,16 @@ namespace ComSelLib {
       return;
     }; // end of newPosFn
 
-
-    const bool par = true;
+    const bool par = false; // parallel, asynch searches for new positions?
+    
     auto ts = vector<std::thread>();
     // Each actor, h, finds the position which maximizes their EU in this situation.
     for (unsigned int h = 0; h < numA; h++) {
       if (par) { // launch all, concurrent
         ts.push_back(std::thread([newPosFn, h]() {
-          newPosFn(h);
-          return;
-        }));
+	      newPosFn(h);
+	      return;
+	    }));
       }
       else { // do each, sequential
         newPosFn(h);
@@ -551,31 +586,78 @@ namespace ComSelLib {
   }
 
   void CSState::setAllAUtil(ReportingLevel rl) {
-    cout << "CSState::setAllAUtil not yet implemented" << endl; // TODO: finish this
-    assert(false);
+    auto csm = (( CSModel*) model);
+    const unsigned int na = csm->numAct;
+    assert (Model::minNumActor <= na);
+    assert (na <= Model::maxNumActor);
+    assert (0 == aUtil.size());
+    auto u = KMatrix(na, na);
+    
+    for (unsigned int i=0; i<na; i++) {
+      for (unsigned int j=0; j<na; j++) {
+        auto pj = ((const MtchPstn*) (pstns[j]));
+        VUI vj = pj->match;
+        unsigned int nj = vbToInt(vj);
+        u(i,j) = csm->getActorPstnUtil(i, nj);
+      }
+    }
+    
+    // this sets the utility matrices to all be identical
+    for (unsigned int i=0; i<na; i++) { aUtil.push_back(u); } 
     return;
   }
 
   // --------------------------------------------
-  CSActor::CSActor(string n, string d, const Model* csm) : Actor(n, d) {
-    // nothing yet
+  CSActor::CSActor(string n, string d,  CSModel* csm) : Actor(n, d) {
+    csMod = csm;
   }
 
   CSActor::~CSActor() {
-    // nothing yet
+    csMod = nullptr;
   }
 
   double CSActor::posUtil(const Position * ap1) const {
-    cout << "CSActor::posUtil - not yet implemented" << endl << flush; // TODO: complete this
-    assert(false);
+    //cout << "CSActor::posUtil - not yet implemented" << endl << flush; // TODO: complete this
+    //assert(false);
+     
+    auto ai = csMod->actrNdx(this);
     auto rp = ((const MtchPstn *)ap1);
-    //unsigned int ai = model->actrNdx(this);
-    //double u0 = rpMod->utilActorPos(ai, rp->match);
-
-    double u0 = 0.0;
+    auto nj = vbToInt(rp->match);
+    double u0 = csMod->getActorPstnUtil(ai, nj);
     return u0;
   }
+  
+  
+  double CSActor::vote(unsigned int p1, unsigned int p2, const State* st) const {
+    /// vote between the current positions to actors at positions p1 and p2 of this state
+    auto rPos1 = ((const MtchPstn*)(st->pstns[p1]));
+    auto rPos2 = ((const MtchPstn*)(st->pstns[p2]));
+    double v = vote(rPos1, rPos2);
+    return v;
+  }
 
+  double CSActor::vote(const Position* ap1, const Position* ap2) const {
+    double u1 = posUtil(ap1);
+    double u2 = posUtil(ap2);
+    const double v12 = Model::vote(vr, sCap, u1, u2);
+    return v12;
+  }
+  
+  
+    void CSActor::randomize(PRNG* rng, unsigned int nDim) {
+      assert (nullptr != rng);
+      assert(0 < nDim);
+      
+      sCap = exp(log(10.0)*rng->uniform(1.0, 2.0)); // 10 to 100, median at 31.6 
+      vPos = VctrPstn(KMatrix::uniform(rng, nDim, 1, 0.01, 0.99));
+      
+      double totalSal = rng->uniform(0.4, 1.0);
+      auto vsi = KMatrix::uniform(rng, nDim, 1, 0.01, 0.99); 
+      vSal = (totalSal/sum(vsi)) *  vsi;
+      return;
+    }
+    
+    
 };
 // end of namespace
 

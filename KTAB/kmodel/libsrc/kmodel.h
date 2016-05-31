@@ -217,6 +217,9 @@ public:
     static const unsigned int minNumActor = 3;
     static const unsigned int maxNumActor = 250; //quite generous, as we expect 10-30.
     
+    // parameters which every Model instance must set
+    VPModel vpm = VPModel::Linear; // arbitrary default
+    PCEModel pcem = PCEModel::ConditionalPCM; // arbitrary default
 
     // In the abstract, you run a model by stepping it until it is time to stop.
     // In detail, each step is likely to record copious information to
@@ -278,9 +281,6 @@ public:
 
     // returns h's estimate of i's risk attitude, using the risk-adjustment-rule
     static double estNRA(double rh, double  ri, BigRAdjust ra) ;
-
-    VPModel vpm = VPModel::Linear; // arbitrary default
-    PCEModel pcem = PCEModel::ConditionalPCM; // arbitrary default
 
 protected:
     static string createTableSQL(unsigned int tn);

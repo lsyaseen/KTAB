@@ -29,6 +29,10 @@
 // Set of actors to be included (or not) in a committee, with 2-dim SMP to follow.
 // and many more.
 //
+// Initially, the reformpri and comsel actually have enumerated spaces,
+// so the things which appear in both are clear candidates to get raised up
+// into EModel, EState, etc.
+//
 // Some issue spaces are too large to enumerate, so they must be treated as "implicit".
 // They include the following.
 // Revenue-neutral tax/subsidy policy over 20 items

@@ -91,11 +91,13 @@ void State::setUENdx()  {
     auto uePair = KBase::ueIndices<unsigned int>(ns, efn);
 
     uIndices = get<0>(uePair);
-    assert (0 < uIndices.size());
-    assert (uIndices.size() <= na);
+    const unsigned int nu =  uIndices.size();
+    assert (0 < nu);
+    assert (nu <= na);
 
     eIndices = get<1>(uePair);
-    assert (na == eIndices.size());
+    const unsigned int ne = eIndices.size();
+    assert (na == ne);
 
     return;
 }

@@ -74,6 +74,11 @@ namespace RfrmPri {
   const string appName = "rpdemo";
   const string appVersion = "0.2";
 
+  
+  // -------------------------------------------------
+  // return vector of neighboring 1- and 2-permutations
+  vector <MtchPstn>  nghbrPerms(const MtchPstn & mp0);
+  
   // -------------------------------------------------
   // class declarations
 
@@ -81,7 +86,7 @@ namespace RfrmPri {
   public:
     enum class PropModel {
       ExpUtil, Probability, AgreeUtil
-    };
+	};
 
     RPActor(string n, string d, const RPModel* rm);
     ~RPActor();
@@ -91,7 +96,7 @@ namespace RfrmPri {
 
     static MtchPstn* rPos(unsigned int numI, unsigned int numA, PRNG * rng); // make a random position
     static RPActor* rAct(unsigned int numI, double minCap,
-      double maxCap, PRNG* rng, unsigned int i); // make a random actor
+			 double maxCap, PRNG* rng, unsigned int i); // make a random actor
 
     void randomize(PRNG* rng, double minCap, double maxCap, unsigned int id, unsigned int numI); // randomly alter this actor
 
@@ -129,7 +134,7 @@ namespace RfrmPri {
     virtual ~RPModel();
 
     static RPModel* randomMS(unsigned int numA, unsigned int numI,
-      VotingRule vr, RPActor::PropModel pMod, PRNG * rng);
+			     VotingRule vr, RPActor::PropModel pMod, PRNG * rng);
 
     double utilActorPos(unsigned int ai, const VUI &pstn) const;
 
@@ -176,13 +181,19 @@ namespace RfrmPri {
 
     void show() const;
 
+ 
+    
   protected:
     virtual void setAllAUtil(ReportingLevel rl);
     void setOneAUtil(unsigned int perspH, ReportingLevel rl);
 
     RPState * doSUSN(ReportingLevel rl) const;
     RPState * doBCN(ReportingLevel rl) const;
-    // bool stableRPState(unsigned int iter, const State* s);
+    
+    // Given the utility matrix, uMat, calculate the expected utility to each actor,
+    // as a column-vector. Again, this is from the perspective of whoever developed uMat.
+    KMatrix  expUtilMat  (KBase::ReportingLevel rl, unsigned int numA, unsigned int numP,  KBase::VPModel vpm, const KMatrix & uMat) const;
+                          
     const RPModel * rpMod = nullptr; // saves a lot of type-casting later
 
     virtual bool equivNdx(unsigned int i, unsigned int j) const;
