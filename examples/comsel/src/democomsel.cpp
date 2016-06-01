@@ -164,10 +164,18 @@ namespace DemoComSel {
       auto ai = ((const CSActor *)(csm->actrs[i]));  
       aCap(0, i) = ai->sCap; 
     }
+    
+    aCap = (100.0 / sum(aCap)) * aCap;
+    cout << "Scalar strengths: " << endl; 
+    for (unsigned int i = 0; i < csm->numAct; i++) {
+      auto ai = ((CSActor *)(csm->actrs[i]));  
+      ai->sCap = aCap(0, i); 
+      printf("%3i  %6.2f \n", i, ai->sCap);
+    }
 
     cout << "Computing utilities of positions ... " << endl;
     for (unsigned int i=0; i<numA; i++) {
-      double uii = csm->getActorPstnUtil(i,i); // (0,0) causes computation of entire table
+      double uii = csm->getActorCSPstnUtil(i,i); // (0,0) causes computation of entire table
     }
     
     // At this point, we have almost a generic enumerated model,
@@ -181,7 +189,7 @@ namespace DemoComSel {
       printCS(pstn);
       printf("  ");
       for (unsigned int ai = 0; ai < numA; ai++) {
-        const double uap = csm->getActorPstnUtil(ai, pj);
+        const double uap = csm->getActorCSPstnUtil(ai, pj);
         uij(ai, pj) = uap;
         printf("%6.4f, ", uap);
       }
@@ -272,7 +280,7 @@ namespace DemoComSel {
       return css0->stepSUSN();
     };
 
-    unsigned int maxIter = 50;
+    unsigned int maxIter = 1000;
     csm->stop = [maxIter, csm](unsigned int iter, const KBase::State * s) {
       bool doneP = iter > maxIter;
       if (doneP) {

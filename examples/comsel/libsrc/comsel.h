@@ -92,12 +92,21 @@ namespace ComSelLib {
     unsigned int numItm = 0;
     unsigned int numCat = 2;
 
-    double getActorPstnUtil(unsigned int ai, unsigned int pj); // get [0,1] normalized utility to each actor of each position
+    double getActorCSPstnUtil(unsigned int ai, unsigned int pj); // get [0,1] normalized utility to each actor of each CSposition
     
   protected:
     unsigned int numDims = 0;
-    void setActorPstnUtil();
-    KMatrix * actorPstnUtil = nullptr; // normalized [0,1] utility to each actor (row) of each position (column)
+    KMatrix * actorCSPstnUtil = nullptr; // normalized [0,1] utility to each actor (row) of each CS position (column)
+    void setActorCSPstnUtil();
+    
+    // return the clm-vector of actors' expected utility for this particular committee
+    KMatrix oneCSPstnUtil(const VUI& vb) const;
+    
+    KMatrix * actorSpPstnUtil = nullptr; // normalized [0,1] utility to each actor (row) of each spatial position (column)
+    void setActorSpPstnUtil();
+    
+    // when an actor is not on the committee, its influence is divided by this factor
+    double nonCommDivisor = 100.0;
     
   private:
   };
@@ -124,7 +133,7 @@ namespace ComSelLib {
     void randomize(PRNG* rng, unsigned int nDim);
   
   protected:
-     CSModel* csMod = nullptr;
+    CSModel* csMod = nullptr;
     
   private:
   };
@@ -154,7 +163,7 @@ namespace ComSelLib {
     
     // Given the utility matrix, uMat, calculate the expected utility to each actor,
     // as a column-vector. Again, this is from the perspective of whoever developed uMat.
-     KMatrix expUtilMat (KBase::ReportingLevel rl, unsigned int numA, unsigned int numP, const KMatrix & uMat) const; 
+    KMatrix expUtilMat (KBase::ReportingLevel rl, unsigned int numA, unsigned int numP, const KMatrix & uMat) const; 
      
     virtual bool equivNdx(unsigned int i, unsigned int j) const;
 

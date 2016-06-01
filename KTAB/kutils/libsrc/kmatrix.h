@@ -85,8 +85,13 @@ namespace KBase {
     unsigned int numR() const;
     unsigned int numC() const;
     static KMatrix uniform(PRNG* rng, unsigned int nr, unsigned int nc, double a, double b);
+    
+    // this maps a function over a matrix, setting each element to the returned value
     static KMatrix map(function<double(unsigned int i, unsigned int j)> f,
 		       unsigned int nr, unsigned int nc);
+    
+    // this maps a function over a matrix, performing the indicated operation on
+    // each pair of indices. As the function must return 'void', it is invoked for side-affects only.
     static void mapV(function<void(unsigned int i, unsigned int j)> f,
 		     unsigned int nr, unsigned int nc);
 
