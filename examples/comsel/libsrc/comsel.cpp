@@ -125,22 +125,9 @@ namespace ComSelLib {
    
   void CSModel::setActorSpPstnUtil() {
     assert (actorSpPstnUtil == nullptr);
-    cout << "CSModel::setActorSpPstnUtil - not yet implemented - randomizing" << endl << flush; // TODO: complete this
     const unsigned int na = numAct;
     actorSpPstnUtil = new KMatrix(na, na);
     auto setuij = [this] (unsigned int i, unsigned int j) {
-   //   if (i == j) {
-//	(*actorSpPstnUtil)(i,i) = 1.0;
- //     } else  if (i < j) {
-	// the logic here is that the unweighted distance from (ij) to (ji)
-	// is the same in both directions, but each actor has a different
-	// salience vector. Hence, the two weighted distances will be
-	// correlated but not identical.
-//	double x = rng->uniform(0.0, 1.0);
-//	double y = rng->uniform(0.0, 1.0);
-//	(*actorSpPstnUtil)(i,j) = (2.0*x + y)/3.0;
-//	(*actorSpPstnUtil)(j,i) = (2.0*y + x)/3.0;
- //     }
       double uij = oneSpPstnUtil(i,j);
       (*actorSpPstnUtil)(i,j) = uij;
       return;
@@ -190,13 +177,12 @@ namespace ComSelLib {
             break;
           default:
             cout << "CSModel::oneCSPstnUtil - unrecognized match value: "<<vb[k] << endl << flush;
-            assert(false);
+            assert(false); // no way to recover from this programming error
             break;
         }
         auto v = Model::vote(ak->vr, sk, (*actorSpPstnUtil)(k,i),  (*actorSpPstnUtil)(k,j));
         return v;
-      };
-      
+      };     
         
       const KMatrix c = Model::coalitions(vkij, numAct, numAct); // coalitions for/against
       const KMatrix pv = Model::vProb(vpm, c); // prob of victory, square
@@ -208,19 +194,9 @@ namespace ComSelLib {
   void CSModel::setActorCSPstnUtil() {
     assert (actorSpPstnUtil != nullptr); // prerequisite data must be provided
     assert (actorCSPstnUtil == nullptr);
-    //cout << "CSModel::setActorCSPstnUtil - not yet implemented - randomizing" << endl << flush; // TODO: complete this
-     
     assert (nullptr != rng); 
-    unsigned int numPos = exp2(numAct);
-     
+    unsigned int numPos = exp2(numAct);  
     auto rawUij = KMatrix(numAct, numPos);
-   // auto rawUij = KMatrix::uniform(rng, numAct, numPos, 0.0, 10.0);
-   // for (unsigned int i = 0; i < numAct; i++) {
-   //   rawUij(i, 0) = 0.0; // worst outcome for i is no committee at all
-   //   unsigned int j = exp2(i);
-   //   rawUij(i, j) = 11.0; // best outcome for i is that only i is in the committee
-   // }
-    
     for (unsigned int j = 0; j<numPos; j++) {
       const VUI vbj = intToVB(j, numAct);
       const KMatrix euj = oneCSPstnUtil(vbj);
@@ -230,11 +206,8 @@ namespace ComSelLib {
         rawUij(i,j) = euj(i,0);
       }
     }
-
-
     auto uij = KBase::rescaleRows(rawUij, 0.0, 1.0); // von Neumann utility scale
     actorCSPstnUtil = new KMatrix(uij);
-     
     return;
   }
   
