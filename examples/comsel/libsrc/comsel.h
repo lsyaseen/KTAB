@@ -104,9 +104,10 @@ namespace ComSelLib {
     
     KMatrix * actorSpPstnUtil = nullptr; // normalized [0,1] utility to each actor (row) of each spatial position (column)
     void setActorSpPstnUtil();
+    double oneSpPstnUtil(unsigned int ai, unsigned int pj) const;
     
     // when an actor is not on the committee, its influence is divided by this factor
-    double nonCommDivisor = 100.0;
+    double nonCommDivisor = 20.0;
     
   private:
   };

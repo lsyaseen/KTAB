@@ -29,6 +29,7 @@
 //  CSState* CSState::stepSUSN
 // --------------------------------------------
 
+#include "smp.h"
 #include "comsel.h"
 #include "hcsearch.h"
 
@@ -46,6 +47,8 @@ namespace ComSelLib {
   using KBase::PCEModel;
 
   using KBase::Model;
+  
+  using SMPLib::SMPModel;
 
   // --------------------------------------------
   VUI intToVB(unsigned int x, unsigned int n) {
@@ -126,19 +129,20 @@ namespace ComSelLib {
     const unsigned int na = numAct;
     actorSpPstnUtil = new KMatrix(na, na);
     auto setuij = [this] (unsigned int i, unsigned int j) {
-      double uij = 1.0;
-      if (i == j) {
-	(*actorSpPstnUtil)(i,i) = 1.0;
-      } else  if (i < j) {
+   //   if (i == j) {
+//	(*actorSpPstnUtil)(i,i) = 1.0;
+ //     } else  if (i < j) {
 	// the logic here is that the unweighted distance from (ij) to (ji)
 	// is the same in both directions, but each actor has a different
 	// salience vector. Hence, the two weighted distances will be
 	// correlated but not identical.
-	double x = rng->uniform(0.0, 1.0);
-	double y = rng->uniform(0.0, 1.0);
-	(*actorSpPstnUtil)(i,j) = (2.0*x + y)/3.0;
-	(*actorSpPstnUtil)(j,i) = (2.0*y + x)/3.0;
-      }
+//	double x = rng->uniform(0.0, 1.0);
+//	double y = rng->uniform(0.0, 1.0);
+//	(*actorSpPstnUtil)(i,j) = (2.0*x + y)/3.0;
+//	(*actorSpPstnUtil)(j,i) = (2.0*y + x)/3.0;
+ //     }
+      double uij = oneSpPstnUtil(i,j);
+      (*actorSpPstnUtil)(i,j) = uij;
       return;
     };
     KMatrix::mapV(setuij, na, na); 
@@ -150,7 +154,17 @@ namespace ComSelLib {
     return;
   }
   
-  
+  double CSModel::oneSpPstnUtil(unsigned int ai, unsigned int pj) const {
+    const double bigR = 0.5; // moderatly risk-averse in spatial positions
+    auto csai = ((const CSActor*) (actrs[ai]));
+    auto csaj = ((const CSActor*) (actrs[pj]));
+    const KMatrix spi = csai->vPos;
+    const KMatrix spj = csaj->vPos;
+    KMatrix vDiff = spi - spj;
+    const auto vSal = csai->vSal;
+    const double u = SMPModel::bvUtil(vDiff, vSal, bigR);
+    return u;
+  }
     
     // return the clm-vector of actors' expected utility for this particular committee
   KMatrix CSModel::oneCSPstnUtil(const VUI& vb) const { 
@@ -620,7 +634,7 @@ namespace ComSelLib {
       return;
     }; // end of newPosFn
 
-    const bool par = false; // parallel, asynch searches for new positions?
+    const bool par = true; // parallel, asynch searches for new positions?
     
     auto ts = vector<std::thread>();
     // Each actor, h, finds the position which maximizes their EU in this situation.
