@@ -67,7 +67,7 @@ namespace ComSelLib {
   // -------------------------------------------------
 
   const string appName = "csdemo";
-  const string appVersion = "0.2";
+  const string appVersion = "0.3";
 
   // -------------------------------------------------
   // function declarations

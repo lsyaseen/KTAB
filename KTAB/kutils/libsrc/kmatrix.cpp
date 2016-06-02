@@ -264,6 +264,12 @@ namespace KBase {
   }
 
 
+  KMatrix operator* (const KMatrix & m1, double x) {
+    auto mf = [x, &m1](unsigned int i, unsigned int j) { return x*m1(i, j); };
+    return KMatrix::map(mf, m1.numR(), m1.numC());
+  }
+
+
   KMatrix operator/ (const KMatrix & m1, double x) {
     auto df = [x, &m1](unsigned int i, unsigned int j) { return m1(i, j) / x; };
     return KMatrix::map(df, m1.numR(), m1.numC());
@@ -394,6 +400,20 @@ namespace KBase {
   }
 
 
+  KMatrix clip(const KMatrix & m, double xMin, double xMax) {
+    assert (xMin <= xMax);
+    const unsigned int nr = m.numR();
+    const unsigned int nc = m.numC();
+    auto cfn = [m, xMin, xMax] (unsigned int i, unsigned int j) {
+      double mij = m(i,j);
+      mij = (mij < xMin) ? xMin : mij;
+      mij = (xMax < mij) ? xMax : mij;
+      return mij;
+    };
+    return KMatrix::map(cfn, nr, nc);
+  }
+  
+  
   KMatrix iMat(unsigned int n) {
     auto idm = KMatrix(n, n);
     for (unsigned int i = 0; i < n; i++){

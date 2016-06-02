@@ -158,6 +158,30 @@ namespace DemoComSel {
     csm->numItm = numA;
     assert (csm->numCat == 2);
     
+    if ((9 == numA) && (2 == nDim)) {
+      for (unsigned int i=0; i<3; i++) {
+        auto ci = KMatrix::uniform(rng, nDim, 1, 0.1, 0.9);
+        for (unsigned int j=0; j<3; j++) {
+          auto ej = KMatrix::uniform(rng, nDim, 1, -0.2, +0.2);
+          const KMatrix pij = clip(ci + ej, 0.0, 1.0);
+          unsigned int n = (3*i)+j;
+          auto an = (( CSActor *)(csm->actrs[n]));  
+          an->vPos = VctrPstn(pij); 
+        }
+      }
+    }
+    
+    cout << "Scalar positions of actors (fixed) ..." << endl;
+    for (auto a : csm->actrs) {
+      auto csa = ((CSActor*) a);
+      printf("%s v-position: ", csa->name.c_str());
+      trans(csa->vPos).mPrintf(" %5.2f"); 
+      printf("%s v-salience: ", a->name.c_str());
+      trans(csa->vSal).mPrintf(" %5.2f"); 
+      cout << endl;
+    }
+    cout << endl << flush;
+    
     cout << "Getting scalar strength of actors ..." << endl;
     KMatrix aCap = KMatrix(1, csm->numAct);
     for (unsigned int i = 0; i < csm->numAct; i++) {
@@ -419,8 +443,8 @@ int main(int ac, char **av) {
     // note that we reset the seed every time, so that in case something
     // goes wrong, we need not scroll back too far to find the
     // seed required to reproduce the bug.
-    DemoComSel::demoCSC(8, // actors trying to get onto committee
-      5, // issues to be addressed by the committee
+    DemoComSel::demoCSC(9, // actors trying to get onto committee
+      2, // issues to be addressed by the committee
       cpP, siP,
       seed, rng);
   }

@@ -55,6 +55,7 @@ namespace KBase {
   double  dot(const KMatrix & m1, const KMatrix & m2);
   double  lCorr(const KMatrix & m1, const KMatrix & m2);
   KMatrix  inv(const KMatrix & m);
+  KMatrix  clip(const KMatrix & m, double xMin, double xMax);
   KMatrix iMat(unsigned int n);
   KMatrix makePerp(const KMatrix & x, const KMatrix & p);
   KMatrix  joinH(const KMatrix & mL, const KMatrix & mR);
@@ -64,6 +65,7 @@ namespace KBase {
   KMatrix operator- (const KMatrix & m1, const KMatrix & m2);
   KMatrix operator- (const KMatrix & m1, double x);
   KMatrix operator* (double x, const KMatrix & m1);
+  KMatrix operator* (const KMatrix & m1, double x);
   KMatrix operator/ (const KMatrix & m1, double x);
   bool sameShape(const KMatrix & m1, const KMatrix & m2);
   KMatrix operator* (const KMatrix & m1, const KMatrix & m2);
@@ -86,11 +88,11 @@ namespace KBase {
     unsigned int numC() const;
     static KMatrix uniform(PRNG* rng, unsigned int nr, unsigned int nc, double a, double b);
     
-    // this maps a function over a matrix, setting each element to the returned value
+    // this builds a matrix by mapping a function over a ranges, setting each element to the returned value
     static KMatrix map(function<double(unsigned int i, unsigned int j)> f,
 		       unsigned int nr, unsigned int nc);
     
-    // this maps a function over a matrix, performing the indicated operation on
+    // this maps a function over a ranges,, performing the indicated operation on
     // each pair of indices. As the function must return 'void', it is invoked for side-affects only.
     static void mapV(function<void(unsigned int i, unsigned int j)> f,
 		     unsigned int nr, unsigned int nc);

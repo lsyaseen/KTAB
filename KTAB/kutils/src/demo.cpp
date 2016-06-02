@@ -261,8 +261,12 @@ namespace UDemo {
     cout << "Small zero-filled matrix" << endl;
     m1.mPrintf(" %+5.2f ");
     cout << endl;
-    m1(0, 1) = 0.9;
-    m1(1, 2) = 1.2;
+    m1(0, 0) = 4.03;
+    m1(0, 1) = 2.19;
+    m1(0, 2) = 6.34;
+    m1(1, 0) = 8.40;
+    m1(1, 1) = 6.65;
+    m1(1, 2) = 2.36;
     printf("Set (0,1) element to %+5.2f  \n", m1(0, 1));
     printf("Set (1,2) element to %+5.2f  \n", m1(1, 2));
     m1.mPrintf(" %5.2f ");
@@ -271,6 +275,22 @@ namespace UDemo {
     cout << "Computing norm ... " << flush;
     double nm = norm(m1);
     cout << "norm is " << nm << endl << flush;
+     
+    double c1 = 2.3;
+    printf("Pre- and post-multiply c1 and m1, where c1=%5.2f and m1= \n", c1);
+    m1.mPrintf(" %5.2f");
+    cout << endl << flush;
+    
+    printf("Pre-multiply c1 * m1 = \n");
+    auto c1m1 = c1 * m1;
+    c1m1.mPrintf(" %5.2f");
+    cout << endl << flush;
+    
+    printf("Post-multiply m1*c1 = \n");
+    auto m1c1 = m1 * c1;
+    m1c1.mPrintf(" %5.2f");
+    cout << endl << flush;
+    
 
 
     printf("Transposition then copy \n");
