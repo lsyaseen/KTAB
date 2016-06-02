@@ -162,7 +162,7 @@ namespace DemoComSel {
       for (unsigned int i=0; i<3; i++) {
         auto ci = KMatrix::uniform(rng, nDim, 1, 0.1, 0.9);
         for (unsigned int j=0; j<3; j++) {
-          auto ej = KMatrix::uniform(rng, nDim, 1, -0.2, +0.2);
+          auto ej = KMatrix::uniform(rng, nDim, 1, -0.05, +0.05);
           const KMatrix pij = clip(ci + ej, 0.0, 1.0);
           unsigned int n = (3*i)+j;
           auto an = (( CSActor *)(csm->actrs[n]));  
