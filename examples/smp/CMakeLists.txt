@@ -22,6 +22,8 @@ set(CMAKE_BUILD_TYPE Debug)
 set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
+set (ENABLE_FLTK_GUI false CACHE  BOOL "Build app with FLTK GUI")
+
 if (UNIX)
   set (ENABLE_EFFCPP true CACHE  BOOL "Check Effective C++ Guidelines")
   set (ENABLE_EFENCE false CACHE  BOOL "Use Electric Fence memory debugger")
@@ -47,28 +49,7 @@ endif (NOT SQLITE_FOUND)
 
 set (SMP_XLIBS  )
 
-if(UNIX)
-  find_package(X11)
-  if (NOT X11_FOUND)
-    message (FATAL_ERROR "Couldn't find X11: required for building smpg")
-  endif (NOT X11_FOUND)
-  set (SMP_XLIBS
-    #           Xaw Xmu Xpm Xt Xft X11 Xinerama dl fontconfig
-    # Xext Xft fontconfig Xinerama dl m X11
-    Xext Xft fontconfig dl m X11  Xfixes 
-    # Xft dl m X11
-    )
-endif (UNIX)
 
-
-include (${LOCAL_MODULE_DIR}/FLTKHelper.cmake)
-find_package(FLTK REQUIRED)
-if (NOT FLTK_FOUND)
-  message (FATAL_ERROR "Could not find fltk: required for building smpg")
-endif (NOT FLTK_FOUND)
-
-set (FLUID_DIR
-  fluid)
 
 # --------------------------------------------------------
 # See "Findkutils.cmake" in cmakemodules to figure
@@ -86,11 +67,37 @@ if(NOT KMODEL_FOUND)
 endif(NOT KMODEL_FOUND)
 
 
+if (ENABLE_FLTK_GUI)
+    
+if(UNIX)
+  find_package(X11)
+  if (NOT X11_FOUND)
+    message (FATAL_ERROR "Couldn't find X11: required for building smpg")
+  endif (NOT X11_FOUND)
+  set (SMP_XLIBS
+    #           Xaw Xmu Xpm Xt Xft X11 Xinerama dl fontconfig
+    # Xext Xft fontconfig Xinerama dl m X11
+    Xext Xft fontconfig dl m X11  Xfixes 
+    # Xft dl m X11
+    )
+  endif (UNIX)
+
+include (${LOCAL_MODULE_DIR}/FLTKHelper.cmake)
+find_package(FLTK REQUIRED)
+if (NOT FLTK_FOUND)
+  message (FATAL_ERROR "Could not find fltk: required for building smpg")
+endif (NOT FLTK_FOUND)
+
+set (FLUID_DIR
+  fluid)
+  
+  
 # Ditto for "Findkgraph.cmake"
 find_package(kgraph)
 if(NOT KGRAPH_FOUND)
   message(FATAL_ERROR "Could not find kgraph")
 endif(NOT KGRAPH_FOUND)
+endif (ENABLE_FLTK_GUI)
 
 # -------------------------------------------------
 # files to be built into a library go in libsrc/
@@ -153,47 +160,46 @@ install(
     ${SMP_INSTALL_DIR}/include)  
     
 # -------------------------------------------------
-# define a little library of smp GUI stuff
+if (ENABLE_FLTK_GUI)
+# define a little library of smp GUI stuff (if desired)
 
-set (SMPGUI_FLS
-  ${FLUID_DIR}/mainw.fl
-  )
+  set (SMPGUI_FLS
+    ${FLUID_DIR}/mainw.fl
+    )
 
-message (STATUS "Use these SMPGUI_FLS: ${SMPGUI_FLS}")
+  message (STATUS "Use these SMPGUI_FLS: ${SMPGUI_FLS}")
 
-fltk_wrap_ui (smpGUI ${SMPGUI_FLS})
-add_library (smpGUI STATIC ${smpGUI_FLTK_UI_SRCS})
+  fltk_wrap_ui (smpGUI ${SMPGUI_FLS})
+  add_library (smpGUI STATIC ${smpGUI_FLTK_UI_SRCS})
 
 # --------------------------------------------------------
-
-set (SMPG_SRCS
-  ${PROJECT_SOURCE_DIR}/src/guimain.cpp
+  set (SMPG_SRCS
+    ${PROJECT_SOURCE_DIR}/src/guimain.cpp
+    )
+  set (SMPG_LIBS
+    ${FLTK_LIBRARIES}
+    ${KGRAPH_LIBRARIES}
+    smpGUI
+    ${SMP_XLIBS}
   )
 
-set (SMPG_LIBS
-  ${FLTK_LIBRARIES}
-  ${KGRAPH_LIBRARIES}
-  smpGUI
-  ${SMP_XLIBS}
-  )
-
-add_executable (smpg ${SMPG_SRCS})
-target_link_libraries(smpg
+  add_executable (smpg ${SMPG_SRCS})
+  target_link_libraries(smpg
   smp
-  ${SMPG_LIBS}
-  ${SQLITE_LIBRARIES}
-  ${EFENCE_LIBRARIES}
+    ${SMPG_LIBS}
+    ${SQLITE_LIBRARIES}
+    ${EFENCE_LIBRARIES}
   )
   
 # suppress the console window under Windows
-if (WIN32)  
-  if (MSVC)  
-    set_target_properties(smpg PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:WINDOWS")
-    set_target_properties(smpg PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS")
-    message (STATUS "Using /SUBSYSTEM:WINDOWS") 
-  endif(MSVC) 
-endif(WIN32)
-
+  if (WIN32)  
+    if (MSVC)  
+      set_target_properties(smpg PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:WINDOWS")
+      set_target_properties(smpg PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS")
+      message (STATUS "Using /SUBSYSTEM:WINDOWS") 
+    endif(MSVC) 
+  endif(WIN32)
+endif (ENABLE_FLTK_GUI)
 # -------------------------------------------------
 
 add_executable (smpc
@@ -216,18 +222,21 @@ message (STATUS "Using PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
 message (STATUS "KUTILS_INCLUDE_DIR: " ${KUTILS_INCLUDE_DIR})
 message (STATUS "KMODEL_INCLUDE_DIR: " ${KMODEL_INCLUDE_DIR})
 
-message (STATUS "FLTK_INCLUDE_DIR: " ${FLTK_INCLUDE_DIR})
+if (ENABLE_FLTK_GUI)
+  message (STATUS "FLTK_INCLUDE_DIR: " ${FLTK_INCLUDE_DIR})
+  message (STATUS "KGRAPH_INCLUDE_DIR: " ${KGRAPH_INCLUDE_DIR})
+endif (ENABLE_FLTK_GUI)
 
 # -------------------------------------------------
 # As of early 2014, C++11 is still not the default
 # for g++, so I have to provide it here.
 # Also on Unix, the C++11 thread library relies on pthreads
-if (UNIX)
+if (UNIX OR MINGW)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 ")
   if (ENABLE_EFFCPP)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++ ")
   endif (ENABLE_EFFCPP)
-endif(UNIX)
+endif(UNIX OR MINGW)
 
 # ===========================================
 # Copyright KAPSARC. Open Source MIT License 
