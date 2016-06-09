@@ -84,7 +84,7 @@ void Model::demoSQLite() {
     sOpen(1);
 
     // Create SQL statement
-    sql = "create table PETS("  \
+    sql = "create table if not exists PETS("  \
           "ID INT PRIMARY KEY     NOT NULL," \
           "NAME           text    NOT NULL," \
           "AGE            int     NOT NULL," \
@@ -144,7 +144,7 @@ string Model::createTableSQL(unsigned int tn) {
     case 0:
         // position-utility table
         // the estimated utility to each actor of each other's position
-        sql = "create table PosUtil ("  \
+        sql = "create table if not exists PosUtil ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -156,7 +156,7 @@ string Model::createTableSQL(unsigned int tn) {
 
     case 1: // pos-vote table
         // estimated vote of each actor between each pair of positions
-        sql = "create table PosVote ("  \
+        sql = "create table if not exists PosVote ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -168,7 +168,7 @@ string Model::createTableSQL(unsigned int tn) {
         break;
 
     case 2: // pos-prob table. Note that there may be duplicates, unless we limit it to unique positions
-        sql = "create table PosProb ("  \
+        sql = "create table if not exists PosProb ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -178,7 +178,7 @@ string Model::createTableSQL(unsigned int tn) {
         break;
 
     case 3: // pos-equiv table. E(i)= lowest j s.t. Pos(i) ~ Pos(j). if j < i, it is not unique.
-        sql = "create table PosEquiv ("  \
+        sql = "create table if not exists PosEquiv ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Pos_i	INTEGER NOT NULL DEFAULT 0, "\
@@ -189,7 +189,7 @@ string Model::createTableSQL(unsigned int tn) {
     case 4:
         // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
         // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-        sql = "create table UtilContest ("  \
+        sql = "create table if not exists UtilContest ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -203,7 +203,7 @@ string Model::createTableSQL(unsigned int tn) {
     case 5:
         // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
         // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-        sql = "create table UtilChlg ("  \
+        sql = "create table if not exists UtilChlg ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -217,7 +217,7 @@ string Model::createTableSQL(unsigned int tn) {
     case 6:
         // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
         // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-        sql = "create table UtilVict ("  \
+        sql = "create table if not exists UtilVict ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -230,7 +230,7 @@ string Model::createTableSQL(unsigned int tn) {
 
     case 7:
         // h's estimate that i will defeat j, including third party contributions
-        sql = "create table ProbVict ("  \
+        sql = "create table if not exists ProbVict ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -244,7 +244,7 @@ string Model::createTableSQL(unsigned int tn) {
         // h's estimate of utility to k of status quo.
         // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
         // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-        sql = "create table UtilSQ ("  \
+        sql = "create table if not exists UtilSQ ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -254,7 +254,7 @@ string Model::createTableSQL(unsigned int tn) {
         break;
 
     case 9:  // probability ik > j
-        sql = "create table ProbTPVict ("  \
+        sql = "create table if not exists ProbTPVict ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -268,7 +268,7 @@ string Model::createTableSQL(unsigned int tn) {
     case 10: // utility to k of ik>j
         // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
         // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-        sql = "create table UtilTPVict ("  \
+        sql = "create table if not exists UtilTPVict ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -282,7 +282,7 @@ string Model::createTableSQL(unsigned int tn) {
     case 11: // utility to k of i>jk
         // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
         // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-        sql = "create table UtilTPLoss ("  \
+        sql = "create table if not exists UtilTPLoss ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\

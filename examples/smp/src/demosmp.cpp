@@ -227,7 +227,10 @@ namespace DemoSMP {
     const unsigned int nState = md0->history.size();
     auto lastState = ((SMPState*)(md0->history[nState - 1]));
     md0->sqlAUtil(nState - 1);
+	md0->PopulateSpatialSalienceTable(true);
+	 
 
+	md0->PopulateSpatialCapabilityTable(true);
     cout << "Completed model run" << endl << endl;
     printf("There were %u states, with %i steps between them\n", nState, nState - 1);
 
@@ -254,6 +257,8 @@ namespace DemoSMP {
     md0->run();
 
     cout << "Completed model run" << endl << endl;
+	md0->PopulateSpatialCapabilityTable(true);
+	md0->PopulateSpatialSalienceTable(true);
 
     cout << "History of actor positions over time" << endl;
     md0->showVPHistory(true);
