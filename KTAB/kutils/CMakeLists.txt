@@ -153,12 +153,12 @@ message(STATUS "KTAB_INSTALL_DIR: " ${KTAB_INSTALL_DIR})
 # As of February 2014, C++11 is still not the default
 # for g++, so I have to provide it here.
 # Also on Unix, the C++11 thread library relies on pthreads
-if (UNIX)
+if (UNIX OR MINGW)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 ")
   if (ENABLE_EFFCPP)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++ ")
   endif (ENABLE_EFFCPP)
-endif(UNIX)
+endif(UNIX OR MINGW)
 
 # --------------------------------------------
 # Copyright KAPSARC. Open source MIT License.

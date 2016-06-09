@@ -237,12 +237,12 @@ endif (BUILD_тетрис)
 message (STATUS "Using PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
 message (STATUS "KUTILS_INCLUDE_DIR: " ${KUTILS_INCLUDE_DIR})
 
-if (UNIX)
+if (UNIX OR MINGW)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 ")
   if (ENABLE_EFFCPP)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++ ")
   endif (ENABLE_EFFCPP)
-endif(UNIX)
+endif(UNIX OR MINGW)
 
 # --------------------------------------------
 # Copyright KAPSARC. Open source MIT License.
