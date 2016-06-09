@@ -244,6 +244,7 @@ if(ENABLE_QT_GUI)
     # qt5_wrap_ui is used to create code from ui files
     qt5_wrap_ui(QtProjectLib_ui_moc  ${QtProjectLib_ui} )
 
+
     #including source and binary directories
     include_directories (${PROJECT_SOURCE_DIR})
     include_directories (${PROJECT_BINARY_DIR})
