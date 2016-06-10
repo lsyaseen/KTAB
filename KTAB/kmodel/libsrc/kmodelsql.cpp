@@ -365,7 +365,69 @@ void Model::sqlAUtil(unsigned int t) {
 
     return;
 }
+void Model::sqlPosEquiv(unsigned int t)
+{
+	assert(nullptr != smpDB);
+	assert(t < history.size());
+	State* st = history[t];
+	assert(nullptr != st);
+	assert(numAct == st->aUtil.size());
+	// I don't like passing 'this' into lambda-functions,
+	// so I copy the pointer into a local variable I can pass in
+	// without exposing everything in 'this'. If this were a big,
+	// mission-critical RDBMS, rather than a 1-off record of this run,
+	// doing so might be disasterous in case the system crashed before
+	// things were cleaned up.
+	sqlite3 * db = smpDB;
+	smpDB = nullptr;
 
+	char* zErrMsg = nullptr;
+	auto sqlBuff = newChars(200);
+	sprintf(sqlBuff,
+		"INSERT INTO PosEquiv (Scenario, Turn_t, Pos_i, Eqv_j) VALUES ('%s', ?1, ?2, ?3)",
+		scenName.c_str());
+	const char* insStr = sqlBuff;
+	sqlite3_stmt *insStmt;
+	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+	// Prepared statements cache the execution plan for a query after the query optimizer has
+	// found the best plan, so there is no big gain with simple insertions.
+	// What makes a huge difference is bundling a few hundred into one atomic "transaction".
+	// For this case, runtime droped from 62-65 seconds to 0.5-0.6 (vs. 0.30-0.33 with no SQL at all).
+
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+	for (unsigned int i = 0; i < numAct; i++) {
+	
+		int je = numAct + 1;					
+		for (unsigned int j = 0; j < numAct && je > numAct; j++) {
+			if (st->equivNdx(i, j)) {
+				je = j;
+			}
+		}
+		int rslt = 0;
+		rslt = sqlite3_bind_int(insStmt, 1, t);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_bind_int(insStmt, 2, i);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_bind_int(insStmt, 3, je);
+		assert(SQLITE_OK == rslt);
+				
+		rslt = sqlite3_step(insStmt);
+		assert(SQLITE_DONE == rslt);
+		sqlite3_clear_bindings(insStmt);
+		assert(SQLITE_DONE == rslt);
+		rslt = sqlite3_reset(insStmt);
+		assert(SQLITE_OK == rslt);
+	}
+		
+ 	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+
+	delete sqlBuff;
+	sqlBuff = nullptr;
+
+	smpDB = db; // give it the new pointer
+	return;
+}
 } // end of namespace
 
 // --------------------------------------------
