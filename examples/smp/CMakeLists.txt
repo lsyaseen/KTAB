@@ -21,8 +21,8 @@ set(CMAKE_BUILD_TYPE Debug)
 set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
-set (ENABLE_FLTK_GUI false CACHE  BOOL "Build app with FLTK GUI")
-set (ENABLE_QT_GUI false CACHE  BOOL "Build app with QT GUI")
+set (ENABLE_FLTK_GUI true CACHE  BOOL "Build app with FLTK GUI")
+set (ENABLE_QT_GUI true CACHE  BOOL "Build app with QT GUI")
 
 if (UNIX)
     set (ENABLE_EFFCPP true CACHE  BOOL "Check Effective C++ Guidelines")
@@ -242,8 +242,7 @@ if(ENABLE_QT_GUI)
     # qt5_wrap_cpp is used to create moc files of the cpp files
     qt5_wrap_cpp(QtProjectLib_hdr_moc ${QtProjectLib_hdr})
     # qt5_wrap_ui is used to create code from ui files
-    qt5_wrap_ui(QtProjectLib_ui_moc  ${QtProjectLib_ui} )
-
+    qt5_wrap_ui(QtProjectLib_ui_moc ${QtProjectLib_ui})
 
     #including source and binary directories
     include_directories (${PROJECT_SOURCE_DIR})
@@ -265,7 +264,6 @@ if(ENABLE_QT_GUI)
 
 endif (ENABLE_QT_GUI)
 #------------------------------------------------------------------
-
 
 # show some useful status/debugging information
 message (STATUS "Using PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
