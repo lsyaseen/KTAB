@@ -365,8 +365,59 @@ void Model::sqlAUtil(unsigned int t) {
 
     return;
 }
-
-// populates record for table PosProb for each steo of
+// populates record for table PosEquiv for each step of
+// module run
+void Model::sqlPosEquiv(unsigned int t)
+{
+	// Check database intact
+	assert(nullptr != smpDB);
+	assert(t < history.size());
+	State* st = history[t];
+	assert(nullptr != st);
+ 	sqlite3 * db = smpDB;
+	smpDB = nullptr;
+    // In case of error
+	char* zErrMsg = nullptr;
+	auto sqlBuff = newChars(200);
+	sprintf(sqlBuff,
+		"INSERT INTO PosEquiv (Scenario, Turn_t, Pos_i, Eqv_j) VALUES ('%s', ?1, ?2, ?3)",
+		scenName.c_str());
+	const char* insStr = sqlBuff;
+	sqlite3_stmt *insStmt;
+	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+	// Start inserting record
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+	for (unsigned int i = 0; i < numAct; i++) {
+	    // calculate the equivalance  
+		int je = numAct + 1;					
+		for (unsigned int j = 0; j < numAct && je > numAct; j++) {
+			if (st->equivNdx(i, j)) {
+				je = j;
+			}
+		}
+		int rslt = 0;
+		rslt = sqlite3_bind_int(insStmt, 1, t);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_bind_int(insStmt, 2, i);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_bind_int(insStmt, 3, je);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_step(insStmt);
+		assert(SQLITE_DONE == rslt);
+		sqlite3_clear_bindings(insStmt);
+		assert(SQLITE_DONE == rslt);
+		rslt = sqlite3_reset(insStmt);
+		assert(SQLITE_OK == rslt);
+	}
+	// end databse transaction	
+ 	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+	delete sqlBuff;
+	sqlBuff = nullptr;
+	smpDB = db;  
+	return;
+}
+// populates record for table PosProb for each step of
 // module run
 void Model::sqlPosProb(unsigned int t) {
 	assert(nullptr != smpDB);

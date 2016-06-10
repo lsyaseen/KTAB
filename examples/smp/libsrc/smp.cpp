@@ -546,9 +546,10 @@ namespace SMPLib {
     }
     assert(0 <= myT);
     model->sqlAUtil(myT);
-	model->sqlPosProb(myT);
-    // Notice that this does not record the next state.
-    // That gets recorded upon the next state - but it
+	
+	//Populate PosEquiv table
+	model->sqlPosEquiv(myT);
+   	model->sqlPosProb(myT);    // That gets recorded upon the next state - but it
     // therefore misses the very last state.
     auto s2 = doBCN();
     gSetup(s2);
