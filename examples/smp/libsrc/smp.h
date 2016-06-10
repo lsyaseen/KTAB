@@ -153,8 +153,6 @@ public:
 
     SMPState* stepBCN();
 
-    double  posProb(unsigned int i, const VUI & unq, const KMatrix & pdt) const;
-
     // The key steps of BCN are to identify a target (and perhaps other target-relevant info)
     // and then to develop a Bargain (possibly nullptr if no bargain is mutually preferable
     // to conflict)

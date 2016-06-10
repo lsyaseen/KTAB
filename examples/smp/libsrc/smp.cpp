@@ -549,9 +549,7 @@ namespace SMPLib {
 	
 	//Populate PosEquiv table
 	model->sqlPosEquiv(myT);
-    
-	// Notice that this does not record the next state.
-    // That gets recorded upon the next state - but it
+   	model->sqlPosProb(myT);    // That gets recorded upon the next state - but it
     // therefore misses the very last state.
     auto s2 = doBCN();
     gSetup(s2);
@@ -1027,26 +1025,6 @@ namespace SMPLib {
     const double u = bsUtil(sd, R);
     return u;
   };
-
-  /// the probability of the position occupied by actor i
-  double SMPState::posProb(unsigned int i, const VUI & unq, const KMatrix & pdt) const {
-    const unsigned int numA = model->numAct;
-    const unsigned int nUnq = unq.size();
-    unsigned int k = numA + 1; // impossibly high
-    for (unsigned int j1 = 0; j1 < nUnq; j1++) { // scan unique positions
-      unsigned int j2 = unq[j1]; // get ordinary index of the position
-      if (equivNdx(i, j2)) {
-        k = j1;
-      }
-    }
-    assert(k < numA);
-    assert(1 == pdt.numC());
-    assert(k < pdt.numR());
-    assert(nUnq == pdt.numR());
-    double pr = pdt(k, 0);
-    return pr;
-  }
-
 
   void SMPModel::sankeyOutput(string inputCSV) const {
     assert(numAct == actrs.size());

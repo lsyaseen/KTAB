@@ -227,6 +227,8 @@ namespace DemoSMP {
     const unsigned int nState = md0->history.size();
     auto lastState = ((SMPState*)(md0->history[nState - 1]));
     md0->sqlAUtil(nState - 1);
+
+	md0->sqlPosProb(nState - 1);
 	md0->PopulateSpatialSalienceTable(true);
 	 
 
