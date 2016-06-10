@@ -366,6 +366,67 @@ void Model::sqlAUtil(unsigned int t) {
     return;
 }
 
+// populates record for table PosProb for each steo of
+// module run
+void Model::sqlPosProb(unsigned int t) {
+	assert(nullptr != smpDB);
+	assert(t < history.size());
+	State* st = history[t];
+	// check module for null 
+	assert(nullptr != st);
+   // initiate the database 
+	sqlite3 * db = smpDB;
+	smpDB = nullptr;
+	// Error message in case
+	char* zErrMsg = nullptr;
+	auto sqlBuff = newChars(200);
+	// prepare the sql statement to insert
+	sprintf(sqlBuff,
+		"INSERT INTO PosProb (Scenario, Turn_t, Est_h,Pos_i, Prob) VALUES ('%s', ?1, ?2, ?3, ?4)",
+		scenName.c_str());
+	const char* insStr = sqlBuff;
+	sqlite3_stmt *insStmt;
+	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+	// start for the transaction
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+ 	// collect the information from each estimator,actor
+	for (unsigned int h = 0; h < numAct; h++) { // estimator is h
+		// calculate the probablity with respect to each estimator
+		auto pn = st->pDist(h);
+		auto pdt = std::get<0>(pn); // note that these are unique positions
+		assert( fabs(1 - sum(pdt)) < 1e-4);
+		auto unq = std::get<1>(pn);
+		// for each actor pupulate the probablity information
+		for (unsigned int i = 0; i < numAct; i++) {
+				int rslt = 0;
+				// Extract the probabity for each actor
+				double prob = st->posProb(i, unq, pdt);
+				rslt = sqlite3_bind_int(insStmt, 1, t);
+				assert(SQLITE_OK == rslt);
+				rslt = sqlite3_bind_int(insStmt, 2, h);
+				assert(SQLITE_OK == rslt);
+				rslt = sqlite3_bind_int(insStmt, 3, i);
+				assert(SQLITE_OK == rslt);
+				rslt = sqlite3_bind_double(insStmt, 4, prob);
+				assert(SQLITE_OK == rslt);
+				rslt = sqlite3_step(insStmt);
+				assert(SQLITE_DONE == rslt);
+				sqlite3_clear_bindings(insStmt);
+				assert(SQLITE_DONE == rslt);
+				rslt = sqlite3_reset(insStmt);
+				assert(SQLITE_OK == rslt);
+		}
+	}
+	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+
+	delete sqlBuff;
+	sqlBuff = nullptr;
+
+	smpDB = db; // give it the new pointer
+
+	return;
+}
 } // end of namespace
 
 // --------------------------------------------
