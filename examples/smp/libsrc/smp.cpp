@@ -79,9 +79,13 @@ namespace SMPLib {
   SMPActor::~SMPActor() {
   }
 
-  double SMPActor::vote(unsigned int, unsigned int, const State*) const {
-    assert(false);  // TDO: finish this
-    return 0;
+  double SMPActor::vote(unsigned int est, unsigned int i, unsigned int j, const State*st) const {
+	  unsigned int k = st->model->actrNdx(this);
+	  auto uk = st->aUtil[est];
+	  double uhki = uk(k, i);
+	  double uhkj = uk(k, j);
+	  const double vij = Model::vote(vr, sCap, uhki, uhkj);
+	  return vij;
   }
 
 
@@ -549,7 +553,9 @@ namespace SMPLib {
 	
 	//Populate PosEquiv table
 	model->sqlPosEquiv(myT);
-   	model->sqlPosProb(myT);    // That gets recorded upon the next state - but it
+   	model->sqlPosProb(myT);    
+	model->sqlPosVote(myT);    
+	// That gets recorded upon the next state - but it
     // therefore misses the very last state.
     auto s2 = doBCN();
     gSetup(s2);

@@ -104,9 +104,13 @@ namespace DemoMtch {
     //
   }
 
-  double MtchActor::vote(unsigned int p1, unsigned int p2, const State* st) const {
-    assert(false);
-    return 0;
+  double MtchActor::vote(unsigned int est,unsigned int i, unsigned int j, const State* st) const {
+	  unsigned int k = st->model->actrNdx(this);
+	  auto uk = st->aUtil[est];
+	  double uhki = uk(k, i);
+	  double uhkj = uk(k, j);
+	  const double vij = Model::vote(vr, sCap, uhki, uhkj);
+	  return vij;
   }
 
   double MtchActor::vote(const Position * ap1, const Position * ap2) const {

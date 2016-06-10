@@ -123,7 +123,7 @@ namespace ComSelLib {
 
     double posUtil(const Position * ap1) const;
 
-    double vote(unsigned int p1, unsigned int p2, const State* st) const;
+    double vote(unsigned int est,unsigned int i, unsigned int j, const State* st) const;
     double vote(const Position* ap1, const Position* ap2) const;
     
     // the CSActor has a standard vector position, with vector saliences.

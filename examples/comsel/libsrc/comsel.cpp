@@ -703,12 +703,15 @@ namespace ComSelLib {
   }
   
   
-  double CSActor::vote(unsigned int p1, unsigned int p2, const State* st) const {
+  double CSActor::vote(unsigned int est,unsigned int i, unsigned int j, const State* st) const {
     /// vote between the current positions to actors at positions p1 and p2 of this state
-    auto rPos1 = ((const MtchPstn*)(st->pstns[p1]));
-    auto rPos2 = ((const MtchPstn*)(st->pstns[p2]));
-    double v = vote(rPos1, rPos2);
-    return v;
+    
+	  unsigned int k = st->model->actrNdx(this);
+	  auto uk = st->aUtil[est];
+	  double uhki = uk(k, i);
+	  double uhkj = uk(k, j);
+	  const double vij = Model::vote(vr, sCap, uhki, uhkj);
+	  return vij;
   }
 
   double CSActor::vote(const Position* ap1, const Position* ap2) const {

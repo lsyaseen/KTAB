@@ -478,6 +478,81 @@ void Model::sqlPosProb(unsigned int t) {
 
 	return;
 }
+// populates record for table PosProb for each step of
+// module run
+void Model::sqlPosVote(unsigned int t) {
+	assert(nullptr != smpDB);
+	assert(t < history.size());
+	State* st = history[t];
+
+	
+	// check module for null 
+	assert(nullptr != st);
+	// initiate the database 
+	sqlite3 * db = smpDB;
+	smpDB = nullptr;
+	// Error message in case
+	char* zErrMsg = nullptr;
+	auto sqlBuff = newChars(200);
+	// prepare the sql statement to insert
+	sprintf(sqlBuff,
+		"INSERT INTO PosVote (Scenario, Turn_t, Est_h, Voter_k,Pos_i, Pos_j,Vote) VALUES ('%s', ?1, ?2, ?3, ?4,?5,?6)",
+		scenName.c_str());
+	const char* insStr = sqlBuff;
+	sqlite3_stmt *insStmt;
+	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+	// start for the transaction
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+	auto vr = VotingRule::Proportional;
+	// collect the information from each estimator 
+	for (unsigned int h = 0; h < numAct; h++) { // estimator is h
+	
+
+		for (unsigned int k = 0; k < numAct; k++) { // voter is k
+			auto rd = st->model->actrs[k];
+			for (unsigned int i = 0; i < numAct; i++) {
+
+				for (unsigned int j = 0; j < numAct; j++) {
+					auto vij = rd->vote(h,i, j, st);
+					int rslt = 0;
+
+					rslt = sqlite3_bind_int(insStmt, 1, t);
+					assert(SQLITE_OK == rslt);
+					//
+					rslt = sqlite3_bind_int(insStmt, 2, h);
+					assert(SQLITE_OK == rslt);
+					//voter_k 
+					rslt = sqlite3_bind_int(insStmt, 3, k);
+					assert(SQLITE_OK == rslt);
+					// position i
+					rslt = sqlite3_bind_int(insStmt, 4, i);
+					assert(SQLITE_OK == rslt);
+					//position j
+					rslt = sqlite3_bind_int(insStmt, 5, j);
+					assert(SQLITE_OK == rslt);
+					// vote ?
+					rslt = sqlite3_bind_double(insStmt, 6, vij);
+					assert(SQLITE_OK == rslt);
+					rslt = sqlite3_step(insStmt);
+					assert(SQLITE_DONE == rslt);
+					sqlite3_clear_bindings(insStmt);
+					assert(SQLITE_DONE == rslt);
+					rslt = sqlite3_reset(insStmt);
+					assert(SQLITE_OK == rslt);
+				}
+			}
+		}
+	}
+	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+
+	delete sqlBuff;
+	sqlBuff = nullptr;
+
+	smpDB = db; // give it the new pointer
+
+	return;
+}
 } // end of namespace
 
 // --------------------------------------------
