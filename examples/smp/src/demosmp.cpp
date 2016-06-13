@@ -55,7 +55,7 @@ namespace DemoSMP {
   using SMPLib::SMPState;
 
   // -------------------------------------------------
-  
+
 
   void demoEUSpatial(unsigned int numA, unsigned int sDim, uint64_t s, PRNG* rng) {
     printf("Using PRNG seed: %020llu \n", s);
@@ -148,7 +148,7 @@ namespace DemoSMP {
       md0->addActor(ai);
       st0->addPstn(iPos);
     }
-    
+
 
     for (unsigned int i = 0; i < numA; i++) {
       auto ai = ((SMPActor*)(md0->actrs[i]));
@@ -165,11 +165,11 @@ namespace DemoSMP {
       cout << endl;
     }
 
-    
+
     st0->setUENdx();
     st0->setAUtil(-1, ReportingLevel::Silent);
     st0->setNRA(); // TODO: simple setting of NRA
-    
+
     // with SMP actors, we can always read their ideal position.
     // with strategic voting, they might want to advocate positions
     // separate from their ideal, but this simple demo skips that.
@@ -228,11 +228,11 @@ namespace DemoSMP {
     auto lastState = ((SMPState*)(md0->history[nState - 1]));
     md0->sqlAUtil(nState - 1);
 
-	md0->sqlPosProb(nState - 1);
-	md0->PopulateSpatialSalienceTable(true);
-	 
+    md0->sqlPosProb(nState - 1);
+    md0->PopulateSpatialSalienceTable(true);
 
-	md0->PopulateSpatialCapabilityTable(true);
+
+    md0->PopulateSpatialCapabilityTable(true);
     cout << "Completed model run" << endl << endl;
     printf("There were %u states, with %i steps between them\n", nState, nState - 1);
 
@@ -241,7 +241,7 @@ namespace DemoSMP {
 
     cout << endl;
     cout << "Delete model (actors, states, positions, etc.)" << endl << flush;
- 
+
     md0 = nullptr;
 
     return;
@@ -258,30 +258,25 @@ namespace DemoSMP {
     };
     md0->stop = [minIter, maxIter, qf](unsigned int iter, const State * s) {
       bool tooLong = (maxIter <= iter);
+      bool longEnough = (minIter <= iter);
       bool quiet = false;
-      if (minIter < iter) { // only check  if it has run 'long enough'
-        auto sf = [](unsigned int i1, unsigned int i2, double d12) {
-          printf("sDist [%2i,%2i] = %.2E   ", i1, i2, d12);
-          return;
-        };
-        auto s0 = ((const SMPState*)(s->model->history[0]));
-        auto s1 = ((const SMPState*)(s->model->history[1]));
-        auto d01 = SMPModel::stateDist(s0, s1);
-        sf(0, 1, d01);
-        auto sx = ((const SMPState*)(s->model->history[iter - 0]));
-        auto sy = ((const SMPState*)(s->model->history[iter - 1]));
-        auto dxy = SMPModel::stateDist(sx, sy);
-        sf(iter - 0, iter - 1, dxy);
-        const double aRatio = dxy / d01;
-        const double tRatio = 1.0 / qf;
-        quiet = (aRatio < tRatio);
-        if (quiet)
-          printf("Quiet: %.4f vs. %.4f \n", aRatio, tRatio);
-        else
-          printf("Not quiet %.4f vs %.4f \n", aRatio, tRatio);
-        cout << endl << flush;
-      }
-      return tooLong || quiet;
+      auto sf = [](unsigned int i1, unsigned int i2, double d12) {
+        printf("sDist [%2i,%2i] = %.2E   ", i1, i2, d12);
+        return;
+      };
+      auto s0 = ((const SMPState*)(s->model->history[0]));
+      auto s1 = ((const SMPState*)(s->model->history[1]));
+      auto d01 = SMPModel::stateDist(s0, s1);
+      sf(0, 1, d01);
+      auto sx = ((const SMPState*)(s->model->history[iter - 0]));
+      auto sy = ((const SMPState*)(s->model->history[iter - 1]));
+      auto dxy = SMPModel::stateDist(sx, sy);
+      sf(iter - 1, iter - 0, dxy);
+      const double aRatio = dxy / d01;
+      const double tRatio = 1.0 / qf;
+      quiet = (aRatio < tRatio); 
+      printf("\nFractional change compared to first step: %.4f  (target=%.4f) \n\n", aRatio, tRatio);
+      return tooLong || (longEnough && quiet);
     };
 
 
@@ -289,8 +284,8 @@ namespace DemoSMP {
     md0->run();
 
     cout << "Completed model run" << endl << endl;
-	md0->PopulateSpatialCapabilityTable(true);
-	md0->PopulateSpatialSalienceTable(true);
+    md0->PopulateSpatialCapabilityTable(true);
+    md0->PopulateSpatialSalienceTable(true);
 
     cout << "History of actor positions over time" << endl;
     md0->showVPHistory(true);

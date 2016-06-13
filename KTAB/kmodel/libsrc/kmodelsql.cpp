@@ -506,19 +506,14 @@ void Model::sqlPosVote(unsigned int t) {
 	auto vr = VotingRule::Proportional;
 	// collect the information from each estimator 
 	for (unsigned int h = 0; h < numAct; h++) { // estimator is h
-	
-
 		for (unsigned int k = 0; k < numAct; k++) { // voter is k
 			auto rd = st->model->actrs[k];
 			for (unsigned int i = 0; i < numAct; i++) {
-
 				for (unsigned int j = 0; j < numAct; j++) {
 					auto vij = rd->vote(h,i, j, st);
 					int rslt = 0;
-
 					rslt = sqlite3_bind_int(insStmt, 1, t);
-					assert(SQLITE_OK == rslt);
-					//
+					assert(SQLITE_OK == rslt); 
 					rslt = sqlite3_bind_int(insStmt, 2, h);
 					assert(SQLITE_OK == rslt);
 					//voter_k 
