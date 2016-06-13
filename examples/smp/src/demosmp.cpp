@@ -250,10 +250,40 @@ namespace DemoSMP {
   void readEUSpatial(uint64_t seed, string inputCSV, PRNG* rng) {
     auto md0 = SMPModel::readCSV(inputCSV, rng);
 
-    const unsigned int maxIter = 5;
+    const unsigned int minIter = 3;
+    const unsigned int maxIter = 100;
+    const double qf = 50.0;
     md0->stop = [maxIter](unsigned int iter, const State * s) {
       return (maxIter <= iter);
     };
+    md0->stop = [minIter, maxIter, qf](unsigned int iter, const State * s) {
+      bool tooLong = (maxIter <= iter);
+      bool quiet = false;
+      if (minIter < iter) { // only check  if it has run 'long enough'
+        auto sf = [](unsigned int i1, unsigned int i2, double d12) {
+          printf("sDist [%2i,%2i] = %.2E   ", i1, i2, d12);
+          return;
+        };
+        auto s0 = ((const SMPState*)(s->model->history[0]));
+        auto s1 = ((const SMPState*)(s->model->history[1]));
+        auto d01 = SMPModel::stateDist(s0, s1);
+        sf(0, 1, d01);
+        auto sx = ((const SMPState*)(s->model->history[iter - 0]));
+        auto sy = ((const SMPState*)(s->model->history[iter - 1]));
+        auto dxy = SMPModel::stateDist(sx, sy);
+        sf(iter - 0, iter - 1, dxy);
+        const double aRatio = dxy / d01;
+        const double tRatio = 1.0 / qf;
+        quiet = (aRatio < tRatio);
+        if (quiet)
+          printf("Quiet: %.4f vs. %.4f \n", aRatio, tRatio);
+        else
+          printf("Not quiet %.4f vs %.4f \n", aRatio, tRatio);
+        cout << endl << flush;
+      }
+      return tooLong || quiet;
+    };
+
 
     cout << "Starting model run" << endl << flush;
     md0->run();
