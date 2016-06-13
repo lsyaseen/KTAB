@@ -79,9 +79,13 @@ namespace SMPLib {
   SMPActor::~SMPActor() {
   }
 
-  double SMPActor::vote(unsigned int, unsigned int, const State*) const {
-    assert(false);  // TDO: finish this
-    return 0;
+  double SMPActor::vote(unsigned int est, unsigned int i, unsigned int j, const State*st) const {
+	  unsigned int k = st->model->actrNdx(this);
+	  auto uk = st->aUtil[est];
+	  double uhki = uk(k, i);
+	  double uhkj = uk(k, j);
+	  const double vij = Model::vote(vr, sCap, uhki, uhkj);
+	  return vij;
   }
 
 
@@ -335,12 +339,26 @@ namespace SMPLib {
     auto wFn = [this](unsigned int i, unsigned int j) {
       auto aj = ((SMPActor*)(model->actrs[j]));
       return aj->sCap;
+	 
     };
 
+	
     auto w = KMatrix::map(wFn, 1, model->numAct);
     return w;
   }
 
+
+ /* KMatrix SMPState::actrSals() const {
+	  auto w1Fn = [this](unsigned int i, unsigned int j) {
+		  auto aj = ((SMPActor*)(model->actrs[j]));
+		  return aj->vSal;
+
+	  };
+
+
+	  auto w = KMatrix::map(w1Fn, 1, model->numAct);
+	  return w;
+  }*/
   void SMPState::setAllAUtil(ReportingLevel rl) {
     // you can change these parameters
     auto vr = VotingRule::Proportional;
@@ -356,7 +374,7 @@ namespace SMPLib {
     assert(0 < uIndices.size());
     assert(uIndices.size() <= na);
 
-    auto w_j = actrCaps();
+     auto w_j =  actrCaps();
     setVDiff();
     nra = KMatrix(na, 1); // zero-filled, i.e. risk neutral
     auto uFn1 = [this](unsigned int i, unsigned int j) {
@@ -532,8 +550,12 @@ namespace SMPLib {
     }
     assert(0 <= myT);
     model->sqlAUtil(myT);
-    // Notice that this does not record the next state.
-    // That gets recorded upon the next state - but it
+	
+	//Populate PosEquiv table
+	model->sqlPosEquiv(myT);
+   	model->sqlPosProb(myT);    
+	model->sqlPosVote(myT);    
+	// That gets recorded upon the next state - but it
     // therefore misses the very last state.
     auto s2 = doBCN();
     gSetup(s2);
@@ -1010,26 +1032,6 @@ namespace SMPLib {
     return u;
   };
 
-  /// the probability of the position occupied by actor i
-  double SMPState::posProb(unsigned int i, const VUI & unq, const KMatrix & pdt) const {
-    const unsigned int numA = model->numAct;
-    const unsigned int nUnq = unq.size();
-    unsigned int k = numA + 1; // impossibly high
-    for (unsigned int j1 = 0; j1 < nUnq; j1++) { // scan unique positions
-      unsigned int j2 = unq[j1]; // get ordinary index of the position
-      if (equivNdx(i, j2)) {
-        k = j1;
-      }
-    }
-    assert(k < numA);
-    assert(1 == pdt.numC());
-    assert(k < pdt.numR());
-    assert(nUnq == pdt.numR());
-    double pr = pdt(k, 0);
-    return pr;
-  }
-
-
   void SMPModel::sankeyOutput(string inputCSV) const {
     assert(numAct == actrs.size());
     assert(numDim == dimName.size());
@@ -1171,6 +1173,113 @@ namespace SMPLib {
       cout << endl << flush;
     }
     return;
+  }
+  //Populates the SpatialCapability table
+  void SMPModel::PopulateSpatialCapabilityTable(bool sqlP) const {
+	  // verify the actor size
+	  assert(numAct == actrs.size());
+	  // check the database availability
+	  assert(nullptr != smpDB);
+	  char* zErrMsg = nullptr;
+	  // Make sure table present
+	  createSMPTableSQL(2);  
+	  auto sqlBuff = newChars(200);
+	  // form sql insert command
+	  sprintf(sqlBuff,
+		  "INSERT INTO SpatialCapability (Scenario, Turn_t, Act_i, Cap) VALUES ('%s', ?1, ?2, ?3)",
+		  scenName.c_str());
+	  const char* insStr = sqlBuff;
+	  sqlite3_stmt *insStmt;
+	  // fill the Scenario
+	  sqlite3_prepare_v2(smpDB, insStr, strlen(insStr), &insStmt, NULL);
+	  
+	  // Start transctions
+	  sqlite3_exec(smpDB, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+	  // for each turn extract the information
+	  for (unsigned int t = 0; t < history.size(); t++)  {
+		  auto st = history[t];
+		  // getr the each actor capability value for each turn
+		  auto cp = (const SMPState*)history[t];
+		  auto caps = cp->actrCaps();
+		  for (unsigned int i = 0; i < numAct; i++)  { 
+			  if (sqlP) { // Populate each field 
+					  int rslt = 0;
+					  rslt = sqlite3_bind_int(insStmt, 1, t);
+					  assert(SQLITE_OK == rslt);
+					  rslt = sqlite3_bind_int(insStmt, 2, i);
+					  assert(SQLITE_OK == rslt);
+					  rslt = sqlite3_bind_double(insStmt, 3, caps(0,i));
+					  assert(SQLITE_OK == rslt);
+					  rslt = sqlite3_step(insStmt);
+					  assert(SQLITE_DONE == rslt);
+					  sqlite3_clear_bindings(insStmt);
+					  assert(SQLITE_DONE == rslt);
+					  rslt = sqlite3_reset(insStmt);
+					  assert(SQLITE_OK == rslt);
+				  }
+			  } 
+	  }
+	  sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg); 
+	  return;
+  }
+  //Populates the SpatialSliencetable
+  void SMPModel::PopulateSpatialSalienceTable(bool sqlP) const {
+	  // Verify the actor and dimesnsion
+	  assert(numAct == actrs.size());
+	  assert(numDim == dimName.size());
+      // Verify the database is live
+	  assert(nullptr != smpDB);
+	  char* zErrMsg = nullptr;
+	  // check if table present if not create
+	  createSMPTableSQL(1); // VectorPosition
+	  auto sqlBuff = newChars(200);
+	  // Form a insert command 
+	  sprintf(sqlBuff,
+		  "INSERT INTO SpatialSalience (Scenario, Turn_t, Act_i, Dim_k,Sal) VALUES ('%s', ?1, ?2, ?3, ?4)",
+		  scenName.c_str());
+	  const char* insStr = sqlBuff;
+	  sqlite3_stmt *insStmt;
+	  // fill the Scenario
+	  sqlite3_prepare_v2(smpDB, insStr, strlen(insStr), &insStmt, NULL);
+
+	  // Start transctions
+	  sqlite3_exec(smpDB, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+	  // For each turn information exatrct the table required information
+	  for (unsigned int t = 0; t < history.size(); t++) {
+		  // Get the indivuidual turn
+		  auto st = history[t];
+		  // get the SMPState for turn
+		  auto cp = (const SMPState*)history[t];
+		  // Extract information for each actor and dimension
+		  for (unsigned int i = 0; i < numAct; i++) {
+		     for (unsigned int k = 0; k < numDim; k++) {
+               // Populate the actor 
+				  auto ai = ((const SMPActor*)actrs[i]);
+                  // Get the Salience Value for each actor
+				  double sal = ai->vSal(k,0);
+				  if (sqlP) {
+					  int rslt = 0;
+					  rslt = sqlite3_bind_int(insStmt, 1, t);
+					  assert(SQLITE_OK == rslt);
+					  rslt = sqlite3_bind_int(insStmt, 2, i);
+					  assert(SQLITE_OK == rslt);
+					  rslt = sqlite3_bind_int(insStmt, 3, k);
+					  assert(SQLITE_OK == rslt);
+					  // populate Salience value
+					  rslt = sqlite3_bind_double(insStmt, 4, sal);
+					  assert(SQLITE_OK == rslt);
+					  rslt = sqlite3_step(insStmt);
+					  assert(SQLITE_DONE == rslt);
+					  sqlite3_clear_bindings(insStmt);
+					  assert(SQLITE_DONE == rslt);
+					  rslt = sqlite3_reset(insStmt);
+					  assert(SQLITE_OK == rslt);
+				  }
+			  } 
+		  }
+		  sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg); 
+	  }
+	  return;
   }
 
 

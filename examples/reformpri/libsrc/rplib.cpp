@@ -103,7 +103,7 @@ namespace RfrmPri {
     // nothing yet
   }
 
-  double RPActor::vote(unsigned int p1, unsigned int p2, const State* st) const {
+  double RPActor::vote(unsigned int est, unsigned int p1, unsigned int p2, const State* st) const {
     /// vote between the current positions to actors at positions p1 and p2 of this state
     auto rPos1 = ((const MtchPstn*)(st->pstns[p1]));
     auto rPos2 = ((const MtchPstn*)(st->pstns[p2]));

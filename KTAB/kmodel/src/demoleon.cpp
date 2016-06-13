@@ -58,13 +58,13 @@ namespace DemoLeon {
   LeonActor::~LeonActor() {}
 
 
-  double LeonActor::vote(unsigned int i, unsigned int j, const State* st) const {
-    unsigned int h = st->model->actrNdx(this);
-    auto uij = st->aUtil[h];
-    double uhi = uij(h, i);
-    double uhj = uij(h, j);
+  double LeonActor::vote(unsigned int est,unsigned int i, unsigned int j, const State* st) const {
+    unsigned int k = st->model->actrNdx(this);
+    auto uk = st->aUtil[est];
+    double uhki = uk(k, i);
+    double uhkj = uk(k, j);
     const double sCap = sum(vCap);
-    const double vij = Model::vote(vr, sCap, uhi, uhj);
+    const double vij = Model::vote(vr, sCap, uhki, uhkj);
     // as mentioned below, I calculate the vote the easy way.
     // I could compile the matrix of votes and re-use it.
     return vij;
@@ -1484,7 +1484,7 @@ namespace DemoLeon {
     auto vfn = [eMod0, eSt0](unsigned int k, unsigned int i, unsigned int j) {
       assert(j != i);
       auto ak = ((LeonActor*)(eMod0->actrs[k]));
-      double vk = ak->vote(i, j, eSt0);
+      double vk = ak->vote(i,i, j, eSt0);
       return vk;
     };
 

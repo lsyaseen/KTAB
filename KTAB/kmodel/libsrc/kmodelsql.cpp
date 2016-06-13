@@ -84,7 +84,7 @@ void Model::demoSQLite() {
     sOpen(1);
 
     // Create SQL statement
-    sql = "create table PETS("  \
+    sql = "create table if not exists PETS("  \
           "ID INT PRIMARY KEY     NOT NULL," \
           "NAME           text    NOT NULL," \
           "AGE            int     NOT NULL," \
@@ -144,7 +144,7 @@ string Model::createTableSQL(unsigned int tn) {
     case 0:
         // position-utility table
         // the estimated utility to each actor of each other's position
-        sql = "create table PosUtil ("  \
+        sql = "create table if not exists PosUtil ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -156,7 +156,7 @@ string Model::createTableSQL(unsigned int tn) {
 
     case 1: // pos-vote table
         // estimated vote of each actor between each pair of positions
-        sql = "create table PosVote ("  \
+        sql = "create table if not exists PosVote ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -168,7 +168,7 @@ string Model::createTableSQL(unsigned int tn) {
         break;
 
     case 2: // pos-prob table. Note that there may be duplicates, unless we limit it to unique positions
-        sql = "create table PosProb ("  \
+        sql = "create table if not exists PosProb ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -178,7 +178,7 @@ string Model::createTableSQL(unsigned int tn) {
         break;
 
     case 3: // pos-equiv table. E(i)= lowest j s.t. Pos(i) ~ Pos(j). if j < i, it is not unique.
-        sql = "create table PosEquiv ("  \
+        sql = "create table if not exists PosEquiv ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Pos_i	INTEGER NOT NULL DEFAULT 0, "\
@@ -189,7 +189,7 @@ string Model::createTableSQL(unsigned int tn) {
     case 4:
         // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
         // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-        sql = "create table UtilContest ("  \
+        sql = "create table if not exists UtilContest ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -203,7 +203,7 @@ string Model::createTableSQL(unsigned int tn) {
     case 5:
         // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
         // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-        sql = "create table UtilChlg ("  \
+        sql = "create table if not exists UtilChlg ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -217,7 +217,7 @@ string Model::createTableSQL(unsigned int tn) {
     case 6:
         // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
         // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-        sql = "create table UtilVict ("  \
+        sql = "create table if not exists UtilVict ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -230,7 +230,7 @@ string Model::createTableSQL(unsigned int tn) {
 
     case 7:
         // h's estimate that i will defeat j, including third party contributions
-        sql = "create table ProbVict ("  \
+        sql = "create table if not exists ProbVict ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -244,7 +244,7 @@ string Model::createTableSQL(unsigned int tn) {
         // h's estimate of utility to k of status quo.
         // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
         // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-        sql = "create table UtilSQ ("  \
+        sql = "create table if not exists UtilSQ ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -254,7 +254,7 @@ string Model::createTableSQL(unsigned int tn) {
         break;
 
     case 9:  // probability ik > j
-        sql = "create table ProbTPVict ("  \
+        sql = "create table if not exists ProbTPVict ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -268,7 +268,7 @@ string Model::createTableSQL(unsigned int tn) {
     case 10: // utility to k of ik>j
         // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
         // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-        sql = "create table UtilTPVict ("  \
+        sql = "create table if not exists UtilTPVict ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -282,7 +282,7 @@ string Model::createTableSQL(unsigned int tn) {
     case 11: // utility to k of i>jk
         // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
         // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-        sql = "create table UtilTPLoss ("  \
+        sql = "create table if not exists UtilTPLoss ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -365,7 +365,189 @@ void Model::sqlAUtil(unsigned int t) {
 
     return;
 }
+// populates record for table PosEquiv for each step of
+// module run
+void Model::sqlPosEquiv(unsigned int t)
+{
+	// Check database intact
+	assert(nullptr != smpDB);
+	assert(t < history.size());
+	State* st = history[t];
+	assert(nullptr != st);
+ 	sqlite3 * db = smpDB;
+	smpDB = nullptr;
+    // In case of error
+	char* zErrMsg = nullptr;
+	auto sqlBuff = newChars(200);
+	sprintf(sqlBuff,
+		"INSERT INTO PosEquiv (Scenario, Turn_t, Pos_i, Eqv_j) VALUES ('%s', ?1, ?2, ?3)",
+		scenName.c_str());
+	const char* insStr = sqlBuff;
+	sqlite3_stmt *insStmt;
+	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+	// Start inserting record
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+	for (unsigned int i = 0; i < numAct; i++) {
+	    // calculate the equivalance  
+		int je = numAct + 1;					
+		for (unsigned int j = 0; j < numAct && je > numAct; j++) {
+			if (st->equivNdx(i, j)) {
+				je = j;
+			}
+		}
+		int rslt = 0;
+		rslt = sqlite3_bind_int(insStmt, 1, t);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_bind_int(insStmt, 2, i);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_bind_int(insStmt, 3, je);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_step(insStmt);
+		assert(SQLITE_DONE == rslt);
+		sqlite3_clear_bindings(insStmt);
+		assert(SQLITE_DONE == rslt);
+		rslt = sqlite3_reset(insStmt);
+		assert(SQLITE_OK == rslt);
+	}
+	// end databse transaction	
+ 	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+	delete sqlBuff;
+	sqlBuff = nullptr;
+	smpDB = db;  
+	return;
+}
+// populates record for table PosProb for each step of
+// module run
+void Model::sqlPosProb(unsigned int t) {
+	assert(nullptr != smpDB);
+	assert(t < history.size());
+	State* st = history[t];
+	// check module for null 
+	assert(nullptr != st);
+   // initiate the database 
+	sqlite3 * db = smpDB;
+	smpDB = nullptr;
+	// Error message in case
+	char* zErrMsg = nullptr;
+	auto sqlBuff = newChars(200);
+	// prepare the sql statement to insert
+	sprintf(sqlBuff,
+		"INSERT INTO PosProb (Scenario, Turn_t, Est_h,Pos_i, Prob) VALUES ('%s', ?1, ?2, ?3, ?4)",
+		scenName.c_str());
+	const char* insStr = sqlBuff;
+	sqlite3_stmt *insStmt;
+	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+	// start for the transaction
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+ 	// collect the information from each estimator,actor
+	for (unsigned int h = 0; h < numAct; h++) { // estimator is h
+		// calculate the probablity with respect to each estimator
+		auto pn = st->pDist(h);
+		auto pdt = std::get<0>(pn); // note that these are unique positions
+		assert( fabs(1 - sum(pdt)) < 1e-4);
+		auto unq = std::get<1>(pn);
+		// for each actor pupulate the probablity information
+		for (unsigned int i = 0; i < numAct; i++) {
+				int rslt = 0;
+				// Extract the probabity for each actor
+				double prob = st->posProb(i, unq, pdt);
+				rslt = sqlite3_bind_int(insStmt, 1, t);
+				assert(SQLITE_OK == rslt);
+				rslt = sqlite3_bind_int(insStmt, 2, h);
+				assert(SQLITE_OK == rslt);
+				rslt = sqlite3_bind_int(insStmt, 3, i);
+				assert(SQLITE_OK == rslt);
+				rslt = sqlite3_bind_double(insStmt, 4, prob);
+				assert(SQLITE_OK == rslt);
+				rslt = sqlite3_step(insStmt);
+				assert(SQLITE_DONE == rslt);
+				sqlite3_clear_bindings(insStmt);
+				assert(SQLITE_DONE == rslt);
+				rslt = sqlite3_reset(insStmt);
+				assert(SQLITE_OK == rslt);
+		}
+	}
+	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 
+	delete sqlBuff;
+	sqlBuff = nullptr;
+
+	smpDB = db; // give it the new pointer
+
+	return;
+}
+// populates record for table PosProb for each step of
+// module run
+void Model::sqlPosVote(unsigned int t) {
+	assert(nullptr != smpDB);
+	assert(t < history.size());
+	State* st = history[t];
+
+	
+	// check module for null 
+	assert(nullptr != st);
+	// initiate the database 
+	sqlite3 * db = smpDB;
+	smpDB = nullptr;
+	// Error message in case
+	char* zErrMsg = nullptr;
+	auto sqlBuff = newChars(200);
+	// prepare the sql statement to insert
+	sprintf(sqlBuff,
+		"INSERT INTO PosVote (Scenario, Turn_t, Est_h, Voter_k,Pos_i, Pos_j,Vote) VALUES ('%s', ?1, ?2, ?3, ?4,?5,?6)",
+		scenName.c_str());
+	const char* insStr = sqlBuff;
+	sqlite3_stmt *insStmt;
+	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+	// start for the transaction
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+	auto vr = VotingRule::Proportional;
+	// collect the information from each estimator 
+	for (unsigned int h = 0; h < numAct; h++) { // estimator is h
+		for (unsigned int k = 0; k < numAct; k++) { // voter is k
+			auto rd = st->model->actrs[k];
+			for (unsigned int i = 0; i < numAct; i++) {
+				for (unsigned int j = 0; j < numAct; j++) {
+					auto vij = rd->vote(h,i, j, st);
+					int rslt = 0;
+					rslt = sqlite3_bind_int(insStmt, 1, t);
+					assert(SQLITE_OK == rslt); 
+					rslt = sqlite3_bind_int(insStmt, 2, h);
+					assert(SQLITE_OK == rslt);
+					//voter_k 
+					rslt = sqlite3_bind_int(insStmt, 3, k);
+					assert(SQLITE_OK == rslt);
+					// position i
+					rslt = sqlite3_bind_int(insStmt, 4, i);
+					assert(SQLITE_OK == rslt);
+					//position j
+					rslt = sqlite3_bind_int(insStmt, 5, j);
+					assert(SQLITE_OK == rslt);
+					// vote ?
+					rslt = sqlite3_bind_double(insStmt, 6, vij);
+					assert(SQLITE_OK == rslt);
+					rslt = sqlite3_step(insStmt);
+					assert(SQLITE_DONE == rslt);
+					sqlite3_clear_bindings(insStmt);
+					assert(SQLITE_DONE == rslt);
+					rslt = sqlite3_reset(insStmt);
+					assert(SQLITE_OK == rslt);
+				}
+			}
+		}
+	}
+	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+
+	delete sqlBuff;
+	sqlBuff = nullptr;
+
+	smpDB = db; // give it the new pointer
+
+	return;
+}
 } // end of namespace
 
 // --------------------------------------------

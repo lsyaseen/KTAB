@@ -95,7 +95,7 @@ public:
     ~SMPActor();
 
     // interfaces to be provided
-    double vote(unsigned int p1, unsigned int p2, const State* st) const;
+	double vote(unsigned int est, unsigned int i, unsigned int j, const State*st) const;
     virtual double vote(const Position * ap1, const Position * ap2, const SMPState* as1) const;
     double posUtil(const Position * ap1, const SMPState* as1) const;
 
@@ -149,10 +149,9 @@ public:
 
     // returns row-vector of actor's capabilities
     KMatrix actrCaps() const;
+ 
 
     SMPState* stepBCN();
-
-    double  posProb(unsigned int i, const VUI & unq, const KMatrix & pdt) const;
 
     // The key steps of BCN are to identify a target (and perhaps other target-relevant info)
     // and then to develop a Bargain (possibly nullptr if no bargain is mutually preferable
@@ -166,7 +165,8 @@ public:
     // use the parameters of your state to compute the relative probability of each actor's position
     virtual tuple< KMatrix, VUI> pDist(int persp) const;
     void showBargains(const vector < vector < BargainSMP* > > & brgns) const;
-
+	
+	virtual bool equivNdx(unsigned int i, unsigned int j) const;
     
     void setNRA(); // TODO: this just sets risk neutral, for now
     // return actor's normalized risk attitude (if set)
@@ -188,7 +188,7 @@ protected:
 
 
     SMPState* doBCN() const;
-    virtual bool equivNdx(unsigned int i, unsigned int j) const;
+    
 
     // returns estimated probability k wins (given likely coaltiions), and expected value of that challenge
     tuple<double, double> probEduChlg(unsigned int h, unsigned int k, unsigned int i, unsigned int j) const;
@@ -214,6 +214,10 @@ public:
 
     // print history of each actor in CSV (might want to generalize to arbitrary VctrPstn)
     void showVPHistory(bool sqlP) const;
+
+	void PopulateSpatialCapabilityTable(bool sqlP) const;
+
+	void PopulateSpatialSalienceTable(bool sqlP) const;
 
     // output the two files needed to draw Sankey diagrams
     void sankeyOutput(string inputCSV) const;
