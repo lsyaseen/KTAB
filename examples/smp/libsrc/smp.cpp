@@ -839,7 +839,8 @@ namespace SMPLib {
 
     // we assess the overall coalition strengths by adding up the contribution of
     // individual actors (including i and j, above). We assess the contribution of third
-    // parties by looking at little coalitions in the hypothetical (in:j) or (i:nj) contests.
+    // parties (n) by looking at little coalitions in the hypothetical (in:j) or (i:nj) contests.
+    vector<double> tpvArray = {};
     for (unsigned int n = 0; n < na; n++) {
       if ((n != i) && (n != j)) { // already got their influence-contributions
         auto an = ((const SMPActor*)(model->actrs[n]));
@@ -850,12 +851,12 @@ namespace SMPLib {
         double unn = aUtil[h](n, n);
 
         double pin = Actor::vProbLittle(vr, sn*cn, uni, unj, chij, chji);
+        // record for SQLite
+        tpvArray.push_back(pin);
         assert(0.0 <= pin);
         assert(pin <= 1.0);
         double pjn = 1.0 - pin;
-
         double vnij = Actor::thirdPartyVoteSU(sn*cn, vr, tpc, pin, pjn, uni, unj, unn);
-
         chij = (vnij > 0) ? (chij + vnij) : chij;
         assert(0 < chij);
         chji = (vnij < 0) ? (chji - vnij) : chji;
@@ -863,6 +864,10 @@ namespace SMPLib {
       }
     }
 
+    // record tpvArray into SQLite turn, est (h), init (i), third party (n), receiver (j), and tpvArray[n]
+    unsigned int t = myTurn();
+        
+        
     // UtilContest, ProbVict, UtilChlg
     // UtilSQ, UtilVict
     const double phij = chij / (chij + chji);
