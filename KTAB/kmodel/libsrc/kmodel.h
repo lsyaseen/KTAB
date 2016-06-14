@@ -211,6 +211,8 @@ namespace KBase {
   // -------------------------------------------------
   class Model {
   public:
+
+	sqlite3 *smpDB = nullptr; // keep this protected, to ease later multi-threading
     explicit Model(PRNG * r, string d);
     virtual ~Model();
 
@@ -286,6 +288,7 @@ namespace KBase {
 
     // returns h's estimate of i's risk attitude, using the risk-adjustment-rule
     static double estNRA(double rh, double  ri, BigRAdjust ra) ;
+	string getScenarioName() const { return scenName; };
 
   protected:
     static string createTableSQL(unsigned int tn);
@@ -295,8 +298,7 @@ namespace KBase {
 
     // TODO: rename this from 'smpDB' to 'scenarioDB'
     // Note that, with composite models, there many be dozens interacting.
-    sqlite3 *smpDB = nullptr; // keep this protected, to ease later multi-threading
-    string scenName = "Scen"; // default is set from UTC time
+     string scenName = "Scen"; // default is set from UTC time
 
     // this is the basic model of victory dependent on strength-ratio
     static tuple<double, double> vProb(VPModel vpm, const double s1, const double s2);

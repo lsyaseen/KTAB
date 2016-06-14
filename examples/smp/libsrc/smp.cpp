@@ -844,6 +844,7 @@ namespace SMPLib {
     for (unsigned int n = 0; n < na; n++) {
       if ((n != i) && (n != j)) { // already got their influence-contributions
         auto an = ((const SMPActor*)(model->actrs[n]));
+	    
         double cn = an->sCap;
         double sn = KBase::sum(an->vSal);
         double uni = aUtil[h](n, i);
@@ -866,8 +867,54 @@ namespace SMPLib {
 
     // record tpvArray into SQLite turn, est (h), init (i), third party (n), receiver (j), and tpvArray[n]
     unsigned int t = myTurn();
-        
-        
+ 
+	sqlite3 * db = model->smpDB ;
+	char* zErrMsg = nullptr;
+	// Error message in case
+	
+	auto sqlBuff = newChars(200);
+	for (int vt = 0; vt < tpvArray.size(); vt++)
+	{
+		// initiate the database 
+		auto an = ((const SMPActor*)(model->actrs[vt]));
+	 
+		// prepare the sql statement to insert
+		sprintf(sqlBuff,	
+			"INSERT INTO ProbTPVict (Scenario, Turn_t, Est_h,Init_i,ThrdP_k,Rcvr_j,Prob) VALUES ('%s', ?1, ?2, ?3, ?4, ?5, ?6)",
+			model->getScenarioName().c_str());
+		const char* insStr = sqlBuff;
+		sqlite3_stmt *insStmt;
+		sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+		// start for the transaction
+		sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+		int rslt = 0;
+		rslt = sqlite3_bind_int(insStmt, 1, t);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_bind_int(insStmt, 2, h);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_bind_int(insStmt, 3, i);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_bind_int(insStmt, 4, vt);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_bind_int(insStmt, 5, j);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_bind_double(insStmt, 6, tpvArray[vt]);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_step(insStmt);
+		assert(SQLITE_DONE == rslt);
+		sqlite3_clear_bindings(insStmt);
+		assert(SQLITE_DONE == rslt);
+		rslt = sqlite3_reset(insStmt);
+		assert(SQLITE_OK == rslt);
+	}
+	 
+	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+
+	delete sqlBuff;
+	sqlBuff = nullptr;
+
+ 
     // UtilContest, ProbVict, UtilChlg
     // UtilSQ, UtilVict
     const double phij = chij / (chij + chji);
