@@ -190,7 +190,7 @@ protected:
     SMPState* doBCN() const;
     
 
-    // returns estimated probability k wins (given likely coaltiions), and expected value of that challenge
+    // returns estimated probability k wins (given likely coaltiions), and expected delta-util of that challenge
     tuple<double, double> probEduChlg(unsigned int h, unsigned int k, unsigned int i, unsigned int j) const;
 
     // return best j, p[i>j], edu[i->j]

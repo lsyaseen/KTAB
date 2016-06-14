@@ -785,7 +785,7 @@ namespace SMPLib {
   }
 
 
-  // h's estimate of the victory probability and expected change in utility for k from i challenging j,
+  // h's estimate of the victory probability and expected delta in utility for k from i challenging j,
   // compared to status quo.
   // Note that the  aUtil vector of KMatrix must be set before starting this.
   // TODO: offer a choice the different ways of estimating value-of-a-state: even sum or expected value.
@@ -813,7 +813,7 @@ namespace SMPLib {
     // h's estimate of utility to k of j defeating i, so i adopts j's position
     double uhkji = aUtil[h](k, j) + aUtil[h](k, j);
     assert((0.0 <= uhkji) && (uhkji <= 2.0));
-
+    
     auto ai = ((const SMPActor*)(model->actrs[i]));
     double si = KBase::sum(ai->vSal);
     double ci = ai->sCap;
@@ -914,16 +914,18 @@ namespace SMPLib {
 	delete sqlBuff;
 	sqlBuff = nullptr;
 
- 
-    // UtilContest, ProbVict, UtilChlg
-    // UtilSQ, UtilVict
-    const double phij = chij / (chij + chji);
-    const double phji = chji / (chij + chji);
+  
+    const double phij = chij / (chij + chji); // ProbVict, for i
+    const double phji = chji / (chij + chji);  
 
-    const double euCh = (1 - sj)*uhkij + sj*(phij*uhkij + phji*uhkji);
-    const double euChlg = euCh - euSQ;
+    const double euVict = uhkij;  // UtilVict
+    const double euCntst = phij*uhkij + phji*uhkji; // UtilContest,
+    const double euChlg = (1 - sj)*euVict + sj*euCntst; // UtilChlg 
+    const double duChlg = euChlg - euSQ; //  delta-util of challenge versus status-quo
+    
+    // do SQLite to update all tables here
     // printf ("SMPState::probEduChlg(%2i, %2i, %2i, %i2) = %+6.4f - %+6.4f = %+6.4f\n", h, k, i, j, euCh, euSQ, euChlg);
-    auto rslt = tuple<double, double>(phij, euChlg);
+    auto rslt = tuple<double, double>(phij, duChlg);
     return rslt;
   }
 
