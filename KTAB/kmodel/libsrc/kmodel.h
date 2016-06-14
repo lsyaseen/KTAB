@@ -222,6 +222,7 @@ namespace KBase {
     static const unsigned int maxScenNameLen = 512; // might be auto-generated in sensitivy analysis
     static const unsigned int maxActNameLen = 25; // quite generous, as we expect 1-5
     static const unsigned int maxActDescLen = 256;
+	
 
     // parameters which every Model instance must set
     VPModel vpm = VPModel::Linear; // arbitrary default
@@ -296,6 +297,7 @@ namespace KBase {
 
   protected:
     static string createTableSQL(unsigned int tn);
+	static const int NumTable = 13;
     // note that the function to write to table #k must be kept
     // synchronized with the result of createTableSQL(k) !
 

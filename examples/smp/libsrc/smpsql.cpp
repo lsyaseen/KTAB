@@ -144,7 +144,7 @@ void SMPModel::sqlTest() {
     sqlite3_exec(db, "PRAGMA journal_mode = MEMORY", NULL, NULL, &zErrMsg);
 
     // Create & execute SQL statements
-    for (unsigned int i = 0; i < 12; i++) {
+    for (unsigned int i = 0; i < SMPModel::NumTable; i++) {
         auto buff = newChars(50);
         sprintf(buff, "Created Model table %u successfully \n", i);
         sql = createTableSQL(i);

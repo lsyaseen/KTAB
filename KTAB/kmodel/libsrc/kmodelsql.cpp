@@ -293,6 +293,21 @@ string Model::createTableSQL(unsigned int tn) {
               ");";
         break;
 
+	case 12: //  Actor Information Table
+		{
+			char *sqlBuff = newChars(256);
+			sprintf(sqlBuff, "create table if not exists ActorDescription ("  \
+				"Scenario TEXT(%d) NOT NULL DEFAULT 'NoName', "\
+				"Act_i	INTEGER NOT NULL DEFAULT 0, "\
+				"Name	TEXT(%d) NOT NULL DEFAULT 'NoName', "\
+				"Desc	TEXT(%d) NOT NULL DEFAULT 'NoName', "\
+				");", maxScenNameLen, maxActNameLen, maxActDescLen);
+			sql = std::string(sqlBuff);
+			delete sqlBuff;
+			sqlBuff = nullptr;
+		}
+		break;
+
     default:
         throw(KException("Model::createTableSQL unrecognized table number"));
     }

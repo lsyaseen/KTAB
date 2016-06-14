@@ -926,6 +926,8 @@ namespace SMPLib {
     // do SQLite to update all tables here
     // printf ("SMPState::probEduChlg(%2i, %2i, %2i, %i2) = %+6.4f - %+6.4f = %+6.4f\n", h, k, i, j, euCh, euSQ, euChlg);
     auto rslt = tuple<double, double>(phij, duChlg);
+
+	
     return rslt;
   }
 
