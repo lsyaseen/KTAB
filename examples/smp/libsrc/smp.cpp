@@ -1346,6 +1346,7 @@ namespace SMPLib {
     string scenName = csv.get_value(1, 1);
     cout << "Scenario name: |" << scenName << "|" << endl;
     cout << flush;
+    assert(scenName.length() <= Model::maxScenNameLen);
     string numActorString = csv.get_value(1, 3);
     unsigned int numActor = atoi(numActorString.c_str());
     string numDimString = csv.get_value(1, 4);
@@ -1373,6 +1374,7 @@ namespace SMPLib {
       // get short names
       string nis = csv.get_value(3 + i, 1);
       assert(0 < nis.length());
+      assert(nis.length() <= Model::maxActNameLen);
       actorNames.push_back(nis);
       printf("Actor %3u name: %s \n", i, actorNames[i].c_str());
 
@@ -1380,6 +1382,7 @@ namespace SMPLib {
       string descsi = csv.get_value(3 + i, 2);
       actorDescs.push_back(descsi);
       printf("Actor %3u desc: %s \n", i, actorDescs[i].c_str());
+      assert(descsi.length() <= Model::maxActDescLen);
 
       // get capability/power, often on 0-100 scale
       string psi = csv.get_value(3 + i, 3);
