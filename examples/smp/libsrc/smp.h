@@ -95,7 +95,7 @@ public:
     ~SMPActor();
 
     // interfaces to be provided
-    double vote(unsigned int p1, unsigned int p2, const State* st) const;
+	double vote(unsigned int est, unsigned int i, unsigned int j, const State*st) const;
     virtual double vote(const Position * ap1, const Position * ap2, const SMPState* as1) const;
     double posUtil(const Position * ap1, const SMPState* as1) const;
 

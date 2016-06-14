@@ -79,9 +79,13 @@ namespace SMPLib {
   SMPActor::~SMPActor() {
   }
 
-  double SMPActor::vote(unsigned int, unsigned int, const State*) const {
-    assert(false);  // TDO: finish this
-    return 0;
+  double SMPActor::vote(unsigned int est, unsigned int i, unsigned int j, const State*st) const {
+	  unsigned int k = st->model->actrNdx(this);
+	  auto uk = st->aUtil[est];
+	  double uhki = uk(k, i);
+	  double uhkj = uk(k, j);
+	  const double vij = Model::vote(vr, sCap, uhki, uhkj);
+	  return vij;
   }
 
 
@@ -549,7 +553,9 @@ namespace SMPLib {
 	
 	//Populate PosEquiv table
 	model->sqlPosEquiv(myT);
-   	model->sqlPosProb(myT);    // That gets recorded upon the next state - but it
+   	model->sqlPosProb(myT);    
+	model->sqlPosVote(myT);    
+	// That gets recorded upon the next state - but it
     // therefore misses the very last state.
     auto s2 = doBCN();
     gSetup(s2);
@@ -1190,17 +1196,13 @@ namespace SMPLib {
 	  // Start transctions
 	  sqlite3_exec(smpDB, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 	  // for each turn extract the information
-	  for (unsigned int t = 0; t < history.size(); t++)
-	  {
+	  for (unsigned int t = 0; t < history.size(); t++)  {
 		  auto st = history[t];
 		  // getr the each actor capability value for each turn
 		  auto cp = (const SMPState*)history[t];
 		  auto caps = cp->actrCaps();
-		  for (unsigned int i = 0; i < numAct; i++)  
-		  {
-			  // Populate each field 	
-			  if (sqlP)
-			  {
+		  for (unsigned int i = 0; i < numAct; i++)  { 
+			  if (sqlP) { // Populate each field 
 					  int rslt = 0;
 					  rslt = sqlite3_bind_int(insStmt, 1, t);
 					  assert(SQLITE_OK == rslt);
@@ -1215,11 +1217,9 @@ namespace SMPLib {
 					  rslt = sqlite3_reset(insStmt);
 					  assert(SQLITE_OK == rslt);
 				  }
-			  }
-			  cout << endl;
+			  } 
 	  }
-	  sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
-	  cout << endl;
+	  sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg); 
 	  return;
   }
   //Populates the SpatialSliencetable
@@ -1245,8 +1245,7 @@ namespace SMPLib {
 	  // Start transctions
 	  sqlite3_exec(smpDB, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 	  // For each turn information exatrct the table required information
-	  for (unsigned int t = 0; t < history.size(); t++)
-	  {
+	  for (unsigned int t = 0; t < history.size(); t++) {
 		  // Get the indivuidual turn
 		  auto st = history[t];
 		  // get the SMPState for turn
@@ -1254,10 +1253,10 @@ namespace SMPLib {
 		  // Extract information for each actor and dimension
 		  for (unsigned int i = 0; i < numAct; i++) {
 		     for (unsigned int k = 0; k < numDim; k++) {
-			      // Get the Salience Value for each actor
+               // Populate the actor 
 				  auto ai = ((const SMPActor*)actrs[i]);
+                  // Get the Salience Value for each actor
 				  double sal = ai->vSal(k,0);
-				  // Populate the actor 
 				  if (sqlP) {
 					  int rslt = 0;
 					  rslt = sqlite3_bind_int(insStmt, 1, t);
@@ -1276,14 +1275,14 @@ namespace SMPLib {
 					  rslt = sqlite3_reset(insStmt);
 					  assert(SQLITE_OK == rslt);
 				  }
-			  }
-			  cout << endl;
+			  } 
 		  }
-		  sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
-		  cout << endl;
+		  sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg); 
 	  }
 	  return;
   }
+
+
   SMPModel * SMPModel::readCSV(string fName, PRNG * rng) {
     using KBase::KException;
     char * errBuff = newChars(100); // as sprintf requires

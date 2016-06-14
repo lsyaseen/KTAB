@@ -78,7 +78,7 @@ namespace DemoLeon {
     ~LeonActor();
 
     // interfaces to be provided
-    double vote(unsigned int p1, unsigned int p2, const State* st) const;
+    double vote(unsigned int est,unsigned int p1, unsigned int p2, const State* st) const;
     virtual double vote(const Position * ap1, const Position * ap2) const;
     double posUtil(const Position * ap1) const;
 
