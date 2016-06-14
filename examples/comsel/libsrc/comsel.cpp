@@ -729,8 +729,8 @@ namespace ComSelLib {
     sCap = exp(log(10.0)*rng->uniform(1.0, 2.0)); // 10 to 100, median at 31.6 
     vPos = VctrPstn(KMatrix::uniform(rng, nDim, 1, 0.01, 0.99));
       
-    double totalSal = rng->uniform(0.4, 1.0);
-    auto vsi = KMatrix::uniform(rng, nDim, 1, 0.01, 0.99); 
+    double totalSal = rng->uniform(0.8, 1.0);
+    auto vsi = KMatrix::uniform(rng, nDim, 1, 0.90, 0.95); 
     vSal = (totalSal/sum(vsi)) *  vsi;
     return;
   }
