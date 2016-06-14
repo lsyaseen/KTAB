@@ -22,7 +22,7 @@ set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
 set (ENABLE_FLTK_GUI true CACHE  BOOL "Build app with FLTK GUI")
-set (ENABLE_QT_GUI true CACHE  BOOL "Build app with QT GUI")
+set (ENABLE_QT_GUI false CACHE  BOOL "Build app with QT GUI")
 
 if (UNIX)
     set (ENABLE_EFFCPP true CACHE  BOOL "Check Effective C++ Guidelines")
@@ -234,8 +234,8 @@ if(ENABLE_QT_GUI)
     find_package(Qt5 REQUIRED COMPONENTS Widgets Core)
 
     #manually adding files to the variables
-    set (QtProjectLib_src ../../examples/smp/SMPQ/mainwindow.cpp)
-    set (QtProjectLib_hdr ../../examples/smp/SMPQ/mainwindow.h)
+    set (QtProjectLib_src ../../examples/smp/SMPQ/mainwindow.cpp ../../examples/smp/SMPQ/csv.cpp)
+    set (QtProjectLib_hdr ../../examples/smp/SMPQ/mainwindow.h ../../examples/smp/SMPQ/csv.h)
     set (QtProjectLib_ui  ../../examples/smp/SMPQ/mainwindow.ui)
     set (QtProjectBin_src ../../examples/smp/SMPQ/main.cpp)
 
@@ -257,7 +257,7 @@ if(ENABLE_QT_GUI)
     target_link_libraries (QtProjectLib Qt5::Gui)
     target_link_libraries (QtProjectLib Qt5::Widgets)
 
-    add_executable(smpq ${QtProjectBin_src})
+    add_executable(smpq ${QtProjectBin_src} ../../examples/smp/SMPQ/dockwidgets.qrc)
 
     #to link a library to the executable
     target_link_libraries (smpq QtProjectLib)
