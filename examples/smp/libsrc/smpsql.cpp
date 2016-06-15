@@ -50,44 +50,52 @@ using KBase::ReportingLevel;
 
 // --------------------------------------------
 
-string SMPModel::createSMPTableSQL(unsigned int tn)  {
+string SMPModel::createSQL(unsigned int n)  {
     string sql = "";
-    switch (tn) {
-    case 0:
-        // coordinates of each actor's position
-        sql = "create table if not exists VectorPosition ("  \
-              "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
-              "Turn_t		INTEGER NOT NULL DEFAULT 0, "\
-              "Act_i		INTEGER NOT NULL DEFAULT 0, "\
-              "Dim_k		INTEGER NOT NULL DEFAULT 0, "\
-              "Coord		REAL"\
-              ");";
-        break;
+	// check total number of table exceeds
+	assert(n < Model::NumTables + NumTables);
+	if (n < Model::NumTables) {
+		return Model::createSQL(n);
+	}
+	else
+	{
+		switch (n) {
+		case  13:
+			// coordinates of each actor's position
+			sql = "create table if not exists VectorPosition ("  \
+				"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
+				"Turn_t		INTEGER NOT NULL DEFAULT 0, "\
+				"Act_i		INTEGER NOT NULL DEFAULT 0, "\
+				"Dim_k		INTEGER NOT NULL DEFAULT 0, "\
+				"Coord		REAL"\
+				");";
+			break;
 
-    case 1:
-        // salience to each actor of each dimension
-        sql = "create table if not exists SpatialSalience ("  \
-              "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
-              "Turn_t		INTEGER NOT NULL DEFAULT 0, "\
-              "Act_i		INTEGER NOT NULL DEFAULT 0, "\
-              "Dim_k		INTEGER NOT NULL DEFAULT 0, "\
-              "Sal		REAL"\
-              ");";
-        break;
+		case 14:
+			// salience to each actor of each dimension
+			sql = "create table if not exists SpatialSalience ("  \
+				"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
+				"Turn_t		INTEGER NOT NULL DEFAULT 0, "\
+				"Act_i		INTEGER NOT NULL DEFAULT 0, "\
+				"Dim_k		INTEGER NOT NULL DEFAULT 0, "\
+				"Sal		REAL"\
+				");";
+			break;
 
-    case 2:
-        // scalar capability of each actor
-        sql = "create table if not exists SpatialCapability ("  \
-              "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
-              "Turn_t		INTEGER NOT NULL DEFAULT 0, "\
-              "Act_i		INTEGER NOT NULL DEFAULT 0, "\
-              "Cap		REAL"\
-              ");";
-        break;
+		case 15:
+			// scalar capability of each actor
+			sql = "create table if not exists SpatialCapability ("  \
+				"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
+				"Turn_t		INTEGER NOT NULL DEFAULT 0, "\
+				"Act_i		INTEGER NOT NULL DEFAULT 0, "\
+				"Cap		REAL"\
+				");";
+			break;
 
-    default:
-        throw(KException("SMPModel::createSMPTableSQL unrecognized table number"));
-    }
+		default:
+			throw(KException("SMPModel::createSQL unrecognized table number"));
+		}
+	}
     return sql;
 }
 
@@ -144,19 +152,10 @@ void SMPModel::sqlTest() {
     sqlite3_exec(db, "PRAGMA journal_mode = MEMORY", NULL, NULL, &zErrMsg);
 
     // Create & execute SQL statements
-    for (unsigned int i = 0; i < 12; i++) {
-        auto buff = newChars(50);
-        sprintf(buff, "Created Model table %u successfully \n", i);
-        sql = createTableSQL(i);
-        sExec(sql, buff); // ignore return-code
-        buff = nullptr;
-        cout << flush;
-    }
-    cout << endl << flush;
-    for (unsigned int i = 0; i < 3; i++) {
+    for (unsigned int i = 0; i < SMPModel::NumTables +Model::NumTables; i++) {
         auto buff = newChars(50);
         sprintf(buff, "Created SMPModel table %u successfully \n", i);
-        sql = createSMPTableSQL(i);
+        sql = SMPModel::createSQL(i);
         sExec(sql, buff); // ignore return-code
         buff = nullptr;
         cout << flush;

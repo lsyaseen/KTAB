@@ -190,7 +190,7 @@ protected:
     SMPState* doBCN() const;
     
 
-    // returns estimated probability k wins (given likely coaltiions), and expected value of that challenge
+    // returns estimated probability k wins (given likely coaltiions), and expected delta-util of that challenge
     tuple<double, double> probEduChlg(unsigned int h, unsigned int k, unsigned int i, unsigned int j) const;
 
     // return best j, p[i>j], edu[i->j]
@@ -215,9 +215,10 @@ public:
     // print history of each actor in CSV (might want to generalize to arbitrary VctrPstn)
     void showVPHistory(bool sqlP) const;
 
-	void PopulateSpatialCapabilityTable(bool sqlP) const;
+	void populateSpatialCapabilityTable(bool sqlP) const;
 
-	void PopulateSpatialSalienceTable(bool sqlP) const;
+	void populateSpatialSalienceTable(bool sqlP) const;
+	void populateActorDescriptionTable(bool sqlP  ) const;
 
     // output the two files needed to draw Sankey diagrams
     void sankeyOutput(string inputCSV) const;
@@ -230,25 +231,25 @@ public:
 
     static double stateDist(const SMPState* s1, const SMPState* s2);
 
+	static string createSQL(unsigned int n) ;
+	 
     // this does not set AUtil, just output it to SQLite
     //virtual void sqlAUtil(unsigned int t);
 
 protected:
     //sqlite3 *smpDB = nullptr; // keep this protected, to ease multi-threading
     //string scenName = "Scen";
+	static const int NumTables = 3; // TODO : Add one to this num when new table is added
 protected:
     // note that the function to write to table #k must be kept
     // synchronized with the result of createTableSQL(k) !
     void sqlTest();
 
-    // note that the function to write to table #k must be kept
-    // synchronized with the result of createTableSQL(k) !
-    static string createSMPTableSQL(unsigned int tn);
-
     // compute several useful items implied by the risk attitudes, saliences, and the matrix of differences
     static void setUtilProb(const KMatrix& vR, const KMatrix& vS, const KMatrix& vD, KBase::VotingRule vr);
 
 private:
+
 };
 
 

@@ -11,9 +11,10 @@ Examples are provided to illustrate the range of modeling which can be done in t
 
 - Using an input/output economic model to bargain over tax/subsidy rates,
 - Simple discrete matching 
+- Negotiating the priority order to tasks to undertake (and which to drop)
 
 
-- A simple but highly parameterizable version of the [spatial model of politics](examples/smp/README.md). The command line version is `smpc`; a GUI version will be called `smpg`. Dummy data is provided to illustrate the format for CSV input files.
+- A simple but highly parameterizable version of the [spatial model of politics](examples/smp/README.md). The command line version is `smpc`;  GUI versions will be called `smpg` and `smpq`. Dummy data is provided to illustrate the format for CSV input files.
 
 
 - A simple model of bargaining over the order in which projects should be addressed, taking into account budget limits. Dummy data is provided.
@@ -45,9 +46,11 @@ The code is compiled, linked, and tested with absolutely no modification, simult
 
 ## User Interfaces ##
 
-A graphical front end is under development. The current plan is that it will use the open source, cross-platform, C++ toolkit [FLTK](http://www.fltk.org). The source code and build instructions for the most recent stable version can be obtained  [here](http://www.fltk.org/software.php). FLTK also uses CMake for configuration, then your favorite IDE to build.
+A graphical front end is under development. The initial version, `smpg`,  is based in part on the work of the FLTK project (http://www.fltk.org) [FLTK](http://www.fltk.org). FLTK is a cross-platform, C++ tookit provided under the terms of the GNU Library Public License, Version 2 with exceptions that allow for static linking; details can be found [here](http://www.fltk.org/COPYING.php).  The source code and build instructions for the most recent stable version can be obtained  [here](http://www.fltk.org/software.php). FLTK also uses CMake for configuration, then your favorite IDE to build.
 
-The current preference for FLTK is based simply on the fact that it was the easiest to build, install, and use across multiple OS. Because the libraries that analyze negotiation are completely separate from the applications that use them, developers are perfectly free to write command line applications or use other GUI toolkits. Along these lines, the GUI work is expected to diversify into  other toolkits, such as [Qt](https://www.qt.io/), [WxWidgets](https://www.wxwidgets.org/), or even a web interface such as [Wt](http://www.webtoolkit.eu/wt).
+ Because the libraries that analyze negotiation are completely separate from the applications that use them, developers are perfectly free to write command line applications or use other GUI toolkits. Along these lines, the GUI work is expected to diversify into  other toolkits, such as [Qt](https://www.qt.io/), [WxWidgets](https://www.wxwidgets.org/), or even a web interface such as [Wt](http://www.webtoolkit.eu/wt).  Qt is dual-licensed under both commercial and open-source terms; details can be found [here](https://www.qt.io/qt-licensing-terms/). The Qt licensing page states that dynamically linking an application to the open-source Qt libraries does not make the application open-source.
+
+For authoritative ruling on licensing issues, consult appropriate counsel.
 
 ## Data Input Formats ##
 

@@ -785,7 +785,7 @@ namespace SMPLib {
   }
 
 
-  // h's estimate of the victory probability and expected change in utility for k from i challenging j,
+  // h's estimate of the victory probability and expected delta in utility for k from i challenging j,
   // compared to status quo.
   // Note that the  aUtil vector of KMatrix must be set before starting this.
   // TODO: offer a choice the different ways of estimating value-of-a-state: even sum or expected value.
@@ -813,7 +813,7 @@ namespace SMPLib {
     // h's estimate of utility to k of j defeating i, so i adopts j's position
     double uhkji = aUtil[h](k, j) + aUtil[h](k, j);
     assert((0.0 <= uhkji) && (uhkji <= 2.0));
-
+    
     auto ai = ((const SMPActor*)(model->actrs[i]));
     double si = KBase::sum(ai->vSal);
     double ci = ai->sCap;
@@ -839,10 +839,12 @@ namespace SMPLib {
 
     // we assess the overall coalition strengths by adding up the contribution of
     // individual actors (including i and j, above). We assess the contribution of third
-    // parties by looking at little coalitions in the hypothetical (in:j) or (i:nj) contests.
+    // parties (n) by looking at little coalitions in the hypothetical (in:j) or (i:nj) contests.
+    vector<double> tpvArray = {};
     for (unsigned int n = 0; n < na; n++) {
       if ((n != i) && (n != j)) { // already got their influence-contributions
         auto an = ((const SMPActor*)(model->actrs[n]));
+	    
         double cn = an->sCap;
         double sn = KBase::sum(an->vSal);
         double uni = aUtil[h](n, i);
@@ -850,12 +852,12 @@ namespace SMPLib {
         double unn = aUtil[h](n, n);
 
         double pin = Actor::vProbLittle(vr, sn*cn, uni, unj, chij, chji);
+        // record for SQLite
+        tpvArray.push_back(pin);
         assert(0.0 <= pin);
         assert(pin <= 1.0);
         double pjn = 1.0 - pin;
-
         double vnij = Actor::thirdPartyVoteSU(sn*cn, vr, tpc, pin, pjn, uni, unj, unn);
-
         chij = (vnij > 0) ? (chij + vnij) : chij;
         assert(0 < chij);
         chji = (vnij < 0) ? (chji - vnij) : chji;
@@ -863,15 +865,103 @@ namespace SMPLib {
       }
     }
 
-    // UtilContest, ProbVict, UtilChlg
-    // UtilSQ, UtilVict
-    const double phij = chij / (chij + chji);
-    const double phji = chji / (chij + chji);
+    // record tpvArray into SQLite turn, est (h), init (i), third party (n), receiver (j), and tpvArray[n]
+    unsigned int t = myTurn();
+ 
+	sqlite3 * db = model->smpDB ;
+	char* zErrMsg = nullptr;
+	// Error message in case
+	
+	auto sqlBuff = newChars(200);
+	// start for the transaction
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+	for (int vt = 0; vt < tpvArray.size(); vt++)
+	{
+		// initiate the database 
+		auto an = ((const SMPActor*)(model->actrs[vt]));
+	 
+		// prepare the sql statement to insert
+		sprintf(sqlBuff,	
+			"INSERT INTO ProbTPVict (Scenario, Turn_t, Est_h,Init_i,ThrdP_k,Rcvr_j,Prob) VALUES ('%s', ?1, ?2, ?3, ?4, ?5, ?6)",
+			model->getScenarioName().c_str());
+		const char* insStr = sqlBuff;
+		sqlite3_stmt *insStmt;
+		sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+	
+		int rslt = 0;
+		rslt = sqlite3_bind_int(insStmt, 1, t);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_bind_int(insStmt, 2, h);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_bind_int(insStmt, 3, i);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_bind_int(insStmt, 4, vt);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_bind_int(insStmt, 5, j);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_bind_double(insStmt, 6, tpvArray[vt]);
+		assert(SQLITE_OK == rslt);
+		rslt = sqlite3_step(insStmt);
+		assert(SQLITE_DONE == rslt);
+		sqlite3_clear_bindings(insStmt);
+		assert(SQLITE_DONE == rslt);
+		rslt = sqlite3_reset(insStmt);
+		assert(SQLITE_OK == rslt);
+	}
+	  
+    const double phij = chij / (chij + chji); // ProbVict, for i
+    const double phji = chji / (chij + chji);  
 
-    const double euCh = (1 - sj)*uhkij + sj*(phij*uhkij + phji*uhkji);
-    const double euChlg = euCh - euSQ;
+    const double euVict = uhkij;  // UtilVict
+    const double euCntst = phij*uhkij + phji*uhkji; // UtilContest,
+    const double euChlg = (1 - sj)*euVict + sj*euCntst; // UtilChlg 
+    const double duChlg = euChlg - euSQ; //  delta-util of challenge versus status-quo
+    
+    // do SQLite to update all tables here
     // printf ("SMPState::probEduChlg(%2i, %2i, %2i, %i2) = %+6.4f - %+6.4f = %+6.4f\n", h, k, i, j, euCh, euSQ, euChlg);
-    auto rslt = tuple<double, double>(phij, euChlg);
+    auto rslt = tuple<double, double>(phij, duChlg);
+
+	//Util Charge database record insertion
+	memset(sqlBuff, '\0', 200);
+	sprintf(sqlBuff,
+		"INSERT INTO UtilChlg (Scenario, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util) VALUES ('%s',%d,%d,%d,%d,%d,%f)",
+		model->getScenarioName().c_str(), t, h, k, i, j, euChlg);
+	sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
+
+	//ProbVict database record insertion
+	memset(sqlBuff, '\0', 200);
+	sprintf(sqlBuff,
+		"INSERT INTO ProbVict (Scenario, Turn_t, Est_h,Init_i,Rcvr_j,Prob) VALUES ('%s',%d,%d,%d,%d,%f)",
+		model->getScenarioName().c_str(), t, h, i, j, phij);
+	sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
+
+	//UtilContest database record insertion
+	memset(sqlBuff, '\0', 200);
+	sprintf(sqlBuff,
+		"INSERT INTO UtilContest (Scenario, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util) VALUES ('%s',%d,%d,%d,%d,%d,%f)",
+		model->getScenarioName().c_str(), t, h, k, i, j, euCntst);
+	sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
+
+	//UtilSQ database record insertion
+	memset(sqlBuff, '\0', 200);
+	sprintf(sqlBuff,
+		"INSERT INTO UtilSQ (Scenario, Turn_t, Est_h, Aff_k,Init_i,Rcvr_j, Util) VALUES ('%s',%d,%d,%d,%d,%d,%f)",
+		model->getScenarioName().c_str(), t, h, k, i,j,euSQ);
+	sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
+
+	//UtilVict database record insertion
+	memset(sqlBuff, '\0', 200);
+	sprintf(sqlBuff,
+		"INSERT INTO UtilVict (Scenario, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util) VALUES ('%s',%d,%d,%d,%d,%d,%f)",
+		model->getScenarioName().c_str(), t, h, k, i, j, uhkij);
+	sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
+
+	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+
+	delete sqlBuff;
+	sqlBuff = nullptr;
+
     return rslt;
   }
 
@@ -991,7 +1081,7 @@ namespace SMPLib {
     return dSum;
   }
 
-
+   
   // 0 <= d <= 1 is the difference in normalized position
   // -1 <= R <= +1 is normalized risk-aversion
   double SMPModel::bsUtil(double sd, double R) {
@@ -1087,7 +1177,8 @@ namespace SMPLib {
 
     assert(nullptr != smpDB);
     char* zErrMsg = nullptr;
-    createSMPTableSQL(0); // VectorPosition
+   
+	createSQL(13);
     auto sqlBuff = newChars(200);
     sprintf(sqlBuff,
       "INSERT INTO VectorPosition (Scenario, Turn_t, Act_i, Dim_k, Coord) VALUES ('%s', ?1, ?2, ?3, ?4)",
@@ -1175,14 +1266,14 @@ namespace SMPLib {
     return;
   }
   //Populates the SpatialCapability table
-  void SMPModel::PopulateSpatialCapabilityTable(bool sqlP) const {
+  void SMPModel::populateSpatialCapabilityTable(bool sqlP) const {
 	  // verify the actor size
 	  assert(numAct == actrs.size());
 	  // check the database availability
 	  assert(nullptr != smpDB);
 	  char* zErrMsg = nullptr;
 	  // Make sure table present
-	  createSMPTableSQL(2);  
+	  createSQL(15);
 	  auto sqlBuff = newChars(200);
 	  // form sql insert command
 	  sprintf(sqlBuff,
@@ -1223,7 +1314,7 @@ namespace SMPLib {
 	  return;
   }
   //Populates the SpatialSliencetable
-  void SMPModel::PopulateSpatialSalienceTable(bool sqlP) const {
+  void SMPModel::populateSpatialSalienceTable(bool sqlP) const {
 	  // Verify the actor and dimesnsion
 	  assert(numAct == actrs.size());
 	  assert(numDim == dimName.size());
@@ -1231,7 +1322,7 @@ namespace SMPLib {
 	  assert(nullptr != smpDB);
 	  char* zErrMsg = nullptr;
 	  // check if table present if not create
-	  createSMPTableSQL(1); // VectorPosition
+	  createSQL(14);
 	  auto sqlBuff = newChars(200);
 	  // Form a insert command 
 	  sprintf(sqlBuff,
@@ -1281,8 +1372,49 @@ namespace SMPLib {
 	  }
 	  return;
   }
-
-
+  //Populate the actor description table
+  void SMPModel::populateActorDescriptionTable(bool sqlP) const {
+	  // Verify the actor  
+	  assert(numAct == actrs.size());
+	  // Verify the database is live and 
+	  assert(nullptr != smpDB);
+	  // check table is present
+	  createSQL(12);
+	  // buffer to hold data
+	  char* zErrMsg = nullptr;
+	  auto sqlBuff = newChars(200);
+	  // Form a insert command 
+	  sprintf(sqlBuff,
+		  "INSERT INTO ActorDescription (Scenario,  Act_i, Name,Desc) VALUES ('%s', ?1, ?2, ?3)",
+		  scenName.c_str());
+	  const char* insStr = sqlBuff;
+	  sqlite3_stmt *insStmt;
+	  // fill the Scenario
+	  sqlite3_prepare_v2(smpDB, insStr, strlen(insStr), &insStmt, NULL);
+	  // Start transctions
+	  sqlite3_exec(smpDB, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+	  // For each actor fill the requird information
+	  for (unsigned int i = 0; i < actrs.size(); i++) {
+	 	  Actor * act = actrs.at(i);
+		  if (sqlP) {
+			  int rslt = 0;
+			  rslt = sqlite3_bind_int(insStmt, 1, i);
+			  assert(SQLITE_OK == rslt);
+			  rslt = sqlite3_bind_text(insStmt, 2, act->name.c_str(), -1, SQLITE_TRANSIENT);
+			  assert(SQLITE_OK == rslt);
+			  rslt = sqlite3_bind_text(insStmt, 3, act->desc.c_str(), -1, SQLITE_TRANSIENT);
+			  assert(SQLITE_OK == rslt);
+			  rslt = sqlite3_step(insStmt);
+			  assert(SQLITE_DONE == rslt);
+			  sqlite3_clear_bindings(insStmt);
+			  assert(SQLITE_DONE == rslt);
+			  rslt = sqlite3_reset(insStmt);
+			  assert(SQLITE_OK == rslt);
+		  }
+	  }
+	  sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
+	  return;
+  }
   SMPModel * SMPModel::readCSV(string fName, PRNG * rng) {
     using KBase::KException;
     char * errBuff = newChars(100); // as sprintf requires
@@ -1292,6 +1424,7 @@ namespace SMPLib {
     string scenName = csv.get_value(1, 1);
     cout << "Scenario name: |" << scenName << "|" << endl;
     cout << flush;
+    assert(scenName.length() <= Model::maxScenNameLen);
     string numActorString = csv.get_value(1, 3);
     unsigned int numActor = atoi(numActorString.c_str());
     string numDimString = csv.get_value(1, 4);
@@ -1319,6 +1452,7 @@ namespace SMPLib {
       // get short names
       string nis = csv.get_value(3 + i, 1);
       assert(0 < nis.length());
+      assert(nis.length() <= Model::maxActNameLen);
       actorNames.push_back(nis);
       printf("Actor %3u name: %s \n", i, actorNames[i].c_str());
 
@@ -1326,6 +1460,7 @@ namespace SMPLib {
       string descsi = csv.get_value(3 + i, 2);
       actorDescs.push_back(descsi);
       printf("Actor %3u desc: %s \n", i, actorDescs[i].c_str());
+      assert(descsi.length() <= Model::maxActDescLen);
 
       // get capability/power, often on 0-100 scale
       string psi = csv.get_value(3 + i, 3);
