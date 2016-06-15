@@ -46,4 +46,9 @@ Release*
 # cached by CMake          
 CMakeLists.txt.user    
 
+# Project files
+.kdev4*
+*.kdev4
+
+
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
