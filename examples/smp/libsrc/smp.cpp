@@ -873,6 +873,8 @@ namespace SMPLib {
 	// Error message in case
 	
 	auto sqlBuff = newChars(200);
+	// start for the transaction
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 	for (int vt = 0; vt < tpvArray.size(); vt++)
 	{
 		// initiate the database 
@@ -885,8 +887,7 @@ namespace SMPLib {
 		const char* insStr = sqlBuff;
 		sqlite3_stmt *insStmt;
 		sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
-		// start for the transaction
-		sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+	
 		int rslt = 0;
 		rslt = sqlite3_bind_int(insStmt, 1, t);
 		assert(SQLITE_OK == rslt);
@@ -907,14 +908,7 @@ namespace SMPLib {
 		rslt = sqlite3_reset(insStmt);
 		assert(SQLITE_OK == rslt);
 	}
-	 
-	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
-	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
-
-	delete sqlBuff;
-	sqlBuff = nullptr;
-
-  
+	  
     const double phij = chij / (chij + chji); // ProbVict, for i
     const double phji = chji / (chij + chji);  
 
@@ -927,7 +921,40 @@ namespace SMPLib {
     // printf ("SMPState::probEduChlg(%2i, %2i, %2i, %i2) = %+6.4f - %+6.4f = %+6.4f\n", h, k, i, j, euCh, euSQ, euChlg);
     auto rslt = tuple<double, double>(phij, duChlg);
 
-	
+	//Util Charge database record insertion
+	memset(sqlBuff, '\0', 200);
+	sprintf(sqlBuff,
+		"INSERT INTO UtilChlg (Scenario, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util) VALUES ('%s',%d,%d,%d,%d,%d,%f)",
+		model->getScenarioName().c_str(), t, h, k, i, j, euChlg);
+	sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
+
+	//ProbVict database record insertion
+	memset(sqlBuff, '\0', 200);
+	sprintf(sqlBuff,
+		"INSERT INTO ProbVict (Scenario, Turn_t, Est_h,Init_i,Rcvr_j,Prob) VALUES ('%s',%d,%d,%d,%d,%f)",
+		model->getScenarioName().c_str(), t, h, i, j, phij);
+	sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
+
+	//UtilContest database record insertion
+	memset(sqlBuff, '\0', 200);
+	sprintf(sqlBuff,
+		"INSERT INTO UtilContest (Scenario, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util) VALUES ('%s',%d,%d,%d,%d,%d,%f)",
+		model->getScenarioName().c_str(), t, h, k, i, j, euCntst);
+	sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
+
+	//UtilSQ database record insertion
+	memset(sqlBuff, '\0', 200);
+	sprintf(sqlBuff,
+		"INSERT INTO UtilSQ (Scenario, Turn_t, Est_h, Aff_k, Util) VALUES ('%s',%d,%d,%d,%f)",
+		model->getScenarioName().c_str(), t, h, k, euSQ);
+	sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
+
+	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+
+	delete sqlBuff;
+	sqlBuff = nullptr;
+
     return rslt;
   }
 

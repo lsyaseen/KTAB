@@ -300,7 +300,7 @@ string Model::createTableSQL(unsigned int tn) {
 				"Scenario TEXT(%d) NOT NULL DEFAULT 'NoName', "\
 				"Act_i	INTEGER NOT NULL DEFAULT 0, "\
 				"Name	TEXT(%d) NOT NULL DEFAULT 'NoName', "\
-				"Desc	TEXT(%d) NOT NULL DEFAULT 'NoName', "\
+				"Desc	TEXT(%d) NOT NULL DEFAULT 'NoName' "\
 				");", maxScenNameLen, maxActNameLen, maxActDescLen);
 			sql = std::string(sqlBuff);
 			delete sqlBuff;
