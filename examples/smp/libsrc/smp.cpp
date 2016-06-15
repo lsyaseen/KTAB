@@ -949,6 +949,13 @@ namespace SMPLib {
 		model->getScenarioName().c_str(), t, h, k, euSQ);
 	sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
 
+	//UtilVict database record insertion
+	memset(sqlBuff, '\0', 200);
+	sprintf(sqlBuff,
+		"INSERT INTO UtilVict (Scenario, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util) VALUES ('%s',%d,%d,%d,%d,%d,%f)",
+		model->getScenarioName().c_str(), t, h, k, i, j, uhkij);
+	sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
+
 	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
 	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 
@@ -1258,7 +1265,7 @@ namespace SMPLib {
     return;
   }
   //Populates the SpatialCapability table
-  void SMPModel::PopulateSpatialCapabilityTable(bool sqlP) const {
+  void SMPModel::populateSpatialCapabilityTable(bool sqlP) const {
 	  // verify the actor size
 	  assert(numAct == actrs.size());
 	  // check the database availability
@@ -1306,7 +1313,7 @@ namespace SMPLib {
 	  return;
   }
   //Populates the SpatialSliencetable
-  void SMPModel::PopulateSpatialSalienceTable(bool sqlP) const {
+  void SMPModel::populateSpatialSalienceTable(bool sqlP) const {
 	  // Verify the actor and dimesnsion
 	  assert(numAct == actrs.size());
 	  assert(numDim == dimName.size());
@@ -1364,8 +1371,49 @@ namespace SMPLib {
 	  }
 	  return;
   }
-
-
+  //Populate the actor description table
+  void SMPModel::populateActorDescriptionTable(bool sqlP) const {
+	  // Verify the actor  
+	  assert(numAct == actrs.size());
+	  // Verify the database is live and 
+	  assert(nullptr != smpDB);
+	  // table is created
+	  createTableSQL(12);
+	  // buffer to hold data
+	  char* zErrMsg = nullptr;
+	  auto sqlBuff = newChars(200);
+	  // Form a insert command 
+	  sprintf(sqlBuff,
+		  "INSERT INTO ActorDescription (Scenario,  Act_i, Name,Desc) VALUES ('%s', ?1, ?2, ?3)",
+		  scenName.c_str());
+	  const char* insStr = sqlBuff;
+	  sqlite3_stmt *insStmt;
+	  // fill the Scenario
+	  sqlite3_prepare_v2(smpDB, insStr, strlen(insStr), &insStmt, NULL);
+	  // Start transctions
+	  sqlite3_exec(smpDB, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+	  // For each actor fill the requird information
+	  for (unsigned int i = 0; i < actrs.size(); i++) {
+	 	  Actor * act = actrs.at(i);
+		  if (sqlP) {
+			  int rslt = 0;
+			  rslt = sqlite3_bind_int(insStmt, 1, i);
+			  assert(SQLITE_OK == rslt);
+			  rslt = sqlite3_bind_text(insStmt, 2, act->name.c_str(), -1, SQLITE_TRANSIENT);
+			  assert(SQLITE_OK == rslt);
+			  rslt = sqlite3_bind_text(insStmt, 3, act->desc.c_str(), -1, SQLITE_TRANSIENT);
+			  assert(SQLITE_OK == rslt);
+			  rslt = sqlite3_step(insStmt);
+			  assert(SQLITE_DONE == rslt);
+			  sqlite3_clear_bindings(insStmt);
+			  assert(SQLITE_DONE == rslt);
+			  rslt = sqlite3_reset(insStmt);
+			  assert(SQLITE_OK == rslt);
+		  }
+	  }
+	  sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
+	  return;
+  }
   SMPModel * SMPModel::readCSV(string fName, PRNG * rng) {
     using KBase::KException;
     char * errBuff = newChars(100); // as sprintf requires

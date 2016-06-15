@@ -215,9 +215,10 @@ public:
     // print history of each actor in CSV (might want to generalize to arbitrary VctrPstn)
     void showVPHistory(bool sqlP) const;
 
-	void PopulateSpatialCapabilityTable(bool sqlP) const;
+	void populateSpatialCapabilityTable(bool sqlP) const;
 
-	void PopulateSpatialSalienceTable(bool sqlP) const;
+	void populateSpatialSalienceTable(bool sqlP) const;
+	void populateActorDescriptionTable(bool sqlP  ) const;
 
     // output the two files needed to draw Sankey diagrams
     void sankeyOutput(string inputCSV) const;

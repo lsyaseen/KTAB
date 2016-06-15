@@ -229,10 +229,13 @@ namespace DemoSMP {
     md0->sqlAUtil(nState - 1);
 
     md0->sqlPosProb(nState - 1);
-    md0->PopulateSpatialSalienceTable(true);
+    md0->populateSpatialSalienceTable(true);
+
+	md0->populateActorDescriptionTable(true );
+	
 
 
-    md0->PopulateSpatialCapabilityTable(true);
+    md0->populateSpatialCapabilityTable(true);
     cout << "Completed model run" << endl << endl;
     printf("There were %u states, with %i steps between them\n", nState, nState - 1);
 
@@ -284,8 +287,9 @@ namespace DemoSMP {
     md0->run();
 
     cout << "Completed model run" << endl << endl;
-    md0->PopulateSpatialCapabilityTable(true);
-    md0->PopulateSpatialSalienceTable(true);
+    md0->populateSpatialCapabilityTable(true);
+    md0->populateSpatialSalienceTable(true);
+	md0->populateActorDescriptionTable(true );
 
     cout << "History of actor positions over time" << endl;
     md0->showVPHistory(true);
