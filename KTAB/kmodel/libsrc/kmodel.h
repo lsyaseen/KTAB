@@ -279,6 +279,7 @@ namespace KBase {
     PRNG * rng = nullptr;
     vector<State*> history = {};
 
+	
 
     // output an existing actor util table, for the given turn, to SQLite
     void sqlAUtil(unsigned int t);
@@ -294,10 +295,10 @@ namespace KBase {
     // returns h's estimate of i's risk attitude, using the risk-adjustment-rule
     static double estNRA(double rh, double  ri, BigRAdjust ra) ;
 	string getScenarioName() const { return scenName; };
-
+	static string createSQL(unsigned int n);
   protected:
-    static string createTableSQL(unsigned int tn);
-	static const int NumTable = 13;
+    //static string createTableSQL(unsigned int tn);
+	static const int NumTables = 13; //TODO: constant need to be redefined when new table is added
     // note that the function to write to table #k must be kept
     // synchronized with the result of createTableSQL(k) !
 
@@ -311,6 +312,8 @@ namespace KBase {
     
     static KMatrix markovPCE(const KMatrix & pv);
     static KMatrix condPCE(const KMatrix & pv);
+
+	 
   private:
   };
 

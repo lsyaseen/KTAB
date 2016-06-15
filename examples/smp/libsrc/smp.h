@@ -231,25 +231,25 @@ public:
 
     static double stateDist(const SMPState* s1, const SMPState* s2);
 
+	static string createSQL(unsigned int n) ;
+	 
     // this does not set AUtil, just output it to SQLite
     //virtual void sqlAUtil(unsigned int t);
 
 protected:
     //sqlite3 *smpDB = nullptr; // keep this protected, to ease multi-threading
     //string scenName = "Scen";
+	static const int NumTables = 3; // TODO : Add one to this num when new table is added
 protected:
     // note that the function to write to table #k must be kept
     // synchronized with the result of createTableSQL(k) !
     void sqlTest();
 
-    // note that the function to write to table #k must be kept
-    // synchronized with the result of createTableSQL(k) !
-    static string createSMPTableSQL(unsigned int tn);
-
     // compute several useful items implied by the risk attitudes, saliences, and the matrix of differences
     static void setUtilProb(const KMatrix& vR, const KMatrix& vS, const KMatrix& vD, KBase::VotingRule vr);
 
 private:
+
 };
 
 

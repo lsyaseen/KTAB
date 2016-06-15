@@ -945,8 +945,8 @@ namespace SMPLib {
 	//UtilSQ database record insertion
 	memset(sqlBuff, '\0', 200);
 	sprintf(sqlBuff,
-		"INSERT INTO UtilSQ (Scenario, Turn_t, Est_h, Aff_k, Util) VALUES ('%s',%d,%d,%d,%f)",
-		model->getScenarioName().c_str(), t, h, k, euSQ);
+		"INSERT INTO UtilSQ (Scenario, Turn_t, Est_h, Aff_k,Init_i,Rcvr_j, Util) VALUES ('%s',%d,%d,%d,%d,%d,%f)",
+		model->getScenarioName().c_str(), t, h, k, i,j,euSQ);
 	sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
 
 	//UtilVict database record insertion
@@ -1081,7 +1081,7 @@ namespace SMPLib {
     return dSum;
   }
 
-
+   
   // 0 <= d <= 1 is the difference in normalized position
   // -1 <= R <= +1 is normalized risk-aversion
   double SMPModel::bsUtil(double sd, double R) {
@@ -1177,7 +1177,8 @@ namespace SMPLib {
 
     assert(nullptr != smpDB);
     char* zErrMsg = nullptr;
-    createSMPTableSQL(0); // VectorPosition
+   
+	createSQL(13);
     auto sqlBuff = newChars(200);
     sprintf(sqlBuff,
       "INSERT INTO VectorPosition (Scenario, Turn_t, Act_i, Dim_k, Coord) VALUES ('%s', ?1, ?2, ?3, ?4)",
@@ -1272,7 +1273,7 @@ namespace SMPLib {
 	  assert(nullptr != smpDB);
 	  char* zErrMsg = nullptr;
 	  // Make sure table present
-	  createSMPTableSQL(2);  
+	  createSQL(15);
 	  auto sqlBuff = newChars(200);
 	  // form sql insert command
 	  sprintf(sqlBuff,
@@ -1321,7 +1322,7 @@ namespace SMPLib {
 	  assert(nullptr != smpDB);
 	  char* zErrMsg = nullptr;
 	  // check if table present if not create
-	  createSMPTableSQL(1); // VectorPosition
+	  createSQL(14);
 	  auto sqlBuff = newChars(200);
 	  // Form a insert command 
 	  sprintf(sqlBuff,
@@ -1377,8 +1378,8 @@ namespace SMPLib {
 	  assert(numAct == actrs.size());
 	  // Verify the database is live and 
 	  assert(nullptr != smpDB);
-	  // table is created
-	  createTableSQL(12);
+	  // check table is present
+	  createSQL(12);
 	  // buffer to hold data
 	  char* zErrMsg = nullptr;
 	  auto sqlBuff = newChars(200);

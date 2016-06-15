@@ -600,7 +600,7 @@ namespace KBase {
     return p;
   }
 
-
+  
   // Given square matrix of Prob[i>j] returns a column vector for Prob[i].
   // Uses Markov process, not 1-step conditional probability
   KMatrix Model::markovPCE(const KMatrix & pv) {

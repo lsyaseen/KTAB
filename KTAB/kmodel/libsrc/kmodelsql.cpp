@@ -137,10 +137,12 @@ void Model::demoSQLite() {
 
 
 // note that the function to write to table #k must be kept
-// synchronized with the result of createTableSQL(k) !
-string Model::createTableSQL(unsigned int tn) {
+// synchronized with the result of createSQL(k) !
+string Model::createSQL(unsigned int n) {
+	
     string sql = "";
-    switch (tn) {
+	assert(n < Model::NumTables);
+    switch (n) {
     case 0:
         // position-utility table
         // the estimated utility to each actor of each other's position
@@ -249,6 +251,8 @@ string Model::createTableSQL(unsigned int tn) {
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
               "Aff_k	INTEGER NOT NULL DEFAULT 0, "\
+			  "Init_i	INTEGER NOT NULL DEFAULT 0, "\
+			  "Rcvr_j	INTEGER NOT NULL DEFAULT 0, "\
               "Util	REAL"\
               ");";
         break;
@@ -520,35 +524,39 @@ void Model::sqlPosVote(unsigned int t) {
 	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 	auto vr = VotingRule::Proportional;
 	// collect the information from each estimator 
-	for (unsigned int h = 0; h < numAct; h++) { // estimator is h
+	
 		for (unsigned int k = 0; k < numAct; k++) { // voter is k
 			auto rd = st->model->actrs[k];
 			for (unsigned int i = 0; i < numAct; i++) {
 				for (unsigned int j = 0; j < numAct; j++) {
-					auto vij = rd->vote(h,i, j, st);
-					int rslt = 0;
-					rslt = sqlite3_bind_int(insStmt, 1, t);
-					assert(SQLITE_OK == rslt); 
-					rslt = sqlite3_bind_int(insStmt, 2, h);
-					assert(SQLITE_OK == rslt);
-					//voter_k 
-					rslt = sqlite3_bind_int(insStmt, 3, k);
-					assert(SQLITE_OK == rslt);
-					// position i
-					rslt = sqlite3_bind_int(insStmt, 4, i);
-					assert(SQLITE_OK == rslt);
-					//position j
-					rslt = sqlite3_bind_int(insStmt, 5, j);
-					assert(SQLITE_OK == rslt);
-					// vote ?
-					rslt = sqlite3_bind_double(insStmt, 6, vij);
-					assert(SQLITE_OK == rslt);
-					rslt = sqlite3_step(insStmt);
-					assert(SQLITE_DONE == rslt);
-					sqlite3_clear_bindings(insStmt);
-					assert(SQLITE_DONE == rslt);
-					rslt = sqlite3_reset(insStmt);
-					assert(SQLITE_OK == rslt);
+					for (unsigned int h = 0; h < numAct; h++) { // estimator is h
+					if (((h == i) || (h == j)) && (i!=j))
+					{
+						auto vij = rd->vote(h, i, j, st);
+						int rslt = 0;
+						rslt = sqlite3_bind_int(insStmt, 1, t);
+						assert(SQLITE_OK == rslt);
+						rslt = sqlite3_bind_int(insStmt, 2, h);
+						assert(SQLITE_OK == rslt);
+						//voter_k 
+						rslt = sqlite3_bind_int(insStmt, 3, k);
+						assert(SQLITE_OK == rslt);
+						// position i
+						rslt = sqlite3_bind_int(insStmt, 4, i);
+						assert(SQLITE_OK == rslt);
+						//position j
+						rslt = sqlite3_bind_int(insStmt, 5, j);
+						assert(SQLITE_OK == rslt);
+						// vote ?
+						rslt = sqlite3_bind_double(insStmt, 6, vij);
+						assert(SQLITE_OK == rslt);
+						rslt = sqlite3_step(insStmt);
+						assert(SQLITE_DONE == rslt);
+						sqlite3_clear_bindings(insStmt);
+						assert(SQLITE_DONE == rslt);
+						rslt = sqlite3_reset(insStmt);
+						assert(SQLITE_OK == rslt);
+					}
 				}
 			}
 		}
