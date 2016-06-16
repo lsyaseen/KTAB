@@ -8,23 +8,6 @@ MainWindow::MainWindow()
     createActions();
     createStatusBar();
 
-    //#ifdef _WIN32
-    //    QString dbPath = "../Data";
-    //#else
-    //QString dbPath = "/home/arunsathvik/Desktop/Dr.Ben/for-Arun/2016-06-14-SOE-Competitive.db";
-    //#endif
-
-    //    db = QSqlDatabase::addDatabase("QSQLITE");
-    //    db.setDatabaseName(dbPath);
-    //    db.setHostName("localhost");
-    //    db.setUserName("root");
-
-    //    if(!db.open())
-    //    {
-    //        QMessageBox::warning(this,"Database Error", db.lastError().text());
-    //        //        qDebug()<<"Error while opening DB: " << db.databaseName() << "\n"<< db.lastError().text();
-    //    }
-
     createModuleParametersDockWindow();
     createGraph1DockWindows();
     createGraph2DockWindows();
@@ -40,19 +23,28 @@ MainWindow::MainWindow()
 
     //Database
     dbObj = new Database();
-    //connect to open database by passing the path
+    //To open database by passing the path
     connect(this,&MainWindow::dbFilePath,dbObj, &Database::openDB);
+    //To get Database item Model to show on GUI
     connect(dbObj,&Database::dbModel,this,&MainWindow::setDBItemModel);
+    //To display any message to user
     connect(dbObj,&Database::Message,this,&MainWindow::DisplayMessage);
+    //To get vector positions of actors to plot a graph on GUI
     connect(dbObj,&Database::vectorPosition,this,&MainWindow::addGraphOnModule1);
-
+    //To get number of states to set the max values of slider
+    connect(dbObj,&Database::statesCount,this,&MainWindow::updateStateCount_SliderRange);
+    //To get all scenarios from Database to update ScenarioComboBox
+    connect(dbObj,&Database::scenarios,this,&MainWindow::updateScenarioList_ComboBox);
+    //To get initial scenario vector positions and Item model to update graph and Table view
+    connect(this, &MainWindow::getScenarioRunValues,dbObj,&Database::getScenarioData);
+    //To get state count
+    connect(this, &MainWindow::getStateCount,dbObj,&Database::getStateCount);
 
 }
 
 MainWindow::~MainWindow()
 {
 }
-
 
 void MainWindow::csvGetFilePAth()
 {
@@ -78,6 +70,28 @@ void MainWindow::dbGetFilePAth()
         emit dbFilePath(dbPath);
 }
 
+void MainWindow::updateStateCount_SliderRange(int states)
+{
+    turnSlider->setRange(0,states);
+}
+
+void MainWindow::updateScenarioList_ComboBox(QStringList *scenarios)
+{
+    scenarioComboBox->clear();
+    for(int index=0;index<scenarios->length();++index)
+        scenarioComboBox->addItem(scenarios->at(index));
+}
+
+void MainWindow::sliderStateValueToQryDB(int value)
+{
+    removeAllGraphs();
+    emit getScenarioRunValues(value,scenario_box);
+}
+
+void MainWindow::scenarioComboBoxValue(QString scenario)
+{
+    scenario_box = scenario;
+}
 
 void MainWindow::DisplayMessage(QString cls, QString message)
 {
@@ -110,16 +124,16 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model)
     //        csv_tableView->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
 
     csv_tableView->resizeColumnsToContents();
+    csv_tableView->hideColumn(0);
 
     //Enable run button, which is disabled by default
     runButton->setEnabled(true);
 }
 
-
 void MainWindow::setDBItemModel(QSqlTableModel *model)
 {
-    qDebug()<<"inside DB Item model ";
     //update received model to widget
+
     csv_tableView->setModel(model);
     csv_tableView->showMaximized();
     csv_tableView->setAlternatingRowColors(true);
@@ -129,10 +143,12 @@ void MainWindow::setDBItemModel(QSqlTableModel *model)
     //        csv_tableView->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
 
     csv_tableView->resizeColumnsToContents();
+    csv_tableView->hideColumn(0);
 
     //Enable run button, which is disabled by default
     runButton->setEnabled(true);
 }
+
 void MainWindow::about()
 {
     QMessageBox::about(this, tr("About SMP "),
@@ -212,7 +228,7 @@ void MainWindow::createGraph1DockWindows()
     plotGraph();
 
     graph1Dock->setWidget(graphWidget);
-    addDockWidget(Qt::BottomDockWidgetArea, graph1Dock);
+    addDockWidget(Qt::RightDockWidgetArea, graph1Dock);
     viewMenu->addAction(graph1Dock->toggleViewAction());
 
     connect(graph1Dock,SIGNAL(dockLocationChanged(Qt::DockWidgetArea)),this,SLOT(dockWindowChanged()));
@@ -341,44 +357,70 @@ void MainWindow::initializeCentralViewFrame()
     central = new QFrame;
     central->setFrameShape(QFrame::StyledPanel);
 
-    QVBoxLayout *vLayout = new QVBoxLayout(central);
-    tableControlsFrame = new QFrame(central);
+    QGridLayout *gLayout = new QGridLayout;
+    central->setLayout(gLayout);
 
-    //    QHBoxLayout *hLayout = new QHBoxLayout(tableControlsFrame);
+    tableControlsFrame = new QFrame;
+    tableControlsFrame->setFrameShape(QFrame::StyledPanel);
 
-    //    scenarioComboBox = new QComboBox(tableControlsFrame);
-    //    hLayout->addWidget(scenarioComboBox);
+    QGridLayout *gCLayout = new QGridLayout(tableControlsFrame);
 
-    //    actorsPushButton = new QPushButton(tableControlsFrame);
-    //    hLayout->addWidget(actorsPushButton);
+    scenarioComboBox = new QComboBox(tableControlsFrame);
+    //    scenarioComboBox->setMinimumWidth(40);
+    //    scenarioComboBox->setMaximumWidth(70);
+    //    scenarioComboBox->setFixedWidth(60);
+    gCLayout->addWidget(scenarioComboBox,0,2);
+    connect(scenarioComboBox,SIGNAL(currentIndexChanged(QString)),this,SLOT(scenarioComboBoxValue(QString)));
 
-    //    actorsLineEdit = new QLineEdit (tableControlsFrame);
-    //    actorsLineEdit->setMaximumWidth(50);
-    //    actorsLineEdit->setFixedWidth(60);
-    //    hLayout->addWidget(actorsLineEdit);
 
-    //    dimensionsPushButton = new QPushButton(tableControlsFrame);
-    //    hLayout->addWidget(dimensionsPushButton);
-
-    //    dimensionsLineEdit = new QLineEdit (tableControlsFrame);
-    //    dimensionsLineEdit->setMaximumWidth(50);
-    //    dimensionsLineEdit->setFixedWidth(60);
-    //    hLayout->addWidget(dimensionsLineEdit);
-
-    //    donePushButton = new QPushButton(tableControlsFrame);
-    //    hLayout->addWidget(donePushButton);
-    //    turnSlider = new QSlider(Qt::Horizontal,tableControlsFrame);
-    //    turnSlider->setMaximumWidth(150);
-    //    turnSlider->setFixedWidth(170);
+    turnSlider = new QSlider(Qt::Horizontal,tableControlsFrame);
+    //    turnSlider->setMinimumWidth(40);
+    //    turnSlider->setMaximumWidth(70);
+    //    turnSlider->setFixedWidth(60);
     //    turnSlider->setTickInterval(1);
-    //    turnSlider->setTickPosition();
-    //    hLayout->addWidget(turnSlider);
+    turnSlider->setPageStep(1);
+    gCLayout->addWidget(turnSlider,1,2);
+
+    connect(turnSlider,&QSlider::valueChanged,this,&MainWindow::sliderStateValueToQryDB);
+
+
+    actorsPushButton = new QPushButton("Actors",tableControlsFrame);
+    actorsPushButton->setMaximumWidth(120);
+    actorsPushButton->setFixedWidth(90);
+    gCLayout->addWidget(actorsPushButton,0,0);
+
+    actorsLineEdit = new QLineEdit ("3",tableControlsFrame);
+    actorsLineEdit->setMaximumWidth(70);
+    actorsLineEdit->setFixedWidth(60);
+    gCLayout->addWidget(actorsLineEdit,0,1);
+
+    dimensionsPushButton = new QPushButton("Dimensions",tableControlsFrame);
+    dimensionsPushButton->setMaximumWidth(120);
+    dimensionsPushButton->setFixedWidth(90);
+    gCLayout->addWidget(dimensionsPushButton,1,0);
+
+    dimensionsLineEdit = new QLineEdit ("1",tableControlsFrame);
+    dimensionsLineEdit->setMaximumWidth(70);
+    dimensionsLineEdit->setFixedWidth(60);
+    gCLayout->addWidget(dimensionsLineEdit,1,1);
+
+    scenarioNewLineEdit = new QLineEdit(tableControlsFrame);
+    scenarioNewLineEdit->setMaximumWidth(120);
+    scenarioNewLineEdit->setFixedWidth(90);
+    scenarioNewLineEdit->setHidden(true);
+    gCLayout->addWidget(scenarioNewLineEdit,0,3);
+
+
+    donePushButton = new QPushButton("Done",tableControlsFrame);
+    donePushButton->setMaximumWidth(120);
+    donePushButton->setFixedWidth(90);
+    gCLayout->addWidget(donePushButton,1,3);
 
     csv_tableView = new QTableView(central);
+    csv_tableView->setShowGrid(true);
 
-    vLayout->addWidget(tableControlsFrame);
-    vLayout->addWidget(csv_tableView);
-    central->setLayout(vLayout);
+    gLayout->addWidget(tableControlsFrame);
+    gLayout->addWidget(csv_tableView);
 
     setCentralWidget(central);
 }
@@ -497,84 +539,86 @@ void MainWindow::mouseWheel()
         customGraph->axisRect()->setRangeZoom(Qt::Horizontal|Qt::Vertical);
 }
 
-void MainWindow::addGraphOnModule1(const QVector<double> &x, const QVector<double> &y)
+void MainWindow::addGraphOnModule1(const QVector<double> &x, const QVector<double> &y,QString Actor)
 {
-    //    QSqlQuery qry;
-    //    QString query= QString("select * from VectorPosition where Act_i='%1' and Dim_k='%2' ").arg(act).arg(dim);
+    {//    QSqlQuery qry;
+        //    QString query= QString("select * from VectorPosition where Act_i='%1' and Dim_k='%2' ").arg(act).arg(dim);
 
-    //    int n=0;
-    //    qry.exec(query);
+        //    int n=0;
+        //    qry.exec(query);
 
-    //    while(qry.next())
-    //    {
-    //        n++;
-    //        qDebug()<<"n" << n;
-    //    }
+        //    while(qry.next())
+        //    {
+        //        n++;
+        //        qDebug()<<"n" << n;
+        //    }
 
-    //    QVector<double> x(n), y(n);
-    //    int actornumber=0;
-    //    int i =0;
-    //    query= QString("select * from VectorPosition where Act_i='%1' and Dim_k='%2' ").arg(act).arg(dim);
-    //    qry.exec(query);
-    //    while(qry.next())
-    //    {
-    //        qDebug()<<qry.value(1).toDouble() << "    " <<qry.value(4).toDouble();
-    //        x[i]=qry.value(1).toDouble();
-    //        y[i]=qry.value(4).toDouble()*100;
-    //        actornumber=qry.value(2).toInt();
-    //        ++i;
-    //    }
+        //    QVector<double> x(n), y(n);
+        //    int actornumber=0;
+        //    int i =0;
+        //    query= QString("select * from VectorPosition where Act_i='%1' and Dim_k='%2' ").arg(act).arg(dim);
+        //    qry.exec(query);
+        //    while(qry.next())
+        //    {
+        //        qDebug()<<qry.value(1).toDouble() << "    " <<qry.value(4).toDouble();
+        //        x[i]=qry.value(1).toDouble();
+        //        y[i]=qry.value(4).toDouble()*100;
+        //        actornumber=qry.value(2).toInt();
+        //        ++i;
+        //    }
 
-    //    customGraph->addGraph();
-    //    customGraph->graph()->setPen(QPen(Qt::blue));
-    //    customGraph->graph()->setBrush(QBrush(QColor(0, 0, 255, 20)));
-    //    customGraph->addGraph();
-    //    customGraph->graph()->setPen(QPen(Qt::red));
-    //    QVector<double> x(500), y0(500), y1(500);
+        //    customGraph->addGraph();
+        //    customGraph->graph()->setPen(QPen(Qt::blue));
+        //    customGraph->graph()->setBrush(QBrush(QColor(0, 0, 255, 20)));
+        //    customGraph->addGraph();
+        //    customGraph->graph()->setPen(QPen(Qt::red));
+        //    QVector<double> x(500), y0(500), y1(500);
 
-    //    for (int i=0; i<n; ++i)
-    //    {
-    //        //     x[i] = (i/n-0.5)*10;
-    //        //     y[i] = qExp(-x[i]*x[i]*0.25)*qSin(x[i]*5)*5;
-    //        //      y[i] = qExp(-x[i]*x[i]*0.25)*5;
-    //    }
-    //    customGraph->graph(0)->setData(x, y);
-    //    //  customGraph->graph(1)->setData(x, y1);
-    //    customGraph->axisRect()->setupFullAxesBox(true);
-    //    customGraph->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+        //    for (int i=0; i<n; ++i)
+        //    {
+        //        //     x[i] = (i/n-0.5)*10;
+        //        //     y[i] = qExp(-x[i]*x[i]*0.25)*qSin(x[i]*5)*5;
+        //        //      y[i] = qExp(-x[i]*x[i]*0.25)*5;
+        //    }
+        //    customGraph->graph(0)->setData(x, y);
+        //    //  customGraph->graph(1)->setData(x, y1);
+        //    customGraph->axisRect()->setupFullAxesBox(true);
+        //    customGraph->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
-    //    QVector<double> x(500), y0(500), y1(500);
+        //    QVector<double> x(500), y0(500), y1(500);
 
 
-    //    for (int i=0; i<n; ++i)
-    //    {
-    //      x[i] = (i/n-1-0.5)*10;
-    //      y[i] = qExp(-x[i]*x[i]*0.25)*qSin(x[i]*5)*5;
-    //    }
-    //    customGraph->graph()->setData(x, y);
-    //   // customGraph->graph(1)->setData(x, y);
-    //    customGraph->axisRect()->setupFullAxesBox(true);
-    //    customGraph->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+        //    for (int i=0; i<n; ++i)
+        //    {
+        //      x[i] = (i/n-1-0.5)*10;
+        //      y[i] = qExp(-x[i]*x[i]*0.25)*qSin(x[i]*5)*5;
+        //    }
+        //    customGraph->graph()->setData(x, y);
+        //   // customGraph->graph(1)->setData(x, y);
+        //    customGraph->axisRect()->setupFullAxesBox(true);
+        //    customGraph->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
-    //        int n = 50; // number of points in graph
-    //    double xScale = (rand()/(double)RAND_MAX + 0.5)*2;
-    //    double yScale = (rand()/(double)RAND_MAX + 0.5)*2;
-    //    double xOffset = (rand()/(double)RAND_MAX - 0.5)*4;
-    //    double yOffset = (rand()/(double)RAND_MAX - 0.5)*5;
-    //    double r1 = (rand()/(double)RAND_MAX - 0.5)*2;
-    //    double r2 = (rand()/(double)RAND_MAX - 0.5)*2;
-    //    double r3 = (rand()/(double)RAND_MAX - 0.5)*2;
-    //    double r4 = (rand()/(double)RAND_MAX - 0.5)*2;
-    //        QVector<double> x(n), y(n);
+        //        int n = 50; // number of points in graph
+        //    double xScale = (rand()/(double)RAND_MAX + 0.5)*2;
+        //    double yScale = (rand()/(double)RAND_MAX + 0.5)*2;
+        //    double xOffset = (rand()/(double)RAND_MAX - 0.5)*4;
+        //    double yOffset = (rand()/(double)RAND_MAX - 0.5)*5;
+        //    double r1 = (rand()/(double)RAND_MAX - 0.5)*2;
+        //    double r2 = (rand()/(double)RAND_MAX - 0.5)*2;
+        //    double r3 = (rand()/(double)RAND_MAX - 0.5)*2;
+        //    double r4 = (rand()/(double)RAND_MAX - 0.5)*2;
+        //        QVector<double> x(n), y(n);
 
-    //        for (int i=0; i<n; i++)
-    //        {
-    //            x[i] = (i/(double)n-0.5)*10.0*xScale + xOffset;
-    //            y[i] = (qSin(x[i]*r1*5)*qSin(qCos(x[i]*r2)*r4*3)+r3*qCos(qSin(x[i])*r4*2))*yScale + yOffset;
-    //        }
+        //        for (int i=0; i<n; i++)
+        //        {
+        //            x[i] = (i/(double)n-0.5)*10.0*xScale + xOffset;
+        //            y[i] = (qSin(x[i]*r1*5)*qSin(qCos(x[i]*r2)*r4*3)+r3*qCos(qSin(x[i])*r4*2))*yScale + yOffset;
+        //        }
+    }
+
 
     customGraph->addGraph();
-    //  customGraph->graph()->setName("Actor : "+ QString::number(actornumber));
+    customGraph->graph()->setName(Actor);
     customGraph->graph()->setData(x, y);
     customGraph->graph()->setLineStyle(((QCPGraph::LineStyle)(1)));//upto 5
 
@@ -587,31 +631,6 @@ void MainWindow::addGraphOnModule1(const QVector<double> &x, const QVector<doubl
 
     customGraph->graph()->setPen(graphPen);
     customGraph->replot();
-
-    //    QCPCurve *curve = new QCPCurve(customGraph->xAxis, customGraph->yAxis);
-    //    customGraph->addPlottable(curve);
-
-    //    for (int i =0 ; i <n ;++i)
-    //    {
-    //        double phi = (i/(double)(n-1))*8*M_1_PI;
-    //        x[i]=qSqrt(phi)*qCos(phi);
-    //        y[i]=qSqrt(phi)*qSin(phi);
-
-    //        double t = i/(double)(n-1)*2*qSin(t);
-
-    //    }
-
-    //     customGraph->addGraph();
-    //    curve->setData(x,y);
-
-
-
-    //    QPen graphPen;
-    //    graphPen.setColor(QColor(rand()%245+10, rand()%245+10, rand()%245+10));
-    //    graphPen.setWidthF(rand()/(double)RAND_MAX*2+1);
-
-    //    customGraph->graph()->setPen(graphPen);
-    //    customGraph->replot();
 
 }
 

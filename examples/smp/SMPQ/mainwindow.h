@@ -42,8 +42,6 @@ public:
     MainWindow();
     ~MainWindow();
 
-
-
 private slots:
     void about();
     void dockWindowChanged();
@@ -55,6 +53,12 @@ private slots:
     void DisplayMessage(QString cls, QString message);
     void VectorPositionsFromDB();
     void dbGetFilePAth();
+    void updateStateCount_SliderRange(int states);
+    void updateScenarioList_ComboBox(QStringList * scenarios);
+
+    //Central-  Controls Frame
+    void sliderStateValueToQryDB(int value);
+    void scenarioComboBoxValue(QString scenario_box);
 
 signals:
     //CSV
@@ -62,6 +66,10 @@ signals:
 
     //Database
     void dbFilePath(QString path);
+
+    void getScenarioRunValues(int state, QString scenario_box);
+    void getStateCount();
+    //void send_scenario(QString scenario);
 private:
     //MainWindow
     void createActions();
@@ -73,12 +81,14 @@ private:
     // Central Main Frame
     QFrame *central;
     QFrame *tableControlsFrame;
+
     QComboBox * scenarioComboBox;
     QPushButton * actorsPushButton;
     QLineEdit * actorsLineEdit;
     QPushButton * dimensionsPushButton;
     QLineEdit * dimensionsLineEdit;
     QPushButton * donePushButton;
+    QLineEdit * scenarioNewLineEdit;
     QSlider * turnSlider;
 
     //Model parameters
@@ -122,6 +132,7 @@ private:
     void initializeCentralViewFrame();
 
 
+    QString scenario_box;
     //graph - customplot
 private slots:
     void titleDoubleClick(QMouseEvent *event, QCPPlotTitle *title);
@@ -130,7 +141,7 @@ private slots:
     void selectionChanged();
     void mousePress();
     void mouseWheel();
-    void addGraphOnModule1(const QVector<double> &x, const QVector<double> &y);
+    void addGraphOnModule1(const QVector<double> &x, const QVector<double> &y, QString Actor);
     void removeSelectedGraph();
     void removeAllGraphs();
     void contextMenuRequest(QPoint pos);
