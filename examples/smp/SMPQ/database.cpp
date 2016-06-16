@@ -60,7 +60,7 @@ void Database::getVectorPosition(int actor, int dim, int turn, QString scenario)
     QString query;
 
     int i =0;
-    QVector<double> x(numActors), y(numActors);
+    QVector<double> x(numStates+1), y(numStates+1);
 
     query= QString("select * from VectorPosition where Act_i='%1' and Dim_k='%2' and Turn_t<='%3' and  Scenario = '%4' ")
             .arg(actor).arg(dim).arg(turn).arg(scenario);
@@ -102,7 +102,7 @@ void Database::readVectorPositionTable(int state, QString scenario)
     emit dbModel(sqlmodel);
 
     //To plot Initial graph
-    for(int actors=0; actors < numActors; ++actors)
+    for(int actors=0; actors <= numActors; ++actors)
         getVectorPosition(actors,0,state,scenario);//actors, dimension, turn
 }
 
@@ -116,7 +116,7 @@ void Database::getNumActors()
     while(qry.next())
     {
         numActors = qry.value(0).toInt();
-        // qDebug()<<"numActors" << numActors;
+        qDebug()<<"numActors" << numActors;
     }
 
 }
@@ -131,7 +131,7 @@ void Database::getNumStates()
     while(qry.next())
     {
         numStates = qry.value(0).toInt();
-        // qDebug()<<"numStates" << numStates;
+        qDebug()<<"numStates" << numStates;
     }
 
     emit statesCount(numStates);

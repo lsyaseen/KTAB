@@ -68,7 +68,7 @@ signals:
     void dbFilePath(QString path);
 
     void getScenarioRunValues(int state, QString scenario_box);
-    void getStateCount();
+    void getStateCountfromDB();
     //void send_scenario(QString scenario);
 private:
     //MainWindow

@@ -38,7 +38,7 @@ MainWindow::MainWindow()
     //To get initial scenario vector positions and Item model to update graph and Table view
     connect(this, &MainWindow::getScenarioRunValues,dbObj,&Database::getScenarioData);
     //To get state count
-    connect(this, &MainWindow::getStateCount,dbObj,&Database::getStateCount);
+    connect(this, &MainWindow::getStateCountfromDB,dbObj,&Database::getStateCount);
 
 }
 
@@ -602,7 +602,6 @@ void MainWindow::addGraphOnModule1(const QVector<double> &x, const QVector<doubl
         //            y[i] = (qSin(x[i]*r1*5)*qSin(qCos(x[i]*r2)*r4*3)+r3*qCos(qSin(x[i])*r4*2))*yScale + yOffset;
         //        }
     }
-
 
     customGraph->addGraph();
     customGraph->graph()->setName(Actor);
