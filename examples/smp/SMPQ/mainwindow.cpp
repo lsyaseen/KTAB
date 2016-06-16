@@ -410,7 +410,6 @@ void MainWindow::initializeCentralViewFrame()
     scenarioNewLineEdit->setHidden(true);
     gCLayout->addWidget(scenarioNewLineEdit,0,3);
 
-
     donePushButton = new QPushButton("Done",tableControlsFrame);
     donePushButton->setMaximumWidth(120);
     donePushButton->setFixedWidth(90);
@@ -472,18 +471,6 @@ void MainWindow::legendDoubleClick(QCPLegend *legend, QCPAbstractLegendItem *ite
 
 void MainWindow::selectionChanged()
 {
-    /*
-   normally, axis base line, axis tick labels and axis labels are selectable separately, but we want
-   the user only to be able to select the axis as a whole, so we tie the selected states of the tick labels
-   and the axis base line together. However, the axis label shall be selectable individually.
-
-   The selection state of the left and right axes shall be synchronized as well as the state of the
-   bottom and top axes.
-
-   Further, we want to synchronize the selection of the graphs with the selection state of the respective
-   legend item belonging to that graph. So the user can select a graph by either clicking on the graph itself
-   or on its legend item.
-  */
 
     // make top and bottom axes be selected synchronously, and handle axis and tick labels as one selectable object:
     if (customGraph->xAxis->selectedParts().testFlag(QCPAxis::spAxis) || customGraph->xAxis->selectedParts().testFlag(QCPAxis::spTickLabels) ||

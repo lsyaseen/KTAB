@@ -102,7 +102,7 @@ void Database::readVectorPositionTable(int state, QString scenario)
     emit dbModel(sqlmodel);
 
     //To plot Initial graph
-    for(int actors; actors < numActors; ++actors)
+    for(int actors=0; actors < numActors; ++actors)
         getVectorPosition(actors,0,state,scenario);//actors, dimension, turn
 }
 
