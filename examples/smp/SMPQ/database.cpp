@@ -46,6 +46,8 @@ void Database::openDB(QString dbPath)
 
 void Database::getScenarioData(int turn, QString scenario)
 {
+    qDebug()<<"Turn"<<turn;
+
     readVectorPositionTable(turn,scenario);//turn
 }
 
@@ -56,6 +58,7 @@ void Database::getStateCount()
 
 void Database::getVectorPosition(int actor, int dim, int turn, QString scenario)
 {
+
     QSqlQuery qry;
     QString query;
 
@@ -68,8 +71,8 @@ void Database::getVectorPosition(int actor, int dim, int turn, QString scenario)
     qry.exec(query);
     while(qry.next())
     {
-        x.append(qry.value(1).toDouble());
-        y.append(qry.value(4).toDouble()*100);// y scales from 0 to 100
+        x[i]=qry.value(1).toDouble();
+        y[i]=qry.value(4).toDouble()*100;// y scales from 0 to 100
         ++i;
     }
 
@@ -86,9 +89,10 @@ void Database::getVectorPosition(int actor, int dim, int turn, QString scenario)
 
     emit vectorPosition(x,y,actor_name);
 
+
 }
 
-void Database::readVectorPositionTable(int state, QString scenario)
+void Database::readVectorPositionTable(int turn, QString scenario)
 {
     //TO-DO add scenario as a constraint and populate the scenario dropdown cum edit box
     //choose the first scenario as default
@@ -96,14 +100,14 @@ void Database::readVectorPositionTable(int state, QString scenario)
     sqlmodel = new QSqlTableModel(this);
     sqlmodel->setTable("VectorPosition");
     sqlmodel->setFilter(QString("Turn_t='%1' and  Dim_k='%2' and Scenario='%3'")
-                        .arg(state).arg(QString::number(0)).arg(scenario));
+                        .arg(turn).arg(QString::number(0)).arg(scenario));
     sqlmodel->select ();
 
     emit dbModel(sqlmodel);
 
-    //To plot Initial graph
+    //To plot graph
     for(int actors=0; actors <= numActors; ++actors)
-        getVectorPosition(actors,0,state,scenario);//actors, dimension, turn
+        getVectorPosition(actors,0,turn,scenario);//actors, dimension, turn
 }
 
 void Database::getNumActors()
