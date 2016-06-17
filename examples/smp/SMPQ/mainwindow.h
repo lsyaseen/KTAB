@@ -20,6 +20,7 @@
 
 #include <QDebug>
 #include <QMessageBox>
+#include <QMenu>
 
 class QAction;
 class QListWidget;

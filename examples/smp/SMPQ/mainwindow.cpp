@@ -90,6 +90,8 @@ void MainWindow::sliderStateValueToQryDB(int value)
 
 void MainWindow::scenarioComboBoxValue(QString scenario)
 {
+    removeAllGraphs();
+    turnSlider->setValue(0);
     scenario_box = scenario;
 }
 
@@ -152,7 +154,7 @@ void MainWindow::setDBItemModel(QSqlTableModel *model)
 void MainWindow::about()
 {
     QMessageBox::about(this, tr("About SMP "),
-                       tr("Should update informtion regarding SMP here !! "));
+                       tr("SMP !! "));
 }
 
 void MainWindow::createActions()
@@ -194,7 +196,9 @@ void MainWindow::createActions()
 
     fileMenu->addSeparator();
 
-    QAction *quitAct = fileMenu->addAction(tr("&Quit"), this, &QWidget::close);
+    QAction *quitAct = new QAction(dbIcon, tr("&Quit"), this);
+    connect(quitAct,SIGNAL(triggered(bool)),this,SLOT(close()));
+    fileMenu->addAction(quitAct);
     quitAct->setShortcuts(QKeySequence::Quit);
     quitAct->setStatusTip(tr("Quit the application"));
 
@@ -204,8 +208,10 @@ void MainWindow::createActions()
 
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
 
-    QAction *aboutAct = helpMenu->addAction(tr("&About"), this, &MainWindow::about);
-    aboutAct->setStatusTip(tr("Show the application's About box"));
+    QAction *aboutAct =new QAction(tr("&About"), this);
+    helpMenu->addAction(aboutAct);
+    connect(aboutAct,SIGNAL(triggered(bool)),this,SLOT(about()));
+    aboutAct->setStatusTip(tr("About SMPQ "));
 
 }
 
@@ -383,7 +389,6 @@ void MainWindow::initializeCentralViewFrame()
 
     connect(turnSlider,&QSlider::valueChanged,this,&MainWindow::sliderStateValueToQryDB);
 
-
     actorsPushButton = new QPushButton("Actors",tableControlsFrame);
     actorsPushButton->setMaximumWidth(120);
     actorsPushButton->setFixedWidth(90);
@@ -455,6 +460,7 @@ void MainWindow::axisLabelDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart par
 void MainWindow::legendDoubleClick(QCPLegend *legend, QCPAbstractLegendItem *item)
 {
     // Rename a graph by double clicking on its legend item
+
     Q_UNUSED(legend)
     if (item) // only react if item was clicked (user could have clicked on border padding of legend where there is no item, then item is 0)
     {

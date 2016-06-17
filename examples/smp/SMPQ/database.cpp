@@ -68,8 +68,8 @@ void Database::getVectorPosition(int actor, int dim, int turn, QString scenario)
     qry.exec(query);
     while(qry.next())
     {
-        x[i]=qry.value(1).toDouble();
-        y[i]=qry.value(4).toDouble()*100;// y scales from 0 to 100
+        x.append(qry.value(1).toDouble());
+        y.append(qry.value(4).toDouble()*100);// y scales from 0 to 100
         ++i;
     }
 
@@ -81,7 +81,7 @@ void Database::getVectorPosition(int actor, int dim, int turn, QString scenario)
     while(qry2.next())
     {
         actor_name = qry2.value(2).toString();
-        qDebug()<<actor_name <<"NAME";
+        // qDebug()<<actor_name <<"NAME";
     }
 
     emit vectorPosition(x,y,actor_name);

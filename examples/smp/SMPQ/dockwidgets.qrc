@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/images">
+    <qresource prefix="/../../examples/smp/SMPQ/images">
         <file>images/new.png</file>
         <file>images/print.png</file>
         <file>images/save.png</file>
