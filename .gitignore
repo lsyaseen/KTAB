@@ -1,8 +1,15 @@
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# We extended the standard .gitignore from GitHub to ignore the marked additions
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Compiled Object files
 *.slo
 *.lo
 *.o
 *.obj
+# linking
+*.ilk  
+# debugging             
+*.pdb               
 
 # Precompiled Headers
 *.gch
@@ -24,5 +31,24 @@
 
 # Executables
 *.exe
+# intermediate build products
+*.exe*    
 *.out
 *.app
+
+# Build stuff
+# generated directories of build products
+build*      
+# generated directories of Debug versions           
+Debug*        
+# generated directories of Release versions         
+Release*     
+# cached by CMake          
+CMakeLists.txt.user    
+
+# Project files
+.kdev4*
+*.kdev4
+
+
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
