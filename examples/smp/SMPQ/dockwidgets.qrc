@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>images/new.png</file>
+        <file>images/print.png</file>
+        <file>images/save.png</file>
+        <file>images/undo.png</file>
+        <file>images/csv.png</file>
+    </qresource>
+</RCC>

@@ -21,8 +21,8 @@ set(CMAKE_BUILD_TYPE Debug)
 set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
-set (ENABLE_FLTK_GUI false CACHE  BOOL "Build app with FLTK GUI")
-set (ENABLE_QT_GUI false CACHE  BOOL "Build app with QT GUI")
+set (ENABLE_FLTK_GUI true CACHE  BOOL "Build app with FLTK GUI")
+set (ENABLE_QT_GUI true CACHE  BOOL "Build app with QT GUI")
 
 if (UNIX)
     set (ENABLE_EFFCPP true CACHE  BOOL "Check Effective C++ Guidelines")
@@ -231,19 +231,25 @@ if(ENABLE_QT_GUI)
     endif(WIN32)
 
     #adding qt libraries
-    find_package(Qt5 REQUIRED COMPONENTS Widgets Core)
+    find_package(Qt5 REQUIRED COMPONENTS Widgets Core Sql PrintSupport)
 
     #manually adding files to the variables
-    set (QtProjectLib_src ../../examples/smp/SMPQ/mainwindow.cpp)
-    set (QtProjectLib_hdr ../../examples/smp/SMPQ/mainwindow.h)
+    set (QtProjectLib_src ../../examples/smp/SMPQ/mainwindow.cpp
+        ../../examples/smp/SMPQ/csv.cpp
+        ../../examples/smp/SMPQ/database.cpp
+        ../../examples/smp/SMPQ/qcustomplot.cpp
+        ../../examples/smp/SMPQ/customgraph.cpp)
+    set (QtProjectLib_hdr ../../examples/smp/SMPQ/mainwindow.h
+        ../../examples/smp/SMPQ/csv.h
+        ../../examples/smp/SMPQ/database.h
+        ../../examples/smp/SMPQ/qcustomplot.h)
     set (QtProjectLib_ui  ../../examples/smp/SMPQ/mainwindow.ui)
     set (QtProjectBin_src ../../examples/smp/SMPQ/main.cpp)
 
     # qt5_wrap_cpp is used to create moc files of the cpp files
     qt5_wrap_cpp(QtProjectLib_hdr_moc ${QtProjectLib_hdr})
     # qt5_wrap_ui is used to create code from ui files
-    qt5_wrap_ui(QtProjectLib_ui_moc  ${QtProjectLib_ui} )
-
+    qt5_wrap_ui(QtProjectLib_ui_moc ${QtProjectLib_ui})
 
     #including source and binary directories
     include_directories (${PROJECT_SOURCE_DIR})
@@ -257,15 +263,16 @@ if(ENABLE_QT_GUI)
     target_link_libraries (QtProjectLib Qt5::Core)
     target_link_libraries (QtProjectLib Qt5::Gui)
     target_link_libraries (QtProjectLib Qt5::Widgets)
+    target_link_libraries (QtProjectLib Qt5::Sql)
+    target_link_libraries (QtProjectLib Qt5::PrintSupport)
 
-    add_executable(smpq ${QtProjectBin_src})
+    add_executable(smpq ${QtProjectBin_src} ../../examples/smp/SMPQ/dockwidgets.qrc)
 
     #to link a library to the executable
     target_link_libraries (smpq QtProjectLib)
 
 endif (ENABLE_QT_GUI)
 #------------------------------------------------------------------
-
 
 # show some useful status/debugging information
 message (STATUS "Using PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
