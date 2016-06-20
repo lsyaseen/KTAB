@@ -875,38 +875,46 @@ namespace SMPLib {
 	auto sqlBuff = newChars(200);
 	// start for the transaction
 	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
-	for (int vt = 0; vt < tpvArray.size(); vt++)
+	if (((h == i) || (h == j)) && (i != j))
 	{
-		// initiate the database 
-		auto an = ((const SMPActor*)(model->actrs[vt]));
-	 
-		// prepare the sql statement to insert
-		sprintf(sqlBuff,	
-			"INSERT INTO ProbTPVict (Scenario, Turn_t, Est_h,Init_i,ThrdP_k,Rcvr_j,Prob) VALUES ('%s', ?1, ?2, ?3, ?4, ?5, ?6)",
-			model->getScenarioName().c_str());
-		const char* insStr = sqlBuff;
-		sqlite3_stmt *insStmt;
-		sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
-	
-		int rslt = 0;
-		rslt = sqlite3_bind_int(insStmt, 1, t);
-		assert(SQLITE_OK == rslt);
-		rslt = sqlite3_bind_int(insStmt, 2, h);
-		assert(SQLITE_OK == rslt);
-		rslt = sqlite3_bind_int(insStmt, 3, i);
-		assert(SQLITE_OK == rslt);
-		rslt = sqlite3_bind_int(insStmt, 4, vt);
-		assert(SQLITE_OK == rslt);
-		rslt = sqlite3_bind_int(insStmt, 5, j);
-		assert(SQLITE_OK == rslt);
-		rslt = sqlite3_bind_double(insStmt, 6, tpvArray[vt]);
-		assert(SQLITE_OK == rslt);
-		rslt = sqlite3_step(insStmt);
-		assert(SQLITE_DONE == rslt);
-		sqlite3_clear_bindings(insStmt);
-		assert(SQLITE_DONE == rslt);
-		rslt = sqlite3_reset(insStmt);
-		assert(SQLITE_OK == rslt);
+		for (int vt = 0; vt < tpvArray.size(); vt++)
+		{
+
+			// initiate the database 
+			auto an = ((const SMPActor*)(model->actrs[vt]));
+
+			// prepare the sql statement to insert
+			sprintf(sqlBuff,
+				"INSERT INTO ProbTPVict_UnitTpLoss_UnitTpVict (Scenario, Turn_t, Est_h,Init_i,ThrdP_k,Rcvr_j,Prob,UnitLoss,UtilVict) VALUES ('%s', ?1, ?2, ?3, ?4, ?5, ?6,?7,?8)",
+				model->getScenarioName().c_str());
+			const char* insStr = sqlBuff;
+			sqlite3_stmt *insStmt;
+			sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+
+			int rslt = 0;
+			rslt = sqlite3_bind_int(insStmt, 1, t);
+			assert(SQLITE_OK == rslt);
+			rslt = sqlite3_bind_int(insStmt, 2, h);
+			assert(SQLITE_OK == rslt);
+			rslt = sqlite3_bind_int(insStmt, 3, i);
+			assert(SQLITE_OK == rslt);
+			rslt = sqlite3_bind_int(insStmt, 4, vt);
+			assert(SQLITE_OK == rslt);
+			rslt = sqlite3_bind_int(insStmt, 5, j);
+			assert(SQLITE_OK == rslt);
+			rslt = sqlite3_bind_double(insStmt, 6, tpvArray[vt]);
+			assert(SQLITE_OK == rslt);
+			rslt = sqlite3_bind_double(insStmt, 7, uhkji - euSQ);
+			assert(SQLITE_OK == rslt);
+			assert(SQLITE_OK == rslt);
+			rslt = sqlite3_bind_double(insStmt, 8, uhkij - euSQ);
+			rslt = sqlite3_step(insStmt);
+			assert(SQLITE_DONE == rslt);
+			sqlite3_clear_bindings(insStmt);
+			assert(SQLITE_DONE == rslt);
+			rslt = sqlite3_reset(insStmt);
+			assert(SQLITE_OK == rslt);
+		}
 	}
 	  
     const double phij = chij / (chij + chji); // ProbVict, for i

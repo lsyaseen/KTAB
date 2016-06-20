@@ -298,7 +298,7 @@ namespace KBase {
 	static string createSQL(unsigned int n);
   protected:
     //static string createTableSQL(unsigned int tn);
-	static const int NumTables = 13; //TODO: constant need to be redefined when new table is added
+	static const int NumTables = 14; //TODO: constant need to be redefined when new table is added
     // note that the function to write to table #k must be kept
     // synchronized with the result of createTableSQL(k) !
 

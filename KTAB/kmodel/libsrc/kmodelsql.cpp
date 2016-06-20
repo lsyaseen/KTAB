@@ -258,42 +258,40 @@ string Model::createSQL(unsigned int n) {
         break;
 
     case 9:  // probability ik > j
-        sql = "create table if not exists ProbTPVict ("  \
+        sql = "create table if not exists ProbTPVict_UnitTpLoss_UnitTpVict ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
               "Init_i	INTEGER NOT NULL DEFAULT 0, "\
               "ThrdP_k	INTEGER NOT NULL DEFAULT 0, "\
               "Rcvr_j	INTEGER NOT NULL DEFAULT 0, "\
-              "Prob	REAL"\
-              ");";
+              "Prob	REAL NOT NULL DEFAULT 0.0, "\
+			  "UnitLoss	REAL NOT NULL DEFAULT 0.0, "\
+			  "UtilVict	REAL"");";
         break;
 
-    case 10: // utility to k of ik>j
-        // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
-        // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-        sql = "create table if not exists UtilTPVict ("  \
+    case 10:  
+         // Bargain table
+        sql = "create table if not exists Bargn ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-              "Est_h	INTEGER NOT NULL DEFAULT 0, "\
-              "Init_i	INTEGER NOT NULL DEFAULT 0, "\
-              "ThrdP_k	INTEGER NOT NULL DEFAULT 0, "\
-              "Rcvr_j	INTEGER NOT NULL DEFAULT 0, "\
-              "Util	REAL"\
-              ");";
+              "Bargn_i 	INTEGER PRIMARY KEY, "\
+              "Brgn_Act_i INTEGER NOT NULL DEFAULT 0, "\
+              "Init_Act_i INTEGER NOT NULL DEFAULT 0, "\
+              "Recd_Act_i 	INTEGER NOT NULL DEFAULT 0, "\
+			  "Value REAL NOT NULL DEFAULT 0.0, "\
+			  "Prob	REAL NOT NULL DEFAULT 0.0, "\
+			  "Seld	BOOLEAN "");";
         break;
 
-    case 11: // utility to k of i>jk
-        // Utilities are evaluated so that UtilSQ, UtilVict, UtilChlg, UtilContest,
-        // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
-        sql = "create table if not exists UtilTPLoss ("  \
+    case 11: //  BargnValu
+        sql = "create table if not exists BargnValu ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-              "Est_h	INTEGER NOT NULL DEFAULT 0, "\
-              "Init_i	INTEGER NOT NULL DEFAULT 0, "\
-              "ThrdP_k	INTEGER NOT NULL DEFAULT 0, "\
-              "Rcvr_j	INTEGER NOT NULL DEFAULT 0, "\
-              "Util	REAL"\
+              "Bargn_i	INTEGER NOT NULL DEFAULT 0, "\
+              "Brgn_Act_i	INTEGER NOT NULL DEFAULT 0, "\
+              "Dim_k	INTEGER NOT NULL DEFAULT 0, "\
+              "Coord	REAL"\
               ");";
         break;
 
@@ -311,6 +309,18 @@ string Model::createSQL(unsigned int n) {
 			sqlBuff = nullptr;
 		}
 		break;
+
+	case 13: //  BargnValu
+		sql = "create table if not exists BargnVote ("  \
+			"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
+			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
+			"Bargn_i	INTEGER NOT NULL DEFAULT 0, "\
+			"Brgn_Act_i	INTEGER NOT NULL DEFAULT 0, "\
+			"Act_i 	INTEGER NOT NULL DEFAULT 0, "\
+			"Vote	REAL"\
+			");";
+		break;
+
 
     default:
         throw(KException("Model::createTableSQL unrecognized table number"));
