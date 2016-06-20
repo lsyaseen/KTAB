@@ -51,8 +51,8 @@ private slots:
     void setDBItemModel(QSqlTableModel * model);
     void csvGetFilePAth();
     //Database
-    void DisplayMessage(QString cls, QString message);
-    void VectorPositionsFromDB();
+    void displayMessage(QString cls, QString message);
+    void vectorPositionsFromDB();
     void dbGetFilePAth();
     void updateStateCount_SliderRange(int states);
     void updateScenarioList_ComboBox(QStringList * scenarios);
@@ -60,6 +60,11 @@ private slots:
     //Central-  Controls Frame
     void sliderStateValueToQryDB(int value);
     void scenarioComboBoxValue(QString scenario_box);
+    void createNewCSV();
+    void cellSelected(int row, int column);
+    void insertNewRowCSV();
+    void insertNewColumnCSV();
+    void donePushButtonClicked();
 
 signals:
     //CSV
@@ -82,6 +87,7 @@ private:
     // Central Main Frame
     QFrame *central;
     QFrame *tableControlsFrame;
+    QGridLayout *gLayout;
 
     QComboBox * scenarioComboBox;
     QPushButton * actorsPushButton;
@@ -107,6 +113,8 @@ private:
     //csv window
     QTableView * csv_tableView;
     CSV *csvObj;
+
+    QTableWidget * csv_tableWidget;
 
     QListWidget *listwidget2;
 
@@ -135,6 +143,16 @@ private:
 
     QString scenario_box;
     //graph - customplot
+
+
+    //    to  edit headers
+
+    QLineEdit* header_editor;
+    int editor_index;
+
+    QStringList Headers;
+
+
 private slots:
     void titleDoubleClick(QMouseEvent *event, QCPPlotTitle *title);
     void axisLabelDoubleClick(QCPAxis* axis, QCPAxis::SelectablePart part);

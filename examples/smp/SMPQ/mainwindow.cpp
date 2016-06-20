@@ -28,7 +28,7 @@ MainWindow::MainWindow()
     //To get Database item Model to show on GUI
     connect(dbObj,&Database::dbModel,this,&MainWindow::setDBItemModel);
     //To display any message to user
-    connect(dbObj,&Database::Message,this,&MainWindow::DisplayMessage);
+    connect(dbObj,&Database::Message,this,&MainWindow::displayMessage);
     //To get vector positions of actors to plot a graph on GUI
     connect(dbObj,&Database::vectorPosition,this,&MainWindow::addGraphOnModule1);
     //To get number of states to set the max values of slider
@@ -40,6 +40,11 @@ MainWindow::MainWindow()
     //To get state count
     connect(this, &MainWindow::getStateCountfromDB,dbObj,&Database::getStateCount);
 
+
+    //headers of TableWidget
+    header_editor = 0;
+    csv_tableWidget->horizontalHeader()->viewport()->installEventFilter(this);
+    csv_tableWidget->verticalHeader()->viewport()->installEventFilter(this);
 }
 
 MainWindow::~MainWindow()
@@ -95,12 +100,40 @@ void MainWindow::scenarioComboBoxValue(QString scenario)
     scenario_box = scenario;
 }
 
-void MainWindow::DisplayMessage(QString cls, QString message)
+void MainWindow::cellSelected(int row, int column)
+{
+
+}
+
+void MainWindow::insertNewRowCSV()
+{
+    for(int i = 0; i < actorsLineEdit->text().toInt() ; ++i)
+        csv_tableWidget->insertRow(csv_tableWidget->rowCount());
+}
+
+void MainWindow::insertNewColumnCSV()
+{
+
+    QTableWidgetItem * hdr = new QTableWidgetItem("Header");
+    for(int i = 0; i < dimensionsLineEdit->text().toInt()*2 ; ++i)
+    {
+        csv_tableWidget->insertColumn(csv_tableWidget->columnCount());
+        csv_tableWidget->setHorizontalHeaderItem(csv_tableWidget->columnCount()-1,hdr);
+    }
+
+}
+
+void MainWindow::donePushButtonClicked()
+{
+
+}
+
+void MainWindow::displayMessage(QString cls, QString message)
 {
     QMessageBox::warning(0,cls,message);
 }
 
-void MainWindow::VectorPositionsFromDB()
+void MainWindow::vectorPositionsFromDB()
 {
 
 }
@@ -116,7 +149,56 @@ void MainWindow::dockWindowChanged()
 
 void MainWindow::setCSVItemModel(QStandardItemModel *model)
 {
+
+    gLayout->addWidget(tableControlsFrame);
+    gLayout->addWidget(csv_tableView);
+
+    tableControlsFrame->show();
+    csv_tableView->show();
+    csv_tableWidget->hide();
+
+    turnSlider->setEnabled(false);
+    actorsPushButton->setEnabled(false);
+    actorsLineEdit->setEnabled(false);
+    dimensionsLineEdit->setEnabled(false);
+    dimensionsPushButton->setEnabled(false);
+    donePushButton->setEnabled(false);
+
     //update received model to widget
+    csv_tableView->setModel(model);
+    csv_tableView->showMaximized();
+    csv_tableView->setAlternatingRowColors(true);
+    csv_tableView->resizeRowsToContents();
+
+    //    for (int c = 0; c < csv_tableView->horizontalHeader()->count(); ++c)
+    //        csv_tableView->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
+
+    csv_tableView->resizeColumnsToContents();
+
+    //Enable run button, which is disabled by default
+    runButton->setEnabled(true);
+}
+
+void MainWindow::setDBItemModel(QSqlTableModel *model)
+{
+    gLayout->replaceWidget(csv_tableWidget,csv_tableView);
+
+    //update received model to widget
+
+    gLayout->addWidget(tableControlsFrame);
+    gLayout->addWidget(csv_tableView);
+
+    tableControlsFrame->show();
+    csv_tableView->show();
+    csv_tableWidget->hide();
+
+    turnSlider->setEnabled(true);
+    actorsPushButton->setEnabled(false);
+    actorsLineEdit->setEnabled(false);
+    dimensionsLineEdit->setEnabled(false);
+    dimensionsPushButton->setEnabled(false);
+    donePushButton->setEnabled(false);
+
     csv_tableView->setModel(model);
     csv_tableView->showMaximized();
     csv_tableView->setAlternatingRowColors(true);
@@ -132,23 +214,31 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model)
     runButton->setEnabled(true);
 }
 
-void MainWindow::setDBItemModel(QSqlTableModel *model)
+void MainWindow::createNewCSV()
 {
-    //update received model to widget
+    gLayout->addWidget(tableControlsFrame);
+    gLayout->addWidget(csv_tableWidget);
 
-    csv_tableView->setModel(model);
-    csv_tableView->showMaximized();
-    csv_tableView->setAlternatingRowColors(true);
-    csv_tableView->resizeRowsToContents();
+    tableControlsFrame->show();
+    csv_tableWidget->show();
+    csv_tableView->hide();
 
-    //    for (int c = 0; c < csv_tableView->horizontalHeader()->count(); ++c)
-    //        csv_tableView->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
+    turnSlider->setEnabled(false);
+    actorsPushButton->setEnabled(true);
+    actorsLineEdit->setEnabled(true);
+    dimensionsLineEdit->setEnabled(true);
+    dimensionsPushButton->setEnabled(true);
+    donePushButton->setEnabled(true);
 
-    csv_tableView->resizeColumnsToContents();
-    csv_tableView->hideColumn(0);
+    csv_tableWidget->setShowGrid(true);
+    csv_tableWidget->setRowCount(3);
+    csv_tableWidget->setColumnCount(5);// if 1 Dimension 5 columns, if 2 Dimension 7 columns
 
-    //Enable run button, which is disabled by default
-    runButton->setEnabled(true);
+    csv_tableWidget->setItem(0, 1, new QTableWidgetItem("Hello"));
+    connect(csv_tableWidget, SIGNAL( cellDoubleClicked (int, int)),
+            this, SLOT( cellSelected( int, int )));
+
+    csv_tableWidget->setHorizontalHeaderLabels(QString("HEADER ;HEADER ;HEADER ;HEADER ;HEADER ").split(";"));
 }
 
 void MainWindow::about()
@@ -193,6 +283,14 @@ void MainWindow::createActions()
     connect(importDBAct, &QAction::triggered, this, &MainWindow::dbGetFilePAth);
     fileMenu->addAction(importDBAct);
     fileToolBar->addAction(importDBAct);
+
+    const QIcon newCSVIcon = QIcon::fromTheme("Create CSV File", QIcon(":/images/csv.png"));
+    QAction *newCsvAct = new QAction(newCSVIcon, tr("&Create CSV"), this);
+    //newCsvAct->setShortcuts(QKeySequence::Open);
+    newCsvAct->setStatusTip(tr("Create a new CSV File"));
+    connect(newCsvAct, &QAction::triggered, this, &MainWindow::createNewCSV);
+    fileMenu->addAction(newCsvAct);
+    fileToolBar->addAction(newCsvAct);
 
     fileMenu->addSeparator();
 
@@ -363,7 +461,7 @@ void MainWindow::initializeCentralViewFrame()
     central = new QFrame;
     central->setFrameShape(QFrame::StyledPanel);
 
-    QGridLayout *gLayout = new QGridLayout;
+    gLayout = new QGridLayout;
     central->setLayout(gLayout);
 
     tableControlsFrame = new QFrame;
@@ -376,6 +474,7 @@ void MainWindow::initializeCentralViewFrame()
     //    scenarioComboBox->setMaximumWidth(70);
     //    scenarioComboBox->setFixedWidth(60);
     gCLayout->addWidget(scenarioComboBox,0,2);
+    scenarioComboBox->setEditable(true);
     connect(scenarioComboBox,SIGNAL(currentIndexChanged(QString)),this,SLOT(scenarioComboBoxValue(QString)));
 
 
@@ -420,13 +519,27 @@ void MainWindow::initializeCentralViewFrame()
     donePushButton->setFixedWidth(90);
     gCLayout->addWidget(donePushButton,1,3);
 
-    csv_tableView = new QTableView(central);
+    setCentralWidget(central);
+
+    csv_tableWidget = new QTableWidget(central); // new CSV File
+
+    csv_tableView = new QTableView(central); // CSV and DB
+    csv_tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     csv_tableView->setShowGrid(true);
 
-    gLayout->addWidget(tableControlsFrame);
-    gLayout->addWidget(csv_tableView);
 
-    setCentralWidget(central);
+    gLayout->addWidget(tableControlsFrame);
+    gLayout->addWidget(csv_tableWidget);
+    gLayout->addWidget(csv_tableView);
+    tableControlsFrame->hide();
+    csv_tableWidget->hide();
+    csv_tableView->hide();
+
+
+    connect(actorsPushButton,&QPushButton::clicked,this, &MainWindow::insertNewRowCSV);
+    connect(dimensionsPushButton,&QPushButton::clicked,this, &MainWindow::insertNewColumnCSV);
+    connect(donePushButton,&QPushButton::clicked,this,&MainWindow::donePushButtonClicked);
+
 }
 
 void MainWindow::titleDoubleClick(QMouseEvent* event, QCPPlotTitle* title)

@@ -88,8 +88,6 @@ void Database::getVectorPosition(int actor, int dim, int turn, QString scenario)
     }
 
     emit vectorPosition(x,y,actor_name);
-
-
 }
 
 void Database::readVectorPositionTable(int turn, QString scenario)
@@ -101,7 +99,7 @@ void Database::readVectorPositionTable(int turn, QString scenario)
     sqlmodel->setTable("VectorPosition");
     sqlmodel->setFilter(QString("Turn_t='%1' and  Dim_k='%2' and Scenario='%3'")
                         .arg(turn).arg(QString::number(0)).arg(scenario));
-    sqlmodel->select ();
+    sqlmodel->select();
 
     emit dbModel(sqlmodel);
 
