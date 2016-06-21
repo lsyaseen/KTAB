@@ -58,6 +58,8 @@ void MainWindow::csvGetFilePAth()
     csvPath = QFileDialog::getOpenFileName(this,tr("Open CSV File"), QDir::homePath() , tr("CSV File (*.csv)"));
     statusBar()->showMessage(tr("csv path"));
 
+    modeltoCSV->clear();
+
     //emit path to csv class for processing
     if(!csvPath.isEmpty())
         emit csvFilePath(csvPath);
@@ -107,25 +109,42 @@ void MainWindow::cellSelected(int row, int column)
 
 void MainWindow::insertNewRowCSV()
 {
-    for(int i = 0; i < actorsLineEdit->text().toInt() ; ++i)
-        csv_tableWidget->insertRow(csv_tableWidget->rowCount());
+    if(tableType=="NewCSV")
+    {
+        for(int i = 0; i < actorsLineEdit->text().toInt() ; ++i)
+            csv_tableWidget->insertRow(csv_tableWidget->rowCount());
+    }
+    else if(tableType=="CSV")
+    {
+        for(int i = 0; i < actorsLineEdit->text().toInt() ; ++i)
+            modeltoCSV->insertRow(modeltoCSV->rowCount());
+    }
 }
 
 void MainWindow::insertNewColumnCSV()
 {
-
-    QTableWidgetItem * hdr = new QTableWidgetItem("Header");
-    for(int i = 0; i < dimensionsLineEdit->text().toInt()*2 ; ++i)
+    if(tableType=="NewCSV")
     {
-        csv_tableWidget->insertColumn(csv_tableWidget->columnCount());
-        csv_tableWidget->setHorizontalHeaderItem(csv_tableWidget->columnCount()-1,hdr);
+        QTableWidgetItem * hdr = new QTableWidgetItem("Header");
+        for(int i = 0; i < dimensionsLineEdit->text().toInt()*2 ; ++i)
+        {
+            csv_tableWidget->insertColumn(csv_tableWidget->columnCount());
+            csv_tableWidget->setHorizontalHeaderItem(csv_tableWidget->columnCount()-1,hdr);
+        }
     }
-
+    else if(tableType=="CSV")
+    {
+        for(int i = 0; i < dimensionsLineEdit->text().toInt()*2; ++i)
+            modeltoCSV->insertColumn(modeltoCSV->columnCount());
+    }
 }
 
 void MainWindow::donePushButtonClicked()
 {
-
+    if(tableType=="CSV")
+        saveTableViewToCSV();
+    else if (tableType=="NewCSV")
+        saveTableWidgetToCSV();
 }
 
 void MainWindow::displayMessage(QString cls, QString message)
@@ -147,8 +166,12 @@ void MainWindow::dockWindowChanged()
         graph2Dock->setTitleBarWidget(0);
 }
 
-void MainWindow::setCSVItemModel(QStandardItemModel *model)
+void MainWindow::setCSVItemModel(QStandardItemModel *model, QString scenarioName)
 {
+    tableType="CSV";
+
+    //Enable Editing
+    csv_tableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
 
     gLayout->addWidget(tableControlsFrame);
     gLayout->addWidget(csv_tableView);
@@ -157,18 +180,21 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model)
     csv_tableView->show();
     csv_tableWidget->hide();
 
-    turnSlider->setEnabled(false);
-    actorsPushButton->setEnabled(false);
-    actorsLineEdit->setEnabled(false);
-    dimensionsLineEdit->setEnabled(false);
-    dimensionsPushButton->setEnabled(false);
-    donePushButton->setEnabled(false);
+    turnSlider->setVisible(false);
+    actorsPushButton->setVisible(true);
+    actorsLineEdit->setVisible(true);
+    dimensionsLineEdit->setVisible(true);
+    dimensionsPushButton->setVisible(true);
+    donePushButton->setVisible(true);
+    scenarioComboBox->setEditable(true);
+
+    modeltoCSV = model;
 
     //update received model to widget
-    csv_tableView->setModel(model);
+    csv_tableView->setModel(modeltoCSV);
     csv_tableView->showMaximized();
-    csv_tableView->setAlternatingRowColors(true);
-    csv_tableView->resizeRowsToContents();
+    //    csv_tableView->setAlternatingRowColors(true);
+    //    csv_tableView->resizeRowsToContents();
 
     //    for (int c = 0; c < csv_tableView->horizontalHeader()->count(); ++c)
     //        csv_tableView->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
@@ -177,10 +203,20 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model)
 
     //Enable run button, which is disabled by default
     runButton->setEnabled(true);
+
+    //update scenario name
+    scenarioComboBox->clear();
+    scenarioComboBox->addItem(scenarioName);
 }
 
 void MainWindow::setDBItemModel(QSqlTableModel *model)
 {
+
+    tableType="Database";
+
+    //Disable Editing
+    csv_tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
     gLayout->replaceWidget(csv_tableWidget,csv_tableView);
 
     //update received model to widget
@@ -192,17 +228,19 @@ void MainWindow::setDBItemModel(QSqlTableModel *model)
     csv_tableView->show();
     csv_tableWidget->hide();
 
-    turnSlider->setEnabled(true);
-    actorsPushButton->setEnabled(false);
-    actorsLineEdit->setEnabled(false);
-    dimensionsLineEdit->setEnabled(false);
-    dimensionsPushButton->setEnabled(false);
-    donePushButton->setEnabled(false);
+
+    turnSlider->setVisible(true);
+    actorsPushButton->setVisible(false);
+    actorsLineEdit->setVisible(false);
+    dimensionsLineEdit->setVisible(false);
+    dimensionsPushButton->setVisible(false);
+    donePushButton->setVisible(false);
+    scenarioComboBox->setEditable(false);
 
     csv_tableView->setModel(model);
     csv_tableView->showMaximized();
-    csv_tableView->setAlternatingRowColors(true);
-    csv_tableView->resizeRowsToContents();
+    //    csv_tableView->setAlternatingRowColors(true);
+    //    csv_tableView->resizeRowsToContents();
 
     //    for (int c = 0; c < csv_tableView->horizontalHeader()->count(); ++c)
     //        csv_tableView->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
@@ -216,6 +254,8 @@ void MainWindow::setDBItemModel(QSqlTableModel *model)
 
 void MainWindow::createNewCSV()
 {
+    tableType="NewCSV";
+
     gLayout->addWidget(tableControlsFrame);
     gLayout->addWidget(csv_tableWidget);
 
@@ -223,22 +263,25 @@ void MainWindow::createNewCSV()
     csv_tableWidget->show();
     csv_tableView->hide();
 
-    turnSlider->setEnabled(false);
-    actorsPushButton->setEnabled(true);
-    actorsLineEdit->setEnabled(true);
-    dimensionsLineEdit->setEnabled(true);
-    dimensionsPushButton->setEnabled(true);
-    donePushButton->setEnabled(true);
+    turnSlider->setVisible(false);
+    actorsPushButton->setVisible(true);
+    actorsLineEdit->setVisible(true);
+    dimensionsLineEdit->setVisible(true);
+    dimensionsPushButton->setVisible(true);
+    donePushButton->setVisible(true);
+    scenarioComboBox->setEditable(true);
 
     csv_tableWidget->setShowGrid(true);
     csv_tableWidget->setRowCount(3);
     csv_tableWidget->setColumnCount(5);// if 1 Dimension 5 columns, if 2 Dimension 7 columns
 
-    csv_tableWidget->setItem(0, 1, new QTableWidgetItem("Hello"));
-    connect(csv_tableWidget, SIGNAL( cellDoubleClicked (int, int)),
-            this, SLOT( cellSelected( int, int )));
+    // csv_tableWidget->setItem(0, 1, new QTableWidgetItem("Test"));
+    // connect(csv_tableWidget, SIGNAL(cellDoubleClicked (int, int)),
+    //      this, SLOT( cellSelected( int, int )));
 
     csv_tableWidget->setHorizontalHeaderLabels(QString("HEADER ;HEADER ;HEADER ;HEADER ;HEADER ").split(";"));
+
+    scenarioComboBox->clear();
 }
 
 void MainWindow::about()
@@ -268,10 +311,18 @@ void MainWindow::createActions()
 
     fileMenu->addSeparator();
 
-    const QIcon csvIcon = QIcon::fromTheme("Read CSV File", QIcon(":/images/csv.png"));
-    QAction *readCsvAct = new QAction(csvIcon, tr("&Read CSV"), this);
+    const QIcon newCSVIcon = QIcon::fromTheme("Create New CSV File", QIcon(":/images/csv.png"));
+    QAction *newCsvAct = new QAction(newCSVIcon, tr("&Create New CSV File"), this);
+    //newCsvAct->setShortcuts(QKeySequence::Open);
+    newCsvAct->setStatusTip(tr("Create New CSV File"));
+    connect(newCsvAct, &QAction::triggered, this, &MainWindow::createNewCSV);
+    fileMenu->addAction(newCsvAct);
+    fileToolBar->addAction(newCsvAct);
+
+    const QIcon csvIcon = QIcon::fromTheme("View/Modify Exisiting CSV File", QIcon(":/images/csv.png"));
+    QAction *readCsvAct = new QAction(csvIcon, tr("&View/Modify Exisiting CSV File"), this);
     readCsvAct->setShortcuts(QKeySequence::Open);
-    readCsvAct->setStatusTip(tr("Read a CSV File"));
+    readCsvAct->setStatusTip(tr("View/Modify Exisiting CSV File"));
     connect(readCsvAct, &QAction::triggered, this, &MainWindow::csvGetFilePAth);
     fileMenu->addAction(readCsvAct);
     fileToolBar->addAction(readCsvAct);
@@ -279,22 +330,21 @@ void MainWindow::createActions()
     const QIcon dbIcon = QIcon::fromTheme("Import Database ", QIcon(":/images/csv.png"));
     QAction *importDBAct = new QAction(dbIcon, tr("&Import Database"), this);
     //    importDBAct->setShortcuts(QKeySequence::);
-    importDBAct->setStatusTip(tr("Import a database"));
+    importDBAct->setStatusTip(tr("Import Database"));
     connect(importDBAct, &QAction::triggered, this, &MainWindow::dbGetFilePAth);
     fileMenu->addAction(importDBAct);
     fileToolBar->addAction(importDBAct);
 
-    const QIcon newCSVIcon = QIcon::fromTheme("Create CSV File", QIcon(":/images/csv.png"));
-    QAction *newCsvAct = new QAction(newCSVIcon, tr("&Create CSV"), this);
-    //newCsvAct->setShortcuts(QKeySequence::Open);
-    newCsvAct->setStatusTip(tr("Create a new CSV File"));
-    connect(newCsvAct, &QAction::triggered, this, &MainWindow::createNewCSV);
-    fileMenu->addAction(newCsvAct);
-    fileToolBar->addAction(newCsvAct);
+    const QIcon modDBIcon = QIcon::fromTheme("Modify Exisiting Database", QIcon(":/images/csv.png"));
+    QAction *modifyDBAct = new QAction(modDBIcon, tr("&Modify Exisiting Database"), this);
+    modifyDBAct->setStatusTip(tr("Modify Exisiting Database"));
+    connect(modifyDBAct, &QAction::triggered, this, &MainWindow::dbGetFilePAth);
+    fileMenu->addAction(modifyDBAct);
+    fileToolBar->addAction(modifyDBAct);
 
     fileMenu->addSeparator();
 
-    QAction *quitAct = new QAction(dbIcon, tr("&Quit"), this);
+    QAction *quitAct = new QAction(modDBIcon, tr("&Quit"), this);
     connect(quitAct,SIGNAL(triggered(bool)),this,SLOT(close()));
     fileMenu->addAction(quitAct);
     quitAct->setShortcuts(QKeySequence::Quit);
@@ -398,6 +448,106 @@ void MainWindow::createModuleParametersDockWindow()
 
 }
 
+void MainWindow::saveTableViewToCSV()
+{
+    QString saveFilePath = QFileDialog::getSaveFileName(this,tr("Save File to "), QDir::homePath(),tr("CSV File (*.csv)"));
+    saveFilePath.append(".csv");
+    QFile f(saveFilePath);
+
+    if (f.open(QFile::WriteOnly | QFile::Truncate))
+    {
+        QTextStream data( &f );
+        QStringList strList;
+
+        strList << " "+scenarioComboBox->currentText() +" ";
+        strList << " "+scenarioComboBox->currentText() + "  ";
+        strList << " "+QString::number(modeltoCSV->rowCount())+" ";
+        strList << " "+QString::number((modeltoCSV->columnCount()-3)/2) +" ";
+
+        data << strList.join(",") << ","<< "\n";
+        strList.clear();
+
+        //Appending a header
+        for( int col = 0; col < modeltoCSV->columnCount(); ++col )
+        {
+            strList << " " +
+                       modeltoCSV->horizontalHeaderItem(col)->data(Qt::DisplayRole).toString() +
+                       " ";
+        }
+        data << strList.join(",") << "," <<"\n";
+
+        //appending data
+        for (int row=0; row<modeltoCSV->rowCount(); row++)
+        {
+            strList.clear();
+
+            for (int col=0; col<modeltoCSV->columnCount(); col++)
+            {
+
+                //NOTE : uncomment if strict checking is required
+                //                if(!modeltoCSV->data(modeltoCSV->index(row,col)).toString().isEmpty())
+                strList << modeltoCSV->data(modeltoCSV->index(row,col)).toString();
+                //                else
+                //                {    QMessageBox::about(0,"No Data Entered","Enter Data at Row : "
+                //                                        + QString::number(row+1) + ", Column : " + QString::number(col+1));
+                //                    return;
+                //                }
+            }
+            data << strList.join(",") + "\n";
+        }
+        f.close();
+    }
+}
+
+void MainWindow::saveTableWidgetToCSV()
+{
+    QString saveFilePath = QFileDialog::getSaveFileName(this,tr("Save File to "), QDir::homePath(),tr("CSV File (*.csv)"));
+    saveFilePath.append(".csv");
+    QFile f(saveFilePath);
+
+    if (f.open(QFile::WriteOnly | QFile::Truncate))
+    {
+        QTextStream data( &f );
+        QStringList strList;
+
+        strList << " "+scenarioComboBox->currentText() +" ";
+        strList << " "+scenarioComboBox->currentText() + "  ";
+        strList << " "+QString::number(csv_tableWidget->rowCount())+" ";
+        strList << " "+QString::number((csv_tableWidget->columnCount()-3)/2) +" ";
+
+        data << strList.join(",") << ","<< "\n";
+        strList.clear();
+
+        //Appending a header
+        for( int col = 0; col < csv_tableWidget->columnCount(); ++col )
+        {
+            strList << " " +
+                       csv_tableWidget->horizontalHeaderItem(col)->data(Qt::DisplayRole).toString() +
+                       " ";
+        }
+        data << strList.join(",") << "," <<"\n";
+
+        for( int row = 0; row < csv_tableWidget->rowCount(); ++row )
+        {
+            strList.clear();
+            for( int column = 0; column < csv_tableWidget->columnCount(); ++column )
+            {
+                QTableWidgetItem* item = csv_tableWidget->item(row,column);
+
+                if( !item  || item->text().isEmpty() )
+                {
+                    QMessageBox::about(0,"No Data Entered","Enter Data at Row : " + QString::number(row+1) + ", Column : " + QString::number(column+1));
+                    return;
+                }
+                else
+                    strList << " "+csv_tableWidget->item(row,column)->text()+" ";
+            }
+            data << strList.join( "," ) << ","  << "\n";
+        }
+        f.close();
+    }
+}
+
 void MainWindow::initializeGraphPlot1()
 {
     customGraph->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes |
@@ -477,7 +627,6 @@ void MainWindow::initializeCentralViewFrame()
     scenarioComboBox->setEditable(true);
     connect(scenarioComboBox,SIGNAL(currentIndexChanged(QString)),this,SLOT(scenarioComboBoxValue(QString)));
 
-
     turnSlider = new QSlider(Qt::Horizontal,tableControlsFrame);
     //    turnSlider->setMinimumWidth(40);
     //    turnSlider->setMaximumWidth(70);
@@ -521,12 +670,12 @@ void MainWindow::initializeCentralViewFrame()
 
     setCentralWidget(central);
 
+    modeltoCSV = new QStandardItemModel;
+
     csv_tableWidget = new QTableWidget(central); // new CSV File
 
     csv_tableView = new QTableView(central); // CSV and DB
-    csv_tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     csv_tableView->setShowGrid(true);
-
 
     gLayout->addWidget(tableControlsFrame);
     gLayout->addWidget(csv_tableWidget);
@@ -535,11 +684,9 @@ void MainWindow::initializeCentralViewFrame()
     csv_tableWidget->hide();
     csv_tableView->hide();
 
-
     connect(actorsPushButton,&QPushButton::clicked,this, &MainWindow::insertNewRowCSV);
     connect(dimensionsPushButton,&QPushButton::clicked,this, &MainWindow::insertNewColumnCSV);
     connect(donePushButton,&QPushButton::clicked,this,&MainWindow::donePushButtonClicked);
-
 }
 
 void MainWindow::titleDoubleClick(QMouseEvent* event, QCPPlotTitle* title)
@@ -590,7 +737,6 @@ void MainWindow::legendDoubleClick(QCPLegend *legend, QCPAbstractLegendItem *ite
 
 void MainWindow::selectionChanged()
 {
-
     // make top and bottom axes be selected synchronously, and handle axis and tick labels as one selectable object:
     if (customGraph->xAxis->selectedParts().testFlag(QCPAxis::spAxis) || customGraph->xAxis->selectedParts().testFlag(QCPAxis::spTickLabels) ||
             customGraph->xAxis2->selectedParts().testFlag(QCPAxis::spAxis) || customGraph->xAxis2->selectedParts().testFlag(QCPAxis::spTickLabels))

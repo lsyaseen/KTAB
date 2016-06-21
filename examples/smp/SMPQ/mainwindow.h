@@ -47,7 +47,7 @@ private slots:
     void about();
     void dockWindowChanged();
     //CSV
-    void setCSVItemModel(QStandardItemModel * model);
+    void setCSVItemModel(QStandardItemModel * model, QString scenarioName);
     void setDBItemModel(QSqlTableModel * model);
     void csvGetFilePAth();
     //Database
@@ -83,6 +83,8 @@ private:
     void createGraph1DockWindows();
     void createGraph2DockWindows();
     void createModuleParametersDockWindow();
+    void saveTableViewToCSV();
+    void saveTableWidgetToCSV();
 
     // Central Main Frame
     QFrame *central;
@@ -150,7 +152,10 @@ private:
     QLineEdit* header_editor;
     int editor_index;
 
-    QStringList Headers;
+    QString  tableType; // CSV, Database, NewCSV
+    QStandardItemModel *modeltoCSV;
+    QStandardItemModel *dummyModel;
+
 
 
 private slots:
