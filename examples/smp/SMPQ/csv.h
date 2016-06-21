@@ -15,7 +15,7 @@ public:
     QStandardItemModel * model;
 
 signals:
-    void csvModel(QStandardItemModel *);
+    void csvModel(QStandardItemModel * ,QString ScenarioName);
 
 };
 
