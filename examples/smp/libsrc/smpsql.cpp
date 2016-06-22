@@ -162,6 +162,7 @@ void SMPModel::sqlTest() {
     }
     cout << endl << flush;
 
+
     smpDB = db;
     return;
 }

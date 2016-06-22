@@ -288,6 +288,7 @@ namespace KBase {
     // output an existing actor posprob table, for the given turn, to SQLite
     void sqlPosProb(unsigned int t);
     void sqlPosVote(unsigned int t);
+ 
     static void demoSQLite();
 
     static KMatrix bigRfromProb(const KMatrix & p, BigRRange rr);

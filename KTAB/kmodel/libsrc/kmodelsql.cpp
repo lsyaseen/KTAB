@@ -258,7 +258,7 @@ string Model::createSQL(unsigned int n) {
         break;
 
     case 9:  // probability ik > j
-        sql = "create table if not exists ProbTPVict_UnitTpLoss_UnitTpVict ("  \
+        sql = "create table if not exists TP_Prob_Loss_Vict ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
               "Est_h	INTEGER NOT NULL DEFAULT 0, "\
@@ -266,8 +266,8 @@ string Model::createSQL(unsigned int n) {
               "ThrdP_k	INTEGER NOT NULL DEFAULT 0, "\
               "Rcvr_j	INTEGER NOT NULL DEFAULT 0, "\
               "Prob	REAL NOT NULL DEFAULT 0.0, "\
-			  "UnitLoss	REAL NOT NULL DEFAULT 0.0, "\
-			  "UtilVict	REAL"");";
+			  "Loss	REAL NOT NULL DEFAULT 0.0, "\
+			  "Vict	REAL"");";
         break;
 
     case 10:  
@@ -317,7 +317,7 @@ string Model::createSQL(unsigned int n) {
 			"Bargn_i	INTEGER NOT NULL DEFAULT 0, "\
 			"Brgn_Act_i	INTEGER NOT NULL DEFAULT 0, "\
 			"Act_i 	INTEGER NOT NULL DEFAULT 0, "\
-			"Vote	REAL"\
+			"Util	REAL"\
 			");";
 		break;
 
@@ -581,6 +581,7 @@ void Model::sqlPosVote(unsigned int t) {
 
 	return;
 }
+ 
 } // end of namespace
 
 // --------------------------------------------
