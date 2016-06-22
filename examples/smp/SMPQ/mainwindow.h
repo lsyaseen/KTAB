@@ -35,8 +35,7 @@ static const int N = 2;
 
 class MainWindow : public QMainWindow
 {
-
-    Q_OBJECT
+     Q_OBJECT
 
 public:
     //explicit MainWindow(QWidget *parent = 0);
@@ -47,7 +46,7 @@ private slots:
     void about();
     void dockWindowChanged();
     //CSV
-    void setCSVItemModel(QStandardItemModel * model, QString scenarioName);
+    void setCSVItemModel(QStandardItemModel * model, QStringList scenarioName);
     void setDBItemModel(QSqlTableModel * model);
     void csvGetFilePAth();
     //Database
@@ -56,6 +55,7 @@ private slots:
     void dbGetFilePAth();
     void updateStateCount_SliderRange(int states);
     void updateScenarioList_ComboBox(QStringList * scenarios);
+    void updateDimensionCount(int dim);
 
     //Central-  Controls Frame
     void sliderStateValueToQryDB(int value);
@@ -75,6 +75,7 @@ signals:
 
     void getScenarioRunValues(int state, QString scenario_box);
     void getStateCountfromDB();
+    void getDimensionCountfromDB();
     //void send_scenario(QString scenario);
 private:
     //MainWindow
@@ -97,7 +98,7 @@ private:
     QPushButton * dimensionsPushButton;
     QLineEdit * dimensionsLineEdit;
     QPushButton * donePushButton;
-    QLineEdit * scenarioNewLineEdit;
+    QLineEdit * scenarioDescriptionLineEdit;
     QSlider * turnSlider;
 
     //Model parameters
@@ -132,6 +133,7 @@ private:
     //Database Obj
     Database * dbObj ;
     QSqlDatabase db;
+    int dimensions;
 
     //Graph 1 widget
     QFrame *graphWidget;
@@ -146,7 +148,6 @@ private:
     QString scenario_box;
     //graph - customplot
 
-
     //    to  edit headers
 
     QLineEdit* header_editor;
@@ -154,8 +155,6 @@ private:
 
     QString  tableType; // CSV, Database, NewCSV
     QStandardItemModel *modeltoCSV;
-    QStandardItemModel *dummyModel;
-
 
 
 private slots:

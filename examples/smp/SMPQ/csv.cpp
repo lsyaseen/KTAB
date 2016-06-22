@@ -7,7 +7,7 @@ CSV::CSV()
 void CSV::readCSVFile(QString path)
 {
     //getting the csv file path
-QString scenarioName;
+    QStringList scenarioName;
     if(!path.isEmpty())
     {
         // model->clear();
@@ -42,7 +42,8 @@ QString scenarioName;
                 }
                 else if(rowindex == 0)
                 {
-                    scenarioName= lineToken.at(0);
+                    scenarioName.append(lineToken.at(0));
+                    scenarioName.append(lineToken.at(1));
                     lineToken.clear();
                 }
                 rowindex++;

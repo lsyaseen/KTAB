@@ -2,7 +2,6 @@
 
 Database::Database()
 {
-    qDebug()<< "Test";
 }
 
 Database::~Database()
@@ -46,7 +45,6 @@ void Database::openDB(QString dbPath)
 
 void Database::getScenarioData(int turn, QString scenario)
 {
-    qDebug()<<"Turn"<<turn;
 
     readVectorPositionTable(turn,scenario);//turn
 }
@@ -56,9 +54,22 @@ void Database::getStateCount()
     getNumStates();
 }
 
+void Database::getDimensionCount()
+{
+    QSqlQuery qry;
+    QString query= QString("select DISTINCT Dim_k from VectorPosition ");
+
+    qry.exec(query);
+
+    while(qry.next())
+    {
+        numDimension = qry.value(0).toInt();
+    }
+    emit dimensionsCount(numDimension);
+}
+
 void Database::getVectorPosition(int actor, int dim, int turn, QString scenario)
 {
-
     QSqlQuery qry;
     QString query;
 
@@ -84,7 +95,6 @@ void Database::getVectorPosition(int actor, int dim, int turn, QString scenario)
     while(qry2.next())
     {
         actor_name = qry2.value(2).toString();
-        // qDebug()<<actor_name <<"NAME";
     }
 
     emit vectorPosition(x,y,actor_name);
@@ -118,7 +128,6 @@ void Database::getNumActors()
     while(qry.next())
     {
         numActors = qry.value(0).toInt();
-        qDebug()<<"numActors" << numActors;
     }
 
 }
@@ -133,7 +142,6 @@ void Database::getNumStates()
     while(qry.next())
     {
         numStates = qry.value(0).toInt();
-        qDebug()<<"numStates" << numStates;
     }
 
     emit statesCount(numStates);
@@ -150,7 +158,6 @@ void Database::getScenarioList()
     while(qry.next())
     {
         scenarioList->append(qry.value(1).toString());
-        qDebug()<<"scenarioList" << scenarioList ;
     }
     emit scenarios(scenarioList);
 }
