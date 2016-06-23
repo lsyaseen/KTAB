@@ -47,8 +47,7 @@ MainWindow::MainWindow()
 
     //headers of TableWidget
     header_editor = 0;
-    csv_tableWidget->horizontalHeader()->viewport()->installEventFilter(this);
-    csv_tableWidget->verticalHeader()->viewport()->installEventFilter(this);
+
 }
 
 MainWindow::~MainWindow()
@@ -141,12 +140,10 @@ void MainWindow::insertNewColumnCSV()
 {
     if(tableType=="NewCSV")
     {
-        QTableWidgetItem * hdr = new QTableWidgetItem("HEADER");
         while(((csv_tableWidget->columnCount()-3)/2)!=dimensionsLineEdit->text().toInt()
               && ((csv_tableWidget->columnCount()-3)/2) <= dimensionsLineEdit->text().toInt())
         {
-            csv_tableWidget->insertColumn(csv_tableWidget->columnCount());
-            csv_tableWidget->setHorizontalHeaderItem(csv_tableWidget->columnCount()-1,hdr);
+            createSeperateColumn();
         }
     }
     else if(tableType=="CSV")
@@ -154,6 +151,15 @@ void MainWindow::insertNewColumnCSV()
         if(((modeltoCSV->columnCount()-3)/2) < dimensionsLineEdit->text().toInt())
             modeltoCSV->insertColumns(modeltoCSV->columnCount(),((modeltoCSV->columnCount()-3))-dimensionsLineEdit->text().toInt());
     }
+}
+
+
+void MainWindow::createSeperateColumn()
+{
+    QTableWidgetItem * hdr = new QTableWidgetItem("HEADER");
+
+    csv_tableWidget->insertColumn(csv_tableWidget->columnCount());
+    csv_tableWidget->setHorizontalHeaderItem(csv_tableWidget->columnCount()-1,hdr);
 }
 
 void MainWindow::donePushButtonClicked()
@@ -186,21 +192,25 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model, QStringList scenario
 {
     tableType="CSV";
 
+    stackWidget->setCurrentIndex(0);
+    csv_tableView->horizontalHeader()->viewport()->installEventFilter(this);
+    csv_tableView->verticalHeader()->viewport()->installEventFilter(this);
+
     //Enable Editing
     csv_tableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
 
-    gLayout->addWidget(tableControlsFrame);
-    gLayout->addWidget(turnSlider);
-    gLayout->addWidget(csv_tableView);
-
-    csv_tableWidget->hide();
     turnSlider->hide();
     tableControlsFrame->show();
-    csv_tableView->show();
 
     scenarioComboBox->setEditable(true);
     turnSlider->setVisible(false);
     scenarioDescriptionLineEdit->setVisible(true);
+
+    actorsLineEdit->setEnabled(true);
+    dimensionsLineEdit->setEnabled(true);
+    actorsPushButton->setEnabled(true);
+    dimensionsPushButton->setEnabled(true);
+    donePushButton->setEnabled(true);
 
     modeltoCSV = model;
 
@@ -209,7 +219,6 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model, QStringList scenario
     csv_tableView->showMaximized();
     //    csv_tableView->setAlternatingRowColors(true);
     //    csv_tableView->resizeRowsToContents();
-
     //    for (int c = 0; c < csv_tableView->horizontalHeader()->count(); ++c)
     //        csv_tableView->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
 
@@ -226,8 +235,6 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model, QStringList scenario
 
     actorsLineEdit->setText(QString::number(modeltoCSV->rowCount()));
     dimensionsLineEdit->setText(QString::number((modeltoCSV->columnCount()-3)/2));
-
-
 }
 
 void MainWindow::setDBItemModel(QSqlTableModel *model)
@@ -237,21 +244,22 @@ void MainWindow::setDBItemModel(QSqlTableModel *model)
     //Disable Editing
     csv_tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    gLayout->replaceWidget(csv_tableWidget,csv_tableView);
-
-    //update received model to widget
-    gLayout->addWidget(tableControlsFrame);
-    gLayout->addWidget(turnSlider);
-    gLayout->addWidget(csv_tableView);
+    stackWidget->setCurrentIndex(0);
+    csv_tableView->horizontalHeader()->viewport()->removeEventFilter(this);
+    csv_tableView->verticalHeader()->viewport()->removeEventFilter(this);
 
     turnSlider->hide();
-    csv_tableWidget->hide();
     tableControlsFrame->show();
-    csv_tableView->show();
 
     scenarioComboBox->setEditable(false);
     turnSlider->setVisible(true);
     scenarioDescriptionLineEdit->setVisible(false);
+
+    actorsLineEdit->setEnabled(false);
+    dimensionsLineEdit->setEnabled(false);
+    actorsPushButton->setEnabled(false);
+    dimensionsPushButton->setEnabled(false);
+    donePushButton->setEnabled(false);
 
     csv_tableView->setModel(model);
     csv_tableView->showMaximized();
@@ -277,20 +285,33 @@ void MainWindow::createNewCSV()
 {
     tableType="NewCSV";
 
+    if(stackWidget->count()>1) // 1 is csv_table view
+        stackWidget->removeWidget(csv_tableWidget);
+
+    csv_tableWidget = new QTableWidget(central); // new CSV File
+    csv_tableWidget->horizontalHeader()->viewport()->installEventFilter(this);
+    csv_tableWidget->verticalHeader()->viewport()->installEventFilter(this);
+
+    stackWidget->addWidget(csv_tableWidget);
+    stackWidget->setCurrentIndex(1);
+
     removeAllGraphs();
 
-    gLayout->addWidget(tableControlsFrame);
-    gLayout->addWidget(turnSlider);
-    gLayout->addWidget(csv_tableWidget);
+    actorsLineEdit->setEnabled(true);
+    dimensionsLineEdit->setEnabled(true);
+    actorsPushButton->setEnabled(true);
+    dimensionsPushButton->setEnabled(true);
+    donePushButton->setEnabled(true);
 
-    turnSlider->hide();
-    csv_tableView->hide();
-    tableControlsFrame->show();
-    csv_tableWidget->show();
 
     scenarioComboBox->setEditable(true);
     turnSlider->setVisible(false);
     scenarioDescriptionLineEdit->setVisible(true);
+    scenarioComboBox->lineEdit()->setPlaceholderText("Enter Scenario...");
+    scenarioDescriptionLineEdit->setPlaceholderText("Enter Scenario Description here ... ");
+
+    turnSlider->hide();
+    tableControlsFrame->show();
 
     //    for (int i = 0 ; i < csv_tableWidget->columnCount(); ++i)
     //        csv_tableWidget->removeColumn(i);
@@ -311,17 +332,15 @@ void MainWindow::createNewCSV()
     actorsLineEdit->setText(QString::number(3));
     dimensionsLineEdit->setText(QString::number(1));
 
-
     //    csv_tableWidget->horizontalHeader()->hide();
 
     insertNewRowCSV();
     insertNewColumnCSV();
-}
 
+}
 
 void MainWindow::initializeCentralViewFrame()
 {
-
     central = new QFrame;
     central->setFrameShape(QFrame::StyledPanel);
 
@@ -333,10 +352,12 @@ void MainWindow::initializeCentralViewFrame()
 
     QGridLayout *gCLayout = new QGridLayout(tableControlsFrame);
 
+    stackWidget = new QStackedWidget(central);
+
     scenarioComboBox = new QComboBox(tableControlsFrame);
     //    scenarioComboBox->setMinimumWidth(40);
-    scenarioComboBox->setMaximumWidth(150);
-    scenarioComboBox->setFixedWidth(130);
+    scenarioComboBox->setMaximumWidth(200);
+    scenarioComboBox->setFixedWidth(150);
     gCLayout->addWidget(scenarioComboBox,0,2);
     scenarioComboBox->setEditable(true);
     connect(scenarioComboBox,SIGNAL(currentIndexChanged(QString)),this,SLOT(scenarioComboBoxValue(QString)));
@@ -385,20 +406,24 @@ void MainWindow::initializeCentralViewFrame()
 
     modeltoCSV = new QStandardItemModel;
 
-    csv_tableWidget = new QTableWidget(central); // new CSV File
-
     csv_tableView = new QTableView(central); // CSV and DB
     csv_tableView->setShowGrid(true);
+    csv_tableView->horizontalHeader()->viewport()->installEventFilter(this);
+    csv_tableView->verticalHeader()->viewport()->installEventFilter(this);
+
+    csv_tableWidget = new QTableWidget(central); // new CSV File
+    csv_tableWidget->horizontalHeader()->viewport()->installEventFilter(this);
+    csv_tableWidget->verticalHeader()->viewport()->installEventFilter(this);
 
     gLayout->addWidget(tableControlsFrame);
     gLayout->addWidget(turnSlider);
-    gLayout->addWidget(csv_tableWidget);
-    gLayout->addWidget(csv_tableView);
+    gLayout->addWidget(stackWidget);
+
+    stackWidget->addWidget(csv_tableView);
+    stackWidget->addWidget(csv_tableWidget);
 
     tableControlsFrame->hide();
     turnSlider->hide();
-    csv_tableWidget->hide();
-    csv_tableView->hide();
 
     connect(actorsPushButton,&QPushButton::clicked,this, &MainWindow::insertNewRowCSV);
     connect(dimensionsPushButton,&QPushButton::clicked,this, &MainWindow::insertNewColumnCSV);
@@ -725,6 +750,131 @@ void MainWindow::plotGraph()
     //    addGraphOnModule1(6,0);
     //    addGraphOnModule1(7,0);
 }
+
+
+bool MainWindow::eventFilter(QObject* object, QEvent* event)
+{
+
+    if ((object == csv_tableView->horizontalHeader()->viewport() ||
+         object == csv_tableView->verticalHeader()->viewport()) &&
+            event->type() == QEvent::MouseButtonDblClick)
+    {
+        if (header_editor)
+        { //delete previous editor just in case
+            header_editor->deleteLater();
+            header_editor = 0;
+        }
+        QMouseEvent* e = static_cast<QMouseEvent*>(event);
+        QHeaderView* header = static_cast<QHeaderView*>(object->parent());
+        int mouse_pos = header->orientation() == Qt::Horizontal ? e->x() : e->y();
+        int logical_index = header->logicalIndex(header->visualIndexAt(mouse_pos));
+
+        if (logical_index >= 0)
+        {
+            // if mouse is over an item
+            QRect rect; // line edit rect in header's viewport's coordinates
+
+            if (header->orientation() == Qt::Horizontal)
+            {
+                rect.setLeft(header->sectionPosition(logical_index));
+                rect.setWidth(header->sectionSize(logical_index));
+                rect.setTop(0);
+                rect.setHeight(header->height());
+            }
+            else
+            {
+                rect.setTop(header->sectionPosition(logical_index));
+                rect.setHeight(header->sectionSize(logical_index));
+                rect.setLeft(0);
+                rect.setWidth(header->width());
+            }
+            rect.adjust(1, 1, -1, -1);
+
+            header_editor = new QLineEdit(header->viewport());
+            header_editor->move(rect.topLeft());
+            header_editor->resize(rect.size());
+            header_editor->setFrame(false);//get current item text
+
+            QString text = header->model()->headerData(logical_index, header->orientation()).toString();
+
+            header_editor->setText(text);
+            header_editor->setFocus();
+            editor_index = logical_index; //save for future use
+            header_editor->installEventFilter(this); //catch focus out event
+
+            //if user presses Enter it should close editor
+            connect(header_editor, SIGNAL(returnPressed()),csv_tableView, SLOT(setFocus()));
+            header_editor->show();
+        }
+        return true; // filter out event
+    }
+    else if ((object == csv_tableWidget->horizontalHeader()->viewport() ||
+              object == csv_tableWidget->verticalHeader()->viewport()) &&
+             event->type() == QEvent::MouseButtonDblClick)
+    {
+        if (header_editor)
+        { //delete previous editor just in case
+            header_editor->deleteLater();
+            header_editor = 0;
+        }
+        QMouseEvent* e = static_cast<QMouseEvent*>(event);
+        QHeaderView* header = static_cast<QHeaderView*>(object->parent());
+        int mouse_pos = header->orientation() == Qt::Horizontal ? e->x() : e->y();
+        int logical_index = header->logicalIndex(header->visualIndexAt(mouse_pos));
+
+        if (logical_index >= 0)
+        {
+            // if mouse is over an item
+            QRect rect; // line edit rect in header's viewport's coordinates
+
+            if (header->orientation() == Qt::Horizontal)
+            {
+                rect.setLeft(header->sectionPosition(logical_index));
+                rect.setWidth(header->sectionSize(logical_index));
+                rect.setTop(0);
+                rect.setHeight(header->height());
+            }
+            else
+            {
+                rect.setTop(header->sectionPosition(logical_index));
+                rect.setHeight(header->sectionSize(logical_index));
+                rect.setLeft(0);
+                rect.setWidth(header->width());
+            }
+            rect.adjust(1, 1, -1, -1);
+
+            header_editor = new QLineEdit(header->viewport());
+            header_editor->move(rect.topLeft());
+            header_editor->resize(rect.size());
+            header_editor->setFrame(false);//get current item text
+
+            QString text = header->model()->headerData(logical_index, header->orientation()).toString();
+
+            header_editor->setText(text);
+            header_editor->setFocus();
+            editor_index = logical_index; //save for future use
+            header_editor->installEventFilter(this); //catch focus out event
+
+            //if user presses Enter it should close editor
+            connect(header_editor, SIGNAL(returnPressed()),csv_tableWidget, SLOT(setFocus()));
+            header_editor->show();
+        }
+        return true; // filter out event
+    }
+
+    else if (object == header_editor && event->type() == QEvent::FocusOut)
+    {
+        QHeaderView* header = static_cast<QHeaderView*>(header_editor->parentWidget()->parentWidget());
+
+        //save item text
+        header->model()->setHeaderData(editor_index, header->orientation(),header_editor->text());
+        header_editor->deleteLater(); //safely delete editor
+        header_editor = 0;
+    }
+    return false;
+}
+
+
 
 void MainWindow::titleDoubleClick(QMouseEvent* event, QCPPlotTitle* title)
 {

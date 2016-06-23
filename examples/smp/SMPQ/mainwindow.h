@@ -66,6 +66,8 @@ private slots:
     void insertNewColumnCSV();
     void donePushButtonClicked();
 
+     bool eventFilter(QObject*, QEvent*);
+
 signals:
     //CSV
     void csvFilePath(QString path);
@@ -91,6 +93,7 @@ private:
     QFrame *central;
     QFrame *tableControlsFrame;
     QGridLayout *gLayout;
+    QStackedWidget * stackWidget;
 
     QComboBox * scenarioComboBox;
     QPushButton * actorsPushButton;
@@ -157,6 +160,7 @@ private:
     QStandardItemModel *modeltoCSV;
 
 
+    void createSeperateColumn();
 private slots:
     void titleDoubleClick(QMouseEvent *event, QCPPlotTitle *title);
     void axisLabelDoubleClick(QCPAxis* axis, QCPAxis::SelectablePart part);
