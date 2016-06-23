@@ -288,7 +288,7 @@ string Model::createSQL(unsigned int n) {
         sql = "create table if not exists BargnValu ("  \
               "Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
               "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-              "Bargn_i	INTEGER NOT NULL DEFAULT 0, "\
+			  "Bargn_i    INTEGER NOT NULL	DEFAULT '0'	REFERENCES Bargn(Bargn_i) ON DELETE CASCADE	ON UPDATE CASCADE, "\
               "Brgn_Act_i	INTEGER NOT NULL DEFAULT 0, "\
               "Dim_k	INTEGER NOT NULL DEFAULT 0, "\
               "Coord	REAL"\
@@ -311,16 +311,26 @@ string Model::createSQL(unsigned int n) {
 		break;
 
 	case 13: //  BargnValu
-		sql = "create table if not exists BargnVote ("  \
+		sql = "create table if not exists BargnUtil ("  \
 			"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
 			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-			"Bargn_i	INTEGER NOT NULL DEFAULT 0, "\
+			"Bargn_i    INTEGER NOT NULL	DEFAULT '0'	REFERENCES Bargn(Bargn_i) ON DELETE CASCADE	ON UPDATE CASCADE, "\
 			"Brgn_Act_i	INTEGER NOT NULL DEFAULT 0, "\
 			"Act_i 	INTEGER NOT NULL DEFAULT 0, "\
 			"Util	REAL"\
 			");";
 		break;
 
+	case 14: //  BargnVote
+		sql = "create table if not exists BargnVote ("  \
+			"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
+			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
+			"Bargn_i    INTEGER NOT NULL	DEFAULT '0'	REFERENCES Bargn(Bargn_i) ON DELETE CASCADE	ON UPDATE CASCADE, "\
+			"Brgn_Act_i	INTEGER NOT NULL DEFAULT 0, "\
+			"Act_i 	INTEGER NOT NULL DEFAULT 0, "\
+			"Vote	REAL"\
+			");";
+		break;
 
     default:
         throw(KException("Model::createTableSQL unrecognized table number"));

@@ -681,7 +681,7 @@ namespace KBase {
 	  double vkij = vote(vr, w(0, k), u(k, i), u(k, j));
 	  return vkij;
 	};
-
+ 
 	auto c = coalitions(vfn, numAct, numOpt); // c(i,j) = strength of coaltion for i against j
 	KMatrix p2 = vProb(vpm, c);  // p(i,j) = prob Ai defeats Aj
 
