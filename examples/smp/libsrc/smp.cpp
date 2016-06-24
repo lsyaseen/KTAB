@@ -581,6 +581,9 @@ SMPState* SMPState::doBCN() const {
 	auto sqlBuff = newChars(200);
 	auto sql2Buff = newChars(200);
 
+	//char sqlBuff[200] = { 0 };
+	//char sql2Buff[200] = { 0 };
+
 
 	memset(sqlBuff, '\0', 200);
 	memset(sql2Buff, '\0', 200);
@@ -686,7 +689,7 @@ SMPState* SMPState::doBCN() const {
 			lastRowinserted = sqlite3_column_int(stmt, 0);
 
 		 
-			for (int bgnlop = 0; bgnlop < brgnIIJ->posRcvr.numC(); bgnlop++)
+			for (int bgnlop = 0; bgnlop < brgnIIJ->posRcvr.numR(); bgnlop++)
 			{
 				// prepare the sql statement to insert
 				memset(sql2Buff, '\0', 200);
@@ -715,7 +718,7 @@ SMPState* SMPState::doBCN() const {
 			rc = sqlite3_step(stmt);
 			lastRowinserted = sqlite3_column_int(stmt, 0);
 
-			for (int bgnlop = 0; bgnlop < brgnJIJ->posInit.numC(); bgnlop++)
+			for (int bgnlop = 0; bgnlop < brgnJIJ->posInit.numR(); bgnlop++)
 			{
 
 				// prepare the sql statement to insert
@@ -745,7 +748,7 @@ SMPState* SMPState::doBCN() const {
 			rc = sqlite3_step(stmt);
 			lastRowinserted = sqlite3_column_int(stmt, 0);
 
-			for (int bgnlop = 0; bgnlop < brgnJIJ->posRcvr.numC(); bgnlop++)
+			for (int bgnlop = 0; bgnlop < brgnJIJ->posRcvr.numR(); bgnlop++)
 			{
 				// prepare the sql statement to insert
 				memset(sql2Buff, '\0', 200);
@@ -891,24 +894,32 @@ SMPState* SMPState::doBCN() const {
 		assert(mMax < nb);
 		cout << "Chosen bargain (" << stm << "): " << mMax << "/" << nb << endl;
 
-  
-		memset(sqlBuff, '\0', 200);
-		sprintf(sqlBuff, "UPDATE Bargn SET Prob = %f, Seld = %d  WHERE (Brgn_Act_i = %d ) and (%d = Turn_t)", p(0, 0), mMax, k,t);
-		int rslt = sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);	
+		for (int bgnlop = 0; bgnlop < p.numR(); bgnlop++)
+		{
+			memset(sqlBuff, '\0', 200);
+			sprintf(sqlBuff, "UPDATE Bargn SET Prob = %f, Seld = %d  WHERE (Brgn_Act_i = %d ) and (%d = Turn_t)", p(bgnlop, 0), mMax, k, t);
+			int rslt = sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
+		}
 
-		memset(sqlBuff, '\0', 200);
-		sprintf(sqlBuff, "UPDATE Bargn SET Prob = %f, Seld = %d  WHERE (Brgn_Act_i = %d ) and (%d = Turn_t)", p(1, 0), mMax,  k, t);
-		  rslt = sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
+	 
 		// BargnVote table records
-
 		cout << "Bargain Vote : " << endl;
 		w.mPrintf(" %.f");
+		
+		//Extract the bargain id 
+		memset(sqlBuff, '\0', 200);
+		sprintf(sqlBuff, "select Bargn_i from Bargn WHERE (Brgn_Act_i = %d ) and (%d = Turn_t)", k, t);
+		stmt = NULL;
+		rowtoupdate = sqlite3_prepare_v2(db, sqlBuff, -1, &stmt, NULL);
+		rc = sqlite3_step(stmt);
+		lastRowinserted = sqlite3_column_int(stmt, 0);  
+		
 		for (int bgnlop = 0; bgnlop <  w.numC(); bgnlop++)
 		{
 			memset(sql2Buff, '\0', 200);
 			sprintf(sql2Buff,
-				"INSERT INTO BargnVote (Scenario, Turn_t,  Brgn_Act_i, Act_i, Vote) VALUES ('%s',%d,%d,%d,%f)",
-				model->getScenarioName().c_str(), t, k, bgnlop, w( 0, bgnlop));
+				"INSERT INTO BargnVote (Scenario, Turn_t,Bargn_i,  Brgn_Act_i, Act_i, Vote) VALUES ('%s',%d,%d,%d,%d,%f)",
+				model->getScenarioName().c_str(), t, lastRowinserted,k, na, w( 0, bgnlop));
 			sqlite3_exec(db, sql2Buff, NULL, NULL, &zErrMsg);
 		}
 
@@ -917,8 +928,8 @@ SMPState* SMPState::doBCN() const {
 		{
 			memset(sql2Buff, '\0', 200);
 			sprintf(sql2Buff,
-				"INSERT INTO BargnUtil (Scenario, Turn_t,  Brgn_Act_i, Act_i, Util) VALUES ('%s',%d,%d,%d,%f)",
-				model->getScenarioName().c_str(), t, k, bgnlop, u_im(bgnlop, 0));
+				"INSERT INTO BargnUtil (Scenario, Turn_t,Bargn_i, Brgn_Act_i, Act_i, Util) VALUES ('%s',%d,%d,%d,%d,%f)",
+				model->getScenarioName().c_str(), t, lastRowinserted, k, bgnlop, u_im(bgnlop, 0));
 			sqlite3_exec(db, sql2Buff, NULL, NULL, &zErrMsg);
 		}
  
@@ -953,9 +964,9 @@ SMPState* SMPState::doBCN() const {
 	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
 
 	// Deallocate Sql statement buffer
-	delete sqlBuff;
+	delete [] sqlBuff;
 	sqlBuff = nullptr;
-	delete sql2Buff;
+	delete [] sql2Buff;
 	sql2Buff = nullptr;
 
 	// Some bargains are nullptr, and there are two copies of every non-nullptr randomly
