@@ -25,8 +25,12 @@ MainWindow::MainWindow()
     dbObj = new Database();
     //To open database by passing the path
     connect(this,&MainWindow::dbFilePath,dbObj, &Database::openDB);
+    //To open database by passing the path
+    connect(this,&MainWindow::dbEditFilePath,dbObj, &Database::openDBEdit);
     //To get Database item Model to show on GUI
     connect(dbObj,&Database::dbModel,this,&MainWindow::setDBItemModel);
+    //To get Database item Model to show on Edit
+    connect(dbObj,&Database::dbModelEdit,this,&MainWindow::setDBItemModelEdit);
     //To display any message to user
     connect(dbObj,&Database::Message,this,&MainWindow::displayMessage);
     //To get vector positions of actors to plot a graph on GUI
@@ -37,6 +41,8 @@ MainWindow::MainWindow()
     connect(dbObj,&Database::scenarios,this,&MainWindow::updateScenarioList_ComboBox);
     //To get initial scenario vector positions and Item model to update graph and Table view
     connect(this, &MainWindow::getScenarioRunValues,dbObj,&Database::getScenarioData);
+    //To store scenario value, for edit database to save as csv reference
+    connect(this, &MainWindow::getScenarioRunValuesEdit,dbObj,&Database::getScenarioDataEdit);
     //To get state count
     connect(this, &MainWindow::getStateCountfromDB,dbObj,&Database::getStateCount);
     //To get dimensions count
@@ -44,8 +50,11 @@ MainWindow::MainWindow()
     //received dimension Values
     connect(dbObj,SIGNAL(dimensionsCount(int)),this,SLOT(updateDimensionCount(int)));
 
+    //DB to CSV
+    connect(this, &MainWindow::getActorsDesc,dbObj,&Database::getActors_DescriptionDB);
+    connect(dbObj,SIGNAL(actorsNameDesc(QList <QString> ,QList <QString>)),this,SLOT(actorsName_Description(QList  <QString> ,QList  <QString>)));
 
-    //headers of TableWidget
+    //editable headers of TableWidget
     header_editor = 0;
 
 }
@@ -71,13 +80,26 @@ void MainWindow::csvGetFilePAth()
 void MainWindow::dbGetFilePAth()
 {
     //Get  *.db file path
-    QString dbPath;
     dbPath = QFileDialog::getOpenFileName(this,tr("Database File"), QDir::homePath() , tr("Database File (*.db)"));
     statusBar()->showMessage(tr("Looking for Database file ..."));
 
     //emit path to db class for processing
     if(!dbPath.isEmpty())
         emit dbFilePath(dbPath);
+}
+
+void MainWindow::dbEditGetFilePAth()
+{
+    //Get  *.db file path
+    if(dbPath.isEmpty())
+    {
+        //        dbPath = QFileDialog::getOpenFileName(this,tr("Database File to Create CSV"), QDir::homePath() , tr("Database File (*.db)"));
+        //        statusBar()->showMessage(tr("Looking for Database file to Create CSV ..."));
+        displayMessage("Database File", "Import a Database first, then Click on \n - Edit Database to Save as CSV");
+    }
+    //emit path to db class for processing
+    else if (!dbPath.isEmpty())
+        emit dbEditFilePath(dbPath);
 }
 
 void MainWindow::updateStateCount_SliderRange(int states)
@@ -89,6 +111,7 @@ void MainWindow::updateScenarioList_ComboBox(QStringList *scenarios)
 {
     turnSlider->setValue(0);
     scenarioComboBox->clear();
+
     for(int index=0;index<scenarios->length();++index)
         scenarioComboBox->addItem(scenarios->at(index));
 
@@ -104,6 +127,10 @@ void MainWindow::sliderStateValueToQryDB(int value)
 {
     removeAllGraphs();
     emit getScenarioRunValues(value,scenario_box);
+
+    // to update current scenario value for editing database to csv reference
+    emit getScenarioRunValuesEdit(scenario_box);
+
 }
 
 void MainWindow::scenarioComboBoxValue(QString scenario)
@@ -113,7 +140,6 @@ void MainWindow::scenarioComboBoxValue(QString scenario)
 
     if(tableType=="Database")
         emit getScenarioRunValues(turnSlider->value(),scenario_box); // to keep the same state when scenario changes
-
 }
 
 void MainWindow::cellSelected(int row, int column)
@@ -153,7 +179,6 @@ void MainWindow::insertNewColumnCSV()
     }
 }
 
-
 void MainWindow::createSeperateColumn()
 {
     QTableWidgetItem * hdr = new QTableWidgetItem("HEADER");
@@ -168,6 +193,8 @@ void MainWindow::donePushButtonClicked()
         saveTableViewToCSV();
     else if (tableType=="NewCSV")
         saveTableWidgetToCSV();
+    else if (tableType=="DatabaseEdit")
+        convertDBtoCSVFormat();
 }
 
 void MainWindow::displayMessage(QString cls, QString message)
@@ -177,6 +204,7 @@ void MainWindow::displayMessage(QString cls, QString message)
 
 void MainWindow::vectorPositionsFromDB()
 {
+
 }
 
 void MainWindow::dockWindowChanged()
@@ -235,6 +263,68 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model, QStringList scenario
 
     actorsLineEdit->setText(QString::number(modeltoCSV->rowCount()));
     dimensionsLineEdit->setText(QString::number((modeltoCSV->columnCount()-3)/2));
+
+}
+
+void MainWindow::setDBItemModelEdit(QSqlTableModel *modelEdit)
+{
+    tableType="DatabaseEdit";
+
+    if(stackWidget->count()>1) // 1 is csv_table view
+        stackWidget->removeWidget(csv_tableWidget);
+
+    csv_tableWidget = new QTableWidget(central); // new CSV File
+    csv_tableWidget->horizontalHeader()->viewport()->installEventFilter(this);
+    csv_tableWidget->verticalHeader()->viewport()->installEventFilter(this);
+
+    stackWidget->addWidget(csv_tableWidget);
+    stackWidget->setCurrentIndex(1);
+
+    removeAllGraphs();
+
+    actorsLineEdit->setEnabled(false);
+    dimensionsLineEdit->setEnabled(false);
+    actorsPushButton->setEnabled(false);
+    dimensionsPushButton->setEnabled(false);
+    donePushButton->setEnabled(true);
+
+    scenarioComboBox->setEditable(true);
+    turnSlider->setVisible(false);
+    scenarioDescriptionLineEdit->setVisible(true);
+    scenarioComboBox->lineEdit()->setPlaceholderText("Enter Scenario...");
+    scenarioDescriptionLineEdit->setPlaceholderText("Enter Scenario Description here ... ");
+
+    turnSlider->hide();
+    tableControlsFrame->show();
+    csv_tableWidget->setShowGrid(true);
+
+    scenarioComboBox->clear();
+    scenarioDescriptionLineEdit->clear();
+
+    for(int row=0 ; row < modelEdit->rowCount(); ++row)
+        csv_tableWidget->insertRow(row);
+    for(int col =0; col < modelEdit->columnCount(); ++col)
+        csv_tableWidget->insertColumn(col);
+
+    for(int row=0 ; row < modelEdit->rowCount(); ++row)
+    {
+        for(int col =0; col < modelEdit->columnCount(); ++col)
+        {
+            QModelIndex  id = modelEdit->index(row, col, QModelIndex());
+            csv_tableWidget->setItem(row,col,new QTableWidgetItem(modelEdit->data(id).toString()));
+        }
+    }
+    //csv_tableWidget->hideColumn(0); //hiding the scenario column
+
+    //updating scenario combobox with scenario name
+    QModelIndex  id = modelEdit->index(0, 0, QModelIndex());
+    scenarioComboBox->addItem(modelEdit->data(id).toString());
+
+    for(int col =0; col < modelEdit->columnCount(); ++col)
+    {
+        csv_tableWidget->setHorizontalHeaderItem(
+                    col, new QTableWidgetItem(modelEdit->headerData(col, Qt::Horizontal, Qt::DisplayRole).toString()));
+    }
 }
 
 void MainWindow::setDBItemModel(QSqlTableModel *model)
@@ -302,7 +392,6 @@ void MainWindow::createNewCSV()
     actorsPushButton->setEnabled(true);
     dimensionsPushButton->setEnabled(true);
     donePushButton->setEnabled(true);
-
 
     scenarioComboBox->setEditable(true);
     turnSlider->setVisible(false);
@@ -482,12 +571,14 @@ void MainWindow::createActions()
     fileMenu->addAction(importDBAct);
     fileToolBar->addAction(importDBAct);
 
-    const QIcon modDBIcon = QIcon::fromTheme("Modify Exisiting Database", QIcon(":/images/csv.png"));
-    QAction *modifyDBAct = new QAction(modDBIcon, tr("&Modify Exisiting Database"), this);
-    modifyDBAct->setStatusTip(tr("Modify Exisiting Database"));
-    connect(modifyDBAct, &QAction::triggered, this, &MainWindow::dbGetFilePAth);
+    const QIcon modDBIcon = QIcon::fromTheme("Edit Database", QIcon(":/images/csv.png"));
+    QAction *modifyDBAct = new QAction(modDBIcon, tr("&Edit DB, Save as CSV"), this);
+    modifyDBAct->setStatusTip(tr("&Edit DB, Save as CSV"));
+    connect(modifyDBAct, &QAction::triggered, this, &MainWindow::dbEditGetFilePAth);
     fileMenu->addAction(modifyDBAct);
     fileToolBar->addAction(modifyDBAct);
+
+
 
     fileMenu->addSeparator();
 
@@ -694,6 +785,14 @@ void MainWindow::saveTableWidgetToCSV()
     }
 }
 
+void MainWindow::convertDBtoCSVFormat()
+{
+    emit getActorsDesc();
+
+   //infl and sal
+
+}
+
 void MainWindow::initializeGraphPlot1()
 {
     customGraph->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes |
@@ -874,7 +973,15 @@ bool MainWindow::eventFilter(QObject* object, QEvent* event)
     return false;
 }
 
+void MainWindow::actorsName_Description(QList <QString> actorName,QList <QString> actorDescription)
+{
+    actorsName.clear();
+    actorsDescription.clear();
+    actorsName = actorName;
+    actorsDescription = actorDescription;
 
+    qDebug()<<actorsName.at(1) <<actorsName.count();
+}
 
 void MainWindow::titleDoubleClick(QMouseEvent* event, QCPPlotTitle* title)
 {

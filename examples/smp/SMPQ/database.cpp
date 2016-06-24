@@ -6,11 +6,6 @@ Database::Database()
 
 Database::~Database()
 {
-
-}
-
-void Database::openDB(QString dbPath)
-{
     // Database Initiaization
     QStringList driverList;
     driverList = QSqlDatabase::drivers();
@@ -18,6 +13,12 @@ void Database::openDB(QString dbPath)
     if (!driverList.contains("QSQLITE", Qt::CaseInsensitive))
         emit Message("Database Error", "No QSQLITE support! Check all needed dll-files!");
 
+
+
+}
+
+void Database::openDB(QString dbPath)
+{
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(dbPath);
     db.setHostName("localhost");
@@ -38,15 +39,43 @@ void Database::openDB(QString dbPath)
         // Scenarios list in db
         getScenarioList();
 
-        scenario =  scenarioList->at(0);
-        readVectorPositionTable(0, scenario);//turn
+        scenario_m =  scenarioList->at(0);
+        readVectorPositionTable(0, scenario_m);//turn
+    }
+}
+
+void Database::openDBEdit(QString dbPath)
+{
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(dbPath);
+    db.setHostName("localhost");
+    db.setUserName("root");
+
+    if(!db.open())
+    {
+        emit Message("Database Error", db.lastError().text());
+    }
+    else
+    {
+
+        readVectorPositionTableEdit(scenario_m);//turn
+
+        // Scenarios list in db
+        //  getScenarioList();
+
+        // readVectorPositionTableEdit(scenario_m);//turn
     }
 }
 
 void Database::getScenarioData(int turn, QString scenario)
 {
+    scenario_m=scenario;
+    readVectorPositionTable(turn,scenario_m);//turn
+}
 
-    readVectorPositionTable(turn,scenario);//turn
+void Database::getScenarioDataEdit(QString scenario)
+{
+    scenario_m=scenario;
 }
 
 void Database::getStateCount()
@@ -67,6 +96,27 @@ void Database::getDimensionCount()
     }
     emit dimensionsCount(numDimension);
 }
+
+void Database::getActors_DescriptionDB()
+{
+
+    actorNameList.clear();
+    actorDescList.clear();
+
+    QSqlQuery qry;
+    QString query= QString("select Name,DESC from ActorDescription order by Act_i ASC ");
+
+    qry.exec(query);
+
+    while(qry.next())
+    {
+        actorNameList.append(qry.value(0).toString());
+        actorDescList.append(qry.value(1).toString());
+    }
+
+    emit actorsNameDesc(actorNameList , actorDescList);
+}
+
 
 void Database::getVectorPosition(int actor, int dim, int turn, QString scenario)
 {
@@ -116,6 +166,20 @@ void Database::readVectorPositionTable(int turn, QString scenario)
     //To plot graph
     for(int actors=0; actors <= numActors; ++actors)
         getVectorPosition(actors,0,turn,scenario);//actors, dimension, turn
+}
+
+
+void Database::readVectorPositionTableEdit(QString scenario)
+{
+    //TO-DO add scenario as a constraint and populate the scenario dropdown cum edit box
+    //choose the first scenario as default
+
+    sqlmodelEdit = new QSqlTableModel(this);
+    sqlmodelEdit->setTable("VectorPosition");
+    sqlmodelEdit->setFilter(QString("Turn_t=0 and Scenario='%1'").arg(scenario));
+    sqlmodelEdit->select();
+
+    emit dbModelEdit(sqlmodelEdit);
 }
 
 void Database::getNumActors()
