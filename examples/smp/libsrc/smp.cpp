@@ -900,6 +900,9 @@ SMPState* SMPState::doBCN() const {
 		sprintf(sqlBuff, "UPDATE Bargn SET Prob = %f, Seld = %d  WHERE (Brgn_Act_i = %d ) and (%d = Turn_t)", p(1, 0), mMax,  k, t);
 		  rslt = sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
 		// BargnVote table records
+
+		cout << "Bargain Vote : " << endl;
+		w.mPrintf(" %.f");
 		for (int bgnlop = 0; bgnlop <  w.numC(); bgnlop++)
 		{
 			memset(sql2Buff, '\0', 200);
