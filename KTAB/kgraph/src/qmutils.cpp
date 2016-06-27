@@ -22,30 +22,8 @@
 // --------------------------------------------
 // start of a quadratic map
 //---------------------------------------------
-#ifndef QUADMAP_UTILS_H
-#define QUADMAP_UTILS_H
 
-#include <assert.h>
-#include <chrono>
-#include <cstdint>
-#include <cstdlib>
-#include <cstring>
-#include <iostream>
-#include <functional>
-#include <future>
-#include <math.h>
-#include <memory>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string>
-#include <thread>
-#include <tuple>
-#include <vector>
-
-#include <FL/Enumerations.H>
-#include "kutils.h"
-#include "prng.h"
-#include "kgraph.h"
+#include "qmutils.h"
 
 //---------------------------------------------
 
@@ -53,33 +31,76 @@ using std::cout;
 using std::endl;
 using std::flush;
 
-using KBase::KMatrix;
-using KBase::PRNG;
-using KGraph::Canvas;
-
 //---------------------------------------------
 
 namespace QuadMap {
 
-class QMApp;
 
-// this fills in a matrix with occurance-counts
-// The N rows are the X coordinate, 0 to 1
-// The M columns are the 'a' parameter, from aLow to aHigh
+double xVal(unsigned int i, unsigned int N) {
+    assert (i < N);
+    return ((double) i)/((double) N);
+};
 
-double xVal(unsigned int i, unsigned int N);
-unsigned int iVal(double x, unsigned int N);
-double aVal(unsigned int j, unsigned int M, double aLow, double aHigh);
+unsigned int iVal(double x, unsigned int N) {
+    double f = x * N;
+    unsigned int i = ((unsigned int) (f + 0.0));
+    assert (i < N);
+    return i;
+}
+
+bool testI(unsigned int i1, unsigned int N) {
+    double x = xVal(i1, N);
+    unsigned int i2 = iVal(x, N);
+    bool match = (i1 == i2);
+    if (!match) {
+        printf(" %3i => %.4f => %3i \n", i1, x, i2);
+    }
+    return match;
+}
+
+void testX(unsigned int N) {
+    for (unsigned int i =0; i<N; i++) {
+        testI(i,N);
+    }
+    return;
+}
+
+double aVal(unsigned int j, unsigned int M, double aLow, double aHigh) {
+    assert (j < M);
+    double m1 = M - 1.0;
+    double a = (j*aHigh + (m1-j)*aLow)/m1;
+    return a;
+}
 
 
-void testX(unsigned int N);
+KMatrix fillOccuranceMatrix(unsigned int N, unsigned int M,  double aLow, double aHigh) {
+    const unsigned int tNum = 100;
+    const unsigned int iNum = 17;
+    const unsigned int cNum = 50;
+    auto om = KMatrix(N, M);
+    // scan across the columns, for a
+    for (unsigned int jc = 0; jc<M; jc++) {
+        const double a = aVal(jc, M, aLow, aHigh);
+        // for each of several initial x values, get over transients then iterate
+        for (unsigned int ir = 0; ir<iNum; ir++) {
+            double x = xVal(ir, iNum);
+            for (unsigned int t=0; t<tNum; t++) {
+                x = a * x * (1.0 - x);
+            }
+            for (unsigned int t = 0; t<cNum; t++) {
+                x = a * x * (1.0 - x);
+                unsigned int ix = iVal(x,N);
+                om(ix,jc) = 1.0 + om(ix,jc);
+            }
+        }
 
-KMatrix fillOccuranceMatrix(unsigned int N, unsigned int M,  double aLow, double aHigh);
+    }
+
+    return om;
+}
 
 }; // end of namespace
 
-//---------------------------------------------
-#endif
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------

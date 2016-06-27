@@ -176,6 +176,7 @@ FLTK_WRAP_UI(qmui fluid/qmUI.fl)
 ADD_LIBRARY(qmui STATIC ${qmui_FLTK_UI_SRCS})
 
 ADD_EXECUTABLE(quadmap
+    src/qmutils.cpp
     src/qmmain.cpp
 )
   TARGET_LINK_LIBRARIES(quadmap
