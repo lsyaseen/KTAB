@@ -54,7 +54,8 @@ using KBase::PCEModel;
 using KBase::ReportingLevel;
 
 
-
+// --------------------------------------------
+uint64_t BargainSMP::highestBargainID = 1000;
 
 BargainSMP::BargainSMP(const SMPActor* ai, const SMPActor* ar, const VctrPstn & pi, const VctrPstn & pr) {
     assert(nullptr != ai);
@@ -71,6 +72,11 @@ BargainSMP::~BargainSMP() {
     posInit = VctrPstn(KMatrix(0, 0));
     posRcvr = VctrPstn(KMatrix(0, 0));
 }
+
+
+    uint64_t BargainSMP::getID() const {
+      return myBargainID;
+    }
 
 SMPActor::SMPActor(string n, string d) : Actor(n, d) {
     vr = VotingRule::Proportional; // just a default

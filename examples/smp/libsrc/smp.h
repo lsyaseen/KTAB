@@ -65,6 +65,7 @@ const string appVersion = "0.1.1";
 // -------------------------------------------------
 // Plain-Old-Data
 struct BargainSMP {
+public:
     BargainSMP(const SMPActor* ai, const SMPActor* ar, const VctrPstn & pi, const VctrPstn & pr);
     ~BargainSMP();
 
@@ -73,6 +74,11 @@ struct BargainSMP {
     const SMPActor* actRcvr = nullptr;
     VctrPstn posInit = VctrPstn();
     VctrPstn posRcvr = VctrPstn();
+    uint64_t getID() const;
+    
+protected:
+  static uint64_t highestBargainID;
+  uint64_t myBargainID = 0;
 };
 
 // -------------------------------------------------
