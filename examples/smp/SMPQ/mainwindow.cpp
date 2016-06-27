@@ -30,7 +30,7 @@ MainWindow::MainWindow()
     //To get Database item Model to show on GUI
     connect(dbObj,&Database::dbModel,this,&MainWindow::setDBItemModel);
     //To get Database item Model to show on Edit
-    connect(dbObj,&Database::dbModelEdit,this,&MainWindow::setDBItemModelEdit);
+    //    connect(dbObj,&Database::dbModelEdit,this,&MainWindow::setDBItemModelEdit);
     //To display any message to user
     connect(dbObj,&Database::Message,this,&MainWindow::displayMessage);
     //To get vector positions of actors to plot a graph on GUI
@@ -53,8 +53,14 @@ MainWindow::MainWindow()
     //DB to CSV
     connect(this, &MainWindow::getActorsDesc,dbObj,&Database::getActors_DescriptionDB);
     connect(dbObj,SIGNAL(actorsNameDesc(QList <QString> ,QList <QString>)),this,SLOT(actorsName_Description(QList  <QString> ,QList  <QString>)));
+    connect(this, &MainWindow::getInfluence,dbObj,&Database::getInfluenceDB);
+    connect(dbObj,SIGNAL(actorsInflu(QList<QString>)),this,SLOT(actors_Influence(QList  <QString>)));
+    connect(this, &MainWindow::getPosition,dbObj,&Database::getPositionDB);
+    connect(dbObj,SIGNAL(actors_Pos(QList<QString>,int)),this,SLOT(actors_Position(QList<QString>,int)));
+    connect(this, &MainWindow::getSalience,dbObj,&Database::getSalienceDB);
+    connect(dbObj,SIGNAL(actors_Sal(QList<QString>,int)),this,SLOT(actors_Salience(QList<QString>,int)));
 
-    //editable headers of TableWidget
+    //editable headers of TableWidget and TableView
     header_editor = 0;
 
 }
@@ -98,8 +104,20 @@ void MainWindow::dbEditGetFilePAth()
         displayMessage("Database File", "Import a Database first, then Click on \n - Edit Database to Save as CSV");
     }
     //emit path to db class for processing
-    else if (!dbPath.isEmpty())
-        emit dbEditFilePath(dbPath);
+    //    else if (!dbPath.isEmpty())
+    //        emit dbEditFilePath(dbPath);
+    else
+    {
+        emit getActorsDesc();
+        emit getInfluence();
+
+        for(int i = 0 ; i < dimensionsLineEdit->text().toInt();++i)
+            emit getPosition(i);
+        for(int i = 0 ; i < dimensionsLineEdit->text().toInt();++i)
+            emit getSalience(i);
+
+        setDBItemModelEdit();
+    }
 }
 
 void MainWindow::updateStateCount_SliderRange(int states)
@@ -130,7 +148,6 @@ void MainWindow::sliderStateValueToQryDB(int value)
 
     // to update current scenario value for editing database to csv reference
     emit getScenarioRunValuesEdit(scenario_box);
-
 }
 
 void MainWindow::scenarioComboBoxValue(QString scenario)
@@ -149,7 +166,7 @@ void MainWindow::cellSelected(int row, int column)
 
 void MainWindow::insertNewRowCSV()
 {
-    if(tableType=="NewCSV")
+    if(tableType=="NewCSV" || tableType=="DatabaseEdit")
     {
         while(csv_tableWidget->rowCount()!=actorsLineEdit->text().toInt() && actorsLineEdit->text().toInt()>=csv_tableWidget->rowCount())
             csv_tableWidget->insertRow(csv_tableWidget->rowCount());
@@ -164,7 +181,7 @@ void MainWindow::insertNewRowCSV()
 
 void MainWindow::insertNewColumnCSV()
 {
-    if(tableType=="NewCSV")
+    if(tableType=="NewCSV" || tableType=="DatabaseEdit")
     {
         while(((csv_tableWidget->columnCount()-3)/2)!=dimensionsLineEdit->text().toInt()
               && ((csv_tableWidget->columnCount()-3)/2) <= dimensionsLineEdit->text().toInt())
@@ -191,10 +208,8 @@ void MainWindow::donePushButtonClicked()
 {
     if(tableType=="CSV")
         saveTableViewToCSV();
-    else if (tableType=="NewCSV")
+    else if (tableType=="NewCSV"|| tableType=="DatabaseEdit")
         saveTableWidgetToCSV();
-    else if (tableType=="DatabaseEdit")
-        convertDBtoCSVFormat();
 }
 
 void MainWindow::displayMessage(QString cls, QString message)
@@ -263,17 +278,17 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model, QStringList scenario
 
     actorsLineEdit->setText(QString::number(modeltoCSV->rowCount()));
     dimensionsLineEdit->setText(QString::number((modeltoCSV->columnCount()-3)/2));
-
 }
 
-void MainWindow::setDBItemModelEdit(QSqlTableModel *modelEdit)
+void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
 {
+    if(stackWidget->count()>1) // 1 is csv_table view
+    {
+        stackWidget->removeWidget(csv_tableWidget);
+    }
     tableType="DatabaseEdit";
 
-    if(stackWidget->count()>1) // 1 is csv_table view
-        stackWidget->removeWidget(csv_tableWidget);
-
-    csv_tableWidget = new QTableWidget(central); // new CSV File
+    csv_tableWidget = new QTableWidget(central);
     csv_tableWidget->horizontalHeader()->viewport()->installEventFilter(this);
     csv_tableWidget->verticalHeader()->viewport()->installEventFilter(this);
 
@@ -282,11 +297,13 @@ void MainWindow::setDBItemModelEdit(QSqlTableModel *modelEdit)
 
     removeAllGraphs();
 
-    actorsLineEdit->setEnabled(false);
-    dimensionsLineEdit->setEnabled(false);
-    actorsPushButton->setEnabled(false);
-    dimensionsPushButton->setEnabled(false);
+    actorsLineEdit->setEnabled(true);
+    dimensionsLineEdit->setEnabled(true);
+    actorsPushButton->setEnabled(true);
+    dimensionsPushButton->setEnabled(true);
     donePushButton->setEnabled(true);
+
+    scenarioComboBox->clear();
 
     scenarioComboBox->setEditable(true);
     turnSlider->setVisible(false);
@@ -298,33 +315,61 @@ void MainWindow::setDBItemModelEdit(QSqlTableModel *modelEdit)
     tableControlsFrame->show();
     csv_tableWidget->setShowGrid(true);
 
-    scenarioComboBox->clear();
-    scenarioDescriptionLineEdit->clear();
-
-    for(int row=0 ; row < modelEdit->rowCount(); ++row)
+    //scenarioDescriptionLineEdit->clear();
+    for(int row = 0 ; row < actorsName.length();++row)
         csv_tableWidget->insertRow(row);
-    for(int col =0; col < modelEdit->columnCount(); ++col)
+    for(int col =0; col < 3+(dimensionsLineEdit->text().toInt())*2; ++col)
         csv_tableWidget->insertColumn(col);
 
-    for(int row=0 ; row < modelEdit->rowCount(); ++row)
+    //Headers Label
+    csv_tableWidget->setHorizontalHeaderItem(0,new QTableWidgetItem("Actor"));
+    csv_tableWidget->setHorizontalHeaderItem(1,new QTableWidgetItem("Actor Description"));
+    csv_tableWidget->setHorizontalHeaderItem(2,new QTableWidgetItem("Influence"));
+
+    int k=1;
+    for(int i=3 ; i <csv_tableWidget->columnCount(); i=i+2)
     {
-        for(int col =0; col < modelEdit->columnCount(); ++col)
+        csv_tableWidget->setHorizontalHeaderItem(i,new QTableWidgetItem("Position "+QString::number(k)));
+        csv_tableWidget->setHorizontalHeaderItem(i+1,new QTableWidgetItem("Saliance "+QString::number(k)));
+        ++k;
+    }
+    //Updating values
+    for(int row=0 ; row < actorsName.length(); ++row)
+    {
+        int col=0;
+        csv_tableWidget->setItem(row,col,new QTableWidgetItem(actorsName.at(row)));
+        csv_tableWidget->setItem(row,++col,new QTableWidgetItem(actorsDescription.at(row)));
+        csv_tableWidget->setItem(row,++col,new QTableWidgetItem(actorsInfluence.at(row)));
+
+        if(dimensionsLineEdit->text().toInt()>=1)
         {
-            QModelIndex  id = modelEdit->index(row, col, QModelIndex());
-            csv_tableWidget->setItem(row,col,new QTableWidgetItem(modelEdit->data(id).toString()));
+            csv_tableWidget->setItem(row,++col,new QTableWidgetItem(actorsPosition[0].at(row)));
+            csv_tableWidget->setItem(row,++col,new QTableWidgetItem(actorsSalience[0].at(row)));
+        }
+        if(dimensionsLineEdit->text().toInt()>=2)
+        {
+            csv_tableWidget->setItem(row,++col,new QTableWidgetItem(actorsPosition[1].at(row)));
+            csv_tableWidget->setItem(row,++col,new QTableWidgetItem(actorsSalience[1].at(row)));
+        }
+        if(dimensionsLineEdit->text().toInt()==3)
+        {
+            csv_tableWidget->setItem(row,++col,new QTableWidgetItem(actorsPosition[0].at(row)));
+            csv_tableWidget->setItem(row,++col,new QTableWidgetItem(actorsSalience[0].at(row)));
         }
     }
+
     //csv_tableWidget->hideColumn(0); //hiding the scenario column
 
     //updating scenario combobox with scenario name
-    QModelIndex  id = modelEdit->index(0, 0, QModelIndex());
-    scenarioComboBox->addItem(modelEdit->data(id).toString());
+    //    QModelIndex  id = modelEdit->index(0, 0, QModelIndex());
+    //    scenarioComboBox->addItem(modelEdit->data(id).toString());
 
-    for(int col =0; col < modelEdit->columnCount(); ++col)
-    {
-        csv_tableWidget->setHorizontalHeaderItem(
-                    col, new QTableWidgetItem(modelEdit->headerData(col, Qt::Horizontal, Qt::DisplayRole).toString()));
-    }
+    //    for(int col =0; col < modelEdit->columnCount(); ++col)
+    //    {
+    //        csv_tableWidget->setHorizontalHeaderItem(
+    //                    col, new QTableWidgetItem(modelEdit->headerData(col, Qt::Horizontal, Qt::DisplayRole).toString()));
+    //    }
+
 }
 
 void MainWindow::setDBItemModel(QSqlTableModel *model)
@@ -375,8 +420,10 @@ void MainWindow::createNewCSV()
 {
     tableType="NewCSV";
 
-    if(stackWidget->count()>1) // 1 is csv_table view
+    if( stackWidget->count()>1 ) // 1 is csv_table view
+    {
         stackWidget->removeWidget(csv_tableWidget);
+    }
 
     csv_tableWidget = new QTableWidget(central); // new CSV File
     csv_tableWidget->horizontalHeader()->viewport()->installEventFilter(this);
@@ -578,8 +625,6 @@ void MainWindow::createActions()
     fileMenu->addAction(modifyDBAct);
     fileToolBar->addAction(modifyDBAct);
 
-
-
     fileMenu->addSeparator();
 
     QAction *quitAct = new QAction(modDBIcon, tr("&Quit"), this);
@@ -636,7 +681,6 @@ void MainWindow::createGraph2DockWindows()
     viewMenu->addAction(graph2Dock->toggleViewAction());
 
     connect(graph2Dock,SIGNAL(dockLocationChanged(Qt::DockWidgetArea)),this,SLOT(dockWindowChanged()));
-
 }
 
 void MainWindow::createModuleParametersDockWindow()
@@ -689,7 +733,7 @@ void MainWindow::createModuleParametersDockWindow()
 void MainWindow::saveTableViewToCSV()
 {
     QString saveFilePath = QFileDialog::getSaveFileName(this,tr("Save File to "), QDir::homePath(),tr("CSV File (*.csv)"));
-    if( __linux__ )
+    if( !saveFilePath.endsWith(".csv") )
         saveFilePath.append(".csv");
 
     QFile f(saveFilePath);
@@ -721,7 +765,6 @@ void MainWindow::saveTableViewToCSV()
 
             for (int col=0; col<modeltoCSV->columnCount(); col++)
             {
-
                 //NOTE : uncomment if strict checking is required
                 //                if(!modeltoCSV->data(modeltoCSV->index(row,col)).toString().isEmpty())
                 strList << modeltoCSV->data(modeltoCSV->index(row,col)).toString();
@@ -740,8 +783,9 @@ void MainWindow::saveTableViewToCSV()
 void MainWindow::saveTableWidgetToCSV()
 {
     QString saveFilePath = QFileDialog::getSaveFileName(this,tr("Save File to "), QDir::homePath(),tr("CSV File (*.csv)"));
-    if( __linux__ )
+    if( !saveFilePath.endsWith(".csv") )
         saveFilePath.append(".csv");
+
     QFile f(saveFilePath);
 
     if (f.open(QFile::WriteOnly | QFile::Truncate))
@@ -787,9 +831,6 @@ void MainWindow::saveTableWidgetToCSV()
 
 void MainWindow::convertDBtoCSVFormat()
 {
-    emit getActorsDesc();
-
-   //infl and sal
 
 }
 
@@ -849,7 +890,6 @@ void MainWindow::plotGraph()
     //    addGraphOnModule1(6,0);
     //    addGraphOnModule1(7,0);
 }
-
 
 bool MainWindow::eventFilter(QObject* object, QEvent* event)
 {
@@ -960,7 +1000,6 @@ bool MainWindow::eventFilter(QObject* object, QEvent* event)
         }
         return true; // filter out event
     }
-
     else if (object == header_editor && event->type() == QEvent::FocusOut)
     {
         QHeaderView* header = static_cast<QHeaderView*>(header_editor->parentWidget()->parentWidget());
@@ -979,8 +1018,26 @@ void MainWindow::actorsName_Description(QList <QString> actorName,QList <QString
     actorsDescription.clear();
     actorsName = actorName;
     actorsDescription = actorDescription;
+    qDebug()<<actorsName.at(0) <<actorsName.count();
+}
 
-    qDebug()<<actorsName.at(1) <<actorsName.count();
+void MainWindow::actors_Influence(QList<QString> actorInfluence)
+{
+    actorsInfluence.clear();
+    actorsInfluence=actorInfluence;
+    qDebug()<<actorsInfluence.at(1) <<actorsInfluence.count();
+}
+
+void MainWindow::actors_Position(QList<QString> actorPosition, int dim)
+{
+    actorsPosition[dim]=actorPosition;
+    qDebug()<<actorsPosition[dim].at(1);
+}
+
+void MainWindow::actors_Salience(QList<QString> actorSalience,int dim)
+{
+    actorsSalience[dim]=actorSalience;
+    qDebug()<<actorsSalience[dim].at(0);
 }
 
 void MainWindow::titleDoubleClick(QMouseEvent* event, QCPPlotTitle* title)

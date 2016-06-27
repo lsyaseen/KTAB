@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+
+
 #include <QMainWindow>
 #include "csv.h"
 #include "database.h"
@@ -50,7 +52,7 @@ private slots:
     void csvGetFilePAth();
     //Database
     void setDBItemModel(QSqlTableModel * model);
-    void setDBItemModelEdit(QSqlTableModel *modelEdit);
+    void setDBItemModelEdit();
     void displayMessage(QString cls, QString message);
     void vectorPositionsFromDB();
     void dbGetFilePAth();
@@ -72,6 +74,9 @@ private slots:
 
     //DB to CSV
     void actorsName_Description(QList<QString> actorName, QList<QString> actorDescription);
+    void actors_Influence(QList<QString> ActorInfluence);
+    void actors_Position(QList<QString> actorPosition, int dim);
+    void actors_Salience(QList<QString> actorSalience, int dim);
 
 
 signals:
@@ -86,8 +91,12 @@ signals:
     void getScenarioRunValuesEdit(QString scenario_box);
     void getStateCountfromDB();
     void getDimensionCountfromDB();
+
     //save DB to csv
     void getActorsDesc();
+    void getInfluence();
+    void getPosition(int dim);
+    void getSalience(int dim);
 
 private:
     //MainWindow
@@ -159,7 +168,6 @@ private:
     void plotGraph();
     void initializeCentralViewFrame();
 
-
     QString scenario_box;
     //graph - customplot
 
@@ -171,14 +179,16 @@ private:
     QString  tableType; // CSV, Database, NewCSV
     QStandardItemModel *modeltoCSV;
 
-
+    QString inputCSV;
     void createSeperateColumn();
-
 
     //DB to CSV
     int dim;
     QList <QString> actorsName;
     QList <QString> actorsDescription;
+    QList <QString> actorsInfluence;
+    QList <QString> actorsPosition[3];
+    QList <QString> actorsSalience[3];
 
 
 private slots:

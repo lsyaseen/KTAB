@@ -99,7 +99,6 @@ void Database::getDimensionCount()
 
 void Database::getActors_DescriptionDB()
 {
-
     actorNameList.clear();
     actorDescList.clear();
 
@@ -117,6 +116,64 @@ void Database::getActors_DescriptionDB()
     emit actorsNameDesc(actorNameList , actorDescList);
 }
 
+
+void Database::getInfluenceDB()
+{
+    actorInfluence.clear();
+
+    qDebug()<<scenario_m;
+    QSqlQuery qry;
+    QString query= QString(" select SpatialCapability.Cap from SpatialCapability,ActorDescription where"
+                           " ActorDescription.Act_i = SpatialCapability.Act_i"
+                           " and SpatialCapability.Scenario='%1' and Turn_t=0").arg(scenario_m);
+
+    qry.exec(query);
+
+    while(qry.next())
+    {
+        actorInfluence.append(qry.value(0).toString());
+    }
+
+    emit actorsInflu(actorInfluence);
+}
+
+void Database::getPositionDB(int dim)
+{
+    actorPosition.clear();
+    qDebug()<<scenario_m;
+
+    QSqlQuery qry;
+    QString query= QString(" select VectorPosition.Coord from VectorPosition,ActorDescription where"
+                           " ActorDescription.Act_i = VectorPosition.Act_i"
+                           " and VectorPosition.Scenario='%2' and Turn_t=0 and dim_k='%1'").arg(dim).arg(scenario_m);
+
+    qry.exec(query);
+
+    while(qry.next())
+    {
+        actorPosition.append(qry.value(0).toString());
+    }
+    emit actors_Pos(actorPosition,dim);
+}
+
+void Database::getSalienceDB(int dim)
+{
+    actorSalience.clear();
+    qDebug()<<scenario_m;
+
+    QSqlQuery qry;
+    QString query= QString(" select SpatialSalience.Sal from SpatialSalience,ActorDescription where"
+                           " ActorDescription.Act_i = SpatialSalience.Act_i"
+                           " and  SpatialSalience.Scenario='%2' and Turn_t=0 and dim_k='%1'").arg(dim).arg(scenario_m);
+
+    qry.exec(query);
+
+    while(qry.next())
+    {
+        actorSalience.append(qry.value(0).toString());
+    }
+    emit actors_Sal(actorSalience,dim);
+}
 
 void Database::getVectorPosition(int actor, int dim, int turn, QString scenario)
 {

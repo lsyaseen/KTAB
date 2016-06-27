@@ -21,8 +21,11 @@ public slots :
     void getScenarioDataEdit(QString scenario);
     void getStateCount();
     void getDimensionCount();
-   //DB to CSV
+    //DB to CSV
     void getActors_DescriptionDB();
+    void getInfluenceDB();
+    void getPositionDB(int dim);
+    void getSalienceDB(int dim);
 
 signals:
     void Message(QString , QString );
@@ -35,6 +38,9 @@ signals:
 
     //DB to CSV
     void actorsNameDesc(QList <QString>, QList <QString>);
+    void actorsInflu(QList <QString>);
+    void actors_Pos(QList<QString>,int);
+    void actors_Sal(QList<QString>,int);
 
 private:
     QSqlDatabase db;
@@ -50,6 +56,10 @@ private:
     //DB to CSV
     QList <QString> actorNameList;
     QList <QString> actorDescList;
+    QList <QString> actorInfluence;
+    QList <QString> actorPosition;
+    QList <QString> actorSalience;
+
 
     void getVectorPosition(int actor, int dim, int turn, QString scenario);
 
