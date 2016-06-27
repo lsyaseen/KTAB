@@ -17,12 +17,14 @@ public slots :
     void openDB(QString dbPath);
     void getScenarioData(int turn, QString scenario);
     void getStateCount();
+    void getDimensionCount();
 
 signals:
     void Message(QString , QString );
     void vectorPosition(QVector<double> &x, QVector<double> &y, QString actor);
     void dbModel(QSqlTableModel *);
     void statesCount(int value);
+    void dimensionsCount(int value);
     void scenarios(QStringList *scenariosList);
 
 private:
@@ -31,6 +33,7 @@ private:
 
     int numActors =0;
     int numStates =0;
+    int numDimension =0;
     QStringList * scenarioList;
     QString scenario;
 

@@ -46,40 +46,46 @@
 #include "prng.h"
 
 namespace KBase {
-  using std::ostream;
-  using std::shared_ptr;
-  using std::string;
-  using std::tuple;
-  using std::vector;
-  using KBase::KMatrix;
-  using KBase::ReportingLevel;
+using std::ostream;
+using std::shared_ptr;
+using std::string;
+using std::tuple;
+using std::vector;
+using KBase::KMatrix;
+using KBase::ReportingLevel;
 
-  class KMatrix;
-  class PRNG;
-  class State;
-  class Actor;
+class KMatrix;
+class PRNG;
+class State;
+class Actor;
 
-  // How much influence to exert (vote) given a difference in [0,1] utility
-  enum class VotingRule { Binary, PropBin, Proportional, PropCbc, Cubic };
-  string vrName(const VotingRule& vr);
-  ostream& operator<< (ostream& os, const VotingRule& vr);
+// How much influence to exert (vote) given a difference in [0,1] utility
+enum class VotingRule {
+    Binary, PropBin, Proportional, PropCbc, Cubic
+};
+string vrName(const VotingRule& vr);
+ostream& operator<< (ostream& os, const VotingRule& vr);
 
-  // Will state transitions be in deterministic or stochastic mode
-  enum class StateTransMode { DeterminsticSTM, StochasticSTM };
-  string stmName(const StateTransMode& stm);
-  ostream& operator<< (ostream& os, const StateTransMode& stm);
+// Will state transitions be in deterministic or stochastic mode
+enum class StateTransMode {
+    DeterminsticSTM, StochasticSTM
+};
+string stmName(const StateTransMode& stm);
+ostream& operator<< (ostream& os, const StateTransMode& stm);
 
-  // At this point, the LISP keyword 'defmacro' should leap to mind.
-  // Will this PCE be Markov or Conditional or ...
-  enum class PCEModel { MarkovPCM, ConditionalPCM };
-  string pcmName(const PCEModel& pcm);
-  ostream& operator<< (ostream& os, const PCEModel& pcm);
+// At this point, the LISP keyword 'defmacro' should leap to mind.
+// Will this PCE be Markov or Conditional or ...
+enum class PCEModel {
+    MarkovPCM, ConditionalPCM
+};
+string pcmName(const PCEModel& pcm);
+ostream& operator<< (ostream& os, const PCEModel& pcm);
 
 
 
-  // whether you consider the probability of a coalition winning to go up linearly
-  // quadratically, quartically, or even discontinuously with strength ratios
-  enum class VPModel {
+// whether you consider the probability of a coalition winning to go up linearly
+// quadratically, quartically, or even discontinuously with strength ratios
+enum class VPModel {
     // Linear law says 2:1 advantage gives pv = 2/3, and 3:1 gives 3/4
     //            and that 11:10 advantage gives 52.4%
     // Square law says 2:1 advantage gives pv = 4/5, and 3:1 gives 9/10
@@ -91,84 +97,84 @@ namespace KBase {
     //            to avoid weird round-off effects.
 
     Linear,  // first power
-      Square,  // second power
-      Quartic, // fourth power
-      Binary
-      };
-  string vpmName(const VPModel& vpm);
-  ostream& operator<< (ostream& os, const VPModel& vpm);
+    Square,  // second power
+    Quartic, // fourth power
+    Binary
+};
+string vpmName(const VPModel& vpm);
+ostream& operator<< (ostream& os, const VPModel& vpm);
 
 
-  enum class ThirdPartyCommit {
+enum class ThirdPartyCommit {
     NoCommit, SemiCommit, FullCommit
-      };
-  string tpcName(const ThirdPartyCommit& tpc);
-  ostream& operator<< (ostream& os, const ThirdPartyCommit& tpc);
+};
+string tpcName(const ThirdPartyCommit& tpc);
+ostream& operator<< (ostream& os, const ThirdPartyCommit& tpc);
 
 
-  // estimating risk attitudes from probabilities might have use outside the SMP
-  enum class BigRRange {
+// estimating risk attitudes from probabilities might have use outside the SMP
+enum class BigRRange {
     Min, Mid, Max
-      };
-  string bigRRName(const BigRRange & rRng);
-  ostream& operator << (ostream& os, const BigRRange& rRng);
+};
+string bigRRName(const BigRRange & rRng);
+ostream& operator << (ostream& os, const BigRRange& rRng);
 
-  enum class BigRAdjust {
+enum class BigRAdjust {
     NoRA, OneThirdRA, HalfRA, TwoThirdsRA, FullRA
-      };
-  string bigRAName(const BigRAdjust & rAdj);
-  ostream& operator << (ostream& os, const BigRAdjust& rAdj);
+};
+string bigRAName(const BigRAdjust & rAdj);
+ostream& operator << (ostream& os, const BigRAdjust& rAdj);
 
-  // -------------------------------------------------
-  // There is not much to say about abstract positions, even
-  // though the set of possible positions/outcomes is key
-  // to defining each particular problem.
-  class Position {
-  public:
+// -------------------------------------------------
+// There is not much to say about abstract positions, even
+// though the set of possible positions/outcomes is key
+// to defining each particular problem.
+class Position {
+public:
     Position();
     virtual ~Position();
 
     friend ostream& operator<< (ostream& os, const Position& p) {
-      p.print(os);
-      return os;
+        p.print(os);
+        return os;
     }
 
-  protected:
+protected:
     virtual void print(ostream& os) const = 0;
 
-  private:
-  };
+private:
+};
 
-  ostream& operator<< (ostream& os, const Position& p);
+ostream& operator<< (ostream& os, const Position& p);
 
 
-  // -------------------------------------------------
-  // Basic vector position: just a column-vector of numbers.
-  // They could be interpretted in many ways, as policies
-  // are often described by a vector of numbers (e.g. tax/subsidy rates).
-  class VctrPstn : public Position, public KMatrix {
-  public:
+// -------------------------------------------------
+// Basic vector position: just a column-vector of numbers.
+// They could be interpretted in many ways, as policies
+// are often described by a vector of numbers (e.g. tax/subsidy rates).
+class VctrPstn : public Position, public KMatrix {
+public:
     VctrPstn();
     VctrPstn(unsigned int nr, unsigned int nc);
     explicit VctrPstn(const KMatrix & m); // copy constructor
     virtual ~VctrPstn();
-  protected:
+protected:
     virtual void print(ostream& os) const;
-  private:
-  };
+private:
+};
 
-  // -------------------------------------------------
-  // this is a matching of N items to M categories.
-  // Note that this is intended to be independent of MtchState, MtchActor, etc.
-  // Each category is a bucket into which 0, 1, or more items can be put.
-  // Each item goes in exactly one category. A Matching states, for each of N items,
-  // which of M categories it goes into. Thus, there are M^N possible matchings.
-  // Examples are items = pieces of candy, categories = which actor gets them,
-  // or items = projects to fund, categories = {High, Medium, Low} priority, actors = interest groups
-  // or items = cabinet seats, categories = parties, actors = interest groups
-  // or ....
-  class MtchPstn : public Position {
-  public:
+// -------------------------------------------------
+// this is a matching of N items to M categories.
+// Note that this is intended to be independent of MtchState, MtchActor, etc.
+// Each category is a bucket into which 0, 1, or more items can be put.
+// Each item goes in exactly one category. A Matching states, for each of N items,
+// which of M categories it goes into. Thus, there are M^N possible matchings.
+// Examples are items = pieces of candy, categories = which actor gets them,
+// or items = projects to fund, categories = {High, Medium, Low} priority, actors = interest groups
+// or items = cabinet seats, categories = parties, actors = interest groups
+// or ....
+class MtchPstn : public Position {
+public:
     MtchPstn();
     virtual ~MtchPstn();
     virtual vector<MtchPstn> neighbors(unsigned int nVar) const;
@@ -178,16 +184,16 @@ namespace KBase {
     unsigned int numCat = 0;
     VUI match = {}; // must be of length numItm
 
-  protected:
+protected:
     virtual void print(ostream& os) const;
 
-  private:
-  };
+private:
+};
 
 
-  // bundle up methods relevant to GA over MtchPstn
-  class MtchGene : public MtchPstn {
-  public:
+// bundle up methods relevant to GA over MtchPstn
+class MtchGene : public MtchPstn {
+public:
     MtchGene();
     ~MtchGene();
 
@@ -199,20 +205,20 @@ namespace KBase {
 
     void setState(vector<Actor*> as, vector<MtchPstn*> ps);
 
-  protected:
+protected:
     virtual void print(ostream& os) const;
     void copySelf(MtchGene*) const;
     // links to the State are necessary to evaluate the net support, EU, etc.
     vector<Actor*> actrs = {};
     vector<MtchPstn*> pstns = {};
-  };
+};
 
 
-  // -------------------------------------------------
-  class Model {
-  public:
+// -------------------------------------------------
+class Model {
+public:
 
-	sqlite3 *smpDB = nullptr; // keep this protected, to ease later multi-threading
+    sqlite3 *smpDB = nullptr; // keep this protected, to ease later multi-threading
     explicit Model(PRNG * r, string d);
     virtual ~Model();
 
@@ -222,7 +228,7 @@ namespace KBase {
     static const unsigned int maxScenNameLen = 512; // might be auto-generated in sensitivy analysis
     static const unsigned int maxActNameLen = 25; // quite generous, as we expect 1-5
     static const unsigned int maxActDescLen = 256;
-	
+
 
     // parameters which every Model instance must set
     VPModel vpm = VPModel::Linear; // arbitrary default
@@ -279,49 +285,50 @@ namespace KBase {
     PRNG * rng = nullptr;
     vector<State*> history = {};
 
-	
+
 
     // output an existing actor util table, for the given turn, to SQLite
     void sqlAUtil(unsigned int t);
-    // output an existing PosEquiv table, for the given turn, to SQLite  
+    // output an existing PosEquiv table, for the given turn, to SQLite
     void sqlPosEquiv(unsigned int t);
     // output an existing actor posprob table, for the given turn, to SQLite
     void sqlPosProb(unsigned int t);
     void sqlPosVote(unsigned int t);
- 
     static void demoSQLite();
 
     static KMatrix bigRfromProb(const KMatrix & p, BigRRange rr);
 
     // returns h's estimate of i's risk attitude, using the risk-adjustment-rule
     static double estNRA(double rh, double  ri, BigRAdjust ra) ;
-	string getScenarioName() const { return scenName; };
-	static string createSQL(unsigned int n);
-  protected:
+    string getScenarioName() const {
+        return scenName;
+    };
+    static string createSQL(unsigned int n);
+protected:
     //static string createTableSQL(unsigned int tn);
-	static const int NumTables = 15; //TODO: constant need to be redefined when new table is added
+    static const int NumTables = 8; //TODO: constant need to be redefined when new table is added
     // note that the function to write to table #k must be kept
-    // synchronized with the result of createTableSQL(k) !
+    // synchronized with the result of createSQL(k) !
 
 
     // TODO: rename this from 'smpDB' to 'scenarioDB'
     // Note that, with composite models, there many be dozens interacting.
-     string scenName = "Scen"; // default is set from UTC time
+    string scenName = "Scen"; // default is set from UTC time
 
     // this is the basic model of victory dependent on strength-ratio
     static tuple<double, double> vProb(VPModel vpm, const double s1, const double s2);
-    
+
     static KMatrix markovPCE(const KMatrix & pv);
     static KMatrix condPCE(const KMatrix & pv);
 
-	 
-  private:
-  };
+
+private:
+};
 
 
-  // -------------------------------------------------
-  class State {
-  public:
+// -------------------------------------------------
+class State {
+public:
     explicit State(Model* mod);
     virtual ~State();
 
@@ -347,107 +354,109 @@ namespace KBase {
     // If H == -1, then set them all.
     void setAUtil(int perspH = -1, ReportingLevel rl = ReportingLevel::Silent);
 
-    void setUENdx();  
+    void setUENdx();
     virtual bool equivNdx(unsigned int i, unsigned int j) const = 0;
-    double posProb(unsigned int i, const VUI & unq, const KMatrix & pdt) const; 
-    
+    double posProb(unsigned int i, const VUI & unq, const KMatrix & pdt) const;
+
     // return the turn-number of this state.
     // 0 == initial state, and error if not in the model's history
     unsigned int myTurn() const;
 
-  protected:
+protected:
     VUI uIndices = {}; // which positions occupied postions are unique, generated by KBase::ueIndices
     VUI eIndices = {}; // to which unique position each occupied postions matches, generated by KBase::ueIndices
 
     KMatrix uProb = KMatrix(); // probability of each Unique state
-    
+
     virtual void setAllAUtil(ReportingLevel rl) = 0;
-    
+
     virtual void setOneAUtil(unsigned int perspH, ReportingLevel rl); // TODO: make this non-dummy
-    
-   /* 
-    // exactly like Actor::vProbLittle, but with optional logging to SQLite
-    double vProbLittle(VotingRule vr, double wn, double uni, double unj, 
-                                 double contrib_i_ij, double contrib_j_ij,
-                                 bool logP) const;
-*/
-    
-    
 
-    private:
-		     };
-
-
-    // In the abstract, we can not say much about actors.
-    // Different utility models might assume different parameters
-    // in the utility function - and the associated actor
-    // would have to have their own value for those parameters.
-    // For example, their capability may change over time,
-    // so an actor like that would have to have a history of capabilities
-    // into  which the State could look.
-    // An actor in multi-dimensional issues might have different
-    // capabilities on different issues.
-    // They do not have fixed positions, but change over time.
-    // And so on.
-    class Actor {
-    public:
-      Actor(string n, string d);
-      virtual ~Actor();
-
-      static double thirdPartyVoteSU(double wk, VotingRule vr, ThirdPartyCommit comm,
-				     double pik, double pjk, double uki, double ukj, double ukk);
-
-    
-      // Third-party actor n determines his contribution on influence by analyzing the hypothetical
-      // "little conflict" of just three actors, i.e.  (i:j) with n weighing in on whichever side it favors.
-      static double vProbLittle(VotingRule vr, double wn, double uni, double unj, double contrib_i_ij, double contrib_j_ij);
-
-      string name = "GA"; // a short name, usually 2-5 characters
-      string desc = "Generic Actor"; // short description, like a line or two.
-
-
-      // the most common kinds of votes for actors are the following:
-
-      // Vote between positions occupied by two different actors in the same
-      // state, just looking up stored information.
-      // Note well: it cannot be assumed that the vote between two
-      // options can be determined simply by looking at the difference
-      // in stored utilities.
-      virtual double vote(unsigned int est,unsigned int p1, unsigned int p2, const State* st) const = 0;
-
-      // Bear in mind that some Domain Specific Utility Models, like
-      // full-scale computable general equilibrium (CGE) models, may
-      // be very expensive to evaluate. Evaluating one policy position yields
-      // a predicted state to which all the actors react with their differing utility fns.
-      // Thus, we can get a whole column of the U_ij matrix from one CGE evaluation;
-      // it would be very slow to re-evaluate the same model (Pj) once for each actor (Ai).
-      // Of course, if every actor has a completely different model to predict the
-      // states that will result from a policy, then you have no choice but to
-      // run each model separately for each actor - so it's best to keep them simple.
-      // It may turn out that in policy debates, actors actually use very simple
-      // heuristics that are *informed* by complex off-line considerations, so you'd
-      // be back to using very simple models.
-      // Most actors will have functions somewhat like the following, but
-      // the number and type of inputs will vary. Use lambda-fns to
-      // construct the 'vfn' for Models::coalition, binding whatever extra
-      // parameters your actor needs (e.g. a State* is necessary for strategic voting).
-      // double posUtil(const Position * ap1) const = 0;
-      // double vote(const Position * ap1, const Position * ap2) const = 0;
-
-
-    protected:
-    };
+    /*
+     // exactly like Actor::vProbLittle, but with optional logging to SQLite
+     double vProbLittle(VotingRule vr, double wn, double uni, double unj,
+                                  double contrib_i_ij, double contrib_j_ij,
+                                  bool logP) const;
+    */
 
 
 
-  }; // end of namespace
+private:
+};
 
 
-  bool operator==(const KBase::MtchPstn& mp1, const KBase::MtchPstn& mp2);
+// In the abstract, we can not say much about actors.
+// Different utility models might assume different parameters
+// in the utility function - and the associated actor
+// would have to have their own value for those parameters.
+// For example, their capability may change over time,
+// so an actor like that would have to have a history of capabilities
+// into  which the State could look.
+// An actor in multi-dimensional issues might have different
+// capabilities on different issues.
+// They do not have fixed positions, but change over time.
+// And so on.
+class Actor {
+public:
+    Actor(string n, string d);
+    virtual ~Actor();
+
+    // returns the vote v_k(i:j), and the utilities of ik>j and i>jk.
+    static tuple<double, double, double>
+    thirdPartyVoteSU(double wk, VotingRule vr, ThirdPartyCommit comm,
+                     double pik, double pjk, double uki, double ukj, double ukk);
 
 
-  // -------------------------------------------------
+    // Third-party actor n determines his contribution on influence by analyzing the hypothetical
+    // "little conflict" of just three actors, i.e.  (i:j) with n weighing in on whichever side it favors.
+    static double vProbLittle(VotingRule vr, double wn, double uni, double unj, double contrib_i_ij, double contrib_j_ij);
+
+    string name = "GA"; // a short name, usually 2-5 characters
+    string desc = "Generic Actor"; // short description, like a line or two.
+
+
+    // the most common kinds of votes for actors are the following:
+
+    // Vote between positions occupied by two different actors in the same
+    // state, just looking up stored information.
+    // Note well: it cannot be assumed that the vote between two
+    // options can be determined simply by looking at the difference
+    // in stored utilities.
+    virtual double vote(unsigned int est,unsigned int p1, unsigned int p2, const State* st) const = 0;
+
+    // Bear in mind that some Domain Specific Utility Models, like
+    // full-scale computable general equilibrium (CGE) models, may
+    // be very expensive to evaluate. Evaluating one policy position yields
+    // a predicted state to which all the actors react with their differing utility fns.
+    // Thus, we can get a whole column of the U_ij matrix from one CGE evaluation;
+    // it would be very slow to re-evaluate the same model (Pj) once for each actor (Ai).
+    // Of course, if every actor has a completely different model to predict the
+    // states that will result from a policy, then you have no choice but to
+    // run each model separately for each actor - so it's best to keep them simple.
+    // It may turn out that in policy debates, actors actually use very simple
+    // heuristics that are *informed* by complex off-line considerations, so you'd
+    // be back to using very simple models.
+    // Most actors will have functions somewhat like the following, but
+    // the number and type of inputs will vary. Use lambda-fns to
+    // construct the 'vfn' for Models::coalition, binding whatever extra
+    // parameters your actor needs (e.g. a State* is necessary for strategic voting).
+    // double posUtil(const Position * ap1) const = 0;
+    // double vote(const Position * ap1, const Position * ap2) const = 0;
+
+
+protected:
+};
+
+
+
+}; // end of namespace
+
+
+bool operator==(const KBase::MtchPstn& mp1, const KBase::MtchPstn& mp2);
+
+
+// -------------------------------------------------
 #endif
-  // --------------------------------------------
-  // Copyright KAPSARC. Open source MIT License.
-  // --------------------------------------------
+// --------------------------------------------
+// Copyright KAPSARC. Open source MIT License.
+// --------------------------------------------

@@ -7,7 +7,7 @@ CSV::CSV()
 void CSV::readCSVFile(QString path)
 {
     //getting the csv file path
-
+    QStringList scenarioName;
     if(!path.isEmpty())
     {
         // model->clear();
@@ -40,8 +40,10 @@ void CSV::readCSVFile(QString path)
                 {
                     model->setHorizontalHeaderLabels(lineToken);
                 }
-                else
+                else if(rowindex == 0)
                 {
+                    scenarioName.append(lineToken.at(0));
+                    scenarioName.append(lineToken.at(1));
                     lineToken.clear();
                 }
                 rowindex++;
@@ -51,5 +53,5 @@ void CSV::readCSVFile(QString path)
         }
 
     }
-    emit csvModel(model);
+    emit csvModel(model,scenarioName);
 }

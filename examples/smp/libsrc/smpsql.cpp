@@ -59,9 +59,8 @@ string SMPModel::createSQL(unsigned int n)  {
 	}
 	else
 	{
-		switch (n) {
-		case  15:
-			// coordinates of each actor's position
+		switch (n-Model::NumTables) {
+		case  0: // coordinates of each actor's position
 			sql = "create table if not exists VectorPosition ("  \
 				"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
 				"Turn_t		INTEGER NOT NULL DEFAULT 0, "\
@@ -71,8 +70,7 @@ string SMPModel::createSQL(unsigned int n)  {
 				");";
 			break;
 
-		case 16:
-			// salience to each actor of each dimension
+		case 1: // salience to each actor of each dimension
 			sql = "create table if not exists SpatialSalience ("  \
 				"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
 				"Turn_t		INTEGER NOT NULL DEFAULT 0, "\
@@ -82,8 +80,7 @@ string SMPModel::createSQL(unsigned int n)  {
 				");";
 			break;
 
-		case 17:
-			// scalar capability of each actor
+		case 2: // scalar capability of each actor
 			sql = "create table if not exists SpatialCapability ("  \
 				"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
 				"Turn_t		INTEGER NOT NULL DEFAULT 0, "\
@@ -161,7 +158,6 @@ void SMPModel::sqlTest() {
         cout << flush;
     }
     cout << endl << flush;
-
 
     smpDB = db;
     return;

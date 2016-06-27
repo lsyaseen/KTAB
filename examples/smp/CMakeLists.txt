@@ -245,11 +245,14 @@ if(ENABLE_QT_GUI)
         ../../examples/smp/SMPQ/qcustomplot.h)
     set (QtProjectLib_ui  ../../examples/smp/SMPQ/mainwindow.ui)
     set (QtProjectBin_src ../../examples/smp/SMPQ/main.cpp)
+    set (QtProjectRsc_qrc ../../examples/smp/SMPQ/dockwidgets.qrc)
 
     # qt5_wrap_cpp is used to create moc files of the cpp files
     qt5_wrap_cpp(QtProjectLib_hdr_moc ${QtProjectLib_hdr})
     # qt5_wrap_ui is used to create code from ui files
-    qt5_wrap_ui(QtProjectLib_ui_moc ${QtProjectLib_ui})
+    qt5_wrap_ui(QtProjectLib_ui_uic ${QtProjectLib_ui})
+    # qt5_wrd_resources is used to add resources from qrc file
+    qt5_add_resources(QtProjectLib_qrc_rcc ${QtProjectRsc_qrc})
 
     #including source and binary directories
     include_directories (${PROJECT_SOURCE_DIR})
@@ -258,7 +261,8 @@ if(ENABLE_QT_GUI)
     add_library (QtProjectLib STATIC
         ${QtProjectLib_src}# adding source files of source directory to the library
         ${QtProjectLib_hdr_moc}# adding the moc files generated using header files to the library
-        ${QtProjectLib_ui_moc}) # adding the moc files generated using ui files to the library
+        ${QtProjectLib_qrc_rcc} # adding the rcc files generated using qrc files to the library
+        ${QtProjectLib_ui_uic}) # adding the uic files generated using ui files to the library
 
     target_link_libraries (QtProjectLib Qt5::Core)
     target_link_libraries (QtProjectLib Qt5::Gui)
@@ -266,7 +270,7 @@ if(ENABLE_QT_GUI)
     target_link_libraries (QtProjectLib Qt5::Sql)
     target_link_libraries (QtProjectLib Qt5::PrintSupport)
 
-    add_executable(smpq ${QtProjectBin_src} ../../examples/smp/SMPQ/dockwidgets.qrc)
+    add_executable(smpq ${QtProjectBin_src})
 
     #to link a library to the executable
     target_link_libraries (smpq QtProjectLib)

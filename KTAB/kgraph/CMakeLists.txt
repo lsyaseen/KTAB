@@ -40,6 +40,11 @@ set(CMAKE_MODULE_PATH
 set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
+
+
+# -------------------------------------------------
+set (ENABLE_QUADMAP false CACHE  BOOL "Build quadratic-map demo")
+
 # -------------------------------------------------
 # basic check that this is a supported compiler/OS
 # -------------------------------------------------
@@ -164,6 +169,36 @@ install(
 
 # -------------------------------------------------
 # demo programs
+
+# -------------------------------------------------
+if (ENABLE_QUADMAP)
+FLTK_WRAP_UI(qmui fluid/qmUI.fl)
+ADD_LIBRARY(qmui STATIC ${qmui_FLTK_UI_SRCS})
+
+ADD_EXECUTABLE(quadmap
+    src/qmutils.cpp
+    src/qmmain.cpp
+)
+  TARGET_LINK_LIBRARIES(quadmap
+    kgraph
+    qmui 
+    ${FLTK_LIBRARIES} 
+    ${KUTILS_LIBRARY}
+    ${KG_XLIBS} 
+    ${EFENCE_LIBRARIES}
+    )
+    
+  # suppress the console window under Windows
+  if (WIN32)  
+    if (MSVC)  
+      set_target_properties(quadmap PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:WINDOWS")
+      set_target_properties(quadmap PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS")
+      message (STATUS "Using /SUBSYSTEM:WINDOWS") 
+    endif(MSVC) 
+  endif(WIN32)
+
+endif (ENABLE_QUADMAP)
+# -------------------------------------------------
 
 FLTK_WRAP_UI(tui fluid/tetrisUI.fl)
 ADD_LIBRARY(tui STATIC ${tui_FLTK_UI_SRCS})

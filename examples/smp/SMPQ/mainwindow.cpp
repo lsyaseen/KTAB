@@ -28,7 +28,7 @@ MainWindow::MainWindow()
     //To get Database item Model to show on GUI
     connect(dbObj,&Database::dbModel,this,&MainWindow::setDBItemModel);
     //To display any message to user
-    connect(dbObj,&Database::Message,this,&MainWindow::DisplayMessage);
+    connect(dbObj,&Database::Message,this,&MainWindow::displayMessage);
     //To get vector positions of actors to plot a graph on GUI
     connect(dbObj,&Database::vectorPosition,this,&MainWindow::addGraphOnModule1);
     //To get number of states to set the max values of slider
@@ -39,6 +39,14 @@ MainWindow::MainWindow()
     connect(this, &MainWindow::getScenarioRunValues,dbObj,&Database::getScenarioData);
     //To get state count
     connect(this, &MainWindow::getStateCountfromDB,dbObj,&Database::getStateCount);
+    //To get dimensions count
+    connect(this, &MainWindow::getDimensionCountfromDB,dbObj,&Database::getDimensionCount);
+    //received dimension Values
+    connect(dbObj,SIGNAL(dimensionsCount(int)),this,SLOT(updateDimensionCount(int)));
+
+
+    //headers of TableWidget
+    header_editor = 0;
 
 }
 
@@ -52,6 +60,8 @@ void MainWindow::csvGetFilePAth()
     QString csvPath;
     csvPath = QFileDialog::getOpenFileName(this,tr("Open CSV File"), QDir::homePath() , tr("CSV File (*.csv)"));
     statusBar()->showMessage(tr("csv path"));
+
+    modeltoCSV->clear();
 
     //emit path to csv class for processing
     if(!csvPath.isEmpty())
@@ -77,9 +87,17 @@ void MainWindow::updateStateCount_SliderRange(int states)
 
 void MainWindow::updateScenarioList_ComboBox(QStringList *scenarios)
 {
+    turnSlider->setValue(0);
     scenarioComboBox->clear();
     for(int index=0;index<scenarios->length();++index)
         scenarioComboBox->addItem(scenarios->at(index));
+
+    //    sliderStateValueToQryDB(0);//when new database is opened, start from zero
+}
+
+void MainWindow::updateDimensionCount(int dim)
+{
+    dimensions = dim;
 }
 
 void MainWindow::sliderStateValueToQryDB(int value)
@@ -90,17 +108,75 @@ void MainWindow::sliderStateValueToQryDB(int value)
 
 void MainWindow::scenarioComboBoxValue(QString scenario)
 {
+    removeAllGraphs();
     scenario_box = scenario;
+
+    if(tableType=="Database")
+        emit getScenarioRunValues(turnSlider->value(),scenario_box); // to keep the same state when scenario changes
+
 }
 
-void MainWindow::DisplayMessage(QString cls, QString message)
+void MainWindow::cellSelected(int row, int column)
+{
+
+}
+
+void MainWindow::insertNewRowCSV()
+{
+    if(tableType=="NewCSV")
+    {
+        while(csv_tableWidget->rowCount()!=actorsLineEdit->text().toInt() && actorsLineEdit->text().toInt()>=csv_tableWidget->rowCount())
+            csv_tableWidget->insertRow(csv_tableWidget->rowCount());
+
+    }
+    else if(tableType=="CSV")
+    {
+        if(modeltoCSV->rowCount() < actorsLineEdit->text().toInt())
+            modeltoCSV->insertRows(modeltoCSV->rowCount(),(actorsLineEdit->text().toInt() - modeltoCSV->rowCount()));
+    }
+}
+
+void MainWindow::insertNewColumnCSV()
+{
+    if(tableType=="NewCSV")
+    {
+        while(((csv_tableWidget->columnCount()-3)/2)!=dimensionsLineEdit->text().toInt()
+              && ((csv_tableWidget->columnCount()-3)/2) <= dimensionsLineEdit->text().toInt())
+        {
+            createSeperateColumn();
+        }
+    }
+    else if(tableType=="CSV")
+    {
+        if(((modeltoCSV->columnCount()-3)/2) < dimensionsLineEdit->text().toInt())
+            modeltoCSV->insertColumns(modeltoCSV->columnCount(),((modeltoCSV->columnCount()-3))-dimensionsLineEdit->text().toInt());
+    }
+}
+
+
+void MainWindow::createSeperateColumn()
+{
+    QTableWidgetItem * hdr = new QTableWidgetItem("HEADER");
+
+    csv_tableWidget->insertColumn(csv_tableWidget->columnCount());
+    csv_tableWidget->setHorizontalHeaderItem(csv_tableWidget->columnCount()-1,hdr);
+}
+
+void MainWindow::donePushButtonClicked()
+{
+    if(tableType=="CSV")
+        saveTableViewToCSV();
+    else if (tableType=="NewCSV")
+        saveTableWidgetToCSV();
+}
+
+void MainWindow::displayMessage(QString cls, QString message)
 {
     QMessageBox::warning(0,cls,message);
 }
 
-void MainWindow::VectorPositionsFromDB()
+void MainWindow::vectorPositionsFromDB()
 {
-
 }
 
 void MainWindow::dockWindowChanged()
@@ -112,32 +188,83 @@ void MainWindow::dockWindowChanged()
         graph2Dock->setTitleBarWidget(0);
 }
 
-void MainWindow::setCSVItemModel(QStandardItemModel *model)
+void MainWindow::setCSVItemModel(QStandardItemModel *model, QStringList scenarioName)
 {
-    //update received model to widget
-    csv_tableView->setModel(model);
-    csv_tableView->showMaximized();
-    csv_tableView->setAlternatingRowColors(true);
-    csv_tableView->resizeRowsToContents();
+    tableType="CSV";
 
+    stackWidget->setCurrentIndex(0);
+    csv_tableView->horizontalHeader()->viewport()->installEventFilter(this);
+    csv_tableView->verticalHeader()->viewport()->installEventFilter(this);
+
+    //Enable Editing
+    csv_tableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
+
+    turnSlider->hide();
+    tableControlsFrame->show();
+
+    scenarioComboBox->setEditable(true);
+    turnSlider->setVisible(false);
+    scenarioDescriptionLineEdit->setVisible(true);
+
+    actorsLineEdit->setEnabled(true);
+    dimensionsLineEdit->setEnabled(true);
+    actorsPushButton->setEnabled(true);
+    dimensionsPushButton->setEnabled(true);
+    donePushButton->setEnabled(true);
+
+    modeltoCSV = model;
+
+    //update received model to widget
+    csv_tableView->setModel(modeltoCSV);
+    csv_tableView->showMaximized();
+    //    csv_tableView->setAlternatingRowColors(true);
+    //    csv_tableView->resizeRowsToContents();
     //    for (int c = 0; c < csv_tableView->horizontalHeader()->count(); ++c)
     //        csv_tableView->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
 
     csv_tableView->resizeColumnsToContents();
-    csv_tableView->hideColumn(0);
 
     //Enable run button, which is disabled by default
     runButton->setEnabled(true);
+
+    //update scenario name
+    scenarioComboBox->clear();
+    scenarioComboBox->addItem(scenarioName.at(0));
+    scenarioDescriptionLineEdit->clear();
+    scenarioDescriptionLineEdit->setText(scenarioName.at(1));
+
+    actorsLineEdit->setText(QString::number(modeltoCSV->rowCount()));
+    dimensionsLineEdit->setText(QString::number((modeltoCSV->columnCount()-3)/2));
 }
 
 void MainWindow::setDBItemModel(QSqlTableModel *model)
 {
-    //update received model to widget
+    tableType="Database";
+
+    //Disable Editing
+    csv_tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    stackWidget->setCurrentIndex(0);
+    csv_tableView->horizontalHeader()->viewport()->removeEventFilter(this);
+    csv_tableView->verticalHeader()->viewport()->removeEventFilter(this);
+
+    turnSlider->hide();
+    tableControlsFrame->show();
+
+    scenarioComboBox->setEditable(false);
+    turnSlider->setVisible(true);
+    scenarioDescriptionLineEdit->setVisible(false);
+
+    actorsLineEdit->setEnabled(false);
+    dimensionsLineEdit->setEnabled(false);
+    actorsPushButton->setEnabled(false);
+    dimensionsPushButton->setEnabled(false);
+    donePushButton->setEnabled(false);
 
     csv_tableView->setModel(model);
     csv_tableView->showMaximized();
-    csv_tableView->setAlternatingRowColors(true);
-    csv_tableView->resizeRowsToContents();
+    //    csv_tableView->setAlternatingRowColors(true);
+    //    csv_tableView->resizeRowsToContents();
 
     //    for (int c = 0; c < csv_tableView->horizontalHeader()->count(); ++c)
     //        csv_tableView->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
@@ -147,12 +274,166 @@ void MainWindow::setDBItemModel(QSqlTableModel *model)
 
     //Enable run button, which is disabled by default
     runButton->setEnabled(true);
+
+    emit getDimensionCountfromDB();
+
+    actorsLineEdit->setText(QString::number(model->rowCount()));
+    dimensionsLineEdit->setText(QString::number(dimensions+1));
+}
+
+void MainWindow::createNewCSV()
+{
+    tableType="NewCSV";
+
+    if(stackWidget->count()>1) // 1 is csv_table view
+        stackWidget->removeWidget(csv_tableWidget);
+
+    csv_tableWidget = new QTableWidget(central); // new CSV File
+    csv_tableWidget->horizontalHeader()->viewport()->installEventFilter(this);
+    csv_tableWidget->verticalHeader()->viewport()->installEventFilter(this);
+
+    stackWidget->addWidget(csv_tableWidget);
+    stackWidget->setCurrentIndex(1);
+
+    removeAllGraphs();
+
+    actorsLineEdit->setEnabled(true);
+    dimensionsLineEdit->setEnabled(true);
+    actorsPushButton->setEnabled(true);
+    dimensionsPushButton->setEnabled(true);
+    donePushButton->setEnabled(true);
+
+
+    scenarioComboBox->setEditable(true);
+    turnSlider->setVisible(false);
+    scenarioDescriptionLineEdit->setVisible(true);
+    scenarioComboBox->lineEdit()->setPlaceholderText("Enter Scenario...");
+    scenarioDescriptionLineEdit->setPlaceholderText("Enter Scenario Description here ... ");
+
+    turnSlider->hide();
+    tableControlsFrame->show();
+
+    //    for (int i = 0 ; i < csv_tableWidget->columnCount(); ++i)
+    //        csv_tableWidget->removeColumn(i);
+
+    csv_tableWidget->setShowGrid(true);
+
+    // csv_tableWidget->setItem(0, 1, new QTableWidgetItem("Test"));
+    // connect(csv_tableWidget, SIGNAL(cellDoubleClicked (int, int)),
+    //      this, SLOT( cellSelected( int, int )));
+
+    //csv_tableWidget->setHorizontalHeaderLabels(QString("HEADER;HEADER;HEADER;HEADER;HEADER").split(";"));
+
+    actorsLineEdit->clear();
+    dimensionsLineEdit->clear();
+    scenarioComboBox->clear();
+    scenarioDescriptionLineEdit->clear();
+
+    actorsLineEdit->setText(QString::number(3));
+    dimensionsLineEdit->setText(QString::number(1));
+
+    //    csv_tableWidget->horizontalHeader()->hide();
+
+    insertNewRowCSV();
+    insertNewColumnCSV();
+
+}
+
+void MainWindow::initializeCentralViewFrame()
+{
+    central = new QFrame;
+    central->setFrameShape(QFrame::StyledPanel);
+
+    gLayout = new QGridLayout;
+    central->setLayout(gLayout);
+
+    tableControlsFrame = new QFrame;
+    tableControlsFrame->setFrameShape(QFrame::StyledPanel);
+
+    QGridLayout *gCLayout = new QGridLayout(tableControlsFrame);
+
+    stackWidget = new QStackedWidget(central);
+
+    scenarioComboBox = new QComboBox(tableControlsFrame);
+    //    scenarioComboBox->setMinimumWidth(40);
+    scenarioComboBox->setMaximumWidth(200);
+    scenarioComboBox->setFixedWidth(150);
+    gCLayout->addWidget(scenarioComboBox,0,2);
+    scenarioComboBox->setEditable(true);
+    connect(scenarioComboBox,SIGNAL(currentIndexChanged(QString)),this,SLOT(scenarioComboBoxValue(QString)));
+
+    turnSlider = new QSlider(Qt::Horizontal,central);
+    //    turnSlider->setMinimumWidth(40);
+    //    turnSlider->setMaximumWidth(150);
+    //    turnSlider->setFixedWidth(130);
+    //    turnSlider->setTickInterval(1);
+    turnSlider->setPageStep(1);
+    //gCLayout->addWidget(turnSlider,1,3);
+
+    connect(turnSlider,&QSlider::valueChanged,this,&MainWindow::sliderStateValueToQryDB);
+
+    actorsPushButton = new QPushButton("Actors",tableControlsFrame);
+    actorsPushButton->setMaximumWidth(120);
+    actorsPushButton->setFixedWidth(90);
+    gCLayout->addWidget(actorsPushButton,0,0);
+
+    actorsLineEdit = new QLineEdit ("3",tableControlsFrame);
+    actorsLineEdit->setMaximumWidth(70);
+    actorsLineEdit->setFixedWidth(60);
+    gCLayout->addWidget(actorsLineEdit,0,1);
+
+    dimensionsPushButton = new QPushButton("Dimensions",tableControlsFrame);
+    dimensionsPushButton->setMaximumWidth(120);
+    dimensionsPushButton->setFixedWidth(90);
+    gCLayout->addWidget(dimensionsPushButton,1,0);
+
+    dimensionsLineEdit = new QLineEdit ("1",tableControlsFrame);
+    dimensionsLineEdit->setMaximumWidth(70);
+    dimensionsLineEdit->setFixedWidth(60);
+    gCLayout->addWidget(dimensionsLineEdit,1,1);
+
+    scenarioDescriptionLineEdit = new QLineEdit(tableControlsFrame);
+    //    scenarioDescriptionLineEdit->setMaximumWidth(150);
+    //    scenarioDescriptionLineEdit->setFixedWidth(130);
+    gCLayout->addWidget(scenarioDescriptionLineEdit,0,3);
+
+    donePushButton = new QPushButton("Done",tableControlsFrame);
+    donePushButton->setMaximumWidth(150);
+    donePushButton->setFixedWidth(130);
+    gCLayout->addWidget(donePushButton,1,2);
+
+    setCentralWidget(central);
+
+    modeltoCSV = new QStandardItemModel;
+
+    csv_tableView = new QTableView(central); // CSV and DB
+    csv_tableView->setShowGrid(true);
+    csv_tableView->horizontalHeader()->viewport()->installEventFilter(this);
+    csv_tableView->verticalHeader()->viewport()->installEventFilter(this);
+
+    csv_tableWidget = new QTableWidget(central); // new CSV File
+    csv_tableWidget->horizontalHeader()->viewport()->installEventFilter(this);
+    csv_tableWidget->verticalHeader()->viewport()->installEventFilter(this);
+
+    gLayout->addWidget(tableControlsFrame);
+    gLayout->addWidget(turnSlider);
+    gLayout->addWidget(stackWidget);
+
+    stackWidget->addWidget(csv_tableView);
+    stackWidget->addWidget(csv_tableWidget);
+
+    tableControlsFrame->hide();
+    turnSlider->hide();
+
+    connect(actorsPushButton,&QPushButton::clicked,this, &MainWindow::insertNewRowCSV);
+    connect(dimensionsPushButton,&QPushButton::clicked,this, &MainWindow::insertNewColumnCSV);
+    connect(donePushButton,&QPushButton::clicked,this,&MainWindow::donePushButtonClicked);
 }
 
 void MainWindow::about()
 {
     QMessageBox::about(this, tr("About SMP "),
-                       tr("Should update informtion regarding SMP here !! "));
+                       tr("SMP !! "));
 }
 
 void MainWindow::createActions()
@@ -160,15 +441,16 @@ void MainWindow::createActions()
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
     QToolBar *fileToolBar = addToolBar(tr("File"));
 
-    const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(":/images/new.png"));
-    QAction *newDoc = new QAction(newIcon, tr("&New "), this);
-    newDoc->setShortcuts(QKeySequence::New);
-    newDoc->setStatusTip(tr("Create new "));
-    fileMenu->addAction(newDoc);
-    fileToolBar->addAction(newDoc);
+    //    const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(":/images/new.png"));
+    //    QAction *newDoc = new QAction(newIcon, tr("&New "), this);
+    //    newDoc->setShortcuts(QKeySequence::New);
+    //    newDoc->setStatusTip(tr("Create new "));
+    //    fileMenu->addAction(newDoc);
+    //    fileToolBar->addAction(newDoc);
 
     const QIcon saveIcon = QIcon::fromTheme("document-save", QIcon(":/images/save.png"));
     QAction *saveAct = new QAction(saveIcon, tr("&Save..."), this);
+    connect(saveAct, &QAction::triggered, this, &MainWindow::donePushButtonClicked);
     saveAct->setShortcuts(QKeySequence::Save);
     saveAct->setStatusTip(tr("Save"));
     fileMenu->addAction(saveAct);
@@ -176,10 +458,18 @@ void MainWindow::createActions()
 
     fileMenu->addSeparator();
 
-    const QIcon csvIcon = QIcon::fromTheme("Read CSV File", QIcon(":/images/csv.png"));
-    QAction *readCsvAct = new QAction(csvIcon, tr("&Read CSV"), this);
+    const QIcon newCSVIcon = QIcon::fromTheme("Create New CSV File", QIcon(":/images/csv.png"));
+    QAction *newCsvAct = new QAction(newCSVIcon, tr("&Create New CSV File"), this);
+    //newCsvAct->setShortcuts(QKeySequence::Open);
+    newCsvAct->setStatusTip(tr("Create New CSV File"));
+    connect(newCsvAct, &QAction::triggered, this, &MainWindow::createNewCSV);
+    fileMenu->addAction(newCsvAct);
+    fileToolBar->addAction(newCsvAct);
+
+    const QIcon csvIcon = QIcon::fromTheme("View/Modify Exisiting CSV File", QIcon(":/images/csv.png"));
+    QAction *readCsvAct = new QAction(csvIcon, tr("&View/Modify Exisiting CSV File"), this);
     readCsvAct->setShortcuts(QKeySequence::Open);
-    readCsvAct->setStatusTip(tr("Read a CSV File"));
+    readCsvAct->setStatusTip(tr("View/Modify Exisiting CSV File"));
     connect(readCsvAct, &QAction::triggered, this, &MainWindow::csvGetFilePAth);
     fileMenu->addAction(readCsvAct);
     fileToolBar->addAction(readCsvAct);
@@ -187,14 +477,23 @@ void MainWindow::createActions()
     const QIcon dbIcon = QIcon::fromTheme("Import Database ", QIcon(":/images/csv.png"));
     QAction *importDBAct = new QAction(dbIcon, tr("&Import Database"), this);
     //    importDBAct->setShortcuts(QKeySequence::);
-    importDBAct->setStatusTip(tr("Import a database"));
+    importDBAct->setStatusTip(tr("Import Database"));
     connect(importDBAct, &QAction::triggered, this, &MainWindow::dbGetFilePAth);
     fileMenu->addAction(importDBAct);
     fileToolBar->addAction(importDBAct);
 
+    const QIcon modDBIcon = QIcon::fromTheme("Modify Exisiting Database", QIcon(":/images/csv.png"));
+    QAction *modifyDBAct = new QAction(modDBIcon, tr("&Modify Exisiting Database"), this);
+    modifyDBAct->setStatusTip(tr("Modify Exisiting Database"));
+    connect(modifyDBAct, &QAction::triggered, this, &MainWindow::dbGetFilePAth);
+    fileMenu->addAction(modifyDBAct);
+    fileToolBar->addAction(modifyDBAct);
+
     fileMenu->addSeparator();
 
-    QAction *quitAct = fileMenu->addAction(tr("&Quit"), this, &QWidget::close);
+    QAction *quitAct = new QAction(modDBIcon, tr("&Quit"), this);
+    connect(quitAct,SIGNAL(triggered(bool)),this,SLOT(close()));
+    fileMenu->addAction(quitAct);
     quitAct->setShortcuts(QKeySequence::Quit);
     quitAct->setStatusTip(tr("Quit the application"));
 
@@ -204,8 +503,10 @@ void MainWindow::createActions()
 
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
 
-    QAction *aboutAct = helpMenu->addAction(tr("&About"), this, &MainWindow::about);
-    aboutAct->setStatusTip(tr("Show the application's About box"));
+    QAction *aboutAct =new QAction(tr("&About"), this);
+    helpMenu->addAction(aboutAct);
+    connect(aboutAct,SIGNAL(triggered(bool)),this,SLOT(about()));
+    aboutAct->setStatusTip(tr("About SMPQ "));
 
 }
 
@@ -294,6 +595,105 @@ void MainWindow::createModuleParametersDockWindow()
 
 }
 
+void MainWindow::saveTableViewToCSV()
+{
+    QString saveFilePath = QFileDialog::getSaveFileName(this,tr("Save File to "), QDir::homePath(),tr("CSV File (*.csv)"));
+    if( __linux__ )
+        saveFilePath.append(".csv");
+
+    QFile f(saveFilePath);
+
+    if (f.open(QFile::WriteOnly | QFile::Truncate))
+    {
+        QTextStream data( &f );
+        QStringList strList;
+
+        strList <<scenarioComboBox->currentText();
+        strList <<scenarioDescriptionLineEdit->text().trimmed();
+        strList <<QString::number(modeltoCSV->rowCount());
+        strList <<QString::number((modeltoCSV->columnCount()-3)/2);
+
+        data << strList.join(",") << ","<< "\n";
+        strList.clear();
+
+        //Appending a header
+        for( int col = 0; col < modeltoCSV->columnCount(); ++col )
+        {
+            strList <<modeltoCSV->horizontalHeaderItem(col)->data(Qt::DisplayRole).toString();
+        }
+        data << strList.join(",") << "," <<"\n";
+
+        //appending data
+        for (int row=0; row<modeltoCSV->rowCount(); row++)
+        {
+            strList.clear();
+
+            for (int col=0; col<modeltoCSV->columnCount(); col++)
+            {
+
+                //NOTE : uncomment if strict checking is required
+                //                if(!modeltoCSV->data(modeltoCSV->index(row,col)).toString().isEmpty())
+                strList << modeltoCSV->data(modeltoCSV->index(row,col)).toString();
+                //                else
+                //                {    QMessageBox::about(0,"No Data Entered","Enter Data at Row : "
+                //                                        + QString::number(row+1) + ", Column : " + QString::number(col+1));
+                //                    return;
+                //                }
+            }
+            data << strList.join(",") + "\n";
+        }
+        f.close();
+    }
+}
+
+void MainWindow::saveTableWidgetToCSV()
+{
+    QString saveFilePath = QFileDialog::getSaveFileName(this,tr("Save File to "), QDir::homePath(),tr("CSV File (*.csv)"));
+    if( __linux__ )
+        saveFilePath.append(".csv");
+    QFile f(saveFilePath);
+
+    if (f.open(QFile::WriteOnly | QFile::Truncate))
+    {
+        QTextStream data( &f );
+        QStringList strList;
+
+        strList <<scenarioComboBox->currentText();
+        strList <<scenarioDescriptionLineEdit->text();
+        strList <<QString::number(csv_tableWidget->rowCount());
+        strList <<QString::number((csv_tableWidget->columnCount()-3)/2);
+
+        data << strList.join(",") << ","<< "\n";
+        strList.clear();
+
+        //Appending a header
+        for( int col = 0; col < csv_tableWidget->columnCount(); ++col )
+        {
+            strList << csv_tableWidget->horizontalHeaderItem(col)->data(Qt::DisplayRole).toString();
+        }
+        data << strList.join(",") << "," <<"\n";
+
+        for( int row = 0; row < csv_tableWidget->rowCount(); ++row )
+        {
+            strList.clear();
+            for( int column = 0; column < csv_tableWidget->columnCount(); ++column )
+            {
+                QTableWidgetItem* item = csv_tableWidget->item(row,column);
+
+                if( !item  || item->text().isEmpty() )
+                {
+                    QMessageBox::about(0,"No Data Entered","Enter Data at Row : " + QString::number(row+1) + ", Column : " + QString::number(column+1));
+                    return;
+                }
+                else
+                    strList << " "+csv_tableWidget->item(row,column)->text()+" ";
+            }
+            data << strList.join( "," ) << ","  << "\n";
+        }
+        f.close();
+    }
+}
+
 void MainWindow::initializeGraphPlot1()
 {
     customGraph->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes |
@@ -351,78 +751,130 @@ void MainWindow::plotGraph()
     //    addGraphOnModule1(7,0);
 }
 
-void MainWindow::initializeCentralViewFrame()
+
+bool MainWindow::eventFilter(QObject* object, QEvent* event)
 {
 
-    central = new QFrame;
-    central->setFrameShape(QFrame::StyledPanel);
+    if ((object == csv_tableView->horizontalHeader()->viewport() ||
+         object == csv_tableView->verticalHeader()->viewport()) &&
+            event->type() == QEvent::MouseButtonDblClick)
+    {
+        if (header_editor)
+        { //delete previous editor just in case
+            header_editor->deleteLater();
+            header_editor = 0;
+        }
+        QMouseEvent* e = static_cast<QMouseEvent*>(event);
+        QHeaderView* header = static_cast<QHeaderView*>(object->parent());
+        int mouse_pos = header->orientation() == Qt::Horizontal ? e->x() : e->y();
+        int logical_index = header->logicalIndex(header->visualIndexAt(mouse_pos));
 
-    QGridLayout *gLayout = new QGridLayout;
-    central->setLayout(gLayout);
+        if (logical_index >= 0)
+        {
+            // if mouse is over an item
+            QRect rect; // line edit rect in header's viewport's coordinates
 
-    tableControlsFrame = new QFrame;
-    tableControlsFrame->setFrameShape(QFrame::StyledPanel);
+            if (header->orientation() == Qt::Horizontal)
+            {
+                rect.setLeft(header->sectionPosition(logical_index));
+                rect.setWidth(header->sectionSize(logical_index));
+                rect.setTop(0);
+                rect.setHeight(header->height());
+            }
+            else
+            {
+                rect.setTop(header->sectionPosition(logical_index));
+                rect.setHeight(header->sectionSize(logical_index));
+                rect.setLeft(0);
+                rect.setWidth(header->width());
+            }
+            rect.adjust(1, 1, -1, -1);
 
-    QGridLayout *gCLayout = new QGridLayout(tableControlsFrame);
+            header_editor = new QLineEdit(header->viewport());
+            header_editor->move(rect.topLeft());
+            header_editor->resize(rect.size());
+            header_editor->setFrame(false);//get current item text
 
-    scenarioComboBox = new QComboBox(tableControlsFrame);
-    //    scenarioComboBox->setMinimumWidth(40);
-    //    scenarioComboBox->setMaximumWidth(70);
-    //    scenarioComboBox->setFixedWidth(60);
-    gCLayout->addWidget(scenarioComboBox,0,2);
-    connect(scenarioComboBox,SIGNAL(currentIndexChanged(QString)),this,SLOT(scenarioComboBoxValue(QString)));
+            QString text = header->model()->headerData(logical_index, header->orientation()).toString();
 
+            header_editor->setText(text);
+            header_editor->setFocus();
+            editor_index = logical_index; //save for future use
+            header_editor->installEventFilter(this); //catch focus out event
 
-    turnSlider = new QSlider(Qt::Horizontal,tableControlsFrame);
-    //    turnSlider->setMinimumWidth(40);
-    //    turnSlider->setMaximumWidth(70);
-    //    turnSlider->setFixedWidth(60);
-    //    turnSlider->setTickInterval(1);
-    turnSlider->setPageStep(1);
-    gCLayout->addWidget(turnSlider,1,2);
+            //if user presses Enter it should close editor
+            connect(header_editor, SIGNAL(returnPressed()),csv_tableView, SLOT(setFocus()));
+            header_editor->show();
+        }
+        return true; // filter out event
+    }
+    else if ((object == csv_tableWidget->horizontalHeader()->viewport() ||
+              object == csv_tableWidget->verticalHeader()->viewport()) &&
+             event->type() == QEvent::MouseButtonDblClick)
+    {
+        if (header_editor)
+        { //delete previous editor just in case
+            header_editor->deleteLater();
+            header_editor = 0;
+        }
+        QMouseEvent* e = static_cast<QMouseEvent*>(event);
+        QHeaderView* header = static_cast<QHeaderView*>(object->parent());
+        int mouse_pos = header->orientation() == Qt::Horizontal ? e->x() : e->y();
+        int logical_index = header->logicalIndex(header->visualIndexAt(mouse_pos));
 
-    connect(turnSlider,&QSlider::valueChanged,this,&MainWindow::sliderStateValueToQryDB);
+        if (logical_index >= 0)
+        {
+            // if mouse is over an item
+            QRect rect; // line edit rect in header's viewport's coordinates
 
+            if (header->orientation() == Qt::Horizontal)
+            {
+                rect.setLeft(header->sectionPosition(logical_index));
+                rect.setWidth(header->sectionSize(logical_index));
+                rect.setTop(0);
+                rect.setHeight(header->height());
+            }
+            else
+            {
+                rect.setTop(header->sectionPosition(logical_index));
+                rect.setHeight(header->sectionSize(logical_index));
+                rect.setLeft(0);
+                rect.setWidth(header->width());
+            }
+            rect.adjust(1, 1, -1, -1);
 
-    actorsPushButton = new QPushButton("Actors",tableControlsFrame);
-    actorsPushButton->setMaximumWidth(120);
-    actorsPushButton->setFixedWidth(90);
-    gCLayout->addWidget(actorsPushButton,0,0);
+            header_editor = new QLineEdit(header->viewport());
+            header_editor->move(rect.topLeft());
+            header_editor->resize(rect.size());
+            header_editor->setFrame(false);//get current item text
 
-    actorsLineEdit = new QLineEdit ("3",tableControlsFrame);
-    actorsLineEdit->setMaximumWidth(70);
-    actorsLineEdit->setFixedWidth(60);
-    gCLayout->addWidget(actorsLineEdit,0,1);
+            QString text = header->model()->headerData(logical_index, header->orientation()).toString();
 
-    dimensionsPushButton = new QPushButton("Dimensions",tableControlsFrame);
-    dimensionsPushButton->setMaximumWidth(120);
-    dimensionsPushButton->setFixedWidth(90);
-    gCLayout->addWidget(dimensionsPushButton,1,0);
+            header_editor->setText(text);
+            header_editor->setFocus();
+            editor_index = logical_index; //save for future use
+            header_editor->installEventFilter(this); //catch focus out event
 
-    dimensionsLineEdit = new QLineEdit ("1",tableControlsFrame);
-    dimensionsLineEdit->setMaximumWidth(70);
-    dimensionsLineEdit->setFixedWidth(60);
-    gCLayout->addWidget(dimensionsLineEdit,1,1);
+            //if user presses Enter it should close editor
+            connect(header_editor, SIGNAL(returnPressed()),csv_tableWidget, SLOT(setFocus()));
+            header_editor->show();
+        }
+        return true; // filter out event
+    }
 
-    scenarioNewLineEdit = new QLineEdit(tableControlsFrame);
-    scenarioNewLineEdit->setMaximumWidth(120);
-    scenarioNewLineEdit->setFixedWidth(90);
-    scenarioNewLineEdit->setHidden(true);
-    gCLayout->addWidget(scenarioNewLineEdit,0,3);
+    else if (object == header_editor && event->type() == QEvent::FocusOut)
+    {
+        QHeaderView* header = static_cast<QHeaderView*>(header_editor->parentWidget()->parentWidget());
 
-    donePushButton = new QPushButton("Done",tableControlsFrame);
-    donePushButton->setMaximumWidth(120);
-    donePushButton->setFixedWidth(90);
-    gCLayout->addWidget(donePushButton,1,3);
-
-    csv_tableView = new QTableView(central);
-    csv_tableView->setShowGrid(true);
-
-    gLayout->addWidget(tableControlsFrame);
-    gLayout->addWidget(csv_tableView);
-
-    setCentralWidget(central);
+        //save item text
+        header->model()->setHeaderData(editor_index, header->orientation(),header_editor->text());
+        header_editor->deleteLater(); //safely delete editor
+        header_editor = 0;
+    }
+    return false;
 }
+
+
 
 void MainWindow::titleDoubleClick(QMouseEvent* event, QCPPlotTitle* title)
 {
@@ -455,6 +907,7 @@ void MainWindow::axisLabelDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart par
 void MainWindow::legendDoubleClick(QCPLegend *legend, QCPAbstractLegendItem *item)
 {
     // Rename a graph by double clicking on its legend item
+
     Q_UNUSED(legend)
     if (item) // only react if item was clicked (user could have clicked on border padding of legend where there is no item, then item is 0)
     {
@@ -471,7 +924,6 @@ void MainWindow::legendDoubleClick(QCPLegend *legend, QCPAbstractLegendItem *ite
 
 void MainWindow::selectionChanged()
 {
-
     // make top and bottom axes be selected synchronously, and handle axis and tick labels as one selectable object:
     if (customGraph->xAxis->selectedParts().testFlag(QCPAxis::spAxis) || customGraph->xAxis->selectedParts().testFlag(QCPAxis::spTickLabels) ||
             customGraph->xAxis2->selectedParts().testFlag(QCPAxis::spAxis) || customGraph->xAxis2->selectedParts().testFlag(QCPAxis::spTickLabels))

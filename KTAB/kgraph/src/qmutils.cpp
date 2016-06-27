@@ -20,13 +20,10 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // --------------------------------------------
-// start of a simple Tetris clone
+// start of a quadratic map
 //---------------------------------------------
-#ifndef TETRIS_PVCANVAS_H
-#define TETRIS_PVCANVAS_H
 
-#include "kutils.h"
-#include "kgraph.h"
+#include "qmutils.h"
 
 //---------------------------------------------
 
@@ -34,35 +31,76 @@ using std::cout;
 using std::endl;
 using std::flush;
 
-using KGraph::Canvas;
-
 //---------------------------------------------
-namespace Tetris {
+
+namespace QuadMap {
 
 
-  class PVCanvas : public Canvas {
-  public:
-    PVCanvas(int x, int y, int w, int h, const char * l = 0);
-    virtual ~PVCanvas();
-    
-    void onMove(int x, int y);
-    void onDrag(int x, int y);
-    void onPush(int x, int y, int b);
-    void onRelease(int x, int y, int b);
-    void onKeyDown(int x, int y, int k);
-     
-  protected:
-    virtual void draw();
-    // again, user should never call 'draw' directly.
-    // just mark damage and/or call 'redraw'
-  
-  private:
-  };
+double xVal(unsigned int i, unsigned int N) {
+    assert (i < N);
+    return ((double) i)/((double) N);
+};
+
+unsigned int iVal(double x, unsigned int N) {
+    double f = x * N;
+    unsigned int i = ((unsigned int) (f + 0.0));
+    assert (i < N);
+    return i;
+}
+
+bool testI(unsigned int i1, unsigned int N) {
+    double x = xVal(i1, N);
+    unsigned int i2 = iVal(x, N);
+    bool match = (i1 == i2);
+    if (!match) {
+        printf(" %3i => %.4f => %3i \n", i1, x, i2);
+    }
+    return match;
+}
+
+void testX(unsigned int N) {
+    for (unsigned int i =0; i<N; i++) {
+        testI(i,N);
+    }
+    return;
+}
+
+double aVal(unsigned int j, unsigned int M, double aLow, double aHigh) {
+    assert (j < M);
+    double m1 = M - 1.0;
+    double a = (j*aHigh + (m1-j)*aLow)/m1;
+    return a;
+}
+
+
+KMatrix fillOccuranceMatrix(unsigned int N, unsigned int M,  double aLow, double aHigh) {
+    const unsigned int tNum = 100;
+    const unsigned int iNum = 17;
+    const unsigned int cNum = 50;
+    auto om = KMatrix(N, M);
+    // scan across the columns, for a
+    for (unsigned int jc = 0; jc<M; jc++) {
+        const double a = aVal(jc, M, aLow, aHigh);
+        // for each of several initial x values, get over transients then iterate
+        for (unsigned int ir = 0; ir<iNum; ir++) {
+            double x = xVal(ir, iNum);
+            for (unsigned int t=0; t<tNum; t++) {
+                x = a * x * (1.0 - x);
+            }
+            for (unsigned int t = 0; t<cNum; t++) {
+                x = a * x * (1.0 - x);
+                unsigned int ix = iVal(x,N);
+                om(ix,jc) = 1.0 + om(ix,jc);
+            }
+        }
+
+    }
+
+    return om;
+}
 
 }; // end of namespace
 
-//---------------------------------------------
-#endif
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------

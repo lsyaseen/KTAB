@@ -20,68 +20,66 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // --------------------------------------------
-// start of a simple Tetris clone
+// start of a quadratic map
+//---------------------------------------------
+#ifndef QUADMAP_UTILS_H
+#define QUADMAP_UTILS_H
+
+#include <assert.h>
+#include <chrono>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <functional>
+#include <future>
+#include <math.h>
+#include <memory>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <thread>
+#include <tuple>
+#include <vector>
+
+#include <FL/Enumerations.H>
+#include "kutils.h"
+#include "prng.h"
+#include "kgraph.h"
+
 //---------------------------------------------
 
-#include <string.h>
-#include "tutils.h"
-#include "pvcanvas.h"
-#include "tmain.h"
+using std::cout;
+using std::endl;
+using std::flush;
+
+using KBase::KMatrix;
+using KBase::PRNG;
+using KGraph::Canvas;
+
+//---------------------------------------------
+
+namespace QuadMap {
+
+class QMApp;
+
+// this fills in a matrix with occurance-counts
+// The N rows are the X coordinate, 0 to 1
+// The M columns are the 'a' parameter, from aLow to aHigh
+
+double xVal(unsigned int i, unsigned int N);
+unsigned int iVal(double x, unsigned int N);
+double aVal(unsigned int j, unsigned int M, double aLow, double aHigh);
 
 
-namespace Tetris {
+void testX(unsigned int N);
 
-  PVCanvas::PVCanvas(int x, int y, int w, int h, const char * l) : Canvas(x, y, w, h, l) {
-    // nothing, yet
-  }
-
-
-  PVCanvas::~PVCanvas() {
-    // nothing, yet
-  }
-
-  void PVCanvas::onMove(int x, int y) {
-    return;
-  }
-  void PVCanvas::onDrag(int x, int y) {
-    return;
-  }
-  void PVCanvas::onPush(int x, int y, int b) {
-    return;
-  }
-  void PVCanvas::onRelease(int x, int y, int b) {
-    return;
-  }
-  void PVCanvas::onKeyDown(int x, int y, int k) {
-    return;
-  }
-  void PVCanvas::draw() {
-    const int px = x();
-    const int py = y();
-    const int pw = w();
-    const int ph = h();
-    clearMaps();
-    xMap = new KGraph::CoordMap(px, 0.5, px+pw, 5.5);
-    yMap = new KGraph::CoordMap(py + ph, 0.5, py, 3.5);
-    Canvas::draw();
-
-    fl_push_clip(px, py, pw, ph); 
-    Shape ns = TApp::theApp->board->nextShape;
-    TCode nc = ns.getShape();
-    const Fl_Color clr = TApp::theApp->color((unsigned int)nc);
-    const int ci = 2;
-    const int cj = 3;
-    for (int k = 0; k < 4; k++) {
-      TApp::theApp->board->drawUnitSquare(clr,
-        ci + ns.y(k), cj + ns.x(k),
-        false, FL_WHITE, this);
-    } 
-    fl_pop_clip();
-    return;
-  }
+KMatrix fillOccuranceMatrix(unsigned int N, unsigned int M,  double aLow, double aHigh);
 
 }; // end of namespace
 
+//---------------------------------------------
+#endif
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------
