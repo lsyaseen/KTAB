@@ -647,8 +647,9 @@ SMPState* SMPState::doBCN() const {
 			auto bpj = VctrPstn((wi*brgnIIJ->posRcvr + wj*brgnJIJ->posRcvr) / (wi + wj));
 			BargainSMP *brgnIJ = new  BargainSMP(brgnIIJ->actInit, brgnIIJ->actRcvr, bpi, bpj);
 
-
-			printf(" %2i proposes %2i adopt: ", nai, nai);
+			printf("\n");
+			printf("Bargain [%i:%i] from %2i's perspective (brgnIIJ) \n", nai, naj, nai);
+			printf("  %2i proposes %2i adopt: ", nai, nai);
 			KBase::trans(brgnIIJ->posInit).mPrintf(" %.3f ");
 			//1 starts
 			// prepare the sql statement to insert
@@ -675,8 +676,9 @@ SMPState* SMPState::doBCN() const {
 			// 1 ends
 
 			//2 starts
-			printf(" %2i proposes %2i adopt: ", nai, naj);
+			printf("  %2i proposes %2i adopt: ", nai, naj);
 			KBase::trans(brgnIIJ->posRcvr).mPrintf(" %.3f ");
+			printf("\n");
 
 			// prepare the sql statement to insert
 			memset(sqlBuff, '\0', 200);
@@ -703,8 +705,8 @@ SMPState* SMPState::doBCN() const {
 			// 2 ends
 
 			//3 starts
-
-			printf(" %2i proposes %2i adopt: ", naj, nai);
+			printf("Bargain [%i:%i] from %2i's perspective (brgnJIJ) \n", nai, naj, naj);
+			printf("  %2i proposes %2i adopt: ", naj, nai);
 			KBase::trans(brgnJIJ->posInit).mPrintf(" %.3f ");
 
 			// prepare the sql statement to insert
@@ -732,8 +734,9 @@ SMPState* SMPState::doBCN() const {
 			// 3 ends
 
 			// 4 starts
-			printf(" %2i proposes %2i adopt: ", naj, naj);
+			printf("  %2i proposes %2i adopt: ", naj, naj);
 			KBase::trans(brgnJIJ->posRcvr).mPrintf(" %.3f ");
+			printf("\n");
 			// prepare the sql statement to insert
 			memset(sqlBuff, '\0', 200);
 			sprintf(sqlBuff,
@@ -756,10 +759,13 @@ SMPState* SMPState::doBCN() const {
 					model->getScenarioName().c_str(), t, lastRowinserted, i, bgnlop, brgnJIJ->posRcvr(bgnlop, 0));
 				sqlite3_exec(db, sql2Buff, NULL, NULL, &zErrMsg);
 			}
-			printf(" compromise proposes %2i adopt: ", nai);
+			
+			printf("Power-weighted compromise [%i:%i] bargain (brgnIJ) \n", nai, naj);
+			printf("  compromise proposes %2i adopt: ", nai);
 			KBase::trans(brgnIJ->posInit).mPrintf(" %.3f ");
-			printf(" compromise proposes %2i adopt: ", naj);
+			printf("  compromise proposes %2i adopt: ", naj);
 			KBase::trans(brgnIJ->posRcvr).mPrintf(" %.3f ");
+			printf("\n");
 			// clean up 
 			delete brgnIIJ; brgnIIJ = nullptr;
 			delete brgnJIJ; brgnJIJ = nullptr;
