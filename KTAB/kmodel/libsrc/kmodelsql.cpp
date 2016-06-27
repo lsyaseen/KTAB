@@ -255,6 +255,53 @@ string Model::createSQL(unsigned int n) {
     }
     break;
 
+	case 8:  //
+			 // Bargain table
+		sql = "create table if not exists Bargn ("  \
+			"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
+			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
+			"Bargn_i 	INTEGER PRIMARY KEY, "\
+			"Brgn_Act_i INTEGER NOT NULL DEFAULT 0, "\
+			"Init_Act_i INTEGER NOT NULL DEFAULT 0, "\
+			"Recd_Act_i 	INTEGER NOT NULL DEFAULT 0, "\
+			"Value REAL NOT NULL DEFAULT 0.0, "\
+			"Prob	REAL NOT NULL DEFAULT 0.0, "\
+			"Seld	BOOLEAN "");";
+			break;
+	case 9:  //
+			 // BargnValu table
+		sql = "create table if not exists BargnValu ("  \
+			"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
+			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
+			"Bargn_i    INTEGER NOT NULL	DEFAULT '0'	REFERENCES Bargn(Bargn_i) ON DELETE CASCADE	ON UPDATE CASCADE, "\
+			"Brgn_Act_i	INTEGER NOT NULL DEFAULT 0, "\
+			"Dim_k	INTEGER NOT NULL DEFAULT 0, "\
+			"Coord	REAL"\
+			");";
+		break;
+		 
+	case 10:  // BargnUtil table creation
+		sql = "create table if not exists BargnUtil ("  \
+			"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
+			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
+			"Bargn_i    INTEGER NOT NULL	DEFAULT '0'	REFERENCES Bargn(Bargn_i) ON DELETE CASCADE	ON UPDATE CASCADE, "\
+			"Brgn_Act_i	INTEGER NOT NULL DEFAULT 0, "\
+			"Act_i 	INTEGER NOT NULL DEFAULT 0, "\
+			"Util	REAL"\
+			");";
+		break;
+
+	case 11:  // BargnVote table creation
+		sql = "create table if not exists BargnVote ("  \
+			"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
+			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
+			"Bargn_i    INTEGER NOT NULL	DEFAULT '0'	REFERENCES Bargn(Bargn_i) ON DELETE CASCADE	ON UPDATE CASCADE, "\
+			"Brgn_Act_i	INTEGER NOT NULL DEFAULT 0, "\
+			"Act_i 	INTEGER NOT NULL DEFAULT 0, "\
+			"Vote	REAL"\
+			");";
+		break;
+
     default:
         throw(KException("Model::createTableSQL unrecognized table number"));
     }
