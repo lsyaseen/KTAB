@@ -1602,8 +1602,8 @@ void SMPModel::populateSpatialSalienceTable(bool sqlP) const {
                 }
             }
         }
-        sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
     }
+    sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
     return;
 }
 //Populate the actor description table
