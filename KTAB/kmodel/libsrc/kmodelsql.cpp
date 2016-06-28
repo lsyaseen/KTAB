@@ -259,14 +259,14 @@ string Model::createSQL(unsigned int n) {
 		sql = "create table if not exists Bargn ("  \
 			"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
 			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-			"Bargn_i INTEGER PRIMARY KEY DEFAULT -1, "\
+			"Bargn_i INTEGER NOT NULL DEFAULT 0, "\
 			"Brgn_Act_i INTEGER NOT NULL DEFAULT 0, "\
 			"Init_Act_i INTEGER NOT NULL DEFAULT 0, "\
 			"Recd_Act_i INTEGER NOT NULL DEFAULT 0, "\
 			"Value REAL NOT NULL DEFAULT 0.0, "\
-			"Init_Prob_i INTEGER NULL DEFAULT 0, "\
+			"Init_Prob REAL NULL DEFAULT 0, "\
 			"Init_Seld	BOOLEAN NULL ,"\
-			"Recd_Prob_i INTEGER NULL DEFAULT 0, "\
+			"Recd_Prob REAL NULL DEFAULT 0, "\
 			"Recd_Seld	BOOLEAN NULL"\
 			");";
 			break;

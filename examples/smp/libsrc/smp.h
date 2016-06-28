@@ -75,9 +75,9 @@ public:
     VctrPstn posInit = VctrPstn();
     VctrPstn posRcvr = VctrPstn();
     uint64_t getID() const;
-    
+	static uint64_t highestBargainID;
 protected:
-  static uint64_t highestBargainID;
+ 
   uint64_t myBargainID = 0;
 };
 
