@@ -784,7 +784,7 @@ SMPState* SMPState::doBCN() const {
 
 	cout << endl << "Bargains to be resolved" << endl << flush;
 	showBargains(brgns);
-
+	
 	auto w = actrCaps();
 	cout << "w:" << endl;
 	w.mPrintf(" %6.2f ");
