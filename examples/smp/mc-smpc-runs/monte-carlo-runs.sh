@@ -15,7 +15,7 @@ do
   timestamp="$(date --utc +%Y-%m-%d_%H-%M-%S-%NZ)"
   name="run-smpc-$timestamp"
   echo "$i: $name" 
-  #../smpc --seed 0 --euSMP > $name.txt ; mv test.db $name.db
+  nice ../smpc --seed 0 --euSMP > $name.txt ; mv test.db $name.db
 done
 
 
