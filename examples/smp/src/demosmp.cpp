@@ -61,10 +61,14 @@ namespace DemoSMP {
     printf("Using PRNG seed: %020llu \n", s);
     rng->setSeed(s);
     if (0 == numA) {
-      numA = 5 + (rng->uniform() % 6); // i.e. [5,10] inclusive
+      double lnMin = log(4);
+      double lnMax = log(40);
+      // median is 13 = round(12.65), where 12.65 = exp( [log(4)+log(40)] /2 )
+      double na = exp(rng->uniform(lnMin, lnMax)); 
+      numA = ((unsigned int) (na + 0.5)); // i.e. [5,10] inclusive
     }
     if (0 == sDim) {
-      sDim = 3 + (rng->uniform() % 3); // i.e. [3,5] inclusive
+      sDim = 1 + (rng->uniform() % 3); // i.e. [1,3] inclusive
     }
 
     cout << "EU State for SMP actors with scalar capabilities" << endl;

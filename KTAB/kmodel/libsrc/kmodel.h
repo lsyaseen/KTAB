@@ -306,7 +306,7 @@ public:
     static string createSQL(unsigned int n);
 protected:
     //static string createTableSQL(unsigned int tn);
-    static const int NumTables = 8; //TODO: constant need to be redefined when new table is added
+    static const int NumTables = 12; //TODO: constant need to be redefined when new table is added
     // note that the function to write to table #k must be kept
     // synchronized with the result of createSQL(k) !
 
