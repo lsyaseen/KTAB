@@ -49,14 +49,14 @@ private slots:
     void dockWindowChanged();
     //CSV
     void setCSVItemModel(QStandardItemModel * model, QStringList scenarioName);
-    void csvGetFilePAth();
+    void csvGetFilePAth(bool bl);
     //Database
     void setDBItemModel(QSqlTableModel * model);
     void setDBItemModelEdit();
     void displayMessage(QString cls, QString message);
     void vectorPositionsFromDB();
-    void dbGetFilePAth();
-    void dbEditGetFilePAth();
+    void dbGetFilePAth(bool bl);
+    void dbEditGetFilePAth(bool bl);
     void updateStateCount_SliderRange(int states);
     void updateScenarioList_ComboBox(QStringList * scenarios);
     void updateDimensionCount(int dim);
@@ -64,11 +64,11 @@ private slots:
     //Central-  Controls Frame
     void sliderStateValueToQryDB(int value);
     void scenarioComboBoxValue(QString scenario_box);
-    void createNewCSV();
-    void cellSelected(int row, int column);
+    void createNewCSV(bool bl);
+    void cellSelected(QStandardItem *in);
     void insertNewRowCSV();
     void insertNewColumnCSV();
-    void donePushButtonClicked();
+    void donePushButtonClicked(bool bl);
 
     bool eventFilter(QObject*, QEvent*);
 
@@ -107,7 +107,7 @@ private:
     void createModuleParametersDockWindow();
     void saveTableViewToCSV();
     void saveTableWidgetToCSV();
-    void convertDBtoCSVFormat();
+    int validateControlButtons(QString viewName);
 
     // Central Main Frame
     QFrame *central;

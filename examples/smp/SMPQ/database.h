@@ -29,7 +29,7 @@ public slots :
 
 signals:
     void Message(QString , QString );
-    void vectorPosition(QVector<double> &x, QVector<double> &y, QString actor);
+    void vectorPosition(QVector<double> x, QVector<double> y, QString actor);
     void dbModel(QSqlTableModel *);
     void dbModelEdit(QSqlTableModel *);
     void statesCount(int value);

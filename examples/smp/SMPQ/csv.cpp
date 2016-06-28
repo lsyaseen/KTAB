@@ -13,7 +13,7 @@ void CSV::readCSVFile(QString path)
         // model->clear();
 
         QFile file(path);
-        if (file.open(QIODevice::ReadOnly))
+        if (file.open(QIODevice::ReadOnly) && file.size() > 0)
         {
             int rowindex = 0;                     // file row counter
             QTextStream in(&file);                 // read to text stream
@@ -46,12 +46,17 @@ void CSV::readCSVFile(QString path)
                     scenarioName.append(lineToken.at(1));
                     lineToken.clear();
                 }
+
                 rowindex++;
             }
 
             file.close();
         }
-
+        else
+        {
+            emit sendMessage("CSV","Empty File !");
+            return;
+        }
     }
     emit csvModel(model,scenarioName);
 }
