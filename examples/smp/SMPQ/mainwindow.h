@@ -70,7 +70,9 @@ private slots:
     void insertNewColumnCSV();
     void donePushButtonClicked(bool bl);
 
-    bool eventFilter(QObject*, QEvent*);
+//    bool eventFilter(QObject*, QEvent*);
+    void displayMenu_tableWidget(QPoint pos);
+    void displayMenu_tableView(QPoint pos);
 
     //DB to CSV
     void actorsName_Description(QList<QString> actorName, QList<QString> actorDescription);
@@ -180,7 +182,7 @@ private:
     QStandardItemModel *modeltoCSV;
 
     QString inputCSV;
-    void createSeperateColumn();
+    void createSeperateColumn(QTableWidgetItem *hdr);
 
     //DB to CSV
     int dim;
