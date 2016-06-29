@@ -11,11 +11,13 @@ class CSV : public QObject
     Q_OBJECT
 public:
     CSV();
-    void readCSVFile(QString path);
     QStandardItemModel * model;
+public slots:
+    void readCSVFile(QString path);
 
 signals:
     void csvModel(QStandardItemModel * ,QStringList ScenarioName);
+    void sendMessage(QString className, QString Message);
 
 };
 

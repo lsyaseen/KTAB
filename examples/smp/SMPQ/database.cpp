@@ -6,11 +6,6 @@ Database::Database()
 
 Database::~Database()
 {
-
-}
-
-void Database::openDB(QString dbPath)
-{
     // Database Initiaization
     QStringList driverList;
     driverList = QSqlDatabase::drivers();
@@ -18,6 +13,12 @@ void Database::openDB(QString dbPath)
     if (!driverList.contains("QSQLITE", Qt::CaseInsensitive))
         emit Message("Database Error", "No QSQLITE support! Check all needed dll-files!");
 
+
+
+}
+
+void Database::openDB(QString dbPath)
+{
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(dbPath);
     db.setHostName("localhost");
@@ -38,15 +39,43 @@ void Database::openDB(QString dbPath)
         // Scenarios list in db
         getScenarioList();
 
-        scenario =  scenarioList->at(0);
-        readVectorPositionTable(0, scenario);//turn
+        scenario_m =  scenarioList->at(0);
+        readVectorPositionTable(0, scenario_m);//turn
+    }
+}
+
+void Database::openDBEdit(QString dbPath)
+{
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(dbPath);
+    db.setHostName("localhost");
+    db.setUserName("root");
+
+    if(!db.open())
+    {
+        emit Message("Database Error", db.lastError().text());
+    }
+    else
+    {
+
+        readVectorPositionTableEdit(scenario_m);//turn
+
+        // Scenarios list in db
+        //  getScenarioList();
+
+        // readVectorPositionTableEdit(scenario_m);//turn
     }
 }
 
 void Database::getScenarioData(int turn, QString scenario)
 {
+    scenario_m=scenario;
+    readVectorPositionTable(turn,scenario_m);//turn
+}
 
-    readVectorPositionTable(turn,scenario);//turn
+void Database::getScenarioDataEdit(QString scenario)
+{
+    scenario_m=scenario;
 }
 
 void Database::getStateCount()
@@ -66,6 +95,84 @@ void Database::getDimensionCount()
         numDimension = qry.value(0).toInt();
     }
     emit dimensionsCount(numDimension);
+}
+
+void Database::getActors_DescriptionDB()
+{
+    actorNameList.clear();
+    actorDescList.clear();
+
+    QSqlQuery qry;
+    QString query= QString("select Name,DESC from ActorDescription order by Act_i ASC ");
+
+    qry.exec(query);
+
+    while(qry.next())
+    {
+        actorNameList.append(qry.value(0).toString());
+        actorDescList.append(qry.value(1).toString());
+    }
+
+    emit actorsNameDesc(actorNameList , actorDescList);
+}
+
+
+void Database::getInfluenceDB()
+{
+    actorInfluence.clear();
+
+    qDebug()<<scenario_m;
+    QSqlQuery qry;
+    QString query= QString(" select SpatialCapability.Cap from SpatialCapability,ActorDescription where"
+                           " ActorDescription.Act_i = SpatialCapability.Act_i"
+                           " and SpatialCapability.Scenario='%1' and Turn_t=0").arg(scenario_m);
+
+    qry.exec(query);
+
+    while(qry.next())
+    {
+        actorInfluence.append(qry.value(0).toString());
+    }
+
+    emit actorsInflu(actorInfluence);
+}
+
+void Database::getPositionDB(int dim)
+{
+    actorPosition.clear();
+    qDebug()<<scenario_m;
+
+    QSqlQuery qry;
+    QString query= QString(" select VectorPosition.Coord from VectorPosition,ActorDescription where"
+                           " ActorDescription.Act_i = VectorPosition.Act_i"
+                           " and VectorPosition.Scenario='%2' and Turn_t=0 and dim_k='%1'").arg(dim).arg(scenario_m);
+
+    qry.exec(query);
+
+    while(qry.next())
+    {
+        actorPosition.append(qry.value(0).toString());
+    }
+    emit actors_Pos(actorPosition,dim);
+}
+
+void Database::getSalienceDB(int dim)
+{
+    actorSalience.clear();
+    qDebug()<<scenario_m;
+
+    QSqlQuery qry;
+    QString query= QString(" select SpatialSalience.Sal from SpatialSalience,ActorDescription where"
+                           " ActorDescription.Act_i = SpatialSalience.Act_i"
+                           " and  SpatialSalience.Scenario='%2' and Turn_t=0 and dim_k='%1'").arg(dim).arg(scenario_m);
+
+    qry.exec(query);
+
+    while(qry.next())
+    {
+        actorSalience.append(qry.value(0).toString());
+    }
+    emit actors_Sal(actorSalience,dim);
 }
 
 void Database::getVectorPosition(int actor, int dim, int turn, QString scenario)
@@ -116,6 +223,20 @@ void Database::readVectorPositionTable(int turn, QString scenario)
     //To plot graph
     for(int actors=0; actors <= numActors; ++actors)
         getVectorPosition(actors,0,turn,scenario);//actors, dimension, turn
+}
+
+
+void Database::readVectorPositionTableEdit(QString scenario)
+{
+    //TO-DO add scenario as a constraint and populate the scenario dropdown cum edit box
+    //choose the first scenario as default
+
+    sqlmodelEdit = new QSqlTableModel(this);
+    sqlmodelEdit->setTable("VectorPosition");
+    sqlmodelEdit->setFilter(QString("Turn_t=0 and Scenario='%1'").arg(scenario));
+    sqlmodelEdit->select();
+
+    emit dbModelEdit(sqlmodelEdit);
 }
 
 void Database::getNumActors()

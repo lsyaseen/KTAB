@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+
+
 #include <QMainWindow>
 #include "csv.h"
 #include "database.h"
@@ -35,7 +37,7 @@ static const int N = 2;
 
 class MainWindow : public QMainWindow
 {
-     Q_OBJECT
+    Q_OBJECT
 
 public:
     //explicit MainWindow(QWidget *parent = 0);
@@ -47,12 +49,14 @@ private slots:
     void dockWindowChanged();
     //CSV
     void setCSVItemModel(QStandardItemModel * model, QStringList scenarioName);
-    void setDBItemModel(QSqlTableModel * model);
-    void csvGetFilePAth();
+    void csvGetFilePAth(bool bl);
     //Database
+    void setDBItemModel(QSqlTableModel * model);
+    void setDBItemModelEdit();
     void displayMessage(QString cls, QString message);
     void vectorPositionsFromDB();
-    void dbGetFilePAth();
+    void dbGetFilePAth(bool bl);
+    void dbEditGetFilePAth(bool bl);
     void updateStateCount_SliderRange(int states);
     void updateScenarioList_ComboBox(QStringList * scenarios);
     void updateDimensionCount(int dim);
@@ -60,13 +64,20 @@ private slots:
     //Central-  Controls Frame
     void sliderStateValueToQryDB(int value);
     void scenarioComboBoxValue(QString scenario_box);
-    void createNewCSV();
-    void cellSelected(int row, int column);
+    void createNewCSV(bool bl);
+    void cellSelected(QStandardItem *in);
     void insertNewRowCSV();
     void insertNewColumnCSV();
-    void donePushButtonClicked();
+    void donePushButtonClicked(bool bl);
 
-     bool eventFilter(QObject*, QEvent*);
+    bool eventFilter(QObject*, QEvent*);
+
+    //DB to CSV
+    void actorsName_Description(QList<QString> actorName, QList<QString> actorDescription);
+    void actors_Influence(QList<QString> ActorInfluence);
+    void actors_Position(QList<QString> actorPosition, int dim);
+    void actors_Salience(QList<QString> actorSalience, int dim);
+
 
 signals:
     //CSV
@@ -74,11 +85,19 @@ signals:
 
     //Database
     void dbFilePath(QString path);
+    void dbEditFilePath(QString path);
 
     void getScenarioRunValues(int state, QString scenario_box);
+    void getScenarioRunValuesEdit(QString scenario_box);
     void getStateCountfromDB();
     void getDimensionCountfromDB();
-    //void send_scenario(QString scenario);
+
+    //save DB to csv
+    void getActorsDesc();
+    void getInfluence();
+    void getPosition(int dim);
+    void getSalience(int dim);
+
 private:
     //MainWindow
     void createActions();
@@ -88,6 +107,7 @@ private:
     void createModuleParametersDockWindow();
     void saveTableViewToCSV();
     void saveTableWidgetToCSV();
+    int validateControlButtons(QString viewName);
 
     // Central Main Frame
     QFrame *central;
@@ -137,6 +157,7 @@ private:
     Database * dbObj ;
     QSqlDatabase db;
     int dimensions;
+    QString dbPath;
 
     //Graph 1 widget
     QFrame *graphWidget;
@@ -146,7 +167,6 @@ private:
     void initializeGraphPlot1();
     void plotGraph();
     void initializeCentralViewFrame();
-
 
     QString scenario_box;
     //graph - customplot
@@ -159,8 +179,18 @@ private:
     QString  tableType; // CSV, Database, NewCSV
     QStandardItemModel *modeltoCSV;
 
-
+    QString inputCSV;
     void createSeperateColumn();
+
+    //DB to CSV
+    int dim;
+    QList <QString> actorsName;
+    QList <QString> actorsDescription;
+    QList <QString> actorsInfluence;
+    QList <QString> actorsPosition[3];
+    QList <QString> actorsSalience[3];
+
+
 private slots:
     void titleDoubleClick(QMouseEvent *event, QCPPlotTitle *title);
     void axisLabelDoubleClick(QCPAxis* axis, QCPAxis::SelectablePart part);

@@ -13,29 +13,53 @@ class Database : public QObject
 public:
     Database();
     ~Database();
+
 public slots :
     void openDB(QString dbPath);
+    void openDBEdit(QString dbPath);
     void getScenarioData(int turn, QString scenario);
+    void getScenarioDataEdit(QString scenario);
     void getStateCount();
     void getDimensionCount();
+    //DB to CSV
+    void getActors_DescriptionDB();
+    void getInfluenceDB();
+    void getPositionDB(int dim);
+    void getSalienceDB(int dim);
 
 signals:
     void Message(QString , QString );
-    void vectorPosition(QVector<double> &x, QVector<double> &y, QString actor);
+    void vectorPosition(QVector<double> x, QVector<double> y, QString actor);
     void dbModel(QSqlTableModel *);
+    void dbModelEdit(QSqlTableModel *);
     void statesCount(int value);
     void dimensionsCount(int value);
     void scenarios(QStringList *scenariosList);
 
+    //DB to CSV
+    void actorsNameDesc(QList <QString>, QList <QString>);
+    void actorsInflu(QList <QString>);
+    void actors_Pos(QList<QString>,int);
+    void actors_Sal(QList<QString>,int);
+
 private:
     QSqlDatabase db;
     QSqlTableModel * sqlmodel;
+    QSqlTableModel * sqlmodelEdit;
 
     int numActors =0;
     int numStates =0;
     int numDimension =0;
     QStringList * scenarioList;
-    QString scenario;
+    QString scenario_m;
+
+    //DB to CSV
+    QList <QString> actorNameList;
+    QList <QString> actorDescList;
+    QList <QString> actorInfluence;
+    QList <QString> actorPosition;
+    QList <QString> actorSalience;
+
 
     void getVectorPosition(int actor, int dim, int turn, QString scenario);
 
@@ -49,6 +73,7 @@ private:
     // Scenarios list in db
     void getScenarioList();
 
+    void readVectorPositionTableEdit(QString scenario);
 };
 
 #endif // DATABASE_H

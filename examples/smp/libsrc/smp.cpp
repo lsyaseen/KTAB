@@ -709,7 +709,7 @@ SMPState* SMPState::doBCN() const {
 
 	cout << endl << "Bargains to be resolved" << endl << flush;
 	showBargains(brgns);
-
+	
 	auto w = actrCaps();
 	cout << "w:" << endl;
 	w.mPrintf(" %6.2f ");
@@ -1535,8 +1535,8 @@ void SMPModel::populateSpatialSalienceTable(bool sqlP) const {
                 }
             }
         }
-        sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
     }
+    sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
     return;
 }
 //Populate the actor description table
