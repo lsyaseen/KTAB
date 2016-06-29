@@ -804,34 +804,13 @@ SMPState* SMPState::doBCN() const {
 		// update for bern table for remaining fields
 		model->sqlUodateBargainTable(t,p(0, 0), mMax,   p(maxArrcount - 1, 0), mMax,k);
 		 
-		////Extract the bargain id 
-		//memset(sqlBuff, '\0', 200);
-		//sprintf(sqlBuff, "select Bargn_i from Bargn WHERE (Brgn_Act_i = %d ) and (%d = Turn_t)", k, t);
-		//stmt = NULL;
-		//rowtoupdate = sqlite3_prepare_v2(db, sqlBuff, -1, &stmt, NULL);
-		//rc = sqlite3_step(stmt);
-		//lastRowinserted = sqlite3_column_int(stmt, 0);
-		//for (int bgnlop = 0; bgnlop < w.numC(); bgnlop++)
-		//{
-		//	memset(sql2Buff, '\0', 200);
-		//	sprintf(sql2Buff,
-		//		"INSERT INTO BargnVote (Scenario, Turn_t,Bargn_i,  Brgn_Act_i, Act_i, Vote) VALUES ('%s',%d,%d,%d,%d,%f)",
-		//		model->getScenarioName().c_str(), t, lastRowinserted, k, na, w(0, bgnlop));
-		//	sqlite3_exec(db, sql2Buff, NULL, NULL, &zErrMsg);
-		//}
-		//// BargnUtil table records
-		//for (int row = 0; row < u_im.numR(); row++)
-		//{
-		//	for (int col = 0; col < u_im.numC(); col++)
-		//	{
-		//		memset(sql2Buff, '\0', 200);
-		//		sprintf(sql2Buff,
-		//			"INSERT INTO BargnUtil (Scenario, Turn_t,Bargn_i, Brgn_Act_i, Act_i, Util) VALUES ('%s',%d,%d,%d,%d,%f)",
-		//			model->getScenarioName().c_str(), t, lastRowinserted, k, na, u_im(row, col));
-		//		sqlite3_exec(db, sql2Buff, NULL, NULL, &zErrMsg);
-		//	}
-		//}
-
+		//populate the Bargain Vote table
+		model->sqlBargainVote(t, k, k, w);
+		 
+		//populate the Bargain util table
+		model->sqlBargainUtil(t, k, u_im);
+	  
+		
 		// TODO: create a fresh position for k, from the selected bargain mMax.
 		VctrPstn * pk = nullptr;
 		auto bkm = brgns[k][mMax];
