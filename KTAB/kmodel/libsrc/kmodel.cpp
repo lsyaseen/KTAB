@@ -185,13 +185,13 @@ double Model::estNRA(double rh, double  ri, BigRAdjust ra) {
         rhi = ri;
         break;
     case BigRAdjust::TwoThirdsRA:
-        rhi = (rhi + (2.0*ri)) / 3.0;
+        rhi = (rh + (2.0*ri)) / 3.0;
         break;
     case BigRAdjust::HalfRA:
         rhi = (rh + ri) / 2;
         break;
     case BigRAdjust::OneThirdRA:
-        rhi = ((2.0*rhi) + ri) / 3.0;
+        rhi = ((2.0*rh) + ri) / 3.0;
         break;
     case BigRAdjust::NoRA:
         rhi = rh;

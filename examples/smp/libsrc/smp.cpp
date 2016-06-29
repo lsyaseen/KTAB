@@ -663,6 +663,10 @@ SMPState* SMPState::doBCN() const {
 			rowtoupdate = sqlite3_prepare_v2(db, "select MAX(Bargn_i) from Bargn", -1, &stmt, NULL);
 			rc = sqlite3_step(stmt);
 			lastRowinserted = sqlite3_column_int(stmt, 0);
+            
+            // finalize statement to avoid resource leaks
+            sqlite3_finalize(stmt);
+            stmt = nullptr;
 
 			// prepare the sql statement to insert
 			for (int bgnlop = 0; bgnlop < brgnIIJ->posInit.numR(); bgnlop++)
@@ -693,6 +697,10 @@ SMPState* SMPState::doBCN() const {
 			rc = sqlite3_step(stmt);
 			lastRowinserted = sqlite3_column_int(stmt, 0);
 
+            // finalize statement to avoid resource leaks
+            sqlite3_finalize(stmt);
+            stmt = nullptr;
+
 			for (int bgnlop = 0; bgnlop < brgnIIJ->posRcvr.numR(); bgnlop++)
 			{
 				// prepare the sql statement to insert
@@ -722,6 +730,10 @@ SMPState* SMPState::doBCN() const {
 			rc = sqlite3_step(stmt);
 			lastRowinserted = sqlite3_column_int(stmt, 0);
 
+            // finalize statement to avoid resource leaks
+            sqlite3_finalize(stmt);
+            stmt = nullptr;
+
 			for (int bgnlop = 0; bgnlop < brgnJIJ->posInit.numR(); bgnlop++)
 			{
 				// prepare the sql statement to insert
@@ -749,6 +761,10 @@ SMPState* SMPState::doBCN() const {
 			rowtoupdate = sqlite3_prepare_v2(db, "select MAX(Bargn_i) from Bargn", -1, &stmt, NULL);
 			rc = sqlite3_step(stmt);
 			lastRowinserted = sqlite3_column_int(stmt, 0);
+            
+            // finalize statement to avoid resource leaks
+            sqlite3_finalize(stmt);
+            stmt = nullptr;
 
 			for (int bgnlop = 0; bgnlop < brgnJIJ->posRcvr.numR(); bgnlop++)
 			{
@@ -908,6 +924,11 @@ SMPState* SMPState::doBCN() const {
 		rowtoupdate = sqlite3_prepare_v2(db, sqlBuff, -1, &stmt, NULL);
 		rc = sqlite3_step(stmt);
 		lastRowinserted = sqlite3_column_int(stmt, 0);
+
+        // finalize statement to avoid resource leaks
+        sqlite3_finalize(stmt);
+        stmt = nullptr;
+
 		for (int bgnlop = 0; bgnlop < w.numC(); bgnlop++)
 		{
 			memset(sql2Buff, '\0', 200);
@@ -1192,6 +1213,7 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
     sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
 */
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 
     delete sqlBuff;
@@ -1290,7 +1312,13 @@ SMPModel::~SMPModel() {
 
     if (nullptr != smpDB) {
         cout << "SMPModel::~SMPModel Closing database" << endl << flush;
-        sqlite3_close(smpDB);
+        int close_result = sqlite3_close(smpDB);
+        if (close_result != SQLITE_OK) {
+            cout << "SMPModel::~SMPModel Closing database failed!" << endl << flush;
+        }
+        else {
+            cout << "SMPModel::~SMPModel Closing database succeeded." << endl << flush;
+        }
         smpDB = nullptr;
     }
 
@@ -1463,6 +1491,7 @@ void SMPModel::showVPHistory(bool sqlP) const {
     }
 
     sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     cout << endl;
 
     // show probabilities over time.
@@ -1546,6 +1575,7 @@ void SMPModel::populateSpatialCapabilityTable(bool sqlP) const {
         }
     }
     sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     return;
 }
 //Populates the SpatialSliencetable
@@ -1602,8 +1632,9 @@ void SMPModel::populateSpatialSalienceTable(bool sqlP) const {
                 }
             }
         }
-        sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
     }
+    sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     return;
 }
 //Populate the actor description table
@@ -1646,6 +1677,7 @@ void SMPModel::populateActorDescriptionTable(bool sqlP) const {
         }
     }
     sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     return;
 }
 SMPModel * SMPModel::readCSV(string fName, PRNG * rng) {
