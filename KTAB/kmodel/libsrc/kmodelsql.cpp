@@ -428,10 +428,7 @@ void Model::sqlPosEquiv(unsigned int t)
     return;
 }
 
-
-//memset(sqlBuff, '\0', 200);
-//sprintf(sqlBuff, "UPDATE Bargn SET Init_Prob = %.3f, Init_Seld = %d, Recd_Prob = %.3f, Recd_Seld= %d WHERE (Brgn_Act_i = %d ) and (%d = Turn_t)", p(0, 0), mMax, k, t, p(maxArrcount - 1, 0), mMax);
-//rslt = sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
+ 
 void Model::sqlUodateBargainTable (unsigned int t,   double IntProb, int Init_Seld, double Recd_Prob,int Recd_Seld,  int Brgn_Act_i)
 {
 
