@@ -64,6 +64,11 @@ BargainSMP::BargainSMP(const SMPActor* ai, const SMPActor* ar, const VctrPstn & 
     actRcvr = ar;
     posInit = pi;
     posRcvr = pr;
+	 
+	
+	//// Increment counter when new object is created 
+	//BargainSMP::highestBargainID++;
+
 }
 
 BargainSMP::~BargainSMP() {
@@ -71,6 +76,10 @@ BargainSMP::~BargainSMP() {
     actRcvr = nullptr;
     posInit = VctrPstn(KMatrix(0, 0));
     posRcvr = VctrPstn(KMatrix(0, 0));
+
+
+
+
 }
 
 
@@ -582,27 +591,7 @@ SMPState* SMPState::doBCN() const {
 		brgns[i].push_back(nullptr); // null bargain is SQ
 	}
 
-	// database insertions
-	sqlite3 * db = model->smpDB;
 	unsigned int t = myTurn();
-	char* zErrMsg = nullptr;
-	auto sqlBuff = newChars(200);
-	auto sql2Buff = newChars(200);
- 
-	memset(sqlBuff, '\0', 200);
-	memset(sql2Buff, '\0', 200);
-
-
-	const char* insStr = sqlBuff;
-	sqlite3_stmt *insStmt;
-
-	const char* ins2Str = sql2Buff;
-	sqlite3_stmt *ins2Stmt;
-
-
-	int rowid = 0;
-	int lastRowinserted = 0;
-
 	auto ivb = SMPActor::InterVecBrgn::S2P2;
 	sqlite3_stmt* stmt = NULL;
 	int rowtoupdate = 0;
@@ -651,39 +640,28 @@ SMPState* SMPState::doBCN() const {
 			printf("Bargain [%i:%i] from %2i's perspective (brgnIIJ) \n", nai, naj, nai);
 			printf("  %2i proposes %2i adopt: ", nai, nai);
 			KBase::trans(brgnIIJ->posInit).mPrintf(" %.3f ");
-		 
-			// prepare the sql statement to insert
-			if (i != bestJ)
-			{
-				memset(sqlBuff, '\0', 200);
-				sprintf(sqlBuff,
-					"INSERT INTO Bargn (Scenario, Turn_t,Bargn_i, Brgn_Act_i,Init_Act_i, Recd_Act_i,Value) VALUES ('%s',%d,%d,%d,%d,%d,%.3f)",
-					model->getScenarioName().c_str(), t, BargainSMP::highestBargainID, nai, nai, nai, bestEU);
-				BargainSMP::highestBargainID++;
-				sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
-			}
 
-			 
+			//Brgn table base entries
+			model->sqlBargainEntries(t, BargainSMP::highestBargainID, i, i, nai, bestEU);
+			BargainSMP::highestBargainID++;
+
+		 
+			
 			printf("  %2i proposes %2i adopt: ", nai, naj);
 			KBase::trans(brgnIIJ->posRcvr).mPrintf(" %.3f ");
 			printf("\n");
  			printf("Bargain [%i:%i] from %2i's perspective (brgnJIJ) \n", nai, naj, naj);
 			printf("  %2i proposes %2i adopt: ", naj, nai);
-
-			if (i != bestJ)
-			{
-				memset(sqlBuff, '\0', 200);
-				sprintf(sqlBuff,
-					"INSERT INTO Bargn (Scenario, Turn_t,Bargn_i, Brgn_Act_i,Init_Act_i, Recd_Act_i,Value) VALUES ('%s',%d,%d,%d,%d,%d,%.3f)",
-					model->getScenarioName().c_str(), t, BargainSMP::highestBargainID, nai, naj, bestJ, bestEU);
-				BargainSMP::highestBargainID++;
-				sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
-			}
-
+			
+		
 
 			KBase::trans(brgnJIJ->posInit).mPrintf(" %.3f ");
 			printf("  %2i proposes %2i adopt: ", naj, naj);
 			KBase::trans(brgnJIJ->posRcvr).mPrintf(" %.3f ");
+			//Brgn table base entries
+			model->sqlBargainEntries(t, BargainSMP::highestBargainID, i,i,  bestJ, bestEU);
+			BargainSMP::highestBargainID++;
+
 			printf("\n");
 			printf("Power-weighted compromise [%i:%i] bargain (brgnIJ) \n", nai, naj);
 			printf("  compromise proposes %2i adopt: ", nai);
@@ -691,6 +669,10 @@ SMPState* SMPState::doBCN() const {
 			printf("  compromise proposes %2i adopt: ", naj);
 			KBase::trans(brgnIJ->posRcvr).mPrintf(" %.3f ");
 			printf("\n");
+
+			model->sqlBargainValue(t, BargainSMP::highestBargainID - 2, 0, brgnIJ->posInit);
+			model->sqlBargainValue(t, BargainSMP::highestBargainID - 2, 1, brgnIJ->posRcvr);
+
 			// clean up 
 			delete brgnIIJ; brgnIIJ = nullptr;
 			delete brgnJIJ; brgnJIJ = nullptr;
@@ -807,21 +789,12 @@ SMPState* SMPState::doBCN() const {
 		unsigned int mMax = nb; // indexing actors by i, bargains by m
 		switch (stm) {
 		case StateTransMode::DeterminsticSTM:
-		 
 			mMax = ndxMaxProb(p);
-		/*	memset(sqlBuff, '\0', 200);
-			sprintf(sqlBuff, "UPDATE Bargn SET Init_Prob = %.3f, Init_Seld = %d, Recd_Prob = %f, Recd_Seld= %d WHERE (Brgn_Act_i = %d ) and (%d = Turn_t)", p(0, 0), 0, p(maxArrcount - 1, 0), 0,k, t);
-			rslt = sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);*/
-			break;
-	 
-		case StateTransMode::StochasticSTM:
-		 
+	 		break;
+	 	case StateTransMode::StochasticSTM:
 			mMax = model->rng->probSel(p);
-			
 			break;
-		 
 		default:
-			rslt = -1;
 			throw KException("SMPState::doBCN - unrecognized StateTransMode");
 			break;
 		}
@@ -829,38 +802,35 @@ SMPState* SMPState::doBCN() const {
 		assert(mMax < nb);
 		cout << "Chosen bargain (" << stm << "): " << mMax << "/" << nb << endl;
 		// update for bern table for remaining fields
-	
-		memset(sqlBuff, '\0', 200);
-		sprintf(sqlBuff, "UPDATE Bargn SET Init_Prob = %.3f, Init_Seld = %d, Recd_Prob = %.3f, Recd_Seld= %d WHERE (Brgn_Act_i = %d ) and (%d = Turn_t)", p(0, 0), mMax, k, t, p(maxArrcount - 1, 0), mMax);
-		rslt = sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
+		model->sqlUodateBargainTable(t,p(0, 0), mMax,   p(maxArrcount - 1, 0), mMax,k);
 		 
-		//Extract the bargain id 
-		memset(sqlBuff, '\0', 200);
-		sprintf(sqlBuff, "select Bargn_i from Bargn WHERE (Brgn_Act_i = %d ) and (%d = Turn_t)", k, t);
-		stmt = NULL;
-		rowtoupdate = sqlite3_prepare_v2(db, sqlBuff, -1, &stmt, NULL);
-		rc = sqlite3_step(stmt);
-		lastRowinserted = sqlite3_column_int(stmt, 0);
-		for (int bgnlop = 0; bgnlop < w.numC(); bgnlop++)
-		{
-			memset(sql2Buff, '\0', 200);
-			sprintf(sql2Buff,
-				"INSERT INTO BargnVote (Scenario, Turn_t,Bargn_i,  Brgn_Act_i, Act_i, Vote) VALUES ('%s',%d,%d,%d,%d,%f)",
-				model->getScenarioName().c_str(), t, lastRowinserted, k, na, w(0, bgnlop));
-			sqlite3_exec(db, sql2Buff, NULL, NULL, &zErrMsg);
-		}
-		// BargnUtil table records
-		for (int row = 0; row < u_im.numR(); row++)
-		{
-			for (int col = 0; col < u_im.numC(); col++)
-			{
-				memset(sql2Buff, '\0', 200);
-				sprintf(sql2Buff,
-					"INSERT INTO BargnUtil (Scenario, Turn_t,Bargn_i, Brgn_Act_i, Act_i, Util) VALUES ('%s',%d,%d,%d,%d,%f)",
-					model->getScenarioName().c_str(), t, lastRowinserted, k, na, u_im(row, col));
-				sqlite3_exec(db, sql2Buff, NULL, NULL, &zErrMsg);
-			}
-		}
+		////Extract the bargain id 
+		//memset(sqlBuff, '\0', 200);
+		//sprintf(sqlBuff, "select Bargn_i from Bargn WHERE (Brgn_Act_i = %d ) and (%d = Turn_t)", k, t);
+		//stmt = NULL;
+		//rowtoupdate = sqlite3_prepare_v2(db, sqlBuff, -1, &stmt, NULL);
+		//rc = sqlite3_step(stmt);
+		//lastRowinserted = sqlite3_column_int(stmt, 0);
+		//for (int bgnlop = 0; bgnlop < w.numC(); bgnlop++)
+		//{
+		//	memset(sql2Buff, '\0', 200);
+		//	sprintf(sql2Buff,
+		//		"INSERT INTO BargnVote (Scenario, Turn_t,Bargn_i,  Brgn_Act_i, Act_i, Vote) VALUES ('%s',%d,%d,%d,%d,%f)",
+		//		model->getScenarioName().c_str(), t, lastRowinserted, k, na, w(0, bgnlop));
+		//	sqlite3_exec(db, sql2Buff, NULL, NULL, &zErrMsg);
+		//}
+		//// BargnUtil table records
+		//for (int row = 0; row < u_im.numR(); row++)
+		//{
+		//	for (int col = 0; col < u_im.numC(); col++)
+		//	{
+		//		memset(sql2Buff, '\0', 200);
+		//		sprintf(sql2Buff,
+		//			"INSERT INTO BargnUtil (Scenario, Turn_t,Bargn_i, Brgn_Act_i, Act_i, Util) VALUES ('%s',%d,%d,%d,%d,%f)",
+		//			model->getScenarioName().c_str(), t, lastRowinserted, k, na, u_im(row, col));
+		//		sqlite3_exec(db, sql2Buff, NULL, NULL, &zErrMsg);
+		//	}
+		//}
 
 		// TODO: create a fresh position for k, from the selected bargain mMax.
 		VctrPstn * pk = nullptr;
@@ -890,14 +860,7 @@ SMPState* SMPState::doBCN() const {
 
 		cout << endl << flush;
 	}
-	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
-
-	// Deallocate Sql statement buffer
-	delete[] sqlBuff;
-	sqlBuff = nullptr;
-	delete[] sql2Buff;
-	sql2Buff = nullptr;
-
+ 
 	// Some bargains are nullptr, and there are two copies of every non-nullptr randomly
 	// arranged. If we delete them as we find them, then the second occurance will be corrupted,
 	// so the code crashes when it tries to access the memory to see if it matches something
