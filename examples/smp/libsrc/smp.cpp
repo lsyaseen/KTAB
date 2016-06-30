@@ -1060,6 +1060,7 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
     sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
 */
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 
     delete sqlBuff;
@@ -1158,7 +1159,13 @@ SMPModel::~SMPModel() {
 
     if (nullptr != smpDB) {
         cout << "SMPModel::~SMPModel Closing database" << endl << flush;
-        sqlite3_close(smpDB);
+        int close_result = sqlite3_close(smpDB);
+        if (close_result != SQLITE_OK) {
+            cout << "SMPModel::~SMPModel Closing database failed!" << endl << flush;
+        }
+        else {
+            cout << "SMPModel::~SMPModel Closing database succeeded." << endl << flush;
+        }
         smpDB = nullptr;
     }
 
@@ -1331,6 +1338,7 @@ void SMPModel::showVPHistory(bool sqlP) const {
     }
 
     sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     cout << endl;
 
     // show probabilities over time.
@@ -1414,6 +1422,7 @@ void SMPModel::populateSpatialCapabilityTable(bool sqlP) const {
         }
     }
     sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     return;
 }
 //Populates the SpatialSliencetable
@@ -1472,6 +1481,7 @@ void SMPModel::populateSpatialSalienceTable(bool sqlP) const {
         }
     }
     sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     return;
 }
 //Populate the actor description table
@@ -1514,6 +1524,7 @@ void SMPModel::populateActorDescriptionTable(bool sqlP) const {
         }
     }
     sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     return;
 }
 SMPModel * SMPModel::readCSV(string fName, PRNG * rng) {
