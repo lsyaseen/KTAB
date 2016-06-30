@@ -299,7 +299,7 @@ public:
 	void sqlBargainValue(unsigned int t, int Baragainer, int Dim, KBase::VctrPstn Coord);
 	void sqlBargainUtil(unsigned int t, int Bargn_i,  KBase::KMatrix Util_mat);
 	void sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMatrix Util_mat);
-
+	void sqlScenarioDesc(const char *ScenName);
 
     static void demoSQLite();
 
@@ -313,7 +313,7 @@ public:
     static string createSQL(unsigned int n);
 protected:
     //static string createTableSQL(unsigned int tn);
-    static const int NumTables = 12; //TODO: constant need to be redefined when new table is added
+    static const int NumTables = 13; //TODO: constant need to be redefined when new table is added
     // note that the function to write to table #k must be kept
     // synchronized with the result of createSQL(k) !
 

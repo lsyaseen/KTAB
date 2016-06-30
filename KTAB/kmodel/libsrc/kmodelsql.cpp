@@ -302,7 +302,13 @@ string Model::createSQL(unsigned int n) {
 			"Vote	REAL"\
 			");";
 		break;
-
+	case 12:  //ScenarioDesc creation
+		sql = "create table if not exists ScenarioDesc ("  \
+			"Scenario Text(512) NOT NULL DEFAULT 'NoName', "\
+			"Desc text(512) NOT NULL DEFAULT 'No Description', "\
+			"ScenarioId_t INTEGER PRIMARY KEY AUTOINCREMENT	DEFAULT(0)" \
+			");";
+		break;
     default:
         throw(KException("Model::createTableSQL unrecognized table number"));
     }
@@ -658,7 +664,49 @@ void Model::sqlBargainUtil(unsigned int t, int Bargn_i,  KBase::KMatrix Util_mat
 
 	smpDB = db;
 }
+ 
+//Work In Progress
+void Model::sqlScenarioDesc(const char *ScenName)
+{
+	// initiate the database
+	sqlite3 * db = smpDB;
+	 
+	// Error message in case
+	char* zErrMsg = nullptr;
+	auto sqlBuff = newChars(200);
+  
+	// prepare the sql statement to insert
+	sprintf(sqlBuff,
+		"INSERT INTO ScenarioDesc  (Scenario, Desc) VALUES ('%s',?1)",
+		scenName.c_str());
 
+	const char* insStr = sqlBuff;
+	sqlite3_stmt *insStmt;
+	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+	// start for the transaction
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+
+	 
+	int rslt = 0;
+	// Turn_t
+	rslt = sqlite3_bind_text(insStmt, 1, ScenName,-1, SQLITE_TRANSIENT);
+	assert(SQLITE_OK == rslt);
+		 
+	// finish  
+	//assert(SQLITE_OK == rslt);
+	//rslt = sqlite3_step(insStmt);
+	//assert(SQLITE_DONE == rslt);
+	//sqlite3_clear_bindings(insStmt);
+	//assert(SQLITE_DONE == rslt);
+	//rslt = sqlite3_reset(insStmt);
+	//assert(SQLITE_OK == rslt);
+ 	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+ 
+	delete sqlBuff;
+	sqlBuff = nullptr;
+
+	smpDB = db;
+}
 void Model::sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMatrix Util_mat)
 {
 	// initiate the database
@@ -674,7 +722,7 @@ void Model::sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMat
 
 	// prepare the sql statement to insert
 	sprintf(sqlBuff,
-		"INSERT INTO BargnVote  (Scenario, Turn_t,Bargn_i,  Bargn_j, Act_i, Vote) VALUES ('%s',?1, ?2, ?3, ?4,?5)",
+		"INSERT INTO BargnVote  ( Turn_t,Bargn_i,  Bargn_j, Act_i, Vote) VALUES (?1, ?2, ?3, ?4,?5)",
 		scenName.c_str());
 
 	const char* insStr = sqlBuff;
@@ -859,6 +907,8 @@ void Model::sqlPosVote(unsigned int t) {
 
     return;
 }
+
+ 
 } // end of namespace
 
 // --------------------------------------------

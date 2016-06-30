@@ -64,11 +64,9 @@ BargainSMP::BargainSMP(const SMPActor* ai, const SMPActor* ar, const VctrPstn & 
     actRcvr = ar;
     posInit = pi;
     posRcvr = pr;
-	 
 	
 	//// Increment counter when new object is created 
-	//BargainSMP::highestBargainID++;
-
+	myBargainID = BargainSMP::highestBargainID++;
 }
 
 BargainSMP::~BargainSMP() {
@@ -76,10 +74,7 @@ BargainSMP::~BargainSMP() {
     actRcvr = nullptr;
     posInit = VctrPstn(KMatrix(0, 0));
     posRcvr = VctrPstn(KMatrix(0, 0));
-
-
-
-
+	myBargainID = 0;
 }
 
 
@@ -642,26 +637,21 @@ SMPState* SMPState::doBCN() const {
 			KBase::trans(brgnIIJ->posInit).mPrintf(" %.3f ");
 
 			//Brgn table base entries
-			model->sqlBargainEntries(t, BargainSMP::highestBargainID, i, i, nai, bestEU);
-			BargainSMP::highestBargainID++;
-
+			model->sqlBargainEntries(t, brgnJIJ->getID(), i, i, nai, bestEU);
 		 
-			
+		
 			printf("  %2i proposes %2i adopt: ", nai, naj);
 			KBase::trans(brgnIIJ->posRcvr).mPrintf(" %.3f ");
 			printf("\n");
  			printf("Bargain [%i:%i] from %2i's perspective (brgnJIJ) \n", nai, naj, naj);
 			printf("  %2i proposes %2i adopt: ", naj, nai);
-			
-		
 
 			KBase::trans(brgnJIJ->posInit).mPrintf(" %.3f ");
 			printf("  %2i proposes %2i adopt: ", naj, naj);
 			KBase::trans(brgnJIJ->posRcvr).mPrintf(" %.3f ");
 			//Brgn table base entries
-			model->sqlBargainEntries(t, BargainSMP::highestBargainID, i,i,  bestJ, bestEU);
-			BargainSMP::highestBargainID++;
-
+			model->sqlBargainEntries(t, brgnJIJ->getID(), i,i,  bestJ, bestEU);
+			 
 			printf("\n");
 			printf("Power-weighted compromise [%i:%i] bargain (brgnIJ) \n", nai, naj);
 			printf("  compromise proposes %2i adopt: ", nai);
@@ -670,10 +660,10 @@ SMPState* SMPState::doBCN() const {
 			KBase::trans(brgnIJ->posRcvr).mPrintf(" %.3f ");
 			printf("\n");
 
-			model->sqlBargainValue(t, BargainSMP::highestBargainID - 2, 0, brgnIJ->posInit);
-			model->sqlBargainValue(t, BargainSMP::highestBargainID - 2, 1, brgnIJ->posRcvr);
+			model->sqlBargainValue(t, brgnJIJ->getID() - 2, 0, brgnIJ->posInit);
+			model->sqlBargainValue(t, brgnJIJ->getID() - 2, 1, brgnIJ->posRcvr);
 
-			// clean up 
+			// clean up `
 			delete brgnIIJ; brgnIIJ = nullptr;
 			delete brgnJIJ; brgnJIJ = nullptr;
 
@@ -804,6 +794,7 @@ SMPState* SMPState::doBCN() const {
 		// update for bern table for remaining fields
 		model->sqlUodateBargainTable(t,p(0, 0), mMax,   p(maxArrcount - 1, 0), mMax,k);
 		 
+		
 		//populate the Bargain Vote table
 		model->sqlBargainVote(t, k, k, w);
 		 
