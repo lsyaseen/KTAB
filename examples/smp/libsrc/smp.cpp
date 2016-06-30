@@ -1060,6 +1060,7 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
     sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
 */
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 
     delete sqlBuff;
@@ -1337,6 +1338,7 @@ void SMPModel::showVPHistory(bool sqlP) const {
     }
 
     sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     cout << endl;
 
     // show probabilities over time.
@@ -1420,6 +1422,7 @@ void SMPModel::populateSpatialCapabilityTable(bool sqlP) const {
         }
     }
     sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     return;
 }
 //Populates the SpatialSliencetable
@@ -1478,6 +1481,7 @@ void SMPModel::populateSpatialSalienceTable(bool sqlP) const {
         }
     }
     sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     return;
 }
 //Populate the actor description table
@@ -1520,6 +1524,7 @@ void SMPModel::populateActorDescriptionTable(bool sqlP) const {
         }
     }
     sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     return;
 }
 SMPModel * SMPModel::readCSV(string fName, PRNG * rng) {

@@ -495,6 +495,7 @@ void Model::sqlUpdateBargainTable (unsigned int t,   double IntProb, int Init_Se
 	assert(SQLITE_OK == rslt);
 
 	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
 	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 
 	delete sqlBuff;
@@ -549,6 +550,7 @@ void Model::sqlBargainEntries(unsigned int t, int bargainId, int Baragainer, int
 	assert(SQLITE_OK == rslt);
 
 	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
 	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 
 	delete sqlBuff;
@@ -616,6 +618,7 @@ void Model::sqlBargainValue(unsigned int t, int Baragainer, int Dim, KBase::Vctr
 	assert(SQLITE_OK == rslt);
 	
 	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
  
 
 	delete sqlBuff;
@@ -677,7 +680,7 @@ void Model::sqlBargainUtil(unsigned int t, int Bargn_i,  KBase::KMatrix Util_mat
 	}
 
 	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
-
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
 
 	delete sqlBuff;
 	sqlBuff = nullptr;
@@ -721,6 +724,7 @@ void Model::sqlScenarioDesc(const char *ScenName)
 	//rslt = sqlite3_reset(insStmt);
 	//assert(SQLITE_OK == rslt);
  	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
  
 	delete sqlBuff;
 	sqlBuff = nullptr;
@@ -785,7 +789,7 @@ void Model::sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMat
 	}
 
 	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
-
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
 
 	delete sqlBuff;
 	sqlBuff = nullptr;
