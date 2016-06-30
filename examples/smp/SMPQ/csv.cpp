@@ -6,6 +6,7 @@ CSV::CSV()
 }
 void CSV::readCSVFile(QString path)
 {
+    QRegExp space("^\\s*$");
     //getting the csv file path
     QStringList scenarioName;
     if(!path.isEmpty())
@@ -25,6 +26,10 @@ void CSV::readCSVFile(QString path)
 
                 // parse the read line into separate pieces(tokens) with "," as the delimiter
                 QStringList lineToken = fileLine.split(",", QString::SkipEmptyParts);
+                QString lastField = lineToken.at(lineToken.length()-1);
+                if(lastField.contains(space))
+                    lineToken.removeLast();
+
 
                 if(rowindex >= 2 )
                 {
@@ -38,7 +43,7 @@ void CSV::readCSVFile(QString path)
                 }
                 else if(rowindex == 1)
                 {
-                    model->setHorizontalHeaderLabels(lineToken);
+                     model->setHorizontalHeaderLabels(lineToken);
                 }
                 else if(rowindex == 0)
                 {
@@ -46,7 +51,6 @@ void CSV::readCSVFile(QString path)
                     scenarioName.append(lineToken.at(1));
                     lineToken.clear();
                 }
-
                 rowindex++;
             }
 

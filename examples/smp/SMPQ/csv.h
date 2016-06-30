@@ -4,7 +4,7 @@
 #include <QStandardItemModel>
 #include <QFile>
 #include <QTextStream>
-
+#include <QRegExp>
 
 class CSV : public QObject
 {

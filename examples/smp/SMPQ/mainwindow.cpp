@@ -194,15 +194,13 @@ void MainWindow::insertNewColumnCSV()
         {
             if(csv_tableWidget->columnCount()%2==0)
             {
-                QTableWidgetItem * hdr = new QTableWidgetItem("Header");
-                createSeperateColumn(hdr);
+                QTableWidgetItem * sal = new QTableWidgetItem("Saliance");
+                createSeperateColumn(sal);
             }
             else
             {
                 QTableWidgetItem * pos = new QTableWidgetItem("Position");
                 createSeperateColumn(pos);
-                QTableWidgetItem * sal = new QTableWidgetItem("Saliance");
-                createSeperateColumn(sal);
             }
         }
     }
@@ -214,13 +212,12 @@ void MainWindow::insertNewColumnCSV()
             if(modeltoCSV->columnCount()%2==0)
             {
                 modeltoCSV->insertColumns(modeltoCSV->columnCount(),1);
-                modeltoCSV->setHorizontalHeaderItem(modeltoCSV->columnCount()-1,new QStandardItem("Header"));
+                modeltoCSV->setHorizontalHeaderItem(modeltoCSV->columnCount()-1,new QStandardItem("Salience"));
             }
             else
             {
-                modeltoCSV->insertColumns(modeltoCSV->columnCount(),2);
-                modeltoCSV->setHorizontalHeaderItem(modeltoCSV->columnCount()-2,new QStandardItem("Position"));
-                modeltoCSV->setHorizontalHeaderItem(modeltoCSV->columnCount()-1,new QStandardItem("Salience"));
+                modeltoCSV->insertColumns(modeltoCSV->columnCount(),1);
+                modeltoCSV->setHorizontalHeaderItem(modeltoCSV->columnCount()-1,new QStandardItem("Position"));
             }
 
         }
@@ -427,8 +424,6 @@ void MainWindow::setDBItemModel(QSqlTableModel *model)
     csv_tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     stackWidget->setCurrentIndex(0);
-    //    csv_tableView->horizontalHeader()->viewport()->removeEventFilter(this);
-    //    csv_tableView->verticalHeader()->viewport()->removeEventFilter(this);
     disconnect(csv_tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(displayMenu_tableView(QPoint)));
 
     turnSlider->hide();
@@ -1196,12 +1191,22 @@ void MainWindow::displayMenu_tableWidget(QPoint pos)
             QString text = QInputDialog::getText(this, tr("Plesase Enter the Header Name"),
                                                  tr("Header Name"), QLineEdit::Normal,
                                                  csv_tableWidget->horizontalHeaderItem(csv_tableWidget->currentColumn())->text(), &ok);
+
             if (ok && !text.isEmpty())
             {
+                if(csv_tableWidget->currentColumn()%2!=0)
+                {
+                    if(!(text.contains("Position") || text.contains("position")))
+                        text = "Position";
+                }
+                else
+                {
+                    if(!(text.contains("Salience")|| text.contains("salience")))
+                        text = "Salience";
+                }
                 csv_tableWidget->setHorizontalHeaderItem(csv_tableWidget->currentColumn(),new QTableWidgetItem(text));
                 statusBar()->showMessage("Header changed");
             }
-
         }
         else
             statusBar()->showMessage("No Permission !  You cannot Edit Headers of"
@@ -1236,8 +1241,19 @@ void MainWindow::displayMenu_tableView(QPoint pos)
             QString text = QInputDialog::getText(this, tr("Plesase Enter the Header Name"),
                                                  tr("Header Name"), QLineEdit::Normal,
                                                  modeltoCSV->headerData(csv_tableView->currentIndex().column(),Qt::Horizontal).toString(), &ok);
+
             if (ok && !text.isEmpty())
             {
+                if(csv_tableView->currentIndex().column()%2!=0)
+                {
+                    if(!(text.contains("Position") || text.contains("position")))
+                        text = "Position";
+                }
+                else
+                {
+                    if(!(text.contains("Salience")|| text.contains("salience")))
+                        text = "Salience";
+                }
                 modeltoCSV->setHeaderData(csv_tableView->currentIndex().column(),Qt::Horizontal,text);
                 statusBar()->showMessage("Header changed");
             }
