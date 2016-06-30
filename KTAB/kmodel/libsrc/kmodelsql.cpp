@@ -541,7 +541,7 @@ void Model::sqlBargainEntries(unsigned int t, int bargainId, int Baragainer, int
 
 	smpDB = db;
 }
-//void Model::sqlBargainValue(unsigned int t,  int Baragainer, KBase::VctrPstn IntCoord, KBase::VctrPstn recvrCoord)
+ 
 void Model::sqlBargainValue(unsigned int t, int Baragainer, int Dim, KBase::VctrPstn Coord)
 {
 	// initiate the database
