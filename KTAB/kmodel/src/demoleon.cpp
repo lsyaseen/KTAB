@@ -550,11 +550,6 @@ namespace DemoLeon {
     assert(M > 0);
     assert(N > 0);
 
-    auto trns = KMatrix(N, N);
-    auto rev = KMatrix(L, N);
-    auto cons = KMatrix(N, M);
-    auto xprt = KMatrix(N, 1);
-
     // These data are simple enough that they are clearly
     // correct-by-construction, so I do not check them
     // here. Both data and model get checked in makeIOModel.
@@ -562,20 +557,18 @@ namespace DemoLeon {
     // Build a random transaction matrix.
     // Ensure that the value-added in each column is 1/2 to 2/3
     // of the total value in that column.
+    auto trns = KMatrix::uniform(rng, N, N, 100.0, 999.0);
+    auto rev = KMatrix::uniform(rng, L, N, 0.1, 1.0);
     for (unsigned int n = 0; n < N; n++) { // n-th column
       double cSum = 0.0;
       for (unsigned int j = 0; j < N; j++) { // j-th row of transactions
-        double tij = rng->uniform(100, 999);
-        trns(j, n) = tij;
-        cSum = cSum + tij;
+        cSum = cSum + trns(j, n);
       }
-      double rnTrgt = cSum*rng->uniform(1.0, 2.0);
       double rnSum = 0.0;
       for (unsigned int l = 0; l < L; l++) { // el-th row of value-added
-        double rln = rng->uniform(0.1, 1.0);
-        rev(l, n) = rln;
-        rnSum = rnSum + rln;
+        rnSum = rnSum + rev(l, n);
       }
+      double rnTrgt = cSum*rng->uniform(1.0, 2.0);
       for (unsigned int l = 0; l < L; l++) { // el-th row of value-added
         double rln = (rev(l, n) * rnTrgt) / rnSum;
         rev(l, n) = rln;
@@ -637,10 +630,12 @@ namespace DemoLeon {
     rev.mPrintf(" %7.1f ");
     cout << endl;
 
+    auto xprt = KMatrix::uniform(rng, N, 1, 1.0, 100.0);
+    auto cons = KMatrix(N, M);
+
     for (unsigned int i = 0; i < N; i++) {
       double rDef = sumClmT[i] + sumClmR[i] - sumRowT[i];
-      double v = rng->uniform(1, 100);
-      xprt(i, 0) = v;
+      double v = xprt(i, 0);
       double rSum = v;
       for (unsigned int m = 0; m < M; m++) {
         v = rng->uniform(1, 100);
@@ -678,7 +673,7 @@ namespace DemoLeon {
     cout << endl;
     cout << "Build I/O model from base-year data" << endl;
 
-    x0 = xprt; // that was easy.
+    x0 = xprt;
 
     assert(N == trns.numR());
     assert(N == trns.numC());
@@ -707,10 +702,7 @@ namespace DemoLeon {
     // we assume each consumption group is driven by a Cobb-Douglas utility function,
     // which is easily inferred for each column. The budget constraints just add up
     // to the total value added, so we construct a random matrix to do that.
-    double sxc = 0.0;
-    for (unsigned int i = 0; i < N; i++) {
-      sxc = sxc + xprt(i, 0);
-    }
+    double sxc = sum(xprt); 
     auto zeta0 = KMatrix(N, M); // the CD coefficients
     auto sumConsClm = KMatrix(M, 1);
     double sCons = 0.0;
@@ -762,13 +754,7 @@ namespace DemoLeon {
     // = f_i * ( sum_j [ e_ij * R_j ] )
     // so
     // f_i = B_i / ( sum_j [ e_ij * R_j ] )
-    auto eij = KMatrix(M, L);
-    for (unsigned int i = 0; i < M; i++) {
-      for (unsigned int j = 0; j < L; j++) {
-        double e = rng->uniform(10, 100);
-        eij(i, j) = e;
-      }
-    }
+    auto eij = KMatrix::uniform(rng, M, L, 10.0, 100.0);
 
     auto expnd = KMatrix(M, L);
     for (unsigned int i = 0; i < M; i++) {
@@ -803,12 +789,7 @@ namespace DemoLeon {
     double grw = rng->uniform(0.02, 0.05);
     printf("Growth: %.3f \n", grw);
 
-    eps = KMatrix(N, 1);
-    for (unsigned int i = 0; i < N; i++) {
-      double ei = rng->uniform(2.0, 3.0);
-      eps(i, 0) = ei;
-    }
-
+    eps = KMatrix::uniform(rng, N, 1, 2.0, 3.0);
     printf("export elasticities \n");
     eps.mPrintf(" %.2f ");
     cout << endl;
@@ -1079,14 +1060,6 @@ namespace DemoLeon {
       }
       return tm2;
     };
-
-    /*
-      auto makeRN = [this](const KMatrix & tm1) {
-      double lmbd = dot(tm1, x0) / dot(x0, x0);
-      auto tm2 = tm1 - lmbd*x0;
-      return tm2;
-      };
-      */
 
     bool retry = true;
     while (retry) {
