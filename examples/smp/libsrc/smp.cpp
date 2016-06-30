@@ -64,10 +64,7 @@ BargainSMP::BargainSMP(const SMPActor* ai, const SMPActor* ar, const VctrPstn & 
     actRcvr = ar;
     posInit = pi;
     posRcvr = pr;
-	 
-	
-	//// Increment counter when new object is created 
-	//BargainSMP::highestBargainID++;
+    myBargainID = BargainSMP::highestBargainID++;
 
 }
 
@@ -76,10 +73,7 @@ BargainSMP::~BargainSMP() {
     actRcvr = nullptr;
     posInit = VctrPstn(KMatrix(0, 0));
     posRcvr = VctrPstn(KMatrix(0, 0));
-
-
-
-
+    myBargainID = 0;
 }
 
 
