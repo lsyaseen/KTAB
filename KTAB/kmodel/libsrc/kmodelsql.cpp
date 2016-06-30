@@ -255,28 +255,30 @@ string Model::createSQL(unsigned int n) {
     }
     break;
 
-	case 8:  //
-			 // Bargain table
+	case 8: // Bargain table
 		sql = "create table if not exists Bargn ("  \
 			"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
 			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-			"Bargn_i 	INTEGER PRIMARY KEY, "\
+			"Bargn_i INTEGER NOT NULL DEFAULT 0, "\
 			"Brgn_Act_i INTEGER NOT NULL DEFAULT 0, "\
 			"Init_Act_i INTEGER NOT NULL DEFAULT 0, "\
-			"Recd_Act_i 	INTEGER NOT NULL DEFAULT 0, "\
+			"Recd_Act_i INTEGER NOT NULL DEFAULT 0, "\
 			"Value REAL NOT NULL DEFAULT 0.0, "\
-			"Prob	REAL NOT NULL DEFAULT 0.0, "\
-			"Seld	BOOLEAN "");";
+			"Init_Prob REAL NULL DEFAULT 0, "\
+			"Init_Seld	BOOLEAN NULL ,"\
+			"Recd_Prob REAL NULL DEFAULT 0, "\
+			"Recd_Seld	BOOLEAN NULL"\
+			");";
 			break;
 	case 9:  //
 			 // BargnValu table
 		sql = "create table if not exists BargnValu ("  \
 			"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
 			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-			"Bargn_i    INTEGER NOT NULL	DEFAULT '0'	REFERENCES Bargn(Bargn_i) ON DELETE CASCADE	ON UPDATE CASCADE, "\
-			"Brgn_Act_i	INTEGER NOT NULL DEFAULT 0, "\
-			"Dim_k	INTEGER NOT NULL DEFAULT 0, "\
-			"Coord	REAL"\
+			"Bargn_i INTEGER NOT NULL DEFAULT 0, "\
+			"Dim_k INTEGER NOT NULL DEFAULT 0, "\
+			"Init_Coord	REAL NULL DEFAULT 0.0,"\
+			"Recd_Coord	REAL"\
 			");";
 		break;
 		 
@@ -284,8 +286,7 @@ string Model::createSQL(unsigned int n) {
 		sql = "create table if not exists BargnUtil ("  \
 			"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
 			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-			"Bargn_i    INTEGER NOT NULL	DEFAULT '0'	REFERENCES Bargn(Bargn_i) ON DELETE CASCADE	ON UPDATE CASCADE, "\
-			"Brgn_Act_i	INTEGER NOT NULL DEFAULT 0, "\
+			"Bargn_i    INTEGER NOT NULL	DEFAULT 0, "\
 			"Act_i 	INTEGER NOT NULL DEFAULT 0, "\
 			"Util	REAL"\
 			");";
@@ -295,13 +296,19 @@ string Model::createSQL(unsigned int n) {
 		sql = "create table if not exists BargnVote ("  \
 			"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
 			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-			"Bargn_i    INTEGER NOT NULL	DEFAULT '0'	REFERENCES Bargn(Bargn_i) ON DELETE CASCADE	ON UPDATE CASCADE, "\
-			"Brgn_Act_i	INTEGER NOT NULL DEFAULT 0, "\
+			"Bargn_i  INTEGER NOT NULL DEFAULT 0, "\
+			"Bargn_j INTEGER NOT NULL DEFAULT 0, "\
 			"Act_i 	INTEGER NOT NULL DEFAULT 0, "\
 			"Vote	REAL"\
 			");";
 		break;
-
+	case 12:  //ScenarioDesc creation
+		sql = "create table if not exists ScenarioDesc ("  \
+			"Scenario Text(512) NOT NULL DEFAULT 'NoName', "\
+			"Desc text(512) NOT NULL DEFAULT 'No Description', "\
+			"ScenarioId_t INTEGER PRIMARY KEY AUTOINCREMENT	DEFAULT(0)" \
+			");";
+		break;
     default:
         throw(KException("Model::createTableSQL unrecognized table number"));
     }
@@ -427,6 +434,363 @@ void Model::sqlPosEquiv(unsigned int t)
     sqlBuff = nullptr;
     smpDB = db;
     return;
+}
+
+ 
+void Model::sqlUpdateBargainTable (unsigned int t,   double IntProb, int Init_Seld, double Recd_Prob,int Recd_Seld,  int Brgn_Act_i)
+{
+
+
+	// initiate the database
+	sqlite3 * db = smpDB;
+
+	// Error message in case
+	char* zErrMsg = nullptr;
+	auto sqlBuff = newChars(200);
+	// prepare the sql statement to insert
+	sprintf(sqlBuff, "UPDATE Bargn SET Init_Prob = ?1, Init_Seld = ?2, Recd_Prob = ?3, Recd_Seld= ?4 WHERE (Brgn_Act_i = ?5 ) and (?6 = Turn_t)");
+
+	const char* insStr = sqlBuff;
+	sqlite3_stmt *insStmt;
+	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+	// start for the transaction
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+
+	int rslt = 0;
+	
+	//Bargn_i
+	rslt = sqlite3_bind_double(insStmt, 1, IntProb);
+	assert(SQLITE_OK == rslt);
+	//Brgn_Act_i
+	rslt = sqlite3_bind_int(insStmt, 2, Init_Seld);
+	assert(SQLITE_OK == rslt);
+	//Init_Act_i
+	if (Recd_Prob)
+		rslt = sqlite3_bind_double(insStmt, 3, 1);
+	else
+		rslt = sqlite3_bind_double(insStmt, 3, 0);
+
+	assert(SQLITE_OK == rslt);
+
+	//Recd_Seld
+	if (Recd_Seld)
+		rslt = sqlite3_bind_int(insStmt, 4, 1);
+	else
+		rslt = sqlite3_bind_int(insStmt, 4, 0);
+
+	assert(SQLITE_OK == rslt);
+
+	// Bargain actor
+	rslt = sqlite3_bind_int(insStmt, 5, Brgn_Act_i);
+	assert(SQLITE_OK == rslt);
+
+	//turn
+	rslt = sqlite3_bind_int(insStmt, 6, t);
+	assert(SQLITE_OK == rslt);
+	rslt = sqlite3_step(insStmt);
+	assert(SQLITE_DONE == rslt);
+	sqlite3_clear_bindings(insStmt);
+	assert(SQLITE_DONE == rslt);
+	rslt = sqlite3_reset(insStmt);
+	assert(SQLITE_OK == rslt);
+
+	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+
+	delete sqlBuff;
+	sqlBuff = nullptr;
+
+	smpDB = db;
+}
+
+void Model::sqlBargainEntries(unsigned int t, int bargainId, int Baragainer, int initiator, int receiver, double val)
+{
+	// initiate the database
+	sqlite3 * db = smpDB;
+
+	// Error message in case
+	char* zErrMsg = nullptr;
+	auto sqlBuff = newChars(200);
+	// prepare the sql statement to insert
+	sprintf(sqlBuff,
+		"INSERT INTO Bargn (Scenario, Turn_t,Bargn_i, Brgn_Act_i,Init_Act_i, Recd_Act_i,Value) VALUES ('%s',?1, ?2, ?3, ?4,?5,?6)",
+		scenName.c_str());
+
+	const char* insStr = sqlBuff;
+	sqlite3_stmt *insStmt;
+	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+	// start for the transaction
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+
+	int rslt = 0;
+	// Turn_t
+	rslt = sqlite3_bind_int(insStmt, 1, t);
+	assert(SQLITE_OK == rslt);
+	//Bargn_i
+	rslt = sqlite3_bind_int(insStmt, 2, bargainId);
+	assert(SQLITE_OK == rslt);
+	//Brgn_Act_i
+	rslt = sqlite3_bind_int(insStmt, 3, Baragainer);
+	assert(SQLITE_OK == rslt);
+	//Init_Act_i
+	rslt = sqlite3_bind_int(insStmt, 4, initiator);
+	assert(SQLITE_OK == rslt);
+	//Recd_Act_i
+	rslt = sqlite3_bind_int(insStmt, 5, receiver);
+	assert(SQLITE_OK == rslt);
+	//Value
+	rslt = sqlite3_bind_double(insStmt, 6, val);
+	assert(SQLITE_OK == rslt);
+	rslt = sqlite3_step(insStmt);
+	assert(SQLITE_DONE == rslt);
+	sqlite3_clear_bindings(insStmt);
+	assert(SQLITE_DONE == rslt);
+	rslt = sqlite3_reset(insStmt);
+	assert(SQLITE_OK == rslt);
+
+	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+
+	delete sqlBuff;
+	sqlBuff = nullptr;
+
+	smpDB = db;
+}
+ 
+void Model::sqlBargainValue(unsigned int t, int Baragainer, int Dim, KBase::VctrPstn Coord)
+{
+	// initiate the database
+	sqlite3 * db = smpDB;
+
+	// Error message in case
+	char* zErrMsg = nullptr;
+	auto sqlBuff = newChars(200);
+
+	int Util_mat_row = Coord.numR();
+	int Util_mat_col = Coord.numC();
+
+ 
+	// prepare the sql statement to insert
+	sprintf(sqlBuff,
+		"INSERT INTO BargnValu (Scenario, Turn_t,Bargn_i, Dim_k, Init_Coord,Recd_Coord) VALUES ('%s',?1, ?2, ?3, ?4,?5)",
+		scenName.c_str());
+
+	const char* insStr = sqlBuff;
+	sqlite3_stmt *insStmt;
+	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+	// start for the transaction
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+
+
+	 
+	int rslt = 0;
+	// Turn_t
+	rslt = sqlite3_bind_int(insStmt, 1, t);
+	assert(SQLITE_OK == rslt);
+	//Baragainer
+	rslt = sqlite3_bind_int(insStmt, 2, Baragainer);
+	assert(SQLITE_OK == rslt);
+	//Dim_K
+	rslt = sqlite3_bind_int(insStmt, 3, Dim);
+	assert(SQLITE_OK == rslt);
+	 
+	//Init_Coord
+	rslt = sqlite3_bind_double(insStmt, 4, Coord(0, 0));
+	assert(SQLITE_OK == rslt);
+	//Recd_Coord
+	int bk = Coord.numR();
+	if (bk >1 )
+		rslt = sqlite3_bind_double(insStmt, 5, Coord(1, 0));
+	else
+		rslt = sqlite3_bind_double(insStmt, 5, 0.0);
+
+	assert(SQLITE_OK == rslt);
+ 
+
+	assert(SQLITE_OK == rslt);
+	rslt = sqlite3_step(insStmt);
+	assert(SQLITE_DONE == rslt);
+	sqlite3_clear_bindings(insStmt);
+	assert(SQLITE_DONE == rslt);
+	rslt = sqlite3_reset(insStmt);
+	assert(SQLITE_OK == rslt);
+	
+	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+ 
+
+	delete sqlBuff;
+	sqlBuff = nullptr;
+
+	smpDB = db;
+}
+
+void Model::sqlBargainUtil(unsigned int t, int Bargn_i,  KBase::KMatrix Util_mat)
+{
+	// initiate the database
+	sqlite3 * db = smpDB;
+
+	// Error message in case
+	char* zErrMsg = nullptr;
+	auto sqlBuff = newChars(200);
+
+	int Util_mat_row = Util_mat.numR();
+	int Util_mat_col = Util_mat.numC();
+
+ 
+	// prepare the sql statement to insert
+	sprintf(sqlBuff,
+		"INSERT INTO BargnUtil  (Scenario, Turn_t,Bargn_i, Act_i, Util) VALUES ('%s',?1, ?2, ?3, ?4)",
+		scenName.c_str());
+
+	const char* insStr = sqlBuff;
+	sqlite3_stmt *insStmt;
+	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+	// start for the transaction
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+
+	for (unsigned int i = 0; i < Util_mat_col; i++) {
+		for (unsigned int j = 0; j < Util_mat_row; j++)
+		{
+
+			int rslt = 0;
+			// Turn_t
+			rslt = sqlite3_bind_int(insStmt, 1, t);
+			assert(SQLITE_OK == rslt);
+			//Bargn_i
+			rslt = sqlite3_bind_int(insStmt, 2, Bargn_i+i);
+			assert(SQLITE_OK == rslt);
+			//Act_i
+			rslt = sqlite3_bind_int(insStmt, 3, j);
+			assert(SQLITE_OK == rslt);
+			//Util
+			rslt = sqlite3_bind_double(insStmt, 4, Util_mat(j, i));
+			assert(SQLITE_OK == rslt);
+			// finish  
+			assert(SQLITE_OK == rslt);
+			rslt = sqlite3_step(insStmt);
+			assert(SQLITE_DONE == rslt);
+			sqlite3_clear_bindings(insStmt);
+			assert(SQLITE_DONE == rslt);
+			rslt = sqlite3_reset(insStmt);
+			assert(SQLITE_OK == rslt);
+		}
+	}
+
+	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+
+
+	delete sqlBuff;
+	sqlBuff = nullptr;
+
+	smpDB = db;
+}
+ 
+//Work In Progress
+void Model::sqlScenarioDesc(const char *ScenName)
+{
+	// initiate the database
+	sqlite3 * db = smpDB;
+	 
+	// Error message in case
+	char* zErrMsg = nullptr;
+	auto sqlBuff = newChars(200);
+  
+	// prepare the sql statement to insert
+	sprintf(sqlBuff,
+		"INSERT INTO ScenarioDesc  (Scenario, Desc) VALUES ('%s',?1)",
+		scenName.c_str());
+
+	const char* insStr = sqlBuff;
+	sqlite3_stmt *insStmt;
+	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+	// start for the transaction
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+
+	 
+	int rslt = 0;
+	// Turn_t
+	rslt = sqlite3_bind_text(insStmt, 1, ScenName,-1, SQLITE_TRANSIENT);
+	assert(SQLITE_OK == rslt);
+		 
+	// finish  
+	//assert(SQLITE_OK == rslt);
+	//rslt = sqlite3_step(insStmt);
+	//assert(SQLITE_DONE == rslt);
+	//sqlite3_clear_bindings(insStmt);
+	//assert(SQLITE_DONE == rslt);
+	//rslt = sqlite3_reset(insStmt);
+	//assert(SQLITE_OK == rslt);
+ 	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+ 
+	delete sqlBuff;
+	sqlBuff = nullptr;
+
+	smpDB = db;
+}
+void Model::sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMatrix Util_mat)
+{
+	// initiate the database
+	sqlite3 * db = smpDB;
+
+	// Error message in case
+	char* zErrMsg = nullptr;
+	auto sqlBuff = newChars(200);
+
+	int Util_mat_row = Util_mat.numR();
+	int Util_mat_col = Util_mat.numC();
+
+
+	// prepare the sql statement to insert
+	sprintf(sqlBuff,
+		"INSERT INTO BargnVote  ( Turn_t,Bargn_i,  Bargn_j, Act_i, Vote) VALUES (?1, ?2, ?3, ?4,?5)",
+		scenName.c_str());
+
+	const char* insStr = sqlBuff;
+	sqlite3_stmt *insStmt;
+	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+	// start for the transaction
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+
+	for (unsigned int i = 0; i < Util_mat_col; i++) {
+		for (unsigned int j = 0; j < Util_mat_row; j++)
+		{
+
+			int rslt = 0;
+			// Turn_t
+			rslt = sqlite3_bind_int(insStmt, 1, t);
+			assert(SQLITE_OK == rslt);
+			//Bargn_i
+			rslt = sqlite3_bind_int(insStmt, 2, Bargn_i + i);
+			assert(SQLITE_OK == rslt);
+
+			//Bargn_j
+			rslt = sqlite3_bind_int(insStmt, 3, Bargn_i + i);
+			assert(SQLITE_OK == rslt);
+
+			//Act_i
+			rslt = sqlite3_bind_int(insStmt, 4, j);
+			assert(SQLITE_OK == rslt);
+			//Util
+			rslt = sqlite3_bind_double(insStmt, 5, Util_mat(j, i));
+			assert(SQLITE_OK == rslt);
+			// finish  
+			assert(SQLITE_OK == rslt);
+			rslt = sqlite3_step(insStmt);
+			assert(SQLITE_DONE == rslt);
+			sqlite3_clear_bindings(insStmt);
+			assert(SQLITE_DONE == rslt);
+			rslt = sqlite3_reset(insStmt);
+			assert(SQLITE_OK == rslt);
+		}
+	}
+
+	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+
+
+	delete sqlBuff;
+	sqlBuff = nullptr;
+
+	smpDB = db;
 }
 // populates record for table PosProb for each step of
 // module run
@@ -565,6 +929,8 @@ void Model::sqlPosVote(unsigned int t) {
 
     return;
 }
+
+ 
 } // end of namespace
 
 // --------------------------------------------
