@@ -302,7 +302,13 @@ string Model::createSQL(unsigned int n) {
 			"Vote	REAL"\
 			");";
 		break;
-
+	case 12:  //ScenarioDesc creation
+		sql = "create table if not exists ScenarioDesc ("  \
+			"Scenario Text(512) NOT NULL DEFAULT 'NoName', "\
+			"Desc text(512) NOT NULL DEFAULT 'No Description', "\
+			"ScenarioId_t INTEGER PRIMARY KEY AUTOINCREMENT	DEFAULT(0)" \
+			");";
+		break;
     default:
         throw(KException("Model::createTableSQL unrecognized table number"));
     }
@@ -431,7 +437,7 @@ void Model::sqlPosEquiv(unsigned int t)
 }
 
  
-void Model::sqlUodateBargainTable (unsigned int t,   double IntProb, int Init_Seld, double Recd_Prob,int Recd_Seld,  int Brgn_Act_i)
+void Model::sqlUpdateBargainTable (unsigned int t,   double IntProb, int Init_Seld, double Recd_Prob,int Recd_Seld,  int Brgn_Act_i)
 {
 
 
@@ -459,10 +465,19 @@ void Model::sqlUodateBargainTable (unsigned int t,   double IntProb, int Init_Se
 	rslt = sqlite3_bind_int(insStmt, 2, Init_Seld);
 	assert(SQLITE_OK == rslt);
 	//Init_Act_i
-	rslt = sqlite3_bind_double(insStmt, 3, Recd_Prob);
+	if (Recd_Prob)
+		rslt = sqlite3_bind_double(insStmt, 3, 1);
+	else
+		rslt = sqlite3_bind_double(insStmt, 3, 0);
+
 	assert(SQLITE_OK == rslt);
-	//Recd_Act_i
-	rslt = sqlite3_bind_int(insStmt, 4, Recd_Seld);
+
+	//Recd_Seld
+	if (Recd_Seld)
+		rslt = sqlite3_bind_int(insStmt, 4, 1);
+	else
+		rslt = sqlite3_bind_int(insStmt, 4, 0);
+
 	assert(SQLITE_OK == rslt);
 
 	// Bargain actor
@@ -550,6 +565,10 @@ void Model::sqlBargainValue(unsigned int t, int Baragainer, int Dim, KBase::Vctr
 	// Error message in case
 	char* zErrMsg = nullptr;
 	auto sqlBuff = newChars(200);
+
+	int Util_mat_row = Coord.numR();
+	int Util_mat_col = Coord.numC();
+
  
 	// prepare the sql statement to insert
 	sprintf(sqlBuff,
@@ -579,7 +598,12 @@ void Model::sqlBargainValue(unsigned int t, int Baragainer, int Dim, KBase::Vctr
 	rslt = sqlite3_bind_double(insStmt, 4, Coord(0, 0));
 	assert(SQLITE_OK == rslt);
 	//Recd_Coord
-	rslt = sqlite3_bind_double(insStmt, 5, Coord(1, 0));
+	int bk = Coord.numR();
+	if (bk >1 )
+		rslt = sqlite3_bind_double(insStmt, 5, Coord(1, 0));
+	else
+		rslt = sqlite3_bind_double(insStmt, 5, 0.0);
+
 	assert(SQLITE_OK == rslt);
  
 
@@ -660,7 +684,49 @@ void Model::sqlBargainUtil(unsigned int t, int Bargn_i,  KBase::KMatrix Util_mat
 
 	smpDB = db;
 }
+ 
+//Work In Progress
+void Model::sqlScenarioDesc(const char *ScenName)
+{
+	// initiate the database
+	sqlite3 * db = smpDB;
+	 
+	// Error message in case
+	char* zErrMsg = nullptr;
+	auto sqlBuff = newChars(200);
+  
+	// prepare the sql statement to insert
+	sprintf(sqlBuff,
+		"INSERT INTO ScenarioDesc  (Scenario, Desc) VALUES ('%s',?1)",
+		scenName.c_str());
 
+	const char* insStr = sqlBuff;
+	sqlite3_stmt *insStmt;
+	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+	// start for the transaction
+	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+
+	 
+	int rslt = 0;
+	// Turn_t
+	rslt = sqlite3_bind_text(insStmt, 1, ScenName,-1, SQLITE_TRANSIENT);
+	assert(SQLITE_OK == rslt);
+		 
+	// finish  
+	//assert(SQLITE_OK == rslt);
+	//rslt = sqlite3_step(insStmt);
+	//assert(SQLITE_DONE == rslt);
+	//sqlite3_clear_bindings(insStmt);
+	//assert(SQLITE_DONE == rslt);
+	//rslt = sqlite3_reset(insStmt);
+	//assert(SQLITE_OK == rslt);
+ 	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+ 
+	delete sqlBuff;
+	sqlBuff = nullptr;
+
+	smpDB = db;
+}
 void Model::sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMatrix Util_mat)
 {
 	// initiate the database
@@ -676,7 +742,7 @@ void Model::sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMat
 
 	// prepare the sql statement to insert
 	sprintf(sqlBuff,
-		"INSERT INTO BargnVote  (Scenario, Turn_t,Bargn_i,  Bargn_j, Act_i, Vote) VALUES ('%s',?1, ?2, ?3, ?4,?5)",
+		"INSERT INTO BargnVote  ( Turn_t,Bargn_i,  Bargn_j, Act_i, Vote) VALUES (?1, ?2, ?3, ?4,?5)",
 		scenName.c_str());
 
 	const char* insStr = sqlBuff;
@@ -863,6 +929,8 @@ void Model::sqlPosVote(unsigned int t) {
 
     return;
 }
+
+ 
 } // end of namespace
 
 // --------------------------------------------
