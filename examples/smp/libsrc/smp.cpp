@@ -1158,7 +1158,13 @@ SMPModel::~SMPModel() {
 
     if (nullptr != smpDB) {
         cout << "SMPModel::~SMPModel Closing database" << endl << flush;
-        sqlite3_close(smpDB);
+        int close_result = sqlite3_close(smpDB);
+        if (close_result != SQLITE_OK) {
+            cout << "SMPModel::~SMPModel Closing database failed!" << endl << flush;
+        }
+        else {
+            cout << "SMPModel::~SMPModel Closing database succeeded." << endl << flush;
+        }
         smpDB = nullptr;
     }
 
