@@ -366,6 +366,7 @@ void Model::sqlAUtil(unsigned int t) {
         }
     }
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 
     delete sqlBuff;
@@ -421,6 +422,7 @@ void Model::sqlPosEquiv(unsigned int t)
     }
     // end databse transaction
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
     delete sqlBuff;
     sqlBuff = nullptr;
@@ -776,6 +778,7 @@ void Model::sqlPosProb(unsigned int t) {
         }
     }
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 
     delete sqlBuff;
@@ -850,6 +853,7 @@ void Model::sqlPosVote(unsigned int t) {
         }
     }
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 
     delete sqlBuff;
