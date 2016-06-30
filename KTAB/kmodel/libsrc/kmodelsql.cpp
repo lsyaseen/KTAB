@@ -435,7 +435,7 @@ void Model::sqlPosEquiv(unsigned int t)
 }
 
  
-void Model::sqlUodateBargainTable (unsigned int t,   double IntProb, int Init_Seld, double Recd_Prob,int Recd_Seld,  int Brgn_Act_i)
+void Model::sqlUpdateBargainTable (unsigned int t,   double IntProb, int Init_Seld, double Recd_Prob,int Recd_Seld,  int Brgn_Act_i)
 {
 
 
@@ -463,10 +463,19 @@ void Model::sqlUodateBargainTable (unsigned int t,   double IntProb, int Init_Se
 	rslt = sqlite3_bind_int(insStmt, 2, Init_Seld);
 	assert(SQLITE_OK == rslt);
 	//Init_Act_i
-	rslt = sqlite3_bind_double(insStmt, 3, Recd_Prob);
+	if (Recd_Prob)
+		rslt = sqlite3_bind_double(insStmt, 3, 1);
+	else
+		rslt = sqlite3_bind_double(insStmt, 3, 0);
+
 	assert(SQLITE_OK == rslt);
-	//Recd_Act_i
-	rslt = sqlite3_bind_int(insStmt, 4, Recd_Seld);
+
+	//Recd_Seld
+	if (Recd_Seld)
+		rslt = sqlite3_bind_int(insStmt, 4, 1);
+	else
+		rslt = sqlite3_bind_int(insStmt, 4, 0);
+
 	assert(SQLITE_OK == rslt);
 
 	// Bargain actor
@@ -554,6 +563,10 @@ void Model::sqlBargainValue(unsigned int t, int Baragainer, int Dim, KBase::Vctr
 	// Error message in case
 	char* zErrMsg = nullptr;
 	auto sqlBuff = newChars(200);
+
+	int Util_mat_row = Coord.numR();
+	int Util_mat_col = Coord.numC();
+
  
 	// prepare the sql statement to insert
 	sprintf(sqlBuff,
@@ -583,7 +596,12 @@ void Model::sqlBargainValue(unsigned int t, int Baragainer, int Dim, KBase::Vctr
 	rslt = sqlite3_bind_double(insStmt, 4, Coord(0, 0));
 	assert(SQLITE_OK == rslt);
 	//Recd_Coord
-	rslt = sqlite3_bind_double(insStmt, 5, Coord(1, 0));
+	int bk = Coord.numR();
+	if (bk >1 )
+		rslt = sqlite3_bind_double(insStmt, 5, Coord(1, 0));
+	else
+		rslt = sqlite3_bind_double(insStmt, 5, 0.0);
+
 	assert(SQLITE_OK == rslt);
  
 

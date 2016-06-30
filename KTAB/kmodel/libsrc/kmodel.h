@@ -295,7 +295,7 @@ public:
     void sqlPosProb(unsigned int t);
     void sqlPosVote(unsigned int t);
 	void sqlBargainEntries(unsigned int t, int bargainId, int Baragainer, int initiator, int receiver, double val);
-	void sqlUodateBargainTable(unsigned int t, double IntProb, int Init_Seld, double Recd_Prob, int Recd_Seld, int Brgn_Act_i);
+	void sqlUpdateBargainTable(unsigned int t, double IntProb, int Init_Seld, double Recd_Prob, int Recd_Seld, int Brgn_Act_i);
 	void sqlBargainValue(unsigned int t, int Baragainer, int Dim, KBase::VctrPstn Coord);
 	void sqlBargainUtil(unsigned int t, int Bargn_i,  KBase::KMatrix Util_mat);
 	void sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMatrix Util_mat);
