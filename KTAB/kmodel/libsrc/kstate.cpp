@@ -80,7 +80,7 @@ namespace KBase {
     for (unsigned int j1 = 0; j1 < nUnq; j1++) { // scan unique positions
       unsigned int j2 = unq[j1]; // get ordinary index of the position
       if (equivNdx(i, j2)) {
-	k = j1;
+        k = j1;
       }
     }
     assert(k < numA);
@@ -95,27 +95,27 @@ namespace KBase {
   // 0 == initial state, and error if not in the model's history
   unsigned int State::myTurn() const {
     int t = -1; // flag an impossible value
-    assert (nullptr != model);
+    assert(nullptr != model);
     unsigned int hLen = model->history.size();
-    for (unsigned int i=0; i<hLen; i++) { // cannot use range-for, as I need the value of 'i'
+    for (unsigned int i = 0; i < hLen; i++) { // cannot use range-for, as I need the value of 'i'
       State* si = model->history[i];
-      assert (nullptr != si);
+      assert(nullptr != si);
       if (this == si) {
-	t = i;
+        t = i;
       }
     }
-    assert (0 <= t);
+    assert(0 <= t);
     return t;
   }
-    
-  void State::setUENdx()  {
+
+  void State::setUENdx() {
     /// Looking only at the positions in this state, return a vector of indices of unique positions.
-    assert (0 == uIndices.size());
-    assert (0 == eIndices.size());
+    assert(0 == uIndices.size());
+    assert(0 == eIndices.size());
     // Note that we have to lambda-bind 'this'. Otherwise, we'd need a 'static' function
     // to give to uIndices.
     auto efn = [this](unsigned int i, unsigned int j) {
-      return equivNdx(i,j);
+      return equivNdx(i, j);
     };
     const unsigned int na = model->numAct;
     assert(Model::minNumActor <= na);
@@ -124,13 +124,13 @@ namespace KBase {
     auto uePair = KBase::ueIndices<unsigned int>(ns, efn);
 
     uIndices = get<0>(uePair);
-    const unsigned int nu =  uIndices.size();
-    assert (0 < nu);
-    assert (nu <= na);
+    const unsigned int nu = uIndices.size();
+    assert(0 < nu);
+    assert(nu <= na);
 
     eIndices = get<1>(uePair);
     const unsigned int ne = eIndices.size();
-    assert (na == ne);
+    assert(na == ne);
 
     return;
   }
@@ -140,23 +140,23 @@ namespace KBase {
     // we want to make sure that data is calculated at most once.
     // This is necessary because some utilities are very expensive to calculate,
     // it is easiest to be precise all the time.
-  
+
     if (-1 == perspH) { // calculate them all at once
-      assert (0 == aUtil.size()); 
+      assert(0 == aUtil.size());
       setAllAUtil(rl);
     }
     else { // we might get the perspectives of just a few actors
       const unsigned int na = model->numAct;
-      assert (0 <= perspH); // -2 not OK
-      assert (perspH < na); 
+      assert(0 <= perspH); // -2 not OK
+      assert(perspH < na);
       bool firstP = (0 == aUtil.size());
       bool firstForH = ((na == aUtil.size()) && (0 == aUtil[perspH].numR()) && (0 == aUtil[perspH].numC()));
-      assert (firstP || firstForH);
+      assert(firstP || firstForH);
       if (firstP) {
-	aUtil.resize(na);
-	for (unsigned int i=0; i<na; i++) {
-	  aUtil[i] = KMatrix(0,0); 
-	}
+        aUtil.resize(na);
+        for (unsigned int i = 0; i < na; i++) {
+          aUtil[i] = KMatrix(0, 0);
+        }
       }
       setOneAUtil(perspH, rl);
     }
@@ -165,26 +165,12 @@ namespace KBase {
 
   void State::setOneAUtil(unsigned int perspH, ReportingLevel rl) {
     // TODO: make this non-dummy
-    assert (false);
+    assert(false);
     return;
   }
 
-/*
-  // exactly like Actor::vProbLittle, but with optional logging to SQLite
-  double State::vProbLittle(VotingRule vr, double wn, double uni, double unj, 
-				      double contrib_i_ij, double contrib_j_ij, bool logP) const {
-                                   
-			    double pin = Actor::vProbLittle(vr, wn, uni, unj, contrib_i_ij, contrib_j_ij);
-			    if (logP) {
-                                     
-			      // do stuff
-                                     
-			    }
-			    return pin;
-			  }
-			  */
-			  } // end of namespace
+} // end of namespace
 
-  // --------------------------------------------
-  // Copyright KAPSARC. Open source MIT License.
-  // --------------------------------------------
+// --------------------------------------------
+// Copyright KAPSARC. Open source MIT License.
+// --------------------------------------------
