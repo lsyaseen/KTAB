@@ -1793,43 +1793,7 @@ namespace UDemo {
     using std::async;
     using std::future;
     using std::launch;
-    /*
-
-      auto g1 = [rng]() {
-      double s = sqrt(15.0 * 1000.0);
-      unsigned int n = rng->uniform(101, 999);
-      unsigned int maxIter = 5;
-      for (unsigned int k = 1; k <= maxIter; k++) {
-      unsigned int t = rng->uniform(10, s);
-      std::this_thread::sleep_for(std::chrono::milliseconds(t*t));
-      printf("Hello, from thread %03i, iteration %i/%i \n", n, k, maxIter);
-      cout << flush; // so "tail -f" can follow the output
-      }
-      return n;
-      };
-
-
-      // These threads are all launched when pushed onto fs
-      auto fs = vector< future<unsigned int> >();
-      unsigned int nt = 10;
-      cout << "Launching " << nt << " parallel asynchronous threads.";
-      cout << " Note interleaved output." << endl;
-      for (unsigned int k = 0; k < nt; k++) {
-      fs.push_back(async(launch::async, g1)); // no input arguments, lambda-bound 'rng', returns 'n'
-      }
-
-      // the threads are launched asynchronously. If we did nothing,
-      // the rest of the program would start executing while they were still running:
-      // the ".. matrix multiply ..." message would appear in the output from the threads.
-      // This 'get' makes it wait and process each returned 'n' value before procedding
-      // to the matrix multiplication. As desired, some are "gotten" before others complete,
-      // so the"Got ..." messages are interleaved with the last of the 'Hello' messages.
-      //
-      for (unsigned int k = 0; k < nt; k++) {
-      unsigned int n = fs[k].get();
-      cout << "Got " << n << endl;
-      }
-    */
+  
     // With [150,7000]*[7000,150], this flock of threads spends about the first 15% of its time
     // effectively single-threaded, then suddenly switches over to using all four CPUs
     // for the other 85%.

@@ -235,16 +235,6 @@ tuple<MtchGene*, MtchGene*>  MtchGene::cross(const MtchGene * mg2, PRNG * rng) c
     return  tuple<MtchGene*, MtchGene*>(gA, gB);
 }
 
-/*
-void MtchGene::show() const {
-    assert(numItm == match.size());
-    cout << "[MtchGene ";
-    for (auto m : match) {
-        cout << m << " ";
-    }
-    cout << "]";
-}
-*/
 
 bool MtchGene::equiv(const MtchGene * mg2) const {
     assert((numItm == mg2->numItm) && (numCat == mg2->numCat));

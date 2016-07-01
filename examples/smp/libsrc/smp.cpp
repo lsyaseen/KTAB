@@ -359,17 +359,6 @@ KMatrix SMPState::actrCaps() const {
 }
 
 
-/* KMatrix SMPState::actrSals() const {
-  auto w1Fn = [this](unsigned int i, unsigned int j) {
-	  auto aj = ((SMPActor*)(model->actrs[j]));
-	  return aj->vSal;
-
-  };
-
-
-  auto w = KMatrix::map(w1Fn, 1, model->numAct);
-  return w;
- }*/
 void SMPState::setAllAUtil(ReportingLevel rl) {
     // you can change these parameters
     auto vr = VotingRule::Proportional;
@@ -553,13 +542,7 @@ SMPState* SMPState::stepBCN() {
         return;
     };
     gSetup(this);
-    int myT = -1;
-    for (unsigned int t = 0; t < model->history.size(); t++) {
-        if (this == model->history[t]) {
-            myT = t;
-        }
-    }
-    assert(0 <= myT);
+    int myT = myTurn(); 
     model->sqlAUtil(myT);
 
     //Populate PosEquiv table
@@ -1039,27 +1022,9 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
             "INSERT INTO UtilChlg (Scenario, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util_SQ,Util_Vict,Util_Cntst,Util_Chlg) VALUES ('%s',%d,%d,%d,%d,%d,%f,%f,%f,%f)",
             model->getScenarioName().c_str(), t, h, k, i, j, euSQ, euVict, euCntst, euChlg);
     sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
-    
-    /*
-    memset(sqlBuff, '\0', 200);
-    sprintf(sqlBuff,
-            "INSERT INTO UtilContest (Scenario, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util) VALUES ('%s',%d,%d,%d,%d,%d,%f)",
-            model->getScenarioName().c_str(), t, h, k, i, j, euCntst);
-    sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
 
-    memset(sqlBuff, '\0', 200);
-    sprintf(sqlBuff,
-            "INSERT INTO UtilSQ (Scenario, Turn_t, Est_h, Aff_k,Init_i,Rcvr_j, Util) VALUES ('%s',%d,%d,%d,%d,%d,%f)",
-            model->getScenarioName().c_str(), t, h, k, i,j,euSQ);
-    sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
-
-    memset(sqlBuff, '\0', 200);
-    sprintf(sqlBuff,
-            "INSERT INTO UtilVict (Scenario, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util) VALUES ('%s',%d,%d,%d,%d,%d,%f)",
-            model->getScenarioName().c_str(), t, h, k, i, j, uhkij);
-    sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
-*/
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 
     delete sqlBuff;
@@ -1158,7 +1123,13 @@ SMPModel::~SMPModel() {
 
     if (nullptr != smpDB) {
         cout << "SMPModel::~SMPModel Closing database" << endl << flush;
-        sqlite3_close(smpDB);
+        int close_result = sqlite3_close(smpDB);
+        if (close_result != SQLITE_OK) {
+            cout << "SMPModel::~SMPModel Closing database failed!" << endl << flush;
+        }
+        else {
+            cout << "SMPModel::~SMPModel Closing database succeeded." << endl << flush;
+        }
         smpDB = nullptr;
     }
 
@@ -1331,6 +1302,7 @@ void SMPModel::showVPHistory(bool sqlP) const {
     }
 
     sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     cout << endl;
 
     // show probabilities over time.
@@ -1414,6 +1386,7 @@ void SMPModel::populateSpatialCapabilityTable(bool sqlP) const {
         }
     }
     sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     return;
 }
 //Populates the SpatialSliencetable
@@ -1472,6 +1445,7 @@ void SMPModel::populateSpatialSalienceTable(bool sqlP) const {
         }
     }
     sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     return;
 }
 //Populate the actor description table
@@ -1514,6 +1488,7 @@ void SMPModel::populateActorDescriptionTable(bool sqlP) const {
         }
     }
     sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     return;
 }
 SMPModel * SMPModel::readCSV(string fName, PRNG * rng) {

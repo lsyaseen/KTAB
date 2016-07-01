@@ -483,15 +483,6 @@ tuple<double, double> Model::vProb(VPModel vpm, const double s1, const double s2
     }
     double p1 = x1 / (x1 + x2);
     double p2 = x2 / (x1 + x2);
-    /*
-      printf("s1: %+.4f \n", s1);
-      printf("s2: %+.4f \n", s2);
-      printf("x1: %+.4f \n", x1);
-      printf("x2: %+.4f \n", x2);
-      printf("p1: %+.4f \n", p1);
-      printf("p2: %+.4f \n", p2);
-      cout << endl << flush;
-    */
     assert(0 <= p1);
     assert(0 <= p2);
     assert(fabs(p1 + p2 - 1.0) < tol);
