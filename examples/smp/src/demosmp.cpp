@@ -251,6 +251,7 @@ namespace DemoSMP {
     cout << endl;
     cout << "Delete model (actors, states, positions, etc.)" << endl << flush;
 
+    delete md0;
     md0 = nullptr;
 
     return;
