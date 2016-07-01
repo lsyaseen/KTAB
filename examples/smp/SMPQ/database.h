@@ -6,6 +6,7 @@
 #include <QSqlQuery>
 #include <QMessageBox>
 #include <QSqlError>
+#include <QStandardItemModel>
 
 class Database : public QObject
 {
@@ -23,14 +24,14 @@ public slots :
     void getDimensionCount();
     //DB to CSV
     void getActors_DescriptionDB();
-    void getInfluenceDB();
-    void getPositionDB(int dim);
-    void getSalienceDB(int dim);
+    void getInfluenceDB(int turn =0);
+    void getPositionDB(int dim,int turn =0);
+    void getSalienceDB(int dim,int turn =0);
 
 signals:
     void Message(QString , QString );
     void vectorPosition(QVector<double> x, QVector<double> y, QString actor);
-    void dbModel(QSqlTableModel *);
+    void dbModel(QStandardItemModel  *);
     void dbModelEdit(QSqlTableModel *);
     void statesCount(int value);
     void dimensionsCount(int value);
@@ -44,8 +45,9 @@ signals:
 
 private:
     QSqlDatabase db;
-    QSqlTableModel * sqlmodel;
+//    QSqlTableModel * sqlmodel;
     QSqlTableModel * sqlmodelEdit;
+    QStandardItemModel * sqlmodel;
 
     int numActors =0;
     int numStates =0;

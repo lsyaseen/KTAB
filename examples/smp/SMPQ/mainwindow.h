@@ -51,7 +51,7 @@ private slots:
     void setCSVItemModel(QStandardItemModel * model, QStringList scenarioName);
     void csvGetFilePAth(bool bl);
     //Database
-    void setDBItemModel(QSqlTableModel * model);
+    void setDBItemModel(QStandardItemModel *model);
     void setDBItemModelEdit();
     void displayMessage(QString cls, QString message);
     void vectorPositionsFromDB();
@@ -96,9 +96,9 @@ signals:
 
     //save DB to csv
     void getActorsDesc();
-    void getInfluence();
-    void getPosition(int dim);
-    void getSalience(int dim);
+    void getInfluence(int turn);
+    void getPosition(int dim,int turn);
+    void getSalience(int dim,int turn);
 
 private:
     //MainWindow
@@ -110,6 +110,8 @@ private:
     void saveTableViewToCSV();
     void saveTableWidgetToCSV();
     int validateControlButtons(QString viewName);
+
+    void updateDBViewColumns();
 
     // Central Main Frame
     QFrame *central;
@@ -180,6 +182,7 @@ private:
 
     QString  tableType; // CSV, Database, NewCSV
     QStandardItemModel *modeltoCSV;
+    QStandardItemModel *modeltoDB;
 
     QString inputCSV;
     void createSeperateColumn(QTableWidgetItem *hdr);
