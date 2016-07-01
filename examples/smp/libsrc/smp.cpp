@@ -1493,7 +1493,7 @@ void SMPModel::populateActorDescriptionTable(bool sqlP) const {
 }
 SMPModel * SMPModel::readCSV(string fName, PRNG * rng) {
     using KBase::KException;
-    char * errBuff = newChars(100); // as sprintf requires
+    char * errBuff; // as sprintf requires
     csv_parser csv(fName);
     // Get values according to row number and column number.
     // Remember it starts from (1,1) and not (0,0)
