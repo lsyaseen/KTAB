@@ -1220,6 +1220,8 @@ void SMPModel::sankeyOutput(string inputCSV) const {
         fclose(f1);
         f1 = nullptr;
         cout << "done" << endl;
+        delete epName;
+        epName = nullptr;
 
         const char* appendPosLog = "_posLog.csv";
         char* plName = newChars(nameLen + strlen(appendPosLog) + 1);
@@ -1241,6 +1243,8 @@ void SMPModel::sankeyOutput(string inputCSV) const {
         fclose(f2);
         f2 = nullptr;
         cout << "done." << endl;
+        delete plName;
+        plName = nullptr;
     }
     return;
 }
@@ -1304,6 +1308,9 @@ void SMPModel::showVPHistory(bool sqlP) const {
     sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
     sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     cout << endl;
+
+    delete sqlBuff;
+    sqlBuff = nullptr;
 
     // show probabilities over time.
     // Note that we have to set the aUtil matrices for the last one.
@@ -1387,6 +1394,10 @@ void SMPModel::populateSpatialCapabilityTable(bool sqlP) const {
     }
     sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
     sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
+
+    delete sqlBuff;
+    sqlBuff = nullptr;
+
     return;
 }
 //Populates the SpatialSliencetable
@@ -1446,6 +1457,10 @@ void SMPModel::populateSpatialSalienceTable(bool sqlP) const {
     }
     sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
     sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
+
+    delete sqlBuff;
+    sqlBuff = nullptr;
+
     return;
 }
 //Populate the actor description table
@@ -1489,6 +1504,10 @@ void SMPModel::populateActorDescriptionTable(bool sqlP) const {
     }
     sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
     sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
+
+    delete sqlBuff;
+    sqlBuff = nullptr;
+
     return;
 }
 SMPModel * SMPModel::readCSV(string fName, PRNG * rng) {
