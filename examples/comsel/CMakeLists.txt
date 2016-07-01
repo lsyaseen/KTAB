@@ -74,6 +74,34 @@ set (FLUID_DIR
   fluid)
 
 # --------------------------------------------------------
+
+set (CSVPARSER_PATHS
+    ${PROJECT_SOURCE_DIR}/../../csv-parser/
+    )
+
+
+find_path(CSVP_DIR csv_parser.hpp 
+  PATHS ${CSVPARSER_PATHS}
+  )
+
+if(CSVP_DIR)
+  message(STATUS "Found csv-parser headers: ${CSVP_DIR}")
+endif(CSVP_DIR)
+
+if(NOT CSVP_DIR)
+  message(FATAL "Could not fid csv-parser headers")
+endif(NOT CSVP_DIR)
+
+# -------------------------------------------------
+
+if (ENABLE_EFENCE)
+  find_package(efence)
+  if (NOT EFENCE_FOUND)
+    message(FATAL_ERROR "Could not find Electric Fence memory debugger")
+  endif (NOT EFENCE_FOUND)
+endif (ENABLE_EFENCE)
+
+# ------------------------------------------------- 
 # See "Findkutils.cmake" in cmakemodules to figure
 # out where it looks and what variables it sets
 find_package(kutils)
@@ -105,10 +133,6 @@ endif(NOT SMP_FOUND)
 # files to be built into a library go in libsrc/
 # any application or testing code goes in src
 
-set (CSVPARSER_DIR
-  ${PROJECT_SOURCE_DIR}/../../KTAB/kmodel/csvparser/
-  )
-
 include_directories (
   ${KUTILS_INCLUDE_DIR}
   ${KMODEL_INCLUDE_DIR}
@@ -118,7 +142,7 @@ include_directories (
   ${PROJECT_SOURCE_DIR}/src/
   ${FLUID_DIR}
   ${FLTK_INCLUDE_DIR}
-  ${CSVPARSER_DIR}
+  ${CSVP_DIR}
   ${SQLITE_INCLUDE_DIR}
   )
 
@@ -156,7 +180,7 @@ set (CSG_LIBS
 
 add_executable (csg 
   ${CSG_SRCS}
-  ${CSVPARSER_DIR}/csv_parser.cpp
+  ${CSVP_DIR}/csv_parser.cpp
 )
 target_link_libraries(csg
   comsel

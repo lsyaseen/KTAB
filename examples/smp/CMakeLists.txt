@@ -102,10 +102,27 @@ endif (ENABLE_FLTK_GUI)
 # -------------------------------------------------
 # files to be built into a library go in libsrc/
 # any application or testing code goes in src
+# -------------------------------------------------
 
-set (CSVPARSER_DIR
-    ${PROJECT_SOURCE_DIR}/../../KTAB/kmodel/csvparser/
+set (CSVPARSER_PATHS
+    ${PROJECT_SOURCE_DIR}/../../csv-parser/
     )
+
+
+find_path(CSVP_DIR csv_parser.hpp 
+  PATHS ${CSVPARSER_PATHS}
+  )
+
+if(CSVP_DIR)
+  message(STATUS "Found csv-parser headers: ${CSVP_DIR}")
+endif(CSVP_DIR)
+
+if(NOT CSVP_DIR)
+  message(FATAL "Could not fid csv-parser headers")
+endif(NOT CSVP_DIR)
+
+
+# -------------------------------------------------    
 
 include_directories (
     ${KUTILS_INCLUDE_DIR}
@@ -115,7 +132,7 @@ include_directories (
     ${PROJECT_SOURCE_DIR}/src/
     ${FLUID_DIR}
     ${FLTK_INCLUDE_DIR}
-    ${CSVPARSER_DIR}
+    ${CSVP_DIR}
     ${SQLITE_INCLUDE_DIR}
     )
 
@@ -204,7 +221,7 @@ endif (ENABLE_FLTK_GUI)
 
 add_executable (smpc
     src/demosmp.cpp
-    ${CSVPARSER_DIR}/csv_parser.cpp
+    ${CSVP_DIR}/csv_parser.cpp
     )
 
 target_link_libraries (smpc
@@ -282,6 +299,7 @@ endif (ENABLE_QT_GUI)
 message (STATUS "Using PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
 message (STATUS "KUTILS_INCLUDE_DIR: " ${KUTILS_INCLUDE_DIR})
 message (STATUS "KMODEL_INCLUDE_DIR: " ${KMODEL_INCLUDE_DIR})
+message (STATUS "CSVP_DIR: " ${CSVP_DIR})
 
 if (ENABLE_FLTK_GUI)
     message (STATUS "FLTK_INCLUDE_DIR: " ${FLTK_INCLUDE_DIR})
