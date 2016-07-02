@@ -1962,9 +1962,10 @@ int main(int ac, char **av) {
 
   PRNG * rng = new PRNG();
   seed = rng->setSeed(seed); // 0 == get a random number
-  printf("Using PRNG seed:  %020llu \n", seed);
-  printf("Using PRNG seed:  %020I64u \n", seed);
-  printf("Same seed in hex:   0x%016llX \n", seed);
+  //printf("Using PRNG seed:  %020llu \n", seed);
+  //printf("Same seed in hex:   0x%016llX \n", seed);
+  printf("Using PRNG seed:  %020I64u \n", seed);  
+  printf("Same seed in hex:   0x%016I64X \n", seed);
   // Unix correctly prints all digits with lu, lX, llu, and llX.
   // Windows only prints part, with lu, lX, llu, and llX.
 
