@@ -164,16 +164,16 @@ namespace UDemo {
 
     for (int i = 0; i < n; ++i) {
       ts.push_back(std::thread([i, ifn]() {
-        cout << "Hello ";
-        assert(0 < ifn(i, 500000000));
-        cout << "from ";
-        assert(0 < ifn(i, 500000000));
-        cout << "thread ";
-        assert(0 < ifn(i, 500000000));
-        cout << i << endl;
-        assert(0 < ifn(i, 500000000));
-        return;
-      }));
+	    cout << "Hello ";
+	    assert(0 < ifn(i, 500000000));
+	    cout << "from ";
+	    assert(0 < ifn(i, 500000000));
+	    cout << "thread ";
+	    assert(0 < ifn(i, 500000000));
+	    cout << i << endl;
+	    assert(0 < ifn(i, 500000000));
+	    return;
+	  }));
     }
 
     for (auto& t : ts) {
@@ -231,10 +231,10 @@ namespace UDemo {
     vector<thread> ts;
     for (int i = 0; i < n; ++i) {
       ts.push_back(thread([&cc]() {
-        for (int i = 0; i < 100; ++i) {
-          cc.increment();
-        }
-      }));
+	    for (int i = 0; i < 100; ++i) {
+	      cc.increment();
+	    }
+	  }));
     }
 
     for (auto& t : ts) {
@@ -995,9 +995,9 @@ namespace UDemo {
     trans(p0).mPrintf(" %+.4f ");
     cout << endl;
     auto rslt = vhc->run(p0,
-      1000, 10, 1E-10,
-      1.0, 0.618, 1.25, 1e-8,
-      ReportingLevel::Low);
+			 1000, 10, 1E-10,
+			 1.0, 0.618, 1.25, 1e-8,
+			 ReportingLevel::Low);
     double vBest = get<0>(rslt);
     KMatrix pBest = get<1>(rslt);
     unsigned int in = get<2>(rslt);
@@ -1072,9 +1072,9 @@ namespace UDemo {
     cout << "NP 1: " << eFn(d0ij) << endl << flush;
 
     auto rslt = vc->run(d0ij,
-      1000, 20, 1e-16,
-      0.01, 0.618, 1.25, 1e-8, // NP already multiplied by 1000
-      ReportingLevel::Low);
+			1000, 20, 1e-16,
+			0.01, 0.618, 1.25, 1e-8, // NP already multiplied by 1000
+			ReportingLevel::Low);
     double vBest = get<0>(rslt);
     KMatrix pBest = get<1>(rslt);
     unsigned int in = get<2>(rslt);
@@ -1356,9 +1356,9 @@ namespace UDemo {
     sfn("Initial point: ", p0);
 
     auto rslt = vc->run(p0,
-      1000, 20, 1e-16,
-      0.01, 0.618, 1.25, 1e-8, // NP already multiplied by 1000
-      ReportingLevel::Low);
+			1000, 20, 1e-16,
+			0.01, 0.618, 1.25, 1e-8, // NP already multiplied by 1000
+			ReportingLevel::Low);
 
     double vBest = get<0>(rslt);
     KMatrix pBest = get<1>(rslt);  // an [8,1] column-vector
@@ -1412,10 +1412,10 @@ namespace UDemo {
       printf("3:7  %.4f \n", fabs(pBest(3, 0) - pBest(7, 0)));
 
       double mb[] = {
-          (pBest(0, 0) + pBest(4, 0)) / 2,
-          (pBest(1, 0) + pBest(5, 0)) / 2,
-          (pBest(2, 0) + pBest(6, 0)) / 2,
-          (pBest(3, 0) + pBest(7, 0)) / 2
+	(pBest(0, 0) + pBest(4, 0)) / 2,
+	(pBest(1, 0) + pBest(5, 0)) / 2,
+	(pBest(2, 0) + pBest(6, 0)) / 2,
+	(pBest(3, 0) + pBest(7, 0)) / 2
       }; // position
       auto b = KMatrix::arrayInit(mb, 4, 1);
       // now if b = p*ti + (1-p)*tj
@@ -1470,8 +1470,8 @@ namespace UDemo {
       printf("%7.4f  %7.4f  ", joinedRMS(dBS1P2), joinedRMS(dBS2P2));
 
       printf("%7.4f  %7.4f  %7.4f  %7.4f  %7.4f  %7.4f  ",
-        rms(fS1P0 - pBest), rms(fS1P1 - pBest), rms(fS1P2 - pBest),
-        rms(fS2P0 - pBest), rms(fS2P1 - pBest), rms(fS2P2 - pBest));
+	     rms(fS1P0 - pBest), rms(fS1P1 - pBest), rms(fS1P2 - pBest),
+	     rms(fS2P0 - pBest), rms(fS2P1 - pBest), rms(fS2P2 - pBest));
       cout << endl << endl << flush;
 
       printf("Resulting MaxAbs estimation error: \n");
@@ -1631,9 +1631,9 @@ namespace UDemo {
     sfn("Initial point: ", p0);
 
     auto rslt = vc->run(p0,
-      1000, 20, 1e-16,
-      0.01, 0.618, 1.25, 1e-8, // NP already multiplied by 1000
-      ReportingLevel::Low);
+			1000, 20, 1e-16,
+			0.01, 0.618, 1.25, 1e-8, // NP already multiplied by 1000
+			ReportingLevel::Low);
 
     double vBest = get<0>(rslt);
     KMatrix pBest = get<1>(rslt);  // an [8,1] column-vector
@@ -1820,8 +1820,8 @@ namespace UDemo {
       double s = 0.0;
       for (unsigned int j = 0; j < cr; j++) {
         if (0 == (j%m)) { // force interleaving
-            //printf("Thread %3i,%3i sleeping %2i milliseconds \n", i, k, st);
-            //cout << flush;
+	  //printf("Thread %3i,%3i sleeping %2i milliseconds \n", i, k, st);
+	  //cout << flush;
           std::this_thread::sleep_for(std::chrono::milliseconds(st));
         }
         s = s + m1(i, j)*m2(j, k);
@@ -1836,9 +1836,9 @@ namespace UDemo {
     for (unsigned int i = 0; i < r1; i++) {
       for (unsigned int k = 0; k < c2; k++) {
         pfs.push_back(thread([mik, i, k]() {
-          mik(i, k);
-          return;
-        }));
+	      mik(i, k);
+	      return;
+	    }));
         cout << flush; // again, help "tail -f"
       }
     }
@@ -1962,12 +1962,14 @@ int main(int ac, char **av) {
 
   PRNG * rng = new PRNG();
   seed = rng->setSeed(seed); // 0 == get a random number
-  //printf("Using PRNG seed:  %020llu \n", seed);
-  //printf("Same seed in hex:   0x%016llX \n", seed);
-  printf("Using PRNG seed:  %020I64u \n", seed);  
-  printf("Same seed in hex:   0x%016I64X \n", seed);
+  
+  printf("Using PRNG seed:  %020llu \n", seed);
+  printf("Same seed in hex:   0x%016llX \n", seed);
   // Unix correctly prints all digits with lu, lX, llu, and llX.
   // Windows only prints part, with lu, lX, llu, and llX.
+  
+  printf("Using PRNG seed:  %020" PRIu64 "\n", seed);
+  printf("Same seed in hex:   0x%016" PRIX64" \n", seed);
 
 
   //    UDemo::demoCoords(rng);
