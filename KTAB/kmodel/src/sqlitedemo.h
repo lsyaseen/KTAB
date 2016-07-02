@@ -47,7 +47,7 @@ namespace MDemo {
 
   class SQLDB {
   public:
-    SQLDB(char* filename);
+    explicit SQLDB(char* filename);
     virtual ~SQLDB();
     bool open(char* filename);
 

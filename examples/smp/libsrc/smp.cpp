@@ -321,7 +321,7 @@ void SMPModel::setUtilProb(const KMatrix& vR, const KMatrix& vS, const KMatrix& 
     auto vP = KMatrix(na, na);
     for (unsigned int i = 0; i < na; i++) {
         for (unsigned int j = 0; j < i; j++) {
-            double pij = cs(i, j) / (cs(i, j) + cs(j, i));
+            //double pij = cs(i, j) / (cs(i, j) + cs(j, i)); // was never used
             auto ppr = vProb(vpm, cs(i, j), cs(j, i));
             vP(i, j) = get<0>(ppr); // set the lower left  probability: if Linear, cij / (cij + cji)
             vP(j, i) = get<1>(ppr); // set the upper right probability: if Linear, cji / (cij + cji)
@@ -572,9 +572,9 @@ SMPState* SMPState::doBCN() const {
 
 	unsigned int t = myTurn();
 	auto ivb = SMPActor::InterVecBrgn::S2P2;
-	sqlite3_stmt* stmt = NULL;
-	int rowtoupdate = 0;
-	int rc = 0;
+	//sqlite3_stmt* stmt = NULL; // never used 
+	// int rowtoupdate = 0; // never used 
+	//int rc = 0; // never used
 	// For each actor, identify good targets, and propose bargains to them.
 	// (This loop would be an excellent place for high-level parallelism)
 	for (unsigned int i = 0; i < na; i++) {
@@ -662,7 +662,7 @@ SMPState* SMPState::doBCN() const {
 		}
 	}
 
-	PRNG* rng = model->rng;
+	// PRNG* rng = model->rng; // was never used
 
 	cout << endl << "Bargains to be resolved" << endl << flush;
 	showBargains(brgns);
@@ -760,7 +760,7 @@ SMPState* SMPState::doBCN() const {
 		cout << "done" << endl << flush;
 
 		int maxArrcount = p.numR();
-		int rslt = 0;
+		//int rslt = 0; // never used
 		unsigned int mMax = nb; // indexing actors by i, bargains by m
 		switch (stm) {
 		case StateTransMode::DeterminsticSTM:
@@ -1012,14 +1012,14 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
 
     memset(sqlBuff, '\0', 200);
     sprintf(sqlBuff,
-            "INSERT INTO ProbVict (Scenario, Turn_t, Est_h,Init_i,Rcvr_j,Prob) VALUES ('%s',%d,%d,%d,%d,%f)",
+            "INSERT INTO ProbVict (Scenario, Turn_t, Est_h,Init_i,Rcvr_j,Prob) VALUES ('%s',%u,%u,%u,%u,%f)",
             model->getScenarioName().c_str(), t, h, i, j, phij);
     sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
 
     // the following four statements could be combined into one table
     memset(sqlBuff, '\0', 200);
     sprintf(sqlBuff,
-            "INSERT INTO UtilChlg (Scenario, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util_SQ,Util_Vict,Util_Cntst,Util_Chlg) VALUES ('%s',%d,%d,%d,%d,%d,%f,%f,%f,%f)",
+            "INSERT INTO UtilChlg (Scenario, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util_SQ,Util_Vict,Util_Cntst,Util_Chlg) VALUES ('%s',%u,%u,%u,%u,%u,%f,%f,%f,%f)",
             model->getScenarioName().c_str(), t, h, k, i, j, euSQ, euVict, euCntst, euChlg);
     sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
 
@@ -1090,7 +1090,7 @@ tuple< KMatrix, VUI> SMPState::pDist(int persp) const {
 
     assert(0 < uIndices.size()); // should have been set with setUENdx();
     //auto uNdx2 = uniqueNdx(); // get the indices to unique positions
-    printf("Unique positions %i/%i ", uIndices.size(), na);
+    printf("Unique positions %i/%u ", uIndices.size(), na);
     cout << "[ ";
     for (auto i : uIndices) {
         printf(" %i ", i);

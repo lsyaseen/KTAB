@@ -61,7 +61,7 @@ namespace UDemo {
   void demoUIndices() {
     auto showIS = [](KBase::VUI is) {
       for (unsigned int i = 0; i < is.size(); i++) {
-        printf("%2i: %2i \n", i, is[i]);
+        printf("%2u: %2i \n", i, is[i]);
       }
       return;
     };
@@ -1038,10 +1038,18 @@ namespace UDemo {
     double uii = bsu(fabs(ti - ti), ri) + bsu(fabs(ti - ti), ri);
     double uij = bsu(fabs(ti - tj), ri) + bsu(fabs(ti - tj), ri);
     double uci = pi*uii + pj*uij;  // exp. utility of conflict's outcome to i
+    printf("uii:  %.5f \n", uii);
+    printf("uij:  %.5f \n", uij);
+    printf("uci:  %.5f \n", uci);
+    cout << endl << flush;
 
     double uji = bsu(fabs(tj - ti), rj) + bsu(fabs(tj - ti), rj);
     double ujj = bsu(fabs(tj - tj), rj) + bsu(fabs(tj - tj), rj);
     double ucj = pi*uji + pj*ujj;  // exp. utility of conflict's outcome to j
+    printf("uji:  %.5f \n", uji);
+    printf("ujj:  %.5f \n", ujj);
+    printf("ucj:  %.5f \n", ucj);
+    cout << endl << flush;
 
     auto vc = new VHCSearch();
     vc->nghbrs = VHCSearch::vn2;
@@ -1179,10 +1187,18 @@ namespace UDemo {
     double uii = bvu(ti - ti, si, ri) + bvu(ti - ti, si, ri);
     double uij = bvu(ti - tj, si, ri) + bvu(ti - tj, si, ri);
     double uci = pi*uii + pj*uij;
+    printf("uii:  %.5f \n", uii);
+    printf("uij:  %.5f \n", uij);
+    printf("uci:  %.5f \n", uci);
+    cout << endl << flush;
 
     double uji = bvu(tj - ti, sj, rj) + bvu(tj - ti, sj, rj);
     double ujj = bvu(tj - tj, sj, rj) + bvu(tj - tj, sj, rj);
     double ucj = pi*uji + pj*ujj;
+    printf("uji:  %.5f \n", uji);
+    printf("ujj:  %.5f \n", ujj);
+    printf("ucj:  %.5f \n", ucj);
+    cout << endl << flush;
 
     auto efn2 = [ti, uci, si, ri, tj, ucj, sj, rj](KMatrix t2i, KMatrix t2j) {
       double ubi = bvu(ti - t2i, si, ri) + bvu(ti - t2j, si, ri);
@@ -1963,8 +1979,8 @@ int main(int ac, char **av) {
   PRNG * rng = new PRNG();
   seed = rng->setSeed(seed); // 0 == get a random number
   
-  printf("Using PRNG seed:  %020llu \n", seed);
-  printf("Same seed in hex:   0x%016llX \n", seed);
+  //printf("Using PRNG seed:  %020llu \n", seed);
+  //printf("Same seed in hex:   0x%016llX \n", seed);
   // Unix correctly prints all digits with lu, lX, llu, and llX.
   // Windows only prints part, with lu, lX, llu, and llX.
   
