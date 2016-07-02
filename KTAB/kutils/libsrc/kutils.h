@@ -29,6 +29,7 @@
 #ifndef KBASE_UTIL_H
 #define KBASE_UTIL_H
 
+#include <inttypes.h> // especially uint64_t
 #include <assert.h>
 #include <chrono>
 #include <cstdint>
@@ -56,17 +57,17 @@ namespace KBase {
 
   typedef vector<unsigned int> VUI;
   typedef vector<bool> VBool;
-  
+
   void printVUI(const VUI& p);
 
-  enum class ReportingLevel : uint8_t {  Silent = 0, Low, Medium, High, Debugging  }; 
+  enum class ReportingLevel : uint8_t { Silent = 0, Low, Medium, High, Debugging };
 
   const uint64_t dSeed = 0xD67CC16FE69C185C; // arbitrary default PRNG seed value
 
   double sqr(const double& x);  // second power
   double qrtc(const double& x); // fourth power
-  
-  std::chrono::time_point<std::chrono::system_clock>  displayProgramStart(string appName="", string appVersion="");
+
+  std::chrono::time_point<std::chrono::system_clock>  displayProgramStart(string appName = "", string appVersion = "");
   void displayProgramEnd(std::chrono::time_point<std::chrono::system_clock> st);
 
   // return a string of '0' chars
@@ -77,11 +78,11 @@ namespace KBase {
 
   // Pop the front of the vector, returning the popped item.
   template<typename T>
-    T popBack(vector<T> & v) {
+  T popBack(vector<T> & v) {
     // I find it irritating that the 'pop_xxx' operations of C++11 all return void,
     // unlike the "pop" operations taught in CS courses which return the popped element.
     // Note the use of a reference to avoid the problem of modifying only a copy.
-    unsigned int n = v.size();
+    auto n = ((const unsigned int)(v.size()));
     assert(0 < n);
     auto el = v[n - 1];
     v.pop_back();
@@ -91,8 +92,8 @@ namespace KBase {
 
   // Return a pair of VUI: the unique indices and the equivalent indices.
   template <typename T>
-    tuple<VUI, VUI>
-    ueIndices(const vector<T> &xs, function<bool (const T &a, const T &b)> eqv) {
+  tuple<VUI, VUI>
+    ueIndices(const vector<T> &xs, function<bool(const T &a, const T &b)> eqv) {
     // Suppose we have a vector of eleven items:
     // [10, 11, 20, 12, 30,  9, 23, 29, 40, 22, 43]
     // Their indices are (obviously) just integers in order:
@@ -114,10 +115,10 @@ namespace KBase {
     // Clearly, every index in the eIndices list should appear in the uIndices list, and vice versa.
     VUI uns = {}; // unique indices
     VUI ens = {}; // equivalent indices
-    const unsigned int n = xs.size();
-    for (unsigned int i=0; i<n; i++) {
+    auto n = ((const unsigned int)(xs.size()));
+    for (unsigned int i = 0; i < n; i++) {
       bool found = false;
-      for (unsigned int j=0; (!found)&&(j<uns.size()); j++) {
+      for (unsigned int j = 0; (!found) && (j < uns.size()); j++) {
         unsigned int k = uns[j];
         if (eqv(xs[i], xs[k])) {
           found = true;
@@ -125,11 +126,13 @@ namespace KBase {
         }
       }
       if (!found) {
-        uns.push_back(i);
-        ens.push_back(uns.size()-1);
+        uns.push_back(i); // now uns.size is at least 1
+        auto en = ((unsigned int)(uns.size()));
+        assert(1 <= en);
+        ens.push_back(en - 1);
       }
     }
-    return tuple<VUI, VUI> (uns, ens);
+    return tuple<VUI, VUI>(uns, ens);
   }
 
   // the unsigned ints in order from n1 to n2, inclusive.
@@ -139,7 +142,7 @@ namespace KBase {
   public:
     explicit KException(string m);
     virtual ~KException();
-    string msg="";
+    string msg = "";
   };
 
 

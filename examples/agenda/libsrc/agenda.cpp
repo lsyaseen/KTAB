@@ -118,8 +118,9 @@ namespace AgendaControl {
     else {
       auto cLess = chooseSet(n, m - 1);
       for (auto lst : cLess) {
-        unsigned int len = lst.size();
-        unsigned int maxEl = lst[len - 1];
+        auto len = ((const unsigned int)(lst.size()));
+        assert(1 <= len);
+        auto maxEl = ((const unsigned int)(lst[len - 1]));
         for (unsigned int j = maxEl + 1; j < n; j++) {
           VUI ls = lst;
           ls.push_back(j);
@@ -144,14 +145,14 @@ namespace AgendaControl {
     std::set_difference(xs.begin(), xs.end(),
       rslt.begin(), rslt.end(),
       comp.begin()
-      );
+    );
     auto pr = tuple<VUI, VUI>(rslt, comp);
     return pr;
   }
 
 
   vector<Agenda*> Agenda::agendaSet(PartitionRule pr, const VUI xs) {
-    unsigned int n = xs.size();
+    auto n = ((const unsigned int)(xs.size()));
     assert(0 < n);
     auto showA = [](const VUI &as) {
       printf("[");
@@ -194,7 +195,7 @@ namespace AgendaControl {
         // Thus, the complements of the second half are exactly the first half, so by symmetry
         // we discard the second half.
         if (n == (2 * k)) {
-          unsigned int m = leftIndices.size();
+          auto m = ((const unsigned int)(leftIndices.size()));
           assert(m == 2 * (m / 2));
           vector<VUI> shortIndices = {};
           for (unsigned int i = 0; i < (m / 2); i++) {
@@ -233,8 +234,8 @@ namespace AgendaControl {
     if ((2 <= n) && (PartitionRule::SeqPR == pr)) {
       // just a sorted list, of which there are n!,
       // except that the two orders of the last pair are equivalent 
-      auto fn = fact(n); 
-      assert(as.size() == (fn/2));
+      auto fn = fact(n);
+      assert(as.size() == (fn / 2));
     }
     return as;
   }
@@ -293,7 +294,7 @@ namespace AgendaControl {
   }
 
   Agenda* Agenda::makeAgenda(vector<int> xs, PartitionRule pr, PRNG* rng) {
-    const int n = xs.size();
+    auto n = ((const unsigned int)(xs.size()));
     const int minM = minAgendaSize(pr, n);
 
 
@@ -302,7 +303,7 @@ namespace AgendaControl {
       ap = new Terminal(xs[0]);
     }
     else {
-      int m = 0;
+      unsigned int m = 0;
       while ((m < minM) || (n - m < minM)) {
         m = 1 + rng->uniform() % (n - 1);
       }
@@ -334,7 +335,7 @@ namespace AgendaControl {
     double ev = (4.0*valMin + 3.0*valMax) / 7.0;
     //cout << "Eval " << i << " of " << *this << " = " << ev << endl << flush;
     return ev;
-  }; 
+  };
 
   bool Agenda::balancedLR(PartitionRule pr, unsigned int numL, unsigned int numR) {
     const unsigned int n = numL + numR;
@@ -387,7 +388,7 @@ namespace AgendaControl {
     double ev = val(i, item);
     //cout << "Eval " << i << " of " << *this << " = " << ev << endl << flush;
     return ev;
-  }; 
+  };
 
 }; // end of namespace
 

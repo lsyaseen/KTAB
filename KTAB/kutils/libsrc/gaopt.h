@@ -59,14 +59,14 @@ namespace KBase {
     explicit GAOpt(unsigned int s);
     virtual ~GAOpt();
 
-    void init(vector < GAP* > ipop); 
-    void fill(PRNG* rng); 
+    void init(vector < GAP* > ipop);
+    void fill(PRNG* rng);
     void run(PRNG* rng, double c, double m,
       unsigned int maxI, double sTh, unsigned int maxS,
       ReportingLevel srl,
       unsigned int & iter, unsigned int &sIter);
-    tuple<double, GAP* > getNth(unsigned int n); 
-    void show();   
+    tuple<double, GAP* > getNth(unsigned int n);
+    void show();
 
     // lambda functions that must be supplied to define your particular problem
     function <tuple<GAP*, GAP*>(const GAP* g1, const GAP* g2, PRNG* rng)> cross = nullptr;
@@ -84,8 +84,8 @@ namespace KBase {
     // showGene = [](const GAP* g1)                        { g1->show(); return;        };
     // makeGene = [](const GAP* g1, PRNG* rng)             { return (GAP::random(rng)); };
 
-    void sortPop(); 
-    
+    void sortPop();
+
   protected:
     void step();
     void mutatePop();
@@ -207,7 +207,7 @@ namespace KBase {
 
   template<class GAP>
   void GAOpt<GAP>::sortPop() {
-    const unsigned int ps = gpool.size();
+    auto ps = ((const unsigned int)(gpool.size()));
     for (unsigned int i = 0; i < ps; i++) {
       for (unsigned int j = i + 1; j < ps; j++) {
         auto pri = getNth(i);
@@ -226,7 +226,7 @@ namespace KBase {
   template<class GAP>
   void GAOpt<GAP>::dropDups() {
     using KBase::popBack;
-    unsigned int cSize = gpool.size();
+    auto cSize = ((const unsigned int)(gpool.size()));
     VBool unique = {};
     unique.resize(cSize);
     for (unsigned int i = 0; i < cSize; i++) {

@@ -135,76 +135,76 @@ namespace DemoComSel {
     assert(numPos == positions.size());
 
     printf("Num positions: %u \n", numPos);
-    
-    auto ndfn = [] (string ns, unsigned int i){
-      auto ali = KBase::newChars(10+ ns.length());
+
+    auto ndfn = [](string ns, unsigned int i) {
+      auto ali = KBase::newChars(10 + ((unsigned int)(ns.length())));
       std::sprintf(ali, "%s%i", ns.c_str(), i);
       auto s = string(ali);
       delete ali;
       ali = nullptr;
       return s;
     };
-    
+
     // create a model to hold some random actors
     auto csm = new CSModel(nDim, rng, "csm0");
-    
+
     cout << "Configuring actors: randomizing" << endl;
     for (unsigned int i = 0; i < numA; i++) {
-      auto ai = new CSActor(ndfn("csa-",i), ndfn("csaDesc-",i), csm);
-      ai->randomize(rng, nDim); 
+      auto ai = new CSActor(ndfn("csa-", i), ndfn("csaDesc-", i), csm);
+      ai->randomize(rng, nDim);
       csm->addActor(ai);
     }
-    assert (csm->numAct == numA);
+    assert(csm->numAct == numA);
     csm->numItm = numA;
-    assert (csm->numCat == 2);
-    
+    assert(csm->numCat == 2);
+
     if ((9 == numA) && (2 == nDim)) {
-      for (unsigned int i=0; i<3; i++) {
+      for (unsigned int i = 0; i < 3; i++) {
         auto ci = KMatrix::uniform(rng, nDim, 1, 0.1, 0.9);
-        for (unsigned int j=0; j<3; j++) {
+        for (unsigned int j = 0; j < 3; j++) {
           auto ej = KMatrix::uniform(rng, nDim, 1, -0.05, +0.05);
           const KMatrix pij = clip(ci + ej, 0.0, 1.0);
-          unsigned int n = (3*i)+j;
-          auto an = (( CSActor *)(csm->actrs[n]));  
-          an->vPos = VctrPstn(pij); 
+          unsigned int n = (3 * i) + j;
+          auto an = ((CSActor *)(csm->actrs[n]));
+          an->vPos = VctrPstn(pij);
         }
       }
     }
-    
+
     cout << "Scalar positions of actors (fixed) ..." << endl;
     for (auto a : csm->actrs) {
-      auto csa = ((CSActor*) a);
+      auto csa = ((CSActor*)a);
       printf("%s v-position: ", csa->name.c_str());
-      trans(csa->vPos).mPrintf(" %5.2f"); 
+      trans(csa->vPos).mPrintf(" %5.2f");
       printf("%s v-salience: ", a->name.c_str());
-      trans(csa->vSal).mPrintf(" %5.2f"); 
+      trans(csa->vSal).mPrintf(" %5.2f");
       cout << endl;
     }
     cout << endl << flush;
-    
+
     cout << "Getting scalar strength of actors ..." << endl;
     KMatrix aCap = KMatrix(1, csm->numAct);
     for (unsigned int i = 0; i < csm->numAct; i++) {
-      auto ai = ((const CSActor *)(csm->actrs[i]));  
-      aCap(0, i) = ai->sCap; 
+      auto ai = ((const CSActor *)(csm->actrs[i]));
+      aCap(0, i) = ai->sCap;
     }
-    
+
     aCap = (100.0 / sum(aCap)) * aCap;
-    cout << "Scalar strengths: " << endl; 
+    cout << "Scalar strengths: " << endl;
     for (unsigned int i = 0; i < csm->numAct; i++) {
-      auto ai = ((CSActor *)(csm->actrs[i]));  
-      ai->sCap = aCap(0, i); 
+      auto ai = ((CSActor *)(csm->actrs[i]));
+      ai->sCap = aCap(0, i);
       printf("%3i  %6.2f \n", i, ai->sCap);
     }
 
     cout << "Computing utilities of positions ... " << endl;
-    for (unsigned int i=0; i<numA; i++) {
-      double uii = csm->getActorCSPstnUtil(i,i); // (0,0) causes computation of entire table
+    for (unsigned int i = 0; i < numA; i++) {
+      double uii = csm->getActorCSPstnUtil(i, i); // (0,0) causes computation of entire table
     }
-    
+
     // At this point, we have almost a generic enumerated model,
     // so much of the code below should be easily adaptable to EModel.
-   
+
     KMatrix uij = KMatrix(numA, numPos);  // rows are actors, columns are all possible position
     cout << "Complete (normalized) utility matrix of all possible positions (rows) versus actors (columns)" << endl << flush;
     for (unsigned int pj = 0; pj < numPos; pj++) {
@@ -225,7 +225,7 @@ namespace DemoComSel {
     for (unsigned int ai = 0; ai < numA; ai++) {
       unsigned int bestJ = 0;
       double bestV = 0;
-      for (unsigned int pj = 0; pj < numPos; pj++) { 
+      for (unsigned int pj = 0; pj < numPos; pj++) {
         if (bestV < uij(ai, pj)) {
           bestJ = pj;
           bestV = uij(ai, pj);
@@ -279,8 +279,8 @@ namespace DemoComSel {
     VUI bestCS = get<2>(pairs[0]);
 
     bestAP.push_back(bestCS); // last one is the CP
-    
-    
+
+
     auto css0 = new CSState(csm);
     csm->addState(css0);
 

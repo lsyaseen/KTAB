@@ -405,7 +405,7 @@ namespace KBase {
     sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
     for (unsigned int i = 0; i < numAct; i++) {
       // calculate the equivalance
-      int je = numAct + 1;
+      unsigned int je = numAct + 1; // note that numAct is an unsigned int, and always positive
       for (unsigned int j = 0; j < numAct && je > numAct; j++) {
         if (st->equivNdx(i, j)) {
           je = j;
