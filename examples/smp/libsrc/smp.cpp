@@ -1655,8 +1655,8 @@ SMPModel * SMPModel::initModel(vector<string> aName, vector<string> aDesc, vecto
     sm0->addState(st0);
 
 
-    const unsigned int na = aName.size();
-    const unsigned int nd = dName.size();
+    auto na = ((const unsigned int) (aName.size()));
+    auto nd = ((const unsigned int)(dName.size()));
 
 
     for (auto dn : dName) {
