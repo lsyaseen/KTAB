@@ -121,6 +121,8 @@ namespace DemoSMP {
       auto buff = KBase::newChars(100);
       sprintf(buff, "SDim-%02u", i);
       md0->addDim(buff);
+      delete buff;
+      buff = nullptr;
     }
     assert(sDim == md0->numDim);
 
@@ -249,6 +251,7 @@ namespace DemoSMP {
     cout << endl;
     cout << "Delete model (actors, states, positions, etc.)" << endl << flush;
 
+    delete md0;
     md0 = nullptr;
 
     return;

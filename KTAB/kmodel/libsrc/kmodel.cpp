@@ -53,6 +53,8 @@ Model::Model(PRNG * r, string desc) {
         std::strftime(utcBuff, 150, "Scenario-UTC-%Y-%m-%d-%H%M-%S", gmtime(&start_time));
         cout << "Generating default name from UTC start time" << endl << flush;
         scenName = utcBuff;
+        delete utcBuff;
+        utcBuff = nullptr;
     }
     else
     {
