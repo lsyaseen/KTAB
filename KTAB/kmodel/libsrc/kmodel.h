@@ -223,10 +223,10 @@ namespace KBase {
     virtual ~Model();
 
     static const unsigned int minNumActor = 3;
-    static const unsigned int maxNumActor = 250; //quite generous, as we expect 10-30.
+    static const unsigned int maxNumActor = 256; //quite generous, as we expect 10-30.
 
     static const unsigned int maxScenNameLen = 512; // might be auto-generated in sensitivy analysis
-    static const unsigned int maxActNameLen = 25; // quite generous, as we expect 1-5
+    static const unsigned int maxActNameLen = 10; // quite generous, as we expect 1-5
     static const unsigned int maxActDescLen = 256;
 
 

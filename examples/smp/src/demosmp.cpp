@@ -1,4 +1,4 @@
-// --------------------------------------------
+﻿// --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------
 // The MIT License (MIT)
@@ -27,6 +27,8 @@
 
 #include "smp.h"
 #include "demosmp.h"
+#include <functional>
+
 
 
 using KBase::PRNG;
@@ -55,7 +57,32 @@ namespace DemoSMP {
   using SMPLib::SMPState;
 
   // -------------------------------------------------
-
+  // this binds the given parameters and returns the λ-fn necessary to stop the SMP appropriately
+  function<bool(unsigned int, const State *)>
+    smpStopFn(unsigned int minIter, unsigned int maxIter, double minDeltaRatio, double minSigDelta) {
+    auto  sfn = [minIter, maxIter, minDeltaRatio, minSigDelta](unsigned int iter, const State * s) {
+      bool tooLong = (maxIter <= iter);
+      bool longEnough = (minIter <= iter);
+      bool quiet = false;
+      auto sf = [](unsigned int i1, unsigned int i2, double d12) {
+        printf("sDist [%2i,%2i] = %.2E   ", i1, i2, d12);
+        return;
+      };
+      auto s0 = ((const SMPState*)(s->model->history[0]));
+      auto s1 = ((const SMPState*)(s->model->history[1]));
+      auto d01 = SMPModel::stateDist(s0, s1) + minSigDelta;
+      sf(0, 1, d01);
+      auto sx = ((const SMPState*)(s->model->history[iter - 0]));
+      auto sy = ((const SMPState*)(s->model->history[iter - 1]));
+      auto dxy = SMPModel::stateDist(sx, sy);
+      sf(iter - 1, iter - 0, dxy);
+      const double aRatio = dxy / d01;
+      quiet = (aRatio < minDeltaRatio);
+      printf("\nFractional change compared to first step: %.4f  (target=%.4f) \n\n", aRatio, minDeltaRatio);
+      return tooLong || (longEnough && quiet);
+    };
+    return sfn;
+  };
 
   void demoEUSpatial(unsigned int numA, unsigned int sDim, uint64_t s, PRNG* rng) {
     printf("Using PRNG seed: %020llu \n", s);
@@ -64,8 +91,8 @@ namespace DemoSMP {
       double lnMin = log(4);
       double lnMax = log(40);
       // median is 13 = round(12.65), where 12.65 = exp( [log(4)+log(40)] /2 )
-      double na = exp(rng->uniform(lnMin, lnMax)); 
-      numA = ((unsigned int) (na + 0.5)); // i.e. [5,10] inclusive
+      double na = exp(rng->uniform(lnMin, lnMax));
+      numA = ((unsigned int)(na + 0.5)); // i.e. [5,10] inclusive
     }
     if (0 == sDim) {
       sDim = 1 + (rng->uniform() % 3); // i.e. [1,3] inclusive
@@ -80,43 +107,22 @@ namespace DemoSMP {
 
     // note that because all actors use the same scale for capability, utility, etc,
     // their 'votes' are on the same scale and influence can be added up meaningfully
+    const unsigned int minIter = 3;
     const unsigned int maxIter = 500;
-    double qf = 50.0;
+    const double minDeltaRatio = 0.02;
     // suppose that, on a [0,100] scale, the first move was the most extreme possible,
-    // i.e. 100 points. One twentieth of that is just 5, which seems to about the limit
+    // i.e. 100 points. One fiftieth of that is just 2, which seems to about the limit
     // of what people consider significant.
+    const double minSigDelta = 1E-3;
+    // typical first shifts are on the order of numAct/10, so this is low
+    // enough not to affect anything while guarding against the theoretical
+    // possiblity of 0/0 errors
     auto md0 = new SMPModel(rng);
     md0->stop = [maxIter](unsigned int iter, const State * s) {
       return (maxIter <= iter);
     };
-    md0->stop = [maxIter, qf](unsigned int iter, const State * s) {
-      bool tooLong = (maxIter <= iter);
-      bool quiet = false;
-      if (1 < iter) {
-        auto sf = [](unsigned int i1, unsigned int i2, double d12) {
-          printf("sDist [%2i,%2i] = %.2E   ", i1, i2, d12);
-          return;
-        };
-        auto s0 = ((const SMPState*)(s->model->history[0]));
-        auto s1 = ((const SMPState*)(s->model->history[1]));
-        auto d01 = SMPModel::stateDist(s0, s1);
-        sf(0, 1, d01);
-        auto sx = ((const SMPState*)(s->model->history[iter - 0]));
-        auto sy = ((const SMPState*)(s->model->history[iter - 1]));
-        auto dxy = SMPModel::stateDist(sx, sy);
-        sf(iter - 0, iter - 1, dxy);
-        const double aRatio = dxy / d01;
-        const double tRatio = 1.0 / qf;
-        quiet = (aRatio < tRatio);
-        if (quiet)
-          printf("Quiet: %.4f vs. %.4f \n", aRatio, tRatio);
-        else
-          printf("Not quiet %.4f vs %.4f \n", aRatio, tRatio);
-        cout << endl << flush;
-      }
-      return tooLong || quiet;
-    };
-
+    md0->stop = smpStopFn(minIter, maxIter, minDeltaRatio, minSigDelta);
+      
     for (unsigned int i = 0; i < sDim; i++) {
       auto buff = KBase::newChars(100);
       sprintf(buff, "SDim-%02u", i);
@@ -237,8 +243,8 @@ namespace DemoSMP {
     md0->sqlPosProb(nState - 1);
     md0->populateSpatialSalienceTable(true);
 
-	md0->populateActorDescriptionTable(true );
-	
+    md0->populateActorDescriptionTable(true);
+
 
 
     md0->populateSpatialCapabilityTable(true);
@@ -260,43 +266,27 @@ namespace DemoSMP {
   void readEUSpatial(uint64_t seed, string inputCSV, PRNG* rng) {
     auto md0 = SMPModel::readCSV(inputCSV, rng);
 
-    const unsigned int minIter = 3;
-    const unsigned int maxIter = 100;
-    const double qf = 50.0;
+    const unsigned int minIter = 2;
+    const unsigned int maxIter = 100; const double minDeltaRatio = 0.02;
+    // suppose that, on a [0,100] scale, the first move was the most extreme possible,
+    // i.e. 100 points. One fiftieth of that is just 2, which seems to about the limit
+    // of what people consider significant.
+    const double minSigDelta = 1E-4;
+    // typical first shifts are on the order of numAct/10, so this is low
+    // enough not to affect anything while guarding against the theoretical
+    // possiblity of 0/0 errors
     md0->stop = [maxIter](unsigned int iter, const State * s) {
       return (maxIter <= iter);
     };
-    md0->stop = [minIter, maxIter, qf](unsigned int iter, const State * s) {
-      bool tooLong = (maxIter <= iter);
-      bool longEnough = (minIter <= iter);
-      bool quiet = false;
-      auto sf = [](unsigned int i1, unsigned int i2, double d12) {
-        printf("sDist [%2i,%2i] = %.2E   ", i1, i2, d12);
-        return;
-      };
-      auto s0 = ((const SMPState*)(s->model->history[0]));
-      auto s1 = ((const SMPState*)(s->model->history[1]));
-      auto d01 = SMPModel::stateDist(s0, s1);
-      sf(0, 1, d01);
-      auto sx = ((const SMPState*)(s->model->history[iter - 0]));
-      auto sy = ((const SMPState*)(s->model->history[iter - 1]));
-      auto dxy = SMPModel::stateDist(sx, sy);
-      sf(iter - 1, iter - 0, dxy);
-      const double aRatio = dxy / d01;
-      const double tRatio = 1.0 / qf;
-      quiet = (aRatio < tRatio); 
-      printf("\nFractional change compared to first step: %.4f  (target=%.4f) \n\n", aRatio, tRatio);
-      return tooLong || (longEnough && quiet);
-    };
-
-
+    md0->stop = smpStopFn(minIter, maxIter, minDeltaRatio, minSigDelta);
+   
     cout << "Starting model run" << endl << flush;
     md0->run();
 
     cout << "Completed model run" << endl << endl;
     md0->populateSpatialCapabilityTable(true);
     md0->populateSpatialSalienceTable(true);
-	md0->populateActorDescriptionTable(true );
+    md0->populateActorDescriptionTable(true);
 
     cout << "History of actor positions over time" << endl;
     md0->showVPHistory(true);
