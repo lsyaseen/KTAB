@@ -32,6 +32,8 @@
 //
 // -------------------------------------------------
 
+#include <inttypes.h>
+#include <stdio.h>
 #include "demo.h"
 
 using KBase::newChars;
