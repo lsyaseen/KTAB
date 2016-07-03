@@ -20,8 +20,6 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // -------------------------------------------------
-// Declare the functions and classes unique to the Priority case.
-// -------------------------------------------------
 
 #include "database.h"
 
@@ -44,8 +42,6 @@ void Database::openDB(QString dbPath)
 {
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(dbPath);
-    db.setHostName("localhost");
-    db.setUserName("root");
 
     if(!db.open())
     {
@@ -62,7 +58,6 @@ void Database::openDB(QString dbPath)
         // Scenarios list in db
         getScenarioList();
 
-
         readVectorPositionTable(0, scenario_m);//turn
     }
 }
@@ -71,8 +66,6 @@ void Database::openDBEdit(QString dbPath)
 {
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(dbPath);
-    db.setHostName("localhost");
-    db.setUserName("root");
 
     if(!db.open())
     {
@@ -271,7 +264,7 @@ void Database::readVectorPositionTable(int turn, QString scenario)
         ++rowindex;
     }
     // load parsed data to model accordingly
-     emit dbModel(sqlmodel);
+    emit dbModel(sqlmodel);
 
     //To plot graph
     for(int actors=0; actors <= numActors; ++actors)
