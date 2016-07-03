@@ -200,6 +200,15 @@ protected:
 
     // return best j, p[i>j], edu[i->j]
     tuple<int, double, double> bestChallenge(unsigned int i) const;
+    
+    // the actor's ideal, against which they judge others' positions
+    vector<VctrPstn> ideals = {};
+    
+    // The matrix of rates at which they adjust their ideals toward positions
+    KMatrix accomodate = KMatrix();
+    
+    // form new ideal points, based on other's positions and one's old ideal point
+    vector<VctrPstn> newIdeals() const;
 
 };
 
