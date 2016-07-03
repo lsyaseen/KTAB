@@ -53,7 +53,7 @@ endif(WIN32)
 # -------------------------------------------------
 
 if (UNIX)
-  set (ENABLE_EFFCPP true CACHE  BOOL "Check Effective C++ Guidelines")
+  set (ENABLE_EFFCPP false CACHE  BOOL "Check Effective C++ Guidelines")
   set (ENABLE_EFENCE false CACHE  BOOL "Use Electric Fence memory debugger")
 endif(UNIX)
 # -------------------------------------------------

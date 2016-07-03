@@ -28,7 +28,7 @@ set (ENABLE_FLTK_GUI true CACHE  BOOL "Build app with FLTK GUI")
 set (ENABLE_QT_GUI true CACHE  BOOL "Build app with QT GUI")
 
 if (UNIX)
-    set (ENABLE_EFFCPP true CACHE  BOOL "Check Effective C++ Guidelines")
+    set (ENABLE_EFFCPP false CACHE  BOOL "Check Effective C++ Guidelines")
     set (ENABLE_EFENCE false CACHE  BOOL "Use Electric Fence memory debugger")
 endif(UNIX)
 
