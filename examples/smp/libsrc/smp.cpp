@@ -234,6 +234,8 @@ BargainSMP* SMPActor::interpolateBrgn(const SMPActor* ai, const SMPActor* aj,
 
 SMPState::SMPState(Model * m) : State(m) {
     nra = KMatrix();
+    
+    setupAccomodateMatrix(1.0);
 }
 
 
@@ -1065,6 +1067,8 @@ vector<VctrPstn> SMPState::newIdeals() const {
     assert (false);
 
     const unsigned int na = model->numAct;
+    assert (Model::minNumActor <= na);
+    assert (na <= Model::maxNumActor);
     const double tol = 1E-10;
 
     auto m1 = KMatrix(na, 1);
@@ -1109,6 +1113,26 @@ vector<VctrPstn> SMPState::newIdeals() const {
     return nIdeals;
 }
 
+
+void SMPState::setupAccomodateMatrix(double adjRate) {
+    const unsigned int na = model->numAct;
+    assert (Model::minNumActor <= na);
+    assert (na <= Model::maxNumActor);
+  
+    // a man's gotta know his limits
+    // (with apologies to HC)
+    assert (0.0 <= adjRate);
+    assert (adjRate <= 1.0); 
+    
+    printf("WARNING: setting SMPState::accomodate to %.3f * identity matrix \n", adjRate);
+    
+    // A standard Identity matrix is helpful here because it 
+    // should keep the behavior same as the original "cynical" model:
+    //      ideal_{i,t} := pstn_{i,t}
+    accomodate = adjRate * KBase::iMat(na);
+    
+    return;
+}
 
 tuple< KMatrix, VUI> SMPState::pDist(int persp) const {
     /// Calculate the probability distribution over states from this perspective

@@ -209,6 +209,9 @@ protected:
     
     // form new ideal points, based on other's positions and one's old ideal point
     vector<VctrPstn> newIdeals() const;
+    
+    // for now,set it to a scaled identity matrix.
+    void setupAccomodateMatrix(double adjRate);
 
 };
 
