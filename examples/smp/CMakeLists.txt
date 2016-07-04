@@ -22,7 +22,7 @@ set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
 set (ENABLE_FLTK_GUI true CACHE  BOOL "Build app with FLTK GUI")
-set (ENABLE_QT_GUI false CACHE  BOOL "Build app with QT GUI")
+set (ENABLE_QT_GUI true CACHE  BOOL "Build app with QT GUI")
 
 if (UNIX)
     set (ENABLE_EFFCPP true CACHE  BOOL "Check Effective C++ Guidelines")
