@@ -8,8 +8,8 @@
 
 project(comsel)
 
-cmake_minimum_required (VERSION 2.8)
-cmake_policy(SET CMP0017 NEW) # prefer built-in modules
+cmake_minimum_required (VERSION 3.0)
+cmake_policy(VERSION 3.0)
 
 set (LOCAL_MODULE_DIR
   ${PROJECT_SOURCE_DIR}/../../KTAB/cmakemodules)
@@ -26,7 +26,7 @@ set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
 if (UNIX)
-  set (ENABLE_EFFCPP true CACHE  BOOL "Check Effective C++ Guidelines")
+  set (ENABLE_EFFCPP false CACHE  BOOL "Check Effective C++ Guidelines")
   set (ENABLE_EFENCE false CACHE  BOOL "Use Electric Fence memory debugger")
 endif(UNIX)
 

@@ -1,3 +1,26 @@
+// --------------------------------------------
+// Copyright KAPSARC. Open source MIT License.
+// --------------------------------------------
+// The MIT License (MIT)
+//
+// Copyright (c) 2015 King Abdullah Petroleum Studies and Research Center
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+// and associated documentation files (the "Software"), to deal in the Software without
+// restriction, including without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom
+// the Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or
+// substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// -------------------------------------------------
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -31,7 +54,7 @@ MainWindow::MainWindow()
     //To open database by passing the path
     connect(this,SIGNAL(dbEditFilePath(QString)),dbObj,SLOT(openDBEdit(QString)));
     //To get Database item Model to show on GUI
-    connect(dbObj,SIGNAL(dbModel(QSqlTableModel*)),this,SLOT(setDBItemModel(QSqlTableModel*)));
+    connect(dbObj,SIGNAL(dbModel(QStandardItemModel*)),this,SLOT(setDBItemModel(QStandardItemModel*)));
     //To get Database item Model to show on Edit
     //    connect(dbObj,&Database::dbModelEdit,this,&MainWindow::setDBItemModelEdit);
     //To display any message to user
@@ -57,11 +80,11 @@ MainWindow::MainWindow()
     //DB to CSV
     connect(this, SIGNAL(getActorsDesc()),dbObj,SLOT(getActors_DescriptionDB()));
     connect(dbObj,SIGNAL(actorsNameDesc(QList <QString> ,QList <QString>)),this,SLOT(actorsName_Description(QList  <QString> ,QList  <QString>)));
-    connect(this, SIGNAL(getInfluence()),dbObj,SLOT(getInfluenceDB()));
+    connect(this, SIGNAL(getInfluence(int)),dbObj,SLOT(getInfluenceDB(int)));
     connect(dbObj,SIGNAL(actorsInflu(QList<QString>)),this,SLOT(actors_Influence(QList  <QString>)));
-    connect(this, SIGNAL(getPosition(int)),dbObj,SLOT(getPositionDB(int)));
+    connect(this, SIGNAL(getPosition(int,int)),dbObj,SLOT(getPositionDB(int,int)));
     connect(dbObj,SIGNAL(actors_Pos(QList<QString>,int)),this,SLOT(actors_Position(QList<QString>,int)));
-    connect(this, SIGNAL(getSalience(int)),dbObj,SLOT(getSalienceDB(int)));
+    connect(this, SIGNAL(getSalience(int,int)),dbObj,SLOT(getSalienceDB(int,int)));
     connect(dbObj,SIGNAL(actors_Sal(QList<QString>,int)),this,SLOT(actors_Salience(QList<QString>,int)));
 
     //editable headers of TableWidget and TableView
@@ -81,11 +104,13 @@ void MainWindow::csvGetFilePAth(bool bl)
     QString csvPath;
     csvPath = QFileDialog::getOpenFileName(this,tr("Open CSV File"), QDir::homePath() , tr("CSV File (*.csv)"));
 
-    modeltoCSV->clear();
 
     //emit path to csv class for processing
     if(!csvPath.isEmpty())
+    {
+        modeltoCSV->clear();
         emit csvFilePath(csvPath);
+    }
     statusBar()->showMessage(tr(" "));
 
 }
@@ -99,7 +124,15 @@ void MainWindow::dbGetFilePAth(bool bl)
 
     //emit path to db class for processing
     if(!dbPath.isEmpty())
+    {
+        disconnect(scenarioComboBox,SIGNAL(currentIndexChanged(QString)),this,SLOT(scenarioComboBoxValue(QString)));
+        scenarioComboBox->clear();
+        connect(scenarioComboBox,SIGNAL(currentIndexChanged(QString)),this,SLOT(scenarioComboBoxValue(QString)));
+
+        modeltoDB->clear();
         emit dbFilePath(dbPath);
+
+    }
     statusBar()->showMessage(tr(" "));
 
 }
@@ -114,12 +147,12 @@ void MainWindow::dbEditGetFilePAth(bool bl)
     else
     {
         emit getActorsDesc();
-        emit getInfluence();
+        emit getInfluence(0);
 
         for(int i = 0 ; i < dimensionsLineEdit->text().toInt();++i)
         {
-            emit getSalience(i);
-            emit getPosition(i);
+            emit getSalience(i,0);
+            emit getPosition(i,0);
         }
         setDBItemModelEdit();
     }
@@ -130,14 +163,14 @@ void MainWindow::updateStateCount_SliderRange(int states)
     turnSlider->setRange(0,states);
 }
 
-void MainWindow::updateScenarioList_ComboBox(QStringList *scenarios)
+void MainWindow::updateScenarioList_ComboBox(QStringList * scenarios)
 {
-    turnSlider->setValue(0);
-    scenarioComboBox->clear();
-
     for(int index=0;index<scenarios->length();++index)
         scenarioComboBox->addItem(scenarios->at(index));
 
+    scenario_box = scenarioComboBox->currentText();
+    qDebug() <<scenario_box;
+    turnSlider->setValue(0);
     //    sliderStateValueToQryDB(0);//when new database is opened, start from zero
 }
 
@@ -148,11 +181,23 @@ void MainWindow::updateDimensionCount(int dim)
 
 void MainWindow::sliderStateValueToQryDB(int value)
 {
+
+    scenario_box = scenarioComboBox->currentText();
     removeAllGraphs();
     emit getScenarioRunValues(value,scenario_box);
 
-    // to update current scenario value for editing database to csv reference
+    //csv- DB
+    emit getInfluence(value);
+    for(int i = 0 ; i < dimensionsLineEdit->text().toInt();++i)
+    {
+        emit getSalience(i,value);
+        emit getPosition(i,value);
+    }
+
+    updateDBViewColumns();
+
     emit getScenarioRunValuesEdit(scenario_box);
+    // to update current scenario value for editing database to csv reference
 }
 
 void MainWindow::scenarioComboBoxValue(QString scenario)
@@ -194,15 +239,13 @@ void MainWindow::insertNewColumnCSV()
         {
             if(csv_tableWidget->columnCount()%2==0)
             {
-                QTableWidgetItem * hdr = new QTableWidgetItem("Header");
-                createSeperateColumn(hdr);
+                QTableWidgetItem * sal = new QTableWidgetItem("Saliance");
+                createSeperateColumn(sal);
             }
             else
             {
                 QTableWidgetItem * pos = new QTableWidgetItem("Position");
                 createSeperateColumn(pos);
-                QTableWidgetItem * sal = new QTableWidgetItem("Saliance");
-                createSeperateColumn(sal);
             }
         }
     }
@@ -214,13 +257,12 @@ void MainWindow::insertNewColumnCSV()
             if(modeltoCSV->columnCount()%2==0)
             {
                 modeltoCSV->insertColumns(modeltoCSV->columnCount(),1);
-                modeltoCSV->setHorizontalHeaderItem(modeltoCSV->columnCount()-1,new QStandardItem("Header"));
+                modeltoCSV->setHorizontalHeaderItem(modeltoCSV->columnCount()-1,new QStandardItem("Salience"));
             }
             else
             {
-                modeltoCSV->insertColumns(modeltoCSV->columnCount(),2);
-                modeltoCSV->setHorizontalHeaderItem(modeltoCSV->columnCount()-2,new QStandardItem("Position"));
-                modeltoCSV->setHorizontalHeaderItem(modeltoCSV->columnCount()-1,new QStandardItem("Salience"));
+                modeltoCSV->insertColumns(modeltoCSV->columnCount(),1);
+                modeltoCSV->setHorizontalHeaderItem(modeltoCSV->columnCount()-1,new QStandardItem("Position"));
             }
 
         }
@@ -419,7 +461,7 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
 
 }
 
-void MainWindow::setDBItemModel(QSqlTableModel *model)
+void MainWindow::setDBItemModel(QStandardItemModel *model)
 {
     tableType="Database";
 
@@ -427,8 +469,6 @@ void MainWindow::setDBItemModel(QSqlTableModel *model)
     csv_tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     stackWidget->setCurrentIndex(0);
-    //    csv_tableView->horizontalHeader()->viewport()->removeEventFilter(this);
-    //    csv_tableView->verticalHeader()->viewport()->removeEventFilter(this);
     disconnect(csv_tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(displayMenu_tableView(QPoint)));
 
     turnSlider->hide();
@@ -444,13 +484,10 @@ void MainWindow::setDBItemModel(QSqlTableModel *model)
     dimensionsPushButton->setEnabled(false);
     donePushButton->setEnabled(false);
 
-    csv_tableView->setModel(model);
-    csv_tableView->showMaximized();
-    //    csv_tableView->setAlternatingRowColors(true);
-    //    csv_tableView->resizeRowsToContents();
+    modeltoDB = model;
 
-    //    for (int c = 0; c < csv_tableView->horizontalHeader()->count(); ++c)
-    //        csv_tableView->horizontalHeader()->setSectionResizeMode(c, QHeaderView::Stretch);
+    csv_tableView->setModel(modeltoDB);
+    csv_tableView->showMaximized();
 
     csv_tableView->resizeColumnsToContents();
     csv_tableView->hideColumn(0);
@@ -462,6 +499,36 @@ void MainWindow::setDBItemModel(QSqlTableModel *model)
 
     actorsLineEdit->setText(QString::number(model->rowCount()));
     dimensionsLineEdit->setText(QString::number(dimensions+1));
+
+    // csv-db
+    for(int col = 2 ; col < (5+(dimensionsLineEdit->text().toInt())*2); ++col)
+        modeltoDB->insertColumn(col);
+
+    //Headers Label
+    modeltoDB->setHeaderData(1,Qt::Horizontal,("Turn"));
+    modeltoDB->setHeaderData(2,Qt::Horizontal,("Actor"));
+    modeltoDB->setHeaderData(3,Qt::Horizontal,("Description"));
+    modeltoDB->setHeaderData(4,Qt::Horizontal,("Influence"));
+
+    int k=0;
+    for(int i=5 ; i <modeltoDB->columnCount(); i=i+2)
+    {
+        modeltoDB->setHeaderData(i,Qt::Horizontal ,("Position "+QString::number(k)));
+        modeltoDB->setHeaderData(i+1,Qt::Horizontal,("Salience "+QString::number(k)));
+        ++k;
+    }
+    //to create csv like view
+    emit getActorsDesc();
+
+
+    emit getInfluence(turnSlider->value());
+    for(int i = 0 ; i < dimensionsLineEdit->text().toInt();++i)
+    {
+        emit getSalience(i,turnSlider->value());
+        emit getPosition(i,turnSlider->value());
+    }
+
+    updateDBViewColumns();
 }
 
 void MainWindow::createNewCSV(bool bl)
@@ -602,6 +669,7 @@ void MainWindow::initializeCentralViewFrame()
     setCentralWidget(central);
 
     modeltoCSV = new QStandardItemModel;
+    modeltoDB = new QStandardItemModel;
 
     csv_tableView = new QTableView(central); // CSV and DB
     csv_tableView->setShowGrid(true);
@@ -993,6 +1061,35 @@ int MainWindow::validateControlButtons(QString viewName)
     return ret;
 }
 
+void MainWindow::updateDBViewColumns()
+{
+    //Updating values
+    for(int row=0 ; row < actorsName.length(); ++row)
+    {
+        int col=2;
+
+        modeltoDB->setItem(row,col,new QStandardItem(actorsName.at(row)));
+        modeltoDB->setItem(row,++col,new QStandardItem(actorsDescription.at(row)));
+        modeltoDB->setItem(row,++col,new QStandardItem(actorsInfluence.at(row)));
+
+        if(dimensionsLineEdit->text().toInt()>=1)
+        {
+            modeltoDB->setItem(row,++col,new QStandardItem(actorsPosition[0].at(row)));
+            modeltoDB->setItem(row,++col,new QStandardItem(actorsSalience[0].at(row)));
+        }
+        if(dimensionsLineEdit->text().toInt()>=2)
+        {
+            modeltoDB->setItem(row,++col,new QStandardItem(actorsPosition[1].at(row)));
+            modeltoDB->setItem(row,++col,new QStandardItem(actorsSalience[1].at(row)));
+        }
+        if(dimensionsLineEdit->text().toInt()==3)
+        {
+            modeltoDB->setItem(row,++col,new QStandardItem(actorsPosition[2].at(row)));
+            modeltoDB->setItem(row,++col,new QStandardItem(actorsSalience[2].at(row)));
+        }
+    }
+}
+
 void MainWindow::initializeGraphPlot1()
 {
     customGraph->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes |
@@ -1196,12 +1293,22 @@ void MainWindow::displayMenu_tableWidget(QPoint pos)
             QString text = QInputDialog::getText(this, tr("Plesase Enter the Header Name"),
                                                  tr("Header Name"), QLineEdit::Normal,
                                                  csv_tableWidget->horizontalHeaderItem(csv_tableWidget->currentColumn())->text(), &ok);
+
             if (ok && !text.isEmpty())
             {
+                if(csv_tableWidget->currentColumn()%2!=0)
+                {
+                    if(!(text.contains("Position") || text.contains("position")))
+                        text = "Position";
+                }
+                else
+                {
+                    if(!(text.contains("Salience")|| text.contains("salience")))
+                        text = "Salience";
+                }
                 csv_tableWidget->setHorizontalHeaderItem(csv_tableWidget->currentColumn(),new QTableWidgetItem(text));
                 statusBar()->showMessage("Header changed");
             }
-
         }
         else
             statusBar()->showMessage("No Permission !  You cannot Edit Headers of"
@@ -1236,8 +1343,19 @@ void MainWindow::displayMenu_tableView(QPoint pos)
             QString text = QInputDialog::getText(this, tr("Plesase Enter the Header Name"),
                                                  tr("Header Name"), QLineEdit::Normal,
                                                  modeltoCSV->headerData(csv_tableView->currentIndex().column(),Qt::Horizontal).toString(), &ok);
+
             if (ok && !text.isEmpty())
             {
+                if(csv_tableView->currentIndex().column()%2!=0)
+                {
+                    if(!(text.contains("Position") || text.contains("position")))
+                        text = "Position";
+                }
+                else
+                {
+                    if(!(text.contains("Salience")|| text.contains("salience")))
+                        text = "Salience";
+                }
                 modeltoCSV->setHeaderData(csv_tableView->currentIndex().column(),Qt::Horizontal,text);
                 statusBar()->showMessage("Header changed");
             }
@@ -1259,9 +1377,8 @@ void MainWindow::actorsName_Description(QList <QString> actorName,QList <QString
 
 void MainWindow::actors_Influence(QList<QString> actorInfluence)
 {
-    actorsInfluence.clear();
     actorsInfluence=actorInfluence;
-    //    qDebug()<<actorsInfluence.at(1) <<actorsInfluence.count();
+    qDebug()<<actorsInfluence.count() <<"actorsInfluence";
 }
 
 void MainWindow::actors_Position(QList<QString> actorPosition, int dim)
@@ -1531,3 +1648,6 @@ void MainWindow::graphClicked(QCPAbstractPlottable *plottable)
     //statusBar->showMessage(QString("Clicked on graph '%1'.").arg(plottable->name()), 1000);
 }
 
+// --------------------------------------------
+// Copyright KAPSARC. Open source MIT License.
+// --------------------------------------------

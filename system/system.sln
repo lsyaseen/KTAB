@@ -107,6 +107,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "comsel", "..\examples\comse
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tui", "..\KTAB\kgraph\build\tui.vcxproj", "{87E89EC8-E591-459F-94C8-FC342AC5861D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "smpq", "..\examples\smp\build\smpq.vcxproj", "{3745374D-E52A-4455-B3F4-253C7819246A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -582,6 +584,29 @@ Global
 		{87E89EC8-E591-459F-94C8-FC342AC5861D}.RelWithDebInfo|Win32.Build.0 = Debug|x64
 		{87E89EC8-E591-459F-94C8-FC342AC5861D}.RelWithDebInfo|x64.ActiveCfg = Debug|x64
 		{87E89EC8-E591-459F-94C8-FC342AC5861D}.RelWithDebInfo|x64.Build.0 = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.Debug|Win32.ActiveCfg = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.Debug|x64.ActiveCfg = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.Debug|x64.Build.0 = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.MinSizeRel|Mixed Platforms.ActiveCfg = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.MinSizeRel|Mixed Platforms.Build.0 = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.MinSizeRel|Win32.ActiveCfg = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.MinSizeRel|Win32.Build.0 = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.MinSizeRel|x64.ActiveCfg = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.MinSizeRel|x64.Build.0 = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.Release|Mixed Platforms.ActiveCfg = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.Release|Mixed Platforms.Build.0 = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.Release|Win32.ActiveCfg = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.Release|Win32.Build.0 = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.Release|x64.ActiveCfg = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.Release|x64.Build.0 = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.RelWithDebInfo|Mixed Platforms.ActiveCfg = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.RelWithDebInfo|Mixed Platforms.Build.0 = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.RelWithDebInfo|Win32.ActiveCfg = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.RelWithDebInfo|Win32.Build.0 = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.RelWithDebInfo|x64.ActiveCfg = Debug|x64
+		{3745374D-E52A-4455-B3F4-253C7819246A}.RelWithDebInfo|x64.Build.0 = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
