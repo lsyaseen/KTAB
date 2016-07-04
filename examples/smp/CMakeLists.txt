@@ -22,7 +22,7 @@ set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
 set (ENABLE_FLTK_GUI true CACHE  BOOL "Build app with FLTK GUI")
-set (ENABLE_QT_GUI true CACHE  BOOL "Build app with QT GUI")
+set (ENABLE_QT_GUI false CACHE  BOOL "Build app with QT GUI")
 
 if (UNIX)
     set (ENABLE_EFFCPP true CACHE  BOOL "Check Effective C++ Guidelines")
@@ -48,8 +48,6 @@ endif (NOT SQLITE_FOUND)
 # See this page for useful hints: https://cmake.org/Wiki/CMakeForFLTK
 
 set (SMP_XLIBS  )
-
-
 
 # --------------------------------------------------------
 # See "Findkutils.cmake" in cmakemodules to figure
@@ -108,17 +106,16 @@ set (CSVPARSER_PATHS
     ${PROJECT_SOURCE_DIR}/../../csv-parser/
     )
 
-
 find_path(CSVP_DIR csv_parser.hpp 
-  PATHS ${CSVPARSER_PATHS}
-  )
+    PATHS ${CSVPARSER_PATHS}
+    )
 
 if(CSVP_DIR)
-  message(STATUS "Found csv-parser headers: ${CSVP_DIR}")
+    message(STATUS "Found csv-parser headers: ${CSVP_DIR}")
 endif(CSVP_DIR)
 
 if(NOT CSVP_DIR)
-  message(FATAL "Could not fid csv-parser headers")
+    message(FATAL "Could not find csv-parser headers")
 endif(NOT CSVP_DIR)
 
 
@@ -143,8 +140,6 @@ set(SMPLIB_SRCS
     )
 
 add_library(smp STATIC ${SMPLIB_SRCS})
-
-
 
 # -------------------------------------------------
 # Under Linux, default start of DESTINATION path is /usr/local/ 
@@ -240,6 +235,23 @@ target_link_libraries (smpc
 
 if(ENABLE_QT_GUI)
 
+    set (QCUSTOMPLOT_PATHS
+        ${PROJECT_SOURCE_DIR}/../../qcustomplot/
+        )
+
+    find_path(QCUSTOMPLOT_DIR qcustomplot.h
+        PATHS ${QCUSTOMPLOT_PATHS}
+        )
+
+    if(QCUSTOMPLOT_DIR)
+        message(STATUS "Found qcustomplot headers: ${QCUSTOMPLOT_DIR}")
+    endif(QCUSTOMPLOT_DIR)
+
+    if(NOT QCUSTOMPLOT_DIR)
+        message(FATAL "Could not find qcustomplot headers")
+    endif(NOT QCUSTOMPLOT_DIR)
+
+
     #specifing path to find libraries
     if(WIN32)
         set(CMAKE_PREFIX_PATH "C:\\Qt\\Qt5.6.0\\5.6\\mingw49_32\\lib\\cmake")
@@ -254,12 +266,14 @@ if(ENABLE_QT_GUI)
     set (QtProjectLib_src ../../examples/smp/SMPQ/mainwindow.cpp
         ../../examples/smp/SMPQ/csv.cpp
         ../../examples/smp/SMPQ/database.cpp
-        ../../examples/smp/SMPQ/qcustomplot.cpp
+        ${QCUSTOMPLOT_DIR}/qcustomplot.cpp
         ../../examples/smp/SMPQ/customgraph.cpp)
+
     set (QtProjectLib_hdr ../../examples/smp/SMPQ/mainwindow.h
         ../../examples/smp/SMPQ/csv.h
         ../../examples/smp/SMPQ/database.h
-        ../../examples/smp/SMPQ/qcustomplot.h)
+        ${QCUSTOMPLOT_DIR}/qcustomplot.h)
+
     set (QtProjectLib_ui  ../../examples/smp/SMPQ/mainwindow.ui)
     set (QtProjectBin_src ../../examples/smp/SMPQ/main.cpp)
     set (QtProjectRsc_qrc ../../examples/smp/SMPQ/dockwidgets.qrc)
@@ -300,11 +314,14 @@ message (STATUS "Using PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
 message (STATUS "KUTILS_INCLUDE_DIR: " ${KUTILS_INCLUDE_DIR})
 message (STATUS "KMODEL_INCLUDE_DIR: " ${KMODEL_INCLUDE_DIR})
 message (STATUS "CSVP_DIR: " ${CSVP_DIR})
+message (STATUS "QCUSTOMPLOT_DIR: " ${QCUSTOMPLOT_DIR})
 
 if (ENABLE_FLTK_GUI)
     message (STATUS "FLTK_INCLUDE_DIR: " ${FLTK_INCLUDE_DIR})
     message (STATUS "KGRAPH_INCLUDE_DIR: " ${KGRAPH_INCLUDE_DIR})
 endif (ENABLE_FLTK_GUI)
+
+
 
 # -------------------------------------------------
 # As of early 2014, C++11 is still not the default
