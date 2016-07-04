@@ -356,7 +356,7 @@ namespace RfrmPri {
             nc++;
             cEl = cEl->NextSiblingElement("category");
           }
-          printf("Found %i categories \n", nc);
+          printf("Found %u categories \n", nc);
           numCat = nc;
         }
         catch (...) {
@@ -382,7 +382,7 @@ namespace RfrmPri {
             ni++;
             iEl = iEl->NextSiblingElement("Item");
           }
-          printf("Found %i items \n", ni);
+          printf("Found %u items \n", ni);
           assert(ni == nc); // for this problem, number of items and categories are equal
           numItm = ni;
         }
@@ -440,7 +440,7 @@ namespace RfrmPri {
             na++;
             aEl = aEl->NextSiblingElement("Actor");
           }
-          printf("Found %i actors \n", na);
+          printf("Found %u actors \n", na);
           assert(minNumActor <= na);
           assert(na <= maxNumActor);
         }

@@ -104,7 +104,7 @@ namespace RfrmPri {
 
     cout << "Complete (normalized) utility matrix of all possible positions (rows) versus actors (columns)" << endl << flush;
     for (unsigned int pj = 0; pj < numPos; pj++) {
-      printf("%3i  ", pj);
+      printf("%3u  ", pj);
       auto pstn = positions[pj];
       printVUI(pstn);
       printf("  ");
@@ -320,7 +320,7 @@ int main(int ac, char **av) {
 
   unsigned int numA = rpm->numAct; // the actors are as yet unnamed
   unsigned int numR = rpm->numItm;
-  unsigned int numC = rpm->numCat;
+  //unsigned int numC = rpm->numCat;
 
   auto rps0 = new RPState(rpm);
   rpm->addState(rps0);

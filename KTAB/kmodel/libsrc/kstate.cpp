@@ -75,7 +75,7 @@ namespace KBase {
   }
   double State::posProb(unsigned int i, const VUI & unq, const KMatrix & pdt) const {
     const unsigned int numA = model->numAct;
-    const unsigned int nUnq = unq.size();
+    auto nUnq = ((const unsigned int)(unq.size()));
     unsigned int k = numA + 1; // impossibly high
     for (unsigned int j1 = 0; j1 < nUnq; j1++) { // scan unique positions
       unsigned int j2 = unq[j1]; // get ordinary index of the position
@@ -96,7 +96,7 @@ namespace KBase {
   unsigned int State::myTurn() const {
     int t = -1; // flag an impossible value
     assert(nullptr != model);
-    unsigned int hLen = model->history.size();
+    auto hLen = ((const unsigned int)(model->history.size()));
     for (unsigned int i = 0; i < hLen; i++) { // cannot use range-for, as I need the value of 'i'
       State* si = model->history[i];
       assert(nullptr != si);
@@ -124,12 +124,12 @@ namespace KBase {
     auto uePair = KBase::ueIndices<unsigned int>(ns, efn);
 
     uIndices = get<0>(uePair);
-    const unsigned int nu = uIndices.size();
+    auto nu = ((const unsigned int)(uIndices.size()));
     assert(0 < nu);
     assert(nu <= na);
 
     eIndices = get<1>(uePair);
-    const unsigned int ne = eIndices.size();
+    auto ne = ((const unsigned int)(eIndices.size()));
     assert(na == ne);
 
     return;

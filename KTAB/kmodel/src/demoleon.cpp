@@ -247,6 +247,7 @@ namespace DemoLeon {
     assert(numA == eMod->actrs.size());
     auto vpm = VPModel::Linear;
     const unsigned int numP = pstns.size();
+    assert(0 < numP);
     auto euMat = [rl, numA, numP, vpm, this](const KMatrix & uMat) {
 
       // again, I could do a complex vote, but I'll do the easy one.

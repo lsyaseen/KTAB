@@ -47,7 +47,7 @@ namespace ComSelLib {
   using KBase::PCEModel;
 
   using KBase::Model;
-  
+
   using SMPLib::SMPModel;
 
   // --------------------------------------------
@@ -64,7 +64,7 @@ namespace ComSelLib {
 
 
   unsigned int vbToInt(const VUI & vb) {
-    const unsigned int n = vb.size();
+    auto n = ((const unsigned int)(vb.size()));
     unsigned int x = 0;
     for (unsigned int i = 0; i < n; i++) {
       x = 2 * x;
@@ -93,12 +93,12 @@ namespace ComSelLib {
       delete actorSpPstnUtil;
       actorSpPstnUtil = nullptr;
     }
-    
+
   }
-  
+
 
   bool CSModel::equivStates(const CSState * rs1, const CSState * rs2) {
-    const unsigned int numA = rs1->pstns.size();
+    auto numA = ((const unsigned int)(rs1->pstns.size()));
     assert(numA == rs2->pstns.size());
     bool rslt = true;
     for (unsigned int i = 0; i < numA; i++) {
@@ -110,41 +110,41 @@ namespace ComSelLib {
     }
     return rslt;
   }
-  
-  
+
+
   double CSModel::getActorCSPstnUtil(unsigned int ai, unsigned int pj) {
     if (nullptr == actorCSPstnUtil) {
       setActorSpPstnUtil();
       setActorCSPstnUtil();
     }
-    assert (ai < actorCSPstnUtil->numR());
-    assert (pj < actorCSPstnUtil->numC());
+    assert(ai < actorCSPstnUtil->numR());
+    assert(pj < actorCSPstnUtil->numC());
     double uij = (*actorCSPstnUtil)(ai, pj);
     return uij;
   }
-   
+
   void CSModel::setActorSpPstnUtil() {
-    assert (actorSpPstnUtil == nullptr);
+    assert(actorSpPstnUtil == nullptr);
     const unsigned int na = numAct;
     actorSpPstnUtil = new KMatrix(na, na);
-    auto setuij = [this] (unsigned int i, unsigned int j) {
-      double uij = oneSpPstnUtil(i,j);
-      (*actorSpPstnUtil)(i,j) = uij;
+    auto setuij = [this](unsigned int i, unsigned int j) {
+      double uij = oneSpPstnUtil(i, j);
+      (*actorSpPstnUtil)(i, j) = uij;
       return;
     };
-    KMatrix::mapV(setuij, na, na); 
-  
-    cout << "Actor spatial position utility matrix: "<<endl;
+    KMatrix::mapV(setuij, na, na);
+
+    cout << "Actor spatial position utility matrix: " << endl;
     actorSpPstnUtil->mPrintf(" %5.3f");
     cout << endl << flush;
-  
+
     return;
   }
-  
+
   double CSModel::oneSpPstnUtil(unsigned int ai, unsigned int pj) const {
     const double bigR = 0.5; // moderatly risk-averse in spatial positions
-    auto csai = ((const CSActor*) (actrs[ai]));
-    auto csaj = ((const CSActor*) (actrs[pj]));
+    auto csai = ((const CSActor*)(actrs[ai]));
+    auto csaj = ((const CSActor*)(actrs[pj]));
     const KMatrix spi = csai->vPos;
     const KMatrix spj = csaj->vPos;
     KMatrix vDiff = spi - spj;
@@ -152,71 +152,71 @@ namespace ComSelLib {
     const double u = SMPModel::bvUtil(vDiff, vSal, bigR);
     return u;
   }
-    
-    // return the clm-vector of actors' expected utility for this particular committee
-  KMatrix CSModel::oneCSPstnUtil(const VUI& vb) const { 
-      assert (actorSpPstnUtil != nullptr); // prerequisite data must be provided
-      
-      // TODO: change this to handle only unique positions
-      assert (actorSpPstnUtil->numR() == numAct);
-      assert (actorSpPstnUtil->numC() == numAct);
-      
-      assert (numAct == vb.size()); // must be correct size
-      
-      assert (1.0 < nonCommDivisor); // noncommittee members must have reduced strength, with same sign
-      
-      // vote_k(i:j), using the effective strengths for this committee
-      auto vkij =[this, vb] (unsigned int k, unsigned i, unsigned int j) {
-        auto ak = (CSActor*)(actrs[k]);
-        double sk = ak->sCap;
-        switch (vb[k]) {
-          case 0: // not on committee, reduce strength
-            sk = sk / nonCommDivisor;
-            break;
-          case 1: // on committee, use full strength
-            break;
-          default:
-            cout << "CSModel::oneCSPstnUtil - unrecognized match value: "<<vb[k] << endl << flush;
-            assert(false); // no way to recover from this programming error
-            break;
-        }
-        auto v = Model::vote(ak->vr, sk, (*actorSpPstnUtil)(k,i),  (*actorSpPstnUtil)(k,j));
-        return v;
-      };     
-        
-      const KMatrix c = Model::coalitions(vkij, numAct, numAct); // coalitions for/against
-      const KMatrix pv = Model::vProb(vpm, c); // prob of victory, square
-      const KMatrix p = Model::probCE(pcem, pv); // prob of outcomes, column
-      const KMatrix eu = (*actorSpPstnUtil) * p; // column of expected utilities to each actor
-      return eu;
-    }
-  
+
+  // return the clm-vector of actors' expected utility for this particular committee
+  KMatrix CSModel::oneCSPstnUtil(const VUI& vb) const {
+    assert(actorSpPstnUtil != nullptr); // prerequisite data must be provided
+
+    // TODO: change this to handle only unique positions
+    assert(actorSpPstnUtil->numR() == numAct);
+    assert(actorSpPstnUtil->numC() == numAct);
+
+    assert(numAct == vb.size()); // must be correct size
+
+    assert(1.0 < nonCommDivisor); // noncommittee members must have reduced strength, with same sign
+
+    // vote_k(i:j), using the effective strengths for this committee
+    auto vkij = [this, vb](unsigned int k, unsigned i, unsigned int j) {
+      auto ak = (CSActor*)(actrs[k]);
+      double sk = ak->sCap;
+      switch (vb[k]) {
+      case 0: // not on committee, reduce strength
+        sk = sk / nonCommDivisor;
+        break;
+      case 1: // on committee, use full strength
+        break;
+      default:
+        cout << "CSModel::oneCSPstnUtil - unrecognized match value: " << vb[k] << endl << flush;
+        assert(false); // no way to recover from this programming error
+        break;
+      }
+      auto v = Model::vote(ak->vr, sk, (*actorSpPstnUtil)(k, i), (*actorSpPstnUtil)(k, j));
+      return v;
+    };
+
+    const KMatrix c = Model::coalitions(vkij, numAct, numAct); // coalitions for/against
+    const KMatrix pv = Model::vProb(vpm, c); // prob of victory, square
+    const KMatrix p = Model::probCE(pcem, pv); // prob of outcomes, column
+    const KMatrix eu = (*actorSpPstnUtil) * p; // column of expected utilities to each actor
+    return eu;
+  }
+
   void CSModel::setActorCSPstnUtil() {
-    assert (actorSpPstnUtil != nullptr); // prerequisite data must be provided
-    assert (actorCSPstnUtil == nullptr);
-    assert (nullptr != rng); 
-    unsigned int numPos = exp2(numAct);  
+    assert(actorSpPstnUtil != nullptr); // prerequisite data must be provided
+    assert(actorCSPstnUtil == nullptr);
+    assert(nullptr != rng);
+    auto numPos = ((unsigned int)(0.5 + exp2(numAct)));
     auto rawUij = KMatrix(numAct, numPos);
-    for (unsigned int j = 0; j<numPos; j++) {
+    for (unsigned int j = 0; j < numPos; j++) {
       const VUI vbj = intToVB(j, numAct);
       const KMatrix euj = oneCSPstnUtil(vbj);
-      assert (numAct == euj.numR());
-      assert (1 == euj.numC());
-      for (unsigned int i=0; i<numAct; i++) {
-        rawUij(i,j) = euj(i,0);
+      assert(numAct == euj.numR());
+      assert(1 == euj.numC());
+      for (unsigned int i = 0; i < numAct; i++) {
+        rawUij(i, j) = euj(i, 0);
       }
     }
     auto uij = KBase::rescaleRows(rawUij, 0.0, 1.0); // von Neumann utility scale
     actorCSPstnUtil = new KMatrix(uij);
     return;
   }
-  
+
   // --------------------------------------------
   CSState::CSState(CSModel * m) : State(m) {
     // nothing yet
   }
 
-  
+
   CSState::~CSState() {
     // nothing yet
   }
@@ -233,7 +233,7 @@ namespace ComSelLib {
     auto pu = pDist(-1);
     KMatrix p = get<0>(pu);
     auto uNdx = get<1>(pu);
-    printf("There are %i unique positions \n", uNdx.size());
+    printf("There are %zu unique positions \n", uNdx.size());
     for (unsigned int i1 = 0; i1 < uNdx.size(); i1++) {
       unsigned int i2 = uNdx[i1];
       printf("  %2u:  %.4f \n", i2, p(i1, 0));
@@ -256,7 +256,7 @@ namespace ComSelLib {
     assert(0 < uIndices.size()); // should have been set with setUENdx();
     //auto uNdx2 = uniqueNdx(); // get the indices to unique positions
 
-    const unsigned int numU = uIndices.size();
+    auto numU = ((const unsigned int)(uIndices.size()));
     assert(numU <= numP); // might have dropped some duplicates
 
     cout << "Number of aUtils: " << aUtil.size() << endl << flush;
@@ -290,10 +290,10 @@ namespace ComSelLib {
 
     return tuple <KMatrix, VUI>(p, uIndices);
   }
-   
+
   // Given the utility matrix, uMat, calculate the expected utility to each actor,
   // as a column-vector. Again, this is from the perspective of whoever developed uMat.
-  KMatrix CSState::expUtilMat (KBase::ReportingLevel rl, unsigned int numA, unsigned int numP, const KMatrix & uMat) const {
+  KMatrix CSState::expUtilMat(KBase::ReportingLevel rl, unsigned int numA, unsigned int numP, const KMatrix & uMat) const {
     // BTW, be sure to lambda-bind uMat *after* it is modified.
     assert(uMat.numR() == numA); // must include all actors
     assert(uMat.numC() <= numP); // might have dropped some duplicates
@@ -303,8 +303,8 @@ namespace ComSelLib {
       const double tol = 1E-10;
       const double mij = m(i, j);
       if ((mij + tol < 0.0) || (1.0 + tol < mij)) {
-	printf("%f  %i  %i  \n", mij, i, j);
-	cout << flush;
+        printf("%f  %i  %i  \n", mij, i, j);
+        cout << flush;
       }
       assert(0.0 <= mij + tol);
       assert(mij <= 1.0 + tol);
@@ -359,7 +359,7 @@ namespace ComSelLib {
     }
 
     return eu;
-  }; 
+  };
 
 
   CSState* CSState::stepSUSN() {
@@ -380,25 +380,25 @@ namespace ComSelLib {
   }
 
 
-  CSState * CSState::doSUSN(ReportingLevel rl) const { 
+  CSState * CSState::doSUSN(ReportingLevel rl) const {
     // cout << "CSState::doSUSN not yet implemented" << endl; // TODO: finish this
     // assert(false);
 
     const unsigned int numA = model->numAct;
     assert(numA == model->actrs.size());
 
-    const unsigned int numU = uIndices.size();
+    auto numU = ((const unsigned int)(uIndices.size()));
     assert((0 < numU) && (numU <= numA));
     assert(numA == eIndices.size());
 
     const KMatrix u = aUtil[0]; // all have same beliefs in this demo
 
-    const unsigned int numP = pstns.size();
+    auto numP = ((const unsigned int)(pstns.size()));
 
 
     // Given the utility matrix, uMat, calculate the expected utility to each actor,
     // as a column-vector. Again, this is from the perspective of whoever developed uMat.
-    auto euMat = [rl, numA, numP, this](const KMatrix & uMat) { return expUtilMat(rl, numA, numP, uMat);};
+    auto euMat = [rl, numA, numP, this](const KMatrix & uMat) { return expUtilMat(rl, numA, numP, uMat); };
     auto euState = euMat(u);
     cout << "Actor expected utilities: ";
     KBase::trans(euState).mPrintf("%6.4f, ");
@@ -507,7 +507,7 @@ namespace ComSelLib {
 
         auto ns = KBase::uiSeq(0, model->numAct - 1);
         const VUI uNdx = get<0>(KBase::ueIndices<unsigned int>(ns, equivHNdx));
-        const unsigned int numU = uNdx.size();
+        auto numU = ((const unsigned int)(uNdx.size()));
         auto hypUtil = KMatrix(model->numAct, numU);
         // we need now to go through 'uh', copying column J the first time
         // the J-th position is determined to be equivalent to something in the unique list
@@ -541,14 +541,14 @@ namespace ComSelLib {
         // the hypothetical drops duplicates but the actual (computed elsewhere) does not.
         // FIX: fix  the 'elsewhere'
         const double euh = eu(h, 0);
-        assert(0 < euh); 
+        assert(0 < euh);
         return euh;
       }; // end of efn
 
 
 
       // return vector of neighboring committees
-      auto nfn = [](const MtchPstn & mp0) { auto csVec = mp0.neighbors(2); return csVec;}; 
+      auto nfn = [](const MtchPstn & mp0) { auto csVec = mp0.neighbors(2); return csVec; };
 
       // show some representation of this position on cout
       auto sfn = [](const MtchPstn & mp0) { printVUI(mp0.match); return; };
@@ -559,9 +559,9 @@ namespace ComSelLib {
       ghc->show = sfn;
 
       auto rslt = ghc->run(*ph, // start from h's current positions
-			   ReportingLevel::Silent,
-			   100, // iter max
-			   3, 0.001); // stable-max, stable-tol
+        ReportingLevel::Silent,
+        100, // iter max
+        3, 0.001); // stable-max, stable-tol
 
       if (ReportingLevel::Low < rl) {
         printf("---------------------------------------- \n");
@@ -608,15 +608,15 @@ namespace ComSelLib {
     }; // end of newPosFn
 
     const bool par = true; // parallel, asynch searches for new positions?
-    
+
     auto ts = vector<std::thread>();
     // Each actor, h, finds the position which maximizes their EU in this situation.
     for (unsigned int h = 0; h < numA; h++) {
       if (par) { // launch all, concurrent
         ts.push_back(std::thread([newPosFn, h]() {
-	      newPosFn(h);
-	      return;
-	    }));
+          newPosFn(h);
+          return;
+        }));
       }
       else { // do each, sequential
         newPosFn(h);
@@ -661,29 +661,29 @@ namespace ComSelLib {
   }
 
   void CSState::setAllAUtil(ReportingLevel rl) {
-    auto csm = (( CSModel*) model);
+    auto csm = ((CSModel*)model);
     const unsigned int na = csm->numAct;
-    assert (Model::minNumActor <= na);
-    assert (na <= Model::maxNumActor);
-    assert (0 == aUtil.size());
+    assert(Model::minNumActor <= na);
+    assert(na <= Model::maxNumActor);
+    assert(0 == aUtil.size());
     auto u = KMatrix(na, na);
-    
-    for (unsigned int i=0; i<na; i++) {
-      for (unsigned int j=0; j<na; j++) {
-        auto pj = ((const MtchPstn*) (pstns[j]));
+
+    for (unsigned int i = 0; i < na; i++) {
+      for (unsigned int j = 0; j < na; j++) {
+        auto pj = ((const MtchPstn*)(pstns[j]));
         VUI vj = pj->match;
         unsigned int nj = vbToInt(vj);
-        u(i,j) = csm->getActorCSPstnUtil(i, nj);
+        u(i, j) = csm->getActorCSPstnUtil(i, nj);
       }
     }
-    
+
     // this sets the utility matrices to all be identical
-    for (unsigned int i=0; i<na; i++) { aUtil.push_back(u); } 
+    for (unsigned int i = 0; i < na; i++) { aUtil.push_back(u); }
     return;
   }
 
   // --------------------------------------------
-  CSActor::CSActor(string n, string d,  CSModel* csm) : Actor(n, d) {
+  CSActor::CSActor(string n, string d, CSModel* csm) : Actor(n, d) {
     csMod = csm;
   }
 
@@ -694,24 +694,24 @@ namespace ComSelLib {
   double CSActor::posUtil(const Position * ap1) const {
     //cout << "CSActor::posUtil - not yet implemented" << endl << flush; // TODO: complete this
     //assert(false);
-     
+
     auto ai = csMod->actrNdx(this);
     auto rp = ((const MtchPstn *)ap1);
     auto nj = vbToInt(rp->match);
     double u0 = csMod->getActorCSPstnUtil(ai, nj);
     return u0;
   }
-  
-  
-  double CSActor::vote(unsigned int est,unsigned int i, unsigned int j, const State* st) const {
+
+
+  double CSActor::vote(unsigned int est, unsigned int i, unsigned int j, const State* st) const {
     /// vote between the current positions to actors at positions p1 and p2 of this state
-    
-	  unsigned int k = st->model->actrNdx(this);
-	  auto uk = st->aUtil[est];
-	  double uhki = uk(k, i);
-	  double uhkj = uk(k, j);
-	  const double vij = Model::vote(vr, sCap, uhki, uhkj);
-	  return vij;
+
+    unsigned int k = st->model->actrNdx(this);
+    auto uk = st->aUtil[est];
+    double uhki = uk(k, i);
+    double uhkj = uk(k, j);
+    const double vij = Model::vote(vr, sCap, uhki, uhkj);
+    return vij;
   }
 
   double CSActor::vote(const Position* ap1, const Position* ap2) const {
@@ -720,22 +720,22 @@ namespace ComSelLib {
     const double v12 = Model::vote(vr, sCap, u1, u2);
     return v12;
   }
-  
-  
+
+
   void CSActor::randomize(PRNG* rng, unsigned int nDim) {
-    assert (nullptr != rng);
+    assert(nullptr != rng);
     assert(0 < nDim);
-      
+
     sCap = exp(log(10.0)*rng->uniform(1.0, 2.0)); // 10 to 100, median at 31.6 
     vPos = VctrPstn(KMatrix::uniform(rng, nDim, 1, 0.01, 0.99));
-      
+
     double totalSal = rng->uniform(0.8, 1.0);
-    auto vsi = KMatrix::uniform(rng, nDim, 1, 0.90, 0.95); 
-    vSal = (totalSal/sum(vsi)) *  vsi;
+    auto vsi = KMatrix::uniform(rng, nDim, 1, 0.90, 0.95);
+    vSal = (totalSal / sum(vsi)) *  vsi;
     return;
   }
-    
-    
+
+
 };
 // end of namespace
 

@@ -140,7 +140,7 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
           double sumij = um1(i, j);
           for (unsigned int s = 0; s < nBits; s++) {
             unsigned int k = j ^ (1 << s); // flip the s-bit
-            assert(0 <= k);
+            //assert(0 <= k);
             assert(k < ic);
             sumij = sumij + um1(i, k);
           }

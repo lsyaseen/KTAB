@@ -154,6 +154,7 @@ void SMPModel::sqlTest() {
         sprintf(buff, "Created SMPModel table %u successfully \n", i);
         sql = SMPModel::createSQL(i);
         sExec(sql, buff); // ignore return-code
+        delete buff;
         buff = nullptr;
         cout << flush;
     }

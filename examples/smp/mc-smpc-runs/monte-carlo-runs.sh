@@ -3,10 +3,12 @@
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # see http://zxq9.com/archives/795 for some date formats
 #!/bin/bash
+#
+# usage: monte-carlo-runs.sh <n>
+# -------------------------------------------
 
-# 25 runs
-START=1000
-END=1024
+START=1
+END=$1
 
 rm -f run-smpc*txt  run-smpc*db  test.db
 for i in $(eval echo "{$START..$END}")

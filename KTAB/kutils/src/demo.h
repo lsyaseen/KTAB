@@ -55,7 +55,7 @@ namespace UDemo {
   class TargetedBV {
   public:
     TargetedBV();
-    TargetedBV(const VBool & b);
+    explicit TargetedBV(const VBool & b);
     virtual ~TargetedBV();
     static void setTarget(VBool trgt);
     static VBool getTarget();

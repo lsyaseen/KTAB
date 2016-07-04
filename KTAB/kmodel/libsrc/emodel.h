@@ -54,19 +54,19 @@
 #include "kmodel.h"
 
 namespace KBase {
-using std::shared_ptr;
-using std::string;
-using std::tuple;
-using std::vector;
+  using std::shared_ptr;
+  using std::string;
+  using std::tuple;
+  using std::vector;
 
-// -------------------------------------------------
-// this model relies on an explicit enumeration of all possible
-// outcomes/positions: a few tens of thousands of discrete choices.
-// PT is the position-type
+  // -------------------------------------------------
+  // this model relies on an explicit enumeration of all possible
+  // outcomes/positions: a few tens of thousands of discrete choices.
+  // PT is the position-type
 
-template <class PT>
-class EModel : public Model {
-public:
+  template <class PT>
+  class EModel : public Model {
+  public:
     explicit EModel(PRNG * r, string d = "");
     virtual ~EModel();
 
@@ -80,43 +80,43 @@ public:
     // Enumerate theta, the set of options
     function <vector <PT*>()> enumOptions = nullptr;
 
-protected:
+  protected:
     vector <PT*> theta = {}; // the enumerated space of all possible positions/outcomes
 
 
-private:
-};
+  private:
+  };
 
 
-// -------------------------------------------------
-// enumerated positions are just handles that index into the set theta.
-//
-template <class PT>
-class EPosition : public Position {
-public:
+  // -------------------------------------------------
+  // enumerated positions are just handles that index into the set theta.
+  //
+  template <class PT>
+  class EPosition : public Position {
+  public:
     EPosition(EModel<PT>* m, int n);
     virtual ~EPosition();
 
-protected:
+  protected:
     EModel<PT>* eMod = nullptr;
     int ndx = -1;
 
-private:
+  private:
 
-};
+  };
 
 
-template <class PT>
-class EState : public State {
-public:
-    EState(EModel<PT>* mod);
+  template <class PT>
+  class EState : public State {
+  public:
+    explicit EState(EModel<PT>* mod);
     virtual ~EState();
     void setValues();
 
-protected:
-    
+  protected:
+
     void setAllAUtil(ReportingLevel rl);
-    
+
     // you have to provide these λ-fns.
 
     // probably using the EModel's raw-value matrix, actorVFn,
@@ -134,8 +134,8 @@ protected:
     // This has to be lambda-bound to the relevant parameters. Maybe EState, not EModel?
     function <vector<double>(unsigned int j, const EModel<PT>*)> actorVFn = nullptr;
 
-private:
-};
+  private:
+  };
 
 }; // end of namespace
 

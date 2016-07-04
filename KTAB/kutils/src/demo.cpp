@@ -32,6 +32,8 @@
 //
 // -------------------------------------------------
 
+#include <inttypes.h>
+#include <stdio.h>
 #include "demo.h"
 
 using KBase::newChars;
@@ -59,7 +61,7 @@ namespace UDemo {
   void demoUIndices() {
     auto showIS = [](KBase::VUI is) {
       for (unsigned int i = 0; i < is.size(); i++) {
-        printf("%2i: %2i \n", i, is[i]);
+        printf("%2u: %2i \n", i, is[i]);
       }
       return;
     };
@@ -275,22 +277,22 @@ namespace UDemo {
     cout << "Computing norm ... " << flush;
     double nm = norm(m1);
     cout << "norm is " << nm << endl << flush;
-     
+
     double c1 = 2.3;
     printf("Pre- and post-multiply c1 and m1, where c1=%5.2f and m1= \n", c1);
     m1.mPrintf(" %5.2f");
     cout << endl << flush;
-    
+
     printf("Pre-multiply c1 * m1 = \n");
     auto c1m1 = c1 * m1;
     c1m1.mPrintf(" %5.2f");
     cout << endl << flush;
-    
+
     printf("Post-multiply m1*c1 = \n");
     auto m1c1 = m1 * c1;
     m1c1.mPrintf(" %5.2f");
     cout << endl << flush;
-    
+
 
 
     printf("Transposition then copy \n");
@@ -939,7 +941,7 @@ namespace UDemo {
     };
 
     function< vector<VBool>(VBool)> nfn = [](VBool bv0) {
-      unsigned int nb = bv0.size();
+      auto nb = ((unsigned int)(bv0.size()));
       auto bvs = vector <VBool>();
       for (unsigned int i = 0; i < nb; i++) {
         auto bv = VBool(bv0);
@@ -1036,10 +1038,18 @@ namespace UDemo {
     double uii = bsu(fabs(ti - ti), ri) + bsu(fabs(ti - ti), ri);
     double uij = bsu(fabs(ti - tj), ri) + bsu(fabs(ti - tj), ri);
     double uci = pi*uii + pj*uij;  // exp. utility of conflict's outcome to i
+    printf("uii:  %.5f \n", uii);
+    printf("uij:  %.5f \n", uij);
+    printf("uci:  %.5f \n", uci);
+    cout << endl << flush;
 
     double uji = bsu(fabs(tj - ti), rj) + bsu(fabs(tj - ti), rj);
     double ujj = bsu(fabs(tj - tj), rj) + bsu(fabs(tj - tj), rj);
     double ucj = pi*uji + pj*ujj;  // exp. utility of conflict's outcome to j
+    printf("uji:  %.5f \n", uji);
+    printf("ujj:  %.5f \n", ujj);
+    printf("ucj:  %.5f \n", ucj);
+    cout << endl << flush;
 
     auto vc = new VHCSearch();
     vc->nghbrs = VHCSearch::vn2;
@@ -1177,10 +1187,18 @@ namespace UDemo {
     double uii = bvu(ti - ti, si, ri) + bvu(ti - ti, si, ri);
     double uij = bvu(ti - tj, si, ri) + bvu(ti - tj, si, ri);
     double uci = pi*uii + pj*uij;
+    printf("uii:  %.5f \n", uii);
+    printf("uij:  %.5f \n", uij);
+    printf("uci:  %.5f \n", uci);
+    cout << endl << flush;
 
     double uji = bvu(tj - ti, sj, rj) + bvu(tj - ti, sj, rj);
     double ujj = bvu(tj - tj, sj, rj) + bvu(tj - tj, sj, rj);
     double ucj = pi*uji + pj*ujj;
+    printf("uji:  %.5f \n", uji);
+    printf("ujj:  %.5f \n", ujj);
+    printf("ucj:  %.5f \n", ucj);
+    cout << endl << flush;
 
     auto efn2 = [ti, uci, si, ri, tj, ucj, sj, rj](KMatrix t2i, KMatrix t2j) {
       double ubi = bvu(ti - t2i, si, ri) + bvu(ti - t2j, si, ri);
@@ -1410,10 +1428,10 @@ namespace UDemo {
       printf("3:7  %.4f \n", fabs(pBest(3, 0) - pBest(7, 0)));
 
       double mb[] = {
-          (pBest(0, 0) + pBest(4, 0)) / 2,
-          (pBest(1, 0) + pBest(5, 0)) / 2,
-          (pBest(2, 0) + pBest(6, 0)) / 2,
-          (pBest(3, 0) + pBest(7, 0)) / 2
+    (pBest(0, 0) + pBest(4, 0)) / 2,
+    (pBest(1, 0) + pBest(5, 0)) / 2,
+    (pBest(2, 0) + pBest(6, 0)) / 2,
+    (pBest(3, 0) + pBest(7, 0)) / 2
       }; // position
       auto b = KMatrix::arrayInit(mb, 4, 1);
       // now if b = p*ti + (1-p)*tj
@@ -1667,7 +1685,7 @@ namespace UDemo {
 
   TargetedBV::TargetedBV() {
     bits = VBool();
-    unsigned int n = target.size();
+    auto n = ((const unsigned int)(target.size()));
     for (unsigned int i = 0; i < n; i++) {
       bits.push_back(false);
     }
@@ -1793,7 +1811,7 @@ namespace UDemo {
     using std::async;
     using std::future;
     using std::launch;
-  
+
     // With [150,7000]*[7000,150], this flock of threads spends about the first 15% of its time
     // effectively single-threaded, then suddenly switches over to using all four CPUs
     // for the other 85%.
@@ -1818,8 +1836,8 @@ namespace UDemo {
       double s = 0.0;
       for (unsigned int j = 0; j < cr; j++) {
         if (0 == (j%m)) { // force interleaving
-            //printf("Thread %3i,%3i sleeping %2i milliseconds \n", i, k, st);
-            //cout << flush;
+      //printf("Thread %3i,%3i sleeping %2i milliseconds \n", i, k, st);
+      //cout << flush;
           std::this_thread::sleep_for(std::chrono::milliseconds(st));
         }
         s = s + m1(i, j)*m2(j, k);
@@ -1960,10 +1978,14 @@ int main(int ac, char **av) {
 
   PRNG * rng = new PRNG();
   seed = rng->setSeed(seed); // 0 == get a random number
-  printf("Using PRNG seed:  %020llu \n", seed);
-  printf("Same seed in hex:   0x%016llX \n", seed);
+
+  //printf("Using PRNG seed:  %020llu \n", seed);
+  //printf("Same seed in hex:   0x%016llX \n", seed);
   // Unix correctly prints all digits with lu, lX, llu, and llX.
   // Windows only prints part, with lu, lX, llu, and llX.
+
+  printf("Using PRNG seed:  %020" PRIu64 "\n", seed);
+  printf("Same seed in hex:   0x%016" PRIX64" \n", seed);
 
 
   //    UDemo::demoCoords(rng);

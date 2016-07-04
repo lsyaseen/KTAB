@@ -53,6 +53,8 @@ Model::Model(PRNG * r, string desc) {
         std::strftime(utcBuff, 150, "Scenario-UTC-%Y-%m-%d-%H%M-%S", gmtime(&start_time));
         cout << "Generating default name from UTC start time" << endl << flush;
         scenName = utcBuff;
+        delete utcBuff;
+        utcBuff = nullptr;
     }
     else
     {
@@ -128,17 +130,18 @@ ostream& operator<< (ostream& os, const VPModel& vpm) {
 unsigned int Model::addActor(Actor* a) {
     assert(nullptr != a);
     actrs.push_back(a);
-    numAct = actrs.size();
+    numAct = ((unsigned int) (actrs.size()));
     return numAct;
 }
 
 
-int Model::addState(State* s) {
+unsigned int Model::addState(State* s) {
     assert(nullptr != s);
     assert(this == s->model);
     s->model = this;
     history.push_back(s);
-    return history.size();
+    auto hs = ((const unsigned int) (history.size()));
+    return hs;
 }
 
 

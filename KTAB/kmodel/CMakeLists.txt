@@ -55,9 +55,29 @@ if (UNIX)
   set (ENABLE_EFFCPP true CACHE  BOOL "Check Effective C++ Guidelines")
   set (ENABLE_EFENCE false CACHE  BOOL "Use Electric Fence memory debugger")
 endif(UNIX)
+
 # -------------------------------------------------
 # find libraries on which this project depends
-#
+# -------------------------------------------------
+
+set (CSVPARSER_PATHS
+    ${PROJECT_SOURCE_DIR}/../../csv-parser/
+    )
+
+
+find_path(CSVP_DIR csv_parser.hpp 
+  PATHS ${CSVPARSER_PATHS}
+  )
+
+if(CSVP_DIR)
+  message(STATUS "Found csv-parser headers: ${CSVP_DIR}")
+endif(CSVP_DIR)
+
+if(NOT CSVP_DIR)
+  message(FATAL "Could not fid csv-parser headers")
+endif(NOT CSVP_DIR)
+
+# -------------------------------------------------
 
 if (ENABLE_EFENCE)
   find_package(efence)
@@ -146,7 +166,8 @@ INCLUDE_DIRECTORIES(
   ${KUTILS_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}/libsrc/
   ${PROJECT_SOURCE_DIR}/src/
-  ${PROJECT_SOURCE_DIR}/csvparser/
+#  ${PROJECT_SOURCE_DIR}/csvparser/
+  ${CSVP_DIR}
   ${EFENCE_INCLUDE_DIR}
   ${SQLITE_INCLUDE_DIR}
   ${TINYXML2_INCLUDE_DIR}
@@ -186,7 +207,7 @@ ADD_EXECUTABLE(demomodel
   src/sqlitedemo.cpp
   src/tinyxml2demo.cpp
   src/zactor.cpp
-  csvparser/csv_parser.cpp
+  ${CSVP_DIR}/csv_parser.cpp
   )
 
 TARGET_LINK_LIBRARIES(demomodel
@@ -201,6 +222,7 @@ TARGET_LINK_LIBRARIES(demomodel
 message(STATUS "PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
 message(STATUS "KUTILS_INCLUDE_DIR: " ${KUTILS_INCLUDE_DIR})
 message(STATUS "KTAB_INSTALL_DIR: " ${KTAB_INSTALL_DIR})
+message (STATUS "CSVP_DIR: " ${CSVP_DIR})
 # -------------------------------------------------
 # As of February 2014, C++11 is still not the default
 # for g++, so I have to provide it here.
