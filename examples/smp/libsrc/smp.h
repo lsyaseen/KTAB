@@ -207,8 +207,15 @@ protected:
     // The matrix of rates at which they adjust their ideals toward positions
     KMatrix accomodate = KMatrix();
     
-    // form new ideal points, based on other's positions and one's old ideal point
-    vector<VctrPstn> newIdeals() const;
+    // rest the new ideal points, based on other's positions and one's old ideal point
+    void newIdeals();
+
+    // initialize the actors' ideals from the given list of VctrPstn. 
+    // If the list is omitted or empty, it uses their current positions
+    void idealsFromPstns(const vector<VctrPstn> &  ps = {});
+
+    // return RMS distance between ideals and positions
+    double posIdealDist(ReportingLevel rl = ReportingLevel::Silent) const;
     
     // for now,set it to a scaled identity matrix.
     void setupAccomodateMatrix(double adjRate);
