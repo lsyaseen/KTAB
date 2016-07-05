@@ -415,9 +415,9 @@ namespace KBase {
   
   
   KMatrix iMat(unsigned int n) {
-    auto idm = KMatrix(n, n);
+    auto idm = KMatrix(n, n); // all 0.0
     for (unsigned int i = 0; i < n; i++){
-      idm(i, i) = 1;
+      idm(i, i) = 1.0;
     }
     return idm;
   }

@@ -234,14 +234,17 @@ namespace SMPLib {
 
   SMPState::SMPState(Model * m) : State(m) {
     nra = KMatrix();
+
+    // cannot call setupAccomdateMatrix yet, because we have no actors
+    accomodate = KMatrix();
   }
 
 
   SMPState::~SMPState() {
     nra = KMatrix();
+    ideals = {};
+    accomodate = KMatrix();
   }
-
-
 
   void SMPState::setVDiff(const vector<VctrPstn> & vpos) {
     auto dfn = [vpos, this](unsigned int i, unsigned int j) {
@@ -580,8 +583,8 @@ namespace SMPLib {
 
     unsigned int t = myTurn();
     auto ivb = SMPActor::InterVecBrgn::S2P2;
-    //sqlite3_stmt* stmt = NULL; // never used 
-    // int rowtoupdate = 0; // never used 
+    //sqlite3_stmt* stmt = NULL; // never used
+    // int rowtoupdate = 0; // never used
     //int rc = 0; // never used
     // For each actor, identify good targets, and propose bargains to them.
     // (This loop would be an excellent place for high-level parallelism)
@@ -663,8 +666,10 @@ namespace SMPLib {
         model->sqlBargainValue(t, brgnIJ->getID(), 1, brgnIJ->posRcvr);
 
         // clean up `
-        delete brgnIIJ; brgnIIJ = nullptr;
-        delete brgnJIJ; brgnJIJ = nullptr;
+        delete brgnIIJ;
+        brgnIIJ = nullptr;
+        delete brgnJIJ;
+        brgnJIJ = nullptr;
 
         // record this on BOTH the initiator and receiver queues
         brgns[i].push_back(brgnIJ); // initiator's copy, delete only it later
@@ -745,16 +750,11 @@ namespace SMPLib {
     // end of Î»-fn
 
 
-    // TODO: finish this
-    // For each actor, assess what bargains result from CDMP, and put it into s2
-
-    // The key is to build the usual matrix of U_ai (Brgn_m) for all bargains in brgns[k],
+   // The key is to build the usual matrix of U_ai (Brgn_m) for all bargains in brgns[k],
     // making sure to divide the sum of the utilities of positions by 1/N
     // so 0 <= Util(state after Brgn_m) <= 1, then do the standard scalarPCE for bargains involving k.
 
-
     SMPState* s2 = new SMPState(model);
-
 
     // (This loop would be a good place for high-level parallelism)
     for (unsigned int k = 0; k < na; k++) {
@@ -859,6 +859,28 @@ namespace SMPLib {
 
     // TODO: this really should do all the assessment: ueIndices, rnProb, all U^h_{ij}, raProb
     s2->setUENdx();
+
+    // TODO: setup ideals and accomodate, so newIdeals can be called
+    // for now, just copy them
+    if (0 == ideals.size()) { // nothing to copy
+      s2->setupAccomodateMatrix(1.000);
+      s2->idealsFromPstns(); // set s2's current ideals to s2's current positions
+      s2->newIdeals(); // adjust toward new ones 
+
+      double ipDist = s2->posIdealDist(ReportingLevel::Medium);
+      printf("rms (pstn, ideal) = %.5f \n", ipDist);
+      cout << flush;
+    }
+    else {
+      s2->accomodate = accomodate;
+      s2->ideals = ideals; // copy s1's old ideals
+      s2->newIdeals(); // adjust s2 ideals toward new ones
+
+      double ipDist = s2->posIdealDist(ReportingLevel::Medium);
+      printf("rms (pstn, ideal) = %.5f \n", ipDist);
+      cout << flush;
+
+    }
     return s2;
   }
 
@@ -988,7 +1010,7 @@ namespace SMPLib {
     sqlite3_prepare_v2(db, sqlBuff, strlen(sqlBuff), &insStmt, NULL);
     sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 
-    for (int tpk = 0; tpk < na; tpk++) {  // third party voter, tpk 
+    for (int tpk = 0; tpk < na; tpk++) {  // third party voter, tpk
       auto an = ((const SMPActor*)(model->actrs[tpk]));
       int rslt = 0;
 
@@ -1012,7 +1034,7 @@ namespace SMPLib {
       rslt = sqlite3_bind_double(insStmt, 8, tpvArray(tpk, 2));
       assert(SQLITE_OK == rslt);
 
-      // actually record it 
+      // actually record it
       rslt = sqlite3_step(insStmt);
       assert(SQLITE_DONE == rslt);
       sqlite3_clear_bindings(insStmt);
@@ -1040,6 +1062,7 @@ namespace SMPLib {
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
     sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
     printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+    cout << flush; // so this prints before subsequent assertion failures
 
     delete sqlBuff;
     sqlBuff = nullptr;
@@ -1073,6 +1096,145 @@ namespace SMPLib {
     return rslt;
   }
 
+
+  void SMPState::newIdeals()  {
+    const unsigned int na = model->numAct;
+    const double tol = 1E-10;
+
+    assert(Model::minNumActor <= na);
+    assert(na <= Model::maxNumActor);
+    assert(na == accomodate.numC());
+    assert(na == accomodate.numR());
+    assert(na == ((unsigned int)(ideals.size())));
+
+    const bool identP = (KBase::norm(accomodate - KBase::iMat(na)) < tol);
+
+    const unsigned int nDim = ((SMPModel*)model)->numDim;
+
+    vector<VctrPstn> nIdeals = {};
+
+    auto posK = [this](unsigned int k) {
+      auto ppK = ((const VctrPstn*)(pstns[k]));
+      const KMatrix pK = KMatrix(*ppK);
+      return pK;
+    };
+
+    for (unsigned int i = 0; i < na; i++) {
+      double si = 0.0;
+      auto pI = posK(i);
+      auto newIP = KMatrix(nDim, 1); // new ideal point 
+      for (unsigned int j = 0; j < na; j++) {
+        const double aij = accomodate(i, j); // save typing
+        assert(0 <= aij);
+        assert(aij <= 1.0);
+        si = si + aij;
+        assert(si <= 1.0 + tol); // cannot be more than slightly above at any point
+        auto pJ = posK(j);
+        newIP = newIP + (aij * pJ);
+
+        // very temporary!!
+        if (identP && (i == j)) {
+          assert(fabs(aij - 1.0) < tol);
+        }
+      }
+      si = (1.0 < si) ? 1.0 : si; // clip to 1, if slightly above
+      double lagI = 1.0 - si;
+      assert(0.0 <= lagI);
+      assert(lagI <= 1.0);
+      if (identP) {
+        assert(fabs(lagI) < tol);
+      }
+      newIP = newIP + (lagI * ideals[i]);
+      if (identP) {
+        assert(KBase::norm(newIP - pI) < tol);
+      }
+      nIdeals.push_back(VctrPstn(newIP));
+    }
+
+    ideals = nIdeals;
+
+    if (identP) {
+      assert(posIdealDist() < tol);
+    }
+
+    return;
+  }
+
+  void SMPState::idealsFromPstns(const vector<VctrPstn> &  ps) {
+    const unsigned int na = model->numAct;
+    assert(Model::minNumActor <= na);
+    assert(na <= Model::maxNumActor);
+
+    const bool givenP = (na == ps.size());
+    assert(givenP || (0 == ps.size()));
+
+    ideals = {};
+
+    for (unsigned int i = 0; i < na; i++) {
+      if (givenP) {
+        ideals.push_back(ps[i]);
+      }
+      else {
+        auto ppJ = ((const VctrPstn*)(pstns[i]));
+        auto newIP = VctrPstn(*ppJ);
+        ideals.push_back(VctrPstn(newIP));
+      }
+    }
+
+    return;
+  }
+
+  double SMPState::posIdealDist(ReportingLevel rl) const {
+    const unsigned int t = 0; // myTurn();
+    double rmsDist = 0.0;
+    const unsigned int na = model->numAct;
+    assert(na == pstns.size());
+    assert(na == ideals.size());
+    for (unsigned int i = 0; i < na; i++) {
+      auto ppI = ((const VctrPstn*)(pstns[i]));
+      const KMatrix pI = KMatrix(*ppI);
+      auto iI = ideals[i];
+
+      if (rl > ReportingLevel::Low) {
+        printf("postn %2i, %2i ", i, t);
+        trans(pI).mPrintf(" %.4f ");
+        printf("ideal %2i, %2i ", i, t);
+        trans(iI).mPrintf(" %.4f ");
+      }
+      double dI = KBase::norm(pI - iI);
+      if (rl > ReportingLevel::Silent) {
+        printf("postn-ideal distance %2i, %2i: %.5f \n", i, t, dI);
+      }
+      rmsDist = rmsDist + (dI*dI);
+    }
+    rmsDist = rmsDist / ((double)na);
+    rmsDist = sqrt(rmsDist);
+    if (rl > ReportingLevel::Silent) {
+      printf("postn-ideal distance RMS %2i: %.5f \n", t, rmsDist);
+      cout << flush;
+    }
+    return rmsDist;
+  }
+
+  void SMPState::setupAccomodateMatrix(double adjRate) {
+
+    // a man's gotta know his limits
+    // (with apologies to HC)
+    assert(0.0 <= adjRate);
+    assert(adjRate <= 1.0);
+    const unsigned int na = model->numAct;
+    assert(Model::minNumActor <= na);
+    assert(na <= Model::maxNumActor);
+
+    printf("WARNING: setting SMPState::accomodate to %.3f * identity matrix \n", adjRate);
+
+    // A standard Identity matrix is helpful here because it 
+    // should keep the behavior same as the original "cynical" model:
+    //      ideal_{i,t} := pstn_{i,t}
+    accomodate = adjRate * KBase::iMat(na);
+
+    return;
+  }
 
   tuple< KMatrix, VUI> SMPState::pDist(int persp) const {
     /// Calculate the probability distribution over states from this perspective

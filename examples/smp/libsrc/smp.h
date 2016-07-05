@@ -201,6 +201,25 @@ protected:
 
     // return best j, p[i>j], edu[i->j]
     tuple<int, double, double> bestChallenge(unsigned int i) const;
+    
+    // the actor's ideal, against which they judge others' positions
+    vector<VctrPstn> ideals = {};
+    
+    // The matrix of rates at which they adjust their ideals toward positions
+    KMatrix accomodate = KMatrix();
+    
+    // rest the new ideal points, based on other's positions and one's old ideal point
+    void newIdeals();
+
+    // initialize the actors' ideals from the given list of VctrPstn. 
+    // If the list is omitted or empty, it uses their current positions
+    void idealsFromPstns(const vector<VctrPstn> &  ps = {});
+
+    // return RMS distance between ideals and positions
+    double posIdealDist(ReportingLevel rl = ReportingLevel::Silent) const;
+    
+    // for now,set it to a scaled identity matrix.
+    void setupAccomodateMatrix(double adjRate);
 
 };
 
