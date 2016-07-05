@@ -863,7 +863,7 @@ namespace SMPLib {
     // TODO: setup ideals and accomodate, so newIdeals can be called
     // for now, just copy them
     if (0 == ideals.size()) { // nothing to copy
-      s2->setupAccomodateMatrix(0.875);
+      s2->setupAccomodateMatrix(1.000);
       s2->idealsFromPstns(); // set s2's current ideals to s2's current positions
       s2->newIdeals(); // adjust toward new ones 
 
