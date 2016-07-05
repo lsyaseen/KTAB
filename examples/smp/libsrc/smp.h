@@ -170,6 +170,7 @@ public:
     // use the parameters of your state to compute the relative probability of each actor's position
     virtual tuple< KMatrix, VUI> pDist(int persp) const;
     void showBargains(const vector < vector < BargainSMP* > > & brgns) const;
+    void showOneBargain(const BargainSMP* b) const;
 	
 	virtual bool equivNdx(unsigned int i, unsigned int j) const;
     
