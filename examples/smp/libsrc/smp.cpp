@@ -479,9 +479,10 @@ namespace SMPLib {
       for (unsigned int j = 0; j < brgns[i].size(); j++) {
         BargainSMP* bij = brgns[i][j];
         if (nullptr != bij) {
-          int a1 = model->actrNdx(bij->actInit);
-          int a2 = model->actrNdx(bij->actRcvr);
-          printf(" [%i:%i] ", a1, a2);
+          showOneBargain(bij);
+         // int a1 = model->actrNdx(bij->actInit);
+         // int a2 = model->actrNdx(bij->actRcvr);
+         // printf(" [%i:%i (%llu)] ", a1, a2, bij->getID());
         }
         else {
           printf(" SQ ");
@@ -489,6 +490,15 @@ namespace SMPLib {
       }
       cout << endl << flush;
     }
+    return;
+  }
+
+  void SMPState::showOneBargain(const BargainSMP* b) const {
+    assert(nullptr != b);
+    unsigned int ai = model->actrNdx(b->actInit);
+    unsigned int aj = model->actrNdx(b->actRcvr);
+    uint64_t bid = b->getID();
+    printf("[%llu, %u:%u]", bid, ai, aj);
     return;
   }
 
@@ -617,7 +627,9 @@ namespace SMPLib {
         BargainSMP *brgnIJ = new  BargainSMP(brgnIIJ->actInit, brgnIIJ->actRcvr, bpi, bpj);
 
         printf("\n");
-        printf("Bargain [%i:%i] from %2i's perspective (brgnIIJ) \n", nai, naj, nai);
+        printf("Bargain ");
+        showOneBargain(brgnIIJ);
+        printf(" from %2i's perspective (brgnIIJ) \n", nai);
         printf("  %2i proposes %2i adopt: ", nai, nai);
         KBase::trans(brgnIIJ->posInit).mPrintf(" %.3f ");
 
@@ -628,7 +640,9 @@ namespace SMPLib {
         printf("  %2i proposes %2i adopt: ", nai, naj);
         KBase::trans(brgnIIJ->posRcvr).mPrintf(" %.3f ");
         printf("\n");
-        printf("Bargain [%i:%i] from %2i's perspective (brgnJIJ) \n", nai, naj, naj);
+        printf("Bargain  ");
+        showOneBargain(brgnJIJ);
+        printf(" from %2i's perspective (brgnJIJ) \n", naj);
         printf("  %2i proposes %2i adopt: ", naj, nai);
 
         KBase::trans(brgnJIJ->posInit).mPrintf(" %.3f ");
@@ -639,7 +653,9 @@ namespace SMPLib {
         model->sqlBargainEntries(t, brgnIIJ->getID(), i, i, bestJ, bestEU);
 
         printf("\n");
-        printf("Power-weighted compromise [%i:%i] bargain (brgnIJ) \n", nai, naj);
+        printf("Power-weighted compromise  ");
+        showOneBargain(brgnIJ);
+        printf(" bargain (brgnIJ) \n");
         printf("  compromise proposes %2i adopt: ", nai);
         KBase::trans(brgnIJ->posInit).mPrintf(" %.3f ");
         printf("  compromise proposes %2i adopt: ", naj);
