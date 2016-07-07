@@ -51,7 +51,8 @@ Model::Model(PRNG * r, string desc) {
     if (0 == desc.length()) {
         auto utcBuff = newChars(200);
         std::strftime(utcBuff, 150, "Scenario-UTC-%Y-%m-%d-%H%M-%S", gmtime(&start_time));
-        cout << "Generating default name from UTC start time" << endl << flush;
+        cout << "No scenario description provided to Model::Model, " << endl;
+        cout << "generating default name from UTC start time." << endl << flush;
         scenName = utcBuff;
         delete utcBuff;
         utcBuff = nullptr;

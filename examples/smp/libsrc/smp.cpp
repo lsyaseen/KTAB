@@ -1196,21 +1196,21 @@ namespace SMPLib {
       auto iI = ideals[i];
 
       if (rl > ReportingLevel::Low) {
-        printf("postn %2i, %2i ", i, t);
+        printf("postn %2u, %2u ", i, t);
         trans(pI).mPrintf(" %.4f ");
-        printf("ideal %2i, %2i ", i, t);
+        printf("ideal %2u, %2u ", i, t);
         trans(iI).mPrintf(" %.4f ");
       }
       double dI = KBase::norm(pI - iI);
       if (rl > ReportingLevel::Silent) {
-        printf("postn-ideal distance %2i, %2i: %.5f \n", i, t, dI);
+        printf("postn-ideal distance %2u, %2u: %.5f \n", i, t, dI);
       }
       rmsDist = rmsDist + (dI*dI);
     }
     rmsDist = rmsDist / ((double)na);
     rmsDist = sqrt(rmsDist);
     if (rl > ReportingLevel::Silent) {
-      printf("postn-ideal distance RMS %2i: %.5f \n", t, rmsDist);
+      printf("postn-ideal distance RMS %2u: %.5f \n", t, rmsDist);
       cout << flush;
     }
     return rmsDist;
