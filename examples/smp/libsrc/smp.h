@@ -196,11 +196,12 @@ protected:
     SMPState* doBCN() const;
     
 
-    // returns estimated probability k wins (given likely coaltiions), and expected delta-util of that challenge
-    tuple<double, double> probEduChlg(unsigned int h, unsigned int k, unsigned int i, unsigned int j) const;
+    // returns estimated probability k wins (given likely coaltiions), and expected delta-util of that challenge.
+    // If desired, record in SQLite.
+    tuple<double, double> probEduChlg(unsigned int h, unsigned int k, unsigned int i, unsigned int j, bool sqlP) const;
 
     // return best j, p[i>j], edu[i->j]
-    tuple<int, double, double> bestChallenge(unsigned int i) const;
+    tuple<int, double, double> bestChallenge(unsigned int i, bool sqlP) const;
     
     // the actor's ideal, against which they judge others' positions
     vector<VctrPstn> ideals = {};
