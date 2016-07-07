@@ -480,9 +480,9 @@ namespace SMPLib {
         BargainSMP* bij = brgns[i][j];
         if (nullptr != bij) {
           showOneBargain(bij);
-         // int a1 = model->actrNdx(bij->actInit);
-         // int a2 = model->actrNdx(bij->actRcvr);
-         // printf(" [%i:%i (%llu)] ", a1, a2, bij->getID());
+          // int a1 = model->actrNdx(bij->actInit);
+          // int a2 = model->actrNdx(bij->actRcvr);
+          // printf(" [%i:%i (%llu)] ", a1, a2, bij->getID());
         }
         else {
           printf(" SQ ");
@@ -573,6 +573,7 @@ namespace SMPLib {
 
 
   SMPState* SMPState::doBCN() const {
+    const bool recordBargainingP = true;
     auto brgns = vector< vector < BargainSMP* > >();
     const unsigned int na = model->numAct;
     brgns.resize(na);
@@ -581,7 +582,9 @@ namespace SMPLib {
       brgns[i].push_back(nullptr); // null bargain is SQ
     }
 
-    unsigned int t = myTurn();
+    const int t = myTurn();
+    assert(0 <= t); // need to be in the model's history list
+
     auto ivb = SMPActor::InterVecBrgn::S2P2;
     //sqlite3_stmt* stmt = NULL; // never used
     // int rowtoupdate = 0; // never used
@@ -589,27 +592,63 @@ namespace SMPLib {
     // For each actor, identify good targets, and propose bargains to them.
     // (This loop would be an excellent place for high-level parallelism)
     for (unsigned int i = 0; i < na; i++) {
-      auto chlgI = bestChallenge(i);
-      int bestJ = get<0>(chlgI);
-      double piiJ = get<1>(chlgI); // i's estimate of probability i defeats j
-      double bestEU = get<2>(chlgI);
+      auto chlgI = bestChallenge(i, recordBargainingP);
+      const double bestEU = get<2>(chlgI);
       if (0 < bestEU) {
+        const int bestJ = get<0>(chlgI); //
+        const double piiJ = get<1>(chlgI); // i's estimate of probability i defeats j
         assert(0 <= bestJ);
+        const unsigned int j = bestJ; // for consistency in code below
 
-        printf("Actor %u has most advantageous target %i worth %.3f\n", i, bestJ, bestEU);
+        const int t = myTurn();
+        assert(0 <= t); // need to be on model's history list
+        printf("In turn %i actor %u has most advantageous target %u worth %.3f\n", t, i, j, bestEU);
 
         auto ai = ((const SMPActor*)(model->actrs[i]));
-        auto aj = ((const SMPActor*)(model->actrs[bestJ]));
+        auto aj = ((const SMPActor*)(model->actrs[j]));
         auto posI = ((const VctrPstn*)pstns[i]);
-        auto posJ = ((const VctrPstn*)pstns[bestJ]);
+        auto posJ = ((const VctrPstn*)pstns[j]);
 
-        // interpolate a bargain from I's perspecitive
+        // Look for counter-intuitive cases
+        if (piiJ < 0.5) {
+          cout << "turn " << t << " , ";
+          cout << "i " << i << " , ";
+          cout << "j " << j << " , ";
+          cout << "bestEU worth " << bestEU << " , ";
+          cout << "piiJ " << piiJ << endl;
+          cout << endl << flush; // get it printed
+          //assert(0.5 <= piiJ);
+        }
+
+
+        { // make the variables local to lexical scope of this block.
+          // for testing, calculate and print out a block of data showing each's perspective
+          const bool recordTmpSQLP = false;  // Do not record this in SQLite
+          auto pFn = [this, recordTmpSQLP](unsigned int h, unsigned int k, unsigned int i, unsigned int j) {
+            auto est = probEduChlg(h, k, i, j, recordTmpSQLP); // H's estimate of the effect on K of I->J
+            double phij = get<0>(est);
+            double edu_hk_ij = get<1>(est);
+            printf("Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f \n",
+              h, phij, i, j, k, edu_hk_ij);
+          };
+
+          pFn(i, i, i, j); // I's estimate of the effect on I of I->J
+          pFn(i, j, i, j); // I's estimate of the effect on J of I->J
+
+          pFn(j, i, i, j); // J's estimate of the effect on I of I->J
+          pFn(j, j, i, j); // J's estimate of the effect on I of I->J
+        }
+
+        // interpolate a bargain from I's perspective
         BargainSMP* brgnIIJ = SMPActor::interpolateBrgn(ai, aj, posI, posJ, piiJ, 1 - piiJ, ivb);
-        auto nai = model->actrNdx(brgnIIJ->actInit);
-        auto naj = model->actrNdx(brgnIIJ->actRcvr);
+        const int nai = model->actrNdx(brgnIIJ->actInit);
+        const int naj = model->actrNdx(brgnIIJ->actRcvr);
+        // verify that identities match up as expected
+        assert(nai == i);
+        assert(naj == j);
 
         // interpolate a bargain from targeted J's perspective
-        auto Vjij = probEduChlg(bestJ, i, i, bestJ);
+        auto Vjij = probEduChlg(j, i, i, j, recordBargainingP);
         double pjiJ = get<1>(Vjij); // j's estimate of the probability that i defeats j
         BargainSMP* brgnJIJ = SMPActor::interpolateBrgn(ai, aj, posI, posJ, pjiJ, 1 - pjiJ, ivb);
 
@@ -629,39 +668,48 @@ namespace SMPLib {
         printf("\n");
         printf("Bargain ");
         showOneBargain(brgnIIJ);
-        printf(" from %2i's perspective (brgnIIJ) \n", nai);
-        printf("  %2i proposes %2i adopt: ", nai, nai);
+        printf(" from %2u's perspective (brgnIIJ) \n", i);
+        printf("  %2u proposes %2u adopt: ", i, i);
         KBase::trans(brgnIIJ->posInit).mPrintf(" %.3f ");
 
         //Brgn table base entries
-        model->sqlBargainEntries(t, brgnJIJ->getID(), i, i, nai, bestEU);
+        model->sqlBargainEntries(t, brgnJIJ->getID(), i, i, i, bestEU);
 
 
-        printf("  %2i proposes %2i adopt: ", nai, naj);
+        printf("  %2u proposes %2u adopt: ", i, j);
         KBase::trans(brgnIIJ->posRcvr).mPrintf(" %.3f ");
         printf("\n");
         printf("Bargain  ");
         showOneBargain(brgnJIJ);
-        printf(" from %2i's perspective (brgnJIJ) \n", naj);
-        printf("  %2i proposes %2i adopt: ", naj, nai);
+        printf(" from %2u's perspective (brgnJIJ) \n", j);
+        printf("  %2u proposes %2u adopt: ", j, i);
 
         KBase::trans(brgnJIJ->posInit).mPrintf(" %.3f ");
-        printf("  %2i proposes %2i adopt: ", naj, naj);
+        printf("  %2u proposes %2u adopt: ", j, j);
         KBase::trans(brgnJIJ->posRcvr).mPrintf(" %.3f ");
         //Brgn table base entries
 
-        model->sqlBargainEntries(t, brgnIIJ->getID(), i, i, bestJ, bestEU);
+        model->sqlBargainEntries(t, brgnIIJ->getID(), i, i, j, bestEU);
 
         printf("\n");
         printf("Power-weighted compromise  ");
         showOneBargain(brgnIJ);
         printf(" bargain (brgnIJ) \n");
-        printf("  compromise proposes %2i adopt: ", nai);
+        printf("  compromise proposes %2u adopt: ", i);
         KBase::trans(brgnIJ->posInit).mPrintf(" %.3f ");
-        printf("  compromise proposes %2i adopt: ", naj);
+        printf("  compromise proposes %2u adopt: ", j);
         KBase::trans(brgnIJ->posRcvr).mPrintf(" %.3f ");
         printf("\n");
 
+        // TODO: make one-perspective an option.
+        // For now, emulate it by swapping
+        //auto tIJ = brgnIJ;
+        //auto tIIJ = brgnIIJ;
+        //brgnIJ = tIIJ;
+        //brgnIIJ = tIJ;
+
+        // TODO: sqlBargainValue should cycle through existing dimensions
+        // (plus other changes)
         model->sqlBargainValue(t, brgnIJ->getID(), 0, brgnIJ->posInit);
         model->sqlBargainValue(t, brgnIJ->getID(), 1, brgnIJ->posRcvr);
 
@@ -673,7 +721,7 @@ namespace SMPLib {
 
         // record this on BOTH the initiator and receiver queues
         brgns[i].push_back(brgnIJ); // initiator's copy, delete only it later
-        brgns[bestJ].push_back(brgnIJ); // receiver's copy, just null it out later
+        brgns[j].push_back(brgnIJ); // receiver's copy, just null it out later
 
       }
       else {
@@ -891,7 +939,7 @@ namespace SMPLib {
   // TODO: offer a choice the different ways of estimating value-of-a-state: even sum or expected value.
   // TODO: we may need to separate euConflict from this at some point
   // TODO: add a boolean flag to record this is SQLite, which touches at least three tables
-  tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsigned int i, unsigned int j) const {
+  tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsigned int i, unsigned int j, bool sqlP) const {
 
     // you could make other choices for these two sub-models
     auto vr = VotingRule::Proportional;
@@ -921,7 +969,7 @@ namespace SMPLib {
     double sj = KBase::sum(aj->vSal);
     assert((0 < sj) && (sj <= 1));
     double cj = aj->sCap;
-    double minCltn = 1E-10;
+    const double minCltn = 1E-10;
 
     // get h's estimate of the principal actors' contribution to their own contest
     // h's estimate of i's unilateral influence contribution to (i:j), hence positive
@@ -986,118 +1034,122 @@ namespace SMPLib {
     const double duChlg = euChlg - euSQ; //  delta-util of challenge versus status-quo
     auto rslt = tuple<double, double>(phij, duChlg);
 
-    // now that the computation is finished, record everything into SQLite
-    //
-    // record tpvArray into SQLite turn, est (h), init (i), third party (n), receiver (j), and tpvArray[n]
-    // printf ("SMPState::probEduChlg(%2i, %2i, %2i, %i2) = %+6.4f - %+6.4f = %+6.4f\n", h, k, i, j, euCh, euSQ, euChlg);
+    if (sqlP) {
+      // now that the computation is finished, record everything into SQLite
+      //
+      // record tpvArray into SQLite turn, est (h), init (i), third party (n), receiver (j), and tpvArray[n]
+      // printf ("SMPState::probEduChlg(%2i, %2i, %2i, %i2) = %+6.4f - %+6.4f = %+6.4f\n", h, k, i, j, euCh, euSQ, euChlg);
 
-    unsigned int t = myTurn();
+      unsigned int t = myTurn();
 
-    sqlite3 * db = model->smpDB;
-    char* zErrMsg = nullptr; // Error message in case
+      sqlite3 * db = model->smpDB;
+      char* zErrMsg = nullptr; // Error message in case
 
-    auto sqlBuff = newChars(200);
-    // prepare the sql statement to insert. as it does not depend on tpk, keep it outside the loop.
-    sprintf(sqlBuff,
-      "INSERT INTO TP_Prob_Vict_Loss (Scenario, Turn_t, Est_h,Init_i,ThrdP_k,Rcvr_j,Prob,Util_V,Util_L) VALUES ('%s', ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
-      model->getScenarioName().c_str());
+      auto sqlBuff = newChars(200);
+      // prepare the sql statement to insert. as it does not depend on tpk, keep it outside the loop.
+      sprintf(sqlBuff,
+        "INSERT INTO TP_Prob_Vict_Loss (Scenario, Turn_t, Est_h,Init_i,ThrdP_k,Rcvr_j,Prob,Util_V,Util_L) VALUES ('%s', ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+        model->getScenarioName().c_str());
 
-    // The whole point of a prepared statement is to reuse it.
-    // Therefore, we prepare it before the loop, and reuse it inside the loop:
-    // just moving it outside loop cut dummyData_3Dim.csv run time from 30 to 10 seconds
-    // (with Electric Fence).
-    sqlite3_stmt *insStmt;
-    sqlite3_prepare_v2(db, sqlBuff, strlen(sqlBuff), &insStmt, NULL);
-    sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+      // The whole point of a prepared statement is to reuse it.
+      // Therefore, we prepare it before the loop, and reuse it inside the loop:
+      // just moving it outside loop cut dummyData_3Dim.csv run time from 30 to 10 seconds
+      // (with Electric Fence).
+      sqlite3_stmt *insStmt;
+      sqlite3_prepare_v2(db, sqlBuff, strlen(sqlBuff), &insStmt, NULL);
+      sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 
-    for (int tpk = 0; tpk < na; tpk++) {  // third party voter, tpk
-      auto an = ((const SMPActor*)(model->actrs[tpk]));
-      int rslt = 0;
+      for (int tpk = 0; tpk < na; tpk++) {  // third party voter, tpk
+        auto an = ((const SMPActor*)(model->actrs[tpk]));
+        int rslt = 0;
 
-      // bind the indices
-      rslt = sqlite3_bind_int(insStmt, 1, t);
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_bind_int(insStmt, 2, h);
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_bind_int(insStmt, 3, i);
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_bind_int(insStmt, 4, tpk);
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_bind_int(insStmt, 5, j);
-      assert(SQLITE_OK == rslt);
+        // bind the indices
+        rslt = sqlite3_bind_int(insStmt, 1, t);
+        assert(SQLITE_OK == rslt);
+        rslt = sqlite3_bind_int(insStmt, 2, h);
+        assert(SQLITE_OK == rslt);
+        rslt = sqlite3_bind_int(insStmt, 3, i);
+        assert(SQLITE_OK == rslt);
+        rslt = sqlite3_bind_int(insStmt, 4, tpk);
+        assert(SQLITE_OK == rslt);
+        rslt = sqlite3_bind_int(insStmt, 5, j);
+        assert(SQLITE_OK == rslt);
 
-      // bind the data
-      rslt = sqlite3_bind_double(insStmt, 6, tpvArray(tpk, 0));
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_bind_double(insStmt, 7, tpvArray(tpk, 1));
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_bind_double(insStmt, 8, tpvArray(tpk, 2));
-      assert(SQLITE_OK == rslt);
+        // bind the data
+        rslt = sqlite3_bind_double(insStmt, 6, tpvArray(tpk, 0));
+        assert(SQLITE_OK == rslt);
+        rslt = sqlite3_bind_double(insStmt, 7, tpvArray(tpk, 1));
+        assert(SQLITE_OK == rslt);
+        rslt = sqlite3_bind_double(insStmt, 8, tpvArray(tpk, 2));
+        assert(SQLITE_OK == rslt);
 
-      // actually record it
-      rslt = sqlite3_step(insStmt);
-      assert(SQLITE_DONE == rslt);
-      sqlite3_clear_bindings(insStmt);
-      assert(SQLITE_DONE == rslt);
-      rslt = sqlite3_reset(insStmt);
-      assert(SQLITE_OK == rslt);
+        // actually record it
+        rslt = sqlite3_step(insStmt);
+        assert(SQLITE_DONE == rslt);
+        sqlite3_clear_bindings(insStmt);
+        assert(SQLITE_DONE == rslt);
+        rslt = sqlite3_reset(insStmt);
+        assert(SQLITE_OK == rslt);
+      }
+
+      // formatting note: %d means an integer, base 10
+      // we will use base 10 by default, and these happen to be unsigned integers, so %i is appropriate
+
+      memset(sqlBuff, '\0', 200);
+      sprintf(sqlBuff,
+        "INSERT INTO ProbVict (Scenario, Turn_t, Est_h,Init_i,Rcvr_j,Prob) VALUES ('%s',%u,%u,%u,%u,%f)",
+        model->getScenarioName().c_str(), t, h, i, j, phij);
+      sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
+
+      // the following four statements could be combined into one table
+      memset(sqlBuff, '\0', 200);
+      sprintf(sqlBuff,
+        "INSERT INTO UtilChlg (Scenario, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util_SQ,Util_Vict,Util_Cntst,Util_Chlg) VALUES ('%s',%u,%u,%u,%u,%u,%f,%f,%f,%f)",
+        model->getScenarioName().c_str(), t, h, k, i, j, euSQ, euVict, euCntst, euChlg);
+      sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
+
+      sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+      sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
+      printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+      cout << flush; // so this prints before subsequent assertion failures
+
+      delete sqlBuff;
+      sqlBuff = nullptr;
     }
-
-    // formatting note: %d means an integer, base 10
-    // we will use base 10 by default, and these happen to be unsigned integers, so %i is appropriate
-
-    memset(sqlBuff, '\0', 200);
-    sprintf(sqlBuff,
-      "INSERT INTO ProbVict (Scenario, Turn_t, Est_h,Init_i,Rcvr_j,Prob) VALUES ('%s',%u,%u,%u,%u,%f)",
-      model->getScenarioName().c_str(), t, h, i, j, phij);
-    sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
-
-    // the following four statements could be combined into one table
-    memset(sqlBuff, '\0', 200);
-    sprintf(sqlBuff,
-      "INSERT INTO UtilChlg (Scenario, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util_SQ,Util_Vict,Util_Cntst,Util_Chlg) VALUES ('%s',%u,%u,%u,%u,%u,%f,%f,%f,%f)",
-      model->getScenarioName().c_str(), t, h, k, i, j, euSQ, euVict, euCntst, euChlg);
-    sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
-
-    sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
-    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-    printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
-    cout << flush; // so this prints before subsequent assertion failures
-
-    delete sqlBuff;
-    sqlBuff = nullptr;
-
     return rslt;
   }
 
 
-
-  tuple<int, double, double> SMPState::bestChallenge(unsigned int i) const {
+  tuple<int, double, double> SMPState::bestChallenge(unsigned int i, bool sqlP) const {
     int bestJ = -1;
-    double piJ = 0;
-    double bestEU = 0;
+    double pIJ = 0;
+    double bestEU = -1.00;
 
-    // for SMP, positive ej are typically in the 0.5 to 0.01 range, so I take 1/1000 of the minimum,
-    const double minSig = 1e-5;
+    // for SMP, positive expected gains on the first turn are typically in the 0.5 to 0.01 range
+    // I take a fraction of the minimum.
+    const double minSigEDU = 1e-5; // TODO: 1/20 of the minimum, or 0.0005
 
     for (unsigned int j = 0; j < model->numAct; j++) {
       if (j != i) {
-        auto pej = probEduChlg(i, i, i, j);
-        double pj = get<0>(pej); // i's estimate of the victory-Prob for i challengeing j
-        double ej = get<1>(pej); // i's estimate of the change in utility to i of i challengeing j, compared to SQ
-        if ((minSig < ej) && (bestEU < ej)) {
+        auto peij = probEduChlg(i, i, i, j, sqlP);
+        const double pij = get<0>(peij); // i's estimate of the victory-Prob for i challenging j
+        const double edu = get<1>(peij); // i's estimate of the change in utility to i of i challenging j, compared to SQ
+        if ((minSigEDU < edu) && (bestEU < edu)) {
           bestJ = j;
-          piJ = pj;
-          bestEU = ej;
+          pIJ = pij;
+          bestEU = edu;
         }
       }
     }
-    auto rslt = tuple<int, double, double>(bestJ, piJ, bestEU);
+    if (0 <= bestJ) {
+      assert(minSigEDU < bestEU);
+    }
+    auto rslt = tuple<int, double, double>(bestJ, pIJ, bestEU);
     return rslt;
   }
 
 
-  void SMPState::newIdeals()  {
+  void SMPState::newIdeals() {
     const unsigned int na = model->numAct;
     const double tol = 1E-10;
 
