@@ -1,0 +1,9 @@
+Scenario-0x89B9E56731783372 ,"Dummy scenario to test reading format",7,3,
+Actor,Description,Power,Pstn1,Sal1,Pstn2,Sal2,Pstn3,Sal3,
+SActor-00, Random Spatial Actor, 102.543, 75.79, 49.53,  6.37,  5.91, 70.45, 28.15
+SActor-01, Random Spatial Actor,  53.393, 82.72, 30.33, 73.50, 21.22, 64.00, 24.79
+SActor-02, Random Spatial Actor, 129.643, 82.45, 48.47, 90.89, 13.55,  0.07, 34.62
+SActor-03, Random Spatial Actor,  75.920, 62.52, 20.76, 50.82, 39.24, 62.33, 22.21
+SActor-04, Random Spatial Actor,  63.224, 82.34, 40.96, 45.77, 25.43, 73.31, 22.59
+SActor-05, Random Spatial Actor, 120.048, 84.48, 22.92, 33.70, 39.35, 88.11, 15.42
+SActor-06, Random Spatial Actor,  54.178, 70.96, 31.75, 33.46, 27.93, 90.36, 26.03

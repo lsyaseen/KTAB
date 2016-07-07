@@ -33,7 +33,7 @@ private:
   int total_lines();
 
 public:
-  csv_parser(std::string filename);
+  explicit csv_parser(std::string filename); // 2016-07-07, BPW: added 'explicit'
   ~csv_parser();
   std::string get_line(int line_number);//Returns entire line as a string based on line number.
   int fields(std::string line); //Returns Number of fields in the line
