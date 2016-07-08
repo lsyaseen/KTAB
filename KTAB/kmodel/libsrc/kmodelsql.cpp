@@ -558,8 +558,10 @@ namespace KBase {
     smpDB = db;
   }
 
-  void Model::sqlBargainValue(unsigned int t, int Baragainer, int Dim, KBase::VctrPstn Coord)
-  {
+  void Model::sqlBargainValue(unsigned int t, int Baragainer, int Dim, KBase::VctrPstn Coord) {
+
+    // TODO: fix this up to cycle through the dimensions of the received points
+
     // initiate the database
     sqlite3 * db = smpDB;
 
@@ -603,7 +605,7 @@ namespace KBase {
     if (bk > 1)
       rslt = sqlite3_bind_double(insStmt, 5, Coord(1, 0));
     else
-      rslt = sqlite3_bind_double(insStmt, 5, 0.0);
+      rslt = sqlite3_bind_double(insStmt, 5, 0.0); 
 
     assert(SQLITE_OK == rslt);
 
