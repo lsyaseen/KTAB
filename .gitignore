@@ -36,6 +36,11 @@
 *.out
 *.app
 
+# Visual Studio temp files
+*.suo
+*.VC.db
+
+
 # Build stuff
 # generated directories of build products
 build*      

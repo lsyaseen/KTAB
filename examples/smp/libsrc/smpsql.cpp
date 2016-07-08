@@ -62,30 +62,30 @@ string SMPModel::createSQL(unsigned int n)  {
 		switch (n-Model::NumTables) {
 		case  0: // coordinates of each actor's position
 			sql = "create table if not exists VectorPosition ("  \
-				"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
+				"ScenarioId TEXT(32) NOT NULL DEFAULT 'None', "\
 				"Turn_t		INTEGER NOT NULL DEFAULT 0, "\
 				"Act_i		INTEGER NOT NULL DEFAULT 0, "\
 				"Dim_k		INTEGER NOT NULL DEFAULT 0, "\
-				"Coord		REAL"\
-				");";
+				"Coord		REAL NOT NULL DEFAULT 0"\
+				 ");";
 			break;
 
 		case 1: // salience to each actor of each dimension
 			sql = "create table if not exists SpatialSalience ("  \
-				"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
+				"ScenarioId TEXT(32) NOT NULL DEFAULT 'None', "\
 				"Turn_t		INTEGER NOT NULL DEFAULT 0, "\
 				"Act_i		INTEGER NOT NULL DEFAULT 0, "\
 				"Dim_k		INTEGER NOT NULL DEFAULT 0, "\
-				"Sal		REAL"\
+				"Sal		REAL NOT NULL DEFAULT 0.0"\
 				");";
 			break;
 
 		case 2: // scalar capability of each actor
 			sql = "create table if not exists SpatialCapability ("  \
-				"Scenario	TEXT NOT NULL DEFAULT 'NoName', "\
+				"ScenarioId TEXT(32) NOT NULL DEFAULT 'None', "\
 				"Turn_t		INTEGER NOT NULL DEFAULT 0, "\
 				"Act_i		INTEGER NOT NULL DEFAULT 0, "\
-				"Cap		REAL"\
+				"Cap		REAL NOT NULL DEFAULT 0.0"\
 				");";
 			break;
 
@@ -147,6 +147,7 @@ void SMPModel::sqlTest() {
     // the DB in case the system crashes in mid-operation
     sqlite3_exec(db, "PRAGMA synchronous = OFF", NULL, NULL, &zErrMsg);
     sqlite3_exec(db, "PRAGMA journal_mode = MEMORY", NULL, NULL, &zErrMsg);
+	sqlite3_exec(db, "PRAGMA foreign_keys = ON", NULL, NULL, &zErrMsg);
 
     // Create & execute SQL statements
     for (unsigned int i = 0; i < SMPModel::NumTables +Model::NumTables; i++) {
