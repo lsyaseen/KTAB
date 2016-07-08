@@ -146,7 +146,8 @@ public:
     virtual ~SMPState();
 
     // Calculate the weighted-Euclidean distance matrix, compared to the given positions.
-    // If none are provided, it will compare to the positions in this state.
+    // If none are provided, it will compare to the ideals in this state.
+    // vDiff(i,j) = distance from i's ideal to j's position, using i's salience-weights.
     virtual void setVDiff(const vector<VctrPstn> & vpos = {});
 
     // returns h's estimate of i's risk attitude, using the risk-adjustment-rule
@@ -185,7 +186,7 @@ protected:
     
     virtual void setOneAUtil(unsigned int perspH, ReportingLevel rl); 
     
-    KMatrix vDiff = KMatrix(); // vDiff(i,j) = difference between pos[i] and pos[j], using actor i's saliences as weights
+    KMatrix vDiff = KMatrix(); // vDiff(i,j) = difference between idl[i] and pos[j], using actor i's saliences as weights
     KMatrix rnProb = KMatrix(); // probability of each Unique state, when actors are treated as risk-neutral
 
     // risk-aware probabilities are uProb

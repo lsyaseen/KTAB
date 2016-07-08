@@ -250,15 +250,16 @@ namespace SMPLib {
     auto dfn = [vpos, this](unsigned int i, unsigned int j) {
       auto ai = ((const SMPActor*)(model->actrs[i]));
       KMatrix si = ai->vSal;
-      auto pj = ((const VctrPstn*)(pstns[j]));
+      auto posJ = ((const VctrPstn*)(pstns[j]));
       double dij = 0.0;
       if (0 == vpos.size()) {
-        auto pi = ((const VctrPstn*)(pstns[i]));
-        dij = SMPModel::bvDiff((*pi) - (*pj), si);
+        auto posI = ((const VctrPstn*)(pstns[i]));
+        //auto idlI = ideals[i];
+        dij = SMPModel::bvDiff((*posI) - (*posJ), si);
       }
       else {
         auto vpi = vpos[i];
-        dij = SMPModel::bvDiff(vpi - (*pj), si);
+        dij = SMPModel::bvDiff(vpi - (*posJ), si);
       }
       return dij;
     };
@@ -710,7 +711,9 @@ namespace SMPLib {
 
         // TODO: sqlBargainValue should cycle through existing dimensions
         // (plus other changes)
-		model->sqlBargnCoords(t, brgnIJ->getID(), brgnIJ->posInit, brgnIJ->posRcvr);
+        model->sqlBargainValue(t, brgnIJ->getID(), 0, brgnIJ->posInit);
+        model->sqlBargainValue(t, brgnIJ->getID(), 1, brgnIJ->posRcvr);
+
         // clean up `
         delete brgnIIJ;
         brgnIIJ = nullptr;
@@ -841,7 +844,7 @@ namespace SMPLib {
 
 
       //populate the Bargain Vote table
-     // model->sqlBargainVote(t, k, k, w);
+      model->sqlBargainVote(t, k, k, w);
 
       //populate the Bargain util table
       model->sqlBargainUtil(t, k, u_im);
@@ -1043,11 +1046,11 @@ namespace SMPLib {
       sqlite3 * db = model->smpDB;
       char* zErrMsg = nullptr; // Error message in case
 
-      auto sqlBuff = newChars(250);
+      auto sqlBuff = newChars(200);
       // prepare the sql statement to insert. as it does not depend on tpk, keep it outside the loop.
       sprintf(sqlBuff,
-        "INSERT INTO TP_Prob_Vict_Loss (ScenarioId, Turn_t, Est_h,Init_i,ThrdP_k,Rcvr_j,Prob,Util_V,Util_L) VALUES ('%s', ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
-        model->getScenarioID().c_str());
+        "INSERT INTO TP_Prob_Vict_Loss (Scenario, Turn_t, Est_h,Init_i,ThrdP_k,Rcvr_j,Prob,Util_V,Util_L) VALUES ('%s', ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+        model->getScenarioName().c_str());
 
       // The whole point of a prepared statement is to reuse it.
       // Therefore, we prepare it before the loop, and reuse it inside the loop:
@@ -1093,17 +1096,17 @@ namespace SMPLib {
       // formatting note: %d means an integer, base 10
       // we will use base 10 by default, and these happen to be unsigned integers, so %i is appropriate
 
-      memset(sqlBuff, '\0', 250);
+      memset(sqlBuff, '\0', 200);
       sprintf(sqlBuff,
-        "INSERT INTO ProbVict (ScenarioId, Turn_t, Est_h,Init_i,Rcvr_j,Prob) VALUES ('%s',%u,%u,%u,%u,%f)",
-        model->getScenarioID().c_str(), t, h, i, j, phij);
+        "INSERT INTO ProbVict (Scenario, Turn_t, Est_h,Init_i,Rcvr_j,Prob) VALUES ('%s',%u,%u,%u,%u,%f)",
+        model->getScenarioName().c_str(), t, h, i, j, phij);
       sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
 
       // the following four statements could be combined into one table
-      memset(sqlBuff, '\0', 250);
+      memset(sqlBuff, '\0', 200);
       sprintf(sqlBuff,
-        "INSERT INTO UtilChlg (ScenarioId, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util_SQ,Util_Vict,Util_Cntst,Util_Chlg) VALUES ('%s',%u,%u,%u,%u,%u,%f,%f,%f,%f)",
-        model->getScenarioID().c_str(), t, h, k, i, j, euSQ, euVict, euCntst, euChlg);
+        "INSERT INTO UtilChlg (Scenario, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util_SQ,Util_Vict,Util_Cntst,Util_Chlg) VALUES ('%s',%u,%u,%u,%u,%u,%f,%f,%f,%f)",
+        model->getScenarioName().c_str(), t, h, k, i, j, euSQ, euVict, euCntst, euChlg);
       sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
 
       sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
@@ -1485,8 +1488,8 @@ namespace SMPLib {
     createSQL(Model::NumTables + 0); // Make sure VectorPosition table is present
     auto sqlBuff = newChars(200);
     sprintf(sqlBuff,
-      "INSERT INTO VectorPosition (ScenarioId, Turn_t, Act_i, Dim_k, Coord) VALUES ('%s', ?1, ?2, ?3, ?4)",
-      scenId.c_str());
+      "INSERT INTO VectorPosition (Scenario, Turn_t, Act_i, Dim_k, Coord) VALUES ('%s', ?1, ?2, ?3, ?4)",
+      scenName.c_str());
     const char* insStr = sqlBuff;
     sqlite3_stmt *insStmt;
     sqlite3_prepare_v2(smpDB, insStr, strlen(insStr), &insStmt, NULL);
@@ -1585,8 +1588,8 @@ namespace SMPLib {
     auto sqlBuff = newChars(200);
     // form sql insert command
     sprintf(sqlBuff,
-      "INSERT INTO SpatialCapability (ScenarioId, Turn_t, Act_i, Cap) VALUES ('%s', ?1, ?2, ?3)",
-      scenId.c_str());
+      "INSERT INTO SpatialCapability (Scenario, Turn_t, Act_i, Cap) VALUES ('%s', ?1, ?2, ?3)",
+      scenName.c_str());
     const char* insStr = sqlBuff;
     sqlite3_stmt *insStmt;
     // fill the Scenario
@@ -1638,8 +1641,8 @@ namespace SMPLib {
     auto sqlBuff = newChars(200);
     // Form a insert command
     sprintf(sqlBuff,
-      "INSERT INTO SpatialSalience (ScenarioId, Turn_t, Act_i, Dim_k,Sal) VALUES ('%s', ?1, ?2, ?3, ?4)",
-      scenId.c_str());
+      "INSERT INTO SpatialSalience (Scenario, Turn_t, Act_i, Dim_k,Sal) VALUES ('%s', ?1, ?2, ?3, ?4)",
+      scenName.c_str());
     const char* insStr = sqlBuff;
     sqlite3_stmt *insStmt;
     // fill the Scenario
@@ -1701,8 +1704,8 @@ namespace SMPLib {
     auto sqlBuff = newChars(200);
     // Form a insert command
     sprintf(sqlBuff,
-      "INSERT INTO ActorDescription (ScenarioId,  Act_i, Name,Desc) VALUES ('%s', ?1, ?2, ?3)",
-      scenId.c_str());
+      "INSERT INTO ActorDescription (Scenario,  Act_i, Name,Desc) VALUES ('%s', ?1, ?2, ?3)",
+      scenName.c_str());
     const char* insStr = sqlBuff;
     sqlite3_stmt *insStmt;
     // fill the Scenario
