@@ -80,6 +80,13 @@ protected:
   uint64_t myBargainID = 0;
 };
 
+enum class SMPBargnModel {
+  InitOnlyInterpSMPBM,   // Init interpolates, I&R get same one
+  InitRcvrInterpSMPBM,   // Init interpolates, so does Rcvr, each both from other
+  PWCompInterSMPBM       // Power-weighted compromise of I-interp and R-interp, I&R both get same one
+};
+
+
 // -------------------------------------------------
 // Trivial, SMP-like actor with fixed attributes
 // the old smp.cpp file, SpatialState::developTwoPosBargain, for a discussion of
@@ -178,6 +185,9 @@ public:
     void setNRA(); // TODO: this just sets risk neutral, for now
     // return actor's normalized risk attitude (if set)
     double aNRA(unsigned int i) const;
+
+    SMPBargnModel bMod = SMPBargnModel::PWCompInterSMPBM;
+      // PWCompInterSMPBM, InitOnlyInterpSMPBM or InitRcvrInterpSMPBM; 
 
 protected:
 

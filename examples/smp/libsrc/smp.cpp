@@ -57,6 +57,11 @@ namespace SMPLib {
   // --------------------------------------------
   uint64_t BargainSMP::highestBargainID = 1000;
 
+  // big enough buffer to build all desired SQLite statements
+  const unsigned int sqlBuffSize = 250;
+
+  // --------------------------------------------
+
   BargainSMP::BargainSMP(const SMPActor* ai, const SMPActor* ar, const VctrPstn & pi, const VctrPstn & pr) {
     assert(nullptr != ai);
     assert(nullptr != ar);
@@ -572,14 +577,8 @@ namespace SMPLib {
   }
 
 
-  enum class SMPBargnModel {
-    InitOnlyInterpSMPBM,   // Init interpolates, I&R get same one
-    InitRcvrInterpSMPBM,   // Init interpolates, so does Rcvr, each both from other
-    PWCompInterSMPBM       // Power-weighted compromise of I-interp and R-interp, I&R both get same one
-  };
 
   SMPState* SMPState::doBCN() const {
-    const SMPBargnModel bMod = SMPBargnModel::InitRcvrInterpSMPBM;
     const bool recordBargainingP = true;
     auto brgns = vector< vector < BargainSMP* > >();
     const unsigned int na = model->numAct;
@@ -1088,7 +1087,7 @@ namespace SMPLib {
       sqlite3 * db = model->smpDB;
       char* zErrMsg = nullptr; // Error message in case
 
-      auto sqlBuff = newChars(250);
+      auto sqlBuff = newChars(sqlBuffSize);
       // prepare the sql statement to insert. as it does not depend on tpk, keep it outside the loop.
       sprintf(sqlBuff,
         "INSERT INTO TP_Prob_Vict_Loss (ScenarioId, Turn_t, Est_h,Init_i,ThrdP_k,Rcvr_j,Prob,Util_V,Util_L) VALUES ('%s', ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
@@ -1138,14 +1137,14 @@ namespace SMPLib {
       // formatting note: %d means an integer, base 10
       // we will use base 10 by default, and these happen to be unsigned integers, so %i is appropriate
 
-      memset(sqlBuff, '\0', 250);
+      memset(sqlBuff, '\0', sqlBuffSize);
       sprintf(sqlBuff,
         "INSERT INTO ProbVict (ScenarioId, Turn_t, Est_h,Init_i,Rcvr_j,Prob) VALUES ('%s',%u,%u,%u,%u,%f)",
         model->getScenarioID().c_str(), t, h, i, j, phij);
       sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
 
       // the following four statements could be combined into one table
-      memset(sqlBuff, '\0', 250);
+      memset(sqlBuff, '\0', sqlBuffSize);
       sprintf(sqlBuff,
         "INSERT INTO UtilChlg (ScenarioId, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util_SQ,Util_Vict,Util_Cntst,Util_Chlg) VALUES ('%s',%u,%u,%u,%u,%u,%f,%f,%f,%f)",
         model->getScenarioID().c_str(), t, h, k, i, j, euSQ, euVict, euCntst, euChlg);
@@ -1528,7 +1527,7 @@ namespace SMPLib {
     char* zErrMsg = nullptr;
 
     createSQL(Model::NumTables + 0); // Make sure VectorPosition table is present
-    auto sqlBuff = newChars(200);
+    auto sqlBuff = newChars(sqlBuffSize); 
     sprintf(sqlBuff,
       "INSERT INTO VectorPosition (ScenarioId, Turn_t, Act_i, Dim_k, Coord) VALUES ('%s', ?1, ?2, ?3, ?4)",
       scenId.c_str());
@@ -1627,7 +1626,7 @@ namespace SMPLib {
     char* zErrMsg = nullptr;
 
     createSQL(Model::NumTables + 2); // Make sure SpatialCapability table present
-    auto sqlBuff = newChars(200);
+    auto sqlBuff = newChars(sqlBuffSize);
     // form sql insert command
     sprintf(sqlBuff,
       "INSERT INTO SpatialCapability (ScenarioId, Turn_t, Act_i, Cap) VALUES ('%s', ?1, ?2, ?3)",
@@ -1680,7 +1679,7 @@ namespace SMPLib {
     assert(nullptr != smpDB);
     char* zErrMsg = nullptr;
     createSQL(Model::NumTables + 1); // make sure SpatialSalience table present if not create
-    auto sqlBuff = newChars(200);
+    auto sqlBuff = newChars(sqlBuffSize);
     // Form a insert command
     sprintf(sqlBuff,
       "INSERT INTO SpatialSalience (ScenarioId, Turn_t, Act_i, Dim_k,Sal) VALUES ('%s', ?1, ?2, ?3, ?4)",
@@ -1743,7 +1742,7 @@ namespace SMPLib {
     createSQL(7); // make sure ActorDescription table is present
     // buffer to hold data
     char* zErrMsg = nullptr;
-    auto sqlBuff = newChars(200);
+    auto sqlBuff = newChars(sqlBuffSize);
     // Form a insert command
     sprintf(sqlBuff,
       "INSERT INTO ActorDescription (ScenarioId,  Act_i, Name,Desc) VALUES ('%s', ?1, ?2, ?3)",
