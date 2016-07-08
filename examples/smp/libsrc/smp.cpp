@@ -572,8 +572,14 @@ namespace SMPLib {
   }
 
 
+  enum class SMPBargnModel {
+    InitOnlyInterpSMPBM,   // Init interpolates, I&R get same one
+    InitRcvrInterpSMPBM,   // Init interpolates, so does Rcvr, each both from other
+    PWCompInterSMPBM       // Power-weighted compromise of I-interp and R-interp, I&R both get same one
+  };
 
   SMPState* SMPState::doBCN() const {
+    const SMPBargnModel bMod = SMPBargnModel::InitRcvrInterpSMPBM;
     const bool recordBargainingP = true;
     auto brgns = vector< vector < BargainSMP* > >();
     const unsigned int na = model->numAct;
@@ -673,9 +679,6 @@ namespace SMPLib {
         printf("  %2u proposes %2u adopt: ", i, i);
         KBase::trans(brgnIIJ->posInit).mPrintf(" %.3f ");
 
-        //Brgn table base entries
-        model->sqlBargainEntries(t, brgnJIJ->getID(), i, i, i, bestEU);
-
 
         printf("  %2u proposes %2u adopt: ", i, j);
         KBase::trans(brgnIIJ->posRcvr).mPrintf(" %.3f ");
@@ -690,7 +693,6 @@ namespace SMPLib {
         KBase::trans(brgnJIJ->posRcvr).mPrintf(" %.3f ");
         //Brgn table base entries
 
-        model->sqlBargainEntries(t, brgnIIJ->getID(), i, i, j, bestEU);
 
         printf("\n");
         printf("Power-weighted compromise  ");
@@ -702,27 +704,67 @@ namespace SMPLib {
         KBase::trans(brgnIJ->posRcvr).mPrintf(" %.3f ");
         printf("\n");
 
+
         // TODO: make one-perspective an option.
         // For now, emulate it by swapping
         //auto tIJ = brgnIJ;
         //auto tIIJ = brgnIIJ;
         //brgnIJ = tIIJ;
         //brgnIIJ = tIJ;
+        
+        // TODO: what does this data represent?
+        //Brgn table base entries
+        model->sqlBargainEntries(t, brgnJIJ->getID(), i, i, i, bestEU);
+        model->sqlBargainEntries(t, brgnIIJ->getID(), i, i, j, bestEU);
 
-        // TODO: sqlBargainValue should cycle through existing dimensions
-        // (plus other changes)
-        model->sqlBargainValue(t, brgnIJ->getID(), 0, brgnIJ->posInit);
-        model->sqlBargainValue(t, brgnIJ->getID(), 1, brgnIJ->posRcvr);
 
-        // clean up `
-        delete brgnIIJ;
-        brgnIIJ = nullptr;
-        delete brgnJIJ;
-        brgnJIJ = nullptr;
+        switch (bMod) {
+        case SMPBargnModel::InitOnlyInterpSMPBM:
+          // record the only one used into SQLite
+          model->sqlBargnCoords(t, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr);
+          // record this one onto BOTH the initiator and receiver queues
+          brgns[i].push_back(brgnIIJ); // initiator's copy, delete only it later
+          brgns[j].push_back(brgnIIJ); // receiver's copy, just null it out later
+          // clean up unused
+          delete brgnIJ;
+          brgnIJ = nullptr;
+          delete brgnJIJ;
+          brgnJIJ = nullptr;
+          break;
 
-        // record this on BOTH the initiator and receiver queues
-        brgns[i].push_back(brgnIJ); // initiator's copy, delete only it later
-        brgns[j].push_back(brgnIJ); // receiver's copy, just null it out later
+
+        case SMPBargnModel::InitRcvrInterpSMPBM:
+          // record the pair used into SQLite
+          model->sqlBargnCoords(t, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr);
+          model->sqlBargnCoords(t, brgnJIJ->getID(), brgnJIJ->posInit, brgnJIJ->posRcvr);
+          // record these both onto BOTH the initiator and receiver queues
+          brgns[i].push_back(brgnIIJ); // initiator's copy, delete only it later
+          brgns[i].push_back(brgnJIJ); // initiator's copy, delete only it later
+          brgns[j].push_back(brgnIIJ); // receiver's copy, just null it out later
+          brgns[j].push_back(brgnJIJ); // receiver's copy, just null it out later
+          // clean up unused
+          delete brgnIJ;
+          brgnIJ = nullptr;
+          break;
+
+
+        case SMPBargnModel::PWCompInterSMPBM:
+          // record the only one used into SQLite
+          model->sqlBargnCoords(t, brgnIJ->getID(), brgnIJ->posInit, brgnIJ->posRcvr);
+          // record this one onto BOTH the initiator and receiver queues
+          brgns[i].push_back(brgnIJ); // initiator's copy, delete only it later
+          brgns[j].push_back(brgnIJ); // receiver's copy, just null it out later
+          // clean up unused
+          delete brgnIIJ;
+          brgnIIJ = nullptr;
+          delete brgnJIJ;
+          brgnJIJ = nullptr;
+          break;
+
+        default:
+          cout << "SMPState::doBCN unrecognized SMPBargnModel" << endl << flush;
+          assert(false);
+        }
 
       }
       else {
@@ -844,7 +886,7 @@ namespace SMPLib {
 
 
       //populate the Bargain Vote table
-      model->sqlBargainVote(t, k, k, w);
+     // model->sqlBargainVote(t, k, k, w);
 
       //populate the Bargain util table
       model->sqlBargainUtil(t, k, u_im);
@@ -1046,11 +1088,11 @@ namespace SMPLib {
       sqlite3 * db = model->smpDB;
       char* zErrMsg = nullptr; // Error message in case
 
-      auto sqlBuff = newChars(200);
+      auto sqlBuff = newChars(250);
       // prepare the sql statement to insert. as it does not depend on tpk, keep it outside the loop.
       sprintf(sqlBuff,
-        "INSERT INTO TP_Prob_Vict_Loss (Scenario, Turn_t, Est_h,Init_i,ThrdP_k,Rcvr_j,Prob,Util_V,Util_L) VALUES ('%s', ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
-        model->getScenarioName().c_str());
+        "INSERT INTO TP_Prob_Vict_Loss (ScenarioId, Turn_t, Est_h,Init_i,ThrdP_k,Rcvr_j,Prob,Util_V,Util_L) VALUES ('%s', ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+        model->getScenarioID().c_str());
 
       // The whole point of a prepared statement is to reuse it.
       // Therefore, we prepare it before the loop, and reuse it inside the loop:
@@ -1096,17 +1138,17 @@ namespace SMPLib {
       // formatting note: %d means an integer, base 10
       // we will use base 10 by default, and these happen to be unsigned integers, so %i is appropriate
 
-      memset(sqlBuff, '\0', 200);
+      memset(sqlBuff, '\0', 250);
       sprintf(sqlBuff,
-        "INSERT INTO ProbVict (Scenario, Turn_t, Est_h,Init_i,Rcvr_j,Prob) VALUES ('%s',%u,%u,%u,%u,%f)",
-        model->getScenarioName().c_str(), t, h, i, j, phij);
+        "INSERT INTO ProbVict (ScenarioId, Turn_t, Est_h,Init_i,Rcvr_j,Prob) VALUES ('%s',%u,%u,%u,%u,%f)",
+        model->getScenarioID().c_str(), t, h, i, j, phij);
       sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
 
       // the following four statements could be combined into one table
-      memset(sqlBuff, '\0', 200);
+      memset(sqlBuff, '\0', 250);
       sprintf(sqlBuff,
-        "INSERT INTO UtilChlg (Scenario, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util_SQ,Util_Vict,Util_Cntst,Util_Chlg) VALUES ('%s',%u,%u,%u,%u,%u,%f,%f,%f,%f)",
-        model->getScenarioName().c_str(), t, h, k, i, j, euSQ, euVict, euCntst, euChlg);
+        "INSERT INTO UtilChlg (ScenarioId, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util_SQ,Util_Vict,Util_Cntst,Util_Chlg) VALUES ('%s',%u,%u,%u,%u,%u,%f,%f,%f,%f)",
+        model->getScenarioID().c_str(), t, h, k, i, j, euSQ, euVict, euCntst, euChlg);
       sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
 
       sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
@@ -1488,8 +1530,8 @@ namespace SMPLib {
     createSQL(Model::NumTables + 0); // Make sure VectorPosition table is present
     auto sqlBuff = newChars(200);
     sprintf(sqlBuff,
-      "INSERT INTO VectorPosition (Scenario, Turn_t, Act_i, Dim_k, Coord) VALUES ('%s', ?1, ?2, ?3, ?4)",
-      scenName.c_str());
+      "INSERT INTO VectorPosition (ScenarioId, Turn_t, Act_i, Dim_k, Coord) VALUES ('%s', ?1, ?2, ?3, ?4)",
+      scenId.c_str());
     const char* insStr = sqlBuff;
     sqlite3_stmt *insStmt;
     sqlite3_prepare_v2(smpDB, insStr, strlen(insStr), &insStmt, NULL);
@@ -1588,8 +1630,8 @@ namespace SMPLib {
     auto sqlBuff = newChars(200);
     // form sql insert command
     sprintf(sqlBuff,
-      "INSERT INTO SpatialCapability (Scenario, Turn_t, Act_i, Cap) VALUES ('%s', ?1, ?2, ?3)",
-      scenName.c_str());
+      "INSERT INTO SpatialCapability (ScenarioId, Turn_t, Act_i, Cap) VALUES ('%s', ?1, ?2, ?3)",
+      scenId.c_str());
     const char* insStr = sqlBuff;
     sqlite3_stmt *insStmt;
     // fill the Scenario
@@ -1641,8 +1683,8 @@ namespace SMPLib {
     auto sqlBuff = newChars(200);
     // Form a insert command
     sprintf(sqlBuff,
-      "INSERT INTO SpatialSalience (Scenario, Turn_t, Act_i, Dim_k,Sal) VALUES ('%s', ?1, ?2, ?3, ?4)",
-      scenName.c_str());
+      "INSERT INTO SpatialSalience (ScenarioId, Turn_t, Act_i, Dim_k,Sal) VALUES ('%s', ?1, ?2, ?3, ?4)",
+      scenId.c_str());
     const char* insStr = sqlBuff;
     sqlite3_stmt *insStmt;
     // fill the Scenario
@@ -1704,8 +1746,8 @@ namespace SMPLib {
     auto sqlBuff = newChars(200);
     // Form a insert command
     sprintf(sqlBuff,
-      "INSERT INTO ActorDescription (Scenario,  Act_i, Name,Desc) VALUES ('%s', ?1, ?2, ?3)",
-      scenName.c_str());
+      "INSERT INTO ActorDescription (ScenarioId,  Act_i, Name,Desc) VALUES ('%s', ?1, ?2, ?3)",
+      scenId.c_str());
     const char* insStr = sqlBuff;
     sqlite3_stmt *insStmt;
     // fill the Scenario
