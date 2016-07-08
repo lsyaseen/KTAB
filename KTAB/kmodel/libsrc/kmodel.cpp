@@ -23,10 +23,13 @@
 
 #include <assert.h>
 #include <iostream>
-
+ 
+#include <time.h>
 #include "kmodel.h"
 
-
+//#ifdef WIN32
+//#define localtime_r(_Time, _Tm) localtime_s(_Tm, _Time)
+//#endif
 namespace KBase {
 
 using std::cout;
@@ -48,19 +51,46 @@ Model::Model(PRNG * r, string desc) {
     std::chrono::time_point<std::chrono::system_clock> st;
     st = std::chrono::system_clock::now();
     std::time_t start_time = std::chrono::system_clock::to_time_t(st);
+	 
+	 
+	/*tm localTime;
+	localtime_r(&start_time, &localTime);*/
+
+	const std::chrono::duration<double> tse = st.time_since_epoch();
+	std::chrono::seconds::rep milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(tse).count() % 1000;
+
+
+	auto utcBuffId = newChars(500);
+	auto hshCode = newChars(100);
     if (0 == desc.length()) {
         auto utcBuff = newChars(200);
+		
         std::strftime(utcBuff, 150, "Scenario-UTC-%Y-%m-%d-%H%M-%S", gmtime(&start_time));
         cout << "No scenario description provided to Model::Model, " << endl;
         cout << "generating default name from UTC start time." << endl << flush;
         scenName = utcBuff;
+	    // Scenario Id Generation  include the microsecond
+		 
+		sprintf(utcBuffId, "%s_%u", utcBuff, milliseconds);
+	 
         delete utcBuff;
         utcBuff = nullptr;
+		
     }
     else
     {
         scenName = desc;
-    }
+		sprintf(utcBuffId, "%s_%u", desc, milliseconds);
+	}
+	//get the hash
+	unsigned int scenIdhash = (std::hash < std::string> () (utcBuffId))   ;
+	sprintf(hshCode, "0x%032llX", scenIdhash);
+	scenId = hshCode;
+	delete hshCode;
+	hshCode = nullptr;
+	delete utcBuffId;
+	utcBuffId = nullptr;
+
     cout << "Scenario assigned name: -|" << scenName.c_str() << "|-" << endl << flush;
 }
 
@@ -87,6 +117,10 @@ void Model::run() {
     State* s0 = history[0];
     bool done = false;
     unsigned int iter = 0;
+
+	// Insert New Scenario name and Generate new Id
+	sqlScenarioDesc(getScenarioName().c_str(), getScenarioName().c_str(),getScenarioID().c_str());
+ 
     while (!done) {
         assert(nullptr != s0);
         assert(nullptr != s0->step);
