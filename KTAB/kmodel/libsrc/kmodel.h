@@ -272,7 +272,7 @@ public:
                              const KMatrix & u, VotingRule vr, VPModel vpm, ReportingLevel rl);
 
     virtual unsigned int addActor(Actor* a); // returns new number of actors, always at least 1
-    int actrNdx(const Actor* a) const; // returns -1 if not found
+    int actrNdx(const Actor* a) const;
 
     unsigned int addState(State* s); // returns new number of states, always at least 1
 
