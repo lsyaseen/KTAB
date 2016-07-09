@@ -42,6 +42,21 @@ namespace KBase {
   const W64 MASK64 = 0xffffffffffffffff; // obviously 2^64 - 1
   const W64 MASK32 = 0xffffffff; // obviously 2^32 - 1
 
+
+
+  // The constant e, left-shifted up to 62 bits.
+  // 2718281828459045235 == 0x25B946EBC0B36173
+  // Shifting one more decimal would be 65 bits.
+  const W64 Q64A = 0x25B946EBC0B36173;
+
+  // The constant pi, left shifted up to 62 bits (+1)
+  // 3141592653589793238 + 1 == 0x2B992DDFA23249D7
+  // Shifting one more decimal would be 65 bits.
+  const W64 Q64B = 0x2B992DDFA23249D7;
+
+  // arbitary large constant to avoid fixed-points in qTrans
+  const W64 Q64C = 0xF1FF7B8227A447F5; // any number
+
   W64 qTrans(W64 s);
   W64 rotl(const W64 x, unsigned int n);
   W64 rotr(const W64 x, unsigned int n);
@@ -52,7 +67,7 @@ namespace KBase {
     virtual ~PRNG();
     uint64_t uniform();
     double uniform(double a, double b);
-    unsigned int probSel (const KMatrix & cv);
+    unsigned int probSel(const KMatrix & cv);
     VBool bits(unsigned int nb);
     uint64_t setSeed(uint64_t);
   protected:

@@ -247,8 +247,8 @@ string Model::createSQL(unsigned int n) {
         sprintf(sqlBuff, "create table if not exists ActorDescription ("  \
 				"ScenarioId TEXT(32) NOT NULL DEFAULT 'None', "\
                 "Act_i	INTEGER NOT NULL DEFAULT 0, "\
-                "Name	TEXT(%d) NOT NULL DEFAULT 'NoName', "\
-                "Desc	TEXT(%d) NOT NULL DEFAULT 'NoName' "\
+                "Name	TEXT(%u) NOT NULL DEFAULT 'NoName', "\
+                "Desc	TEXT(%u) NOT NULL DEFAULT 'NoName' "\
 		        ");", maxActNameLen, maxActDescLen);
         sql = std::string(sqlBuff);
         delete sqlBuff;

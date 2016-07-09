@@ -271,10 +271,10 @@ public:
     static KMatrix scalarPCE(unsigned int numAct, unsigned int numOpt, const KMatrix & w,
                              const KMatrix & u, VotingRule vr, VPModel vpm, ReportingLevel rl);
 
-    virtual unsigned int addActor(Actor* a);
+    virtual unsigned int addActor(Actor* a); // returns new number of actors, always at least 1
     int actrNdx(const Actor* a) const;
 
-    unsigned int addState(State* s);
+    unsigned int addState(State* s); // returns new number of states, always at least 1
 
     function <bool(unsigned int iter, const State* s)> stop = nullptr;
     // you have to provide this λ-fn
