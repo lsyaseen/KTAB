@@ -299,7 +299,11 @@ public:
 	void sqlBargnCoords(unsigned int t, int bargnID,  const KBase::VctrPstn & initPos, const KBase::VctrPstn & rcvrPos);
 	void sqlBargainUtil(unsigned int t, int Bargn_i,  KBase::KMatrix Util_mat);
 	void sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMatrix Util_mat, unsigned int act_i);
-	void sqlScenarioDesc(const char *ScenName, const char *ScenDesc, const char * ScenId);
+
+    // the old version of this provided as external constants all the internal values,
+    // so I reduced the possiblity of error and confusion by eliminating the redundant inputs.
+    //void sqlScenarioDesc(const char *ScenName, const char *ScenDesc, const char * ScenId);
+    void sqlScenarioDesc();
 
     static void demoSQLite();
 
@@ -307,13 +311,12 @@ public:
 
     // returns h's estimate of i's risk attitude, using the risk-adjustment-rule
     static double estNRA(double rh, double  ri, BigRAdjust ra) ;
-    string getScenarioName() const {
-        return scenName;
-    };
 
-	string getScenarioID() const {
-		return scenId;
-	};
+
+ //   string getScenarioName() const { return scenName; };
+	string getScenarioID() const { return scenId; };
+
+
     static string createSQL(unsigned int n);
 protected:
     //static string createTableSQL(unsigned int tn);

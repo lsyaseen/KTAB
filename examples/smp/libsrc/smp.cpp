@@ -1097,8 +1097,11 @@ namespace SMPLib {
       // Therefore, we prepare it before the loop, and reuse it inside the loop:
       // just moving it outside loop cut dummyData_3Dim.csv run time from 30 to 10 seconds
       // (with Electric Fence).
+      assert(nullptr != db);
       sqlite3_stmt *insStmt;
       sqlite3_prepare_v2(db, sqlBuff, strlen(sqlBuff), &insStmt, NULL);
+      assert(nullptr != insStmt); //make sure it is ready
+
       sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 
       for (int tpk = 0; tpk < na; tpk++) {  // third party voter, tpk
@@ -1531,9 +1534,13 @@ namespace SMPLib {
     sprintf(sqlBuff,
       "INSERT INTO VectorPosition (ScenarioId, Turn_t, Act_i, Dim_k, Coord) VALUES ('%s', ?1, ?2, ?3, ?4)",
       scenId.c_str());
+
+    assert(nullptr != smpDB);
     const char* insStr = sqlBuff;
     sqlite3_stmt *insStmt;
     sqlite3_prepare_v2(smpDB, insStr, strlen(insStr), &insStmt, NULL);
+    assert(nullptr != insStmt); //make sure it is ready
+
     // Prepared statements cache the execution plan for a query after the query optimizer has
     // found the best plan, so there is no big gain with simple insertions.
     // What makes a huge difference is bundling a few hundred into one atomic "transaction".
@@ -1631,10 +1638,13 @@ namespace SMPLib {
     sprintf(sqlBuff,
       "INSERT INTO SpatialCapability (ScenarioId, Turn_t, Act_i, Cap) VALUES ('%s', ?1, ?2, ?3)",
       scenId.c_str());
+
+    assert(nullptr != smpDB);
     const char* insStr = sqlBuff;
     sqlite3_stmt *insStmt;
     // fill the Scenario
     sqlite3_prepare_v2(smpDB, insStr, strlen(insStr), &insStmt, NULL);
+    assert(nullptr != insStmt); //make sure it is ready
 
     // Start transctions
     sqlite3_exec(smpDB, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
@@ -1675,8 +1685,7 @@ namespace SMPLib {
     // Verify the actor and dimesnsion
     assert(numAct == actrs.size());
     assert(numDim == dimName.size());
-    // Verify the database is live
-    assert(nullptr != smpDB);
+
     char* zErrMsg = nullptr;
     createSQL(Model::NumTables + 1); // make sure SpatialSalience table present if not create
     auto sqlBuff = newChars(sqlBuffSize);
@@ -1684,10 +1693,14 @@ namespace SMPLib {
     sprintf(sqlBuff,
       "INSERT INTO SpatialSalience (ScenarioId, Turn_t, Act_i, Dim_k,Sal) VALUES ('%s', ?1, ?2, ?3, ?4)",
       scenId.c_str());
+
+    // Verify the database is not-null
+    assert(nullptr != smpDB);
     const char* insStr = sqlBuff;
     sqlite3_stmt *insStmt;
     // fill the Scenario
     sqlite3_prepare_v2(smpDB, insStr, strlen(insStr), &insStmt, NULL);
+    assert(nullptr != insStmt); //make sure it is ready
 
     // Start transctions
     sqlite3_exec(smpDB, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
@@ -1737,7 +1750,7 @@ namespace SMPLib {
   void SMPModel::populateActorDescriptionTable(bool sqlP) const {
     // Verify the actor
     assert(numAct == actrs.size());
-    // Verify the database is live and
+    // Verify the database is non-null
     assert(nullptr != smpDB);
     createSQL(7); // make sure ActorDescription table is present
     // buffer to hold data
@@ -1751,6 +1764,8 @@ namespace SMPLib {
     sqlite3_stmt *insStmt;
     // fill the Scenario
     sqlite3_prepare_v2(smpDB, insStr, strlen(insStr), &insStmt, NULL);
+    assert(nullptr != insStmt); //make sure it is ready
+
     // Start transctions
     sqlite3_exec(smpDB, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
     // For each actor fill the requird information

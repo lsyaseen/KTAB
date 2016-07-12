@@ -231,6 +231,9 @@ namespace DemoSMP {
     printf("L-corr of prob and net support: %+.4f \n", KBase::lCorr((w*u), trans(p)));
     printf("A-corr of prob and net support: %+.4f \n", aCorr((w*u), trans(p)));
 
+    // note that recording the scenario is not part of running the scenario,
+    // so this is recorded outside the run.
+    md0->sqlScenarioDesc();
 
     cout << "Starting model run" << endl << flush;
     md0->run();
@@ -309,7 +312,7 @@ int main(int ac, char **av) {
   auto sTime = KBase::displayProgramStart(DemoSMP::appName, DemoSMP::appVersion);
   uint64_t seed = dSeed;
   bool run = true;
-  bool euSmpP = false;
+  bool euSmpP = true; // debugging with Visual Studio
   bool csvP = false;
   string inputCSV = "";
 

@@ -1599,7 +1599,7 @@ int main(int ac, char **av) {
   auto sTime = KBase::displayProgramStart();
   uint64_t seed = dSeed;
   bool run = true;
-  bool euEconP = false;
+  bool euEconP = true; // debugging with Visual Studio
   bool maxEconP = false;
 
   auto showHelp = []() {

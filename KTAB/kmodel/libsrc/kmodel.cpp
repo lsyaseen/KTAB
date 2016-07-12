@@ -118,9 +118,6 @@ void Model::run() {
     bool done = false;
     unsigned int iter = 0;
 
-	// Insert New Scenario name and Generate new Id
-	sqlScenarioDesc(getScenarioName().c_str(), getScenarioName().c_str(),getScenarioID().c_str());
- 
     while (!done) {
         assert(nullptr != s0);
         assert(nullptr != s0->step);

@@ -1029,7 +1029,7 @@ int main(int ac, char **av) {
   bool run = true;
   bool dosP = false;
   bool maxSupP = false;
-  bool mtchSUSNP = false;
+  bool mtchSUSNP = true; // debugging with Visual Studio
 
   auto showHelp = []() {
     printf("\n");

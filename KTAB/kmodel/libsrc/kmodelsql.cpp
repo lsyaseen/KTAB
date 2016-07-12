@@ -341,6 +341,8 @@ void Model::sqlAUtil(unsigned int t) {
     sprintf(sqlBuff,
             "INSERT INTO PosUtil (ScenarioId, Turn_t, Est_h, Act_i, Pos_j, Util) VALUES ('%s', ?1, ?2, ?3, ?4, ?5)",
             scenId.c_str());
+
+    assert(nullptr != db);
     const char* insStr = sqlBuff;
     sqlite3_stmt *insStmt;
     sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
@@ -348,6 +350,7 @@ void Model::sqlAUtil(unsigned int t) {
     // found the best plan, so there is no big gain with simple insertions.
     // What makes a huge difference is bundling a few hundred into one atomic "transaction".
     // For this case, runtime droped from 62-65 seconds to 0.5-0.6 (vs. 0.30-0.33 with no SQL at all).
+    assert(nullptr != insStmt); // make sure it is ready
 
     sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
     for (unsigned int h = 0; h < numAct; h++) { // estimator is h
@@ -402,9 +405,13 @@ void Model::sqlPosEquiv(unsigned int t)
     sprintf(sqlBuff,
             "INSERT INTO PosEquiv (ScenarioId, Turn_t, Pos_i, Eqv_j) VALUES ('%s', ?1, ?2, ?3)",
             scenId.c_str());
+
+    assert(nullptr != db);
     const char* insStr = sqlBuff;
     sqlite3_stmt *insStmt;
     sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+    assert(nullptr != insStmt); // make sure it is ready
+
     // Start inserting record
     sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
     for (unsigned int i = 0; i < numAct; i++) {
@@ -453,9 +460,12 @@ void Model::sqlUpdateBargainTable (unsigned int t,   double IntProb, int Init_Se
 	// prepare the sql statement to insert
 	sprintf(sqlBuff, "UPDATE Bargn SET Init_Prob = ?1, Init_Seld = ?2, Recd_Prob = ?3, Recd_Seld= ?4 WHERE (Brgn_Act_i = ?5 ) and (?6 = Turn_t)");
 
+    assert(nullptr != db);
 	const char* insStr = sqlBuff;
 	sqlite3_stmt *insStmt;
 	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+    assert(nullptr != insStmt); // make sure it is ready
+
 	// start for the transaction
 	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 
@@ -522,9 +532,12 @@ void Model::sqlBargainEntries(unsigned int t, int bargainId, int Baragainer, int
 		"INSERT INTO Bargn (ScenarioId, Turn_t,Bargn_i, Brgn_Act_i,Init_Act_i, Recd_Act_i,Value) VALUES ('%s',?1, ?2, ?3, ?4,?5,?6)",
 		scenId.c_str());
 
+    assert(nullptr != db);
 	const char* insStr = sqlBuff;
 	sqlite3_stmt *insStmt;
 	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+    assert(nullptr != insStmt); // make sure it is ready
+
 	// start for the transaction
 	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 
@@ -581,9 +594,12 @@ void Model::sqlBargnCoords(unsigned int t, int bargnID, const KBase::VctrPstn & 
 		"INSERT INTO BargnCoords (ScenarioId, Turn_t,Bargn_i, Dim_k, Init_Coord,Recd_Coord) VALUES ('%s',?1, ?2, ?3, ?4,?5)",
 		scenId.c_str());
 
+    assert(nullptr != db);
 	const char* insStr = sqlBuff;
 	sqlite3_stmt *insStmt;
 	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+    assert(nullptr != insStmt); // make sure it is ready
+
 	// start for the transaction
 	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 	 
@@ -644,9 +660,12 @@ void Model::sqlBargainUtil(unsigned int t, int Bargn_i,  KBase::KMatrix Util_mat
 		"INSERT INTO BargnUtil  (ScenarioId, Turn_t,Bargn_i, Act_i, Util) VALUES ('%s',?1, ?2, ?3, ?4)",
 		scenId.c_str());
 
+    assert(nullptr != db);
 	const char* insStr = sqlBuff;
 	sqlite3_stmt *insStmt;
 	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+    assert(nullptr != insStmt); // make sure it is ready
+
 	// start for the transaction
 	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 
@@ -688,11 +707,17 @@ void Model::sqlBargainUtil(unsigned int t, int Bargn_i,  KBase::KMatrix Util_mat
 }
  
 //Work In Progress
-void Model::sqlScenarioDesc(const char *ScenName, const char *ScenDesc, const char * ScenId)
+void Model::sqlScenarioDesc()
 {
+
+  assert(nullptr != smpDB);
+  // In order to use it, it must exist.
+  // If it arrives here without creating a DB, then there is a
+  // programming error that CANNOT be glossed over at runtime.
+
+
 	// initiate the database
 	sqlite3 * db = smpDB;
-
 	// Error message in case
 	char* zErrMsg = nullptr;
 	auto sqlBuff = newChars(200);
@@ -703,18 +728,20 @@ void Model::sqlScenarioDesc(const char *ScenName, const char *ScenDesc, const ch
 		scenName.c_str());
 
 	const char* insStr = sqlBuff;
-	sqlite3_stmt *insStmt;
+	sqlite3_stmt *insStmt = nullptr;
 	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+    assert(nullptr != insStmt);  //make sure it is ready
+
 	// start for the transaction
 	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 
 
 	int rslt = 0;
 	// Turn_t
-	rslt = sqlite3_bind_text(insStmt, 1, ScenName, -1, SQLITE_TRANSIENT);
+	rslt = sqlite3_bind_text(insStmt, 1, scenName.c_str(), -1, SQLITE_TRANSIENT);
 	assert(SQLITE_OK == rslt);
 	// Scen Id
-	rslt = sqlite3_bind_text(insStmt, 2, ScenId, -1, SQLITE_TRANSIENT);
+	rslt = sqlite3_bind_text(insStmt, 2, scenId.c_str(), -1, SQLITE_TRANSIENT);
 	assert(SQLITE_OK == rslt);
 
 	// finish  
@@ -748,9 +775,12 @@ void Model::sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMat
 	sprintf(sqlBuff,
 		"INSERT INTO BargnVote  (ScenarioId, Turn_t,Bargn_i,  Bargn_j, Act_k, Vote) VALUES ('%s', ?1, ?2, ?3,?4,?5)",scenId.c_str());
 	
+    assert(nullptr != db);
 	const char* insStr = sqlBuff;
 	sqlite3_stmt *insStmt;
 	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+    assert(nullptr != insStmt); //make sure it is ready
+
 	// start for the transaction
 	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 
@@ -810,8 +840,12 @@ void Model::sqlPosProb(unsigned int t) {
             "INSERT INTO PosProb (ScenarioId, Turn_t, Est_h,Pos_i, Prob) VALUES ('%s', ?1, ?2, ?3, ?4)",
             scenId.c_str());
     const char* insStr = sqlBuff;
+
+    assert(nullptr != db);
     sqlite3_stmt *insStmt;
     sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+    assert(nullptr != insStmt); //make sure it is ready
+
     // start for the transaction
     sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
     // collect the information from each estimator,actor
@@ -873,9 +907,13 @@ void Model::sqlPosVote(unsigned int t) {
     sprintf(sqlBuff,
             "INSERT INTO PosVote (ScenarioId, Turn_t, Est_h, Voter_k,Pos_i, Pos_j,Vote) VALUES ('%s', ?1, ?2, ?3, ?4,?5,?6)",
             scenId.c_str());
+
+    assert(nullptr != db);
     const char* insStr = sqlBuff;
     sqlite3_stmt *insStmt;
     sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
+    assert(nullptr != insStmt); //make sure it is ready
+
     // start for the transaction
     sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
     auto vr = VotingRule::Proportional;
