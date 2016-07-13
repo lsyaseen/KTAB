@@ -199,8 +199,8 @@ namespace RfrmPri {
 
   
   // --------------------------------------------
-
-  RPModel::RPModel(PRNG* rng, string d) : Model(rng, d) {
+  // JAH 20160711 added rng seed
+  RPModel::RPModel(PRNG* rng, string d, uint64_t s) : Model(rng, d, s) {
     // nothing yet
   }
 

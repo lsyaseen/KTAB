@@ -1381,8 +1381,8 @@ namespace SMPLib {
 
   // -------------------------------------------------
 
-
-  SMPModel::SMPModel(PRNG * r, string desc) : Model(r, desc) {
+  // JAH 20160711 added rng seed
+  SMPModel::SMPModel(PRNG * r, string desc, uint64_t s) : Model(r, desc, s) {
     // note that numDim, posTol, and dimName are initialized in class declaration
 
     // TODO: get cleaner opening of smpDB
@@ -1795,7 +1795,9 @@ namespace SMPLib {
 
     return;
   }
-  SMPModel * SMPModel::readCSV(string fName, PRNG * rng) {
+
+  // JAH 20160711 added rng seed
+  SMPModel * SMPModel::readCSV(string fName, PRNG * rng, uint64_t s) {
     using KBase::KException;
     char * errBuff; // as sprintf requires
     csv_parser csv(fName);
@@ -1924,15 +1926,15 @@ namespace SMPLib {
     sal = sal / 100.0;
 
     // now that it is read and verified, use the data
-    auto sm0 = SMPModel::initModel(actorNames, actorDescs, dNames, cap, pos, sal, rng);
+    auto sm0 = SMPModel::initModel(actorNames, actorDescs, dNames, cap, pos, sal, rng, s); // JAH 20160711 added rng seed
     return sm0;
   }
 
 
-
+  // JAH 20160711 added rng seed
   SMPModel * SMPModel::initModel(vector<string> aName, vector<string> aDesc, vector<string> dName,
-    KMatrix cap, KMatrix pos, KMatrix sal, PRNG * rng) {
-    SMPModel * sm0 = new SMPModel(rng);
+    KMatrix cap, KMatrix pos, KMatrix sal, PRNG * rng, uint64_t s) {
+    SMPModel * sm0 = new SMPModel(rng,"",s); // JAH 20160711 added rng seed
     SMPState * st0 = new SMPState(sm0);
     st0->step = [st0]() {
       return st0->stepBCN();

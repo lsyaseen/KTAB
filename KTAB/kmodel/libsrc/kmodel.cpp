@@ -39,7 +39,8 @@ using std::get;
 using std::tuple;
 
 // --------------------------------------------
-Model::Model(PRNG * r, string desc) {
+// JAH 20160711 added seed
+Model::Model(PRNG * r, string desc, uint64_t s) {
     history = vector<State*>();
     actrs = vector<Actor*>();
     numAct = 0;
@@ -80,7 +81,7 @@ Model::Model(PRNG * r, string desc) {
     else
     {
         scenName = desc;
-        sprintf(utcBuffId, "%s_%u", desc.c_str(), milliseconds);
+		sprintf(utcBuffId, "%s_%u", desc, milliseconds);
 	}
 	//get the hash
 	uint64_t scenIdhash = (std::hash < std::string> () (utcBuffId))   ;
@@ -90,6 +91,9 @@ Model::Model(PRNG * r, string desc) {
 	hshCode = nullptr;
 	delete utcBuffId;
 	utcBuffId = nullptr;
+
+    // JAH 20160711 save the seed for the rng
+    rngSeed = s;
 
     cout << "Scenario assigned name: -|" << scenName.c_str() << "|-" << endl << flush;
 }
@@ -117,7 +121,7 @@ void Model::run() {
     State* s0 = history[0];
     bool done = false;
     unsigned int iter = 0;
-
+ 
     while (!done) {
         assert(nullptr != s0);
         assert(nullptr != s0->step);

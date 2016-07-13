@@ -305,11 +305,13 @@ string Model::createSQL(unsigned int n) {
 			"Vote	REAL NOT NULL DEFAULT 0.0"\
 			");";
 		break;
+        // JAH 20160711 added the RNGSeed field
 	case 12:  //ScenarioDesc creation
 		sql = "create table if not exists ScenarioDesc ("  \
 			"Scenario Text(512) NOT NULL UNIQUE DEFAULT 'NoName', "\
 			"Desc text(512) NOT NULL DEFAULT 'No Description', "\
-			"ScenarioId TEXT(32) NOT NULL DEFAULT 'None'" \
+            "ScenarioId TEXT(32) NOT NULL DEFAULT 'None'," \
+            "RNGSeed text(20) NOT NULL DEFAULT '0'" \
 			");";
 		break;
     default:
@@ -715,7 +717,6 @@ void Model::sqlScenarioDesc()
   // If it arrives here without creating a DB, then there is a
   // programming error that CANNOT be glossed over at runtime.
 
-
 	// initiate the database
 	sqlite3 * db = smpDB;
 	// Error message in case
@@ -723,8 +724,9 @@ void Model::sqlScenarioDesc()
 	auto sqlBuff = newChars(200);
 
 	// prepare the sql statement to insert
+    // JAH 20160711 added 3rd input
 	sprintf(sqlBuff,
-		"INSERT INTO ScenarioDesc  (Scenario, Desc,ScenarioId) VALUES ('%s',?1,?2)",
+        "INSERT INTO ScenarioDesc  (Scenario, Desc,ScenarioId,RNGSeed) VALUES ('%s',?1,?2,?3)",
 		scenName.c_str());
 
 	const char* insStr = sqlBuff;
@@ -743,6 +745,13 @@ void Model::sqlScenarioDesc()
 	// Scen Id
 	rslt = sqlite3_bind_text(insStmt, 2, scenId.c_str(), -1, SQLITE_TRANSIENT);
 	assert(SQLITE_OK == rslt);
+    // rng seed JAH 20160711
+    // have to convert to text and store it that way, since sqlite3 doesn't really understand unsigned ints
+    char *seedBuff = newChars(50);
+    sprintf(seedBuff,"%20llu",rngSeed);
+    const char* strSeed = seedBuff;
+    rslt = sqlite3_bind_text(insStmt, 3, strSeed, -1, SQLITE_TRANSIENT);
+    assert(SQLITE_OK == rslt);
 
 	// finish  
 	assert(SQLITE_OK == rslt);
@@ -756,6 +765,9 @@ void Model::sqlScenarioDesc()
 	sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
 	delete sqlBuff;
 	sqlBuff = nullptr;
+    // JAH 20160711
+    delete seedBuff;
+    seedBuff = nullptr;
 
 	smpDB = db;
 }

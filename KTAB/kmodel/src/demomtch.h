@@ -150,7 +150,7 @@ private:
 
 class MtchModel : public Model {
 public:
-    explicit MtchModel(PRNG* rng, string d="");
+    explicit MtchModel(PRNG* rng, string d="", uint64_t s=0); // JAH 20160711 added rng seed
     virtual ~MtchModel();
 
     static MtchModel* randomMS(unsigned int numA, unsigned int numI, VotingRule vr, MtchActor::PropModel pMod, PRNG * rng);
