@@ -8,7 +8,7 @@
 # -------------------------------------------
 
 START=1
-END=$1
+END=5
 
 rm -f run-smpc*txt  run-smpc*db  test.db
 for i in $(eval echo "{$START..$END}")
