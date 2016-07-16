@@ -150,11 +150,11 @@ message(STATUS "CMAKE_SYSTEM_NAME: " ${CMAKE_SYSTEM_NAME} )
 message(STATUS "Using PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
 message(STATUS "KTAB_INSTALL_DIR: " ${KTAB_INSTALL_DIR})
 # -------------------------------------------------
-# As of February 2014, C++11 is still not the default
+# As of July 2016, C++14 is still not the default
 # for g++, so I have to provide it here.
-# Also on Unix, the C++11 thread library relies on pthreads
+# Also on Unix, the C++14 thread library relies on pthreads
 if (UNIX OR MINGW)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 ")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++14 ")
   if (ENABLE_EFFCPP)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++ ")
   endif (ENABLE_EFFCPP)
