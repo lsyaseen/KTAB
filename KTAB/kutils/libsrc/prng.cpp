@@ -32,22 +32,75 @@ namespace KBase {
   using std::endl;
   using std::flush;
 
-  W64 qTrans(W64 s) {
-    // n must be even, != 0
-    W64 n = 2;
+  /*
+  The q transformation is 1-to-1, mod 2^w, for any w>0,
+  when a is arbitrary, n is positive even, and c is odd.
 
-    // c must be odd
-    W64 c = 3;
+  Suppose there were two 0 <= j < i < 2^w where q(i) == q(j) mod 2^w.
+  This leads to a contradiction, odd == even.
+  First, q(i) = n*i^2 + (an+c)*i + ac.
 
-    // a can be any number, even 0, preserves 1-to-1.
-    // Large values avoid fixed-points.
-    W64 a = Q64C;
+  n*i^2 + (an+c)*i + ac  ==  n*j^2 + (an+c)*j + ac + k*s^w
+  n*(i^2 - j^2) + (an+c)(i-j) = k*s^w
+  [ n*(i+j) + (an+c)] * (i-j) = k*2^w
+  As n is even, n(i+j) is even regardless of i and j.
+  As n even, a arbitrary, and c odd, (an+c) is odd.
+  Thus, the equation is [odd] * (i-j) = k * 2^w.
+  If i-j is odd then this is impossible, as it would require odd * odd = even.
 
+  So let's suppose i-j is even. group all factors of 2 so i-j = m*2^z.
+  m must be odd, or else we could move another 2 into 2^z.
+  Now we have
+  [ odd ] * (odd * 2^z) = k*2^w
+  [ odd ] * (odd)  = k * 2^(w-z).
+
+  As 0 <= j < i < 2^w, we must have z <= w.
+  If w > z, then the RHS is even, so again we have the contradiction odd * odd = even.
+  If w = z, then i = j + m*2^w, so i == j mod 2^w, contrary to assumption that i != j mod 2^w.
+--------------------
+Fixed points.
+Suppose a=0, n=2, c=1. We can easily find i s.t. q(i)==i mod 2^w.
+i * (2i+1) = i + k*2^w
+2i^2 + i = i + k*2^w
+i^2 = k * 2^(w-1)
+
+If w=64, i^2 = k*2*2^62, or i = sqrt(2k)*2^32. whenever k=2*j^2, i = 2j, 
+so there is fixed point for every even multiple, (2j)*2^33.
+
+Suppose a is odd, n=2, c=1. Is there an i s.t. q(i) == i mod 2^w?
+Suppose so:
+(a+i)*(2i+1) = i + k * 2^w
+2i(a+i) + (a+i) = i + k*2^w
+2i(a+i) + a = k*2^w.
+The first term on the LHS is even, and the second is odd, so the LHS is odd.
+But the RHS is even, so no such fixed point can exist.
+
+This generalizes: With odd a, positive even n, and odd c there are no fixed points.
+Suppose i were such a fixed point.
+(a+i)*(n*i + c) = i + k*2^w
+ni(a+i) + ac + ic = i + k*2^w
+ni(a+i) + ac + (c-1)i = k * 2^w.
+The first LHS is even, the second is odd, and the third is even.
+Again, the LHS is odd while the RHS is even,
+so no i can be a fixed point.
+
+The values of (a+i)(ni+c) increase quadratically in i.
+q(i+1)-q(i) = n(2i+1) + (an+c).
+For small values of i, this can be quite predictable.
+Therefore, we pick an a-value large enough to 'wrap around'
+quickly, while remaining 1-to-1 without fixed points.
+phi = 1.618.. = (1+sqrt(5))/2
+We right-shifted the decimals and added 1 to make it odd, 64 bits
+  */
+W64 qTrans(W64 s) {
+    W64 n = 2; // even, != 0
+    W64 c = 3; // odd
+    W64 a = 0xE08C'1D66'8B75'6F83; // C++14 digit separators
     W64 r = (s + a) * ((n*s) + c);
     return r;
-  }
+}
 
-  W64 rotl(const W64 x, unsigned int n) {
+W64 rotl(const W64 x, unsigned int n) {
     W64 z = x;
     n = n % WordLength; // drop excessive loops
     if (0 != n) {
