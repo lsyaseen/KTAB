@@ -44,12 +44,18 @@ The code is compiled, linked, and tested with absolutely no modification, simult
   * openSUSE 13.2 with clang/clang++ 3.5,
   * Debian 8.1 with gcc/g++ 4.9.
 
+### Language Versions ###
+
 The C++14 standard is supported by the following versions of 
 these common compilers:
 
 * GCC 4.9.0, or higher
 * Clang 3.5.0, or higher
 * Visual Studio 2015, or higher
+
+We expect to upgrade to C++17 when it becomes well-supported
+by gcc, clang, and VS, especially structured bindings, aka 
+parallel assignment with pattern matching.
 
 ## User Interfaces ##
 
