@@ -80,6 +80,13 @@ protected:
   uint64_t myBargainID = 0;
 };
 
+enum class SMPBargnModel {
+  InitOnlyInterpSMPBM,   // Init interpolates, I&R get same one
+  InitRcvrInterpSMPBM,   // Init interpolates, so does Rcvr, each both from other
+  PWCompInterSMPBM       // Power-weighted compromise of I-interp and R-interp, I&R both get same one
+};
+
+
 // -------------------------------------------------
 // Trivial, SMP-like actor with fixed attributes
 // the old smp.cpp file, SpatialState::developTwoPosBargain, for a discussion of
@@ -146,7 +153,8 @@ public:
     virtual ~SMPState();
 
     // Calculate the weighted-Euclidean distance matrix, compared to the given positions.
-    // If none are provided, it will compare to the positions in this state.
+    // If none are provided, it will compare to the ideals in this state.
+    // vDiff(i,j) = distance from i's ideal to j's position, using i's salience-weights.
     virtual void setVDiff(const vector<VctrPstn> & vpos = {});
 
     // returns h's estimate of i's risk attitude, using the risk-adjustment-rule
@@ -178,6 +186,9 @@ public:
     // return actor's normalized risk attitude (if set)
     double aNRA(unsigned int i) const;
 
+    SMPBargnModel bMod = SMPBargnModel::PWCompInterSMPBM;
+      // PWCompInterSMPBM, InitOnlyInterpSMPBM or InitRcvrInterpSMPBM; 
+
 protected:
 
     // this sets the values in all the AUtil matrices
@@ -185,7 +196,7 @@ protected:
     
     virtual void setOneAUtil(unsigned int perspH, ReportingLevel rl); 
     
-    KMatrix vDiff = KMatrix(); // vDiff(i,j) = difference between pos[i] and pos[j], using actor i's saliences as weights
+    KMatrix vDiff = KMatrix(); // vDiff(i,j) = difference between idl[i] and pos[j], using actor i's saliences as weights
     KMatrix rnProb = KMatrix(); // probability of each Unique state, when actors are treated as risk-neutral
 
     // risk-aware probabilities are uProb
@@ -226,17 +237,17 @@ protected:
 
 class SMPModel : public Model {
 public:
-    explicit SMPModel(PRNG * rng, string desc = "");
+    explicit SMPModel(PRNG * rng, string desc = "", uint64_t s=0); // JAH 20160711 added rng seed
     virtual ~SMPModel();
 
     static double bsUtil(double sd, double R);
     static double bvDiff(const KMatrix & vd, const  KMatrix & vs);
     static double bvUtil(const KMatrix & vd, const  KMatrix & vs, double R);
 
-    static SMPModel * readCSV(string fName, PRNG * rng);
+    static SMPModel * readCSV(string fName, PRNG * rng, uint64_t s); // JAH 20160711 added rng seed
 
     static  SMPModel * initModel(vector<string> aName, vector<string> aDesc, vector<string> dName,
-                                 KMatrix cap, KMatrix pos, KMatrix sal, PRNG * rng);
+                                 KMatrix cap, KMatrix pos, KMatrix sal, PRNG * rng, uint64_t s); // JAH 20160711 added rng seed
 
     // print history of each actor in CSV (might want to generalize to arbitrary VctrPstn)
     void showVPHistory(bool sqlP) const;

@@ -491,7 +491,7 @@ namespace DemoLeon {
 
   // -------------------------------------------------
 
-  LeonModel::LeonModel(PRNG * r, string d) : Model(r, d) {
+  LeonModel::LeonModel(PRNG * r, string d, uint64_t s) : Model(r, d, s) {
     // some arbitrary yet plausible default values
     maxSub = 0.50;
     maxTax = 1.00;
@@ -1599,7 +1599,7 @@ int main(int ac, char **av) {
   auto sTime = KBase::displayProgramStart();
   uint64_t seed = dSeed;
   bool run = true;
-  bool euEconP = false;
+  bool euEconP = true; // debugging with Visual Studio
   bool maxEconP = false;
 
   auto showHelp = []() {

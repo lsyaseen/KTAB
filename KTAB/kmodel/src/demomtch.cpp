@@ -301,7 +301,8 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
 
 
   // -------------------------------------------------
-  MtchModel::MtchModel(PRNG* rng, string d) : Model(rng, d) {
+  // JAH 20160711 added rng seed
+  MtchModel::MtchModel(PRNG* rng, string d, uint64_t s) : Model(rng, d, s) {
     numCat = 0;
     numItm = 0;
   }
@@ -1029,7 +1030,7 @@ int main(int ac, char **av) {
   bool run = true;
   bool dosP = false;
   bool maxSupP = false;
-  bool mtchSUSNP = false;
+  bool mtchSUSNP = true; // debugging with Visual Studio
 
   auto showHelp = []() {
     printf("\n");

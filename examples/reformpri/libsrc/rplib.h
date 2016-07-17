@@ -130,7 +130,7 @@ namespace RfrmPri {
 
   class RPModel : public Model {
   public:
-    explicit RPModel(PRNG* rng, string d = "");
+    explicit RPModel(PRNG* rng, string d = "", uint64_t s=0); // JAH 20160711 added rng seed
     virtual ~RPModel();
 
     static RPModel* randomMS(unsigned int numA, unsigned int numI,

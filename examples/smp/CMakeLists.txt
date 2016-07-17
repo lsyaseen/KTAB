@@ -24,8 +24,8 @@ set(CMAKE_BUILD_TYPE Debug)
 set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
-set (ENABLE_FLTK_GUI true CACHE  BOOL "Build app with FLTK GUI")
-set (ENABLE_QT_GUI true CACHE  BOOL "Build app with QT GUI")
+set (ENABLE_FLTK_GUI false CACHE  BOOL "Build app with FLTK GUI")
+set (ENABLE_QT_GUI false CACHE  BOOL "Build app with QT GUI")
 
 if (UNIX)
     set (ENABLE_EFFCPP false CACHE  BOOL "Check Effective C++ Guidelines")
@@ -329,9 +329,9 @@ endif (ENABLE_FLTK_GUI)
 # -------------------------------------------------
 # As of early 2014, C++11 is still not the default
 # for g++, so I have to provide it here.
-# Also on Unix, the C++11 thread library relies on pthreads
+# Also on Unix, the C++14 thread library relies on pthreads
 if (UNIX OR MINGW)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 ")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++14 ")
     if (ENABLE_EFFCPP)
         set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++ ")
     endif (ENABLE_EFFCPP)

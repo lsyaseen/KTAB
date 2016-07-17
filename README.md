@@ -26,14 +26,14 @@ These are merely illustrative examples.  For rigorous work, one could make whate
 
 ## Building KTAB ##
 
-KTAB is written in portable, cross-platform C++11. 
+KTAB is written in portable, cross-platform C++14. 
 
 KTAB uses CMake for configuration; downloads and instructions can be obtained from [www.cmake.org](http://www.cmake.org). The basic procedure is to configure kutils with CMake, then build the library and examples with your favorite IDE. Then configure kmodel with CMake and build it. Detailed build instructions can be found in the subdirectories, starting with kutils' [README](KTAB/kutils/README.md). After building kutils, you can follow kmodel's [README](KTAB/kmodel/README.md). Following these instructions, under both Windows and Linux, it is not necessary to modify your PATH at any point of the installation.
 
 Example of how to build models outside the main library structure, as one would do for a custom model, are in the examples directories; see the overall [README](examples/README.md) and the README files for each. 
 
 
-The code is compiled, linked, and tested with absolutely no modification, simultaneously on both Windows and Linux: there is one single body of cross-platform code, not  separate versions for each OS. Because no platform-specific code is allowed, porting to Mac or other platforms should be feasible. It was developed and tested on 64-bit Windows and Linux platforms, including the following:
+The code is compiled, linked, and tested with absolutely no modification, simultaneously on both Windows and Linux: there is one single body of cross-platform code, not  separate versions for each OS. All platform- or system-specific configuration is done by CMake. Because no platform-specific code is allowed, porting to Mac or other platforms should be feasible. It was developed and tested on 64-bit Windows and Linux platforms, including the following:
 
 * Windows 
   * Windows 7 Professional with Visual Studio 2010 Express,
@@ -43,6 +43,19 @@ The code is compiled, linked, and tested with absolutely no modification, simult
   * Fedora 22 with gcc/g++ 5.1,
   * openSUSE 13.2 with clang/clang++ 3.5,
   * Debian 8.1 with gcc/g++ 4.9.
+
+### Language Versions ###
+
+The C++14 standard is supported by the following versions of 
+these common compilers:
+
+* GCC 4.9.0, or higher
+* Clang 3.5.0, or higher
+* Visual Studio 2015, or higher
+
+We expect to upgrade to C++17 when it becomes well-supported
+by gcc, clang, and VS, especially structured bindings, aka 
+parallel assignment with pattern matching.
 
 ## User Interfaces ##
 

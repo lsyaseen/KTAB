@@ -46,7 +46,7 @@ namespace KBase {
   As n is even, n(i+j) is even regardless of i and j.
   As n even, a arbitrary, and c odd, (an+c) is odd.
   Thus, the equation is [odd] * (i-j) = k * 2^w.
-  If i-j is even then this is impossible, as it would require odd * even = odd.
+  If i-j is odd then this is impossible, as it would require odd * odd = even.
 
   So let's suppose i-j is even. group all factors of 2 so i-j = m*2^z.
   m must be odd, or else we could move another 2 into 2^z.
@@ -64,8 +64,8 @@ i * (2i+1) = i + k*2^w
 2i^2 + i = i + k*2^w
 i^2 = k * 2^(w-1)
 
-If w=64, i ^2 = 2*k*2^62, or i = sqrt(2k)*2^32. whenever k=2*j^2, i = 2j, 
-so there is fixed point for every j*2^33.
+If w=64, i^2 = k*2*2^62, or i = sqrt(2k)*2^32. whenever k=2*j^2, i = 2j,
+so there is fixed point for every even multiple, (2j)*2^33.
 
 Suppose a is odd, n=2, c=1. Is there an i s.t. q(i) == i mod 2^w?
 Suppose so:
@@ -75,7 +75,7 @@ Suppose so:
 The first term on the LHS is even, and the second is odd, so the LHS is odd.
 But the RHS is even, so no such fixed point can exist.
 
-This generalizes: With odd a, even n, and odd c there are no fixed points.
+This generalizes: With odd a, positive even n, and odd c there are no fixed points.
 Suppose i were such a fixed point.
 (a+i)*(n*i + c) = i + k*2^w
 ni(a+i) + ac + ic = i + k*2^w
@@ -89,14 +89,13 @@ q(i+1)-q(i) = n(2i+1) + (an+c).
 For small values of i, this can be quite predictable.
 Therefore, we pick an a-value large enough to 'wrap around'
 quickly, while remaining 1-to-1 without fixed points.
-phi = 1.618.. = (1+sqrt(5))/2
-We right-shifted the decimals and added 1 to make it odd, 64 bits
   */
-W64 qTrans(W64 s) {
+
+W64 qTrans(W64 i) {
     W64 n = 2; // even, != 0
     W64 c = 3; // odd
-    W64 a = 0xE08C'1D66'8B75'6F83; // C++14 digit separators
-    W64 r = (s + a) * ((n*s) + c);
+    W64 a = Q64C; // large and odd
+    W64 r = (i + a) * ((n*i) + c);
     return r;
 }
 
@@ -104,105 +103,105 @@ W64 rotl(const W64 x, unsigned int n) {
     W64 z = x;
     n = n % WordLength; // drop excessive loops
     if (0 != n) {
-        z = (x << n) | (x >> (WordLength - n));
+      z = (x << n) | (x >> (WordLength - n));
     }
 
     assert(z == (z & MASK64)); // just double-check
     assert(x == rotr(z, n)); // just double-check
     return z;
-}
+  }
 
-W64 rotr(const W64 x, unsigned int n) {
+  W64 rotr(const W64 x, unsigned int n) {
     W64 z = x;
     n = n % WordLength; // drop excessive loops
     if (0 != n) {
-        z = (x >> n) | (x << (WordLength - n));
+      z = (x >> n) | (x << (WordLength - n));
     }
 
     assert(z == (z & MASK64)); // just double-check
     return z;
-}
+  }
 
 
-PRNG::PRNG() {
+  PRNG::PRNG() {
     uint64_t seed_val = KBase::dSeed; // one of my favorite integers
     mt.seed(seed_val);
-}
+  }
 
 
-PRNG::~PRNG() { }
+  PRNG::~PRNG() { }
 
 
-uint64_t PRNG::setSeed(uint64_t s) {
+  uint64_t PRNG::setSeed(uint64_t s) {
     if (0 == s) {
-        std::random_device rd;
-        mt19937_64 mt1(rd());
-        std::uniform_int_distribution<uint64_t> dist(0, 0xFFFFFFFFFFFFFFFF);
-        s = dist(mt1);
+      std::random_device rd;
+      mt19937_64 mt1(rd());
+      std::uniform_int_distribution<uint64_t> dist(0, 0xFFFFFFFFFFFFFFFF);
+      s = dist(mt1);
     }
     mt.seed(s);
     return s;
-}
+  }
 
 
-double PRNG::uniform(double a, double b) {
+  double PRNG::uniform(double a, double b) {
     uint64_t n = uniform();
     double x = ((double)n) / ((double)0xFFFFFFFFFFFFFFFF);
     assert(0.0 <= x);
     assert(x <= 1.0);
     x = a + ((b - a)*x);
     return x;
-}
+  }
 
-unsigned int PRNG::probSel (const KMatrix & cv) {
+  unsigned int PRNG::probSel(const KMatrix & cv) {
     const unsigned int nr = cv.numR();
-    assert(0 < nr); 
-    assert (1 == cv.numC());
+    assert(0 < nr);
+    assert(1 == cv.numC());
     const double pTol = 1E-8;
     assert(fabs(KBase::sum(cv) - 1.0) < pTol);
 
     int iMax = -1;
     const double p = uniform(0.0, 1.0);
     double sum = 0.0;
-    for (unsigned int i=0; (i<nr) && (iMax < 0); i++) {
-        sum = sum + cv(i,0);
-        if (p <= sum) {
-            iMax = i;
-        }
+    for (unsigned int i = 0; (i < nr) && (iMax < 0); i++) {
+      sum = sum + cv(i, 0);
+      if (p <= sum) {
+        iMax = i;
+      }
     }
-    if (iMax < 0 ) { // round-off error
-        iMax = nr - 1 ;
+    if (iMax < 0) { // round-off error
+      iMax = nr - 1;
     }
     // obviously, now 0 <= iMax <= nr-1
-    return ((unsigned int) iMax);
-};
+    return ((unsigned int)iMax);
+  };
 
 
-uint64_t PRNG::uniform() {
+  uint64_t PRNG::uniform() {
     const uint64_t max = 0xFFFFFFFFFFFFFFFF;
     std::uniform_int_distribution<uint64_t> dist(0, max);
     uint64_t n = dist(mt);
     return qTrans(n);
-}
+  }
 
-VBool PRNG::bits(unsigned int nb) {
-  VBool bv = {};
+  VBool PRNG::bits(unsigned int nb) {
+    VBool bv = {};
     bv.resize(nb);
     uint64_t rNum = uniform(); // random bits
     const int nAvail = 64;
     int nUsed = 0;
     for (unsigned int i = 0; i < nb; i++) {
-        bool b = (1 == (rNum & 0x1));
-        rNum = rNum >> 1;
-        nUsed = nUsed + 1;
-        if (nAvail <= nUsed) {
-            rNum = uniform();
-            nUsed = 0;
-        }
-        bv[i] = b;
+      bool b = (1 == (rNum & 0x1));
+      rNum = rNum >> 1;
+      nUsed = nUsed + 1;
+      if (nAvail <= nUsed) {
+        rNum = uniform();
+        nUsed = 0;
+      }
+      bv[i] = b;
     }
     return bv;
-}
+  }
 
 } // end of namespace
 

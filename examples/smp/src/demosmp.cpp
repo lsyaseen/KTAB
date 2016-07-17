@@ -117,7 +117,7 @@ namespace DemoSMP {
     // typical first shifts are on the order of numAct/10, so this is low
     // enough not to affect anything while guarding against the theoretical
     // possiblity of 0/0 errors
-    auto md0 = new SMPModel(rng);
+    auto md0 = new SMPModel(rng, "", s); // JAH 20160711 added rng seed
     md0->stop = [maxIter](unsigned int iter, const State * s) {
       return (maxIter <= iter);
     };
@@ -231,6 +231,9 @@ namespace DemoSMP {
     printf("L-corr of prob and net support: %+.4f \n", KBase::lCorr((w*u), trans(p)));
     printf("A-corr of prob and net support: %+.4f \n", aCorr((w*u), trans(p)));
 
+    // note that recording the scenario is not part of running the scenario,
+    // so this is recorded outside the run.
+    md0->sqlScenarioDesc();
 
     cout << "Starting model run" << endl << flush;
     md0->run();
@@ -264,7 +267,7 @@ namespace DemoSMP {
   }
 
   void readEUSpatial(uint64_t seed, string inputCSV, PRNG* rng) {
-    auto md0 = SMPModel::readCSV(inputCSV, rng);
+    auto md0 = SMPModel::readCSV(inputCSV, rng, seed); // JAH 20160711 added rng seed
 
     const unsigned int minIter = 2;
     const unsigned int maxIter = 100; const double minDeltaRatio = 0.02;
@@ -309,7 +312,7 @@ int main(int ac, char **av) {
   auto sTime = KBase::displayProgramStart(DemoSMP::appName, DemoSMP::appVersion);
   uint64_t seed = dSeed;
   bool run = true;
-  bool euSmpP = false;
+  bool euSmpP = true; // debugging with Visual Studio
   bool csvP = false;
   string inputCSV = "";
 
