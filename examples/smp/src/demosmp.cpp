@@ -117,7 +117,7 @@ namespace DemoSMP {
     // typical first shifts are on the order of numAct/10, so this is low
     // enough not to affect anything while guarding against the theoretical
     // possiblity of 0/0 errors
-    auto md0 = new SMPModel(rng);
+    auto md0 = new SMPModel(rng, "", s); // JAH 20160711 added rng seed
     md0->stop = [maxIter](unsigned int iter, const State * s) {
       return (maxIter <= iter);
     };
@@ -267,7 +267,7 @@ namespace DemoSMP {
   }
 
   void readEUSpatial(uint64_t seed, string inputCSV, PRNG* rng) {
-    auto md0 = SMPModel::readCSV(inputCSV, rng);
+    auto md0 = SMPModel::readCSV(inputCSV, rng, seed); // JAH 20160711 added rng seed
 
     const unsigned int minIter = 2;
     const unsigned int maxIter = 100; const double minDeltaRatio = 0.02;

@@ -237,17 +237,17 @@ protected:
 
 class SMPModel : public Model {
 public:
-    explicit SMPModel(PRNG * rng, string desc = "");
+    explicit SMPModel(PRNG * rng, string desc = "", uint64_t s=0); // JAH 20160711 added rng seed
     virtual ~SMPModel();
 
     static double bsUtil(double sd, double R);
     static double bvDiff(const KMatrix & vd, const  KMatrix & vs);
     static double bvUtil(const KMatrix & vd, const  KMatrix & vs, double R);
 
-    static SMPModel * readCSV(string fName, PRNG * rng);
+    static SMPModel * readCSV(string fName, PRNG * rng, uint64_t s); // JAH 20160711 added rng seed
 
     static  SMPModel * initModel(vector<string> aName, vector<string> aDesc, vector<string> dName,
-                                 KMatrix cap, KMatrix pos, KMatrix sal, PRNG * rng);
+                                 KMatrix cap, KMatrix pos, KMatrix sal, PRNG * rng, uint64_t s); // JAH 20160711 added rng seed
 
     // print history of each actor in CSV (might want to generalize to arbitrary VctrPstn)
     void showVPHistory(bool sqlP) const;

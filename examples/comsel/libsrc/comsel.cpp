@@ -76,7 +76,8 @@ namespace ComSelLib {
   }
 
   // --------------------------------------------
-  CSModel::CSModel(unsigned int nd, PRNG* r, string d) : Model(r, d) {
+  // JAH 20160711 added rng seed
+  CSModel::CSModel(unsigned int nd, PRNG* r, string d, uint64_t s) : Model(r, d, s) {
 
     assert(nd > 0);
 

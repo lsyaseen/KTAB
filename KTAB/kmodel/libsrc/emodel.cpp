@@ -37,7 +37,8 @@ using std::tuple;
 
 // --------------------------------------------
 template <class PT>
-EModel<PT>::EModel(PRNG * r, string desc) : Model(r, desc) {
+// JAH 20160711 added rng seed
+EModel<PT>::EModel(PRNG * r, string desc, uint64_t s) : Model(r, desc, s) {
     // nothing yet
 }
 

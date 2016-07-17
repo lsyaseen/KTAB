@@ -83,11 +83,11 @@ namespace KBase {
   }
 
   tuple<unsigned int, unsigned int>  ndxMaxAbs(const KMatrix & m) {
-    double ma = 0;
     const unsigned int nr = m.numR();
     const unsigned int nc = m.numC();
     
-    // mark with obviously wrong values
+    // mark with obviously impossible values
+    double ma = -1.0; 
     unsigned int ndxI = 1+nr; 
     unsigned int ndxJ = 1+nc; 
     
@@ -101,6 +101,7 @@ namespace KBase {
 	}
       }
     } 
+    assert (0.0 <= ma);
     assert (ndxI < nr);
     assert (ndxJ < nc);
     auto ndx = tuple<unsigned int, unsigned int>(ndxI, ndxJ);
