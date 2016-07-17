@@ -93,6 +93,9 @@ phi = 1.618.. = (1+sqrt(5))/2
 We right-shifted the decimals and added 1 to make it odd, 64 bits
   */
   W64 qTrans(W64 s) {
+    W64 n = 2; // even, != 0
+    W64 c = 3; // odd
+    W64 a = 0xE08C'1D66'8B75'6F83; // C++14 digit separators
     W64 r = (s + a) * ((n*s) + c);
     return r;
   }
