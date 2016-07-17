@@ -147,7 +147,7 @@ private:
 
 ostream& operator<< (ostream& os, const Position& p);
 
-
+bool testMultiThreadSQLite (bool tryReset, KBase::ReportingLevel rl);
 // -------------------------------------------------
 // Basic vector position: just a column-vector of numbers.
 // They could be interpretted in many ways, as policies

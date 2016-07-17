@@ -2,22 +2,22 @@
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------
 // The MIT License (MIT)
-// 
+//
 // Copyright (c) 2015 King Abdullah Petroleum Studies and Research Center
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 // and associated documentation files (the "Software"), to deal in the Software without
 // restriction, including without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom 
+// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom
 // the Software is furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all copies or
 // substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
-// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // -------------------------------------------------
 // Very simple interface to standard Mersenne Twister.
@@ -26,7 +26,7 @@
 #define KTAB_PRNG_H
 
 #include <cstdint>
-#include <random> 
+#include <random>
 
 #include "kutils.h"
 #include "kmatrix.h"
@@ -47,15 +47,17 @@ namespace KBase {
   // The constant e, left-shifted up to 62 bits.
   // 2718281828459045235 == 0x25B946EBC0B36173
   // Shifting one more decimal would be 65 bits.
-  const W64 Q64A = 0x25B946EBC0B36173;
+  const W64 Q64A = 0x25B9'46EB'C0B3'6173; // C++14 digit separators
 
   // The constant pi, left shifted up to 62 bits (+1)
   // 3141592653589793238 + 1 == 0x2B992DDFA23249D7
   // Shifting one more decimal would be 65 bits.
-  const W64 Q64B = 0x2B992DDFA23249D7;
+  const W64 Q64B = 0x2B99'2DDF'A232'49D7;
 
-  // arbitary large constant to avoid fixed-points in qTrans
-  const W64 Q64C = 0xF1FF7B8227A447F5; // any number
+  // Large odd constant to avoid fixed-points in qTrans
+  // phi = 1.618.. = (1+sqrt(5))/2
+  // We right-shifted the decimals and added 1 to make it odd, 64 bits
+  const W64 Q64C = 0xE08C'1D66'8B75'6F83;
 
   W64 qTrans(W64 s);
   W64 rotl(const W64 x, unsigned int n);

@@ -64,7 +64,7 @@ i * (2i+1) = i + k*2^w
 2i^2 + i = i + k*2^w
 i^2 = k * 2^(w-1)
 
-If w=64, i^2 = k*2*2^62, or i = sqrt(2k)*2^32. whenever k=2*j^2, i = 2j, 
+If w=64, i^2 = k*2*2^62, or i = sqrt(2k)*2^32. whenever k=2*j^2, i = 2j,
 so there is fixed point for every even multiple, (2j)*2^33.
 
 Suppose a is odd, n=2, c=1. Is there an i s.t. q(i) == i mod 2^w?
@@ -89,14 +89,13 @@ q(i+1)-q(i) = n(2i+1) + (an+c).
 For small values of i, this can be quite predictable.
 Therefore, we pick an a-value large enough to 'wrap around'
 quickly, while remaining 1-to-1 without fixed points.
-phi = 1.618.. = (1+sqrt(5))/2
-We right-shifted the decimals and added 1 to make it odd, 64 bits
   */
-W64 qTrans(W64 s) {
+
+W64 qTrans(W64 i) {
     W64 n = 2; // even, != 0
     W64 c = 3; // odd
-    W64 a = 0xE08C'1D66'8B75'6F83; // C++14 digit separators
-    W64 r = (s + a) * ((n*s) + c);
+    W64 a = Q64C; // large and odd
+    W64 r = (i + a) * ((n*i) + c);
     return r;
 }
 
