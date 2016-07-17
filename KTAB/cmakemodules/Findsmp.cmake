@@ -26,6 +26,8 @@ set(SMP_PREFIX
 # Note Well the locations in and order of search
 set(SMP_POSSIBLE_PATHS
   ${CMAKE_CURRENT_SOURCE_DIR}/../smp/
+  ${CMAKE_CURRENT_SOURCE_DIR}/../smp/Debug
+  ${CMAKE_CURRENT_SOURCE_DIR}/../smp/Release
   ${CMAKE_CURRENT_SOURCE_DIR}/../build/smp/
   ${CMAKE_CURRENT_SOURCE_DIR}/../../smp/
   ${CMAKE_CURRENT_SOURCE_DIR}/../../examples/libsrc/smp/
