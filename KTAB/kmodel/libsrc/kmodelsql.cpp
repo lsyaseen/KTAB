@@ -27,6 +27,8 @@
 #include "kmodel.h"
 
 
+namespace KBase
+{
 
 using std::cout;
 using std::endl;
@@ -37,8 +39,14 @@ using std::tuple;
 
 // --------------------------------------------
 
+void Model::demoSQLite()
+{
     cout << endl << "Starting basic demo of SQLite in Model class" << endl;
 
+    auto callBack = [](void *data, int numCol, char **stringFields, char **colNames)
+    {
+        for (int i = 0; i < numCol; i++)
+        {
             printf("%s = %s\n", colNames[i], stringFields[i] ? stringFields[i] : "NULL");
         }
         printf("\n");
@@ -50,19 +58,31 @@ using std::tuple;
     int  rc;
     string sql;
 
+    auto sOpen = [&db](unsigned int n)
+    {
         int rc = sqlite3_open("test.db", &db);
+        if (rc != SQLITE_OK)
+        {
             fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
             exit(0);
         }
+        else
+        {
             fprintf(stderr, "Opened database successfully (%i)\n", n);
         }
         return;
     };
 
+    auto sExec = [callBack, &db, &zErrMsg](string sql, string msg)
+    {
         int rc = sqlite3_exec(db, sql.c_str(), callBack, nullptr, &zErrMsg); // nullptr is the 'data' argument
+        if (rc != SQLITE_OK)
+        {
             fprintf(stderr, "SQL error: %s\n", zErrMsg);
             sqlite3_free(zErrMsg);
         }
+        else
+        {
             fprintf(stdout, msg.c_str());
         }
         return rc;
@@ -157,6 +177,8 @@ bool testMultiThreadSQLite (bool tryReset, KBase::ReportingLevel rl) {
 
 // note that the function to write to table #k must be kept
 // synchronized with the result of createSQL(k) !
+string Model::createSQL(unsigned int n)
+{
 
     string sql = "";
     assert(n < Model::NumTables);
@@ -342,6 +364,8 @@ bool testMultiThreadSQLite (bool tryReset, KBase::ReportingLevel rl) {
 }
 
 
+void Model::sqlAUtil(unsigned int t)
+{
     assert(nullptr != smpDB);
     assert(t < history.size());
     State* st = history[t];
@@ -374,7 +398,13 @@ bool testMultiThreadSQLite (bool tryReset, KBase::ReportingLevel rl) {
     assert(nullptr != insStmt); // make sure it is ready
 
     sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+    for (unsigned int h = 0; h < numAct; h++)   // estimator is h
+    {
         KMatrix uij = st->aUtil[h]; // utility to actor i of the position held by actor j
+        for (unsigned int i = 0; i < numAct; i++)
+        {
+            for (unsigned int j = 0; j < numAct; j++)
+            {
                 int rslt = 0;
                 rslt = sqlite3_bind_int(insStmt, 1, t);
                 assert(SQLITE_OK == rslt);
@@ -432,8 +462,14 @@ void Model::sqlPosEquiv(unsigned int t)
 
     // Start inserting record
     sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+    for (unsigned int i = 0; i < numAct; i++)
+    {
         // calculate the equivalance
         int je = numAct + 1;
+        for (unsigned int j = 0; j < numAct && je > numAct; j++)
+        {
+            if (st->equivNdx(i, j))
+            {
                 je = j;
             }
         }
@@ -684,6 +720,8 @@ void Model::sqlBargainUtil(unsigned int t, int Bargn_i,  KBase::KMatrix Util_mat
     // start for the transaction
     sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 
+    for (unsigned int i = 0; i < Util_mat_col; i++)
+    {
         for (unsigned int j = 0; j < Util_mat_row; j++)
         {
 
@@ -808,6 +846,8 @@ void Model::sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMat
     // start for the transaction
     sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 
+    for (unsigned int i = 0; i < Util_mat_col; i++)
+    {
         for (unsigned int j = 0; j < Util_mat_row; j++)
         {
             int rslt = 0;
@@ -846,6 +886,8 @@ void Model::sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMat
 }
 // populates record for table PosProb for each step of
 // module run
+void Model::sqlPosProb(unsigned int t)
+{
     assert(nullptr != smpDB);
     assert(t < history.size());
     State* st = history[t];
@@ -871,12 +913,16 @@ void Model::sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMat
     // start for the transaction
     sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
     // collect the information from each estimator,actor
+    for (unsigned int h = 0; h < numAct; h++)   // estimator is h
+    {
         // calculate the probablity with respect to each estimator
         auto pn = st->pDist(h);
         auto pdt = std::get<0>(pn); // note that these are unique positions
         assert( fabs(1 - sum(pdt)) < 1e-4);
         auto unq = std::get<1>(pn);
         // for each actor pupulate the probablity information
+        for (unsigned int i = 0; i < numAct; i++)
+        {
             int rslt = 0;
             // Extract the probabity for each actor
             double prob = st->posProb(i, unq, pdt);
@@ -909,6 +955,8 @@ void Model::sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMat
 }
 // populates record for table PosProb for each step of
 // module run
+void Model::sqlPosVote(unsigned int t)
+{
     assert(nullptr != smpDB);
     assert(t < history.size());
     State* st = history[t];
@@ -938,7 +986,15 @@ void Model::sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMat
     auto vr = VotingRule::Proportional;
     // collect the information from each estimator
 
+    for (unsigned int k = 0; k < numAct; k++)   // voter is k
+    {
         auto rd = st->model->actrs[k];
+        for (unsigned int i = 0; i < numAct; i++)
+        {
+            for (unsigned int j = 0; j < numAct; j++)
+            {
+                for (unsigned int h = 0; h < numAct; h++)   // estimator is h
+                {
                     if (((h == i) || (h == j)) && (i!=j))
                     {
                         auto vij = rd->vote(h, i, j, st);
