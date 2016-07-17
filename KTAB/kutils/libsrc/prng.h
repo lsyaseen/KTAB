@@ -56,6 +56,7 @@ namespace KBase {
 
   // Large odd constant to avoid fixed-points in qTrans
   // phi = 1.618.. = (1+sqrt(5))/2
+  // 16180339887498948482 + 1 -- 64 bits
   // We right-shifted the decimals and added 1 to make it odd, 64 bits
   const W64 Q64C = 0xE08C'1D66'8B75'6F83;
 
