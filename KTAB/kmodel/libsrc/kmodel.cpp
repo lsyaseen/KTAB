@@ -81,7 +81,8 @@ Model::Model(PRNG * r, string desc, uint64_t s) {
     else
     {
         scenName = desc;
-		sprintf(utcBuffId, "%s_%u", desc.c_str(), milliseconds);
+         sprintf(utcBuffId, "%s_%u", desc.c_str(), milliseconds);
+
 	}
 	//get the hash
 	uint64_t scenIdhash = (std::hash < std::string> () (utcBuffId))   ;
