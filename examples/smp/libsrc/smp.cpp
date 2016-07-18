@@ -577,12 +577,6 @@ namespace SMPLib {
   }
 
 
-  enum class SMPBargnModel {
-    InitOnlyInterpSMPBM,   // Init interpolates, I&R get same one
-    InitRcvrInterpSMPBM,   // Init interpolates, so does Rcvr, each both from other
-    PWCompInterSMPBM       // Power-weighted compromise of I-interp and R-interp, I&R both get same one
-  };
-
   SMPState* SMPState::doBCN() const {
     const SMPBargnModel bMod = SMPBargnModel::InitRcvrInterpSMPBM;
     const bool recordBargainingP = true;
