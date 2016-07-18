@@ -39,7 +39,8 @@ using std::get;
 using std::tuple;
 
 // --------------------------------------------
-Model::Model(PRNG * r, string desc) {
+// JAH 20160711 added seed
+Model::Model(PRNG * r, string desc, uint64_t s) {
     history = vector<State*>();
     actrs = vector<Actor*>();
     numAct = 0;
@@ -65,7 +66,7 @@ Model::Model(PRNG * r, string desc) {
     if (0 == desc.length()) {
         auto utcBuff = newChars(200);
 		
-        std::strftime(utcBuff, 150, "Scenario-UTC-%Y-%m-%d-%H%M-%S", gmtime(&start_time));
+        std::strftime(utcBuff, 150, "Scenario-UTC-%Y-%m-%u-%H%M-%S", gmtime(&start_time));
         cout << "No scenario description provided to Model::Model, " << endl;
         cout << "generating default name from UTC start time." << endl << flush;
         scenName = utcBuff;
@@ -80,16 +81,31 @@ Model::Model(PRNG * r, string desc) {
     else
     {
         scenName = desc;
-		sprintf(utcBuffId, "%s_%u", desc, milliseconds);
+         sprintf(utcBuffId, "%s_%u", desc.c_str(), milliseconds);
+
 	}
 	//get the hash
-	unsigned int scenIdhash = (std::hash < std::string> () (utcBuffId))   ;
+	uint64_t scenIdhash = (std::hash < std::string> () (utcBuffId))   ;
 	sprintf(hshCode, "0x%032llX", scenIdhash);
 	scenId = hshCode;
 	delete hshCode;
 	hshCode = nullptr;
 	delete utcBuffId;
 	utcBuffId = nullptr;
+
+    // BPW 20160717
+    // (a) record a reproducible seed even we were given '0'
+    // (b) make sure that the given value really is the initial seed
+    // (c) at this point, the PRNG* is almost irrelevant, except that someone
+    // might, in the future, provide an object which was a new subclass of PRNG*
+    if (0 == s) {
+      rng->setSeed(0); // random and irreproducible
+      s = rng->uniform(); // random and irreproducible 64-bits
+    }
+    rng->setSeed(s);
+
+    // JAH 20160711 save the seed for the rng
+    rngSeed = s;
 
     cout << "Scenario assigned name: -|" << scenName.c_str() << "|-" << endl << flush;
 }
@@ -117,9 +133,6 @@ void Model::run() {
     State* s0 = history[0];
     bool done = false;
     unsigned int iter = 0;
-
-	// Insert New Scenario name and Generate new Id
-	sqlScenarioDesc(getScenarioName().c_str(), getScenarioName().c_str(),getScenarioID().c_str());
  
     while (!done) {
         assert(nullptr != s0);

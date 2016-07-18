@@ -80,7 +80,7 @@ namespace ComSelLib {
 
   class CSModel : public Model {
   public:
-    explicit CSModel(unsigned int nd, PRNG* r, string d = "");
+    explicit CSModel(unsigned int nd, PRNG* r, string d = "", uint64_t s=0); // JAH 20160711 added rng seed
     virtual ~CSModel();
 
 

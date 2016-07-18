@@ -147,7 +147,7 @@ private:
 
 ostream& operator<< (ostream& os, const Position& p);
 
-
+bool testMultiThreadSQLite (bool tryReset, KBase::ReportingLevel rl);
 // -------------------------------------------------
 // Basic vector position: just a column-vector of numbers.
 // They could be interpretted in many ways, as policies
@@ -219,7 +219,7 @@ class Model {
 public:
 
     sqlite3 *smpDB = nullptr; // keep this protected, to ease later multi-threading
-    explicit Model(PRNG * r, string d);
+    explicit Model(PRNG * r, string d, uint64_t s); // JAH 20160711 added seed
     virtual ~Model();
 
     static const unsigned int minNumActor = 3;
@@ -271,10 +271,10 @@ public:
     static KMatrix scalarPCE(unsigned int numAct, unsigned int numOpt, const KMatrix & w,
                              const KMatrix & u, VotingRule vr, VPModel vpm, ReportingLevel rl);
 
-    virtual unsigned int addActor(Actor* a);
+    virtual unsigned int addActor(Actor* a); // returns new number of actors, always at least 1
     int actrNdx(const Actor* a) const;
 
-    unsigned int addState(State* s);
+    unsigned int addState(State* s); // returns new number of states, always at least 1
 
     function <bool(unsigned int iter, const State* s)> stop = nullptr;
     // you have to provide this λ-fn
@@ -298,8 +298,12 @@ public:
 	void sqlUpdateBargainTable(unsigned int t, double IntProb, int Init_Seld, double Recd_Prob, int Recd_Seld, int Brgn_Act_i);
 	void sqlBargnCoords(unsigned int t, int bargnID,  const KBase::VctrPstn & initPos, const KBase::VctrPstn & rcvrPos);
 	void sqlBargainUtil(unsigned int t, int Bargn_i,  KBase::KMatrix Util_mat);
-	void sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMatrix Util_mat, unsigned int act_i);
-	void sqlScenarioDesc(const char *ScenName, const char *ScenDesc, const char * ScenId);
+    void sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMatrix Util_mat, unsigned int act_i);
+
+    // the old version of this provided as external constants all the internal values,
+    // so I reduced the possiblity of error and confusion by eliminating the redundant inputs.
+    //void sqlScenarioDesc(const char *ScenName, const char *ScenDesc, const char * ScenId);
+    void sqlScenarioDesc();
 
     static void demoSQLite();
 
@@ -307,13 +311,10 @@ public:
 
     // returns h's estimate of i's risk attitude, using the risk-adjustment-rule
     static double estNRA(double rh, double  ri, BigRAdjust ra) ;
-    string getScenarioName() const {
-        return scenName;
-    };
 
-	string getScenarioID() const {
-		return scenId;
-	};
+    // string getScenarioName() const { return scenName; };
+	string getScenarioID() const { return scenId; };
+
     static string createSQL(unsigned int n);
 protected:
     //static string createTableSQL(unsigned int tn);
@@ -326,6 +327,7 @@ protected:
     // Note that, with composite models, there many be dozens interacting.
     string scenName = "Scen"; // default is set from UTC time
 	string scenId = "none";
+    uint64_t rngSeed = 0; // JAH 20160711 rng seed
     // this is the basic model of victory dependent on strength-ratio
     static tuple<double, double> vProb(VPModel vpm, const double s1, const double s2);
 

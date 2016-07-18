@@ -27,6 +27,8 @@ singly or in pairs.
 For more general domains, there is a simple genetic search
 algorithm.
 
+A simple interface to C++11 standard pseudo-random number generators is provided.
+
 
 ## Build Instructions ##
 
