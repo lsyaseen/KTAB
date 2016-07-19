@@ -189,6 +189,13 @@ public:
     SMPBargnModel bMod = SMPBargnModel::PWCompInterSMPBM;
       // PWCompInterSMPBM, InitOnlyInterpSMPBM or InitRcvrInterpSMPBM; 
 
+    
+    void setAccomodate(double adjRate = 1.0);
+    // set ideal-accomodation matrix to scaled identity matrix, for current number of actors
+    
+    void setAccomodate(const KMatrix & aMat);
+    // set ideal-accomodation matrix to given matrix
+    
 protected:
 
     // this sets the values in all the AUtil matrices

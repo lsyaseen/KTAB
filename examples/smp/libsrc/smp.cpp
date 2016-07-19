@@ -521,6 +521,18 @@ namespace SMPLib {
     const double ri = nra(i, 0);
     return ri;
   }
+  
+  
+  
+  void  SMPState::setAccomodate(const KMatrix & aMat) {
+    const unsigned int na = model->numAct;
+    assert(Model::minNumActor <= na);
+    assert(na <= Model::maxNumActor);
+    assert (na == aMat.numR());
+    assert (na == aMat.numC());
+    accomodate = aMat;
+    return;
+  }
 
   void SMPState::addPstn(Position* ap) {
     auto sp = (VctrPstn*)ap;
@@ -950,27 +962,24 @@ namespace SMPLib {
     // TODO: this really should do all the assessment: ueIndices, rnProb, all U^h_{ij}, raProb
     s2->setUENdx();
 
-    // TODO: setup ideals and accomodate, so newIdeals can be called
-    // for now, just copy them
-    if (0 == ideals.size()) { // nothing to copy
-      s2->setupAccomodateMatrix(1.000);
-      s2->idealsFromPstns(); // set s2's current ideals to s2's current positions
-      s2->newIdeals(); // adjust toward new ones 
-
-      double ipDist = s2->posIdealDist(ReportingLevel::Medium);
-      printf("rms (pstn, ideal) = %.5f \n", ipDist);
-      cout << flush;
+  
+    if (0 == accomodate.numC()) { // nothing to copy
+      s2->setAccomodate(1.0); // set to identity matrix
     }
     else {
       s2->accomodate = accomodate;
-      s2->ideals = ideals; // copy s1's old ideals
-      s2->newIdeals(); // adjust s2 ideals toward new ones
-
-      double ipDist = s2->posIdealDist(ReportingLevel::Medium);
-      printf("rms (pstn, ideal) = %.5f \n", ipDist);
-      cout << flush;
-
     }
+    
+    if (0 == ideals.size()) { // nothing to copy
+      s2->idealsFromPstns(); // set s2's current ideals to s2's current positions
+    }
+    else {
+      s2->ideals = ideals; // copy s1's old ideals
+    }
+    s2->newIdeals(); // adjust s2 ideals toward new ones
+    double ipDist = s2->posIdealDist(ReportingLevel::Medium);
+    printf("rms (pstn, ideal) = %.5f \n", ipDist);
+    cout << flush;
     return s2;
   }
 
@@ -1313,23 +1322,21 @@ namespace SMPLib {
     return rmsDist;
   }
 
-  void SMPState::setupAccomodateMatrix(double adjRate) {
+  void SMPState::setAccomodate(double adjRate) {
 
     // a man's gotta know his limits
     // (with apologies to HC)
     assert(0.0 <= adjRate);
     assert(adjRate <= 1.0);
     const unsigned int na = model->numAct;
-    assert(Model::minNumActor <= na);
-    assert(na <= Model::maxNumActor);
 
-    printf("WARNING: setting SMPState::accomodate to %.3f * identity matrix \n", adjRate);
+    printf("Setting SMPState::accomodate to %.3f * identity matrix \n", adjRate);
 
     // A standard Identity matrix is helpful here because it 
     // should keep the behavior same as the original "cynical" model:
     //      ideal_{i,t} := pstn_{i,t}
-    accomodate = adjRate * KBase::iMat(na);
-
+    auto am = adjRate * KBase::iMat(na);
+    setAccomodate(am);
     return;
   }
 
