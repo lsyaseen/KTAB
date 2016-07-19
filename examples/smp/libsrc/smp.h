@@ -153,9 +153,13 @@ public:
     virtual ~SMPState();
 
     // Calculate the weighted-Euclidean distance matrix, compared to the given positions.
-    // If none are provided, it will compare to the ideals in this state.
+    //
+    // If none are provided, it will compare ideals to the postions in this state:
     // vDiff(i,j) = distance from i's ideal to j's position, using i's salience-weights.
-    virtual void setVDiff(const vector<VctrPstn> & vpos = {});
+    //
+    // If vPos provided, it will compare those to the positions in this state:
+    // vDiff(i,j) = distance from vPos[i] to j's position, using i's salience-weights.
+    virtual void setVDiff(const vector<VctrPstn> & vPos = {});
 
     // returns h's estimate of i's risk attitude, using the risk-adjustment-rule
     double estNRA(unsigned int h, unsigned int i, BigRAdjust ra) const;
@@ -195,6 +199,10 @@ public:
     
     void setAccomodate(const KMatrix & aMat);
     // set ideal-accomodation matrix to given matrix
+
+    // initialize the actors' ideals from the given list of VctrPstn. 
+    // If the list is omitted or empty, it uses their current positions
+    void idealsFromPstns(const vector<VctrPstn> &  ps = {});
     
 protected:
 
@@ -229,10 +237,6 @@ protected:
     
     // rest the new ideal points, based on other's positions and one's old ideal point
     void newIdeals();
-
-    // initialize the actors' ideals from the given list of VctrPstn. 
-    // If the list is omitted or empty, it uses their current positions
-    void idealsFromPstns(const vector<VctrPstn> &  ps = {});
 
     // return RMS distance between ideals and positions
     double posIdealDist(ReportingLevel rl = ReportingLevel::Silent) const;

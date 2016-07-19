@@ -251,19 +251,20 @@ namespace SMPLib {
     accomodate = KMatrix();
   }
 
-  void SMPState::setVDiff(const vector<VctrPstn> & vpos) {
-    auto dfn = [vpos, this](unsigned int i, unsigned int j) {
+  void SMPState::setVDiff(const vector<VctrPstn> & vPos) {
+    auto dfn = [vPos, this](unsigned int i, unsigned int j) {
       auto ai = ((const SMPActor*)(model->actrs[i]));
       KMatrix si = ai->vSal;
       auto posJ = ((const VctrPstn*)(pstns[j]));
       double dij = 0.0;
-      if (0 == vpos.size()) {
+      if (0 == vPos.size()) {
         auto posI = ((const VctrPstn*)(pstns[i]));
-        //auto idlI = ideals[i];
-        dij = SMPModel::bvDiff((*posI) - (*posJ), si);
+        auto idlI = ideals[i];
+        //dij = SMPModel::bvDiff((*posI) - (*posJ), si);
+        dij = SMPModel::bvDiff(idlI - (*posJ), si);
       }
       else {
-        auto vpi = vpos[i];
+        auto vpi = vPos[i];
         dij = SMPModel::bvDiff(vpi - (*posJ), si);
       }
       return dij;
