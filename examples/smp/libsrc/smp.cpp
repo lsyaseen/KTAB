@@ -1024,16 +1024,23 @@ namespace SMPLib {
     const double minCltn = 1E-10;
 
     // get h's estimate of the principal actors' contribution to their own contest
-    // h's estimate of i's unilateral influence contribution to (i:j), hence positive
+    
+    // h's estimate of i's unilateral influence contribution to (i:j).
+    // When ideals perfectly track positions, this must be positive
     double contrib_i_ij = Model::vote(vr, si*ci, uii, uij);
-    assert(0 <= contrib_i_ij);
+    if (KBase::iMatP(accomodate)) {
+      assert(0 <= contrib_i_ij);
+    }
     contrib_i_ij = minCltn + contrib_i_ij; // definitely positive
     double chij = contrib_i_ij; // strength of complete coalition supporting i over j
     assert(0.0 < chij);
-
-    // h's estimate of j's unilateral influence contribution to (i:j), hence negative
+   
+    // h's estimate of j's unilateral influence contribution to (i:j).
+    // When ideals perfectly track positions, this must be negative
     double contrib_j_ij = Model::vote(vr, sj*cj, uji, ujj);
-    assert(contrib_j_ij <= 0);
+    if (KBase::iMatP(accomodate)) {
+      assert(contrib_j_ij <= 0);
+    }
     contrib_j_ij = minCltn - contrib_j_ij; // definitely positive
     double chji = contrib_j_ij; // strength of complete coalition supporting j over i
     assert(0.0 < chji);
