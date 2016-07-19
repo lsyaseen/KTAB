@@ -183,14 +183,18 @@ namespace DemoSMP {
     if (accP) {
       cout << "Using randomized matrix for ideal-accomodation"<<endl<<flush;
       for (unsigned int i=0; i<md0->numAct; i++) {
-        aMat(i,i) = rng->uniform(0.1, 0.9);
+        aMat(i,i) = rng->uniform(0.1, 0.5); // make them lag noticably
       }
     }
     else {
       cout << "Using identity matrix for ideal-accomodation"<<endl<<flush;
     }
+    cout << "Accomodate matrix:"<<endl;
+    aMat.mPrintf(" %.3f ");
+    cout << endl;
+    
     st0->setAccomodate(aMat);
-
+    st0->idealsFromPstns();
     st0->setUENdx();
     st0->setAUtil(-1, ReportingLevel::Silent);
     st0->setNRA(); // TODO: simple setting of NRA
