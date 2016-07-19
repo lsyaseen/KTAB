@@ -1031,9 +1031,9 @@ namespace SMPLib {
     if (KBase::iMatP(accomodate)) {
       assert(0 <= contrib_i_ij);
     }
-    contrib_i_ij = minCltn + contrib_i_ij; // definitely positive
-    double chij = contrib_i_ij; // strength of complete coalition supporting i over j
-    assert(0.0 < chij);
+    // If not, you could have the ordering (Idl_i, Pos_j, Pos_i)
+    // so that i would prefer j's position over his own.
+    
    
     // h's estimate of j's unilateral influence contribution to (i:j).
     // When ideals perfectly track positions, this must be negative
@@ -1041,9 +1041,30 @@ namespace SMPLib {
     if (KBase::iMatP(accomodate)) {
       assert(contrib_j_ij <= 0);
     }
-    contrib_j_ij = minCltn - contrib_j_ij; // definitely positive
-    double chji = contrib_j_ij; // strength of complete coalition supporting j over i
+    // Similarly, you could have an ordering like (Idl_j, Pos_i, Pos_j)
+    // so that j would prefer i's position over his own.
+      
+    double chij = minCltn; // strength of complete coalition supporting i over j (initially empty)
+    double chji = minCltn; // strength of complete coalition supporting j over i (initially empty)
+    
+    // add i's contribution to the appropriate coalition
+    if (contrib_i_ij > 0.0) { chij = chij + contrib_i_ij; } 
+    assert(0.0 < chij);
+    
+    if (contrib_i_ij < 0.0) { chji = chji - contrib_i_ij; } 
     assert(0.0 < chji);
+    
+    // add j's contribution to the appropriate coalition
+    if (contrib_j_ij > 0.0) { chij = chij + contrib_j_ij; } 
+    assert(0.0 < chij);
+    
+    if (contrib_j_ij < 0.0) { chji = chji - contrib_j_ij; } 
+    assert(0.0 < chji);
+    
+    // cache those sums
+    contrib_i_ij = chij;
+    contrib_j_ij = chji;
+    
 
     const unsigned int na = model->numAct;
 
