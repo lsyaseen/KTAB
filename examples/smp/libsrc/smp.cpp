@@ -621,7 +621,6 @@ ostream& operator<< (ostream& os, const SMPBargnModel& bMod) {
 
 
   SMPState* SMPState::doBCN() const {
-    const SMPBargnModel bMod = SMPBargnModel::InitOnlyInterpSMPBM; //  SMPBargnModel::InitRcvrInterpSMPBM; // 
     const bool recordBargainingP = true;
     auto brgns = vector< vector < BargainSMP* > >();
     const unsigned int na = model->numAct;
