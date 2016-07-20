@@ -61,6 +61,32 @@ namespace SMPLib {
   const unsigned int sqlBuffSize = 250;
 
   // --------------------------------------------
+string bModName(const SMPBargnModel& bMod) {
+  string rs = "Unrecognized SMPBargnModel";
+  switch (bMod) {
+    case SMPBargnModel::InitOnlyInterpSMPBM:
+      rs = "InitOnlyInterpSMPBM";
+      break;
+      
+    case SMPBargnModel::InitRcvrInterpSMPBM:
+      rs = "InitRcvrInterpSMPBM";
+      break;
+      
+    case SMPBargnModel::PWCompInterSMPBM:
+      rs = "PWCompInterSMPBM";
+      break;
+    default:
+    cout << "bModName: Unrecognized SMPBargnModel"<<endl<<flush;
+    break;
+}
+  return rs;
+}
+
+ostream& operator<< (ostream& os, const SMPBargnModel& bMod) {
+    os << bModName(bMod);
+    return os;
+}
+  // --------------------------------------------
 
   BargainSMP::BargainSMP(const SMPActor* ai, const SMPActor* ar, const VctrPstn & pi, const VctrPstn & pr) {
     assert(nullptr != ai);
@@ -134,10 +160,11 @@ namespace SMPLib {
     vSal = (s * vSal) / sum(vSal);
     assert(fabs(s - sum(vSal)) < 1E-4);
 
-    // I could randomly assign different voting rules
-    // to different actors, but that would just be too cute.
+    // Note that we randomly assign different voting rules
     vr = VotingRule::Proportional;
-
+    const unsigned int vrNum = ((unsigned int) (rng->uniform(0.0, KBase::NumVotingRule-0.01)));
+    vr = VotingRule(vrNum);
+    //cout << "Voting rule " << vrNum << "  " << vr << endl;
     return;
   }
 
@@ -271,6 +298,9 @@ namespace SMPLib {
     };
 
     const unsigned int na = model->numAct;
+    assert (na == ideals.size());
+    assert (na == accomodate.numR());
+    assert (na == accomodate.numC());
     vDiff = KMatrix::map(dfn, na, na);
     return;
   }
@@ -591,7 +621,7 @@ namespace SMPLib {
 
 
   SMPState* SMPState::doBCN() const {
-    const SMPBargnModel bMod = SMPBargnModel::InitRcvrInterpSMPBM;
+    const SMPBargnModel bMod = SMPBargnModel::InitOnlyInterpSMPBM; //  SMPBargnModel::InitRcvrInterpSMPBM; // 
     const bool recordBargainingP = true;
     auto brgns = vector< vector < BargainSMP* > >();
     const unsigned int na = model->numAct;
@@ -729,7 +759,7 @@ namespace SMPLib {
         model->sqlBargainEntries(t, brgnJIJ->getID(), i, i, i, bestEU);
         model->sqlBargainEntries(t, brgnIIJ->getID(), i, i, j, bestEU);
 
-
+        cout << "Using "<<bMod<<" to form proposed bargains" << endl;
         switch (bMod) {
         case SMPBargnModel::InitOnlyInterpSMPBM:
           // record the only one used into SQLite
@@ -1960,21 +1990,28 @@ namespace SMPLib {
     // get them into the proper internal scale:
     pos = pos / 100.0;
     sal = sal / 100.0;
+    
+    // TODO: figure out representation of "accomodate" matrix
+    cout << "Setting ideal-accomodation matrix to identity matrix" << endl;
+    auto accM = KBase::iMat(numActor);
 
     // now that it is read and verified, use the data
-    auto sm0 = SMPModel::initModel(actorNames, actorDescs, dNames, cap, pos, sal, rng, s); // JAH 20160711 added rng seed
+    auto sm0 = SMPModel::initModel(actorNames, actorDescs, dNames, cap, pos, sal, accM, rng, s); // JAH 20160711 added rng seed
     return sm0;
   }
 
 
   // JAH 20160711 added rng seed
   SMPModel * SMPModel::initModel(vector<string> aName, vector<string> aDesc, vector<string> dName,
-    KMatrix cap, KMatrix pos, KMatrix sal, PRNG * rng, uint64_t s) {
+    const KMatrix & cap, const KMatrix & pos, const KMatrix & sal, 
+    const KMatrix & accM,
+    PRNG * rng, uint64_t s) {
     SMPModel * sm0 = new SMPModel(rng,"",s); // JAH 20160711 added rng seed
     SMPState * st0 = new SMPState(sm0);
     st0->step = [st0]() {
       return st0->stepBCN();
     };
+    
     sm0->addState(st0);
 
 
@@ -1999,6 +2036,9 @@ namespace SMPLib {
       st0->addPstn(vpi);
     }
 
+    st0->setAccomodate(accM);
+    st0->idealsFromPstns();
+    
     return sm0;
   }
 

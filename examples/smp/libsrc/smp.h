@@ -38,6 +38,7 @@
 namespace SMPLib {
 // namespace to which KBase has no access
 using std::function;
+using std::ostream;
 using std::shared_ptr;
 using std::string;
 using std::tuple;
@@ -85,7 +86,8 @@ enum class SMPBargnModel {
   InitRcvrInterpSMPBM,   // Init interpolates, so does Rcvr, each both from other
   PWCompInterSMPBM       // Power-weighted compromise of I-interp and R-interp, I&R both get same one
 };
-
+string bModName(const SMPBargnModel& bMod);
+ostream& operator<< (ostream& os, const SMPBargnModel& bMod);
 
 // -------------------------------------------------
 // Trivial, SMP-like actor with fixed attributes
@@ -258,7 +260,9 @@ public:
     static SMPModel * readCSV(string fName, PRNG * rng, uint64_t s); // JAH 20160711 added rng seed
 
     static  SMPModel * initModel(vector<string> aName, vector<string> aDesc, vector<string> dName,
-                                 KMatrix cap, KMatrix pos, KMatrix sal, PRNG * rng, uint64_t s); // JAH 20160711 added rng seed
+                                 const KMatrix & cap, const KMatrix & pos, const KMatrix & sal, 
+                                 const KMatrix & accM, // 20160720 BPW added accomodation matrix
+                                 PRNG * rng, uint64_t s); // JAH 20160711 added rng seed
 
     // print history of each actor in CSV (might want to generalize to arbitrary VctrPstn)
     void showVPHistory(bool sqlP) const;
