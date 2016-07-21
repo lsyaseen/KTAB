@@ -289,6 +289,9 @@ string vrName(const VotingRule& vr) {
     case VotingRule::Cubic:
         vrn = "Cubic";
         break;
+    case VotingRule::ASymProsp:
+         vrn = "ASymProsp";
+         break;
     default:
         throw KException("vrName - Unrecognized VotingRule");
         break;
@@ -474,6 +477,15 @@ double Model::vote(VotingRule vr, double wi, double uij, double uik) {
 
     case VotingRule::Cubic:
         v = wi * rCubic;
+        break;
+        
+    case VotingRule::ASymProsp:
+      if (rProp < 0.0) {
+        v = wi * rProp;
+      }
+      if (0.0 < rProp) {
+        v = (2.0 * wi * rProp)/ 3.0;
+      }
         break;
 
     default:
@@ -717,7 +729,8 @@ KMatrix Model::scalarPCE(unsigned int numAct, unsigned int numOpt, const KMatrix
             cout << flush;
             cout << "Utility to actors of options: " << endl;
             u.mPrintf(" %+8.3f ");
-            cout << endl;
+            cout << endl << flush;
+            //assert(false);
 
             auto vfn = [vr, &w, &u](unsigned int k, unsigned int i, unsigned int j) {
                 double vkij = vote(vr, w(0, k), u(k, i), u(k, j));
