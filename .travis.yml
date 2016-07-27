@@ -17,6 +17,7 @@ addons:
       - g++-5
       - cmake
       - cmake-data
+      - libtinyxml2-dev
   
 script: ./reconfig.sh
 
