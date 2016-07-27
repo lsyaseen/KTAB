@@ -17,11 +17,7 @@ addons:
       - g++-5
       - cmake
       - cmake-data
-      
-
-install:
-    - sudo apt-get update -qq 
-    - sudo apt-get install -qq -y libtinyxml2-dev
+    
   
 script: ./reconfig.sh
 
