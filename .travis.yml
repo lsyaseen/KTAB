@@ -8,7 +8,8 @@ addons:
   apt:
     sources:
       - george-edison55-precise-backports # cmake 3.2.3
-      - ubuntu-toolchain-r-test # source for g++-5
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise
       
     packages:
       - clang-3.8
