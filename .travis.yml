@@ -4,7 +4,9 @@ compiler:
   - clang
   - gcc
   
-script: ./reconfig.sh
-
 install:
   - apt-get install cmake
+  
+script: ./reconfig.sh
+
+
