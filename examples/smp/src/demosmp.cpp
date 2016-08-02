@@ -49,6 +49,7 @@ namespace DemoSMP {
   using std::function;
   using std::get;
   using std::string;
+  using std::vector;
 
   using KBase::ReportingLevel;
 
@@ -84,9 +85,10 @@ namespace DemoSMP {
     return sfn;
   };
 
-  void demoEUSpatial(unsigned int numA, unsigned int sDim, bool accP, uint64_t s, PRNG* rng) {
+  void demoEUSpatial(unsigned int numA, unsigned int sDim, bool accP, uint64_t s, PRNG* rng, vector<bool> f) {
     printf("Using PRNG seed: %020llu \n", s);
-    auto md0 = new SMPModel(rng, "", s); // JAH 20160711 added rng seed
+     // JAH 20160711 added rng seed 20160730 JAH added sql flags
+    auto md0 = new SMPModel(rng, "", s, f);
     //rng->setSeed(s); // seed is now set in Model::Model
     if (0 == numA) {
       double lnMin = log(4);
@@ -134,9 +136,7 @@ namespace DemoSMP {
 
 
     SMPState* st0 = new SMPState(md0);
-    md0->addState(st0); // now state 0 of the history
-    
-   
+    md0->addState(st0); // now state 0 of the histor
 
     st0->step = [st0]() {
       return st0->stepBCN();
@@ -248,31 +248,34 @@ namespace DemoSMP {
     printf("L-corr of prob and net support: %+.4f \n", KBase::lCorr((w*u), trans(p)));
     printf("A-corr of prob and net support: %+.4f \n", aCorr((w*u), trans(p)));
 
-    // note that recording the scenario is not part of running the scenario,
-    // so this is recorded outside the run.
-    md0->sqlScenarioDesc();
-
     cout << "Starting model run" << endl << flush;
     md0->run();
 
     // record the last actor posUtil table
     const unsigned int nState = md0->history.size();
     auto lastState = ((SMPState*)(md0->history[nState - 1]));
-    md0->sqlAUtil(nState - 1);
+    // JAH 20160802 added logging control flag for the last state
+    // also added the sqlPosVote and sqlPosEquiv calls to get the final state
+    if (f[1])
+    {
+        md0->sqlAUtil(nState - 1);
+        md0->sqlPosProb(nState - 1);
+        md0->sqlPosEquiv(nState-1);
+        md0->sqlPosVote(nState-1);
+    }
+    
+    // JAH 20160731 added to either log all information tables or none
+    // this takes care of info re. actors, dimensions, scenario, capabilities, and saliences
+    if (f[0])
+    {
+        md0->LogInfoTables();
+    }
 
-    md0->sqlPosProb(nState - 1);
-    md0->populateSpatialSalienceTable(true);
-
-    md0->populateActorDescriptionTable(true);
-
-
-
-    md0->populateSpatialCapabilityTable(true);
     cout << "Completed model run" << endl << endl;
     printf("There were %u states, with %i steps between them\n", nState, nState - 1);
 
     cout << "History of actor positions over time" << endl;
-    md0->showVPHistory(true);
+    md0->showVPHistory();
 
     cout << endl;
     cout << "Delete model (actors, states, positions, etc.)" << endl << flush;
@@ -283,8 +286,9 @@ namespace DemoSMP {
     return;
   }
 
-  void readEUSpatial(uint64_t seed, string inputCSV, PRNG* rng) {
-    auto md0 = SMPModel::readCSV(inputCSV, rng, seed); // JAH 20160711 added rng seed
+  void readEUSpatial(uint64_t seed, string inputCSV, PRNG* rng, vector<bool> f) {
+    // JAH 20160711 added rng seed 20160730 JAH added sql flags
+    auto md0 = SMPModel::readCSV(inputCSV, rng, seed, f);
 
     const unsigned int minIter = 2;
     const unsigned int maxIter = 100; const double minDeltaRatio = 0.02;
@@ -300,19 +304,21 @@ namespace DemoSMP {
     };
     md0->stop = smpStopFn(minIter, maxIter, minDeltaRatio, minSigDelta);
 
-    // JAH 20160724 store the scenario information
-    md0->sqlScenarioDesc();
    
     cout << "Starting model run" << endl << flush;
     md0->run();
 
     cout << "Completed model run" << endl << endl;
-    md0->populateSpatialCapabilityTable(true);
-    md0->populateSpatialSalienceTable(true);
-    md0->populateActorDescriptionTable(true);
+
+    // JAH 20160731 added to either log all information tables or none
+    // this takes care of info re. actors, dimensions, scenario, capabilities, and saliences
+    if (f[0])
+    {
+        md0->LogInfoTables();
+    }
 
     cout << "History of actor positions over time" << endl;
-    md0->showVPHistory(true);
+    md0->showVPHistory();
 
     // output what R needs for Sankey diagrams
     md0->sankeyOutput(inputCSV);
@@ -337,6 +343,9 @@ int main(int ac, char **av) {
   bool csvP = false;
   string inputCSV = "";
 
+  // JAH 20160730 vector of SQL logging flags for 4 groups of tables:
+  // 0 = Information Tables, 1 = Position Tables, 2 = EDU Tables, 3 = Bargain Resolution Tables
+  std::vector<bool> sqlFlags = {true,true,true,true};
 
   auto showHelp = []() {
     printf("\n");
@@ -395,11 +404,11 @@ int main(int ac, char **av) {
   // seed required to reproduce the bug.
   if (euSmpP) {
     cout << "-----------------------------------" << endl;
-    DemoSMP::demoEUSpatial(0, 0, randAccP, seed, rng);
+    DemoSMP::demoEUSpatial(0, 0, randAccP, seed, rng,sqlFlags);
   }
   if (csvP) {
     cout << "-----------------------------------" << endl;
-    DemoSMP::readEUSpatial(seed, inputCSV, rng);
+    DemoSMP::readEUSpatial(seed, inputCSV, rng,sqlFlags);
   }
   cout << "-----------------------------------" << endl;
 
