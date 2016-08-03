@@ -1,7 +1,6 @@
  language: cpp
  
  compiler:
-   - clang
    - gcc
    
  addons:
@@ -9,11 +8,8 @@
       sources:
         - george-edison55-precise-backports # cmake 3.2.3
         - ubuntu-toolchain-r-test
-        - llvm-toolchain-precise
-        - llvm-toolchain-precise-3.8
         
       packages:
-        - clang-3.8
         - g++-6
         - cmake
         - cmake-data
