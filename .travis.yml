@@ -13,6 +13,7 @@
         - g++-6
         - cmake
         - cmake-data
+        - libfltk1.3-dev
       
    
  script: ./reconfig.sh
