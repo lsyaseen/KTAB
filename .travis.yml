@@ -16,4 +16,8 @@
         - libfltk1.3-dev
       
    
- script: ./reconfig.sh
+ script:
+   - cd /home/travis
+   - git clone https://github.com/leethomason/tinyxml2.git
+   - make all
+   - ./reconfig.sh
