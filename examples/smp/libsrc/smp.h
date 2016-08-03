@@ -268,6 +268,7 @@ public:
                                  PRNG * rng, uint64_t s, vector<bool> f); // JAH 20160711 added rng seed 20160730 JAH added sql flags
 
     // print history of each actor in CSV (might want to generalize to arbitrary VctrPstn)
+
     void showVPHistory() const;
 
 	void LogInfoTables(); // JAH 20160731
@@ -292,8 +293,9 @@ protected:
     //sqlite3 *smpDB = nullptr; // keep this protected, to ease multi-threading
     //string scenName = "Scen";
     static const int NumTables = 4; // TODO : Add one to this num when new table is added
+
     static const int NumSQLLogGrps = 0; // TODO : Add one to this num when new logging group is added
-protected:
+ protected:
     // note that the function to write to table #k must be kept
     // synchronized with the result of createTableSQL(k) !
     void sqlTest();

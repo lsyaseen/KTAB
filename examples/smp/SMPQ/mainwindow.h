@@ -34,6 +34,7 @@
 #include <QSqlQuery>
 #include <QMessageBox>
 #include <QSqlError>
+#include <QRegExp>
 
 
 #include <QtWidgets>
@@ -78,28 +79,28 @@ private slots:
     void vectorPositionsFromDB();
     void dbGetFilePAth(bool bl);
     void dbEditGetFilePAth(bool bl);
-    void updateStateCount_SliderRange(int states);
-    void updateScenarioList_ComboBox(QStringList * scenarios);
-    void updateDimensionCount(int dim);
+    void updateStateCountSliderRange(int states);
+    void updateScenarioListComboBox(QStringList * scenarios, QStringList *scenarioIds, QStringList *scenarioDesc);
+    void updateDimensionCount(int dim, QStringList *dimList);
 
     //Central-  Controls Frame
     void sliderStateValueToQryDB(int value);
-    void scenarioComboBoxValue(QString scenario_box);
+    void scenarioComboBoxValue(int scenarioBox);
     void createNewCSV(bool bl);
     void cellSelected(QStandardItem *in);
     void insertNewRowCSV();
     void insertNewColumnCSV();
     void donePushButtonClicked(bool bl);
 
-//    bool eventFilter(QObject*, QEvent*);
-    void displayMenu_tableWidget(QPoint pos);
-    void displayMenu_tableView(QPoint pos);
+    //    bool eventFilter(QObject*, QEvent*);
+    void displayMenuTableWidget(QPoint pos);
+    void displayMenuTableView(QPoint pos);
 
     //DB to CSV
-    void actorsName_Description(QList<QString> actorName, QList<QString> actorDescription);
-    void actors_Influence(QList<QString> ActorInfluence);
-    void actors_Position(QList<QString> actorPosition, int dim);
-    void actors_Salience(QList<QString> actorSalience, int dim);
+    void actorsNameDesc(QList<QString> actorName, QList<QString> actorDescription);
+    void actorsInfluence(QList<QString> ActorInfluence);
+    void actorsPosition(QList<QString> actorPosition, int dim);
+    void actorsSalience(QList<QString> actorSalience, int dim);
 
 
 signals:
@@ -110,10 +111,11 @@ signals:
     void dbFilePath(QString path);
     void dbEditFilePath(QString path);
 
-    void getScenarioRunValues(int state, QString scenario_box);
-    void getScenarioRunValuesEdit(QString scenario_box);
+    void getScenarioRunValues(int state, QString scenarioBox,int dim);
+    void getScenarioRunValuesEdit(QString scenarioBox);
     void getStateCountfromDB();
     void getDimensionCountfromDB();
+    void getDimforBar();
 
     //save DB to csv
     void getActorsDesc();
@@ -162,18 +164,17 @@ private:
     QCheckBox * cparam3;
 
     //csv window
-    QTableView * csv_tableView;
+    QTableView * csvTableView;
     CSV *csvObj;
 
-    QTableWidget * csv_tableWidget;
+    QTableWidget * csvTableWidget;
 
-    QListWidget *listwidget2;
 
     QMenu *viewMenu;
 
     QDockWidget * moduleParametersDock;
-    QDockWidget * graph1Dock;
-    QDockWidget * graph2Dock;
+    QDockWidget * lineGraphDock;
+    QDockWidget * barGraphDock;
 
     QGridLayout * VLayout;
     QFrame * moduleFrame;
@@ -185,21 +186,24 @@ private:
     QString dbPath;
 
     //Graph 1 widget
-    QFrame *graphWidget;
-    QGridLayout * gridLayout;
-    QCustomPlot * customGraph;
+    QFrame *lineGraphWidget;
+    QGridLayout * lineGraphGridLayout;
+    QCustomPlot * lineCustomGraph;
 
-    void initializeGraphPlot1();
+    void initializeLineGraphPlot();
     void plotGraph();
     void initializeCentralViewFrame();
 
-    QString scenario_box;
+    QString scenarioBox;
+    QStringList mScenarioIds;
+    QStringList mScenarioDesc;
+    QStringList mScenarioName;
     //graph - customplot
 
     //    to  edit headers
 
-    QLineEdit* header_editor;
-    int editor_index;
+    QLineEdit* headerEditor;
+    int editorIndex;
 
     QString  tableType; // CSV, Database, NewCSV
     QStandardItemModel *modeltoCSV;
@@ -209,12 +213,15 @@ private:
     void createSeperateColumn(QTableWidgetItem *hdr);
 
     //DB to CSV
-    int dim;
+    int dimension;
     QList <QString> actorsName;
     QList <QString> actorsDescription;
-    QList <QString> actorsInfluence;
-    QList <QString> actorsPosition[3];
-    QList <QString> actorsSalience[3];
+    QList <QString> actorsInfl;
+    QList <QString> actorsPos[3];
+    QList <QString> actorsSal[3];
+
+    QStringList dimensionList;
+
 
 
 private slots:
@@ -230,7 +237,70 @@ private slots:
     void contextMenuRequest(QPoint pos);
     void moveLegend();
     void graphClicked(QCPAbstractPlottable *plottable);
+    void updateBarDimension(QStringList* dims);
+
+    //Bar Charts
+private :
+    void initializeBarGraphDock();
+    void initializeBarGraphPlot();
+    void populateBarGraphActorsList();
+    void populateBarGraphDimensions(int dim);
+    void populateBarGraphStateRange(int states);
+    void generateColors();
+    void getActorsInRange(int dim);
+    void setStackedBars();
+
+    QCPBars *createBar(int actorId);
+
+    QFrame * barGraphControlsFrame;
+    QFrame * barGraphMainFrame;
+    QGridLayout * barGraphGridLayout;
+    QGridLayout * barGridLayout;
+    QScrollArea * barGraphActorsScrollArea;
+    QCustomPlot * barCustomGraph;
+
+    QCheckBox * barGraphSelectAllCheckBox;
+    QRadioButton * barGraphRadioButton;
+    QComboBox * barGraphDimensionComboBox;
+    QLineEdit * barGraphGroupRangeLineEdit;
+
+    QSlider * barGraphTurnSlider;
+    QList <QCheckBox *> barGraphActorsCheckBoxList;
+    QList <bool> barGraphCheckedActorsIdList;
+
+    QList<QCPBars *> bars[100];
+    QCPBars * prevBar;
+    QCPBars * prevBarU;
+    QList<QColor> colorsList;
+
+    QList <QCheckBox * > actorCBList;
+    QList <int> actorsIdsClr;
+
+    double yAxisLen;
+
+    int in;
+    int barsCount;
+
+    double currentStackHeight[100];
+    double binWidth;
+
+    QCPPlotTitle * title;
+
+signals :
+    void getActorIdsInRange(double lowerRange, double upperRange, int dimension, int turn);
+
+private slots:
+    void barGraphSelectAllActorsCheckBoxClicked(bool Click);
+    void barGraphActorsCheckboxClicked(bool click);
+    void barGraphDimensionChanged(int value);
+    void barGraphTurnSliderChanged(int value);
+    void barGraphBinWidthButtonClicked(bool bl);
+    void barGraphActorsSalienceCapability(QList<int> aId, QList<double> sal, QList<double>cap, double r1, double r2);
+    void xAxisRangeChanged( const QCPRange &newRange, const QCPRange &oldRange );
+    void yAxisRangeChanged( const QCPRange &newRange, const QCPRange &oldRange );
+
 };
+
 
 #endif // MAINWINDOW_H
 

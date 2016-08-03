@@ -1025,7 +1025,7 @@ namespace SMPLib {
 
   // JAH 20160711 added rng seed 20160730 JAH added sql flags
   SMPModel * SMPModel::readCSV(string fName, PRNG * rng, uint64_t s, vector<bool> f) {
-    using KBase::KException;
+     using KBase::KException;
     char * errBuff; // as sprintf requires
     csv_parser csv(fName);
     // Get values according to row number and column number.
