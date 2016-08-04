@@ -15,12 +15,12 @@
         - cmake-data
         - libfltk1.3-dev
       
-   
- script:
+  before_script:
    - cd /home/travis
    - git clone https://github.com/leethomason/tinyxml2.git
    - cd tinyxml2
    - make all
-   - cd ..
-   - cd /KAPSARC/KTAB
+  
+ 
+  script:
    - ./reconfig.sh
