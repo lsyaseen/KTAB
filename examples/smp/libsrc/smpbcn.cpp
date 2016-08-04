@@ -429,7 +429,7 @@ SMPState* SMPState::doBCN() const {
         }
         // 0 <= mMax assured for uint
         assert(mMax < nb);
-        cout << "Chosen bargain (" << stm << "): " << mMax << "/" << nb << endl;
+        cout << "Chosen bargain (" << stm << "): " << mMax << " out of " << nb << " bargains" << endl;
         // update for bern table for remaining fields
         model->sqlUpdateBargainTable(t, p(0, 0), mMax, p(maxArrcount - 1, 0), mMax, k);
 
