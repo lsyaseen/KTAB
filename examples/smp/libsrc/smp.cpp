@@ -461,7 +461,7 @@ namespace SMPLib {
 
   void SMPState::showBargains(const vector < vector < BargainSMP* > > & brgns) const {
     for (unsigned int i = 0; i < brgns.size(); i++) {
-      printf("Bargains involving actor %u: ", i);
+      printf("Bargains involving actor %2u: ", i);
       for (unsigned int j = 0; j < brgns[i].size(); j++) {
         BargainSMP* bij = brgns[i][j];
         if (nullptr != bij) {
