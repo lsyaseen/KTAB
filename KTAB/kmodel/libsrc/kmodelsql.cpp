@@ -469,7 +469,7 @@ void Model::sqlAUtil(unsigned int t)
     }
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
     sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-    printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+    //printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 
     delete sqlBuff;
     sqlBuff = nullptr;
@@ -532,7 +532,7 @@ void Model::sqlPosEquiv(unsigned int t)
     // end databse transaction
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
     sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-    printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+    //printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
     delete sqlBuff;
     sqlBuff = nullptr;
     smpDB = db;
@@ -604,7 +604,7 @@ void Model::sqlUpdateBargainTable (unsigned int t,   double IntProb, int Init_Se
 
 	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
 	sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+    //printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 
 	delete sqlBuff;
 	sqlBuff = nullptr;
@@ -661,7 +661,7 @@ void Model::sqlBargainEntries(unsigned int t, int bargainId, int Baragainer, int
 	assert(SQLITE_OK == rslt);
 
 	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
-	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+    //printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 	sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
 	delete sqlBuff;
 	sqlBuff = nullptr;
@@ -1011,7 +1011,7 @@ void Model::sqlPosProb(unsigned int t)
     }
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
     sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-    printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+    //printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 
     delete sqlBuff;
     sqlBuff = nullptr;
@@ -1095,7 +1095,7 @@ void Model::sqlPosVote(unsigned int t)
     }
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
     sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-    printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+    //printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 
     delete sqlBuff;
     sqlBuff = nullptr;

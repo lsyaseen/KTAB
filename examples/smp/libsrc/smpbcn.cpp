@@ -742,8 +742,8 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
 
         sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
         sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-        printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
-        cout << flush; // so this prints before subsequent assertion failures
+        //printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+        //cout << flush; // so this prints before subsequent assertion failures
 
         delete sqlBuff;
         sqlBuff = nullptr;
