@@ -15,6 +15,7 @@ addons:
         - cmake
         - cmake-data
         - libfltk1.3-dev
+        - libtinyxml2-dev
       
 script:
     ./reconfig.sh
