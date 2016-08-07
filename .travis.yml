@@ -14,6 +14,5 @@
         - cmake
         - cmake-data
         - libfltk1.3-dev
- 
-  script:
-    ./reconfig.sh
+ script:
+   - ./reconfig.sh
