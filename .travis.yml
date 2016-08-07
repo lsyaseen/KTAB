@@ -8,18 +8,14 @@
       sources:
         - george-edison55-precise-backports # cmake 3.2.3
         - ubuntu-toolchain-r-test
+        - chef-current-trusty
         
       packages:
         - g++-6
         - cmake
         - cmake-data
         - libfltk1.3-dev
-        
-before script:
-- cd/home/travis
-- cd /KAPSARC/KTAB
-  
-
+        - libtinyxml2-dev
       
- script:
-   - KAPSARC/KTAB/reconfig.sh
+  script:
+    ./reconfig.sh
