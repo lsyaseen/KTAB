@@ -15,8 +15,8 @@ addons:
         - cmake-data
         - libfltk1.3-dev
         
- before-script:      
- - git clone https://github.com/leethomson/tinyxml2.git
+before-script:      
+ - git clone https://github.com/leethomson/tinyxml2.git ~/build/KAPSARC
  
 script:
     ./reconfig.sh
