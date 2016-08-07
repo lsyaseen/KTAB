@@ -17,6 +17,8 @@ addons:
         
 before-script:      
  - git clone https://github.com/leethomson/tinyxml2.git ~/build/KAPSARC
+ - ccmake .
+ - make
  
 script:
     ./reconfig.sh
