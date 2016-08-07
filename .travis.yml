@@ -16,7 +16,7 @@ addons:
         - libfltk1.3-dev
         
  before-script:      
- - git clone https://github.com/leethomason/tinyxml2.git ~/build/KAPSARC
+ - git clone https://github.com/leethomason/tinyxml2.git
  
 script:
     ./reconfig.sh
