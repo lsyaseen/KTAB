@@ -22,4 +22,4 @@ before script:
 
       
  script:
-   - ./reconfig.sh
+   - KAPSARC/KTAB/reconfig.sh
