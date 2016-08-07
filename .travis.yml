@@ -17,6 +17,7 @@
         
 before script:
 - cd/home/travis
+- cd /KAPSARC/KTAB
   
 
       
