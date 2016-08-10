@@ -15,6 +15,7 @@ addons:
         - cmake-data
         - libfltk1.3-dev
         
-before-script:      
+script:      
  - git clone https://github.com/leethomson/tinyxml2.git
+ - ./reconfig.sh
 
