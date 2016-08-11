@@ -15,9 +15,8 @@ addons:
         - cmake-data
         - libfltk1.3-dev
         
-script:      
- - cd /home/travis
- - cd tinyxml2
+script:     
+
  - sudo git clone https://github.com/leethomson/tinyxml2.git
  - ./reconfig.sh
 
