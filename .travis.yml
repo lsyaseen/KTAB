@@ -15,8 +15,10 @@ addons:
         - cmake-data
         - libfltk1.3-dev
         
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libtinyxml2-dev
+        
 script:     
-
- - git clone https://github.com/leethomson/tinyxml2.git
  - ./reconfig.sh
 
