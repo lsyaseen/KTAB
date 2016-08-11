@@ -17,6 +17,6 @@ addons:
         
 script:     
 
- - sudo git clone https://github.com/leethomson/tinyxml2.git
+ - git clone https://github.com/leethomson/tinyxml2.git
  - ./reconfig.sh
 
