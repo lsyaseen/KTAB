@@ -529,6 +529,19 @@ namespace KBase {
       }
       return mat;
   }
+
+  KMatrix KMatrix::getRow(unsigned int nr)
+  {
+    // be sure the requested row number is < numrows
+    assert(nr < this->numR());
+    auto thisrow = KMatrix(1,this->numC(),0.0);
+    for (unsigned int c = 0; c<this->numC(); c++)
+    {
+      thisrow(0,c) = (*this)(nr,c);
+    }
+    return thisrow;
+  }
+
 } // end of namespace
 
 // --------------------------------------------

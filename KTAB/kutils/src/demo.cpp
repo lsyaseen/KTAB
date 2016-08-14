@@ -397,6 +397,13 @@ namespace UDemo {
     auto mat3 = KMatrix::vecToKmat(dat,2,6);
     mat3.mPrintf("%2.0f ");
 
+    // JAH 20160814 added test for the new getrows nonstatic function
+    cout << "Row 0 of previous 2x6 matrix" << endl;
+    auto row1 = mat3.getRow(0);
+    row1.mPrintf(" %2.0f ");
+    cout << "Row 1 of previous 3x4 matrix" << endl;
+    auto row2 = mat2.getRow(1);
+    row2.mPrintf(" %2.0f ");
     return;
   }
 

@@ -106,6 +106,9 @@ namespace KBase {
     // JAH 20160809 return a matrix of specified dimensions populated with the data in the vector
     static KMatrix vecToKmat(vector<double> vec, unsigned int nr, unsigned int nc);
 
+    // JAH 20160814 get a single row slice from a matrix
+    KMatrix getRow(unsigned int nr);
+
     // For those rare cases when we do not need explicit indices inside the loop, 
     // the standard C++11 iterators are provided to support range-for
     vector<double>::iterator begin() { return vals.begin(); };
