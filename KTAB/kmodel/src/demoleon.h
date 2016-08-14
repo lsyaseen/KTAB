@@ -51,7 +51,7 @@ namespace DemoLeon {
   using KBase::KMatrix;
   using KBase::PRNG;
   using KBase::ReportingLevel;
- using KBase::VUI;
+  using KBase::VUI;
 
   using KBase::Actor;
   using KBase::Position;
@@ -188,11 +188,15 @@ namespace DemoLeon {
     explicit LeonModel(PRNG * r, string d="", uint64_t s=0, vector<bool> f={});
     virtual ~LeonModel();
 
-    // syntheize random, but not-ridiculous, data for a base year
+    // synthesize random, but not-ridiculous, data for a base year
     tuple<KMatrix, KMatrix, KMatrix, KMatrix> makeBaseYear(unsigned int numF, unsigned int numCG, unsigned int numS, PRNG* rng);
 
     // given base year data (real or synthetic), construct a plausible I/O model from that data.
     void makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMatrix & xprt, const KMatrix & cons, PRNG* rng);
+
+    // JAH 20160809 added
+    void prepModel(unsigned int numFac, unsigned int numCon, unsigned int numSec,
+        KMatrix & baseDemnd, KMatrix & dmndElast, KMatrix & revShare, KMatrix & lAlpha, KMatrix & lBeta);
 
     // Estimate vector of export demands, given a vector tau of tax/subsidy rates.
     // assuming base year prices of 1.0
