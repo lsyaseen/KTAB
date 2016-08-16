@@ -7,4 +7,4 @@ language: cpp
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y libsqlite3-0 libx11-6 libfltk1.3 libxaw7
-  - sudo apt-get install -y libxmu libxpm libxft libxt libfontconfig1
+  - sudo apt-get install -y libxmu6 libxpm4 libxft2 libxt6 libfontconfig1
