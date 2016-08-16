@@ -8,3 +8,8 @@ install:
   - sudo apt-get update -qq
   - sudo apt-get install -y libsqlite3-0 libx11-6 libfltk1.3 libxaw7
   - sudo apt-get install -y libxmu6 libxpm4 libxft2 libxt6 libfontconfig1
+
+# this step runs a custom build script that builds the various components of
+# KTAB in the required order.
+script:     
+ - ./reconfig.sh
