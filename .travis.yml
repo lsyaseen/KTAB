@@ -5,9 +5,9 @@ language: cpp
 # this step is for adding additional dependencies required for the project that 
 # are common across the various build configurations.
 before_install:
-  - apt-get update -qq
-  - apt-get install -y libsqlite3-dev libxll-dev libfltk1.3-dev libxaw-dev
-  - apt-get install -y libxmu-dev libxpm-dev libxft-dev libxt-dev libfontconfig1-dev
+  - sudo apt-get update -qq
+  - sudo apt-get install -y libsqlite3-dev libxll-dev libfltk1.3-dev libxaw-dev
+  - sudo apt-get install -y libxmu-dev libxpm-dev libxft-dev libxt-dev libfontconfig1-dev
 
  
 
