@@ -1,3 +1,5 @@
+sudo: required
+
 language: cpp
 
 # this step is for adding additional dependencies required for the project that 
