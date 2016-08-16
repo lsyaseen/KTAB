@@ -6,5 +6,5 @@ language: cpp
 # are common across the various build configurations.
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -y libsqlite3 libx11 libfltk1.3 libxaw7
+  - sudo apt-get install -y libsqlite3-0 libx11-6 libfltk1.3 libxaw7
   - sudo apt-get install -y libxmu libxpm libxft libxt libfontconfig1
