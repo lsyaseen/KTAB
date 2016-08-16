@@ -1,22 +1,12 @@
 language: cpp
+
+# this step is for adding additional dependencies required for the project that 
+# are common across the various build configurations.
+before_install:
+  - apt-get update -qq
+  - apt-get install -y libsqlite3-dev libxll-dev libfltk1.3-dev libxaw-dev
+  - apt-get install -y libxmu-dev libxpm-dev libxft-dev libxt-dev libfontconfig1-dev
+
  
-compiler:
-   - gcc
-   
-addons:
-    apt:
-      sources:
-        - george-edison55-precise-backports # cmake 3.2.3
-        - ubuntu-toolchain-r-test
-        - chef-current-trusty
-        
-      packages:
-        - g++-6
-        - cmake
-        - cmake-data
-        - libfltk1.3-dev
-        - libtinyxml2-dev
-        
-script:     
- - ./reconfig.sh
+
 
