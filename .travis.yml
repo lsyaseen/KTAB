@@ -1,11 +1,7 @@
 language: cpp
 
 sudo: required
-
-# this step is for making alterations to the default environment before
-# installing additional dependencies.
-before_install:
-  - sudo apt-get remove cmake   # default Ubuntu only has cmake 2.8.7!
+dist: trusty
 
 # this step is for adding additional dependencies required for the project that 
 # are common across the various build configurations.
