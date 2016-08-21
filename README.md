@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/KAPSARC/KTAB.svg?branch=master)](https://travis-ci.org/KAPSARC/KTAB)
+
 # KTAB #
 
 
