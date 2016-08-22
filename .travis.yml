@@ -3,6 +3,10 @@ language: cpp
 sudo: required
 dist: trusty
 
+compiler:
+  - gcc
+  - clang
+  
 # this step is for making alterations to the default environment before
 # installing additional dependencies.
 before_install:
@@ -29,7 +33,7 @@ install:
 
   # next install additional required dependencies
   - sudo apt-get install --assume-yes libsqlite3-0 libx11-6 libfltk1.3 libxaw7
-  - sudo apt-get install --assume-yes libxmu6 libxpm4 libxft2 libxt6 libfontconfig1 libfltk1.3 fluid
+  - sudo apt-get install --assume-yes libxmu6 libxpm4 libxft2 libxt6 libfontconfig1 fluid
 
   # install tinyxml2
   - git clone https://github.com/leethomason/tinyxml2.git
