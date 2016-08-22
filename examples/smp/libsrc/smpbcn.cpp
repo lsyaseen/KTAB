@@ -485,10 +485,12 @@ SMPState* SMPState::doBCN() const {
     }
 
 	sqlite3 *db = model->smpDB;
-	auto sqlBuff = newChars(200);
+	auto sqlBuff = newChars(300);
 
+	// JAH 20160822 fixed the oversight of not conditioning on the scenario
 	sprintf(sqlBuff, "UPDATE Bargn SET Init_Prob = ?1, Init_Seld = ?2, Recd_Prob = ?3, Recd_Seld = ?4 \
-     WHERE (?5 = Turn_t) and (?6 = BargnID) and (?7 = Init_Act_i) and (?8 = Recd_Act_j)");
+	  WHERE (\"%s\" = ScenarioId) and (?5 = Turn_t) and (?6 = BargnId) and (?7 = Init_Act_i) and (?8 = Recd_Act_j)",
+	  model->getScenarioID().c_str());
 
 	const char* updateStr = sqlBuff;
 	sqlite3_stmt *updateStmt = nullptr;
@@ -590,7 +592,6 @@ SMPState* SMPState::doBCN() const {
 	delete sqlBuff;
 	sqlBuff = nullptr;
 	model->smpDB = db;
-
 	// Some bargains are nullptr, and there are two copies of every non-nullptr randomly
     // arranged. If we delete them as we find them, then the second occurance will be corrupted,
     // so the code crashes when it tries to access the memory to see if it matches something

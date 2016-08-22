@@ -331,7 +331,7 @@ KTable * Model::createSQL(unsigned int n)
 		sql = "create table if not exists Bargn ("  \
 			"ScenarioId TEXT(32) NOT NULL DEFAULT 'None', "\
 			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-			"BargnID INTEGER NOT NULL DEFAULT 0, "\
+			"BargnId INTEGER NOT NULL DEFAULT 0, "\
 			"Init_Act_i INTEGER NOT NULL DEFAULT 0, "\
 			"Recd_Act_j INTEGER NOT NULL DEFAULT 0, "\
 			"Value REAL NOT NULL DEFAULT 0.0, "\
@@ -348,7 +348,7 @@ KTable * Model::createSQL(unsigned int n)
 		sql = "create table if not exists BargnCoords ("  \
 			"ScenarioId TEXT(32) NOT NULL DEFAULT 'None', "\
 			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-			"Bargn_i INTEGER NOT NULL DEFAULT 0, "\
+			"BargnId INTEGER NOT NULL DEFAULT 0, "\
 			"Dim_k INTEGER NOT NULL DEFAULT 0, "\
 			"Init_Coord	REAL NULL DEFAULT 0.0,"\
 			"Recd_Coord	REAL NOT NULL DEFAULT 0.0"\
@@ -361,7 +361,7 @@ KTable * Model::createSQL(unsigned int n)
 		sql = "create table if not exists BargnUtil ("  \
 			"ScenarioId TEXT(32) NOT NULL DEFAULT 'None', "\
 			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-			"Bargn_i    INTEGER NOT NULL	DEFAULT 0, "\
+			"BargnId    INTEGER NOT NULL	DEFAULT 0, "\
 			"Act_i 	INTEGER NOT NULL DEFAULT 0, "\
 			"Util	REAL NOT NULL DEFAULT 0.0"\
 		 	");";
@@ -375,8 +375,8 @@ KTable * Model::createSQL(unsigned int n)
 		sql = "create table if not exists BargnVote ("  \
 			"ScenarioId TEXT(32) NOT NULL DEFAULT 'None', "\
 			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-			"Bargn_i  INTEGER NOT NULL DEFAULT 0, "\
-			"Bargn_j INTEGER NOT NULL DEFAULT 0, "\
+			"BargnId_i  INTEGER NOT NULL DEFAULT 0, "\
+			"BargnId_j INTEGER NOT NULL DEFAULT 0, "\
 			"Act_k 	INTEGER NOT NULL DEFAULT 0, "\
 			"Vote	REAL NOT NULL DEFAULT 0.0"\
 			");";
@@ -607,7 +607,7 @@ void Model::sqlBargainCoords(unsigned int t, int bargnID, const KBase::VctrPstn 
  
 	// prepare the sql statement to insert
 	sprintf(sqlBuff,
-		"INSERT INTO BargnCoords (ScenarioId, Turn_t,Bargn_i, Dim_k, Init_Coord,Recd_Coord) VALUES ('%s',?1, ?2, ?3, ?4,?5)",
+		"INSERT INTO BargnCoords (ScenarioId, Turn_t,BargnId, Dim_k, Init_Coord,Recd_Coord) VALUES ('%s',?1, ?2, ?3, ?4,?5)",
 		scenId.c_str());
 
     assert(nullptr != db);
@@ -673,7 +673,7 @@ void Model::sqlBargainUtil(unsigned int t, int Bargn_i,  KBase::KMatrix Util_mat
  
 	// prepare the sql statement to insert
 	sprintf(sqlBuff,
-		"INSERT INTO BargnUtil  (ScenarioId, Turn_t,Bargn_i, Act_i, Util) VALUES ('%s',?1, ?2, ?3, ?4)",
+		"INSERT INTO BargnUtil  (ScenarioId, Turn_t,BargnId, Act_i, Util) VALUES ('%s',?1, ?2, ?3, ?4)",
 		scenId.c_str());
 
     assert(nullptr != db);
