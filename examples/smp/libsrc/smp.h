@@ -247,6 +247,9 @@ protected:
     // for now,set it to a scaled identity matrix.
     void setupAccomodateMatrix(double adjRate);
 
+	void bindExecute(sqlite3_stmt *updateStmt, size_t turn, int bargnID,
+		int initActor, double initProb, bool isInitSelected,
+		int recvActor, double recvProb, bool isRecvSelected) const;
 };
 
 class SMPModel : public Model {

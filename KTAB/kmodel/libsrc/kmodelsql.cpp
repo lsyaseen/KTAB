@@ -331,10 +331,9 @@ KTable * Model::createSQL(unsigned int n)
 		sql = "create table if not exists Bargn ("  \
 			"ScenarioId TEXT(32) NOT NULL DEFAULT 'None', "\
 			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-			"Bargn_i INTEGER NOT NULL DEFAULT 0, "\
-			"Brgn_Act_i INTEGER NOT NULL DEFAULT 0, "\
+			"BargnID INTEGER NOT NULL DEFAULT 0, "\
 			"Init_Act_i INTEGER NOT NULL DEFAULT 0, "\
-			"Recd_Act_i INTEGER NOT NULL DEFAULT 0, "\
+			"Recd_Act_j INTEGER NOT NULL DEFAULT 0, "\
 			"Value REAL NOT NULL DEFAULT 0.0, "\
 			"Init_Prob REAL NULL DEFAULT 0, "\
 			"Init_Seld	BOOLEAN NULL ,"\
@@ -539,80 +538,7 @@ void Model::sqlPosEquiv(unsigned int t)
     return;
 }
 
- 
-void Model::sqlUpdateBargainTable (unsigned int t,   double IntProb, int Init_Seld, double Recd_Prob,int Recd_Seld,  int Brgn_Act_i)
-{
-
-
-	// initiate the database
-	sqlite3 * db = smpDB;
-
-	// Error message in case
-	char* zErrMsg = nullptr;
-	auto sqlBuff = newChars(200);
-	// prepare the sql statement to insert
-	sprintf(sqlBuff, "UPDATE Bargn SET Init_Prob = ?1, Init_Seld = ?2, Recd_Prob = ?3, Recd_Seld= ?4 WHERE (Brgn_Act_i = ?5 ) and (?6 = Turn_t)");
-
-    assert(nullptr != db);
-	const char* insStr = sqlBuff;
-	sqlite3_stmt *insStmt;
-	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
-    assert(nullptr != insStmt); // make sure it is ready
-
-	// start for the transaction
-	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
-
-	int rslt = 0;
-	
-	//Bargn_i
-	rslt = sqlite3_bind_double(insStmt, 1, IntProb);
-	assert(SQLITE_OK == rslt);
- 
-	//Init_Seld
-	if (Init_Seld)
-		rslt = sqlite3_bind_int(insStmt, 2, 1);
-	else
-		rslt = sqlite3_bind_int(insStmt, 2, 0);
-
-	//Recd_Prob
-	rslt = sqlite3_bind_double(insStmt, 3, Recd_Prob);
-	 
-
-	assert(SQLITE_OK == rslt);
-
-	//Recd_Seld
-	if (Recd_Seld)
-		rslt = sqlite3_bind_int(insStmt, 4, 1);
-	else
-		rslt = sqlite3_bind_int(insStmt, 4, 0);
-
-	assert(SQLITE_OK == rslt);
-
-	// Bargain actor
-	rslt = sqlite3_bind_int(insStmt, 5, Brgn_Act_i);
-	assert(SQLITE_OK == rslt);
-
-	//turn
-	rslt = sqlite3_bind_int(insStmt, 6, t);
-	assert(SQLITE_OK == rslt);
-	rslt = sqlite3_step(insStmt);
-	assert(SQLITE_DONE == rslt);
-	sqlite3_clear_bindings(insStmt);
-	assert(SQLITE_DONE == rslt);
-	rslt = sqlite3_reset(insStmt);
-	assert(SQLITE_OK == rslt);
-
-	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
-	sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-    //printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
-
-	delete sqlBuff;
-	sqlBuff = nullptr;
-
-	smpDB = db;
-}
-
-void Model::sqlBargainEntries(unsigned int t, int bargainId, int Baragainer, int initiator, int receiver, double val)
+void Model::sqlBargainEntries(unsigned int t, int bargainId, int initiator, int receiver, double val)
 {
 	// initiate the database
 	sqlite3 * db = smpDB;
@@ -622,7 +548,7 @@ void Model::sqlBargainEntries(unsigned int t, int bargainId, int Baragainer, int
 	auto sqlBuff = newChars(200);
 	// prepare the sql statement to insert
 	sprintf(sqlBuff,
-		"INSERT INTO Bargn (ScenarioId, Turn_t,Bargn_i, Brgn_Act_i,Init_Act_i, Recd_Act_i,Value) VALUES ('%s',?1, ?2, ?3, ?4,?5,?6)",
+		"INSERT INTO Bargn (ScenarioId, Turn_t, BargnID, Init_Act_i, Recd_Act_j,Value) VALUES ('%s',?1, ?2, ?3, ?4,?5)",
 		scenId.c_str());
 
     assert(nullptr != db);
@@ -638,20 +564,17 @@ void Model::sqlBargainEntries(unsigned int t, int bargainId, int Baragainer, int
 	// Turn_t
 	rslt = sqlite3_bind_int(insStmt, 1, t);
 	assert(SQLITE_OK == rslt);
-	//Bargn_i
+	//BargnID
 	rslt = sqlite3_bind_int(insStmt, 2, bargainId);
 	assert(SQLITE_OK == rslt);
-	//Brgn_Act_i
-	rslt = sqlite3_bind_int(insStmt, 3, Baragainer);
-	assert(SQLITE_OK == rslt);
 	//Init_Act_i
-	rslt = sqlite3_bind_int(insStmt, 4, initiator);
+	rslt = sqlite3_bind_int(insStmt, 3, initiator);
 	assert(SQLITE_OK == rslt);
-	//Recd_Act_i
-	rslt = sqlite3_bind_int(insStmt, 5, receiver);
+	//Recd_Act_j
+	rslt = sqlite3_bind_int(insStmt, 4, receiver);
 	assert(SQLITE_OK == rslt);
 	//Value
-	rslt = sqlite3_bind_double(insStmt, 6, val);
+	rslt = sqlite3_bind_double(insStmt, 5, val);
 	assert(SQLITE_OK == rslt);
 	rslt = sqlite3_step(insStmt);
 	assert(SQLITE_DONE == rslt);
