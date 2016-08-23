@@ -62,6 +62,7 @@ signals:
   void vectorPosition(QVector<double> x, QVector<double> y, QString actor,int turn);
   void dbModel(QStandardItemModel  *);
   void dbModelEdit(QSqlTableModel *);
+  void actorCount(int value);
   void statesCount(int value);
   void dimensionsCount(int value,QStringList *dimensions);
   void dimensList(QStringList *dimensions);

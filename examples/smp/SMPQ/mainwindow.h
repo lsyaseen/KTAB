@@ -82,6 +82,7 @@ private slots:
   void updateStateCountSliderRange(int states);
   void updateScenarioListComboBox(QStringList * scenarios, QStringList *scenarioIds, QStringList *scenarioDesc);
   void updateDimensionCount(int dim, QStringList *dimList);
+  void updateActorCount(int actNum);
 
   //Central-  Controls Frame
   void sliderStateValueToQryDB(int value);
@@ -199,6 +200,7 @@ private:
   QStringList mScenarioName;
   //graph - customplot
 
+  int numAct;
   //    to  edit headers
 
   QLineEdit* headerEditor;
