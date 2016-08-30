@@ -1386,7 +1386,8 @@ namespace DemoLeon {
     // Thus, generate K basis tax vectors, of N components each, and take the K policy
     // parameters as the weighting vectors (+/-) on those basis taxes.
 
-    auto eMod0 = new LeonModel(rng);
+    // JAH 20160830 changed to pass in the seed
+    auto eMod0 = new LeonModel(rng,"",s);
     eMod0->stop = nullptr; // no stop-run method, for now
 
     const unsigned int maxIter = 50; // TODO: realistic limit
@@ -1519,7 +1520,7 @@ namespace DemoLeon {
       cout << "Pos vector: ";
       trans(*pi).mPrintf(" %+7.3f ");
       cout << "Cap vector: ";
-      trans(ai->vCap).mPrintf(" %7.2f ");
+      trans(ai->vCap).mPrintf(" %7.3f ");
       printf("minS: %.3f \n", ai->minS);
       printf("refS: %.3f \n", ai->refS);
       printf("maxS: %.3f \n", ai->maxS);
@@ -1675,7 +1676,7 @@ namespace DemoLeon {
     using std::get;
 
     // setup Leon model - this is all copied from demoSetup
-    auto eMod0 = new LeonModel(rng);
+    auto eMod0 = new LeonModel(rng, "", s);
     eMod0->stop = nullptr; // no stop-run method, for now
 
     const unsigned int maxIter = 50; // TODO: realistic limit
@@ -1778,16 +1779,27 @@ namespace DemoLeon {
     auto revShare = KMatrix::vecToKmat(rho,L,N);
 
     // set up for scenarios of capacities
-    // 0 = random, 1 = scaled
-    unsigned int capscen = 1;
+    // 0 = random, 1 = equal, 2 = self-weighted, 3 = input-weighted
+    unsigned int capscen = 3;
     KMatrix caps = KMatrix();  // must declare it here even if capscen == 0 because of scope
     switch (capscen){
       case 0:
         // just keep the randomizer code below
+        // the gtap article said that capabilities were functions of value add, but it was really just randomized...
         break;
       case 1:
+      {
+        // every actor has the same capability in each dim (which are all summed anyway)
+        caps = KMatrix(N+L,N,1.0);
+        cout << "Capabilities Matrix" << endl;
+        caps.mPrintf(" %0.3f ");
+        break;
+      }
+      case 2:
+      {
         // set up with cap = 1 for each sector in his own dim, and 1/N everywhere else
-        // factors all have 1/N capability
+        // factors all have 1/N capability - not that this automatically underweights them
+        // relative to the sectors
         auto eye = KMatrix(N,N, 1.0/N);
         for (unsigned int r = 0; r<N; r++)
         {
@@ -1800,6 +1812,36 @@ namespace DemoLeon {
         cout << "Capabilities Matrix" << endl;
         caps.mPrintf(" %0.3f ");
         break;
+        // P.S. JAH 20160830 looking through the existing code, I determined that this
+        // is wasted effort, as the vector of weights for each actor is simply summed
+        // to a scalar number :-(; keeping this scenario for possible future use
+      }
+      case 3:
+      {
+        // JAH 20160830 weight each sector according to it's total inputs into other sectors
+        // weight each factor according to it's total received VA
+        // from '[IO-USA-1981.xlsx]A'!L3:L16 (ideally this would be computed here from an A matrix)
+        vector<double> tmpS = {0.3390, 0.3240, 0.1570, 0.8060, 0.8640, 0.5070, 0.3050, 0.4400, 0.5600};
+        auto capSec = KMatrix::vecToKmat(tmpS,N,1);
+        vector<double> tmpF = {2.2872, 1.1107, 1.3001};
+        auto capFac = KMatrix::vecToKmat(tmpF,L,1);
+        // rescale all sector and all factor weights independently, so each group sums to 1
+        auto cs = sum(capSec);
+        for(unsigned int i=0;i<N;i++)
+        {
+            capSec(i,0) /= cs;
+        }
+        auto cf = sum(capFac);
+        // also scale factors by L/N to remove the excess weight due to there only being 3
+        for(unsigned int i=0;i<L;i++)
+        {
+            capFac(i,0) = L*capFac(i,0)/(N*cf);
+        }
+        caps = KBase::joinV(capSec,capFac);
+        cout << "Capabilities Matrix" << endl;
+        caps.mPrintf(" %0.3f ");
+        break;
+      }
     }
 
     // now prep it all
@@ -1846,7 +1888,7 @@ namespace DemoLeon {
         case 0:
           ai->randomize(rng);
           break;
-        case 1:
+        default:
           // get a row from the scenario capabilities matrix and transpose to the column used by Actor
           ai->vCap = KBase::trans(caps.getRow(i));
           break;
@@ -1898,7 +1940,7 @@ namespace DemoLeon {
       cout << "Pos vector: ";
       trans(*pi).mPrintf(" %+7.3f ");
       cout << "Cap vector: ";
-      trans(ai->vCap).mPrintf(" %7.2f ");
+      trans(ai->vCap).mPrintf(" %7.3f ");
       printf("minS: %.3f \n", ai->minS);
       printf("refS: %.3f \n", ai->refS);
       printf("maxS: %.3f \n", ai->maxS);
