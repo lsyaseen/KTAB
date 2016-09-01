@@ -50,7 +50,7 @@ MainWindow::MainWindow()
   //Database
   dbObj = new Database();
   //To open database by passing the path
-  connect(this,SIGNAL(dbFilePath(QString)),dbObj, SLOT(openDB(QString)));
+  connect(this,SIGNAL(dbFilePath(QString,bool)),dbObj, SLOT(openDB(QString,bool)));
   //To open database by passing the path
   connect(this,SIGNAL(dbEditFilePath(QString)),dbObj,SLOT(openDBEdit(QString)));
   //To get Database item Model to show on GUI
@@ -69,8 +69,8 @@ MainWindow::MainWindow()
   connect(dbObj,SIGNAL(actorCount(int)),this,SLOT(updateActorCount(int)));
 
   //To get all scenarios from Database to update ScenarioComboBox
-  connect(dbObj,SIGNAL(scenarios(QStringList*,QStringList*,QStringList*)),
-          this,SLOT(updateScenarioListComboBox(QStringList*,QStringList*,QStringList*)));
+  connect(dbObj,SIGNAL(scenarios(QStringList*,QStringList*,QStringList*,int)),
+          this,SLOT(updateScenarioListComboBox(QStringList*,QStringList*,QStringList*,int)));
   //To get initial scenario vector positions and Item model to update graph and Table view
   connect(this, SIGNAL(getScenarioRunValues(int,QString,int)),dbObj,SLOT(getScenarioData(int,QString,int)));
   //To store scenario value, for edit database to save as csv reference
@@ -139,7 +139,7 @@ void MainWindow::csvGetFilePAth(bool bl)
 
 }
 
-void MainWindow::dbGetFilePAth(bool bl, QString smpDBPath)
+void MainWindow::dbGetFilePAth(bool bl, QString smpDBPath, bool run)
 {
   clearAllLabels();
 
@@ -170,7 +170,7 @@ void MainWindow::dbGetFilePAth(bool bl, QString smpDBPath)
       connect(turnSlider,SIGNAL(valueChanged(int)),this,SLOT(sliderStateValueToQryDB(int)));
 
       modeltoDB->clear();
-      emit dbFilePath(dbPath);
+      emit dbFilePath(dbPath,run);
 
       reconnectPlotWidgetSignals();
       //To populate Line Graph Dimensions combo box
@@ -213,7 +213,7 @@ void MainWindow::updateStateCountSliderRange(int states)
   populateBarGraphStateRange(states);
 }
 
-void MainWindow::updateScenarioListComboBox(QStringList * scenarios,QStringList* scenarioIds,QStringList* scenarioDesc)
+void MainWindow::updateScenarioListComboBox(QStringList * scenarios,QStringList* scenarioIds,QStringList* scenarioDesc, int indx)
 {
   for(int index=0;index<scenarios->length();++index)
     {
@@ -226,8 +226,8 @@ void MainWindow::updateScenarioListComboBox(QStringList * scenarios,QStringList*
       connect(scenarioComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(scenarioComboBoxValue(int)));
 
     }
-  scenarioBox = mScenarioIds.at(scenarioComboBox->currentIndex());
-  scenarioDescriptionLineEdit->setText(mScenarioDesc.at(scenarioComboBox->currentIndex()));
+  scenarioBox = mScenarioIds.at(indx);
+  scenarioDescriptionLineEdit->setText(mScenarioDesc.at(indx));
 
   //qDebug() <<scenarioBox;
   //    sliderStateValueToQryDB(0);//when new database is opened, start from zero
@@ -511,8 +511,8 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
       int k=0;
       for(int i=3 ; i <csvTableWidget->columnCount(); i=i+2)
         {
-          csvTableWidget->setHorizontalHeaderItem(i ,new QTableWidgetItem(dimensionList.at(k)));
-          csvTableWidget->setHorizontalHeaderItem(i+1,new QTableWidgetItem("Salience "+QString::number(k)));
+          csvTableWidget->setHorizontalHeaderItem(i ,new QTableWidgetItem(dimensionList.at(k)+" Position "+QString::number(k)));
+          csvTableWidget->setHorizontalHeaderItem(i+1,new QTableWidgetItem(dimensionList.at(k)+" Salience "+QString::number(k)));
           ++k;
         }
       //Updating values
@@ -611,8 +611,8 @@ void MainWindow::setDBItemModel(QStandardItemModel *model)
   int k=0;
   for(int i=5 ; i <modeltoDB->columnCount(); i=i+2)
     {
-      modeltoDB->setHeaderData(i,Qt::Horizontal ,(dimensionList.at(k)));
-      modeltoDB->setHeaderData(i+1,Qt::Horizontal,("Salience "+QString::number(k)));
+      modeltoDB->setHeaderData(i,Qt::Horizontal ,(dimensionList.at(k)+" Position "+QString::number(k)));
+      modeltoDB->setHeaderData(i+1,Qt::Horizontal,(dimensionList.at(k)+" Salience "+QString::number(k)));
       ++k;
     }
   //to create csv like view

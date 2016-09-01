@@ -153,8 +153,7 @@ void MainWindow::runPushButtonClicked(bool bl)
   QDateTime UTC = QDateTime::currentDateTime().toTimeSpec(Qt::UTC);
   QString name (UTC.toString());
 
-  name.replace(" ","_");
-  name.replace(":","_");
+  name.replace(" ","_").replace(":","_");
 
   QString dbFilePath;
 
@@ -206,7 +205,7 @@ void MainWindow::runPushButtonClicked(bool bl)
 
 void MainWindow::smpDBPath(QString smpdbPath)
 {
-  dbGetFilePAth(true,smpdbPath);
+  dbGetFilePAth(true,smpdbPath,true);
 }
 
 void MainWindow::disableRunButton(QTableWidgetItem *itm)

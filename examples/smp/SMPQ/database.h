@@ -40,7 +40,7 @@ public:
   ~Database();
 
 public slots :
-  void openDB(QString dbPath);
+  void openDB(QString dbPath,bool run=false);
   void openDBEdit(QString dbPath);
   void getScenarioData(int turn, QString scenario, int dim);
   void getScenarioDataEdit(QString scenario);
@@ -66,7 +66,7 @@ signals:
   void statesCount(int value);
   void dimensionsCount(int value,QStringList *dimensions);
   void dimensList(QStringList *dimensions);
-  void scenarios(QStringList *scenariosList,QStringList *scenariosIdList, QStringList *scenarioDesc);
+  void scenarios(QStringList *scenariosList,QStringList *scenariosIdList, QStringList *scenarioDesc, int indx);
 
   //DB to CSV
   void actorsNameDesc(QList <QString>, QList <QString>);
@@ -116,7 +116,7 @@ private:
   // number of states/turns in db
   void getNumStates();
   // Scenarios list in db
-  void getScenarioList();
+  void getScenarioList(bool run);
 
   void readVectorPositionTableEdit(QString scenario);
 };

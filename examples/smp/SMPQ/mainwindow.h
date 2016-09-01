@@ -76,10 +76,10 @@ private slots:
   void setDBItemModelEdit();
   void displayMessage(QString cls, QString message);
   void vectorPositionsFromDB();
-  void dbGetFilePAth(bool bl, QString dbPath =0 );
+  void dbGetFilePAth(bool bl, QString dbPath =0,bool run = false );
   void dbEditGetFilePAth(bool bl);
   void updateStateCountSliderRange(int states);
-  void updateScenarioListComboBox(QStringList * scenarios, QStringList *scenarioIds, QStringList *scenarioDesc);
+  void updateScenarioListComboBox(QStringList * scenarios, QStringList *scenarioIds, QStringList *scenarioDesc, int indx);
   void updateDimensionCount(int dim, QStringList *dimList);
   void updateActorCount(int actNum);
 
@@ -107,7 +107,7 @@ signals:
   void csvFilePath(QString path);
 
   //Database
-  void dbFilePath(QString path);
+  void dbFilePath(QString path,bool runScenario = false);
   void dbEditFilePath(QString path);
 
   void getScenarioRunValues(int state, QString scenarioBox,int dim);
