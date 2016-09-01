@@ -301,9 +301,9 @@ public:
     // output an existing actor posprob table, for the given turn, to SQLite
     void sqlPosProb(unsigned int t);
     void sqlPosVote(unsigned int t);
-	void sqlBargainEntries(unsigned int t, int bargainId, int initiator, int receiver, double val);
+    void sqlBargainEntries(unsigned int t, int bargainId, int initiator, int receiver, double val);
     void sqlBargainCoords(unsigned int t, int bargnID,  const KBase::VctrPstn & initPos, const KBase::VctrPstn & rcvrPos);
-	void sqlBargainUtil(unsigned int t, int Bargn_i,  KBase::KMatrix Util_mat);
+    void sqlBargainUtil(unsigned int t, int Bargn_i,  KBase::KMatrix Util_mat);
     void sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMatrix Util_mat, unsigned int act_i);
 
     void LogInfoTables(); // JAH 20160731
@@ -316,7 +316,7 @@ public:
     static double estNRA(double rh, double  ri, BigRAdjust ra) ;
 
     // string getScenarioName() const { return scenName; };
-	string getScenarioID() const { return scenId; };
+    string getScenarioID() const { return scenId; };
 
     static KTable * createSQL(unsigned int n);
 protected:
@@ -330,7 +330,7 @@ protected:
     // TODO: rename this from 'smpDB' to 'scenarioDB'
     // Note that, with composite models, there many be dozens interacting.
     string scenName = "Scen"; // default is set from UTC time
-	string scenId = "none";
+    string scenId = "none";
     uint64_t rngSeed = 0; // JAH 20160711 rng seed
     // this is the basic model of victory dependent on strength-ratio
     static tuple<double, double> vProb(VPModel vpm, const double s1, const double s2);

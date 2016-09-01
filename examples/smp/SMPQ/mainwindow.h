@@ -27,7 +27,6 @@
 #include <QMainWindow>
 #include "csv.h"
 #include "database.h"
-#include "../qcustomplot/spline.h"
 #include "../qcustomplot/qcustomplot.h"
 
 #include <QtSql>
@@ -77,7 +76,7 @@ private slots:
   void setDBItemModelEdit();
   void displayMessage(QString cls, QString message);
   void vectorPositionsFromDB();
-  void dbGetFilePAth(bool bl);
+  void dbGetFilePAth(bool bl, QString dbPath =0 );
   void dbEditGetFilePAth(bool bl);
   void updateStateCountSliderRange(int states);
   void updateScenarioListComboBox(QStringList * scenarios, QStringList *scenarioIds, QStringList *scenarioDesc);
@@ -102,7 +101,6 @@ private slots:
   void actorsInfluence(QList<QString> ActorInfluence);
   void actorsPosition(QList<QString> actorPosition, int dim);
   void actorsSalience(QList<QString> actorSalience, int dim);
-
 
 signals:
   //CSV
@@ -346,6 +344,15 @@ private slots :
   void toggleLabels();
   void splineValues(const QVector<double> &x, const QVector<double> &y);
 
+  //run smp
+
+private :
+  QString csvPath;
+
+private slots :
+  void runPushButtonClicked(bool bl);
+  void smpDBPath(QString smpdbPath);
+  void disableRunButton(QTableWidgetItem * itm);
 };
 
 

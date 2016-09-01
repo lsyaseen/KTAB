@@ -129,7 +129,7 @@ void MainWindow::initializeLineGraphPlot()
   QVector<double> xAxisTicks;
   QVector<QString> xAxisLabels;
 
-  for(int i =0 ; i < 50 ; ++i)
+  for(int i =0 ; i < 100 ; ++i)
     {
       xAxisTicks <<i;
       xAxisLabels<<QString::number(i);

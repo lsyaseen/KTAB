@@ -221,7 +221,8 @@ if(SMPQ_SOURCE_DIR)
     ${SMPQ_SOURCE_DIR}/csv.cpp
     ${SMPQ_SOURCE_DIR}/database.cpp
     ${SMPQ_SOURCE_DIR}/bargraph.cpp
-    ${SMPQ_SOURCE_DIR}/linegraph.cpp)
+    ${SMPQ_SOURCE_DIR}/linegraph.cpp
+    ${SMPQ_SOURCE_DIR}/runsmp.cpp)
 
   set (QtProjectLib_hdr
     ${SMPQ_SOURCE_DIR}/mainwindow.h
@@ -246,8 +247,10 @@ if(QCUSTOMPLOT_DIR)
   message(STATUS "Found QCUSTOMPLOT source directory: ${QCUSTOMPLOT_DIR}")
   set (QtProjectLib_src  ${QtProjectLib_src} ${QCUSTOMPLOT_DIR}/qcustomplot.cpp)
   set (QtProjectLib_hdr  ${QtProjectLib_hdr} ${QCUSTOMPLOT_DIR}/qcustomplot.h)
-  set (QtProjectLib_hdr  ${QtProjectLib_hdr} ${QCUSTOMPLOT_DIR}/spline.h)
 endif(QCUSTOMPLOT_DIR)
+
+#csv parser file from smp
+set (QtProjectLib_src  ${QtProjectLib_src})
 
 if(NOT QCUSTOMPLOT_DIR)
   message(FATAL_ERROR "Could not find QCUSTOMPLOT directory")

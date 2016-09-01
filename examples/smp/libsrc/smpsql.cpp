@@ -141,8 +141,8 @@ void SMPModel::sqlTest() {
     char* zErrMsg = nullptr;
     string sql;
 
-    auto sOpen = [&db](unsigned int n) {
-        int rc = sqlite3_open("test.db", &db);
+    auto sOpen = [&db](unsigned int n, string dbPath) {
+        int rc = sqlite3_open(dbPath.c_str(), &db);
         if (rc != SQLITE_OK) {
             fprintf(stdout, "Can't open database: %s\n", sqlite3_errmsg(db));
             exit(0);
@@ -168,7 +168,7 @@ void SMPModel::sqlTest() {
 
     // Open database
     cout << endl << flush;
-    sOpen(1);
+    sOpen(1,dbPath); //passing DB FileName
 
     // we are not dealing with a long-term, mission-critical database,
     // so we can shut off some of the journaling stuff intended to protect
