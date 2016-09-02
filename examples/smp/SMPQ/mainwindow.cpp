@@ -511,8 +511,11 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
       int k=0;
       for(int i=3 ; i <csvTableWidget->columnCount(); i=i+2)
         {
-          csvTableWidget->setHorizontalHeaderItem(i ,new QTableWidgetItem(dimensionList.at(k)+" Position "+QString::number(k)));
-          csvTableWidget->setHorizontalHeaderItem(i+1,new QTableWidgetItem(dimensionList.at(k)+" Salience "+QString::number(k)));
+          QString heading = dimensionList.at(k);
+          heading = checkForHeaderString(heading);
+
+          csvTableWidget->setHorizontalHeaderItem(i ,new QTableWidgetItem(heading +" Position"));
+          csvTableWidget->setHorizontalHeaderItem(i+1,new QTableWidgetItem(heading +" Salience"));
           ++k;
         }
       //Updating values
@@ -611,8 +614,11 @@ void MainWindow::setDBItemModel(QStandardItemModel *model)
   int k=0;
   for(int i=5 ; i <modeltoDB->columnCount(); i=i+2)
     {
-      modeltoDB->setHeaderData(i,Qt::Horizontal ,(dimensionList.at(k)+" Position "+QString::number(k)));
-      modeltoDB->setHeaderData(i+1,Qt::Horizontal,(dimensionList.at(k)+" Salience "+QString::number(k)));
+      QString heading = dimensionList.at(k);
+      heading = checkForHeaderString(heading);
+
+      modeltoDB->setHeaderData(i,Qt::Horizontal ,( heading +" Position" ));
+      modeltoDB->setHeaderData(i+1,Qt::Horizontal,( heading +" Salience" ));
       ++k;
     }
   //to create csv like view
@@ -1209,6 +1215,21 @@ void MainWindow::updateDBViewColumns()
             }
         }
     }
+}
+
+QString MainWindow::checkForHeaderString(QString header)
+{
+  if(header.contains("Position"))
+    header.replace("Position","");
+  else if(header.contains("position"))
+    header.replace("position","");
+
+  if(header.contains("Salience"))
+    header.replace("Salience","");
+  else if(header.contains("salience"))
+    header.replace("salience","");
+
+  return header.trimmed();
 }
 
 void MainWindow::displayMenuTableWidget(QPoint pos)

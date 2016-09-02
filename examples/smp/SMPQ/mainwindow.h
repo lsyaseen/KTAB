@@ -134,6 +134,7 @@ private:
   int validateControlButtons(QString viewName);
 
   void updateDBViewColumns();
+  QString checkForHeaderString(QString header);
 
   // Central Main Frame
   QFrame *central;
