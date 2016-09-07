@@ -807,7 +807,6 @@ void Model::LogInfoTables()
     sqlBuffA = nullptr;
     delete sqlBuffS;
     sqlBuffS = nullptr;
-    
     return;
 }
 

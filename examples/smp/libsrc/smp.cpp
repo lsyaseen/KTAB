@@ -1016,7 +1016,6 @@ namespace SMPLib {
     return;
   }
 
-
   // JAH 20160711 added rng seed 20160730 JAH added sql flags
   SMPModel * SMPModel::readCSV(string fName, PRNG * rng, uint64_t s, vector<bool> f) {
      using KBase::KException;

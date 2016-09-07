@@ -27,7 +27,9 @@
 #include <time.h>
 #include "kmodel.h"
 
- 
+//#ifdef WIN32
+//#define localtime_r(_Time, _Tm) localtime_s(_Tm, _Time)
+//#endif
 namespace KBase {
 
 using std::cout;

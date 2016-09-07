@@ -281,7 +281,6 @@ namespace DemoSMP {
     printf("L-corr of prob and net support: %+.4f \n", KBase::lCorr((w*u), trans(p)));
     printf("A-corr of prob and net support: %+.4f \n", aCorr((w*u), trans(p)));
 
-
     // JAH 20160802 added call to executeSMP
     executeSMP(md0);
 
@@ -315,7 +314,7 @@ int main(int ac, char **av) {
   auto sTime = KBase::displayProgramStart(DemoSMP::appName, DemoSMP::appVersion);
   uint64_t seed = dSeed;
   bool run = true;
-  bool euSmpP = false; 
+  bool euSmpP = false;
   bool randAccP = false;
   bool csvP = false;
   string inputCSV = "";
