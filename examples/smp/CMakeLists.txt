@@ -267,8 +267,6 @@ if(ENABLE_QT_GUI)
   target_link_libraries (smpq QtProjectLib smp ${KMODEL_LIBRARY} ${KUTILS_LIBRARY} ${SQLITE_LIBRARIES} ${EFENCE_LIBRARIES})
 
   if(ENABLE_COPY_QT_LIBS AND WIN32)
-    add_custom_command(TARGET smpq POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy ${EXECUTABLE_OUTPUT_PATH}smpq.exe ${EXECUTABLE_OUTPUT_PATH}smpq_bin)
     find_package(qtdlls)
   endif(ENABLE_COPY_QT_LIBS AND WIN32)
 

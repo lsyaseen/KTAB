@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
   MainWindow w;
   w.showMaximized();
 
+  w.setWindowIcon(QIcon("://images/KTABIcon.jpg"));
   return a.exec();
 }
 

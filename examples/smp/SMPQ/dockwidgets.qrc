@@ -6,5 +6,6 @@
         <file>images/import.png</file>
         <file>images/exit.png</file>
         <file>images/save.png</file>
+        <file>images/KTABIcon.jpg</file>
     </qresource>
 </RCC>

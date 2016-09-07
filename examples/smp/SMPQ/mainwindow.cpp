@@ -35,7 +35,7 @@ MainWindow::MainWindow()
   createGraph1DockWindows();
   createGraph2DockWindows();
 
-  setWindowTitle(tr("SMPQ_Dock_GUI"));
+  setWindowTitle(tr("KTAB"));
 
   //CSV class obj
   csvObj = new CSV;
