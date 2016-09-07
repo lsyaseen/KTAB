@@ -36,6 +36,16 @@ using std::flush;
 using std::get;
 using std::tuple;
 
+// JAH 20160728 added KTable class constructor
+KTable::KTable(unsigned int ID, const string &name, const string &SQL, unsigned int grpID)
+{
+    tabID = ID;
+    tabName = name;
+    tabSQL = SQL;
+    tabGrpID = grpID;
+}
+
+KTable::~KTable() {};
 
 // --------------------------------------------
 
@@ -177,10 +187,14 @@ bool testMultiThreadSQLite (bool tryReset, KBase::ReportingLevel rl) {
 
 // note that the function to write to table #k must be kept
 // synchronized with the result of createSQL(k) !
-string Model::createSQL(unsigned int n)
+// JAH 20160728 modified to return a KTable object instead of the SQL string
+KTable * Model::createSQL(unsigned int n)
 {
 
     string sql = "";
+    string name = "";
+    unsigned int grpID = 0;
+
     assert(n < Model::NumTables);
     switch (n)
     {
@@ -194,8 +208,9 @@ string Model::createSQL(unsigned int n)
               "Act_i	INTEGER NOT NULL DEFAULT 0, "\
               "Pos_j	INTEGER NOT NULL DEFAULT 0, "\
               "Util	REAL NOT NULL DEFAULT 0.0"\
-			  
               ");";
+        name = "PosUtil";
+        grpID = 1;
         break;
 
     case 1: // pos-vote table
@@ -209,6 +224,8 @@ string Model::createSQL(unsigned int n)
               "Pos_j	INTEGER NOT NULL DEFAULT 0, "\
               "Vote	REAL NOT NULL DEFAULT 0.0"\
 		      ");";
+        name = "PosVote";
+        grpID = 1;
         break;
 
     case 2: // pos-prob table. Note that there may be duplicates, unless we limit it to unique positions
@@ -219,6 +236,8 @@ string Model::createSQL(unsigned int n)
               "Pos_i	INTEGER NOT NULL DEFAULT 0, "\
               "Prob	REAL NOT NULL DEFAULT 0.0"\
 	          ");";
+        name = "PosProb";
+        grpID = 1;
         break;
 
     case 3: // pos-equiv table. E(i)= lowest j s.t. Pos(i) ~ Pos(j). if j < i, it is not unique.
@@ -228,6 +247,8 @@ string Model::createSQL(unsigned int n)
               "Pos_i	INTEGER NOT NULL DEFAULT 0, "\
               "Eqv_j	INTEGER NOT NULL DEFAULT 0 "\
 		      ");";
+        name = "PosEquiv";
+        grpID = 1;
         break;
 
     case 4:
@@ -250,6 +271,8 @@ string Model::createSQL(unsigned int n)
               "Util_Cntst	REAL    NOT NULL DEFAULT 0, "\
               "Util_Chlg	REAL    NOT NULL DEFAULT 0  "\
 		      ");";
+        name = "UtilChlg";
+        grpID = 2;
         break;
 
     case 5:
@@ -263,6 +286,8 @@ string Model::createSQL(unsigned int n)
               "Rcvr_j	INTEGER NOT NULL DEFAULT 0, "\
               "Prob	REAL NOT NULL DEFAULT 0"\
 		      ");";
+        name = "PosVict";
+        grpID = 2;
         break;
 
     case 6:
@@ -281,6 +306,8 @@ string Model::createSQL(unsigned int n)
               "Util_V	REAL    NOT NULL DEFAULT 0, "\
               "Util_L	REAL    NOT NULL DEFAULT 0  "\
 		      ");";
+        name = "TP_Prob_Vict_Loss";
+        grpID = 2;
         break;
 
     case 7:   // short-name and long-description of actors
@@ -295,6 +322,8 @@ string Model::createSQL(unsigned int n)
         sql = std::string(sqlBuff);
         delete sqlBuff;
         sqlBuff = nullptr;
+        name = "ActorDescription";
+        grpID = 0;
     }
     break;
 
@@ -302,37 +331,42 @@ string Model::createSQL(unsigned int n)
 		sql = "create table if not exists Bargn ("  \
 			"ScenarioId TEXT(32) NOT NULL DEFAULT 'None', "\
 			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-			"Bargn_i INTEGER NOT NULL DEFAULT 0, "\
-			"Brgn_Act_i INTEGER NOT NULL DEFAULT 0, "\
+			"BargnId INTEGER NOT NULL DEFAULT 0, "\
 			"Init_Act_i INTEGER NOT NULL DEFAULT 0, "\
-			"Recd_Act_i INTEGER NOT NULL DEFAULT 0, "\
+			"Recd_Act_j INTEGER NOT NULL DEFAULT 0, "\
 			"Value REAL NOT NULL DEFAULT 0.0, "\
 			"Init_Prob REAL NULL DEFAULT 0, "\
 			"Init_Seld	BOOLEAN NULL ,"\
 			"Recd_Prob REAL NULL DEFAULT 0, "\
 			"Recd_Seld	BOOLEAN NULL"\
 			");";
-			break;
+        name = "Bargn";
+        grpID = 3;
+        break;
 	case 9:  //
 			 // BargnCoords table
 		sql = "create table if not exists BargnCoords ("  \
 			"ScenarioId TEXT(32) NOT NULL DEFAULT 'None', "\
 			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-			"Bargn_i INTEGER NOT NULL DEFAULT 0, "\
+			"BargnId INTEGER NOT NULL DEFAULT 0, "\
 			"Dim_k INTEGER NOT NULL DEFAULT 0, "\
 			"Init_Coord	REAL NULL DEFAULT 0.0,"\
 			"Recd_Coord	REAL NOT NULL DEFAULT 0.0"\
 			");";
+        name = "BargnCoords";
+        grpID = 3;
 		break;
 		 
 	case 10:  // BargnUtil table creation
 		sql = "create table if not exists BargnUtil ("  \
 			"ScenarioId TEXT(32) NOT NULL DEFAULT 'None', "\
 			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-			"Bargn_i    INTEGER NOT NULL	DEFAULT 0, "\
+			"BargnId    INTEGER NOT NULL	DEFAULT 0, "\
 			"Act_i 	INTEGER NOT NULL DEFAULT 0, "\
 			"Util	REAL NOT NULL DEFAULT 0.0"\
 		 	");";
+        name = "BargnUtil";
+        grpID = 3;
 		break;
 
 	case 11:  
@@ -341,26 +375,33 @@ string Model::createSQL(unsigned int n)
 		sql = "create table if not exists BargnVote ("  \
 			"ScenarioId TEXT(32) NOT NULL DEFAULT 'None', "\
 			"Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-			"Bargn_i  INTEGER NOT NULL DEFAULT 0, "\
-			"Bargn_j INTEGER NOT NULL DEFAULT 0, "\
+			"BargnId_i  INTEGER NOT NULL DEFAULT 0, "\
+			"BargnId_j INTEGER NOT NULL DEFAULT 0, "\
 			"Act_k 	INTEGER NOT NULL DEFAULT 0, "\
 			"Vote	REAL NOT NULL DEFAULT 0.0"\
 			");";
+        name = "BargnVote";
+        grpID = 3;
 		break;
-        // JAH 20160711 added the RNGSeed field
+
 	case 12:  //ScenarioDesc creation
+        // JAH 20160711 added the RNGSeed field
 		sql = "create table if not exists ScenarioDesc ("  \
 			"Scenario Text(512) NOT NULL UNIQUE DEFAULT 'NoName', "\
 			"Desc text(512) NOT NULL DEFAULT 'No Description', "\
             "ScenarioId TEXT(32) NOT NULL DEFAULT 'None'," \
             "RNGSeed text(20) NOT NULL DEFAULT '0'" \
 			");";
+        name = "ScenarioDesc";
+        grpID = 0;
 		break;
     default:
         throw(KException("Model::createTableSQL unrecognized table number"));
     }
 
-    return sql;
+    assert(grpID < NumSQLLogGrps);
+    auto tab = new KTable(n,name,sql,grpID);
+    return tab;
 }
 
 
@@ -427,7 +468,7 @@ void Model::sqlAUtil(unsigned int t)
     }
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
     sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-    printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+    //printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 
     delete sqlBuff;
     sqlBuff = nullptr;
@@ -490,87 +531,14 @@ void Model::sqlPosEquiv(unsigned int t)
     // end databse transaction
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
     sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-    printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+    //printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
     delete sqlBuff;
     sqlBuff = nullptr;
     smpDB = db;
     return;
 }
 
- 
-void Model::sqlUpdateBargainTable (unsigned int t,   double IntProb, int Init_Seld, double Recd_Prob,int Recd_Seld,  int Brgn_Act_i)
-{
-
-
-	// initiate the database
-	sqlite3 * db = smpDB;
-
-	// Error message in case
-	char* zErrMsg = nullptr;
-	auto sqlBuff = newChars(200);
-	// prepare the sql statement to insert
-	sprintf(sqlBuff, "UPDATE Bargn SET Init_Prob = ?1, Init_Seld = ?2, Recd_Prob = ?3, Recd_Seld= ?4 WHERE (Brgn_Act_i = ?5 ) and (?6 = Turn_t)");
-
-    assert(nullptr != db);
-	const char* insStr = sqlBuff;
-	sqlite3_stmt *insStmt;
-	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
-    assert(nullptr != insStmt); // make sure it is ready
-
-	// start for the transaction
-	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
-
-	int rslt = 0;
-	
-	//Bargn_i
-	rslt = sqlite3_bind_double(insStmt, 1, IntProb);
-	assert(SQLITE_OK == rslt);
- 
-	//Init_Seld
-	if (Init_Seld)
-		rslt = sqlite3_bind_int(insStmt, 2, 1);
-	else
-		rslt = sqlite3_bind_int(insStmt, 2, 0);
-
-	//Recd_Prob
-	rslt = sqlite3_bind_double(insStmt, 3, Recd_Prob);
-	 
-
-	assert(SQLITE_OK == rslt);
-
-	//Recd_Seld
-	if (Recd_Seld)
-		rslt = sqlite3_bind_int(insStmt, 4, 1);
-	else
-		rslt = sqlite3_bind_int(insStmt, 4, 0);
-
-	assert(SQLITE_OK == rslt);
-
-	// Bargain actor
-	rslt = sqlite3_bind_int(insStmt, 5, Brgn_Act_i);
-	assert(SQLITE_OK == rslt);
-
-	//turn
-	rslt = sqlite3_bind_int(insStmt, 6, t);
-	assert(SQLITE_OK == rslt);
-	rslt = sqlite3_step(insStmt);
-	assert(SQLITE_DONE == rslt);
-	sqlite3_clear_bindings(insStmt);
-	assert(SQLITE_DONE == rslt);
-	rslt = sqlite3_reset(insStmt);
-	assert(SQLITE_OK == rslt);
-
-	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
-	sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
-
-	delete sqlBuff;
-	sqlBuff = nullptr;
-
-	smpDB = db;
-}
-
-void Model::sqlBargainEntries(unsigned int t, int bargainId, int Baragainer, int initiator, int receiver, double val)
+void Model::sqlBargainEntries(unsigned int t, int bargainId, int initiator, int receiver, double val)
 {
 	// initiate the database
 	sqlite3 * db = smpDB;
@@ -580,7 +548,7 @@ void Model::sqlBargainEntries(unsigned int t, int bargainId, int Baragainer, int
 	auto sqlBuff = newChars(200);
 	// prepare the sql statement to insert
 	sprintf(sqlBuff,
-		"INSERT INTO Bargn (ScenarioId, Turn_t,Bargn_i, Brgn_Act_i,Init_Act_i, Recd_Act_i,Value) VALUES ('%s',?1, ?2, ?3, ?4,?5,?6)",
+		"INSERT INTO Bargn (ScenarioId, Turn_t, BargnID, Init_Act_i, Recd_Act_j,Value) VALUES ('%s',?1, ?2, ?3, ?4,?5)",
 		scenId.c_str());
 
     assert(nullptr != db);
@@ -596,20 +564,17 @@ void Model::sqlBargainEntries(unsigned int t, int bargainId, int Baragainer, int
 	// Turn_t
 	rslt = sqlite3_bind_int(insStmt, 1, t);
 	assert(SQLITE_OK == rslt);
-	//Bargn_i
+	//BargnID
 	rslt = sqlite3_bind_int(insStmt, 2, bargainId);
 	assert(SQLITE_OK == rslt);
-	//Brgn_Act_i
-	rslt = sqlite3_bind_int(insStmt, 3, Baragainer);
-	assert(SQLITE_OK == rslt);
 	//Init_Act_i
-	rslt = sqlite3_bind_int(insStmt, 4, initiator);
+	rslt = sqlite3_bind_int(insStmt, 3, initiator);
 	assert(SQLITE_OK == rslt);
-	//Recd_Act_i
-	rslt = sqlite3_bind_int(insStmt, 5, receiver);
+	//Recd_Act_j
+	rslt = sqlite3_bind_int(insStmt, 4, receiver);
 	assert(SQLITE_OK == rslt);
 	//Value
-	rslt = sqlite3_bind_double(insStmt, 6, val);
+	rslt = sqlite3_bind_double(insStmt, 5, val);
 	assert(SQLITE_OK == rslt);
 	rslt = sqlite3_step(insStmt);
 	assert(SQLITE_DONE == rslt);
@@ -619,7 +584,7 @@ void Model::sqlBargainEntries(unsigned int t, int bargainId, int Baragainer, int
 	assert(SQLITE_OK == rslt);
 
 	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
-	printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+    //printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 	sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
 	delete sqlBuff;
 	sqlBuff = nullptr;
@@ -629,7 +594,7 @@ void Model::sqlBargainEntries(unsigned int t, int bargainId, int Baragainer, int
 
 
  
-void Model::sqlBargnCoords(unsigned int t, int bargnID, const KBase::VctrPstn & initPos, const KBase::VctrPstn & rcvrPos)
+void Model::sqlBargainCoords(unsigned int t, int bargnID, const KBase::VctrPstn & initPos, const KBase::VctrPstn & rcvrPos)
 {
 	int nDim = initPos.numR();
 	assert(nDim == rcvrPos.numR());
@@ -642,7 +607,7 @@ void Model::sqlBargnCoords(unsigned int t, int bargnID, const KBase::VctrPstn & 
  
 	// prepare the sql statement to insert
 	sprintf(sqlBuff,
-		"INSERT INTO BargnCoords (ScenarioId, Turn_t,Bargn_i, Dim_k, Init_Coord,Recd_Coord) VALUES ('%s',?1, ?2, ?3, ?4,?5)",
+		"INSERT INTO BargnCoords (ScenarioId, Turn_t,BargnId, Dim_k, Init_Coord,Recd_Coord) VALUES ('%s',?1, ?2, ?3, ?4,?5)",
 		scenId.c_str());
 
     assert(nullptr != db);
@@ -708,7 +673,7 @@ void Model::sqlBargainUtil(unsigned int t, int Bargn_i,  KBase::KMatrix Util_mat
  
 	// prepare the sql statement to insert
 	sprintf(sqlBuff,
-		"INSERT INTO BargnUtil  (ScenarioId, Turn_t,Bargn_i, Act_i, Util) VALUES ('%s',?1, ?2, ?3, ?4)",
+		"INSERT INTO BargnUtil  (ScenarioId, Turn_t,BargnId, Act_i, Util) VALUES ('%s',?1, ?2, ?3, ?4)",
 		scenId.c_str());
 
     assert(nullptr != db);
@@ -757,70 +722,94 @@ void Model::sqlBargainUtil(unsigned int t, int Bargn_i,  KBase::KMatrix Util_mat
 
 	smpDB = db;
 }
- 
-//Work In Progress
-void Model::sqlScenarioDesc()
+
+// JAH 20160731 added this function in replacement to the separate
+// populate* functions that separately logged information tables
+// this only covers the general "Model" info tables; currently only Actors and Scenarios
+void Model::LogInfoTables()
 {
+    int rslt = 0;
+    // check the database availability
+    sqlite3 * db = smpDB;
+    assert(nullptr != smpDB);
+    char* zErrMsg = nullptr;
+    
+    // assert tests for all tables here at the start
+    assert(numAct == actrs.size());
+    
+    // for efficiency sake, we'll do all tables in a single transaction
+    // form the insert cmmands
+    auto sqlBuffA = newChars(sqlBuffSize);
+    sprintf(sqlBuffA,"INSERT INTO ActorDescription (ScenarioId,Act_i,Name,Desc) VALUES ('%s', ?1, ?2, ?3)",
+        scenId.c_str());
+    auto sqlBuffS = newChars(sqlBuffSize);
+    sprintf(sqlBuffS,"INSERT INTO ScenarioDesc (Scenario,Desc,ScenarioId,RNGSeed) VALUES ('%s',?1,?2,?3)",
+        scenName.c_str());
+    // prepare the prepared statement statements
+    sqlite3_stmt *insStmtA;
+    sqlite3_prepare_v2(smpDB, sqlBuffA, strlen(sqlBuffA), &insStmtA, NULL);
+    assert(nullptr != insStmtA);
+    sqlite3_stmt *insStmtS;
+    sqlite3_prepare_v2(smpDB, sqlBuffS, strlen(sqlBuffS), &insStmtS, NULL);
+    assert(nullptr != insStmtS);
 
-  assert(nullptr != smpDB);
-  // In order to use it, it must exist.
-  // If it arrives here without creating a DB, then there is a
-  // programming error that CANNOT be glossed over at runtime.
+    sqlite3_exec(smpDB, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 
-	// initiate the database
-	sqlite3 * db = smpDB;
-	// Error message in case
-	char* zErrMsg = nullptr;
-	auto sqlBuff = newChars(200);
-
-	// prepare the sql statement to insert
-    // JAH 20160711 added 3rd input
-	sprintf(sqlBuff,
-        "INSERT INTO ScenarioDesc  (Scenario, Desc,ScenarioId,RNGSeed) VALUES ('%s',?1,?2,?3)",
-		scenName.c_str());
-
-	const char* insStr = sqlBuff;
-	sqlite3_stmt *insStmt = nullptr;
-	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
-    assert(nullptr != insStmt);  //make sure it is ready
-
-	// start for the transaction
-	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
-
-
-	int rslt = 0;
+    // Actor Description Table
+    // For each actor fill the required information
+    for (unsigned int i = 0; i < actrs.size(); i++) {
+        Actor * act = actrs.at(i);
+        // bind the data
+        rslt = sqlite3_bind_int(insStmtA, 1, i);
+        assert(SQLITE_OK == rslt);
+        rslt = sqlite3_bind_text(insStmtA, 2, act->name.c_str(), -1, SQLITE_TRANSIENT);
+        assert(SQLITE_OK == rslt);
+        rslt = sqlite3_bind_text(insStmtA, 3, act->desc.c_str(), -1, SQLITE_TRANSIENT);
+        assert(SQLITE_OK == rslt);
+        // record
+        rslt = sqlite3_step(insStmtA);
+        assert(SQLITE_DONE == rslt);
+        sqlite3_clear_bindings(insStmtA);
+        assert(SQLITE_DONE == rslt);
+        rslt = sqlite3_reset(insStmtA);
+        assert(SQLITE_OK == rslt);
+    }
+    
+    // Scenario Description
 	// Turn_t
-	rslt = sqlite3_bind_text(insStmt, 1, scenName.c_str(), -1, SQLITE_TRANSIENT);
+    rslt = sqlite3_bind_text(insStmtS, 1, scenName.c_str(), -1, SQLITE_TRANSIENT);
 	assert(SQLITE_OK == rslt);
 	// Scen Id
-	rslt = sqlite3_bind_text(insStmt, 2, scenId.c_str(), -1, SQLITE_TRANSIENT);
+    rslt = sqlite3_bind_text(insStmtS, 2, scenId.c_str(), -1, SQLITE_TRANSIENT);
 	assert(SQLITE_OK == rslt);
     // rng seed JAH 20160711
     // have to convert to text and store it that way, since sqlite3 doesn't really understand unsigned ints
     char *seedBuff = newChars(50);
     sprintf(seedBuff,"%20llu",rngSeed);
     const char* strSeed = seedBuff;
-    rslt = sqlite3_bind_text(insStmt, 3, strSeed, -1, SQLITE_TRANSIENT);
+    rslt = sqlite3_bind_text(insStmtS, 3, strSeed, -1, SQLITE_TRANSIENT);
     assert(SQLITE_OK == rslt);
-
-	// finish  
+	// record
 	assert(SQLITE_OK == rslt);
-	rslt = sqlite3_step(insStmt);
+    rslt = sqlite3_step(insStmtS);
 	assert(SQLITE_DONE == rslt);
-	sqlite3_clear_bindings(insStmt);
+    sqlite3_clear_bindings(insStmtS);
 	assert(SQLITE_DONE == rslt);
-	rslt = sqlite3_reset(insStmt);
+    rslt = sqlite3_reset(insStmtS);
 	assert(SQLITE_OK == rslt);
-	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
-	sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-	delete sqlBuff;
-	sqlBuff = nullptr;
-    // JAH 20160711
-    delete seedBuff;
-    seedBuff = nullptr;
-
-	smpDB = db;
+   
+    // finish
+    sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+    // finalize statement to avoid resource leaks
+    sqlite3_finalize(insStmtA);
+    sqlite3_finalize(insStmtS);
+    delete sqlBuffA;
+    sqlBuffA = nullptr;
+    delete sqlBuffS;
+    sqlBuffS = nullptr;
+    return;
 }
+
 void Model::sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMatrix Util_mat,unsigned int act_k)
 {
 	// initiate the database
@@ -944,7 +933,7 @@ void Model::sqlPosProb(unsigned int t)
     }
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
     sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-    printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+    //printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 
     delete sqlBuff;
     sqlBuff = nullptr;
@@ -1028,7 +1017,7 @@ void Model::sqlPosVote(unsigned int t)
     }
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
     sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-    printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
+    //printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
 
     delete sqlBuff;
     sqlBuff = nullptr;

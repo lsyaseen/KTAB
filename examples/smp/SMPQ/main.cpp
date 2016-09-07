@@ -26,12 +26,13 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.showMaximized();
+  QCoreApplication::addLibraryPath("./plugins");
+  QApplication a(argc, argv);
+  MainWindow w;
+  w.showMaximized();
 
-
-    return a.exec();
+  w.setWindowIcon(QIcon("://images/KTABIcon.jpg"));
+  return a.exec();
 }
 
 // --------------------------------------------

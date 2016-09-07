@@ -49,6 +49,7 @@ namespace DemoSMP {
   using std::function;
   using std::get;
   using std::string;
+  using std::vector;
 
   using KBase::ReportingLevel;
 
@@ -84,13 +85,66 @@ namespace DemoSMP {
     return sfn;
   };
 
-  void demoEUSpatial(unsigned int numA, unsigned int sDim, uint64_t s, PRNG* rng) {
+    // JAH 20160802 added this new function to actually run a model
+    // this is all copied from old readEUSpatial and demoEUSpatial
+    void executeSMP(SMPModel * md0)
+    {
+        // setup the stopping criteria and lambda function
+        const unsigned int minIter = 2;
+        const unsigned int maxIter = 100;
+        const double minDeltaRatio = 0.02;
+        // suppose that, on a [0,100] scale, the first move was the most extreme possible,
+        // i.e. 100 points. One fiftieth of that is just 2, which seems to about the limit
+        // of what people consider significant.
+        const double minSigDelta = 1E-4;
+        // typical first shifts are on the order of numAct/10, so this is low
+        // enough not to affect anything while guarding against the theoretical
+        // possiblity of 0/0 errors
+        md0->stop = [maxIter](unsigned int iter, const State * s) {
+            return (maxIter <= iter);
+        };
+        md0->stop = smpStopFn(minIter, maxIter, minDeltaRatio, minSigDelta);
+
+        // execute
+        cout << "Starting model run" << endl << flush;
+        md0->run();
+        const unsigned int nState = md0->history.size();
+
+        // log data, or not
+        // JAH 20160731 added to either log all information tables or none
+        // this takes care of info re. actors, dimensions, scenario, capabilities, and saliences
+        if (md0->sqlFlags[0])
+        {
+            md0->LogInfoTables();
+        }
+        // JAH 20160802 added logging control flag for the last state
+        // also added the sqlPosVote and sqlPosEquiv calls to get the final state
+        if (md0->sqlFlags[1])
+        {
+            md0->sqlAUtil(nState - 1);
+            md0->sqlPosProb(nState - 1);
+            md0->sqlPosEquiv(nState-1);
+            md0->sqlPosVote(nState-1);
+        }
+
+        // finish up
+        cout << "Completed model run" << endl << endl;
+        printf("There were %u states, with %i steps between them\n", nState, nState - 1);
+        cout << "History of actor positions over time" << endl;
+        md0->showVPHistory();
+
+        return;
+    }
+
+  void demoEUSpatial(unsigned int numA, unsigned int sDim, bool accP, uint64_t s, PRNG* rng, vector<bool> f) {
     printf("Using PRNG seed: %020llu \n", s);
-    rng->setSeed(s);
+     // JAH 20160711 added rng seed 20160730 JAH added sql flags
+    auto md0 = new SMPModel(rng, "", s, f);
+    //rng->setSeed(s); // seed is now set in Model::Model
     if (0 == numA) {
       double lnMin = log(4);
-      double lnMax = log(40);
-      // median is 13 = round(12.65), where 12.65 = exp( [log(4)+log(40)] /2 )
+      double lnMax = log(25);
+      // median is 10  = exp( [log(4)+log(25)] /2 ) = sqrt(4*25)
       double na = exp(rng->uniform(lnMin, lnMax));
       numA = ((unsigned int)(na + 0.5)); // i.e. [5,10] inclusive
     }
@@ -105,24 +159,6 @@ namespace DemoSMP {
     assert(0 < sDim);
     assert(2 < numA);
 
-    // note that because all actors use the same scale for capability, utility, etc,
-    // their 'votes' are on the same scale and influence can be added up meaningfully
-    const unsigned int minIter = 3;
-    const unsigned int maxIter = 500;
-    const double minDeltaRatio = 0.02;
-    // suppose that, on a [0,100] scale, the first move was the most extreme possible,
-    // i.e. 100 points. One fiftieth of that is just 2, which seems to about the limit
-    // of what people consider significant.
-    const double minSigDelta = 1E-3;
-    // typical first shifts are on the order of numAct/10, so this is low
-    // enough not to affect anything while guarding against the theoretical
-    // possiblity of 0/0 errors
-    auto md0 = new SMPModel(rng, "", s); // JAH 20160711 added rng seed
-    md0->stop = [maxIter](unsigned int iter, const State * s) {
-      return (maxIter <= iter);
-    };
-    md0->stop = smpStopFn(minIter, maxIter, minDeltaRatio, minSigDelta);
-      
     for (unsigned int i = 0; i < sDim; i++) {
       auto buff = KBase::newChars(100);
       sprintf(buff, "SDim-%02u", i);
@@ -134,7 +170,7 @@ namespace DemoSMP {
 
 
     SMPState* st0 = new SMPState(md0);
-    md0->addState(st0); // now state 0 of the history
+    md0->addState(st0); // now state 0 of the histor
 
     st0->step = [st0]() {
       return st0->stepBCN();
@@ -161,7 +197,6 @@ namespace DemoSMP {
       st0->addPstn(iPos);
     }
 
-
     for (unsigned int i = 0; i < numA; i++) {
       auto ai = ((SMPActor*)(md0->actrs[i]));
       double ri = 0.0; // st0->aNRA(i);
@@ -176,8 +211,23 @@ namespace DemoSMP {
       printf("Risk attitude: %+.4f \n", ri);
       cout << endl;
     }
-
-
+    
+    auto aMat = KBase::iMat(md0->numAct);
+    if (accP) {
+      cout << "Using randomized matrix for ideal-accomodation"<<endl<<flush;
+      for (unsigned int i=0; i<md0->numAct; i++) {
+        aMat(i,i) = rng->uniform(0.1, 0.5); // make them lag noticably
+      }
+    }
+    else {
+      cout << "Using identity matrix for ideal-accomodation"<<endl<<flush;
+    }
+    cout << "Accomodate matrix:"<<endl;
+    aMat.mPrintf(" %.3f ");
+    cout << endl;
+    
+    st0->setAccomodate(aMat);
+    st0->idealsFromPstns();
     st0->setUENdx();
     st0->setAUtil(-1, ReportingLevel::Silent);
     st0->setNRA(); // TODO: simple setting of NRA
@@ -231,34 +281,8 @@ namespace DemoSMP {
     printf("L-corr of prob and net support: %+.4f \n", KBase::lCorr((w*u), trans(p)));
     printf("A-corr of prob and net support: %+.4f \n", aCorr((w*u), trans(p)));
 
-    // note that recording the scenario is not part of running the scenario,
-    // so this is recorded outside the run.
-    md0->sqlScenarioDesc();
-
-    cout << "Starting model run" << endl << flush;
-    md0->run();
-
-    // record the last actor posUtil table
-    const unsigned int nState = md0->history.size();
-    auto lastState = ((SMPState*)(md0->history[nState - 1]));
-    md0->sqlAUtil(nState - 1);
-
-    md0->sqlPosProb(nState - 1);
-    md0->populateSpatialSalienceTable(true);
-
-    md0->populateActorDescriptionTable(true);
-
-
-
-    md0->populateSpatialCapabilityTable(true);
-    cout << "Completed model run" << endl << endl;
-    printf("There were %u states, with %i steps between them\n", nState, nState - 1);
-
-    cout << "History of actor positions over time" << endl;
-    md0->showVPHistory(true);
-
-    cout << endl;
-    cout << "Delete model (actors, states, positions, etc.)" << endl << flush;
+    // JAH 20160802 added call to executeSMP
+    executeSMP(md0);
 
     delete md0;
     md0 = nullptr;
@@ -266,35 +290,13 @@ namespace DemoSMP {
     return;
   }
 
-  void readEUSpatial(uint64_t seed, string inputCSV, PRNG* rng) {
-    auto md0 = SMPModel::readCSV(inputCSV, rng, seed); // JAH 20160711 added rng seed
+  void readEUSpatial(uint64_t seed, string inputCSV, PRNG* rng, vector<bool> f) {
+    // JAH 20160711 added rng seed 20160730 JAH added sql flags
+    auto md0 = SMPModel::readCSV(inputCSV, rng, seed, f);
 
-    const unsigned int minIter = 2;
-    const unsigned int maxIter = 100; const double minDeltaRatio = 0.02;
-    // suppose that, on a [0,100] scale, the first move was the most extreme possible,
-    // i.e. 100 points. One fiftieth of that is just 2, which seems to about the limit
-    // of what people consider significant.
-    const double minSigDelta = 1E-4;
-    // typical first shifts are on the order of numAct/10, so this is low
-    // enough not to affect anything while guarding against the theoretical
-    // possiblity of 0/0 errors
-    md0->stop = [maxIter](unsigned int iter, const State * s) {
-      return (maxIter <= iter);
-    };
-    md0->stop = smpStopFn(minIter, maxIter, minDeltaRatio, minSigDelta);
-   
-    cout << "Starting model run" << endl << flush;
-    md0->run();
-
-    cout << "Completed model run" << endl << endl;
-    md0->populateSpatialCapabilityTable(true);
-    md0->populateSpatialSalienceTable(true);
-    md0->populateActorDescriptionTable(true);
-
-    cout << "History of actor positions over time" << endl;
-    md0->showVPHistory(true);
-
-    // output what R needs for Sankey diagrams
+    // JAH 20160802 added call to executeSMP
+    executeSMP(md0);
+     // output what R needs for Sankey diagrams
     md0->sankeyOutput(inputCSV);
 
     delete md0;
@@ -312,16 +314,21 @@ int main(int ac, char **av) {
   auto sTime = KBase::displayProgramStart(DemoSMP::appName, DemoSMP::appVersion);
   uint64_t seed = dSeed;
   bool run = true;
-  bool euSmpP = true; // debugging with Visual Studio
+  bool euSmpP = false;
+  bool randAccP = false;
   bool csvP = false;
   string inputCSV = "";
 
+  // JAH 20160730 vector of SQL logging flags for 4 groups of tables:
+  // 0 = Information Tables, 1 = Position Tables, 2 = EDU Tables, 3 = Bargain Resolution Tables
+  std::vector<bool> sqlFlags = {true,true,true,true};
 
   auto showHelp = []() {
     printf("\n");
     printf("Usage: specify one or more of these options\n");
     printf("--help            print this message\n");
     printf("--euSMP           exp. util. of spatial model of politics\n");
+    printf("--ra              randomize the adjustment of ideal points with euSMP \n");
     printf("--csv <f>         read a scenario from CSV\n");
     printf("--seed <n>        set a 64bit seed\n");
     printf("                  0 means truly random\n");
@@ -344,6 +351,9 @@ int main(int ac, char **av) {
       }
       else if (strcmp(av[i], "--euSMP") == 0) {
         euSmpP = true;
+      }
+      else if (strcmp(av[i], "--ra") == 0) {
+        randAccP = true;
       }
       else if (strcmp(av[i], "--help") == 0) {
         run = false;
@@ -370,11 +380,11 @@ int main(int ac, char **av) {
   // seed required to reproduce the bug.
   if (euSmpP) {
     cout << "-----------------------------------" << endl;
-    DemoSMP::demoEUSpatial(0, 0, seed, rng);
+    DemoSMP::demoEUSpatial(0, 0, randAccP, seed, rng,sqlFlags);
   }
   if (csvP) {
     cout << "-----------------------------------" << endl;
-    DemoSMP::readEUSpatial(seed, inputCSV, rng);
+    DemoSMP::readEUSpatial(seed, inputCSV, rng,sqlFlags);
   }
   cout << "-----------------------------------" << endl;
 

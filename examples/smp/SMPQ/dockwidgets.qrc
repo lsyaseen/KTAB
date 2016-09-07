@@ -1,9 +1,11 @@
 <RCC>
-    <qresource prefix="/../../examples/smp/SMPQ/images">
-        <file>images/new.png</file>
-        <file>images/print.png</file>
-        <file>images/save.png</file>
-        <file>images/undo.png</file>
+    <qresource prefix="/">
         <file>images/csv.png</file>
+        <file>images/editcsv.png</file>
+        <file>images/editdb.png</file>
+        <file>images/import.png</file>
+        <file>images/exit.png</file>
+        <file>images/save.png</file>
+        <file>images/KTABIcon.jpg</file>
     </qresource>
 </RCC>

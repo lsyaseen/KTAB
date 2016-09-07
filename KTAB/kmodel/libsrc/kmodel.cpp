@@ -39,8 +39,8 @@ using std::get;
 using std::tuple;
 
 // --------------------------------------------
-// JAH 20160711 added seed
-Model::Model(PRNG * r, string desc, uint64_t s) {
+// JAH 20160711 added seed 20160730 JAH added sql flags
+Model::Model(PRNG * r, string desc, uint64_t s, vector<bool> f) {
     history = vector<State*>();
     actrs = vector<Actor*>();
     numAct = 0;
@@ -48,17 +48,21 @@ Model::Model(PRNG * r, string desc, uint64_t s) {
     assert(nullptr != r);
     rng = r;
 
+    sqlFlags = f; // JAH 20160730 save the vec of SQL flags
+    printf("SQL Logging Flags\n");
+    for(unsigned int i = 0; i< sqlFlags.size();i++)
+    {
+      printf("Grp %u = %u\n",i,sqlFlags[i] ? 1:0);
+    }
+
     // Record the UTC time so it can be used as the default scenario name
     std::chrono::time_point<std::chrono::system_clock> st;
     st = std::chrono::system_clock::now();
     std::time_t start_time = std::chrono::system_clock::to_time_t(st);
-	 
-	 
-	/*tm localTime;
-	localtime_r(&start_time, &localTime);*/
+	printf("Using PRNG seed: %020llu \n", s);
 
 	const std::chrono::duration<double> tse = st.time_since_epoch();
-	std::chrono::seconds::rep milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(tse).count() % 1000;
+	std::chrono::seconds::rep microSeconds = std::chrono::duration_cast<std::chrono::microseconds >(tse).count() % 1000000;
 
 
 	auto utcBuffId = newChars(500);
@@ -72,7 +76,7 @@ Model::Model(PRNG * r, string desc, uint64_t s) {
         scenName = utcBuff;
 	    // Scenario Id Generation  include the microsecond
 		 
-		sprintf(utcBuffId, "%s_%u", utcBuff, milliseconds);
+		sprintf(utcBuffId, "%s_%u", utcBuff, microSeconds);
 	 
         delete utcBuff;
         utcBuff = nullptr;
@@ -81,7 +85,8 @@ Model::Model(PRNG * r, string desc, uint64_t s) {
     else
     {
         scenName = desc;
-		sprintf(utcBuffId, "%s_%u", desc.c_str(), milliseconds);
+         sprintf(utcBuffId, "%s_%u", desc.c_str(), microSeconds);
+
 	}
 	//get the hash
 	uint64_t scenIdhash = (std::hash < std::string> () (utcBuffId))   ;
@@ -91,6 +96,17 @@ Model::Model(PRNG * r, string desc, uint64_t s) {
 	hshCode = nullptr;
 	delete utcBuffId;
 	utcBuffId = nullptr;
+
+    // BPW 20160717
+    // (a) record a reproducible seed even we were given '0'
+    // (b) make sure that the given value really is the initial seed
+    // (c) at this point, the PRNG* is almost irrelevant, except that someone
+    // might, in the future, provide an object which was a new subclass of PRNG*
+    if (0 == s) {
+      rng->setSeed(0); // random and irreproducible
+      s = rng->uniform(); // random and irreproducible 64-bits
+    }
+    rng->setSeed(s);
 
     // JAH 20160711 save the seed for the rng
     rngSeed = s;
@@ -113,6 +129,14 @@ Model::~Model() {
     }
     numAct = 0;
     rng = nullptr;
+
+    // JAH 20160802 garbage collect the KTables vector
+    while (0 < KTables.size())
+    {
+        KTable* t = KTables[KTables.size()-1];
+        delete t;
+        KTables.pop_back();
+    }
 }
 
 
@@ -277,6 +301,9 @@ string vrName(const VotingRule& vr) {
     case VotingRule::Cubic:
         vrn = "Cubic";
         break;
+    case VotingRule::ASymProsp:
+         vrn = "ASymProsp";
+         break;
     default:
         throw KException("vrName - Unrecognized VotingRule");
         break;
@@ -462,6 +489,15 @@ double Model::vote(VotingRule vr, double wi, double uij, double uik) {
 
     case VotingRule::Cubic:
         v = wi * rCubic;
+        break;
+        
+    case VotingRule::ASymProsp:
+      if (rProp < 0.0) {
+        v = wi * rProp;
+      }
+      if (0.0 < rProp) {
+        v = (2.0 * wi * rProp)/ 3.0;
+      }
         break;
 
     default:
@@ -705,7 +741,8 @@ KMatrix Model::scalarPCE(unsigned int numAct, unsigned int numOpt, const KMatrix
             cout << flush;
             cout << "Utility to actors of options: " << endl;
             u.mPrintf(" %+8.3f ");
-            cout << endl;
+            cout << endl << flush;
+            //assert(false);
 
             auto vfn = [vr, &w, &u](unsigned int k, unsigned int i, unsigned int j) {
                 double vkij = vote(vr, w(0, k), u(k, i), u(k, j));
