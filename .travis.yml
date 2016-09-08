@@ -4,7 +4,6 @@ matrix:
   include:
     - os: linux
       dist: trusty
-      sudo: required
       compiler: gcc
       addons:
         apt:
@@ -12,15 +11,11 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
-      before_install:  # kludge enabling Travis to pick up correct compiler!
-        - sudo unlink /usr/bin/g++
-        - sudo ln -s /usr/bin/g++-4.9 /usr/bin/g++
-        - sudo unlink /usr/bin/gcc
-        - sudo ln -s /usr/bin/gcc-4.9 /usr/bin/gcc
-      env: COMPILER=g++-4.9
+      env:
+        - C_COMPILER=gcc-4.9
+        - CXX_COMPILER=g++-4.9
     - os: linux
       dist: trusty
-      sudo: required
       compiler: gcc
       addons:
         apt:
@@ -28,12 +23,21 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-      before_install:   # kludge enabling Travis to pick up correct compiler!
-        - sudo unlink /usr/bin/g++
-        - sudo ln -s /usr/bin/g++-5 /usr/bin/g++
-        - sudo unlink /usr/bin/gcc
-        - sudo ln -s /usr/bin/gcc-5 /usr/bin/gcc
-      env: COMPILER=g++-5
+      env:
+        - C_COMPILER=gcc-5
+        - CXX_COMPILER=g++-5
+    - os: linux
+      dist: trusty
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env:
+        - C_COMPILER=gcc-6
+        - CXX_COMPILER=g++-6
     - os: linux
       dist: trusty
       compiler: clang
@@ -44,7 +48,9 @@ matrix:
             - sourceline: "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.5 main"
           packages:
             - clang-3.5
-      env: COMPILER=clang++-3.5
+      env:
+        - C_COMPILER=clang-3.5
+        - CXX_COMPILER=clang++-3.5
     - os: linux
       dist: trusty
       compiler: clang
@@ -54,14 +60,34 @@ matrix:
             - ubuntu-toolchain-r-test
             - sourceline: "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.6 main"
           packages:
-            - g++-4.9
             - clang-3.6
-      env: COMPILER=clang++-3.6
+      env:
+        - C_COMPILER=clang-3.6
+        - CXX_COMPILER=clang++-3.6
     - os: osx
+      compiler: clang
+      osx_image: xcode6.4
+    - os: osx
+      compiler: gcc
+      osx_image: xcode6.4
+    - os: osx
+      compiler: clang
       osx_image: xcode7.2
+    - os: osx
+      compiler: gcc
+      osx_image: xcode7.2
+    - os: osx
+      compiler: clang
+      osx_image: xcode8
+    - os: osx
+      compiler: gcc
+      osx_image: xcode8
+
+before_install:  # necessary because Travis overwrites CXX and CC!
+  - if [[ $TRAVIS_OS_NAME == linux ]]; then export CXX=$CXX_COMPILER CC=$C_COMPILER; fi
 
 install:
-  - if [[ $TRAVIS_OS_NAME == linux ]]; then sudo bash ./install-linux-deps.sh; fi
+  - if [[ $TRAVIS_OS_NAME == linux ]]; then sudo bash ./install-linux-deps.sh; fi  # Why do I need permission?
   - if [[ $TRAVIS_OS_NAME == osx ]]; then bash ./install-osx-deps.sh; fi
 
   # install tinyxml2
