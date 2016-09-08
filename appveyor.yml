@@ -14,6 +14,12 @@ configuration:
 init:
   - cmd: cmake --version
 
+install:
+  # install tinyxml2
+  - cmd: git clone https://github.com/leethomason/tinyxml2.git
+  - cmd: cd tinyxml2
+  - cmd: cmake . && make install
+
 branches:
   - except:
-    - gh-pages  
+    - gh-pages
