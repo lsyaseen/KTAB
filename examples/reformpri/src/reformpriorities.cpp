@@ -307,7 +307,7 @@ int main(int ac, char **av) {
   // Windows only prints part, with lu, lX, llu, and llX.
 
 
-  auto rpm = new RPModel(rng);
+  auto rpm = new RPModel(rng,"", seed);
   if (xmlP) {
     rpm->readXML(inputXML);
     cout << "done reading XML" << endl << flush;
