@@ -136,12 +136,17 @@ namespace RfrmPri {
       bestAP.push_back(positions[bestJ]);
     }
 
-    cout << "Computing zeta ... " << endl;
+
     KMatrix aCap = KMatrix(1, numA);
     for (unsigned int i = 0; i < numA; i++) {
       auto ri = ((const RPActor *)(rpm->actrs[i]));
       aCap(0, i) = ri->sCap;
     }
+    cout << "Actor capabilities: " << endl;
+    aCap.mPrintf(" %.2f ");
+    cout << endl;
+
+    cout << "Computing zeta ... " << endl;
     KMatrix zeta = aCap * uij;
     assert((1 == zeta.numR()) && (numPos == zeta.numC()));
 
