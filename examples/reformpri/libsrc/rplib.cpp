@@ -636,6 +636,11 @@ void RPModel::configScen(unsigned int numA, const double aCap[], const KMatrix &
       prob.push_back(pj);
       pj = pj * pDecline;
     }
+    
+    //cout << "Value to actors (rows) of individual reform items (columns): " << endl;
+    //utils.mPrintf(" %6.2f ");
+    //cout << endl << flush;
+    
     return;
   }
 
@@ -649,6 +654,10 @@ double RPModel::utilActorPos(unsigned int ai, const VUI &pstn) const
     assert(nullptr != rai);
     double costSoFar = 0;
     double uip = 0.0;
+    assert (0 < govBudget);
+    //cout << "govBudget: " << govBudget << endl;
+
+    
     for (unsigned int j = 0; j < pstn.size(); j++)
     {
       unsigned int rj = pstn[j];
