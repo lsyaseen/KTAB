@@ -291,7 +291,7 @@ int main(int ac, char **av) {
 
     if (emodP) {
         cout << "-----------------------------------" << endl;
-        MDemo::demoEMod(seed, rng);
+        MDemo::demoEMod(seed);
     }
 
     if (sqlP) {

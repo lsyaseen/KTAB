@@ -226,7 +226,7 @@ double RPActor::posUtil(const Position * ap1) const
   
   // --------------------------------------------
   // JAH 20160711 added rng seed
-  RPModel::RPModel(PRNG* rng, string d, uint64_t s, vector<bool> f) : Model(rng, d, s, f) {
+  RPModel::RPModel(string d, uint64_t s, vector<bool> f) : Model( d, s, f) {
     // nothing yet
   }
 
@@ -501,11 +501,11 @@ void RPModel::readXML(string fileName)
     }
     catch (const KException& ke)
     {
-      cout << "Caught KException in readXML: " << ke.msg << endl << flush;
+      cout << "Caught KException in RPModel::readXML: " << ke.msg << endl << flush;
     }
     catch (...)
     {
-      cout << "Caught unidentified exception in readXML" << endl << flush;
+      cout << "Caught unidentified exception in RPModel::readXML" << endl << flush;
     }
 
     return;

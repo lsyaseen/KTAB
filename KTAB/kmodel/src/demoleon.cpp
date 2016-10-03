@@ -491,7 +491,7 @@ namespace DemoLeon {
 
   // -------------------------------------------------
 
-  LeonModel::LeonModel(PRNG * r, string d, uint64_t s, vector<bool> f) : Model(r, d, s, f) {
+  LeonModel::LeonModel(string d, uint64_t s, vector<bool> f) : Model(d, s, f) {
     // some arbitrary yet plausible default values
     maxSub = 0.50;
     maxTax = 1.00;
@@ -1386,8 +1386,9 @@ namespace DemoLeon {
     // Thus, generate K basis tax vectors, of N components each, and take the K policy
     // parameters as the weighting vectors (+/-) on those basis taxes.
 
+
     // JAH 20160830 changed to pass in the seed
-    auto eMod0 = new LeonModel(rng,"",s);
+    auto eMod0 = new LeonModel("", s);
     eMod0->stop = nullptr; // no stop-run method, for now
 
     const unsigned int maxIter = 50; // TODO: realistic limit
@@ -1676,7 +1677,7 @@ namespace DemoLeon {
     using std::get;
 
     // setup Leon model - this is all copied from demoSetup
-    auto eMod0 = new LeonModel(rng, "", s);
+    auto eMod0 = new LeonModel("", s);
     eMod0->stop = nullptr; // no stop-run method, for now
 
     const unsigned int maxIter = 50; // TODO: realistic limit

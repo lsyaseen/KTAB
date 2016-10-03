@@ -131,7 +131,7 @@ namespace RfrmPri {
   class RPModel : public Model {
   public:
     // JAH 20160711 added rng seed JAH 20160802 added sqlflags
-    explicit RPModel(PRNG* rng, string d = "", uint64_t s=0, vector<bool> f={});
+    explicit RPModel(string d = "", uint64_t s=0, vector<bool> f={});
     virtual ~RPModel();
 
     static RPModel* randomMS(unsigned int numA, unsigned int numI,

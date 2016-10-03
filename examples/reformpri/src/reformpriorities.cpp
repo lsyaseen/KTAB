@@ -297,9 +297,11 @@ int main(int ac, char **av) {
   }
 
 
-  PRNG * rng = new PRNG();
   if (0 == seed) {
-    seed = rng->setSeed(seed); // 0 == get a random number
+    PRNG * rng = new PRNG();
+    seed = rng->setSeed(0); // 0 == get a random number
+    delete rng;
+    rng = nullptr;
   }
   printf("Using PRNG seed:  %020llu \n", seed);
   printf("Same seed in hex:   0x%016llX \n", seed);
@@ -307,7 +309,7 @@ int main(int ac, char **av) {
   // Windows only prints part, with lu, lX, llu, and llX.
 
 
-  auto rpm = new RPModel(rng,"", seed);
+  auto rpm = new RPModel("", seed);
   if (xmlP) {
     rpm->readXML(inputXML);
     cout << "done reading XML" << endl << flush;
@@ -403,9 +405,6 @@ int main(int ac, char **av) {
   delete rpm; // and actors, and states
   rpm = nullptr;
   rps0 = nullptr;
-
-  delete rng;
-  rng = nullptr;
 
   KBase::displayProgramEnd(sTime);
 
