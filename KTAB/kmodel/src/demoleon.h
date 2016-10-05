@@ -189,7 +189,7 @@ class LeonModel : public Model {
     friend class LeonState;
 public:
     // JAH 20160711 added rng seed 20160730 JAH added sql flags
-    explicit LeonModel( string d="", uint64_t s=0, vector<bool> f= {});
+    explicit LeonModel( string d="", uint64_t s=KBase::dSeed, vector<bool> f= {});
     virtual ~LeonModel();
 
     // synthesize random, but not-ridiculous, data for a base year

@@ -151,7 +151,7 @@ private:
 class MtchModel : public Model {
 public:
     // JAH 20160711 added rng seed JAH 20160730 JAH added sql flags
-    explicit MtchModel(string d="", uint64_t s=0, vector<bool> f={});
+    explicit MtchModel(string d="", uint64_t s=KBase::dSeed, vector<bool> f={});
     virtual ~MtchModel();
 
     static MtchModel* randomMS(unsigned int numA, unsigned int numI, VotingRule vr, MtchActor::PropModel pMod, uint64_t seed);

@@ -254,7 +254,7 @@ namespace SMPLib {
 
   class SMPModel : public Model {
   public:
-    explicit SMPModel( string desc = "", uint64_t s=0, vector<bool> f={}); // JAH 20160711 added rng seed
+    explicit SMPModel( string desc = "", uint64_t s=KBase::dSeed, vector<bool> f={}); // JAH 20160711 added rng seed
     virtual ~SMPModel();
 
     static string dbPath; //to store db file name from SMPQ GUI, default is testsmp.db

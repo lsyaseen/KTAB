@@ -183,7 +183,7 @@ double RPActor::posUtil(const Position * ap1) const
     // which may or may not be square
     const KMatrix c = Model::coalitions(vkij, uMat.numR(), uMat.numC());
     const KMatrix pv = Model::vProb(vpm, c); // square
-    const KMatrix p = Model::probCE(PCEModel::ConditionalPCM, pv); // column
+    const KMatrix p = Model::probCE(rpMod->pcem, pv); // column
     const KMatrix eu = uMat*p; // column
 
     assert(numA == eu.numR());
