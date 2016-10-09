@@ -620,8 +620,9 @@ KMatrix Model::coalitions(function<double(unsigned int ak, unsigned int pi, unsi
     return c;
 }
 
+// returns a square matrix of prob(OptI > OptJ)
 // these are assumed to be unique options.
-// returns a square matrix.
+// w is a [1,actor] row-vector of actor strengths, u is [act,option] utilities.
 KMatrix Model::vProb(VotingRule vr, VPModel vpm, const KMatrix & w, const KMatrix & u) {
     // u_ij is utility to actor i of the position advocated by actor j
     unsigned int numAct = u.numR();
@@ -722,14 +723,16 @@ KMatrix Model::condPCE(const KMatrix & pv) {
     return p;
 }
 
+// calculate the [option,1] column vector of option-probabilities.
+// w is a [1,actor] row-vector of actor strengths, u is [act,option] utilities.
 // This assumes scalar capabilities of actors (w), so that the voting strength
 // is a direct function of difference in utilities.Therefore, we can use
 // Model::vProb(VotingRule vr, const KMatrix & w, const KMatrix & u)
 KMatrix Model::scalarPCE(unsigned int numAct, unsigned int numOpt, const KMatrix & w, const KMatrix & u,
-                         VotingRule vr, VPModel vpm, ReportingLevel rl) {
+                         VotingRule vr, VPModel vpm, PCEModel pcem, ReportingLevel rl) {
 
     auto pv = Model::vProb(vr, vpm, w, u);
-    auto p = Model::probCE(PCEModel::ConditionalPCM, pv);
+    auto p = Model::probCE(pcem, pv);
 
     if (ReportingLevel::Low < rl) {
         printf("Num actors: %i \n", numAct);

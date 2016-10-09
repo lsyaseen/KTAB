@@ -257,9 +257,10 @@ namespace DemoSMP {
     auto vr = VotingRule::Binary;
     cout << "Using voting rule " << vrName(vr) << endl;
 
-    auto vpm = VPModel::Linear;
+    const KBase::VPModel vpm = md0->vpm; 
+    const KBase::PCEModel pcem = md0->pcem;
 
-    KMatrix p = Model::scalarPCE(numA, numA, w, u, vr, vpm, ReportingLevel::Medium);
+    KMatrix p = Model::scalarPCE(numA, numA, w, u, vr, vpm, pcem, ReportingLevel::Medium);
 
     cout << "Expected utility to actors: " << endl;
     (u*p).mPrintf(" %.3f ");

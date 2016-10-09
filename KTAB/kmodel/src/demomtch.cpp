@@ -195,6 +195,7 @@ namespace DemoMtch {
  
   tuple <KMatrix, VUI> MtchState::pDist(int persp) const {
     auto na = model->numAct;
+    auto pcem = model->pcem;
     auto w = actrCaps();
     auto vr = VotingRule::Proportional;
     auto rl = KBase::ReportingLevel::Silent;
@@ -216,7 +217,7 @@ namespace DemoMtch {
       cout << "SMPState::pDist: unrecognized perspective, " << persp << endl << flush;
       assert(false);
     }
-    auto pd = Model::scalarPCE(na, na, w, uij, vr, vpm, rl);
+    auto pd = Model::scalarPCE(na, na, w, uij, vr, vpm, pcem, rl);
     
     // TODO: test whether all positions are unique or not, see RPState::pDist for an example
     auto uNdx = VUI();
@@ -830,9 +831,12 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
 
 
   tuple<double, MtchPstn> MtchActor::maxProbEUPstn(PropModel pm, const MtchState * mst) const {
-    // Note that this assumes & requires that aUtil be already setup
+    // Note that this requires & assumes that aUtil be already setup
 
     using KBase::ReportingLevel;
+ 
+    const VPModel vpm = mst->model->vpm;
+    const PCEModel pcem = mst->model->pcem;
 
     const unsigned int numA = mst->model->numAct;
     unsigned int ih = mst->model->actrNdx(this);
@@ -856,14 +860,12 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
     };
 
 
-    auto vpm = VPModel::Linear;
-
     // Note that, for demo purposes, each actor assess the expected utility or the
     // probability-of-adoptions of their proposal under the assumption that everyone
     // uses the same voting rule as do they.
-    auto assessProbEU = [numA, utilH, w, ih, pm, vpm, this](const MtchPstn  ph) {
+    auto assessProbEU = [numA, utilH, w, ih, pm, vpm, pcem, this](const MtchPstn  ph) { 
       auto u = utilH(&ph);
-      auto p = Model::scalarPCE(numA, numA, w, u, vr, vpm, ReportingLevel::Silent);
+      auto p = Model::scalarPCE(numA, numA, w, u, vr, vpm, pcem, ReportingLevel::Silent);
       auto eu = u*p;
       double peu = 0;
       double noAgreementPenalty = 0.333;

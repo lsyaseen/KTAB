@@ -253,6 +253,7 @@ public:
     // significant is likely to happen if the run were to continue.
     void run();
 
+    // the Nash Product for bargaining
     static double nProd(double x, double y);
 
     // simple voting based on the difference in utility.
@@ -268,17 +269,22 @@ public:
                               unsigned int numAct, unsigned int numOpt);
 
     // calculate pv[i>j] from coalitions
+    // c[i,j] is the strength of coalition supporting OptI over OptJ
     static KMatrix vProb(VPModel vpm, const KMatrix & c);
 
     // assumes simple voting over those options with that utility matrix,
-    // builds coalitions, and return pv[i>j]
+    // builds coalitions, and returns a square matrix of prob(OptI > OptJ)
+    // these are assumed to be unique options.
+    // w is a [1,actor] row-vector of actor strengths, u is [act,option] utilities.
     static KMatrix vProb(VotingRule vr, VPModel vpm, const KMatrix & w, const KMatrix & u);
 
     // calculate column vector P[i] from square matrix pv[i>j]
     static KMatrix probCE(PCEModel pcm, const KMatrix & pv);
 
+    // calculate the [option,1] column vector of option-probabilities.
+    // w is a [1,actor] row-vector of actor strengths, u is [act,option] utilities.
     static KMatrix scalarPCE(unsigned int numAct, unsigned int numOpt, const KMatrix & w,
-                             const KMatrix & u, VotingRule vr, VPModel vpm, ReportingLevel rl);
+                             const KMatrix & u, VotingRule vr, VPModel vpm, PCEModel pcem, ReportingLevel rl);
 
     virtual unsigned int addActor(Actor* a); // returns new number of actors, always at least 1
     int actrNdx(const Actor* a) const;
@@ -377,10 +383,10 @@ public:
     void setAUtil(int perspH = -1, ReportingLevel rl = ReportingLevel::Silent);
 
     void setUENdx();
-    
+
     // determine if the i-th position in this state is equivalent to the j-th position
     virtual bool equivNdx(unsigned int i, unsigned int j) const = 0;
-    
+
     double posProb(unsigned int i, const VUI & unq, const KMatrix & pdt) const;
 
     // return the turn-number of this state.

@@ -743,7 +743,7 @@ namespace SMPLib {
         return uij(i, uIndices[j]);
       };
     auto uUij = KMatrix::map(uufn, na, uIndices.size());
-    auto upd = Model::scalarPCE(na, uIndices.size(), w, uUij, vr, model->vpm, rl);
+    auto upd = Model::scalarPCE(na, uIndices.size(), w, uUij, vr, model->vpm, model->pcem, rl);
 
     return tuple< KMatrix, VUI>(upd, uIndices);
   }

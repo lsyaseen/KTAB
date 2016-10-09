@@ -47,6 +47,7 @@ void EModel<PT>::setOptions() {
     assert(nullptr != enumOptions);
     assert(0 == theta.size());
     theta = enumOptions();
+    assert (minNumOptions <= theta.size());
     return;
 }
 
@@ -59,10 +60,6 @@ EModel<PT>::~EModel() {
         t = nullptr;
     }
     theta = {};
-    if (nullptr != baseUtils) {
-        delete baseUtils;
-        baseUtils = nullptr;
-    }
 }
 
 
@@ -115,7 +112,8 @@ EPosition<PT>::EPosition(EModel<PT>* m, int n) : Position() {
     assert(nullptr != m);
     eMod = m;
     assert(0 <= n);
-    assert(n < eMod->numOptions());
+    const unsigned int numOpt = eMod->numOptions();
+    assert(n < numOpt);
     ndx = n;
 }
 
@@ -135,7 +133,7 @@ void EPosition<PT>::print(ostream& os) const {
 
 // --------------------------------------------
 template <class PT>
-EState<PT>::EState(EModel<PT>* mod) : State(mod) {
+EState<PT>::EState( EModel<PT>* mod) : State(mod) {
     step = nullptr;
     eMod = (EModel<PT>*) model;
 }
@@ -198,7 +196,6 @@ EState<PT>* EState<PT>::stepSUSN() {
 
 template <class PT>
 EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
-    EState<PT>* s2 = nullptr;
 
     // do something
     const unsigned int numA = eMod->numAct;
@@ -250,6 +247,8 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
     // Get expected-utility vector, one entry for each actor, in the current state.
     const KMatrix eu0 = euMat(uUnique); // 'u' with duplicates, 'uUnique' without duplicates
 
+     
+    EState<PT>* s2 = new EState<PT>(eMod);
     // do some more
 
     assert(nullptr != s2);
