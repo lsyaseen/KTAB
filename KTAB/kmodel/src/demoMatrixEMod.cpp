@@ -183,7 +183,7 @@ void demoEKem(uint64_t s) {
     auto eKEM = new PMatrixModel("EModel-Matrix-KEM", s);
     
     eKEM->pcem = KBase::PCEModel::ConditionalPCM;
-    eKEM->pcem = KBase::PCEModel::MarkovPCM;
+    eKEM->pcem = KBase::PCEModel::MarkovUPCM;
 
     eKEM->setWeights(weightMat);
     eKEM->setPMatrix(utilMat);

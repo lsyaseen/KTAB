@@ -342,11 +342,11 @@ SMPState* SMPState::doBCN() const {
 
     const KBase::VPModel vpm = model->vpm; 
     const KBase::PCEModel pcem = model->pcem;
+    const KBase::StateTransMode stm = model->stm;
     
     // of course, you can change these parameters.
-    // ideally, they should be read from the scenario object.
+    // ideally, they should be read from the surrounding Model object.
     auto vr = VotingRule::Proportional;
-    auto stm = StateTransMode::DeterminsticSTM;
 
     auto ndxMaxProb = [](const KMatrix & cv) {
         const double pTol = 1E-8;

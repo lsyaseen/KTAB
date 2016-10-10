@@ -348,12 +348,15 @@ ostream& operator<< (ostream& os, const StateTransMode& stm) {
 string pcmName(const PCEModel& pcm) {
     string s="";
     switch (pcm) {
-    case PCEModel::MarkovPCM:
-        s = "MarkovPCM";
-        break;
     case PCEModel::ConditionalPCM:
-        s = "ConditionalPCM";
-        break;
+      s = "ConditionalPCM";
+      break;
+    case PCEModel::MarkovIPCM:
+      s = "MarkovIPCM";
+      break;
+    case PCEModel::MarkovUPCM:
+      s = "MarkovUPCM";
+      break;
     default:
         throw KException("pcmName - Unrecognized PCEModel");
         break;
@@ -657,12 +660,15 @@ KMatrix Model::probCE(PCEModel pcm, const KMatrix & pv) {
 
     auto p = KMatrix ();
     switch (pcm) {
-    case PCEModel::MarkovPCM:
-        p = markovPCE(pv);
-        break;
     case PCEModel::ConditionalPCM:
-        p = condPCE(pv);
-        break;
+      p = condPCE(pv);
+      break;
+    case PCEModel::MarkovIPCM:
+      p = markovIncentivePCE(pv);
+      break;
+    case PCEModel::MarkovUPCM:
+      p = markovUniformPCE(pv);
+      break;
     default:
         throw KException("Model::probCE unrecognized PCEModel");
         break;
@@ -672,9 +678,78 @@ KMatrix Model::probCE(PCEModel pcm, const KMatrix & pv) {
 }
 
 
+// Given square matrix of Coalition[i over j] returns a column vector for Prob[i].
+// Uses Markov process, not 1-step conditional probability.
+// Challenge probabilities are proportional to influence promoting a challenge
+static KMatrix tmpMarkovUniformPCE(const KMatrix & coalitions) {
+
+  const double pTol = 1E-6;
+  const double epsSupport = 1E-10;
+  const unsigned int numOpt = coalitions.numR();
+  assert(numOpt == coalitions.numC());
+
+  // given coalitions, calculate the total incentive for i to challenge j
+  auto iFn = [epsSupport, coalitions](unsigned int i, unsigned int j) {
+    const double sij = coalitions(i, j);
+    const double sji = coalitions(j, i);
+    double inctv = (sij*sij) / (sij + sji);
+    if (i == j) { inctv = inctv + epsSupport; }
+    return inctv;
+  };
+
+  const KMatrix inctvMatrix = KMatrix::map(iFn, numOpt, numOpt);
+
+  // given incentives, calculate the probability of i challenging j,
+  // given that j is the current favorite proposal
+  // Note that if every actor prefers j to every other option,
+  // then all incentive(i,j) will be zero, except incentive(j,j) = eps.
+  // Even in this case, we will not get a division by zero error,
+  // and it will correctly return that the only "challenger" is j itself.
+  //
+  auto pFn = [inctvMatrix, numOpt](unsigned int i, unsigned int j) {
+    double sum = 0.0;
+    for (unsigned int k = 0; k < numOpt; k++) {
+      sum = sum + inctvMatrix(k, j);
+    }
+    double p = inctvMatrix(i, j) / sum;
+    return p;
+  };
+
+  const KMatrix p = KMatrix(numOpt, 1, 1.0) / numOpt;  // all 1/n
+  auto q = p;
+  unsigned int iMax = 1000;  // 10-30 is typical
+  unsigned int iter = 0;
+  double change = 1.0;
+
+  // do the markov calculation
+
+  assert(iter < iMax); // no way to recover
+  return p;
+}
+
+
+KMatrix Model::markovIncentivePCE(const KMatrix & pv) {
+  throw KException("Model::markovIncentivePCE not yet implemented");
+
+  const double pTol = 1E-6;
+  unsigned int numOpt = pv.numR();
+  auto p = KMatrix(numOpt, 1, 1.0) / numOpt;  // all 1/n
+  auto q = p;
+  unsigned int iMax = 1000;  // 10-30 is typical
+  unsigned int iter = 0;
+  double change = 1.0;
+
+  // do the markov calculation
+
+  assert(iter < iMax); // no way to recover
+  return p;
+}
+
+
 // Given square matrix of Prob[i>j] returns a column vector for Prob[i].
-// Uses Markov process, not 1-step conditional probability
-KMatrix Model::markovPCE(const KMatrix & pv) {
+// Uses Markov process, not 1-step conditional probability.
+// Challenges have uniform probability 1/N
+KMatrix Model::markovUniformPCE(const KMatrix & pv) {
     const double pTol = 1E-6;
     unsigned int numOpt = pv.numR();
     auto p = KMatrix(numOpt, 1, 1.0) / numOpt;  // all 1/n

@@ -80,9 +80,9 @@ string stmName(const StateTransMode& stm);
 ostream& operator<< (ostream& os, const StateTransMode& stm);
 
 // At this point, the LISP keyword 'defmacro' should leap to mind.
-// Will this PCE be Markov or Conditional or ...
+// Will this PCE be Conditional or Markov-Incentive or Markov-Uniform or  ...
 enum class PCEModel {
-    MarkovPCM, ConditionalPCM
+  ConditionalPCM, MarkovIPCM, MarkovUPCM
 };
 string pcmName(const PCEModel& pcm);
 ostream& operator<< (ostream& os, const PCEModel& pcm);
@@ -246,6 +246,9 @@ public:
     // default 'probabilistic Condorcet election' model is Conditional
     PCEModel pcem = PCEModel::ConditionalPCM;
 
+    // default state transition mode is deterministic, not stochastic
+    StateTransMode stm = StateTransMode::DeterminsticSTM;
+
     // In the abstract, you run a model by stepping it until it is time to stop.
     // In detail, each step is likely to record copious information to
     // a database for analysis, and the stopping criterion is likely to
@@ -324,10 +327,9 @@ public:
     // returns h's estimate of i's risk attitude, using the risk-adjustment-rule
     static double estNRA(double rh, double  ri, BigRAdjust ra) ;
 
-    // string getScenarioName() const { return scenName; };
-    string getScenarioID() const {
-        return scenId;
-    };
+    static KMatrix tmpMarkovUniformPCE(const KMatrix & coalitions);
+
+    string getScenarioID() const { return scenId; };
 
     static KTable * createSQL(unsigned int n);
 protected:
@@ -346,11 +348,12 @@ protected:
     // this is the basic model of victory dependent on strength-ratio
     static tuple<double, double> vProb(VPModel vpm, const double s1, const double s2);
 
-    static KMatrix markovPCE(const KMatrix & pv);
-    static KMatrix condPCE(const KMatrix & pv);
 
 
 private:
+  static KMatrix markovUniformPCE(const KMatrix & pv);
+  static KMatrix markovIncentivePCE(const KMatrix & pv);
+  static KMatrix condPCE(const KMatrix & pv);
 };
 
 

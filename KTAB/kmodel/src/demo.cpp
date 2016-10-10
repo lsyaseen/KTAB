@@ -111,9 +111,9 @@ void demoPCE(uint64_t s, PRNG* rng) {
     double w01 = c(0, 1);
     double w10 = c(1, 0);
 
-    cout << "By simple " << vpm << " ratios ..." << endl;
+    cout << "Compare simple " << vpm << " ratios to Markov-uniform ..." << endl;
     auto pv = Model::vProb(vpm, c);
-    auto p2 = Model::probCE(PCEModel::MarkovPCM, pv);
+    auto p2 = Model::probCE(PCEModel::MarkovUPCM, pv);
 
     auto show = [](const KMatrix & cMat, const KMatrix & pMat, const KMatrix & pVec) {
         cout << "Coalitions matrix:" << endl;
@@ -137,8 +137,8 @@ void demoPCE(uint64_t s, PRNG* rng) {
     pv = Model::vProb(vpm, c);
 
 
-    cout << endl<< "Markov PCE model: " << endl;
-    p2 = Model::probCE(PCEModel::MarkovPCM, pv);
+    cout << endl<< "Markov-Uniform PCE model: " << endl;
+    p2 = Model::probCE(PCEModel::MarkovUPCM, pv);
     show(c, pv, p2);
 
     cout << endl << "Conditional PCE model: " << endl;
