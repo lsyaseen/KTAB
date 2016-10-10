@@ -300,7 +300,7 @@ namespace SMPLib {
     //string scenName = "Scen";
     static const int NumTables = 4; // TODO : Add one to this num when new table is added
 
-    static const int NumSQLLogGrps = 0; // TODO : Add one to this num when new logging group is added
+    static const int NumSQLLogGrps = 1; // TODO : Add one to this num when new logging group is added
   protected:
     // note that the function to write to table #k must be kept
     // synchronized with the result of createTableSQL(k) !

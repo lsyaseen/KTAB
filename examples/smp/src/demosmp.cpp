@@ -320,9 +320,11 @@ int main(int ac, char **av) {
   bool csvP = false;
   string inputCSV = "";
 
-  // JAH 20160730 vector of SQL logging flags for 4 groups of tables:
-  // 0 = Information Tables, 1 = Position Tables, 2 = EDU Tables, 3 = Bargain Resolution Tables
-  std::vector<bool> sqlFlags = {true,true,true,true};
+  // JAH 20160730 vector of SQL logging flags for 5 groups of tables:
+  // 0 = Information Tables, 1 = Position Tables, 2 = Challenge Tables,
+  // 3 = Bargain Resolution Tables, 4 = VectorPosition table
+  // JAH 20161010 added group 4 for only VectorPos so it can be logged alone
+  std::vector<bool> sqlFlags = {true,true,true,true,true};
 
   auto showHelp = []() {
     printf("\n");
