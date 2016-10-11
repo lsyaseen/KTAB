@@ -423,7 +423,7 @@ SMPState* SMPState::doBCN() const {
         cout << "u_im: " << endl;
         u_im.mPrintf(" %.5f ");
 
-        cout << "Doing probCE for the " << nb << " bargains of actor " << k << " ... " << flush;
+        cout << "Doing scalarPCE for the " << nb << " bargains of actor " << k << " ... " << flush;
         auto p = Model::scalarPCE(na, nb, w, u_im, vr, vpm, pcem, ReportingLevel::Medium);
         assert(nb == p.numR());
         assert(1 == p.numC());

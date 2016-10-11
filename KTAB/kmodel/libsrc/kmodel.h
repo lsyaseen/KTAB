@@ -98,6 +98,8 @@ enum class VPModel {
     //            and that 11:10 advantage gives 54.8%
     // Quartic law says 2:1 advantage gives pv = 16/17, and 3:1 gives 81/82
     //            and that 11:10 advantage gives 59.4%
+    // Octic law says 2:1 advantage gives pv = 256/257 (99.6%), 3:1 gives 6561/6562 (99.985%)
+    //            and that 11:10 advantage gives 68.2%
     // Binary law says that any percentage difference over a small threshold gives
     //            guaranteed success (or loss), with linear interpolation between
     //            to avoid weird round-off effects.
@@ -105,7 +107,8 @@ enum class VPModel {
     Linear,  // first power
     Square,  // second power
     Quartic, // fourth power
-    Binary
+    Octic,   // eighth power
+    Binary   // threshold, limit of N-th power
 };
 string vpmName(const VPModel& vpm);
 ostream& operator<< (ostream& os, const VPModel& vpm);
@@ -284,10 +287,18 @@ public:
     // calculate column vector P[i] from square matrix pv[i>j]
     static KMatrix probCE(PCEModel pcm, const KMatrix & pv);
 
+    // from square matrix coalition[i:j], return two matrices:
+    // column vector P[i] of outcome probabilities
+    // square matrix of P[ i > j] victory probabilities
+    static tuple<KMatrix, KMatrix> probCE2(PCEModel pcm, VPModel vpm, const KMatrix & cltnStrngth);
+
     // calculate the [option,1] column vector of option-probabilities.
     // w is a [1,actor] row-vector of actor strengths, u is [act,option] utilities.
     static KMatrix scalarPCE(unsigned int numAct, unsigned int numOpt, const KMatrix & w,
                              const KMatrix & u, VotingRule vr, VPModel vpm, PCEModel pcem, ReportingLevel rl);
+
+
+    static KMatrix tmpMarkovIncentivePCE(const KMatrix & coalitions, VPModel vpm);
 
     virtual unsigned int addActor(Actor* a); // returns new number of actors, always at least 1
     int actrNdx(const Actor* a) const;
@@ -326,8 +337,6 @@ public:
 
     // returns h's estimate of i's risk attitude, using the risk-adjustment-rule
     static double estNRA(double rh, double  ri, BigRAdjust ra) ;
-
-    static KMatrix tmpMarkovUniformPCE(const KMatrix & coalitions);
 
     string getScenarioID() const { return scenId; };
 

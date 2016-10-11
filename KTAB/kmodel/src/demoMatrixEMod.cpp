@@ -42,8 +42,8 @@ using KBase::EActor;
 using KBase::EPosition;
 
 
-const KMatrix weightMat = KMatrix::arrayInit(weightArray, 1, numActKEM);
-const KMatrix utilMat = KMatrix::arrayInit(utilArray, numActKEM, numPolKEM);
+const auto weightMat = KMatrix::arrayInit(weightArray, 1, numActKEM);
+const auto utilMat = KMatrix::arrayInit(utilArray, numActKEM, numPolKEM);
 
 
 // --------------------------------------------
@@ -188,14 +188,14 @@ void demoEKem(uint64_t s) {
     eKEM->setWeights(weightMat);
     eKEM->setPMatrix(utilMat);
 
-    auto ep1 = new PMatrixPos(eKEM, 17);
+    const auto ep1 = new PMatrixPos(eKEM, 17);
 
 
-    auto probTheta = Model::scalarPCE(eKEM->numAct, eKEM->numOptions() , weightMat,
+    const auto probTheta = Model::scalarPCE(eKEM->numAct, eKEM->numOptions() , weightMat,
                                       utilMat, VotingRule::Proportional,
                                       eKEM->vpm, eKEM->pcem, ReportingLevel::Medium);
     
-    auto p2 = trans(probTheta);
+    const auto p2 = trans(probTheta);
     cout << "PCE over entire option-space:"<<endl;
     p2.mPrintf(" %4.2f "); 
     
@@ -218,7 +218,7 @@ void demoEKem(uint64_t s) {
     
     
     delete ep1;
-    ep1 = nullptr;
+    //ep1 = nullptr;
     delete eKEM;
     eKEM = nullptr;
     return;

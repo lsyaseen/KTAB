@@ -61,17 +61,15 @@ namespace KBase {
     return m2;
   }
 
-  // return row-vector from row number i0
-  KMatrix hSlice(const KMatrix & m1, unsigned int i0) {
-    assert(i0 < m1.numR());
-    auto m2 = subMatrix(m1, i0, i0, 0, m1.numC() - 1);
+  // return row-vector from row number i
+  KMatrix hSlice(const KMatrix & m1, unsigned int i) { 
+    auto m2 = subMatrix(m1, i, i, 0, m1.numC() - 1);
     return m2;
   }
 
-  // return column-vector from column j0
-  KMatrix vSlice(const KMatrix & m1, unsigned int j0) {
-    assert(j0 < m1.numC());
-    auto m2 = subMatrix(m1, 0, m1.numR() - 1, j0, j0);
+  // return column-vector from column j
+  KMatrix vSlice(const KMatrix & m1, unsigned int j) { 
+    auto m2 = subMatrix(m1, 0, m1.numR() - 1, j, j);
     return m2;
   }
 
@@ -463,7 +461,7 @@ namespace KBase {
     if (okP) {
       const double tol = 1E-10;
       // tolerable round-off error on a [0,1] range
-      const KMatrix im = iMat(nr);
+      const auto im = iMat(nr);
       okP = (norm(m - im) < tol);
     }
     return okP;

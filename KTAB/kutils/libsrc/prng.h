@@ -65,14 +65,14 @@ namespace KBase {
   W64 rotr(const W64 x, unsigned int n);
 
   class PRNG {
-  public:
-    PRNG();
+  public: 
+    explicit PRNG(uint64_t sd = KBase::dSeed);
     virtual ~PRNG();
     uint64_t uniform();
     double uniform(double a, double b);
     unsigned int probSel(const KMatrix & cv);
     VBool bits(unsigned int nb);
-    uint64_t setSeed(uint64_t);
+    uint64_t setSeed(uint64_t sd);
   protected:
     mt19937_64 mt = mt19937_64();
   };

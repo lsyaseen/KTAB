@@ -63,6 +63,7 @@ namespace SMPLib {
   class SMPModel;
 
   const string appVersion = "0.1.1";
+  const bool testProbPCE = true;
 
   // -------------------------------------------------
   // Plain-Old-Data

@@ -840,8 +840,8 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
 
     const unsigned int numA = mst->model->numAct;
     unsigned int ih = mst->model->actrNdx(this);
-    const KMatrix uh = mst->aUtil[ih];
-    const KMatrix w = mst->actrCaps();
+    const auto uh = mst->aUtil[ih];
+    const auto w = mst->actrCaps();
 
     //auto wFn = [st](unsigned int i, unsigned int j) {
     //  auto aj = ((MtchActor*)(st->model->actrs[j]));
