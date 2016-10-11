@@ -374,16 +374,26 @@ bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
     cout << endl << flush;
 
     auto vpm = VPModel::Linear;
+    auto pcem = PCEModel::ConditionalPCM;
 
-    auto pv = Model::vProb(vpm, c);
+    const auto ppv = Model::probCE2(pcem, vpm, c);
+    auto p = get<0>(ppv);
+    auto pv = get<1>(ppv);
 
     cout << "Probability Opt_i > Opt_j" << endl;
     pv.mPrintf(" %.4f ");
     cout << endl;
-
-    auto p = Model::probCE(PCEModel::ConditionalPCM, pv);
     cout << "Probability Opt_i" << endl;
     p.mPrintf(" %.4f ");
+
+    if (KBase::testProbCE) {
+      //cout << "Testing probCE in demoDivideSweets ... " << flush;
+      auto pv0 = Model::vProb(vpm, c);
+      assert(KBase::norm(pv - pv0) < 1E-6);
+      auto p0 = Model::probCE(pcem, pv0);
+      assert(KBase::norm(p - p0) < 1E-6);
+      //cout << "ok" << endl << flush;
+    }
 
     cout << "Expected utility to actors: " << endl;
     (u*p).mPrintf(" %+8.3f ");

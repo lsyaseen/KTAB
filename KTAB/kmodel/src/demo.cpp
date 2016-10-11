@@ -73,7 +73,7 @@ void demoPCE(uint64_t s, PRNG* rng) {
     cout << "Demonstrate minimal PCE" << endl << endl;
 
     VPModel vpm = VPModel::Linear; 
-    switch (rng->uniform() % 5) {
+    switch (rng->uniform() % 6) {
     case 0:
     case 1:
         vpm = VPModel::Linear;
@@ -127,38 +127,78 @@ void demoPCE(uint64_t s, PRNG* rng) {
       cout << endl;
       return;
     };
-    cout << "Compare simple " << vpm << " ratios to Markov-uniform ..." << endl;
-    auto pv = Model::vProb(vpm, c);
-    auto p2 = Model::probCE(PCEModel::MarkovUPCM, pv);
-    auto p3 = Model::tmpMarkovIncentivePCE(c, vpm);
-     
-    cout << "Markov Uniform ";
+    cout << "Compare simple " << vpm << " ratios to2-by-2  Markov-uniform ..." << endl;
+    //auto pv = Model::vProb(vpm, c);
+    //auto p2 = Model::probCE(PCEModel::MarkovUPCM, pv);
+    auto p3 = Model::markovIncentivePCE(c, vpm); 
+    auto ppv = Model::probCE2(PCEModel::MarkovUPCM, vpm, c);
+    auto p2 = get<0>(ppv); // column
+    auto pv = get<1>(ppv); //square
+    if (KBase::testProbCE) {
+      auto pv0 = Model::vProb(vpm, c); //square 
+      assert(KBase::norm(pv - pv0) < 1E-6);
+      auto p20 = Model::probCE(PCEModel::MarkovUPCM, pv0); // column
+      assert(KBase::norm(p2 - p20) < 1E-6);
+    }
+
+    cout << "2-Option Markov Uniform " << endl;
     show(c, pv, p2);
     cout << "Markov Incentive" << endl;
     show(c, pv, p3);
 
-    //printf("Norm of difference: %.2E \n", norm(p1 - p2));
-    //cout << endl;
     cout << endl;
-    cout << "But not so clear with tri-lateral conflict ..." << endl;
+     p3 = get<0>(Model::probCE2(PCEModel::MarkovIPCM, vpm, c)); 
+    auto p30 = Model::markovIncentivePCE(c, vpm);
+    cout << "2-Option Markov Incentive" << endl;
+    show(c, pv, p3);
+    if (KBase::testProbCE) {
+      assert(KBase::norm(p3 - p30) < 1E-6);
+    }
+    
+    cout << endl;
+    cout << "But not so clear with three options ..." << endl;
     c = KMatrix::map(cFn, 3, 3);
-    pv = Model::vProb(vpm, c);
-    p2 = Model::probCE(PCEModel::MarkovUPCM, pv);
-    p3 = Model::tmpMarkovIncentivePCE(c, vpm);
+    ppv = Model::probCE2(PCEModel::MarkovUPCM, vpm, c);
+    p2 = get<0>(ppv); // column
+    pv = get<1>(ppv); //square
+    if (KBase::testProbCE) {
+      auto pv0 = Model::vProb(vpm, c); //square 
+      assert(KBase::norm(pv - pv0) < 1E-6);
+      auto p20 = Model::probCE(PCEModel::MarkovUPCM, pv); // column
+      assert(KBase::norm(p2 - p20) < 1E-6);
+    }
+    cout << "3-Option Markov Uniform " <<endl;
+    p3 = Model::markovIncentivePCE(c, vpm);
 
     cout << endl<< "Markov Uniform  " << endl; 
     show(c, pv, p2);
     cout << "Markov Incentive" << endl;
     show(c, pv, p3);
 
+    cout << "3-Option Markov Incentive" << endl << flush;
+    cout << "probCE2 ... " << endl << flush;
+    p3 = get<0>(Model::probCE2(PCEModel::MarkovIPCM, vpm, c));
+    cout << "tmpMarkovIncentivePCE ... " << endl << flush;
+    p30 = Model::markovIncentivePCE(c, vpm);
+    show(c, pv, p3);
+    if (KBase::testProbCE) {
+      assert(KBase::norm(p3 - p30) < 1E-6);
+    }
+    // ---------------------------
+
     cout << endl << "Conditional PCE model: " << endl;
-    p2 = Model::probCE(PCEModel::ConditionalPCM, pv);
+    p2 = get<0>(Model::probCE2(PCEModel::ConditionalPCM, vpm, c));
     show(c, pv, p2);
+
+    if (KBase::testProbCE) {
+      auto p20 = Model::probCE(PCEModel::ConditionalPCM, pv);
+      assert(KBase::norm(p2 - p20) < 1E-6);
+    }
 
     return;
 }
 
-
+// simple demo of shared pointers (largely a test that the compiler is recent enough).
 void demoSpVSR(uint64_t s, PRNG* rng) {
     using std::function;
     using std::get;
@@ -327,7 +367,7 @@ int main(int ac, char **av) {
           coalitions(i, j) = cij * cij;
         }
       }
-      auto pDist = Model::tmpMarkovIncentivePCE(coalitions, vpm);
+      auto pDist = Model::markovIncentivePCE(coalitions, vpm);
       cout << "Markov Incentive probabiities with " <<vpm << endl;
       trans(pDist).mPrintf(" %.4f");
       cout << endl << flush;

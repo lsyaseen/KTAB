@@ -379,7 +379,7 @@ namespace SMPLib {
     auto pv_ij = Model::vProb(vr, vpm, w_j, rnUtil_ij); // square
     auto p_i = Model::probCE(model->pcem, pv_ij); // column
 
-    if (testProbPCE) {
+    if (KBase::testProbCE) {
       auto vfn = [vr, &w_j, &rnUtil_ij](unsigned int k, unsigned int i, unsigned int j) {
         double vkij = Model::vote(vr, w_j(0, k), rnUtil_ij(k, i), rnUtil_ij(k, j));
         return vkij;

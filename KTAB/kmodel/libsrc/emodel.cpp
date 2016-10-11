@@ -292,8 +292,19 @@ tuple <KMatrix, VUI> EState<PT>::pDist(int persp) const {
     // the following uses exactly the values in the given euMat,
     // which may or may not be square
     const auto c = Model::coalitions(vkij, uMat.numR(), uMat.numC());
-    const auto pv = Model::vProb(eMod->vpm, c); // square
-    const auto p = Model::probCE(eMod->pcem, pv); // column
+    const auto ppv = Model::probCE2(eMod->pcem, eMod->vpm, c);
+    const auto p = get<0>(ppv); // column
+    const auto pv = get<1>(ppv); // square
+
+    if (KBase::testProbCE) {
+      cout << "Testing EState::pDist ... " << flush;
+      const auto pv0 = Model::vProb(eMod->vpm, c); // square
+      assert(KBase::norm(pv - pv0) < 1E-6);
+      const auto p0 = Model::probCE(eMod->pcem, pv0); // column
+      assert(KBase::norm(p - p0) < 1E-6);
+      cout << "ok" << endl << flush;
+    }
+
     const auto eu = uMat*p; // column
 
     assert(numA == eu.numR());
@@ -355,12 +366,22 @@ KMatrix EState<PT>::expUtilMat  (KBase::ReportingLevel rl,
         auto v_kij = Model::vote(ak->vr, ak->sCap, uMat(k, i), uMat(k, j));
         return v_kij;
     };
-
+    
     // the following uses exactly the values in the given euMat,
     // which is usually NOT square
     const auto c = Model::coalitions(vkij, uMat.numR(), uMat.numC());
-    const auto pv = Model::vProb(vpm, c); // square
-    const auto p = Model::probCE(eMod->pcem, pv); // column
+    const auto ppv = Model::probCE2(eMod->pcem, eMod->vpm, c);
+    const auto p = get<0>(ppv); // column
+    const auto pv = get<1>(ppv); // square
+
+    if (KBase::testProbCE) {
+      cout << "Testing EState::expUtilMat ... " << flush;
+      const auto pv0 = Model::vProb(eMod->vpm, c); // square
+      assert(KBase::norm(pv - pv0) < 1E-6);
+      const auto p0 = Model::probCE(eMod->pcem, pv0); // column
+      assert(KBase::norm(p - p0) < 1E-6);
+      cout << "ok" << endl << flush;
+    }
     const auto eu = uMat*p; // column
 
     assert(numA == eu.numR());

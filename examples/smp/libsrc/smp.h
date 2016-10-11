@@ -62,7 +62,7 @@ namespace SMPLib {
   class SMPState;
   class SMPModel;
 
-  const string appVersion = "0.1.1";
+  const string appVersion = "0.1.1"; 
   const bool testProbPCE = true;
 
   // -------------------------------------------------

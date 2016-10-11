@@ -188,7 +188,7 @@ namespace RfrmPri
     const auto p = get<0>(pv2); // column
     const auto pv = get<1>(pv2); //square
 
-    if (testProbPCE) {
+    if (KBase::testProbCE) {
       const KMatrix pv0 = Model::vProb(vpm, c); // square
       const KMatrix p2 = Model::probCE(rpMod->pcem, pv0); // column
       double diffP = KBase::norm(p - p2);
@@ -783,7 +783,7 @@ namespace RfrmPri
     const auto p = get<0>(pv2); // column
     const auto pv = get<1>(pv2); // square
 
-    if (testProbPCE) { 
+    if (KBase::testProbCE) { 
       const auto pv0 = Model::vProb(model->vpm, c); // square
       const auto p2 = Model::probCE(model->pcem, pv0); // column
       double diffP = KBase::norm(p - p2);

@@ -60,6 +60,8 @@ class State;
 class Actor;
 class KTable;
 
+const bool testProbCE = true;
+
 // How much influence to exert (vote) given a difference in [0,1] utility.
 // NOTE WELL: ASymProsp is asymmetric in the sense that v(i:k) + v(k:i) != 0.
 // The response to positive delta-Util is only 2/3 of the response to negative,
@@ -298,7 +300,7 @@ public:
                              const KMatrix & u, VotingRule vr, VPModel vpm, PCEModel pcem, ReportingLevel rl);
 
 
-    static KMatrix tmpMarkovIncentivePCE(const KMatrix & coalitions, VPModel vpm);
+    static KMatrix markovIncentivePCE(const KMatrix & coalitions, VPModel vpm);
 
     virtual unsigned int addActor(Actor* a); // returns new number of actors, always at least 1
     int actrNdx(const Actor* a) const;
@@ -361,7 +363,7 @@ protected:
 
 private:
   static KMatrix markovUniformPCE(const KMatrix & pv);
-  static KMatrix markovIncentivePCE(const KMatrix & pv);
+  //static KMatrix markovIncentivePCE(const KMatrix & pv);
   static KMatrix condPCE(const KMatrix & pv);
 };
 

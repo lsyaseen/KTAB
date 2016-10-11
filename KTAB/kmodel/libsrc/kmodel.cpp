@@ -661,7 +661,7 @@ namespace KBase {
       p = condPCE(victProb);
       break;
     case PCEModel::MarkovIPCM:
-      p = tmpMarkovIncentivePCE(cltnStrngth, vpm);
+      p = markovIncentivePCE(cltnStrngth, vpm);
       break;
     case PCEModel::MarkovUPCM:
       p = markovUniformPCE(victProb);
@@ -694,7 +694,7 @@ namespace KBase {
       p = condPCE(pv);
       break;
     case PCEModel::MarkovIPCM:
-      p = markovIncentivePCE(pv);
+      throw KException("Model::probCE not yet implemented MarkovIPCM");
       break;
     case PCEModel::MarkovUPCM:
       p = markovUniformPCE(pv);
@@ -711,7 +711,7 @@ namespace KBase {
   // Given square matrix of strengths, Coalition[i over j] returns a column vector for Prob[i].
   // Uses Markov process, not 1-step conditional probability.
   // Challenge probabilities are proportional to influence promoting a challenge
-  KMatrix Model::tmpMarkovIncentivePCE(const KMatrix & coalitions, VPModel vpm) {
+  KMatrix Model::markovIncentivePCE(const KMatrix & coalitions, VPModel vpm) {
     using KBase::sqr;
     using KBase::qrtc;
     const bool printP = false;
@@ -761,12 +761,14 @@ namespace KBase {
     double change = 1.0;
 
     // do the markov calculation
-    while (pTol < change) { 
+    while (pTol < change)  { // && (iter < iMax)
           if (printP) {
-            printf("Iteration %i \n", iter);
+            printf("Iteration  %i / %i \n", iter, iMax);
             cout << "pDist:" << endl;
             trans(p).mPrintf(" %.4f");
-            cout << endl << endl << flush;
+            cout << endl;
+            printf("change: %.4e \n", change);
+            cout << endl << flush;
           } 
       auto ct = KMatrix(numOpt, numOpt);
       for (unsigned int i = 0; i < numOpt; i++) {
@@ -793,7 +795,8 @@ namespace KBase {
         double c = fabs(q(i, 0) - p(i, 0));
         change = (c > change) ? c : change;
       }
-      p = q;
+      // Newton method improves convergence.
+      p = (p+q)/2.0; 
       iter++;
       assert(fabs(sum(p) - 1.0) < pTol); // double-check
     }
@@ -802,7 +805,7 @@ namespace KBase {
     return p;
   }
 
-
+  /*
   KMatrix Model::markovIncentivePCE(const KMatrix & pv) {
     throw KException("Model::markovIncentivePCE not yet implemented");
 
@@ -819,7 +822,7 @@ namespace KBase {
     assert(iter < iMax); // no way to recover
     return p;
   }
-
+  */
 
   // Given square matrix of Prob[i>j] returns a column vector for Prob[i].
   // Uses Markov process, not 1-step conditional probability.
@@ -844,7 +847,8 @@ namespace KBase {
         double c = fabs(q(i, 0) - p(i, 0));
         change = (c > change) ? c : change;
       }
-      p = q;
+      // Newton method improves convergence.
+      p = (p + q) / 2.0;
       iter++;
       assert(fabs(sum(p) - 1.0) < pTol); // double-check
     }
@@ -890,8 +894,17 @@ namespace KBase {
       };
       const auto c = coalitions(vfn, numAct, numOpt); // c(i,j) = strength of coaltion for i against j
       const auto pv2 = Model::probCE2(pcem, vpm, c);
-      const auto p = get<0>(pv2);
-      const auto pv = get<1>(pv2);
+      const auto p = get<0>(pv2); //column
+      const auto pv = get<1>(pv2); // square
+      
+      if (testProbCE) {
+        //cout << "Testing probCE in Model::scalarPCE ... " << flush;
+        const auto pv0 = vProb(vpm, c); //square
+        const auto p0 = probCE(pcem, pv0); // column
+        assert (KBase::norm(pv0 - pv) < 1E-6);
+        assert (KBase::norm(p0 - p) < 1E-6); 
+        //cout << "ok" << endl << flush;
+      }
 
     if (ReportingLevel::Low < rl) {
       printf("Num actors: %i \n", numAct);

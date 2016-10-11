@@ -43,7 +43,7 @@ using KBase::VotingRule;
 using KBase::VPModel;
 
 namespace DemoLeon {
-  const double TolIFD = 1E-6;
+  const double TolIFD = 1E-6; 
   const bool testProbPCE = true;
 
   LeonActor::LeonActor(string n, string d, LeonModel* em, unsigned int id) : Actor(n, d) {
@@ -308,6 +308,14 @@ namespace DemoLeon {
       const auto pv = get<1>(pv2);
 
       if (testProbPCE) { // check consistency
+        const auto pv0 = Model::vProb(model->vpm, c);
+        assert(KBase::norm(pv - pv0) < 1E-6);
+        const auto p1 = Model::probCE(PCEModel::ConditionalPCM, pv0);
+        double diffP = KBase::norm(p - p1); 
+        assert(diffP < 1E-6);
+      }
+
+      if (KBase::testProbCE) { // check consistency
         const auto pv0 = Model::vProb(model->vpm, c);
         assert(KBase::norm(pv - pv0) < 1E-6);
         const auto p1 = Model::probCE(PCEModel::ConditionalPCM, pv0);
@@ -1630,7 +1638,7 @@ namespace DemoLeon {
     p.mPrintf(" %.4f ");
     cout << endl;
 
-    if (testProbPCE) {
+    if (KBase::testProbCE) {
       auto pv0 = Model::vProb(vpm, c); //square
       assert(KBase::norm(pv - pv0) < 1E-6);
       auto p2 = Model::probCE(pcem, pv0); // column
@@ -2055,7 +2063,7 @@ namespace DemoLeon {
     cout << "Probability Opt_i" << endl;
     p.mPrintf(" %.4f ");
 
-    if (testProbPCE) { // check consistency
+    if (KBase::testProbCE) { // check consistency
       auto pv0 = Model::vProb(vpm, c);
       assert(KBase::norm(pv - pv0) < 1E-6);
 
