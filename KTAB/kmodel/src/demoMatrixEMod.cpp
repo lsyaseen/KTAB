@@ -47,7 +47,6 @@ const auto utilMat = KMatrix::arrayInit(utilArray, numActKEM, numPolKEM);
 
 
 // --------------------------------------------
-
 PMatrixModel::PMatrixModel(string d, uint64_t s, vector<bool> vb) : EModel< unsigned int >(d,s,vb) {
     // nothing yet
 }
@@ -76,8 +75,7 @@ void PMatrixModel::setPMatrix(const KMatrix pm0) {
     else {
         theta.resize(nc); // was size zero
         for (unsigned int i=0; i<nc; i++) {
-            auto pi = new unsigned int (i);
-            theta[i] = pi;
+            theta[i] = i;
         }
     }
 
@@ -85,13 +83,13 @@ void PMatrixModel::setPMatrix(const KMatrix pm0) {
     assert (numAct <= maxNumActor);
 
     assert (minNumOptions <= numOptions());
-    
+
     for (auto u : pm0) {
-      assert (0.0 <= u);
-      assert (u <= 1.0);
+        assert (0.0 <= u);
+        assert (u <= 1.0);
     }
 
-    // if it is OK, set it
+    // if all OK, set it
     polUtilMat = pm0;
 
     return;
@@ -103,9 +101,9 @@ void PMatrixModel::setPMatrix(const KMatrix pm0) {
 void PMatrixModel::setWeights(const KMatrix w0) {
     const unsigned int nr = w0.numR();
     const unsigned int nc = w0.numC();
-    
+
     assert (1 == nr);
-    
+
     if (0 < numAct) {
         assert (nc == numAct);
     }
@@ -114,7 +112,7 @@ void PMatrixModel::setWeights(const KMatrix w0) {
     }
 
     for (auto w : w0) {
-      assert (0.0 <= w);
+        assert (0.0 <= w);
     }
     assert (minNumActor <= numAct);
     assert (numAct <= maxNumActor);
@@ -125,6 +123,28 @@ void PMatrixModel::setWeights(const KMatrix w0) {
 }
 
 
+void PMatrixModel::setActors(vector<string> names, vector<string> descriptions) {
+    const unsigned int na = numAct;
+    numAct = 0;
+
+    assert (0 < na);
+    assert (na == names.size());
+    assert (na == descriptions.size());
+    assert (na == wghtVect.numC());
+    assert (na == polUtilMat.numR());
+
+    for (unsigned int i=0; i<na; i++) {
+        auto ai = new EActor<unsigned int>(this, names[i], descriptions[i]);
+        ai->vr = VotingRule::Proportional;
+        ai->sCap = wghtVect(0,i);
+        addActor(ai);
+    }
+    assert (na == numAct);
+    return;
+}
+
+
+// --------------------------------------------
 PMatrixPos::PMatrixPos(PMatrixModel* pm, int n) : EPosition< unsigned int >(pm,n) {
     // nothing else, yet
 }
@@ -135,92 +155,224 @@ PMatrixPos::~PMatrixPos() {
 
 
 // --------------------------------------------
+PMatrixState::PMatrixState(PMatrixModel* pm) : EState<unsigned int>(pm) {
+    // nothing else, yet
+}
+
+
+PMatrixState::~PMatrixState()  {
+    // nothing else, yet
+}
+
+EState<unsigned int>* PMatrixState::makeNewEState() const  {
+    PMatrixModel* pMod = (PMatrixModel*) model;
+    PMatrixState* s2 = new PMatrixState(pMod);
+    return s2;
+}
+
+
+vector<double> PMatrixState::actorUtilVectFn( int h, int tj) const {
+    // no difference in perspective for this demo
+    const unsigned int na = eMod->numAct;
+    const auto pMod = (const PMatrixModel*) eMod;
+    const auto pMat = pMod->getPolUtilMat();
+    assert (na == pMat.numR());
+    assert (0 <= tj);
+    assert (tj < pMat.numC());
+    vector<double> rslt = {};
+    rslt.resize(na);
+    for (unsigned int i=0; i<na; i++) {
+        rslt[i] = pMat(i, tj);
+    }
+    return rslt;
+}
+
+// build the square matrix of position utilities.
+// Row is actor i, Column is position of actor j,
+// U(i,j) is utility to actor i of position of actor j.
+// If there are duplicate positions, there will be duplicate columns.
+void PMatrixState::setAllAUtil(ReportingLevel) {
+    const unsigned int na = eMod->numAct;
+    assert (Model::minNumActor <= na);
+    assert (na <= Model::maxNumActor);
+    aUtil = {};
+    aUtil.resize(na);
+    auto uMat = KMatrix(na,na); // they will all be the same in this demo
+    for (unsigned int j=0; j<na; j++) {
+        unsigned int nj = posNdx(j);
+        auto utilJ = actorUtilVectFn(-1, nj); // all have objective perspective
+        for (unsigned int i=0; i<na; i++) {
+            uMat(i,j) = utilJ[i];
+        }
+    }
+    for (unsigned int i=0; i<na; i++) {
+        aUtil[i] = uMat;
+    }
+    return;
+}
+
+
+// --------------------------------------------
 
 void demoEKem(uint64_t s) {
     using KBase::lCorr;
     using KBase::mean;
-    printf("Using PRNG seed: %020llu \n", s);
+
+    printf("Using PRNG seed: %020lu \n", s);
+    auto rng = new KBase::PRNG(s);
 
     cout << endl;
-    printf("Creating EModel<char> objects ... \n");
+    printf("Creating EModel<string> objects ... \n");
 
     string nChar = "EModel-KEM-Policy";
-    auto ekm = new EModel<char>(nChar, s);
+    auto ekm = new EModel<string>(nChar, s);
     cout << "Populating " << nChar << endl;
 
     // with such a small set of options, the enumerator
     // function just returns a fixed vector of names.
     ekm->enumOptions = []() {
-        return thetaKEM;
+        return pNamesKEM;
     };
     ekm->setOptions();
     cout << "Now have " << ekm->numOptions() << " enumerated options" << endl;
 
-    const unsigned int maxIter = 5;
+    const unsigned int maxIter = 50;
     ekm->stop = [maxIter](unsigned int iter, const KBase::State * s) {
         return (iter > maxIter);
     };
 
     // these just to force instantiation during compilation.
     // It is NOT yet ready to run.
-    auto eks = new EState<char>(ekm);
-    eks->step = [eks] { return eks->stepSUSN(); };
-    ekm->addState(eks);
+    //auto eks = new EState<string>(ekm);
+    //eks->step = [eks] { return eks->stepSUSN(); };
+    //ekm->addState(eks);
 
-    auto ekp = new EPosition<char>(ekm, 0); // needs ::print
-    auto eka = new EActor<char>(ekm, "Bob", "The second cryptographer");
+    auto ekp = new EPosition<string>(ekm, 0); // needs ::print
+    auto eka = new EActor<string>(ekm, "Bob", "The second cryptographer");
 
     cout << "Length of state history: " << ekm->history.size() << endl << flush;
 
-    // cannot delete this, because it would try to delete some
-    // constant strings, and crash.
-    // printf("Deleting %s ... \n", nChar.c_str());
-    // delete ekm;
+    //delete eks;
+    //eks = nullptr;
+    delete ekp;
+    ekp = nullptr;
+    delete eka;
+    eka = nullptr;
 
-    cout << endl;
+    // the following gets SIGSEGV
+    //delete ekm;
+    //ekm = nullptr;
+
+
+    cout << endl << "====================================="<<endl;
     printf("Creating EKEModel objects ... \n");
 
     auto eKEM = new PMatrixModel("EModel-Matrix-KEM", s);
+
+    eKEM->pcem = KBase::PCEModel::MarkovIPCM;
+
+    auto wMat = KMatrix::uniform(rng, 1, utilMat.numR(), 1.0, 10.0);
+    wMat = KMatrix::map(
+        [](double x, unsigned int, unsigned int) {return x*x;}, 
+        wMat);
+    auto uMat = KMatrix::uniform(rng, utilMat.numR(), utilMat.numC(), 0.0, 1.0);
+    uMat = KBase::rescaleRows(uMat, 0.0, 1.0);
     
-    eKEM->pcem = KBase::PCEModel::ConditionalPCM;
-    eKEM->pcem = KBase::PCEModel::MarkovUPCM;
-
-    eKEM->setWeights(weightMat);
-    eKEM->setPMatrix(utilMat);
-
-    const auto ep1 = new PMatrixPos(eKEM, 17);
-
-
-    const auto probTheta = Model::scalarPCE(eKEM->numAct, eKEM->numOptions() , weightMat,
-                                      utilMat, VotingRule::Proportional,
-                                      eKEM->vpm, eKEM->pcem, ReportingLevel::Medium);
+    cout << "Actor weight vector: "<<endl;
+    wMat.mPrintf("%6.2f ");
+    cout << endl;
     
+    cout << "Utility(actor, option) matrix:"<<endl;
+    uMat.mPrintf("%5.3f ");
+    cout << endl;
+
+    eKEM->setWeights(wMat);
+    eKEM->setPMatrix(uMat);
+    eKEM->setActors(aNamesKEM, aDescKEM);
+
+    eKEM->stop = [maxIter, eKEM](unsigned int iter, const KBase::State * s) {
+        bool doneP = iter > maxIter;
+        if (doneP) {
+            printf("Max iteration limit of %u exceeded \n", maxIter);
+        }
+        auto s2 = ((const PMatrixState *)(eKEM->history[iter]));
+        for (unsigned int i = 0; i < iter; i++) {
+            auto s1 = ((const PMatrixState *)(eKEM->history[i]));
+            if (eKEM->equivStates(s1, s2)) {
+                doneP = true;
+                printf("State number %u matched state number %u \n", iter, i);
+            }
+        }
+        return doneP;
+    };
+
+
+    const unsigned int nOpt = eKEM->numOptions();
+    printf("Number of options %i \n", nOpt);
+    printf("Number of actors %i \n", eKEM->numAct);
+
+
+    const auto probTheta = Model::scalarPCE(eKEM->numAct, nOpt ,
+                                            wMat, uMat,
+                                            VotingRule::Proportional,
+                                            eKEM->vpm, eKEM->pcem,
+                                            ReportingLevel::Silent);
+
     const auto p2 = trans(probTheta);
     cout << "PCE over entire option-space:"<<endl;
-    p2.mPrintf(" %4.2f "); 
-    
-    auto zeta = weightMat * utilMat;
+    p2.mPrintf(" %5.3f ");
+
+    auto zeta = wMat * uMat;
     cout << "Zeta over entire option-space:"<<endl;
-    zeta.mPrintf(" %5.1f");
-    
-    auto aCorr = [] (const KMatrix & x, const KMatrix &y) { return lCorr(x-mean(x), y-mean(y)); };
-    
+    zeta.mPrintf(" %5.1f ");
+
+    auto aCorr = [] (const KMatrix & x, const KMatrix &y) {
+        return lCorr(x-mean(x), y-mean(y));
+    };
+
     printf("af-corr(p2,zeta): %.3f \n",  aCorr(p2, zeta));
-    
-    
-    auto lij = [p2] (unsigned int i, unsigned int j) { return log(p2(i,j));};
+
+
+    auto lij = [p2] (unsigned int i, unsigned int j) {
+        return log(p2(i,j));
+    };
     auto logP = KMatrix::map(lij, p2.numR(), p2.numC());
     printf("af-corr(logp2,zeta): %.3f \n", aCorr(logP, zeta));
-    
-    for (unsigned int i=0; i<eKEM->numOptions(); i++) {
-      printf("%2i  %6.4f  %+8.3f  %5.1f  \n", i, p2(0,i), logP(0,i), zeta(0,i));
+
+    for (unsigned int i=0; i<nOpt; i++) {
+        printf("%2i  %6.4f  %+8.3f  %5.1f  \n", i, p2(0,i), logP(0,i), zeta(0,i));
     }
-    
-    
-    delete ep1;
-    //ep1 = nullptr;
+
+    auto es1 = new PMatrixState(eKEM);
+    for (unsigned int i=0; i<eKEM->numAct; i++) {
+        unsigned int ki = rng->uniform() % nOpt;
+        auto pi = new PMatrixPos(eKEM, ki);
+        es1->addPstn(pi);
+    }
+
+    es1->setUENdx();
+    eKEM->addState(es1);
+
+    cout << "--------------"<<endl;
+    cout << "First state:"<<endl;
+    es1->show();
+
+    // see if the templates can be instantiated ...
+    es1->step = [es1] { return es1->stepSUSN(); };
+
+    eKEM->run();
+
+    const unsigned int histLen = eKEM->history.size();
+    PMatrixState* esA = (PMatrixState*) (eKEM->history[histLen-1]);
+    printf("Last State %i \n", histLen-1);
+    esA->show();
+
     delete eKEM;
     eKEM = nullptr;
+
+    delete rng;
+    rng = nullptr;
+
     return;
 }
 

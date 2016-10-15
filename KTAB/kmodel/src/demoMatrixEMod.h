@@ -38,6 +38,7 @@ using std::string;
 using std::vector;
 
 using KBase::KMatrix;
+using KBase::ReportingLevel;
 
 using KBase::EActor;
 using KBase::EModel;
@@ -56,13 +57,25 @@ public:
     PMatrixModel (string d = "", uint64_t s=KBase::dSeed, vector<bool> = {});
     virtual ~PMatrixModel();
 
-// check the matrix and set as utilities,
-// if valid for [numAct,numOpt] utilities in [0,1] range.
+
+    // check the matrix and set as utilities,
+    // if valid for [numAct,numOpt] utilities in [0,1] range.
+    // Also set theta = {0, 1, 2, ...}
     void setPMatrix(const KMatrix pm0);
 
-// check the row-matrix and set as weight,
-// if valid for non-negative [numAct,1] weights
+    // check the row-matrix and set as weight,
+    // if valid for non-negative [numAct,1] weights
     void setWeights(const KMatrix w0);
+
+    // must set weights and pMatrix first
+    void setActors(vector<string> names, vector<string> descriptions);
+
+    KMatrix getWghtVect() const {
+        return wghtVect;
+    }; // row vector
+    KMatrix getPolUtilMat() const {
+        return polUtilMat;
+    }; // rectangular
 
 protected:
     KMatrix wghtVect; // column vector of actor weights
@@ -84,19 +97,50 @@ private:
 
 };
 
+
+class PMatrixState : public EState<unsigned int> {
+public:
+    explicit PMatrixState(PMatrixModel* pm);
+    virtual ~PMatrixState();
+
+protected:
+    virtual EState<unsigned int>* makeNewEState() const override;
+    void setAllAUtil(ReportingLevel rl) override;
+    vector<double> actorUtilVectFn( int h, int tj) const override;
+
+private:
+
+};
+
+
 // --------------------------------------------
 
-
+/*
 const unsigned int numActKEM = 21;
 const unsigned int numPolKEM = 30;
 
-const vector<char*> thetaKEM = {
+// the policy names are used only to instantiate a template
+const vector<string> pNamesKEM = {
     "00", "01", "02", "03", "04", "05", "06", "07", "08", "09",
     "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
     "20", "21", "22", "23", "24", "25", "26", "27", "28", "29"
 };
 
 
+
+const vector<string> aNamesKEM = {
+    "PA00", "PA01", "PA02", "PA03", "PA04", "PA05", "PA06", "PA07", "PA08", "PA09",
+    "PA10", "PA11", "PA12", "PA13", "PA14", "PA15", "PA16", "PA17", "PA18", "PA19",
+    "PA20"
+};
+const vector<string> aDescKEM = {
+    "Policy Actor 00", "Policy Actor 01", "Policy Actor 02", "Policy Actor 03",
+    "Policy Actor 04", "Policy Actor 05", "Policy Actor 06", "Policy Actor 07",
+    "Policy Actor 08", "Policy Actor 09", "Policy Actor 10", "Policy Actor 11",
+    "Policy Actor 12", "Policy Actor 13", "Policy Actor 14", "Policy Actor 15",
+    "Policy Actor 16", "Policy Actor 17", "Policy Actor 18", "Policy Actor 19",
+    "Policy Actor 20"
+};
 // --------------------------------------------
 // weights of actors 0-20
 // --------------------------------------------
@@ -153,6 +197,46 @@ const double utilArray[] = {
     0.4145 , 0.9710 , 0.2212 , 0.6222 , 0.4858 , 0.3801 , 0.8168 , 0.2393 , 0.6393 , 0.9551 , 0.5869 , 0.6251 , 0.9994 , 0.9084 , 0.5953 , 0.1630 , 0.9764 , 0.7508 , 0.4024 , 0.9622 , 0.5413 , 0.7690 , 0.9851 , 0.0695 , 0.6988 , 0.0000 , 0.4487 , 1.0000 , 0.9488 , 0.8803 ,
     0.8521 , 0.2739 , 0.5391 , 0.6821 , 1.0000 , 0.0000 , 0.9734 , 0.9363 , 0.8173 , 0.3000 , 0.9927 , 0.6827 , 0.2013 , 0.9829 , 0.9657 , 0.9614 , 0.9954 , 0.7470 , 0.9806 , 0.9839 , 0.9770 , 0.0910 , 0.3800 , 0.9984 , 0.9739 , 0.1816 , 0.7823 , 0.7906 , 0.5222 , 0.8023
 };
+*/
+
+
+
+const unsigned int numActKEM =  6;
+const unsigned int numPolKEM = 10;
+
+const vector<string> pNamesKEM = {
+    "00", "01", "02", "03", "04", "05"
+};
+
+const vector<string> aNamesKEM = {
+    "PA00", "PA01", "PA02", "PA03", "PA04", "PA05"
+};
+
+const vector<string> aDescKEM = {
+    "Policy Actor 00", "Policy Actor 01", "Policy Actor 02", "Policy Actor 03",
+    "Policy Actor 04", "Policy Actor 05"
+};
+
+const double weightArray[] = {
+    85.0 ,
+    22.9 ,
+    19.8 ,
+    73.8 ,
+    25.4 ,
+    29.2
+};
+
+
+const double utilArray[] = {
+    0.1491 , 0.4289 , 0.9973 , 0.2777 , 0.6942 , 0.9797 , 0.5568 , 0.3547 , 0.9138 , 0.3834 ,
+    0.4643 , 0.9773 , 0.2573 , 0.6052 , 0.5132 , 0.3925 , 0.8403 , 0.2556 , 0.6755 , 0.9646 ,
+    0.8392 , 0.2911 , 0.5729 , 0.6808 , 1.0000 , 0.0000 , 0.9804 , 0.9309 , 0.8132 , 0.2985 ,
+    0.0923 , 0.4156 , 0.9991 , 0.3018 , 0.6945 , 0.9790 , 0.5274 , 0.3705 , 0.9060 , 0.3848 ,
+    0.4745 , 0.9712 , 0.2298 , 0.5804 , 0.5135 , 0.4054 , 0.8135 , 0.2315 , 0.6897 , 0.9667 ,
+    0.8193 , 0.3346 , 0.5583 , 0.6688 , 0.9992 , 0.0000 , 0.9713 , 0.9273 , 0.8094 , 0.2784
+};
+
+
 
 
 // --------------------------------------------
