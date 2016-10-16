@@ -97,4 +97,10 @@ install:
   - cd ..
 
 script:
- - ./reconfig.sh
+  - ./reconfig.sh
+ 
+after_success:
+  - ./examples/smp/smpc --csv ./examples/smp/doc/SOE-Pol-Comp.csv
+  - ./examples/smp/smpc --csv ./examples/smp/doc/dummyData_3Dim.csv
+  - ./KTAB/kmodel/demomodel --emod
+
