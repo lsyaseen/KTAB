@@ -376,6 +376,22 @@ KMatrix KMatrix::map(function<double(double mij, unsigned int i, unsigned int j)
     return m;
 }
 
+
+KMatrix KMatrix::map(function<double(double x)> f,
+		       const KMatrix & mat) {
+    assert (f != nullptr);
+    const unsigned int nr = mat.numR();
+    const unsigned int nc = mat.numC();
+    auto m = KMatrix(nr,nc);
+    for (unsigned int i = 0; i < nr; i++) {
+        for (unsigned int j = 0; j < nc; j++) {
+            m(i, j) = f(mat(i,j));
+        }
+    }
+    return m;
+}
+    
+
 void KMatrix::mapV(function<void(unsigned int i, unsigned int j)> f, unsigned int nr, unsigned int nc) {
     assert (f != nullptr);
     for (unsigned int i = 0; i < nr; i++) {

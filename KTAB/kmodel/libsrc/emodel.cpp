@@ -80,7 +80,7 @@ bool EModel<PT>::equivStates(const EState<PT>* es1, const EState<PT>*  es2) cons
     const unsigned int np = es1->pstns.size();
     bool eqvP = (np == es2->pstns.size()); // most basic test
     eqvP = eqvP && (es1->eMod == es2->eMod); //
-    for (unsigned int i=0; i<np; i++){
+    for (unsigned int i=0; i<np; i++) {
         eqvP = eqvP && (es1->posNdx(i) == es2->posNdx(i));
     }
     return eqvP;
@@ -105,7 +105,7 @@ double EActor<PT>::vote(unsigned int est,
                         const State* st) const {
     /// vote between the current positions to actors at
     /// positions p1 and p2 of this state
-                            
+
     // get the two corresponding indices into Theta
     auto es = (const EState<PT>*) st;
     auto n1 = es->posNdx(p1);
@@ -113,7 +113,7 @@ double EActor<PT>::vote(unsigned int est,
 
     // TODO: lookup real utilities of Theta[n]
     assert (false);
-    
+
     double u1 = 0.0; // some fn of ep1
     double u2 = 0.0; // some fn of ep2
 
@@ -204,7 +204,7 @@ void EState<PT>::show() const {
     //cout << "EState<PT>::show()  not yet implemented" << endl << flush;
     unsigned int na = pstns.size();
     cout << "[EState";
-    for (unsigned int i=0; i<na; i++){ 
+    for (unsigned int i=0; i<na; i++) {
         cout << " "<< posNdx(i);
     }
     cout << "]"<<endl<<flush;
@@ -244,15 +244,15 @@ EState<PT>* EState<PT>::stepSUSN() {
     }
     
     cout << "Setting all utilities from objective perspective"<<endl<<flush;
-    setAUtil(-1, ReportingLevel::Medium);
+    setAUtil(-1, ReportingLevel::Low);
 
-    cout << "Doing actual SUSN"<<endl<<flush;
-    auto s2 = doSUSN(ReportingLevel::Medium);
+    //cout << "Doing actual SUSN"<<endl<<flush;
+    auto s2 = doSUSN(ReportingLevel::Silent);
     assert(nullptr != s2);
     s2->step = [s2]() {
         return s2->stepSUSN();
     };
-    cout << endl << flush;
+    cout << flush;
     return s2;
 }
 
@@ -406,7 +406,7 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
                                       eMod->numAct, pstns.size(), eMod->vpm,
                                       hypUtil); // uh or hypUtil
         const double euh = eu(h, 0);
-        assert(0 < euh);
+        assert(0.0 <= euh);
         return euh;
     };
     // end of ehFN
@@ -420,7 +420,9 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
     // To do that, it uses three functions for evaluation, neighbors, and show:
     // efn, nghbrPerms, and sfn.
     auto newPosFn = [this, ehFN, rl,  u, eu0, s2](const unsigned int h)  {
-        cout << "Started newPosFn for "<<h<<endl<<flush;
+        if (ReportingLevel::Low < rl) {
+            cout << "Started newPosFn for "<<h<<endl<<flush;
+        }
         s2->pstns[h] = nullptr;
         auto ph = ((const EPosition<PT>*)(pstns[h]));
 
@@ -434,14 +436,16 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
 
         // The 'neighbors' in general are ALL the enumerated positions,
         // so it does not even use the actor's current position
-        auto nfn = [this, numOpt](const EPosition<PT> & ) {
+        auto nfn = [this, rl, numOpt](const EPosition<PT> & ) {
             vector<EPosition<PT>> ns = {};
             //ns.resize(numOpt); // compiler tries to fill with EPosition(), and fails.
             for (unsigned int i=0; i<numOpt; i++) {
                 auto ep = EPosition<PT>(eMod, i);
                 ns.push_back(ep);
             }
-            cout << "Found "<<ns.size()<<" neighbors"<<endl<<flush;
+            if (ReportingLevel::Low < rl) {
+                cout << "Found "<<ns.size()<<" neighbors"<<endl<<flush;
+            }
             assert (0 < ns.size());
             return ns;
         };
@@ -500,9 +504,12 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
 
 
     bool parP = KBase::testMultiThreadSQLite(false, rl);
+
     // concurrent execution works, but mixes up the printed log.
-    parP = false; 
-    if (parP){
+    // So we disable it if reporting is desired.
+    parP = parP && (ReportingLevel::Silent == rl);
+
+    if (parP) {
         cout << "Will continue with multi-threaded execution"<<endl<<flush;
     }
     else {
@@ -513,16 +520,16 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
     // Each actor, h, finds the position which maximizes their EU in this situation.
     for (unsigned int h = 0; h < numA; h++) {
         if (parP)  { // launch all, concurrent
-            printf("Starting concurrent thread for new position %i \n", h);
-            cout << flush;
+            //printf("Starting concurrent thread for new position %u \n", h);
+            //cout << flush;
             ts.push_back(thread([newPosFn, h]() {
                 newPosFn(h);
                 return;
             }));
         }
         else  { // do each, sequential
-            printf("Calculating new position %i \n", h);
-            cout << flush;
+            //printf("Calculating new position %u \n", h);
+            //cout << flush;
             newPosFn(h);
         }
         cout << flush;
@@ -720,7 +727,7 @@ KMatrix EState<PT>::expUtilMat  (KBase::ReportingLevel rl,
     KMatrix::mapV(euRng, eu.numR(), eu.numC());
 
     if (ReportingLevel::Low < rl) {
-        printf("Util matrix is %i x %i \n", uMat.numR(), uMat.numC());
+        printf("Util matrix is %u x %u \n", uMat.numR(), uMat.numC());
         cout << "Assessing EU from util matrix: " << endl;
         uMat.mPrintf(" %.6f ");
         cout << endl << flush;

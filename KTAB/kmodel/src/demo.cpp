@@ -270,6 +270,8 @@ int main(int ac, char **av) {
     bool emodP = false;
     bool tx2P = false;
     bool miP = false;
+    bool cpP = true;
+    bool fitP = false;
     string inputXML = "";
 
     auto showHelp = []() {
@@ -278,7 +280,8 @@ int main(int ac, char **av) {
         printf("--help            print this message\n");
         printf("--pce             simple PCE\n");
         printf("--mi              markov incentives PCE\n");
-        printf("--emod            simple enumerated model \n");
+        printf("--emod  (si|cp)   simple enumerated model, starting at self-interested or central position \n");
+        printf("--fit             fit weights");
         printf("--spvsr           demonstrated shared_ptr<void> return\n");
         printf("--sql             demo SQLite \n");
         printf("--tx2  <file>     demo TinyXML2 \n"); // e.g. dummyData_3Dim.xml
@@ -291,12 +294,16 @@ int main(int ac, char **av) {
 
     if (ac > 1) {
         for (int i = 1; i < ac; i++) {
+            cout << "Argument "<<i<<" is -|"<<av[i]<<"|-"<<endl<<flush;
             if (strcmp(av[i], "--seed") == 0) {
                 i++;
                 seed = std::stoull(av[i]);
             }
             else if (strcmp(av[i], "--pce") == 0) {
                 pceP = true;
+            }
+            else if (strcmp(av[i], "--fit") == 0) {
+                fitP = true;
             }
             else if (strcmp(av[i], "--spvsr") == 0) {
                 spvsrP = true;
@@ -311,6 +318,8 @@ int main(int ac, char **av) {
             }
             else if (strcmp(av[i], "--emod") == 0) {
                 emodP = true;
+                i++;
+                cpP= (strcmp(av[i],"cp") == 0); 
             }
             else if (strcmp(av[i], "--sql") == 0) {
                 sqlP = true;
@@ -376,7 +385,12 @@ int main(int ac, char **av) {
     if (emodP) {
         cout << "-----------------------------------" << endl;
         MDemo::demoEMod(seed);
-        eModKEM::demoEKem(seed);
+        eModKEM::demoEKem(seed, cpP);
+    }
+    
+    if (fitP){
+        cout << "-----------------------------------" << endl;
+        eModKEM::demoWFit(seed);
     }
 
     if (sqlP) {

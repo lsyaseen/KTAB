@@ -50,12 +50,14 @@ using std::tuple;
 
 using KBase::ReportingLevel;
 
-// maximize
+// Setup and manage maximization of scalar function of a column-vector
 class  VHCSearch {
 public:
     VHCSearch();
     virtual ~VHCSearch();
     tuple<double, KMatrix, unsigned int, unsigned int>
+
+    // maximize scalar function of a column-vector
     run(KMatrix p0,
         unsigned int iMax, unsigned int sMax, double sTol,
         double s0, double shrink, double grow, double minStep,
@@ -71,7 +73,7 @@ public:
 };
 
 
-// maximize
+// Class to setup maximization of scalar function of arbitrary class
 template <class HCP>
 class GHCSearch {
 public:
@@ -79,6 +81,8 @@ public:
     virtual ~GHCSearch();
 
     tuple<double, HCP, unsigned int, unsigned int>
+
+    // maximize scalar function of arbitrary class
     run(HCP p0, ReportingLevel srl, unsigned int iMax, unsigned int sMax, double sTol);
 
     function <double(const HCP)> eval = nullptr;
@@ -143,7 +147,8 @@ GHCSearch<HCP>::run(HCP p0, ReportingLevel srl,
         }
     }
     if (ReportingLevel::Silent < srl) {
-        printf("GHCSearch::run ended with %u/%u iterations    %u/%u stable \n", iter, iMax, sIter, sMax);
+        printf("GHCSearch::run ended with %u/%u iterations    %u/%u stable \n", iter,
+               iMax, sIter, sMax);
         printf("newBest value: %+.4f\n", v0);
         printf("newBest point: ");
         show(p0);

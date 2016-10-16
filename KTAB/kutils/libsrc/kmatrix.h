@@ -106,8 +106,13 @@ namespace KBase {
 		       unsigned int nr, unsigned int nc);
     
     // this builds a matrix by mapping a function over a matrix and it
-    // indices, setting each element to the returned value
+    // indices, setting each element to the returned value. Uses indices.
     static KMatrix map(function<double(double mij, unsigned int i, unsigned int j)> f,
+		       const KMatrix & mat);
+    
+    // this builds a matrix by mapping a function over a matrix and it
+    // indices, setting each element to the returned value. Ignores indices.
+    static KMatrix map(function<double(double x)> f,
 		       const KMatrix & mat);
     
     // this maps a function over integer ranges, performing the indicated operation on
