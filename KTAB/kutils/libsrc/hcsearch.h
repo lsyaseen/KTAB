@@ -70,6 +70,17 @@ public:
     function <double(const KMatrix &)> eval = nullptr; // maximize this function
     function < vector<KMatrix>(const KMatrix &, double)> nghbrs = nullptr;
     function <void (const KMatrix &)> report = nullptr;
+
+protected:
+    
+    // Note that these variables to control the search are
+    // unique to this object, so it should be OK to run
+    // several VHCSearch objects concurrently.
+    std::mutex vhcEvalMtx; 
+    double vhcBestVal;
+    KMatrix vhcBestPoint;
+    
+private:
 };
 
 
