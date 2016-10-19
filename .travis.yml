@@ -5,6 +5,9 @@ matrix:
     - os: linux
       dist: trusty
       compiler: gcc
+      branches:
+        only:
+          - master
       addons:
         apt:
           sources:
@@ -17,6 +20,9 @@ matrix:
     - os: linux
       dist: trusty
       compiler: gcc
+      branches:
+        only:
+          - master
       addons:
         apt:
           sources:
@@ -29,6 +35,10 @@ matrix:
     - os: linux
       dist: trusty
       compiler: gcc
+      branches:
+        only:
+          - master
+          - testing
       addons:
         apt:
           sources:
@@ -41,12 +51,16 @@ matrix:
     - os: linux
       dist: trusty
       compiler: clang
+      branches:
+        only:
+          - master
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
             - sourceline: "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.5 main"
           packages:
+            - g++-4.9
             - clang-3.5
       env:
         - C_COMPILER=clang-3.5
@@ -54,12 +68,16 @@ matrix:
     - os: linux
       dist: trusty
       compiler: clang
+      branches:
+        only:
+          - master
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
             - sourceline: "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.6 main"
           packages:
+            - g++-4.9
             - clang-3.6
       env:
         - C_COMPILER=clang-3.6
@@ -67,21 +85,40 @@ matrix:
     - os: osx
       compiler: clang
       osx_image: xcode6.4
+      branches:
+        only:
+          - master
     - os: osx
       compiler: gcc
       osx_image: xcode6.4
+      branches:
+        only:
+          - master
     - os: osx
       compiler: clang
       osx_image: xcode7.2
+      branches:
+        only:
+          - master
     - os: osx
       compiler: gcc
       osx_image: xcode7.2
+      branches:
+        only:
+          - master
     - os: osx
       compiler: clang
       osx_image: xcode8
+      branches:
+        only:
+          - master
     - os: osx
       compiler: gcc
       osx_image: xcode8
+      branches:
+        only:
+          - master
+          - testing
 
 before_install:  # necessary because Travis overwrites CXX and CC!
   - if [[ $TRAVIS_OS_NAME == linux ]]; then export CXX=$CXX_COMPILER CC=$C_COMPILER; fi
@@ -93,14 +130,13 @@ install:
   # install tinyxml2
   - git clone https://github.com/leethomason/tinyxml2.git
   - cd tinyxml2
-  - cmake . && sudo make install
+  - cmake . -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_STATIC_LIBS:BOOL=ON && sudo make install
   - cd ..
 
 script:
   - ./reconfig.sh
- 
-after_success:
+
+#after_success:
   #- ./examples/smp/smpc --csv ./examples/smp/doc/SOE-Pol-Comp.csv
   #- ./examples/smp/smpc --csv ./examples/smp/doc/dummyData_3Dim.csv
-  - ./KTAB/kmodel/demomodel --emod
-
+  #- ./KTAB/kmodel/demomodel --emod
