@@ -26,10 +26,7 @@
 
 #include <time.h>
 #include "kmodel.h"
-
-//#ifdef WIN32
-//#define localtime_r(_Time, _Tm) localtime_s(_Tm, _Time)
-//#endif
+ 
 namespace KBase {
 
   using std::cout;
@@ -278,17 +275,7 @@ namespace KBase {
       }
     }
     return ai; // negative iff this "actor" was not found
-  }
-
-  double Model::nProd(double x, double y) {
-    if ((0.0 < x) && (0.0 < y)) {
-      return (x * y);
-    }
-    if ((x < 0.0) && (y < 0.0)) {
-      return (x + y);
-    }
-    return ((x < y) ? x : y);
-  }
+  } 
 
   string vrName(const VotingRule& vr) {
     string vrn = "";

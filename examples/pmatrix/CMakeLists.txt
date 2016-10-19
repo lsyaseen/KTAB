@@ -21,13 +21,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # -------------------------------------------------
 
-project(kmodel)
+project(pmatdemo)
+
+cmake_minimum_required (VERSION 3.0)
 
 cmake_minimum_required(VERSION 3.0)
 cmake_policy(VERSION 3.0)
 set(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
-  ${PROJECT_SOURCE_DIR}/../cmakemodules)
+  ${PROJECT_SOURCE_DIR}/../../KTAB/cmakemodules
+  )
 
 set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
@@ -58,6 +61,20 @@ endif(UNIX)
 
 # -------------------------------------------------
 # find libraries on which this project depends
+# --------------------------------------------------------
+# See "Findkutils.cmake" in cmakemodules to figure
+# out where it looks and what variables it sets
+find_package(kutils)
+if(NOT KUTILS_FOUND)
+  message(FATAL_ERROR "Could not find kutils")
+endif(NOT KUTILS_FOUND)
+
+
+# Ditto for "Findkmodel.cmake"
+find_package(kmodel)
+if(NOT KMODEL_FOUND)
+  message(FATAL_ERROR "Could not find kmodel")
+endif(NOT KMODEL_FOUND)
 # -------------------------------------------------
 
 set (MINICSV_PATHS
@@ -77,26 +94,7 @@ if(NOT MINICSV_DIR)
   message(FATAL "Could not find minicsv headers")
 endif(NOT MINICSV_DIR)
 
-# -------------------------------------------------
-
-set (CSVPARSER_PATHS
-    ${PROJECT_SOURCE_DIR}/../../csv-parser/
-    )
-
-
-find_path(CSVP_DIR csv_parser.hpp 
-  PATHS ${CSVPARSER_PATHS}
-  )
-
-if(CSVP_DIR)
-  message(STATUS "Found csv-parser headers: ${CSVP_DIR}")
-endif(CSVP_DIR)
-
-if(NOT CSVP_DIR)
-  message(FATAL "Could not find csv-parser headers")
-endif(NOT CSVP_DIR)
-
-# -------------------------------------------------
+# ------------------------------------------------- 
 
 if (ENABLE_EFENCE)
   find_package(efence)
@@ -119,132 +117,62 @@ if (NOT SQLITE_FOUND)
   message(FATAL_ERROR "Could not find SQLite")
 endif (NOT SQLITE_FOUND) 
 
-# -------------------------------------------------
-# See "Findkutils.cmake" in cmakemodules to figure
-# out where it looks and what variables it sets
-
-find_package(kutils)
-if(NOT KUTILS_FOUND)
-  message(FATAL_ERROR "Could not find kutils")
-endif(NOT KUTILS_FOUND)
-
-# -------------------------------------------------
+# ------------------------------------------------- 
 # files to be built into a library go in libsrc/
 # any application or testing code goes in src
 
 include_directories(
   ${KUTILS_INCLUDE_DIR}
+  ${KMODEL_INCLUDE_DIR} 
   ${PROJECT_SOURCE_DIR}/libsrc/
-  ${SQLITE_INCLUDE_DIR}
+  ${MINICSV_DIR} 
   )
-set(KTABMODEL_SRCS
-  libsrc/kmodel.cpp
-  libsrc/kmodelsql.cpp
-  libsrc/emodel.cpp
-  libsrc/kstate.cpp
-  libsrc/kposition.cpp
+  
+  
+# note that we do not put the csv_parser into smp lib.
+set(PMATLIB_SRCS
+  ${PROJECT_SOURCE_DIR}/libsrc/pmatrix.cpp
+  ${PROJECT_SOURCE_DIR}/libsrc/pmatcsv.cpp
   )
 
-add_library(kmodel STATIC ${KTABMODEL_SRCS})
-
- 
-# -------------------------------------------------
-# Under Linux, default start of DESTINATION path is /usr/local/ 
-# so "ktab/lib" denotes destination /usr/local/ktab/lib
-# Under Windows, default start of DESTINATION path is "C:\Program Files\kutils\"
-# so "ktab/lib" denotes destination C:\Program Files\kutils\ktab\lib
-
-set (KTAB_INSTALL_DIR)
-if (WIN32)
-  set (KTAB_INSTALL_DIR
-  c:/local/ktab
-  )
-endif(WIN32)
-if (UNIX)
-  set (KTAB_INSTALL_DIR
-  /usr/local/ktab
-  )
-endif(UNIX)
-
-install(
-  TARGETS
-    kmodel
-  DESTINATION 
-    ${KTAB_INSTALL_DIR}/lib) 
-
-install(
-  FILES
-    libsrc/kmodel.h  
-  DESTINATION
-    ${KTAB_INSTALL_DIR}/include)  
+add_library(pmatrix ${PMATLIB_SRCS})
 
 # -------------------------------------------------
 # demo programs
 
-INCLUDE_DIRECTORIES(
+
+include_directories(
   ${KUTILS_INCLUDE_DIR}
+  ${KMODEL_INCLUDE_DIR} 
   ${PROJECT_SOURCE_DIR}/libsrc/
   ${PROJECT_SOURCE_DIR}/src/
-  ${MINICSV_DIR}
-  ${CSVP_DIR}
+  ${MINICSV_DIR} 
   ${EFENCE_INCLUDE_DIR}
   ${SQLITE_INCLUDE_DIR}
   ${TINYXML2_INCLUDE_DIR}
   )
+   
 
 
 # -------------------------------------------------
-ADD_EXECUTABLE(leonApp
-  src/demoleon.cpp
+ADD_EXECUTABLE(pmdemo
+  src/pmdemo.cpp
   )
 
 
-TARGET_LINK_LIBRARIES(leonApp
-  kmodel
+TARGET_LINK_LIBRARIES(pmdemo 
+  pmatrix
   ${KUTILS_LIBRARY}
+  ${KMODEL_LIBRARY}
   ${EFENCE_LIBRARIES}
   ${SQLITE_LIBRARIES}
   )
-
-# -------------------------------------------------
-ADD_EXECUTABLE(mtchApp
-  src/demomtch.cpp
-  )
-
-
-TARGET_LINK_LIBRARIES(mtchApp
-  kmodel
-  ${KUTILS_LIBRARY}
-  ${EFENCE_LIBRARIES}
-  ${SQLITE_LIBRARIES}
-  )
-
-# -------------------------------------------------
-ADD_EXECUTABLE(demomodel
-  src/demo.cpp
-  src/edemo.cpp
-  src/demoPMFit.cpp
-  src/demoMatrixEMod.cpp
-  src/sqlitedemo.cpp
-  src/csvdemo.cpp
-  src/tinyxml2demo.cpp
-  src/zactor.cpp
-  ${CSVP_DIR}/csv_parser.cpp
-  )
-
-TARGET_LINK_LIBRARIES(demomodel
-  kmodel
-  ${KUTILS_LIBRARY}
-  ${EFENCE_LIBRARIES}
-  ${SQLITE_LIBRARIES}
-  ${TINYXML2_LIBRARIES}
-  )
+  
 # -------------------------------------------------
 # show some useful status/debugging information
 message(STATUS "PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
 message(STATUS "KUTILS_INCLUDE_DIR: " ${KUTILS_INCLUDE_DIR})
-message(STATUS "KTAB_INSTALL_DIR: " ${KTAB_INSTALL_DIR})
-message (STATUS "CSVP_DIR: " ${CSVP_DIR})
+message(STATUS "KMODEL_INCLUDE_DIR: " ${KMODEL_INCLUDE_DIR})
 message (STATUS "MINICSV_DIR: " ${MINICSV_DIR})
 
 # -------------------------------------------------

@@ -68,6 +68,15 @@ namespace KBase {
 
   double sqr(const double& x);  // second power
   double qrtc(const double& x); // fourth power
+  
+  // basic formula for quadratic risk aversion   
+  double quadUfromV(double v, double bigR) ;
+  
+  
+  // basic Nash Product for bargaining
+  double nProd(double x, double y);
+  
+  double trim(double x, double minX, double maxX, bool strict = false);
 
   std::chrono::time_point<std::chrono::system_clock>  displayProgramStart(string appName = "", string appVersion = "");
   void displayProgramEnd(std::chrono::time_point<std::chrono::system_clock> st);

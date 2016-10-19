@@ -48,11 +48,27 @@ using KBase::EPosition;
 using KBase::EState;
 
 
-// --------------------------------------------
-void demoEKem(uint64_t s, bool cpP);
-void runEKEM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat);
-void demoWFit(uint64_t s);
 
+// --------------------------------------------
+
+typedef tuple <vector<string>,  // aNames,
+        vector<bool>,           // maxVect,
+        KMatrix,                // outcomes,
+        KMatrix,                // caseWeights,
+        KMatrix,                // probWeight,
+        vector<double>,         // threshVal,
+        vector<bool>>           // overThresh
+        FittingParameters;
+// --------------------------------------------
+
+
+void runEKEM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, const vector<string> & aNames);
+FittingParameters pccCSV(const string fs);
+
+// --------------------------------------------
+//
+//  NOTE WELL: These classes were superseded by examples/pmatrix
+//
 // --------------------------------------------
 // The Policy Matrix model uses a pre-specified matrix
 // of actor-vs-policy utilities.
@@ -87,6 +103,12 @@ public:
 
     static tuple<double, KMatrix, KMatrix> minProbError(
         const KMatrix& wMat, const KMatrix& uMat, double errWeight);
+    
+    static KMatrix utilFromFP (const FittingParameters & fParams, double bigR);
+
+    static tuple<double, KMatrix, KMatrix> minProbError(
+        const FittingParameters & fParams, 
+        double bigR, double errWeight);
 
 protected:
     KMatrix wghtVect; // column vector of actor weights
@@ -99,10 +121,10 @@ protected:
     // and a cost is incurred to the extend that selected probabilities
     // fall below their respective thresholds.
     static tuple<double, KMatrix, KMatrix> probCost (const KMatrix& pnt,
-                            const KMatrix& wMat, const KMatrix& uMat,
-                            const KMatrix& wAdj1, const KMatrix& pSel1, double thresh1,
-                            const KMatrix& wAdj2, const KMatrix& pSel2, double thresh2,
-                            double errWeight, ReportingLevel rl);
+            const KMatrix& wMat, const KMatrix& uMat,
+            const KMatrix& wAdj1, const KMatrix& pSel1, double thresh1,
+            const KMatrix& wAdj2, const KMatrix& pSel2, double thresh2,
+            double errWeight, ReportingLevel rl);
 
 private:
 

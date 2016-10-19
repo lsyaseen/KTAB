@@ -37,14 +37,16 @@
 #include "edemo.h"
 #include "tinyxml2demo.h"
 #include "demoMatrixEMod.h"
+#include "demoPMatData.h"
 #include "csvdemo.h"
 
 using std::cout;
 using std::endl;
 using std::flush;
 using std::get;
-using std::tuple;
 using std::string;
+using std::tuple;
+using std::vector;
 
 using KBase::PRNG;
 using KBase::KMatrix;
@@ -67,7 +69,7 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
 
 // --------------------------------------------
 
-  void demoPCE(uint64_t s, PRNG* rng) {
+void demoPCE(uint64_t s, PRNG* rng) {
     printf("Using PRNG seed: %020llu \n", s);
     rng->setSeed(s);
 
@@ -77,24 +79,24 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
     switch (rng->uniform() % 6) {
     case 0:
     case 1:
-      vpm = VPModel::Linear;
-      break;
+        vpm = VPModel::Linear;
+        break;
     case 2:
-      vpm = VPModel::Square;
-      break;
+        vpm = VPModel::Square;
+        break;
     case 3:
-      vpm = VPModel::Quartic;
-      break;
+        vpm = VPModel::Quartic;
+        break;
     case 4:
-      vpm = VPModel::Octic;
-      break;
+        vpm = VPModel::Octic;
+        break;
     case 5: // unused
-      vpm = VPModel::Binary;
-      break;
+        vpm = VPModel::Binary;
+        break;
     default:
-      cout << "Unrecognized VPModel option" << endl << flush;
-      assert(false);
-      break;
+        cout << "Unrecognized VPModel option" << endl << flush;
+        assert(false);
+        break;
     }
 
     cout << "Using VPModel " << vpm << endl;
@@ -102,13 +104,13 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
     cout << "First, stable distrib is exactly as expected in bilateral conflict" << endl;
 
     auto cFn = [rng](unsigned int i, unsigned int j) {
-      if (i == j) {
-        return 0.0;
-      }
-      else {
-        double c = rng->uniform(1.0, 10.0);
-        return (c*c);
-      }
+        if (i == j) {
+            return 0.0;
+        }
+        else {
+            double c = rng->uniform(1.0, 10.0);
+            return (c*c);
+        }
     };
 
     auto c = KMatrix::map(cFn, 2, 2);
@@ -117,16 +119,16 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
 
 
     auto show = [](const KMatrix & cMat, const KMatrix & pvMat, const KMatrix & pVec) {
-      cout << "Coalitions matrix:" << endl;
-      cMat.mPrintf(" %6.3f ");
-      cout << endl;
-      cout << "prob[i>j] Markov transitions matrix:" << endl;
-      pvMat.mPrintf(" %.4f ");
-      cout << endl;
-      cout << "limiting stable prob[i] vector:" << endl;
-      pVec.mPrintf(" %.4f ");
-      cout << endl;
-      return;
+        cout << "Coalitions matrix:" << endl;
+        cMat.mPrintf(" %6.3f ");
+        cout << endl;
+        cout << "prob[i>j] Markov transitions matrix:" << endl;
+        pvMat.mPrintf(" %.4f ");
+        cout << endl;
+        cout << "limiting stable prob[i] vector:" << endl;
+        pVec.mPrintf(" %.4f ");
+        cout << endl;
+        return;
     };
     cout << "Compare simple " << vpm << " ratios to2-by-2  Markov-uniform ..." << endl;
     //auto pv = Model::vProb(vpm, c);
@@ -136,10 +138,10 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
     auto p2 = get<0>(ppv); // column
     auto pv = get<1>(ppv); //square
     if (KBase::testProbCE) {
-      auto pv0 = Model::vProb(vpm, c); //square 
-      assert(KBase::norm(pv - pv0) < 1E-6);
-      auto p20 = Model::probCE(PCEModel::MarkovUPCM, pv0); // column
-      assert(KBase::norm(p2 - p20) < 1E-6);
+        auto pv0 = Model::vProb(vpm, c); //square
+        assert(KBase::norm(pv - pv0) < 1E-6);
+        auto p20 = Model::probCE(PCEModel::MarkovUPCM, pv0); // column
+        assert(KBase::norm(p2 - p20) < 1E-6);
     }
 
     cout << "2-Option Markov Uniform " << endl;
@@ -153,7 +155,7 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
     cout << "2-Option Markov Incentive" << endl;
     show(c, pv, p3);
     if (KBase::testProbCE) {
-      assert(KBase::norm(p3 - p30) < 1E-6);
+        assert(KBase::norm(p3 - p30) < 1E-6);
     }
 
     cout << endl;
@@ -163,10 +165,10 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
     p2 = get<0>(ppv); // column
     pv = get<1>(ppv); //square
     if (KBase::testProbCE) {
-      auto pv0 = Model::vProb(vpm, c); //square 
-      assert(KBase::norm(pv - pv0) < 1E-6);
-      auto p20 = Model::probCE(PCEModel::MarkovUPCM, pv); // column
-      assert(KBase::norm(p2 - p20) < 1E-6);
+        auto pv0 = Model::vProb(vpm, c); //square
+        assert(KBase::norm(pv - pv0) < 1E-6);
+        auto p20 = Model::probCE(PCEModel::MarkovUPCM, pv); // column
+        assert(KBase::norm(p2 - p20) < 1E-6);
     }
     cout << "3-Option Markov Uniform " << endl;
     p3 = Model::markovIncentivePCE(c, vpm);
@@ -183,7 +185,7 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
     p30 = Model::markovIncentivePCE(c, vpm);
     show(c, pv, p3);
     if (KBase::testProbCE) {
-      assert(KBase::norm(p3 - p30) < 1E-6);
+        assert(KBase::norm(p3 - p30) < 1E-6);
     }
     // ---------------------------
 
@@ -192,15 +194,15 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
     show(c, pv, p2);
 
     if (KBase::testProbCE) {
-      auto p20 = Model::probCE(PCEModel::ConditionalPCM, pv);
-      assert(KBase::norm(p2 - p20) < 1E-6);
+        auto p20 = Model::probCE(PCEModel::ConditionalPCM, pv);
+        assert(KBase::norm(p2 - p20) < 1E-6);
     }
 
     return;
-  }
+}
 
-  // simple demo of shared pointers (largely a test that the compiler is recent enough).
-  void demoSpVSR(uint64_t s, PRNG* rng) {
+// simple demo of shared pointers (largely a test that the compiler is recent enough).
+void demoSpVSR(uint64_t s, PRNG* rng) {
     using std::function;
     using std::get;
     using std::make_shared;
@@ -223,21 +225,21 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
     //int* p1 = sp1.get(); // gets the  pointer
     cout << "The shared integer is " << *sp1.get() << endl;
     {   // create another reference
-      auto sp2 = sp1;
-      printf("Use count sp1: %li \n", sp1.use_count());
-      // let it go out-of-scope
+        auto sp2 = sp1;
+        printf("Use count sp1: %li \n", sp1.use_count());
+        // let it go out-of-scope
     }
     printf("Use count sp1: %li \n", sp1.use_count());
     cout << endl;
     const string fs = " %+6.2f ";
     // function<shared_ptr<void>(unsigned int, unsigned int)> fn
     auto fn = [rng, &fs](unsigned int nr, unsigned int nc) {
-      auto m1 = KMatrix::uniform(rng, nr, nc, -10, +50);
-      auto d = KBase::norm(m1);
-      cout << "Inside lambda:" << endl;
-      m1.mPrintf(fs);
-      shared_ptr<void> rslt = make_shared<tuple<double, KMatrix>>(d, m1); // shared_ptr version of (void*)
-      return rslt;
+        auto m1 = KMatrix::uniform(rng, nr, nc, -10, +50);
+        auto d = KBase::norm(m1);
+        cout << "Inside lambda:" << endl;
+        m1.mPrintf(fs);
+        shared_ptr<void> rslt = make_shared<tuple<double, KMatrix>>(d, m1); // shared_ptr version of (void*)
+        return rslt;
     };
 
 
@@ -252,183 +254,217 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
     get<1>(r53).mPrintf(fs);
 
     return;
-  }
 }
-// end of namespace MDemo 
+}
+// end of namespace MDemo
 // -------------------------------------------------
 
 
 int main(int ac, char **av) {
-  using std::cout;
-  using std::endl;
-  using KBase::dSeed;
+    using std::cout;
+    using std::endl;
+    using KBase::dSeed;
 
-  auto sTime = KBase::displayProgramStart();
-  uint64_t seed = dSeed;
-  bool run = true;
-  bool pceP = false;
-  bool spvsrP = false;
-  bool sqlP = false;
-  bool emodP = false;
-  bool tx2P = false;
-  bool miP = false;
-  bool cpP = true;
-  bool helpP = true;
-  bool fitP = false;
-  bool csvP = false;
-  string inputXML = "";
-  string inputCSV = "";
+    auto sTime = KBase::displayProgramStart();
+    uint64_t seed = dSeed;
+    bool run = true;
+    bool pceP = false;
+    bool spvsrP = false;
+    bool sqlP = false;
+    bool emodP = false;
+    bool tx2P = false;
+    bool miP = false;
+    bool cpP = true;
+    bool helpP = true; 
+    bool csvSMP = false;
+    bool csvPMat = false;
+    string inputXML = "";
+    string inputCSVSMP = "";
+    string inputCSVPMat = "";
 
-  auto showHelp = []() {
-    printf("\n");
-    printf("Usage: specify one or more of these options\n");
-    printf("--help            print this message\n");
-    printf("--csv  <file>     demo minicsv library on SMP data file \n");
-    printf("--pce             simple PCE\n");
-    printf("--mi              markov incentives PCE\n");
-    printf("--emod  (si|cp)   simple enumerated model, starting at self-interested or central position \n");
-    printf("--fit             fit weights");
-    printf("--spvsr           demonstrated shared_ptr<void> return\n");
-    printf("--sql             demo SQLite \n");
-    printf("--tx2  <file>     demo TinyXML2 library \n"); // e.g. dummyData_3Dim.xml
-    printf("--seed <n>        set a 64bit seed \n");
-    printf("                  0 means truly random\n");
-    printf("                  default: %020llu \n", dSeed);
-  };
+    auto showHelp = []() {
+        printf("\n");
+        printf("Usage: specify one or more of these options\n");
+        printf("--help            print this message\n");
+        printf("--csvSMP  <file>  demo minicsv library on SMP data file \n");
+        printf("--csvPMat <file>  demo minicsv library on SMP data file \n");
+        printf("--pce             simple PCE\n");
+        printf("--mi              markov incentives PCE\n");
+        printf("--emod  (si|cp)   simple enumerated model, starting at self-interested or central position \n");
+        printf("--fit             fit weights \n");
+        printf("--spvsr           demonstrated shared_ptr<void> return\n");
+        printf("--sql             demo SQLite \n");
+        printf("--tx2  <file>     demo TinyXML2 library \n"); // e.g. dummyData_3Dim.xml
+        printf("--seed <n>        set a 64bit seed \n");
+        printf("                  0 means truly random\n");
+        printf("                  default: %020llu \n", dSeed);
+    };
 
-  // tmp args
+    // tmp args
 
-  if (ac > 1) {
-    for (int i = 1; i < ac; i++) {
-      cout << "Argument " << i << " is -|" << av[i] << "|-" << endl << flush;
-      if (strcmp(av[i], "--seed") == 0) {
-        i++;
-        seed = std::stoull(av[i]);
-      }
-      else if (strcmp(av[i], "--csv") == 0) {
-        csvP = true;
-        i++;
-        inputCSV = av[i];
-      }
-      else if (strcmp(av[i], "--pce") == 0) {
-        pceP = true;
-      }
-      else if (strcmp(av[i], "--fit") == 0) {
-        fitP = true;
-      }
-      else if (strcmp(av[i], "--spvsr") == 0) {
-        spvsrP = true;
-      }
-      else if (strcmp(av[i], "--mi") == 0) {
-        miP = true;
-      }
-      else if (strcmp(av[i], "--tx2") == 0) {
-        tx2P = true;
-        i++;
-        inputXML = av[i];
-      }
-      else if (strcmp(av[i], "--emod") == 0) {
-        emodP = true;
-        i++;
-        cpP = (strcmp(av[i], "cp") == 0);
-      }
-      else if (strcmp(av[i], "--sql") == 0) {
-        sqlP = true;
-      }
-      else if (strcmp(av[i], "--help") == 0) {
-        helpP = true;
-        run = false;
-      }
-      else {
-        run = false;
-        printf("Unrecognized argument %s\n", av[i]);
-      }
+    if (ac > 1) {
+        for (int i = 1; i < ac; i++) {
+            cout << "Argument " << i << " is -|" << av[i] << "|-" << endl << flush;
+            if (strcmp(av[i], "--seed") == 0) {
+                i++;
+                seed = std::stoull(av[i]);
+            }
+            else if (strcmp(av[i], "--csvSMP") == 0) {
+                csvSMP = true;
+                i++;
+                inputCSVSMP = av[i];
+            }
+            else if (strcmp(av[i], "--csvPMat") == 0) {
+                csvPMat = true;
+                i++;
+                inputCSVPMat = av[i];
+            }
+            else if (strcmp(av[i], "--pce") == 0) {
+                pceP = true;
+            } 
+            else if (strcmp(av[i], "--spvsr") == 0) {
+                spvsrP = true;
+            }
+            else if (strcmp(av[i], "--mi") == 0) {
+                miP = true;
+            }
+            else if (strcmp(av[i], "--tx2") == 0) {
+                tx2P = true;
+                i++;
+                inputXML = av[i];
+            }
+            else if (strcmp(av[i], "--emod") == 0) {
+                emodP = true;
+                i++;
+                assert (i < ac);
+                cpP = (strcmp(av[i], "cp") == 0);
+            }
+            else if (strcmp(av[i], "--sql") == 0) {
+                sqlP = true;
+            }
+            else if (strcmp(av[i], "--help") == 0) {
+                helpP = true;
+                run = false;
+            }
+            else {
+                run = false;
+                printf("Unrecognized argument %s\n", av[i]);
+            }
+        }
     }
-  }
 
-  if (!run) {
-    showHelp();
+    if (!run) {
+        showHelp();
+        return 0;
+    }
+
+    PRNG * rng = new PRNG();
+    seed = rng->setSeed(seed); // 0 == get a random number
+    printf("Using PRNG seed:  %020llu \n", seed);
+    printf("Same seed in hex:   0x%016llX \n", seed);
+
+
+    // note that we reset the seed every time, so that in case something
+    // goes wrong, we need not scroll back too far to find the
+    // seed required to reproduce the bug.
+    if (pceP) {
+        cout << "-----------------------------------" << endl;
+        MDemo::demoPCE(seed, rng);
+    }
+    if (spvsrP) {
+        cout << "-----------------------------------" << endl;
+        MDemo::demoSpVSR(seed, rng);
+    }
+    if (csvSMP) {
+        cout << "-----------------------------------" << endl;
+        MDemo::demoMiniCSV(inputCSVSMP);
+    }
+    if (csvPMat) {
+        cout << "-----------------------------------" << endl;
+
+        const double bigR = +0.5;
+        auto fParams = eModKEM::pccCSV(inputCSVPMat);
+        vector<string> aNames = get<0>(fParams);
+        auto uMat = eModKEM::PMatrixModel::utilFromFP(fParams, bigR);
+        
+        cout << "RA-Util from outcomes: " << endl << flush;
+        uMat.mPrintf(" %.4f  ");
+        cout << endl << flush;
+        
+        auto c12 = eModKEM::PMatrixModel::minProbError(fParams, bigR, 250.0);
+
+
+        const double score = get<0>(c12);
+
+        // retrieve the weight-matrices which were fitted, so we can
+        // use them to assess coalitions in two different situations.
+        const KMatrix w1 = get<1>(c12);
+        const KMatrix w2 = get<2>(c12);
+
+        assert (0 < score);
+        assert (KBase::sameShape(w1,w2));
+
+        cout << "EMod with BAU-case weights"<<endl<<flush;
+        eModKEM::runEKEM(seed, false, w1, uMat, aNames);
+
+
+        cout << "EMod with change-case weights"<<endl<<flush;
+        eModKEM::runEKEM(seed, false, w2, uMat, aNames);
+    }
+
+
+    if (miP) {
+        unsigned int vNum = rng->uniform() % 3;
+        auto vpm = VPModel::Linear;
+        switch (vNum) {
+        case 0:
+            vpm = VPModel::Linear;
+            break;
+        case 1:
+            vpm = VPModel::Square;
+            break;
+        case 2:
+            vpm = VPModel::Quartic;
+            break;
+        }
+        unsigned int n = 16;
+        auto coalitions = KMatrix(n, n);
+        for (unsigned int i = 0; i < n; i++) {
+            for (unsigned int j = 0; j < n; j++) {
+                double cij = (i == j) ? 0.0 : rng->uniform(1.0, 10.0);
+                coalitions(i, j) = cij * cij;
+            }
+        }
+        auto pDist = Model::markovIncentivePCE(coalitions, vpm);
+        cout << "Markov Incentive probabiities with " << vpm << endl;
+        trans(pDist).mPrintf(" %.4f");
+        cout << endl << flush;
+    }
+
+    const auto weightMat = KMatrix::arrayInit(eModKEM::weightArray, 1, eModKEM::numActKEM);
+    const auto utilMat = KMatrix::arrayInit(eModKEM::utilArray, eModKEM::numActKEM, eModKEM::numPolKEM);
+
+    if (emodP) {
+        cout << "-----------------------------------" << endl;
+        MDemo::demoEMod(seed);
+    }
+
+    if (sqlP) {
+        cout << "-----------------------------------" << endl;
+        Model::demoSQLite();
+        MDemo::demoDBObject();
+    }
+
+    if (tx2P) {
+        cout << "-----------------------------------" << endl;
+        TXDemo::demoTX2(inputXML);
+    }
+
+    cout << "-----------------------------------" << endl;
+
+    delete rng;
+    KBase::displayProgramEnd(sTime);
     return 0;
-  }
-
-  PRNG * rng = new PRNG();
-  seed = rng->setSeed(seed); // 0 == get a random number
-  printf("Using PRNG seed:  %020llu \n", seed);
-  printf("Same seed in hex:   0x%016llX \n", seed);
-
-
-  // note that we reset the seed every time, so that in case something
-  // goes wrong, we need not scroll back too far to find the
-  // seed required to reproduce the bug.
-  if (pceP) {
-    cout << "-----------------------------------" << endl;
-    MDemo::demoPCE(seed, rng);
-  }
-  if (spvsrP) {
-    cout << "-----------------------------------" << endl;
-    MDemo::demoSpVSR(seed, rng);
-  }
-  if (csvP) {
-    cout << "-----------------------------------" << endl;
-    MDemo::demoMiniCSV(inputCSV);
-    cout << endl;
-    MDemo::pccCSV("file"); // file name is ignored
-  }
-  if (miP) {
-    unsigned int vNum = rng->uniform() % 3;
-    auto vpm = VPModel::Linear;
-    switch (vNum) {
-    case 0:
-      vpm = VPModel::Linear;
-      break;
-    case 1:
-      vpm = VPModel::Square;
-      break;
-    case 2:
-      vpm = VPModel::Quartic;
-      break;
-    }
-    unsigned int n = 16;
-    auto coalitions = KMatrix(n, n);
-    for (unsigned int i = 0; i < n; i++) {
-      for (unsigned int j = 0; j < n; j++) {
-        double cij = (i == j) ? 0.0 : rng->uniform(1.0, 10.0);
-        coalitions(i, j) = cij * cij;
-      }
-    }
-    auto pDist = Model::markovIncentivePCE(coalitions, vpm);
-    cout << "Markov Incentive probabiities with " << vpm << endl;
-    trans(pDist).mPrintf(" %.4f");
-    cout << endl << flush;
-  }
-
-  if (emodP) {
-    cout << "-----------------------------------" << endl;
-    MDemo::demoEMod(seed);
-    eModKEM::demoEKem(seed, cpP);
-  }
-
-  if (fitP) {
-    cout << "-----------------------------------" << endl;
-    eModKEM::demoWFit(seed);
-  }
-
-  if (sqlP) {
-    cout << "-----------------------------------" << endl;
-    Model::demoSQLite();
-    MDemo::demoDBObject();
-  }
-
-  if (tx2P) {
-    cout << "-----------------------------------" << endl;
-    TXDemo::demoTX2(inputXML);
-  }
-
-  cout << "-----------------------------------" << endl;
-
-  delete rng;
-  KBase::displayProgramEnd(sTime);
-  return 0;
 }
 
 

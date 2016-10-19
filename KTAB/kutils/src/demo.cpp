@@ -57,6 +57,7 @@ using std::thread;
 
 using KBase::ReportingLevel;
 using KBase::VUI;
+using KBase::nProd;
 
 void demoUIndices() {
     auto showIS = [](KBase::VUI is) {
@@ -97,33 +98,14 @@ void show(string str, const KMatrix & m, string fs) {
     return;
 }
 
-double nProd(double x, double y) {
-    // same as Model::NashProduct, but we do not want to depend on anything but kutils
-    if ((0.0 < x) && (0.0 < y)) {
-        return (x * y);
-    }
-    if ((x < 0.0) && (y < 0.0)) {
-        return (x + y);
-    }
-    return ((x < y) ? x : y);
-}
-
-double bsu(double d, double R) {
-    // same as Model::basicScalarUtil but we do not want to depend on anything but kutils
-    double u = 0;
-    assert(0 <= d);
-    if (d <= 1) {
-        u = (1 - d)*(1 + d*R);  //  (0 <= u) && (u <= 1)
-    }
-    else { // linearly interpolate with last u-slope at d=1
-        double us = -(R + 1);
-        u = us*(d - 1); // u < 0;
-    }
+ 
+double bsu(double d, double R) { 
+    double u = KBase::quadUfromV(1.0-d, R);
     return u;
 }
 
 double bvu(const KBase::KMatrix & d, const KBase::KMatrix & s, double R) {
-    // same as Model::basicVectorUtil but we do not want to depend on anything but kutils
+    // same as Model::bvUtil but we do not want to depend on anything but kutils
     assert(KBase::sameShape(d, s));
     double dsSqr = 0;
     double ssSqr = 0;

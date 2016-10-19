@@ -60,7 +60,7 @@ class State;
 class Actor;
 class KTable;
 
-const bool testProbCE = true;
+const bool testProbCE = false;
 
 // How much influence to exert (vote) given a difference in [0,1] utility.
 // NOTE WELL: ASymProsp is asymmetric in the sense that v(i:k) + v(k:i) != 0.
@@ -262,10 +262,7 @@ public:
     // a database for analysis, and the stopping criterion is likely to
     // lambda-bind a lot of parameters to determine whether anything
     // significant is likely to happen if the run were to continue.
-    void run();
-
-    // the Nash Product for bargaining
-    static double nProd(double x, double y);
+    void run(); 
 
     // simple voting based on the difference in utility.
     static double vote(VotingRule vr, double wi, double uij, double uik);

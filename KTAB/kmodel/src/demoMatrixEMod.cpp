@@ -44,9 +44,6 @@ using KBase::EActor;
 using KBase::EPosition;
 
 
-const auto weightMat = KMatrix::arrayInit(weightArray, 1, numActKEM);
-const auto utilMat = KMatrix::arrayInit(utilArray, numActKEM, numPolKEM);
-
 
 // --------------------------------------------
 PMatrixModel::PMatrixModel(string d, uint64_t s, vector<bool> vb) : EModel< unsigned int >(d,s,vb) {
@@ -187,10 +184,10 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::minProbError(
                  errWeight]
     (const KMatrix & p) {
         auto c12 =  probCost (p,
-                                       wMat,  uMat,
-                                       wAdj1,   pSel1,   thresh1,
-                                       wAdj2,   pSel2,   thresh2,
-                                       errWeight, eRL);
+                              wMat,  uMat,
+                              wAdj1,   pSel1,   thresh1,
+                              wAdj2,   pSel2,   thresh2,
+                              errWeight, eRL);
 
         const double eCost =get<0>(c12);
         // to minimize error cost, maximize 100-eCost.
@@ -219,12 +216,167 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::minProbError(
     cout << endl;
 
     // get more data: cost, w1, w2
-    
+
     auto c12 = probCost (pBest,
-                             wMat,  uMat,
-                             wAdj1,   pSel1,   thresh1,
-                             wAdj2,   pSel2,   thresh2,
-                             errWeight, ReportingLevel::High);
+                         wMat,  uMat,
+                         wAdj1,   pSel1,   thresh1,
+                         wAdj2,   pSel2,   thresh2,
+                         errWeight, ReportingLevel::High);
+
+
+    cout << endl;
+    return c12;
+}
+
+
+KMatrix PMatrixModel::utilFromFP (const FittingParameters & fParams, double bigR) {
+    using KBase::trim;
+    
+    // On some values, the utility returned was -0.
+    // Not just a small number but something that +.20E prints as
+    //  -0.00000000000000000000E+00 
+    // So I had to force all V and U to be at least epsilon
+    const double epsilon = 1E-10;
+
+    auto  maxVect= get<1>(fParams);
+    auto  outcomes= get<2>(fParams);
+    const unsigned int numAct = maxVect.size();
+    assert (numAct == outcomes.numR());
+    const unsigned int numScen = outcomes.numC();
+
+
+    auto uMat = KMatrix(numAct, numScen, -1.0); // invalid values
+    for (unsigned int i=0; i<numAct; i++) {
+        double rowMin = outcomes(i,0);
+        double rowMax = outcomes(i,0);
+        for (unsigned int j = 0; j<numScen; j++) {
+            double oc = outcomes(i,j);
+            if(oc < rowMin) {
+                rowMin = oc;
+            }
+            if (oc > rowMax) {
+                rowMax = oc;
+            }
+        }
+        assert (rowMin < rowMax);
+        for (unsigned int j=0; j<numScen; j++) {
+            double vij = -1.0; // invalid value
+            if (maxVect[i]) {
+                vij = (outcomes(i,j)-rowMin)/(rowMax-rowMin);
+            }
+            else {
+                vij = (outcomes(i,j)-rowMax)/(rowMin-rowMax);
+            }
+            vij = trim(vij, -epsilon, 1.0+epsilon, true);
+            double uij = KBase::quadUfromV(vij, bigR);
+            uMat(i,j)= trim(uij, epsilon, 1.0);
+        }
+    }
+    return uMat;
+}
+
+tuple<double, KMatrix, KMatrix> PMatrixModel::minProbError(
+    const FittingParameters & fParams,
+    double bigR, double errWeight) {
+    using KBase::hSlice;
+    using KBase::vSlice;
+    using KBase::VHCSearch;
+
+    printf("Starting minimization with R = %+.3f and errWeight = %.2f \n",
+           bigR, errWeight);
+    cout <<endl << flush;
+
+
+    auto  aNames = get<0>(fParams);
+    auto  maxVect= get<1>(fParams);
+    auto  outcomes= get<2>(fParams);
+    auto  caseWeights= get<3>(fParams);
+    auto  probWeight= get<4>(fParams);
+    auto  threshVal= get<5>(fParams);
+    auto  overThresh= get<6>(fParams);
+
+    const unsigned int numAct = aNames.size();
+    assert (numAct == maxVect.size());
+    assert (numAct == outcomes.numR());
+    const unsigned int numScen = outcomes.numC();
+    assert (numAct == caseWeights.numC());
+    const unsigned int numCase = caseWeights.numR();
+    assert (numCase == probWeight.numC());
+    assert (numScen == probWeight.numR());
+    assert (numCase == threshVal.size());
+    assert (numCase == overThresh.size());
+
+    // TODO: handle more than two cases
+    assert (2 == numCase);
+
+    // TODO: handle 'under' thresholds, not just 'over'
+    assert (true == overThresh[0]);
+    assert (true == overThresh[1]);
+
+    auto wMat0 = KMatrix(1, numAct, 100.0);
+    auto uMat = utilFromFP(fParams, bigR);
+
+    auto wAdj1 = hSlice(caseWeights, 0);
+    auto pSel1 = vSlice(probWeight, 0);
+    double thresh1 = threshVal[0];
+
+    auto wAdj2 = hSlice(caseWeights, 1);
+    auto pSel2 = vSlice(probWeight, 1);
+    double thresh2 = threshVal[1];
+
+
+    assert (KBase::sameShape(wMat0, wAdj1));
+    assert (KBase::sameShape(wMat0, wAdj2));
+
+
+    auto vhc = new VHCSearch();
+    auto eRL = ReportingLevel::Silent;
+    auto rRL = ReportingLevel::Low;
+
+    vhc->eval = [eRL, wMat0,  uMat,
+                 wAdj1,   pSel1,   thresh1,
+                 wAdj2,   pSel2,   thresh2,
+                 errWeight]
+    (const KMatrix & p) {
+        auto c12 =  probCost (p,
+                              wMat0,  uMat,
+                              wAdj1,   pSel1,   thresh1,
+                              wAdj2,   pSel2,   thresh2,
+                              errWeight, eRL);
+
+        const double eCost =get<0>(c12);
+        // to minimize error cost, maximize 100-eCost.
+        return 100.0 - eCost;
+    };
+
+    vhc->nghbrs = VHCSearch::vn1; // vn2 takes 10 times as long, w/o improvement
+    auto p0 = KMatrix(numAct, 1); // all zeros
+    cout << "Initial point: ";
+    trans(p0).mPrintf(" %+.4f ");
+    cout << endl;
+    auto rslt = vhc->run(p0,
+                         2500, 10, 1E-5, // iMax, sMax, sTol
+                         0.50, 0.618, 1.25, 1e-8, // step, shrink, grow, minStep
+                         rRL);
+    double vBest = get<0>(rslt);
+    KMatrix pBest = get<1>(rslt);
+    unsigned int in = get<2>(rslt);
+    unsigned int sn = get<3>(rslt);
+    delete vhc;
+    vhc = nullptr;
+    printf("Iter: %u  Stable: %u \n", in, sn);
+    printf("Best value: %+.4f \n", vBest);
+    cout << "Best point:    ";
+    trans(pBest).mPrintf(" %+.4f ");
+    cout << endl;
+
+    // get more data: cost, w1, w2
+
+    auto c12 = probCost(pBest,
+                        wMat0,  uMat,
+                        wAdj1,   pSel1,   thresh1,
+                        wAdj2,   pSel2,   thresh2,
+                        errWeight, ReportingLevel::High);
 
 
     cout << endl;
@@ -232,10 +384,10 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::minProbError(
 }
 
 tuple<double, KMatrix, KMatrix> PMatrixModel::probCost (const KMatrix& pnt,
-                               const KMatrix& wMat, const KMatrix& uMat,
-                               const KMatrix& wAdj1, const KMatrix& pSel1, double thresh1,
-                               const KMatrix& wAdj2, const KMatrix& pSel2, double thresh2,
-                               double errWeight, ReportingLevel rl) {
+        const KMatrix& wMat, const KMatrix& uMat,
+        const KMatrix& wAdj1, const KMatrix& pSel1, double thresh1,
+        const KMatrix& wAdj2, const KMatrix& pSel2, double thresh2,
+        double errWeight, ReportingLevel rl) {
     assert (1 == wMat.numR());
     const unsigned int nAct = wMat.numC();
     const unsigned int nOpt = uMat.numC();
@@ -263,7 +415,7 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::probCost (const KMatrix& pnt,
     },
     fVec);
 
-    auto pCost = sum(cVec);
+    auto pCost = mean(cVec);
 
     auto sPlus = [](double x) {
         return (x>0.0 ? x : 0.0);
@@ -283,7 +435,7 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::probCost (const KMatrix& pnt,
     for (unsigned int i=0; i<nAct; i++) {
         w1(0,i)= wMat(0,i)*fVec(i,0)*wAdj1(0,i);
         //printf("w1[%2i] = %7.2f \n", i, w1(0,i));
-        assert (0.0 < w1(0,i));
+        assert (0.0 <= w1(0,i));
     }
     auto pDist1 = Model::scalarPCE(nAct, nOpt, w1, uMat, vr, vpm, pcem, rl);
     auto err1 = sPlus(thresh1 - KBase::dot(pDist1, pSel1));
@@ -301,7 +453,7 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::probCost (const KMatrix& pnt,
     auto err2 = sPlus(thresh2 - KBase::dot(pDist2, pSel2));
     err2 = err2 * err2;
 
-    const double totalCost = (pCost/errWeight) + ((err1 + err2)*errWeight);
+    const double totalCost = (pCost+ ((err1 + err2)*errWeight))/(1.0 + errWeight);
 
     if (ReportingLevel::Silent < rl) {
         cout << "Point :";
@@ -316,8 +468,8 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::probCost (const KMatrix& pnt,
         w2.mPrintf(" %7.2f ");
         cout << endl;
 
-        printf("Total cost= %.4f = %f/%.2f + (%f + %f)*%.2f",
-               totalCost, pCost, errWeight, err1, err2, errWeight);
+        printf("Total cost= %.4f = [ %f + (%f + %f)*%.2f ] / %.2f",
+               totalCost, pCost, err1, err2, errWeight, errWeight+1.0);
         cout << endl << flush;
     }
 
@@ -393,373 +545,8 @@ void PMatrixState::setAllAUtil(ReportingLevel) {
 }
 
 // --------------------------------------------
-void demoWFit(uint64_t s) {
-    auto c12 = PMatrixModel::minProbError(weightMat, utilMat, 500.0);
-    const double score = get<0>(c12);
-    
-    // retrieve the weight-matrices which were fitted, so we can 
-    // use them to assess coalitions in two different situations.
-    const KMatrix w1 = get<1>(c12);
-    const KMatrix w2 = get<2>(c12);
-    
-    assert (0 < score);
-    assert (KBase::sameShape(w1,w2));
-    
-    cout << "EMod with BAU-case weights"<<endl<<flush;
-    runEKEM(s, false, w1, utilMat);
-    
-    
-    cout << "EMod with change-case weights"<<endl<<flush;
-    runEKEM(s, false, w2, utilMat);
-    
-    
-    return;
-}
-// --------------------------------------------
 
-void demoEKem(uint64_t s, bool cpP) {
-    using KBase::lCorr;
-    using KBase::mean;
 
-    printf("Using PRNG seed: %020lu \n", s);
-    auto rng = new KBase::PRNG(s);
-
-    cout << endl;
-    printf("Creating EModel<string> objects ... \n");
-
-    string nChar = "EModel-KEM-Policy";
-    auto ekm = new EModel<string>(nChar, s);
-    cout << "Populating " << nChar << endl;
-
-    // with such a small set of options, the enumerator
-    // function just returns a fixed vector of names.
-    ekm->enumOptions = []() {
-        return pNamesKEM;
-    };
-    ekm->setOptions();
-    cout << "Now have " << ekm->numOptions() << " enumerated options" << endl;
-
-    const unsigned int maxIter = 50;
-    ekm->stop = [maxIter](unsigned int iter, const KBase::State * s) {
-        return (iter > maxIter);
-    };
-
-    // these just to force instantiation during compilation.
-    // It is NOT yet ready to run.
-    //auto eks = new EState<string>(ekm);
-    //eks->step = [eks] { return eks->stepSUSN(); };
-    //ekm->addState(eks);
-
-    auto ekp = new EPosition<string>(ekm, 0); // needs ::print
-    auto eka = new EActor<string>(ekm, "Bob", "The second cryptographer");
-
-    cout << "Length of state history: " << ekm->history.size() << endl << flush;
-
-    //delete eks;
-    //eks = nullptr;
-    delete ekp;
-    ekp = nullptr;
-    delete eka;
-    eka = nullptr;
-
-    // the following gets SIGSEGV
-    //delete ekm;
-    //ekm = nullptr;
-
-
-    cout << endl << "====================================="<<endl;
-    printf("Creating EKEModel objects ... \n");
-
-    auto eKEM = new PMatrixModel("EModel-Matrix-KEM", s);
-
-    eKEM->pcem = KBase::PCEModel::MarkovIPCM;
-    auto wMat = weightMat;
-    auto uMat = utilMat;
-
-    if (false) { // randomize?
-        wMat = KMatrix::uniform(rng, 1, utilMat.numR(), 1.0, 10.0);
-        wMat = KMatrix::map(
-        [](double x) {
-            return x*x;
-        },
-        wMat);
-        uMat = KMatrix::uniform(rng, utilMat.numR(), utilMat.numC(), 0.0, 1.0);
-        uMat = KBase::rescaleRows(uMat, 0.0, 1.0);
-    }
-    
-    runEKEM(s, cpP, wMat, uMat);
-/*
-    cout << "Actor weight vector: "<<endl;
-    wMat.mPrintf("%6.2f ");
-    cout << endl;
-    
-    cout << "Utility(actor, option) matrix:"<<endl;
-    uMat.mPrintf("%5.3f ");
-    cout << endl;
-
-    eKEM->setWeights(wMat);
-    eKEM->setPMatrix(uMat);
-    eKEM->setActors(aNamesKEM, aDescKEM);
-
-    eKEM->stop = [maxIter, eKEM](unsigned int iter, const KBase::State * s) {
-        bool doneP = iter > maxIter;
-        if (doneP) {
-            printf("Max iteration limit of %u exceeded \n", maxIter);
-        }
-        auto s2 = ((const PMatrixState *)(eKEM->history[iter]));
-        for (unsigned int i = 0; i < iter; i++) {
-            auto s1 = ((const PMatrixState *)(eKEM->history[i]));
-            if (eKEM->equivStates(s1, s2)) {
-                doneP = true;
-                printf("State number %u matched state number %u \n", iter, i);
-            }
-        }
-        return doneP;
-    };
-
-    eKEM->setWeights(wMat);
-    eKEM->setPMatrix(uMat);
-    eKEM->setActors(aNamesKEM, aDescKEM);
-
-    eKEM->stop = [maxIter, eKEM](unsigned int iter, const KBase::State * s) {
-        bool doneP = iter > maxIter;
-        if (doneP) {
-            printf("Max iteration limit of %u exceeded \n", maxIter);
-        }
-        auto s2 = ((const PMatrixState *)(eKEM->history[iter]));
-        for (unsigned int i = 0; i < iter; i++) {
-            auto s1 = ((const PMatrixState *)(eKEM->history[i]));
-            if (eKEM->equivStates(s1, s2)) {
-                doneP = true;
-                printf("State number %u matched state number %u \n", iter, i);
-            }
-        }
-        return doneP;
-    };
-
-
-    const unsigned int nOpt = eKEM->numOptions();
-    printf("Number of options %i \n", nOpt);
-    printf("Number of actors %i \n", eKEM->numAct);
-
-
-    const auto probTheta = Model::scalarPCE(eKEM->numAct, nOpt ,
-                                            wMat, uMat,
-                                            VotingRule::Proportional,
-                                            eKEM->vpm, eKEM->pcem,
-                                            ReportingLevel::Silent);
-
-    const auto p2 = trans(probTheta);
-    cout << "PCE over entire option-space:"<<endl;
-    p2.mPrintf(" %5.3f ");
-
-    auto zeta = wMat * uMat;
-    cout << "Zeta over entire option-space:"<<endl;
-    zeta.mPrintf(" %5.1f ");
-
-    auto aCorr = [] (const KMatrix & x, const KMatrix &y) {
-        return lCorr(x-mean(x), y-mean(y));
-    };
-
-    printf("af-corr(p2,zeta): %.3f \n",  aCorr(p2, zeta));
-
-    auto logP = KMatrix::map([](double x) {
-        return log(x);
-    }, p2);
-    };
-    printf("af-corr(logp2,zeta): %.3f \n", aCorr(logP, zeta));
-
-    for (unsigned int i=0; i<nOpt; i++) {
-        printf("%2i  %6.4f  %+8.3f  %5.1f  \n", i, p2(0,i), logP(0,i), zeta(0,i));
-    }
-
-    double maxZ = -1.0;
-    unsigned int ndxMaxZ = 0;
-    for (unsigned int i=0; i<nOpt; i++) {
-        if (zeta(0,i) > maxZ) {
-            maxZ = zeta(0,i);
-            ndxMaxZ = i;
-        }
-    }
-    cout << "Central position is number "<<ndxMaxZ <<endl;
-
-
-    auto es1 = new PMatrixState(eKEM);
-
-    if (cpP) {
-        cout << "Assigning actors to the central position"<<endl;
-    }
-    else {
-        cout << "Assigning actors to their self-interested initial positions"<<endl;
-    }
-    for (unsigned int i=0; i<eKEM->numAct; i++) {
-        double maxU = -1.0;
-        unsigned int bestJ = 0;
-        for (unsigned int j=0; j<nOpt; j++) {
-            double uij = uMat(i,j);
-            if (uij > maxU) {
-                maxU = uij;
-                bestJ = j;
-            }
-        }
-        unsigned int ki = cpP ? ndxMaxZ : bestJ;
-        auto pi = new PMatrixPos(eKEM, ki);
-        es1->addPstn(pi);
-    }
-
-    es1->setUENdx();
-    eKEM->addState(es1);
-
-    cout << "--------------"<<endl;
-    cout << "First state:"<<endl;
-    es1->show();
-
-    // see if the templates can be instantiated ...
-    es1->step = [es1] { return es1->stepSUSN(); };
-
-    eKEM->run();
-
-    const unsigned int histLen = eKEM->history.size();
-    PMatrixState* esA = (PMatrixState*) (eKEM->history[histLen-1]);
-    printf("Last State %i \n", histLen-1);
-    esA->show();
-    */
-
-    delete eKEM;
-    eKEM = nullptr;
-
-    delete rng;
-    rng = nullptr;
-
-    return;
-}
-
-void runEKEM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat) {
-    assert (0 != s);
-    cout << endl << "====================================="<<endl;
-    printf("Creating EKEModel objects ... \n");
-
-    auto eKEM = new PMatrixModel("EModel-Matrix-KEM", s);
-
-    eKEM->pcem = KBase::PCEModel::MarkovIPCM;
-
-    cout << "Actor weight vector: "<<endl;
-    wMat.mPrintf("%6.2f ");
-    cout << endl;
-
-    cout << "Utility(actor, option) matrix:"<<endl;
-    uMat.mPrintf("%5.3f ");
-    cout << endl;
-
-    eKEM->setWeights(wMat);
-    eKEM->setPMatrix(uMat);
-    eKEM->setActors(aNamesKEM, aDescKEM);
-    
-    const unsigned int maxIter = 1000;
-
-    eKEM->stop = [maxIter, eKEM](unsigned int iter, const KBase::State * s) {
-        bool doneP = iter > maxIter;
-        if (doneP) {
-            printf("Max iteration limit of %u exceeded \n", maxIter);
-        }
-        auto s2 = ((const PMatrixState *)(eKEM->history[iter]));
-        for (unsigned int i = 0; i < iter; i++) {
-            auto s1 = ((const PMatrixState *)(eKEM->history[i]));
-            if (eKEM->equivStates(s1, s2)) {
-                doneP = true;
-                printf("State number %u matched state number %u \n", iter, i);
-            }
-        }
-        return doneP;
-    };
-
-
-    const unsigned int nOpt = eKEM->numOptions();
-    printf("Number of options %i \n", nOpt);
-    printf("Number of actors %i \n", eKEM->numAct);
-
-
-    const auto probTheta = Model::scalarPCE(eKEM->numAct, nOpt ,
-                                            wMat, uMat,
-                                            VotingRule::Proportional,
-                                            eKEM->vpm, eKEM->pcem,
-                                            ReportingLevel::Silent);
-
-    const auto p2 = trans(probTheta);
-    cout << "PCE over entire option-space:"<<endl;
-    p2.mPrintf(" %5.3f ");
-
-    auto zeta = wMat * uMat;
-    cout << "Zeta over entire option-space:"<<endl;
-    zeta.mPrintf(" %5.1f ");
-
-    auto aCorr = [] (const KMatrix & x, const KMatrix &y) {
-        return lCorr(x-mean(x), y-mean(y));
-    };
-
-    printf("af-corr(p2,zeta): %.3f \n",  aCorr(p2, zeta));
-
-    auto logP = KMatrix::map([](double x) {
-        return log(x);
-    }, p2);
-    printf("af-corr(logp2,zeta): %.3f \n", aCorr(logP, zeta));
-
-    for (unsigned int i=0; i<nOpt; i++) {
-        printf("%2i  %6.4f  %+8.3f  %5.1f  \n", i, p2(0,i), logP(0,i), zeta(0,i));
-    }
-
-    double maxZ = -1.0;
-    unsigned int ndxMaxZ = 0;
-    for (unsigned int i=0; i<nOpt; i++) {
-        if (zeta(0,i) > maxZ) {
-            maxZ = zeta(0,i);
-            ndxMaxZ = i;
-        }
-    }
-    cout << "Central position is number "<<ndxMaxZ <<endl;
-
-
-    auto es1 = new PMatrixState(eKEM);
-
-    if (cpP) {
-        cout << "Assigning actors to the central position"<<endl;
-    }
-    else {
-        cout << "Assigning actors to their self-interested initial positions"<<endl;
-    }
-    for (unsigned int i=0; i<eKEM->numAct; i++) {
-        double maxU = -1.0;
-        unsigned int bestJ = 0;
-        for (unsigned int j=0; j<nOpt; j++) {
-            double uij = uMat(i,j);
-            if (uij > maxU) {
-                maxU = uij;
-                bestJ = j;
-            }
-        }
-        unsigned int ki = cpP ? ndxMaxZ : bestJ;
-        auto pi = new PMatrixPos(eKEM, ki);
-        es1->addPstn(pi);
-    }
-
-    es1->setUENdx();
-    eKEM->addState(es1);
-
-    cout << "--------------"<<endl;
-    cout << "First state:"<<endl;
-    es1->show();
-
-    // see if the templates can be instantiated ...
-    es1->step = [es1] { return es1->stepSUSN(); };
-
-    eKEM->run();
-
-    const unsigned int histLen = eKEM->history.size();
-    PMatrixState* esA = (PMatrixState*) (eKEM->history[histLen-1]);
-    printf("Last State %i \n", histLen-1);
-    esA->show();
-    return;
-}
 
 } // end of namespace eModKEM
 

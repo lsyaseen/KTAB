@@ -52,8 +52,8 @@ namespace KBase {
   // return row-vector from row number i
   KMatrix hSlice(const KMatrix & m1, unsigned int i);
 
-  // return column-vector from column j
-  KMatrix vSlice(const KMatrix & m1, unsigned int j);
+  // return clm-vector from clm number i
+  KMatrix vSlice(const KMatrix & m1, unsigned int j); 
 
   KMatrix trans(const KMatrix & m);
   double  norm(const KMatrix & m);

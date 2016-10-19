@@ -27,7 +27,7 @@ cmake_minimum_required(VERSION 3.0)
 cmake_policy(VERSION 3.0)
 set(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
-  "${PROJECT_SOURCE_DIR}/../../KTAB/cmakemodules"
+  ${PROJECT_SOURCE_DIR}/../../KTAB/cmakemodules
   )
 
 set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)

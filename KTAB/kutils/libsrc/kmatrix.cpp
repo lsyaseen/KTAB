@@ -67,7 +67,8 @@ KMatrix hSlice(const KMatrix & m1, unsigned int i) {
     return m2;
 }
 
-// return column-vector from column j
+
+// return clm-vector from clm number j
 KMatrix vSlice(const KMatrix & m1, unsigned int j) {
     auto m2 = subMatrix(m1, 0, m1.numR() - 1, j, j);
     return m2;
@@ -378,7 +379,7 @@ KMatrix KMatrix::map(function<double(double mij, unsigned int i, unsigned int j)
 
 
 KMatrix KMatrix::map(function<double(double x)> f,
-		       const KMatrix & mat) {
+                     const KMatrix & mat) {
     assert (f != nullptr);
     const unsigned int nr = mat.numR();
     const unsigned int nc = mat.numC();
@@ -390,7 +391,7 @@ KMatrix KMatrix::map(function<double(double x)> f,
     }
     return m;
 }
-    
+
 
 void KMatrix::mapV(function<void(unsigned int i, unsigned int j)> f, unsigned int nr, unsigned int nc) {
     assert (f != nullptr);
