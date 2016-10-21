@@ -28,12 +28,127 @@
 #include "prng.h"
 #include "kmatrix.h"
 #include "kmodel.h"
- 
+
+#include "emodel.h"
+#include "emodel.cpp"
 
 
-namespace PMatDemo {  
-  
-  // nothing yet
+
+
+namespace PMatDemo {
+using std::string;
+using std::vector;
+using std::tuple;
+
+using KBase::KMatrix;
+using KBase::ReportingLevel;
+using KBase::EModel;
+using KBase::EPosition;
+using KBase::EState;
+
+// --------------------------------------------
+
+typedef tuple <vector<string>,  // aNames,
+vector<bool>,           // maxVect,
+KMatrix,                // outcomes,
+KMatrix,                // caseWeights,
+KMatrix,                // probWeight,
+vector<double>,         // threshVal,
+vector<bool>>           // overThresh
+FittingParameters;
+
+// --------------------------------------------
+class PMatrixModel;
+class PMatrixPos;
+class PMatrixState;
+// --------------------------------------------
+PMatrixModel* pmmCreation(uint64_t sd);
+PMatrixPos*  pmpCreation(PMatrixModel* pmm);
+PMatrixState* pmsCreation(PMatrixModel * pmm);
+
+// --------------------------------------------
+// The Policy Matrix model uses a pre-specified matrix
+// of actor-vs-policy utilities.
+// The utility matrix provides a (basic) linkage to offline
+// models such as KEM/GAMS.
+// The unsigned int in the template is just the column of a policy.
+class PMatrixModel : public EModel<unsigned int> {
+public:
+  explicit PMatrixModel(string d = "", uint64_t s = KBase::dSeed, vector<bool> = {});
+  virtual ~PMatrixModel();
+
+  // check the matrix and set as utilities,
+  // if valid for [numAct,numOpt] utilities in [0,1] range.
+  void setPMatrix(const KMatrix & pm0);
+
+  // check the row-matrix and set as weight,
+  // if valid for non-negative [numAct,1] weights
+  void  setWeights(const KMatrix & w0);
+
+  // must set weights and pMatrix first
+  void  setActors(vector<string> names, vector<string> descriptions);
+
+  KMatrix getWghtVect() const {
+    return wghtVect; // row vector
+  };
+
+  KMatrix getPolUtilMat() const {
+    return polUtilMat; // rectangular
+  };
+
+  static KMatrix utilFromFP(const FittingParameters & fParams, double bigR);
+
+  static tuple<double, KMatrix, KMatrix> minProbError(
+      const FittingParameters & fParams,
+      double bigR, double errWeight);
+
+protected:
+  KMatrix wghtVect; // column vector of actor weights
+  KMatrix polUtilMat; // if set, the basic util(actor,option) matrix
+
+  // This assess and returns the sum of three kinds of costs.
+  // The 'pnt' specifies an adjustment vector and incurs
+  // a cost to the extent that the components differ from 0.
+  // The adjusted wMat is then separately adjusted for case 1 and case 2,
+  // and a cost is incurred to the extend that selected probabilities
+  // fall below their respective thresholds.
+  static tuple<double, KMatrix, KMatrix> probCost(const KMatrix& pnt,
+                                                  const KMatrix& wMat, const KMatrix& uMat,
+                                                  const KMatrix& wAdj1, const KMatrix& pSel1, double thresh1,
+                                                  const KMatrix& wAdj2, const KMatrix& pSel2, double thresh2,
+                                                  double errWeight, ReportingLevel rl);
+
+private:
+};
+
+
+
+class PMatrixPos : public EPosition<unsigned int> {
+public:
+  explicit PMatrixPos(PMatrixModel* pm, int n);
+  virtual ~PMatrixPos();
+
+protected:
+
+private:
+
+};
+
+
+
+class PMatrixState : public EState<unsigned int> {
+public:
+  explicit PMatrixState(PMatrixModel* pm);
+  virtual ~PMatrixState();
+
+protected:
+  virtual EState<unsigned int>* makeNewEState() const override;
+  void setAllAUtil(ReportingLevel rl) override;
+  vector<double> actorUtilVectFn(int h, int tj) const override;
+
+private:
+
+};
 
 }
 // end of namespace

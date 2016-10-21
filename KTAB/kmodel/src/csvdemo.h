@@ -34,14 +34,14 @@
 
 // --------------------------------------------
 namespace MDemo {
-  using std::string;
-  using std::tuple;
-  using std::vector;
-  using KBase::PRNG;
+using std::string;
+using std::tuple;
+using std::vector;
+using KBase::PRNG;
 
 
-  void demoMiniCSV(const string fs);
-  void pccCSV(const string fs);
+void demoMiniCSV(const string fs);
+void pccCSV(const string fs);
 
 
 }; // end of namespace

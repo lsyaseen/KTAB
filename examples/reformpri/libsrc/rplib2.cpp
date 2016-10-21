@@ -43,16 +43,16 @@ using KBase::PCEModel;
 
 
 void RPModel::initScen2Avrg(unsigned int ns) {
-    // unfinished
-    assert(false);
-    return;
+  // unfinished
+  assert(false);
+  return;
 }
 
 
 void RPModel::initScen3Top4(unsigned int ns) {
-    // unfinished
-    assert(false);
-    return;
+  // unfinished
+  assert(false);
+  return;
 }
 
 

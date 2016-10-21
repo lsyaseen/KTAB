@@ -35,8 +35,8 @@
 
 // --------------------------------------------
 namespace PMatDemo {  
-  
-  // nothing yet
+
+// nothing yet
 
 }
 // end of namespace

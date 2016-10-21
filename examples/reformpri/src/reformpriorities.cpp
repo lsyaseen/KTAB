@@ -27,190 +27,190 @@
 #include <tuple>
 
 namespace RfrmPri {
-  // namespace to hold everything related to the
-  // "priority of reforms" CDMP. Note that KBase has no access.
+// namespace to hold everything related to the
+// "priority of reforms" CDMP. Note that KBase has no access.
 
-  using namespace std;
+using namespace std;
 
-  using KBase::KMatrix;
-  using KBase::PRNG;
-  using KBase::VUI;
-  using KBase::printVUI;
+using KBase::KMatrix;
+using KBase::PRNG;
+using KBase::VUI;
+using KBase::printVUI;
 
-  // -------------------------------------------------
-  // function definitions
+// -------------------------------------------------
+// function definitions
 
-  // return the list of the most self-interested position of each actor,
-  // with the CP last.
-  // As a side-affect, set each actor's min/max permutation values so as to
-  // compute normalized utilities later.
-  vector<VUI> scanPositions(const RPModel * rpm) {
-    unsigned int numA = rpm->numAct;
-    unsigned int numRefItem = rpm->numItm;
-    assert(numRefItem == rpm->numCat);
+// return the list of the most self-interested position of each actor,
+// with the CP last.
+// As a side-affect, set each actor's min/max permutation values so as to
+// compute normalized utilities later.
+vector<VUI> scanPositions(const RPModel * rpm) {
+  unsigned int numA = rpm->numAct;
+  unsigned int numRefItem = rpm->numItm;
+  assert(numRefItem == rpm->numCat);
 
-    printf("There are %u actors and %u reform items \n", numA, numRefItem);
+  printf("There are %u actors and %u reform items \n", numA, numRefItem);
 
-    
 
-    KMatrix aCap = KMatrix(1, numA);
-    for (unsigned int i = 0; i < numA; i++) {
-      auto ri = ((const RPActor *)(rpm->actrs[i]));
-      aCap(0, i) = ri->sCap;
-    }
-    cout << "Actor capabilities: " << endl;
-    aCap.mPrintf(" %.2f ");
-    cout << endl;
-    
-    
-    cout << "Effective gov cost of items:" << endl;
-    (rpm->govCost).mPrintf("%.3f ");
-    cout << endl; 
-    cout << "Government budget: " << rpm->govBudget << endl << flush;
-    assert (0 < rpm->govBudget);
-    
-    
-    cout << "Value to actors (rows) of individual reform items (columns):"<<endl; 
-     for (unsigned int i=0; i<rpm->actrs.size(); i++) {
+
+  KMatrix aCap = KMatrix(1, numA);
+  for (unsigned int i = 0; i < numA; i++) {
+    auto ri = ((const RPActor *)(rpm->actrs[i]));
+    aCap(0, i) = ri->sCap;
+  }
+  cout << "Actor capabilities: " << endl;
+  aCap.mPrintf(" %.2f ");
+  cout << endl;
+
+
+  cout << "Effective gov cost of items:" << endl;
+  (rpm->govCost).mPrintf("%.3f ");
+  cout << endl;
+  cout << "Government budget: " << rpm->govBudget << endl << flush;
+  assert (0 < rpm->govBudget);
+
+
+  cout << "Value to actors (rows) of individual reform items (columns):"<<endl;
+  for (unsigned int i=0; i<rpm->actrs.size(); i++) {
     auto rai = ((const RPActor*)(rpm->actrs[i]));
-    for (unsigned int j = 0; j <numRefItem; j++) { 
+    for (unsigned int j = 0; j <numRefItem; j++) {
       double vij =  rai->riVals[j];
       printf(" %6.2f ", vij);
     }
     cout << endl << flush;
-    }
-    
-    cout << "Computing positions ... " << endl;
-    vector<VUI> positions; // list of all positions
-    VUI pstn;
-    // build the first permutation: 1,2,3,...
-    for (unsigned int i = 0; i < numRefItem; i++) {
-      pstn.push_back(i);
-    }
-    positions.push_back(pstn);
-    while (next_permutation(pstn.begin(), pstn.end())) {
-      positions.push_back(pstn);
-    }
-    const unsigned int numPos = positions.size();
-    cout << "For " << numRefItem << " reform items there are ";
-    cout << numPos << " positions" << endl;
-    
-   
-    // -------------------------------------------------
-    // The next section sets up actor utilities.
-    // First, we compute the unnormalized, raw utilities. The 'utilActorPos' checks
-    // to see if pvMin/pvMax have been set, and returns the raw scores if not.
-    // Then we scan across rows to find that actor's pvMin/pvMax, and record that
-    // so utilActorPos can use it in the future. Finally, we normalize the rows and
-    // display the normalized utility matrix.
-    cout << "Computing utilities of positions ... " << endl;
-    auto ruFn = [positions, rpm](unsigned int ai, unsigned int pj) {
-      auto pstn = positions[pj];
-      double uip = rpm->utilActorPos(ai, pstn);
-      return uip;
-    };
-    // rows are actors, columns are all possible positions
-    auto rawUij = KMatrix::map(ruFn, numA, numPos); 
-    for (unsigned int i = 0; i < numA; i++) {
-      double pvMin = rawUij(i, 0);
-      double pvMax = rawUij(i, 0);
-      for (unsigned int j = 0; j < numPos; j++) {
-        double rij = rawUij(i, j);
-        if (rij < pvMin) {
-          pvMin = rij;
-        }
-        if (rij > pvMax) {
-          pvMax = rij;
-        }
-      }
-      assert(0 <= pvMin);
-      assert(pvMin < pvMax);
-      auto ai = ((RPActor*)(rpm->actrs[i]));
-      ai->posValMin = pvMin;
-      ai->posValMax = pvMax;
-    }
-    KMatrix uij = KBase::rescaleRows(rawUij, 0.0, 1.0); // von Neumann utility scale
-
-    
-    cout << "Complete (normalized) utility matrix of all possible positions (rows) ";
-    cout << "versus actors (columns)" << endl << flush;
-    for (unsigned int pj = 0; pj < numPos; pj++) {
-      printf("%3u  ", pj);
-      auto pstn = positions[pj];
-      printVUI(pstn);
-      printf("  ");
-      for (unsigned int ai = 0; ai < numA; ai++) {
-        double uap = uij(ai, pj);
-        printf("%6.4f, ", uap);
-      }
-      cout << endl << flush;
-    }
-
-    // -------------------------------------------------
-    // The next section determines the most self-interested positions for each actor,
-    // as well as the 'central position' over all possible reform priorities
-    // (which 'office seeking politicans' would adopt IF proportional voting).
-    cout << endl << "Computing best position for each actor" << endl;
-    vector<VUI> bestAP; // list of each actor's best position (followed by CP)
-    for (unsigned int ai = 0; ai < numA; ai++) {
-      unsigned int bestJ = 0;
-      double bestV = 0;
-      for (unsigned int pj = 0; pj < numPos; pj++) {
-        if (bestV < uij(ai, pj)) {
-          bestJ = pj;
-          bestV = uij(ai, pj);
-        }
-      }
-      printf("Best for %02u is ", ai);
-      printVUI(positions[bestJ]);
-      cout << endl;
-      bestAP.push_back(positions[bestJ]);
-    }
-
-
-    cout << "Computing zeta ... " << endl;
-    KMatrix zeta = aCap * uij;
-    assert((1 == zeta.numR()) && (numPos == zeta.numC()));
-
-
-    cout << "Sorting positions from most to least net support ..." << endl << flush;
-
-    auto betterPR = [](tuple<unsigned int, double, VUI> pr1,
-      tuple<unsigned int, double, VUI> pr2) {
-      double v1 = get<1>(pr1);
-      double v2 = get<1>(pr2);
-      bool better = (v1 > v2);
-      return better;
-    };
-
-    auto pairs = vector<tuple<unsigned int, double, VUI>>();
-    for (unsigned int i = 0; i < numPos; i++) {
-      auto pri = tuple<unsigned int, double, VUI>(i, zeta(0, i), positions[i]);
-      pairs.push_back(pri);
-    }
-
-    sort(pairs.begin(), pairs.end(), betterPR);
-
-    const unsigned int maxDisplayed = 720; // factorial(6)
-    unsigned int  numPr = (pairs.size() < maxDisplayed) ? pairs.size() : maxDisplayed;
-
-    cout << "Displaying highest " << numPr << endl << flush;
-    for (unsigned int i = 0; i < numPr; i++) {
-      auto pri = pairs[i];
-      unsigned int ni = get<0>(pri);
-      double zi = get<1>(pri);
-      VUI pi = get<2>(pri);
-
-      printf(" %3u: %4u  %.2f  ", i, ni, zi);
-      printVUI(pi);
-      cout << endl << flush;
-    }
-
-    VUI bestPerm = get<2>(pairs[0]);
-
-    bestAP.push_back(bestPerm);
-    return bestAP;
   }
+
+  cout << "Computing positions ... " << endl;
+  vector<VUI> positions; // list of all positions
+  VUI pstn;
+  // build the first permutation: 1,2,3,...
+  for (unsigned int i = 0; i < numRefItem; i++) {
+    pstn.push_back(i);
+  }
+  positions.push_back(pstn);
+  while (next_permutation(pstn.begin(), pstn.end())) {
+    positions.push_back(pstn);
+  }
+  const unsigned int numPos = positions.size();
+  cout << "For " << numRefItem << " reform items there are ";
+  cout << numPos << " positions" << endl;
+
+
+  // -------------------------------------------------
+  // The next section sets up actor utilities.
+  // First, we compute the unnormalized, raw utilities. The 'utilActorPos' checks
+  // to see if pvMin/pvMax have been set, and returns the raw scores if not.
+  // Then we scan across rows to find that actor's pvMin/pvMax, and record that
+  // so utilActorPos can use it in the future. Finally, we normalize the rows and
+  // display the normalized utility matrix.
+  cout << "Computing utilities of positions ... " << endl;
+  auto ruFn = [positions, rpm](unsigned int ai, unsigned int pj) {
+    auto pstn = positions[pj];
+    double uip = rpm->utilActorPos(ai, pstn);
+    return uip;
+  };
+  // rows are actors, columns are all possible positions
+  auto rawUij = KMatrix::map(ruFn, numA, numPos);
+  for (unsigned int i = 0; i < numA; i++) {
+    double pvMin = rawUij(i, 0);
+    double pvMax = rawUij(i, 0);
+    for (unsigned int j = 0; j < numPos; j++) {
+      double rij = rawUij(i, j);
+      if (rij < pvMin) {
+        pvMin = rij;
+      }
+      if (rij > pvMax) {
+        pvMax = rij;
+      }
+    }
+    assert(0 <= pvMin);
+    assert(pvMin < pvMax);
+    auto ai = ((RPActor*)(rpm->actrs[i]));
+    ai->posValMin = pvMin;
+    ai->posValMax = pvMax;
+  }
+  KMatrix uij = KBase::rescaleRows(rawUij, 0.0, 1.0); // von Neumann utility scale
+
+
+  cout << "Complete (normalized) utility matrix of all possible positions (rows) ";
+  cout << "versus actors (columns)" << endl << flush;
+  for (unsigned int pj = 0; pj < numPos; pj++) {
+    printf("%3u  ", pj);
+    auto pstn = positions[pj];
+    printVUI(pstn);
+    printf("  ");
+    for (unsigned int ai = 0; ai < numA; ai++) {
+      double uap = uij(ai, pj);
+      printf("%6.4f, ", uap);
+    }
+    cout << endl << flush;
+  }
+
+  // -------------------------------------------------
+  // The next section determines the most self-interested positions for each actor,
+  // as well as the 'central position' over all possible reform priorities
+  // (which 'office seeking politicans' would adopt IF proportional voting).
+  cout << endl << "Computing best position for each actor" << endl;
+  vector<VUI> bestAP; // list of each actor's best position (followed by CP)
+  for (unsigned int ai = 0; ai < numA; ai++) {
+    unsigned int bestJ = 0;
+    double bestV = 0;
+    for (unsigned int pj = 0; pj < numPos; pj++) {
+      if (bestV < uij(ai, pj)) {
+        bestJ = pj;
+        bestV = uij(ai, pj);
+      }
+    }
+    printf("Best for %02u is ", ai);
+    printVUI(positions[bestJ]);
+    cout << endl;
+    bestAP.push_back(positions[bestJ]);
+  }
+
+
+  cout << "Computing zeta ... " << endl;
+  KMatrix zeta = aCap * uij;
+  assert((1 == zeta.numR()) && (numPos == zeta.numC()));
+
+
+  cout << "Sorting positions from most to least net support ..." << endl << flush;
+
+  auto betterPR = [](tuple<unsigned int, double, VUI> pr1,
+      tuple<unsigned int, double, VUI> pr2) {
+    double v1 = get<1>(pr1);
+    double v2 = get<1>(pr2);
+    bool better = (v1 > v2);
+    return better;
+  };
+
+  auto pairs = vector<tuple<unsigned int, double, VUI>>();
+  for (unsigned int i = 0; i < numPos; i++) {
+    auto pri = tuple<unsigned int, double, VUI>(i, zeta(0, i), positions[i]);
+    pairs.push_back(pri);
+  }
+
+  sort(pairs.begin(), pairs.end(), betterPR);
+
+  const unsigned int maxDisplayed = 720; // factorial(6)
+  unsigned int  numPr = (pairs.size() < maxDisplayed) ? pairs.size() : maxDisplayed;
+
+  cout << "Displaying highest " << numPr << endl << flush;
+  for (unsigned int i = 0; i < numPr; i++) {
+    auto pri = pairs[i];
+    unsigned int ni = get<0>(pri);
+    double zi = get<1>(pri);
+    VUI pi = get<2>(pri);
+
+    printf(" %3u: %4u  %.2f  ", i, ni, zi);
+    printVUI(pi);
+    cout << endl << flush;
+  }
+
+  VUI bestPerm = get<2>(pairs[0]);
+
+  bestAP.push_back(bestPerm);
+  return bestAP;
+}
 
 } // end of namespace
 
@@ -224,14 +224,14 @@ int main(int ac, char **av) {
   using RfrmPri::RPActor;
   using RfrmPri::printPerm;
   
-  auto sTime = KBase::displayProgramStart(RfrmPri::appName, RfrmPri::appVersion); 
+  auto sTime = KBase::displayProgramStart(RfrmPri::appName, RfrmPri::appVersion);
   uint64_t seed = dSeed; // arbitrary;
   bool siP = true;
   bool cpP = false;
   bool runP = true;
   unsigned int sNum = 1;
   bool xmlP = false;
-  string inputXML = ""; 
+  string inputXML = "";
 
   auto showHelp = [ sNum]() {
     printf("\n");
@@ -292,7 +292,7 @@ int main(int ac, char **av) {
         printf("Unrecognized argument: %s\n", av[i]);
       }
     }
-  } 
+  }
 
   if (!runP) {
     showHelp();
