@@ -392,7 +392,7 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::probCost(const KMatrix& pnt,
   }
   auto pDist1 = Model::scalarPCE(nAct, nOpt, w1, uMat, vr, vpm, pcem, rl);
   auto err1 = sPlus(thresh1 - KBase::dot(pDist1, pSel1));
-  err1 = err1 * err1;
+  double serr1 = err1 * err1;
 
   // --------------------------------------------
   // cost of falling below threshold in case #1
@@ -404,9 +404,9 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::probCost(const KMatrix& pnt,
   }
   auto pDist2 = Model::scalarPCE(nAct, nOpt, w2, uMat, vr, vpm, pcem, rl);
   auto err2 = sPlus(thresh2 - KBase::dot(pDist2, pSel2));
-  err2 = err2 * err2;
-
-  const double totalCost = (pCost + ((err1 + err2)*errWeight)) / (1.0 + errWeight);
+  double serr2 = err2 * err2;
+  
+  const double totalCost = (pCost + ((serr1 + serr2)*errWeight)) / (1.0 + errWeight);
 
   if (ReportingLevel::Silent < rl) {
     cout << "Point :";
@@ -421,7 +421,7 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::probCost(const KMatrix& pnt,
     w2.mPrintf(" %7.2f ");
     cout << endl;
 
-    printf("Total cost= %.4f = [ %f + (%f + %f)*%.2f ] / %.2f",
+    printf("Total cost= %.4f = [ %f + (%f^2 + %f^2)*%.2f ] / %.2f",
            totalCost, pCost, err1, err2, errWeight, errWeight + 1.0);
     cout << endl << flush;
   }

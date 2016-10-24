@@ -138,7 +138,7 @@ public:
 
   // As we expect fairly few policies (dozens, not thousands),
   // we just return indices to all of theta, ignoring ti and numPol
-  virtual VUI similarPol(unsigned int ti, unsigned int numPol = 0) const;
+  virtual VUI similarPol(unsigned int ti, unsigned int numPol = 0) const override;
 
 protected:
   EState<unsigned int>* makeNewEState() const override;
