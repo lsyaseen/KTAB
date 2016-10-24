@@ -161,6 +161,9 @@ void demoThreadLambda(unsigned int n) {
   for (auto& t : ts) {
     t.join();
   }
+
+  auto fn2 = [](unsigned int i) { assert(0 < i); return; };
+  KBase::groupThreads(fn2, 17, 45);
   return;
 }
 
@@ -1000,7 +1003,7 @@ void demoVHC00(uint64_t sd) {
   vhc->eval = [trgt, tm](const KMatrix & m) {
     auto v1 = tm * (m-trgt);
     double d2 = dot(v1,v1);
-    double d = norm(m - trgt);
+    //double d = norm(m - trgt);
     return 1.0 - sqrt(d2);
   };
   if (1 == n) {
@@ -2001,6 +2004,9 @@ int main(int ac, char **av) {
         printf("Unrecognized argument: %s\n", av[i]);
       }
     }
+  }
+  else { // no arguments
+    run = false;
   }
 
   if (!run) {

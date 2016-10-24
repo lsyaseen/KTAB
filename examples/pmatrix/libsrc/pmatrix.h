@@ -58,14 +58,8 @@ vector<bool>>           // overThresh
 FittingParameters;
 
 // --------------------------------------------
-class PMatrixModel;
-class PMatrixPos;
+//class PMatrixPos;
 class PMatrixState;
-// --------------------------------------------
-PMatrixModel* pmmCreation(uint64_t sd);
-PMatrixPos*  pmpCreation(PMatrixModel* pmm);
-PMatrixState* pmsCreation(PMatrixModel * pmm);
-
 // --------------------------------------------
 // The Policy Matrix model uses a pre-specified matrix
 // of actor-vs-policy utilities.
@@ -142,13 +136,20 @@ public:
   virtual ~PMatrixState();
 
 protected:
-  virtual EState<unsigned int>* makeNewEState() const override;
+  EState<unsigned int>* makeNewEState() const override;
   void setAllAUtil(ReportingLevel rl) override;
   vector<double> actorUtilVectFn(int h, int tj) const override;
 
 private:
 
 };
+
+// --------------------------------------------
+PMatrixModel* pmmCreation(uint64_t sd);
+PMatrixPos*  pmpCreation(PMatrixModel* pmm);
+PMatrixState* pmsCreation(PMatrixModel * pmm);
+
+string genName(const string & prefix, unsigned int i);
 
 }
 // end of namespace

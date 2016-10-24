@@ -61,7 +61,7 @@ using std::vector;
 
 
 
-template <class PT> class EState; 
+template <class PT> class EState;
 // -------------------------------------------------
 // this model relies on an explicit enumeration of all possible
 // outcomes/positions: a few tens of thousands of discrete choices.
@@ -91,6 +91,9 @@ public:
   // Enumerate theta, the set of options
   function <vector <PT> ()> enumOptions = nullptr;
 
+  // the row-vector of actor's scalar capabilities
+  KMatrix actorWeights() const;
+
 protected:
   vector <PT> theta = {}; // the enumerated space of all possible positions/outcomes
   static const unsigned int minNumOptions = 3;
@@ -111,7 +114,9 @@ class EPosition : public Position {
 public:
   EPosition(EModel<PT>* m, int n);
   virtual ~EPosition();
-  int getIndex() const { return ndx;}
+  int getIndex() const {
+    return ndx;
+  }
 protected:
 
   // print the ndx to the output stream
@@ -132,14 +137,13 @@ class EState : public State {
 public:
   explicit EState( EModel<PT>* mod);
   virtual ~EState();
-  void setValues();
 
   void show() const;
 
   EState<PT>* stepSUSN();
   EState<PT>* stepBCN();
+  EState<PT>* stepMCN();
 
-  // TODO: verify pDist
   // use the parameters of this state to compute the relative probability of
   // each actor's position. persp = -1 means use everyone's separate perspectives
   //(i.e. get actual probabilities, not one actor's beliefs)
@@ -152,23 +156,17 @@ public:
   unsigned int posNdx(const unsigned int i) const;
 
 protected:
-
+  // Notice that the makeNewState will have to use the 'model' of
+  // that state which calls makeNewState
   virtual EState<PT>* makeNewEState() const = 0;
-  virtual void setAllAUtil(ReportingLevel rl) = 0; // must be overridden
-
-  // you have to provide these λ-fns.
-
-  // probably using the EModel's raw-value matrix, actorVFn,
-  // compute and set the aUtils vector of matrices,
-  // where (aUtils[h])(i,j) = h's estimate of the utility to actor i of position held by actor j.
-  //function <vector<KMatrix>()> getAUtils = nullptr;
+  virtual void setAllAUtil(ReportingLevel rl) = 0;
 
   // Calculate the values to the actors of the tj-th option, theta[j].
   // This needs to be done for any possible position, not just those
   // currently advocated.
   // Note that this may depend on their current position, as in the SMP.
   // If the value does NOT depend on the current state (e.g. most CGE models),
-  // then put it in EModel::baseUtils and just look it up here.
+  // then put it in a const matrix (e.g. PMatrixModel::polUtilMat) then look it up.
   //
   // Some models, like CGE, automatically produce the results for all actors at once,
   // given the policy, so it would be quite inefficient to run the model over
@@ -183,6 +181,11 @@ protected:
 
   EState<PT>* doSUSN(ReportingLevel rl) const;
   EState<PT>* doBCN(ReportingLevel rl) const;
+  EState<PT>* doMCN(ReportingLevel rl) const;
+
+  // get the matrix of utility for unique occupied positions,
+  // as estimated by h.
+  KMatrix uMatH(unsigned int h) const;
 
   // Given the utility matrix, uMat, calculate the expected utility to each actor,
   // as a column-vector. Again, this is from the perspective of whoever developed uMat.

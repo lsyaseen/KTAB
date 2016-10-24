@@ -591,12 +591,15 @@ KMatrix rescaleRows(const KMatrix& m1, const double vMin, const double vMax) {
     for (unsigned int j = 0; j < nc; j++) {
       const double mij = m1(i, j);
       const double nij = (mij - rowMin) / rowRange; // normalize into [0, 1]
-      const double rij = vMin + (vMax - vMin)*nij; // rescale into [vMin, vMax]
+      double rij = vMin + (vMax - vMin)*nij; // rescale into [vMin, vMax]
+
+      // fix tiny round-off errors
+      if (rij < vMin) { rij = vMin; }
+      if (vMax < rij) { rij = vMax; }
+
       m2(i, j) = rij;
     }
   }
-
-
   return m2;
 }
 

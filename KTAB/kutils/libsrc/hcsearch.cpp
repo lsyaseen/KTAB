@@ -31,6 +31,61 @@ using std::get;
 
 // --------------------------------------------
 
+void groupThreads(function<void(unsigned int)> tfn,
+                  unsigned int numLow, unsigned int numHigh, unsigned int numPar) {
+  const auto rl = ReportingLevel::Low;
+  using std::thread;
+  unsigned numThreads = 0;
+  if (0 == numPar) {
+    // As of OCt. 2016, this function might or might not have one or two
+    // of the following problems, depending on your implementation.
+    // 1: It might not be implemented, and just return 0.
+    // 2: It might not take into account "hyperthreading", and return
+    //    half the expected number.
+    numThreads = std::thread::hardware_concurrency();
+    if (0 == numThreads) {
+      numPar = 10; // arbitrary default
+    }
+    else {
+      // three times the number of threads is not too inefficient,
+      // and 1.5 times the number of hyperthreads is not too wasteful.
+      numPar = 3 * numThreads;
+    }
+  }
+  if (ReportingLevel::Silent < rl) {
+    if (0 == numThreads) {
+      cout << "Could not detect hardware concurrency" << endl;
+    }
+    else {
+      cout << "Detected hardware concurrency: " << numThreads << endl;
+    }
+    cout << "Using groups of " << numPar << endl;
+  }
+
+  unsigned int cntr = numLow;
+  while (cntr <= numHigh) {
+    vector<thread> myThreads = {};
+    for (unsigned int i = 0; ((i < numPar) && (cntr <= numHigh)); i++) {
+      if (ReportingLevel::Medium < rl) {
+        printf("Launching thread %3u / %3u / [%3u,%3u]", i, cntr, numLow, numHigh);
+        cout << endl << flush;
+      }
+      myThreads.push_back(thread(tfn, cntr));
+      cntr++;
+    }
+    if (ReportingLevel::Low < rl) {
+      cout << "Joining ..." << endl;
+    }
+    for (auto& ti : myThreads) {
+      ti.join();
+    }
+  }
+  return;
+}
+
+// --------------------------------------------
+
+
 vector<KMatrix> VHCSearch::vn1(const KMatrix & m0, double s) {
   unsigned int n = m0.numR();
   auto nghbrs = vector<KMatrix>();
@@ -113,6 +168,8 @@ VHCSearch::run(KMatrix p0,
   while ((iter < iMax) && (sIter < sMax) && (minStep < currStep)) {
     assert(vInitial <= v0);
 
+
+    // TODO: change this to use groupThreads
     auto ts = vector<thread>();
     const auto nPnts = nghbrs(p0, currStep);
     const unsigned int numPnts = nPnts.size();
@@ -202,5 +259,3 @@ VHCSearch::run(KMatrix p0,
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------
-
-

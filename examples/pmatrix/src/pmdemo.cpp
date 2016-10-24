@@ -33,16 +33,17 @@ using std::string;
 
 
 namespace PMatDemo {
+using KBase::PRNG;
 using KBase::Model;
 using KBase::VotingRule;
 using KBase::trans;
 
 
-void runEKEM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, const vector<string> & aNames) {
+void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, const vector<string> & aNames) {
   assert(0 != s);
-  printf("Creating EKEModel objects ... \n");
+  printf("Creating PMatrixModel objects ... \n");
 
-  auto eKEM = new PMatrixModel("EModel-Matrix-KEM", s);
+  auto eKEM = new PMatrixModel("PMatrixModel", s);
 
   eKEM->pcem = KBase::PCEModel::MarkovIPCM;
 
@@ -146,14 +147,22 @@ void runEKEM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, con
   }
 
   es1->setUENdx();
+  es1->step = [es1] { return es1->stepMCN(); };
+
+  // test instantiation of templates
+  auto sFn0 = [es1] { return es1->stepSUSN(); };
+  auto sFn1 = [es1] { return es1->stepBCN(); };
+  auto sFn2 = [es1] { return es1->stepMCN(); };
+
   eKEM->addState(es1);
 
   cout << "--------------" << endl;
   cout << "First state:" << endl;
   es1->show();
 
-  // see if the templates can be instantiated ...
-  es1->step = [es1] { return es1->stepSUSN(); };
+
+  // just a test
+  //auto tmpState = es1->stepMCN();
 
   eKEM->run();
 
@@ -175,32 +184,59 @@ void fitFile(string fName, uint64_t seed) {
   cout << endl << flush;
   auto c12 = PMatrixModel::minProbError(fParams, bigR, 250.0);
 
-
-  const double score = get<0>(c12);
-
   // retrieve the weight-matrices which were fitted, so we can
   // use them to assess coalitions in two different situations.
+  //const double score = get<0>(c12);
   const KMatrix w1 = get<1>(c12);
   const KMatrix w2 = get<2>(c12);
 
-  assert(0 < score);
-  assert(KBase::sameShape(w1, w2));
-
-
   cout << endl;
-
   cout << "=====================================" << endl;
   cout << "EMod with BAU-case weights" << endl << flush;
-  runEKEM(seed, false, w1, uMat, aNames);
+  runPMM(seed, false, w1, uMat, aNames);
   cout << endl;
-
   cout << "=====================================" << endl;
   cout << "EMod with change-case weights" << endl << flush;
-  runEKEM(seed, false, w2, uMat, aNames);
+  runPMM(seed, false, w2, uMat, aNames);
   cout << endl;
 
   return;
 }
+
+void genPMM(uint64_t sd) {
+  assert(0 != sd);
+  auto rng = new PRNG(sd);
+
+  bool cpP = (1 == (rng->uniform() % 2));
+  unsigned int numAct = rng->uniform(10, 25);
+  unsigned int numOpt = rng->uniform(8, 30);
+  auto wMat = KMatrix::uniform(rng, 1, numAct, 5.0, 10.0);
+  wMat = KMatrix::map(KBase::sqr, wMat);
+  auto r1Mat = KMatrix::uniform(rng, numAct, numOpt, -1000.0, +10000.0);
+  // if left totally random, there would be no reason for actors to cooperate
+  // so I correlate their results into three groups
+  auto avrgFn = [r1Mat, numAct](unsigned int i1, unsigned int j) {
+    unsigned int i0 = ((i1 + numAct) - 3) % numAct;
+    unsigned int i2 = ((i1 + numAct) + 3) % numAct;
+    double rij = (r1Mat(i0, j) + r1Mat(i1, j) + r1Mat(i2, j)) / 3.0;
+    return rij;
+  };
+  auto r2Mat = KMatrix::map(avrgFn, numAct, numOpt);
+  auto uMat = KBase::rescaleRows(r2Mat, 0.0, 1.0);
+  vector<string> aNames = {};
+  for (unsigned int i = 0; i < numAct; i++) {
+    auto ni = genName("Actor", i);
+    aNames.push_back(ni);
+  }
+
+  runPMM(sd, cpP, wMat, uMat, aNames);
+
+  delete rng;
+  rng = nullptr;
+  return;
+}
+
+
 }
 // end of namespace
 
@@ -224,7 +260,7 @@ int main(int ac, char **av) {
     printf("Usage: specify one or more of these options\n");
     printf("--fit <file>  read CSV file and fit to it \n");
     printf("--help        print this message \n");
-    printf("--pmm         instantiate PMatrixModel \n");
+    printf("--pmm         run random PMatrixModel \n");
     printf("--seed <n>    set a 64bit seed \n");
     printf("              0 means truly random \n");
     printf("              default: %020llu \n", dSeed);
@@ -234,12 +270,12 @@ int main(int ac, char **av) {
 
   if (ac > 1) {
     for (int i = 1; i < ac; i++) {
-      cout << "Argument " << i << " is -|" << av[i] << "|-" << endl << flush;
+      cout << "Argument " << i << " is =|" << av[i] << "|=" << endl << flush;
       if (strcmp(av[i], "--seed") == 0) {
         i++;
         seed = std::stoull(av[i]);
       }
-      if (strcmp(av[i], "--fit") == 0) {
+      else if (strcmp(av[i], "--fit") == 0) {
         fit = true;
         i++;
         fitFileCSV = av[i];
@@ -277,6 +313,9 @@ int main(int ac, char **av) {
     assert(nullptr != pmp);
     auto pms = PMatDemo::pmsCreation(pmm);
     assert(nullptr != pms);
+
+    PMatDemo::genPMM(seed);
+
   }
 
   if (fit) {

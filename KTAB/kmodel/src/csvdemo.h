@@ -39,8 +39,9 @@ using std::tuple;
 using std::vector;
 using KBase::PRNG;
 
-
+// read a basic SMP format file
 void demoMiniCSV(const string fs);
+
 void pccCSV(const string fs);
 
 

@@ -341,8 +341,12 @@ public:
   // returns h's estimate of i's risk attitude, using the risk-adjustment-rule
   static double estNRA(double rh, double  ri, BigRAdjust ra) ;
 
-  string getScenarioID() const { return scenId; }
-  string getScenarioName() const { return scenName; };
+  string getScenarioID() const {
+    return scenId;
+  }
+  string getScenarioName() const {
+    return scenName;
+  };
 
   static KTable * createSQL(unsigned int n);
 protected:
@@ -419,15 +423,6 @@ protected:
   virtual void setAllAUtil(ReportingLevel rl) = 0;
 
   virtual void setOneAUtil(unsigned int perspH, ReportingLevel rl); // TODO: make this non-dummy
-
-  /*
-     // exactly like Actor::vProbLittle, but with optional logging to SQLite
-     double vProbLittle(VotingRule vr, double wn, double uni, double unj,
-                                  double contrib_i_ij, double contrib_j_ij,
-                                  bool logP) const;
-    */
-
-
 
 private:
 };

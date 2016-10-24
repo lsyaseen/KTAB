@@ -85,6 +85,18 @@ bool EModel<PT>::equivStates(const EState<PT>* es1, const EState<PT>*  es2) cons
   }
   return eqvP;
 }
+
+
+template <class PT>
+KMatrix EModel<PT>::actorWeights() const {
+  auto w = KMatrix(1, numAct);
+  for (unsigned int i=0; i<numAct; i++) {
+    auto ai = (EActor<PT>*) (actrs[i]);
+    w(0,i) = ai->sCap;
+  }
+  return w;
+}
+
 // --------------------------------------------
 
 template <class PT>
@@ -159,45 +171,6 @@ EState<PT>::~EState() {
   step = nullptr;
 }
 
-/*
-// this must be overriden.
-// It only exists because EState::doSUSN cannot instantiate an
-// abstract object.
-template <class PT>
- EState<PT>* EState<PT>::makeNew() const {
-    auto s2 = new EState<PT>(eMod);
-    return s2;
-}
-
-// this must be overriden.
-// It only exists because EState::doSUSN cannot instantiate an
-// abstract object.
-template <class PT>
-void EState<PT>::setAllAUtil(ReportingLevel rl) {
-    assert(false);
-    return;
-}
-*/
-
-
-template <class PT>
-void EState<PT>::setValues() {
-  const unsigned int numAct = eMod->numAct;
-  const unsigned int numOpt = eMod->theta.size();
-  assert(numOpt == eMod->numOptions());
-  assert(0 < numOpt);
-  auto actorVals = KMatrix(numAct, numOpt);
-  for (unsigned int tj = 0; tj < numOpt; tj++) {
-    vector<double> vp = actorVFn(tj, this);
-    assert(numAct == vp.size());
-    for (unsigned int i = 0; i < numAct; i++) {
-      actorVals(i, tj) = vp[i];
-    }
-  }
-  return;
-}
-
-
 
 template <class PT>
 void EState<PT>::show() const {
@@ -242,12 +215,9 @@ EState<PT>* EState<PT>::stepSUSN() {
   if ((0 == uIndices.size()) || (0 == eIndices.size())) {
     setUENdx();
   }
-
   cout << "Setting all utilities from objective perspective"<<endl<<flush;
   setAUtil(-1, ReportingLevel::Low);
-
-  //cout << "Doing actual SUSN"<<endl<<flush;
-  auto s2 = doSUSN(ReportingLevel::Silent);
+  auto s2 = doSUSN(ReportingLevel::Low);
   assert(nullptr != s2);
   s2->step = [s2]() {
     return s2->stepSUSN();
@@ -256,39 +226,65 @@ EState<PT>* EState<PT>::stepSUSN() {
   return s2;
 }
 
+
+
+template <class PT>
+KMatrix EState<PT>::uMatH(unsigned int h) const {
+  const unsigned int numA = eMod->numAct;
+  const unsigned int na2 = eMod->actrs.size();
+  assert(numA == na2);
+  const unsigned int numU = uIndices.size();
+  assert((0 < numU) && (numU <= numA));
+  assert(numA == eIndices.size());
+
+  // These are each actor's beliefs about the utilities
+  // to other actors of the currently occupied positions
+  const unsigned int aus = aUtil.size();
+  assert (KBase::Model::minNumActor <= aus);
+
+  // Utilities to actors of the currently occupied positions.
+  const auto u = aUtil[h];
+  const unsigned int numP = pstns.size();
+
+  // In the state, one-to-one matching of actors and actually
+  // occupied positions (probably including duplicates)
+  assert(numA == numP);
+
+  auto uufn = [u, this](unsigned int i, unsigned int j1) {
+    return u(i, uIndices[j1]);
+  };
+  auto uUnique = KMatrix::map(uufn, numA, numU);
+  return uUnique;
+}
+
 template <class PT>
 EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
   const unsigned int numA = eMod->numAct;
   const unsigned int na2 = eMod->actrs.size();
   assert(numA == na2);
-
   const unsigned int numU = uIndices.size();
   assert((0 < numU) && (numU <= numA));
   assert(numA == eIndices.size());
 
-  const unsigned int aus = aUtil.size();
-
-  assert (KBase::Model::minNumActor <= aus);
-  const auto u = aUtil[0]; // all have same beliefs in this demo
+  // Utilities to actors of the currently occupied positions.
+  // All have same beliefs in this demo
+  const auto u = aUtil[0];
 
   const auto vpm = eMod->vpm; // get the 'victory probability model'
   const unsigned int numP = pstns.size();
+  auto uUnique = uMatH(0);
 
-  const auto euState = expUtilMat(rl, numA, numP, vpm, u);
-  cout << "Actor expected utilities in actual state: ";
-  KBase::trans(euState).mPrintf("%6.4f, ");
-  cout << endl << flush;
-
+  // Get expected-utility vector, one entry for each actor, in the current state.
+  const auto eu0 = expUtilMat(rl, numA, numP, vpm, uUnique); //  without duplicates
 
   if (ReportingLevel::Low < rl) {
     printf("--------------------------------------- \n");
-    printf("Assessing utility of actual state to all actors \n");
+    printf("Actor expected utilities in actual state: \n");
     for (unsigned int h = 0; h < numA; h++)
     {
-      cout << "  actual utilities not available" << endl;
+      printf("%3u , %.5f \n", h, eu0(h, 0));
     }
-    cout << endl << flush;
-    cout << "Positions in this state: ";
+    cout << endl << "Positions in this state: ";
     show();
     cout << endl;
     printf("Out of %u positions, %u were unique, with these indices: ", numA, numU);
@@ -297,25 +293,13 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
     {
       printf("%2i ", i);
     }
-    cout << endl;
-    cout << flush;
+    cout << endl << flush;
   }
-
-
-  auto uufn = [u, this](unsigned int i, unsigned int j1)  {
-    return u(i, uIndices[j1]);
-  };
-  auto uUnique = KMatrix::map(uufn, numA, numU);
-
-  // Get expected-utility vector, one entry for each actor, in the current state.
-  const auto eu0 = expUtilMat(rl, numA, numP, vpm, uUnique); //  without duplicates
 
   // Note that EState::makeNewEState is a pure virtual method,
   // so what gets called here is the method from derived classes,
   // which can provide the extra structure of a derived class.
   auto s2 = makeNewEState();
-  // This cannot do so:
-  //auto s2 = new EState<PT>(eMod);
 
   assert (0 == s2->pstns.size());
   for (unsigned int h = 0; h < numA; h++) {
@@ -414,7 +398,6 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
 
 
   // 'Returns' void in order to have the right type-signature for threading.
-  //
   // Does a generic hill climb to find the best next position for actor h,
   // and stores it in s2.
   // To do that, it uses three functions for evaluation, neighbors, and show:
@@ -425,8 +408,6 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
     }
     s2->pstns[h] = nullptr;
     auto ph = ((const EPosition<PT>*)(pstns[h]));
-
-
     auto ghc = new KBase::GHCSearch<EPosition<PT>>();
 
     ghc->eval = [ehFN, h](const EPosition<PT>  eph)  {
@@ -490,61 +471,48 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
     double du = vBest - eu0(h, 0); // (hypothetical, future) - (actual, current)
     if (ReportingLevel::Low < rl) {
       printf("Expected EU improvement for %2i of %+.4E \n", h, du);
+      if (ReportingLevel::Medium < rl) {
+        printf("  vBest = %+.6f \n", vBest);
+        printf("  eu0(%i, 0) for %i = %+.6f \n", h, h, eu0(h,0));
+        printf("  du = %+.6f \n", du);
+      }
+      cout << endl << flush;
     }
-    //printf("  vBest = %+.6f \n", vBest);
-    //printf("  eu0(%i, 0) for %i = %+.6f \n", h, h, eu0(h,0));
-    //cout << endl << flush;
     // Logically, du should always be non-negative, as GHC never returns a worse value than the starting point.
     // However, actors plan on the assumption that all others do not change - yet they do.
-    const double eps = 0.05; //  enough to avoid problems with round-off error
+    const double eps = 0.0001; //  enough to avoid problems with round-off error
     assert(-eps <= du);
     return;
   };
   // end of newPosFn
 
-
   bool parP = KBase::testMultiThreadSQLite(false, rl);
 
   // concurrent execution works, but mixes up the printed log.
   // So we disable it if reporting is desired.
-  parP = parP && (ReportingLevel::Silent == rl);
+  parP = parP && (rl <= ReportingLevel::Low);
+  if (ReportingLevel::Silent < rl) {
+    if (parP) {
+      cout << "Will continue with multi-threaded execution"<<endl<<flush;
+    }
+    else {
+      cout << "Will continue with single-threaded execution"<<endl<<flush;
+    }
+  }
 
+  // Each actor, h, finds the position which maximizes their EU in this situation.
   if (parP) {
-    cout << "Will continue with multi-threaded execution"<<endl<<flush;
+    KBase::groupThreads(newPosFn, 0, numA - 1);
   }
   else {
-    cout << "Will continue with single-threaded execution"<<endl<<flush;
-  }
-
-  auto ts = vector<thread>();
-  // Each actor, h, finds the position which maximizes their EU in this situation.
-  for (unsigned int h = 0; h < numA; h++) {
-    if (parP)  { // launch all, concurrent
-      //printf("Starting concurrent thread for new position %u \n", h);
-      //cout << flush;
-      ts.push_back(thread([newPosFn, h]() {
-        newPosFn(h);
-        return;
-      }));
-    }
-    else  { // do each, sequential
-      //printf("Calculating new position %u \n", h);
-      //cout << flush;
+    for (unsigned int h = 0; h < numA; h++) {
       newPosFn(h);
     }
-    cout << flush;
   }
-
-  // if multi-threaded, join them all before continuing
-  if (parP)  {
-    for (auto& t : ts) {
-      t.join();
-    }
-  }
-
   assert(nullptr != s2);
   assert(numP == s2->pstns.size());
   assert(numA == s2->model->numAct);
+
   for (auto p : s2->pstns)
   {
     assert(nullptr != p);
@@ -580,6 +548,7 @@ template <class PT>
 EState<PT>* EState<PT>::doBCN(ReportingLevel rl) const {
   EState<PT>* s2 = nullptr;
 
+  cout << "EState<PT>::doBCN not yet implemented"<<endl<<flush;
   // do something
 
   assert (s2 != nullptr);
@@ -588,21 +557,278 @@ EState<PT>* EState<PT>::doBCN(ReportingLevel rl) const {
 // end of doBCN
 
 
+
+
+template <class PT>
+EState<PT>* EState<PT>::stepMCN() {
+  cout << endl << flush;
+  cout << "State number " << model->history.size() - 1 << endl << flush;
+  if ((0 == uIndices.size()) || (0 == eIndices.size())) {
+    setUENdx();
+  }
+  setAUtil(-1, ReportingLevel::Medium);
+  show();
+
+  auto s2 = doMCN(ReportingLevel::Medium);
+
+  s2->step = [s2]() {
+    return s2->stepMCN();
+  };
+  cout << endl << flush;
+  return s2;
+}
+
+template <class PT>
+EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
+  const unsigned int numA = eMod->numAct;
+  const unsigned int na2 = eMod->actrs.size();
+  assert(numA == na2);
+  const unsigned int numU = uIndices.size();
+  assert((0 < numU) && (numU <= numA));
+  assert(numA == eIndices.size());
+
+  const auto vpm = eMod->vpm; // get the 'victory probability model'
+  const unsigned int numP = pstns.size();
+
+  // get matrix of utilities for unique positions
+  auto uUnique = uMatH(0);
+
+  // Get expected-utility col-vector, one entry for each actor,
+  // in the current state, with only unique postion utilities
+  const auto eu0 = expUtilMat(rl, numA, numP, vpm, uUnique);
+
+  if (ReportingLevel::Low < rl) {
+    printf("--------------------------------------- \n");
+    printf("Assessing utility of actual state to all actors \n");
+    for (unsigned int h = 0; h < numA; h++)
+    {
+      printf("%3u , %.5f \n", h, eu0(h, 0));
+    }
+    cout << endl << "Positions in this state: ";
+    show();
+    cout << endl;
+    printf("Out of %u positions, %u were unique, with these indices: ", numA, numU);
+    cout << flush;
+    for (auto i : uIndices)
+    {
+      printf("%2i ", i);
+    }
+    cout << endl << flush;
+  }
+
+  auto clearPstns = [numA] (EState<PT>* est) {
+    assert (0 == est->pstns.size());
+    est->pstns.resize(numA);
+    for (unsigned int i = 0; i < numA; i++) {
+      est->pstns[i] = nullptr;
+    }
+    assert (numA == est->pstns.size());
+    for (unsigned int i=0; i<numA; i++) {
+      assert (nullptr == est->pstns[i]);
+    }
+    return;
+  };
+
+  // The following code is quite similar to doSUSN.
+  // However, it is essentially doing a general hill climbing
+  // search, ala GHCSearch<>, except with better control
+  // of the logging.
+
+  VUI currNdcs = {};
+  currNdcs.resize(numP);
+  for (unsigned int i = 0; i < numA; i++) {
+    auto ppi = (EPosition<PT>*) (pstns[i]);
+    currNdcs[i] = ppi->getIndex();
+  }
+
+  vector<VUI> neighbors = {};
+  // the 0-neighbor, so we never take something less than the current
+  const unsigned int numZero = 1;
+  neighbors.push_back(currNdcs);
+
+  unsigned int numOpt = eMod->numOptions();
+
+  // add 1-neighbors
+  const unsigned int numOne = numA*(numOpt-1);
+  for (unsigned int ai = 0; ai < numA; ai++) {
+    for (unsigned int hpi = 0; hpi < numOpt; hpi++) {
+      if (hpi != currNdcs[ai]) {
+        VUI newN = currNdcs;
+        newN[ai] = hpi;
+        neighbors.push_back(newN);
+      }
+    }
+  }
+  assert ((numZero+numOne) == neighbors.size());
+
+
+  // add 2-neighbors, avoiding equivalent permutations
+  const unsigned int numTwo = (numA*(numA-1)*(numOpt-1)*(numOpt-1))/2;
+  for (unsigned int ai = 0; ai < numA; ai++) {
+    for (unsigned int hpi = 0; hpi < numOpt; hpi++) {
+      for (unsigned int aj = 0; aj < numA; aj++) {
+        for (unsigned int hpj = 0; hpj < numOpt; hpj++) {
+          if ((ai < aj) && (hpi != currNdcs[ai]) && (hpj != currNdcs[aj])) {
+            VUI newN = currNdcs;
+            newN[ai] = hpi;
+            newN[aj] = hpj;
+            neighbors.push_back(newN);
+          }
+        }
+      }
+    }
+  }
+  assert ((numZero+numOne+numTwo) == neighbors.size());
+
+  /*
+    const unsigned int numThree = (numA*(numA-1)*(numA-2)*(numOpt-1)*(numOpt-1)*(numOpt-1))/6;
+    for (unsigned int ai = 0; ai < numA; ai++) {
+        for (unsigned int hpi = 0; hpi < numOpt; hpi++) {
+            for (unsigned int aj = 0; aj < numA; aj++) {
+                for (unsigned int hpj = 0; hpj < numOpt; hpj++) {
+                    for (unsigned int ak = 0; ak < numA; ak++) {
+                        for (unsigned int hpk = 0; hpk < numOpt; hpk++) {
+                            if ((ai < aj) && (aj < ak) && (hpi != currNdcs[ai])
+                                && (hpj != currNdcs[aj])&& (hpk != currNdcs[ak])) {
+                                VUI newN = currNdcs;
+                                newN[ai] = hpi;
+                                newN[aj] = hpj;
+                                newN[ak] = hpk;
+                                neighbors.push_back(newN);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    assert ((numZero+numOne+numTwo+numThree) == neighbors.size());
+    */
+
+  if (ReportingLevel::Silent < rl) {
+    cout << "Creating and ranking "<<neighbors.size();
+    cout << " neighboring states"<<endl<<flush;
+  }
+  // create and rank all (!) the neighboring states
+  const auto w = eMod->actorWeights(); // a row vector
+  const unsigned int numNghbrs = neighbors.size();
+
+  // these two variables collect the results of a parallel search
+  // for the neighbor with highest Zeta
+  double bestZeta = 0.0; // all real zetas are positive
+  unsigned int bestNghbr = 0;
+  std::mutex nsEvalMutex;
+
+  // somewhat more explicit than "auto"
+  function < EState<PT>* (const VUI& , bool)>
+      stateFromVUI = [this, numA, clearPstns] (const VUI& ni, bool autilP) {
+    // Note that EState::makeNewEState is a pure virtual method,
+    // so what gets called here is the method from derived classes,
+    // which can provide the extra structure of a derived class.
+    auto ns = makeNewEState();
+    clearPstns(ns);
+    for (unsigned int j=0; j<numA; j++) {
+      auto pij = new EPosition<PT>(eMod, ni[j]);
+      assert (nullptr == ns->pstns[j]);
+      ns->pstns[j] = pij;
+    }
+    ns->setUENdx();
+    if (autilP) {
+      ns->setAUtil(-1, ReportingLevel::Medium);
+    }
+    return ns;
+  };
+
+
+  function<void(unsigned int)> testNghbr =
+      [&neighbors, &w, &nsEvalMutex, &bestZeta, &bestNghbr, rl, numA, numP, this, stateFromVUI]
+      (unsigned int i) {
+    const auto rlNewEU = ReportingLevel::Silent;
+    const VUI ni = neighbors[i];
+    auto ns = stateFromVUI(ni, true);
+    const unsigned int numUi = ns->uIndices.size();
+
+    auto uMati = ns->uMatH(0);
+    assert(numA == uMati.numR());
+    assert (numUi == uMati.numC());
+    auto eui = ns->expUtilMat(rlNewEU, numA, numP, eMod->vpm, uMati); // col-vec
+    double zi = dot(trans(w), eui);
+
+    // fast, critical section
+    nsEvalMutex.lock();
+    assert (0.0 <= bestZeta);
+    assert (0.0 < zi);
+    double delta = (zi - bestZeta)/(zi + bestZeta);
+    // Empirically, delta seems to be either at least E-4, or at most 1E-13.
+    // So I put the cut-off around the (logarithmic) mid point.
+    const double sigDelta = 1E-8;
+    if ((bestZeta < zi) && (delta > sigDelta)) {
+      bestZeta = zi;
+      bestNghbr = i;
+      if (ReportingLevel::Low < rl) {
+        printf("New best neighbor is %u with z=%.4f (delta=%.2E)\n",
+               i, zi, delta);
+        KBase::printVUI(ni);
+        cout <<endl<<flush;
+        cout <<flush;
+      }
+    }
+    nsEvalMutex.unlock();
+    delete ns;
+    ns = nullptr;
+    return;
+  };
+  bool parP = KBase::testMultiThreadSQLite(false, rl);
+
+  // concurrent execution works, but mixes up the printed log.
+  // So we disable it if reporting is desired.
+  //parP = parP && (rl <= ReportingLevel::Low);
+
+  if (ReportingLevel::Silent < rl) {
+    if (parP) {
+      cout << "Will continue with multi-threaded execution"<<endl<<flush;
+    }
+    else {
+      cout << "Will continue with single-threaded execution"<<endl<<flush;
+    }
+  }
+
+  if (parP) {
+    KBase::groupThreads(testNghbr, 0, numNghbrs-1);
+  }
+  else {
+    for (unsigned int i=0; i<numNghbrs; i++) {
+      testNghbr(i);
+    }
+  }
+
+  VUI nghbr = neighbors[bestNghbr];
+  if (ReportingLevel::Low < rl) {
+    printf("Highest zeta is %.3f for state %u: \n", bestZeta, bestNghbr);
+    printVUI(nghbr);
+  }
+
+  auto s2 = stateFromVUI(nghbr, false);
+
+  return s2;
+}
+// end of doMCN
+
 template<class PT>
 KMatrix EState<PT>::hypExpUtilMat () const {
   KMatrix eu;
 
-  // TODO: fix or delete?
+  // TODO: fix or delete hypExpUtilMat?
   assert(false);
 
   return eu;
 }
 
 
-// TODO: use this instead of the near-duplicate code in expUtilMat
+// TODO: use pDist instead of the near-duplicate code in expUtilMat
 /// Calculate the probability distribution over states from this perspective
 template<class PT>
-tuple <KMatrix, VUI> EState<PT>::pDist(int persp) const { 
+tuple <KMatrix, VUI> EState<PT>::pDist(int persp) const {
   const unsigned int numA = eMod->numAct;
   // for this demo, the number of positions is exactly the number of actors
   const unsigned int numP = numA;
@@ -649,6 +875,7 @@ tuple <KMatrix, VUI> EState<PT>::pDist(int persp) const {
 
 // Given the utility matrix, uMat, calculate the expected utility to each actor,
 // as a column-vector. Again, this is from the perspective of whoever developed uMat.
+// TODO: remove redunant numP parameter
 template <class PT>
 KMatrix EState<PT>::expUtilMat  (KBase::ReportingLevel rl,
                                  unsigned int numA,
@@ -656,6 +883,8 @@ KMatrix EState<PT>::expUtilMat  (KBase::ReportingLevel rl,
                                  KBase::VPModel vpm,
                                  const KMatrix & uMat) const
 {
+  assert (numA == numP); // one-to-one matching of actors and their positions
+
   // BTW, be sure to lambda-bind uMat *after* it is modified.
   assert(uMat.numR() == numA); // must include all actors
   assert(uMat.numC() <= numP); // might have dropped some duplicates

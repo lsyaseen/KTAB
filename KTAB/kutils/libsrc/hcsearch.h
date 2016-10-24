@@ -49,6 +49,15 @@ using std::flush;
 using std::tuple;
 
 using KBase::ReportingLevel;
+// ----------------------------------------------
+
+// This launches a number of threads, but no more than numPar at a time.
+// The function is given unsigned ints in a range, like [0, n-1] inclusive.
+// If no value is given for numPar, it will guess from the number of cores.
+void groupThreads(function<void(unsigned int)> tfn,
+                  unsigned int numLow, unsigned int numHigh, unsigned int numPar=0);
+
+// ----------------------------------------------
 
 // Setup and manage maximization of scalar function of a column-vector.
 // Subclassing from GHCSearch would have been nice.
@@ -136,12 +145,17 @@ GHCSearch<HCP>::run(HCP p0, ReportingLevel srl,
   unsigned int sIter = 0;
   double v0 = eval(p0);
 
+
+  // TODO: change this to use groupThreads
+  // Currently, it is actually single-threaded (with a mutex).
+
   while ((iter < iMax) && (sIter < sMax)) {
     double dv = 0;
     double vBest = v0;
     HCP pBest = p0;
 
     for (HCP pTmp : nghbrs(p0)) {
+
       // Notice that 'eval' is not in the critical section, so we could
       // have arbitrarily many 'eval' operations running concurrently,
       // interleaved arbitrarily with test&reset in the critical section.

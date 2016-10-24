@@ -39,7 +39,7 @@ namespace PMatDemo {
 
 
 
-void runEKEM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, const vector<string> & aNames);
+void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, const vector<string> & aNames);
 FittingParameters pccCSV(const string fs);
 
 }

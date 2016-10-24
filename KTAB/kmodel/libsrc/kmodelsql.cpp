@@ -154,33 +154,42 @@ void Model::demoSQLite()
   return;
 }
 
-bool testMultiThreadSQLite (bool tryReset, KBase::ReportingLevel rl) {
+bool testMultiThreadSQLite (bool tryReset, KBase::ReportingLevel rl) { 
   int mutexP = sqlite3_threadsafe() ;
   bool parP = (0 != mutexP);
-  if (parP) {
-    cout << "This SQLite3 library WAS compiled to be threadsafe."<<endl << flush;
-  } else {
-    cout << "This SQLite3 library was NOT compiled to be threadsafe."<<endl << flush;
+  if (ReportingLevel::Silent < rl) {
+    if (parP) {
+      cout << "This SQLite3 library WAS compiled to be threadsafe."<<endl << flush;
+    } else {
+      cout << "This SQLite3 library was NOT compiled to be threadsafe."<<endl << flush;
+    }
   }
   if (tryReset && (!parP)) {
-    cout << "  Note that multi-threading might have been disabled via sqlite3_config."<<endl<<flush;
-    cout << "  Trying to reconfigure to SQLITE_CONFIG_SERIALIZED ... " << flush;
     int configRslt = sqlite3_config(SQLITE_CONFIG_SERIALIZED);
     if (configRslt == SQLITE_OK) {
       parP = true;
-      cout << "SUCCESS"<< endl;
     }
     else  {
       parP = false;
-      cout << "FAILED"<< endl;
+    }
+    if (ReportingLevel::Low < rl){
+      cout << "  Note that multi-threading might have been disabled via sqlite3_config."<<endl<<flush;
+      cout << "  Tried to reconfigure to SQLITE_CONFIG_SERIALIZED ... " << flush;
+      if (configRslt == SQLITE_OK) {
+        cout << "SUCCESS"<< endl;
+      }
+      else  {
+        cout << "FAILED"<< endl;
+      }
     }
   }
-
-  if (parP)  {
-    cout << "Possible to continue multi-threaded"<< endl << flush;
-  }
-  else {
-    cout << "Necessary to continue single-threaded"<< endl << flush;
+  if (ReportingLevel::Silent < rl) {
+    if (parP)  {
+      cout << "Possible to continue multi-threaded"<< endl << flush;
+    }
+    else {
+      cout << "Necessary to continue single-threaded"<< endl << flush;
+    }
   }
   return parP;
 }
