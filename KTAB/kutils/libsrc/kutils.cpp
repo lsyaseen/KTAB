@@ -120,7 +120,7 @@ VUI uiSeq(const unsigned int n1, const unsigned int n2, const unsigned int ns) {
 void printVUI(const VUI& p) {
   cout << "[VUI ";
   for (auto i : p) {
-    printf("%2i ", i);
+    printf("%2u ", i);
   }
   cout << "]";
   return;

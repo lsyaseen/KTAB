@@ -24,6 +24,7 @@
 // -------------------------------------------------
 
 #include "reformpriorities.h"
+#include "rplib2.h"
 #include <tuple>
 
 namespace RfrmPri {
@@ -67,14 +68,14 @@ vector<VUI> scanPositions(const RPModel * rpm) {
   (rpm->govCost).mPrintf("%.3f ");
   cout << endl;
   cout << "Government budget: " << rpm->govBudget << endl << flush;
-  assert (0 < rpm->govBudget);
+  assert(0 < rpm->govBudget);
 
 
-  cout << "Value to actors (rows) of individual reform items (columns):"<<endl;
-  for (unsigned int i=0; i<rpm->actrs.size(); i++) {
+  cout << "Value to actors (rows) of individual reform items (columns):" << endl;
+  for (unsigned int i = 0; i < rpm->actrs.size(); i++) {
     auto rai = ((const RPActor*)(rpm->actrs[i]));
-    for (unsigned int j = 0; j <numRefItem; j++) {
-      double vij =  rai->riVals[j];
+    for (unsigned int j = 0; j < numRefItem; j++) {
+      double vij = rai->riVals[j];
       printf(" %6.2f ", vij);
     }
     cout << endl << flush;
@@ -212,7 +213,48 @@ vector<VUI> scanPositions(const RPModel * rpm) {
   return bestAP;
 }
 
-} // end of namespace
+}
+// end of namespace
+
+// -------------------------------------------------
+
+namespace RfrmPri2 {
+using KBase::KMatrix;
+using KBase::PRNG;
+using KBase::sum;
+
+void rp2Creation(uint64_t sd) {
+
+  // primarily test instantiation of templates
+  cout << "Create RP2Model" << endl << flush;
+  auto pmm = pmmCreation(sd);
+  cout << "Create RP2Pos" << endl << flush;
+  auto pmp = pmpCreation(pmm);
+  cout << "Create RP2State" << endl << flush;
+  auto pms = pmsCreation(pmm);
+
+
+  cout << "Delete RP2Pos" << endl << flush;
+  delete pmp;
+  pmp = nullptr;
+  cout << "Delete RP2Model" << endl << flush;
+  delete pmm;
+  pmm = nullptr;
+
+  //Note that deleting pmm deletes pms
+  pms = nullptr;
+
+  cout << "Done deleting." << endl;
+
+  initScen(sd);
+  return;
+}
+
+}
+// end of namespace
+
+
+// -------------------------------------------------
 
 int main(int ac, char **av) {
   using KBase::ReportingLevel;
@@ -223,7 +265,7 @@ int main(int ac, char **av) {
   using RfrmPri::RPState;
   using RfrmPri::RPActor;
   using RfrmPri::printPerm;
-  
+
   auto sTime = KBase::displayProgramStart(RfrmPri::appName, RfrmPri::appVersion);
   uint64_t seed = dSeed; // arbitrary;
   bool siP = true;
@@ -231,13 +273,15 @@ int main(int ac, char **av) {
   bool runP = true;
   unsigned int sNum = 1;
   bool xmlP = false;
+  bool rp2P = false;
   string inputXML = "";
 
-  auto showHelp = [ sNum]() {
+  auto showHelp = [sNum]() {
     printf("\n");
     printf("Usage: specify one or more of these options\n");
     printf("\n");
     printf("--cp              start all actors from the central position \n");
+    printf("--rp2             create RP2 objects \n");
     printf("--si              start each actor from their most self-interested position \n");
     printf("                  If neither si nor cp are specified, it will use si. \n");
     printf("                  If both si and cp are specified, it will use second specified. \n");
@@ -276,6 +320,9 @@ int main(int ac, char **av) {
         i++;
         inputXML = av[i];
       }
+      else if (strcmp(av[i], "--rp2") == 0) {
+        rp2P = true;
+      }
       else if (strcmp(av[i], "--si") == 0) {
         cpP = false;
         siP = true;
@@ -292,6 +339,9 @@ int main(int ac, char **av) {
         printf("Unrecognized argument: %s\n", av[i]);
       }
     }
+  }
+  else {
+    runP = false;
   }
 
   if (!runP) {
@@ -311,6 +361,10 @@ int main(int ac, char **av) {
   // Unix correctly prints all digits with lu, lX, llu, and llX.
   // Windows only prints part, with lu, lX, llu, and llX.
 
+  if (rp2P) {
+    RfrmPri2::rp2Creation(seed);
+    return 0;
+  }
 
   auto rpm = new RPModel("", seed);
   if (xmlP) {
@@ -323,22 +377,6 @@ int main(int ac, char **av) {
       rpm->initScen(sNum);
       break;
     case 1:
-      rpm->initScen(sNum);
-      break;
-
-    case 2:
-    case 20:
-    case 21:
-    case 22:
-    case 23:
-      rpm->initScen(sNum);
-      break;
-
-    case 3:
-    case 30:
-    case 31:
-    case 32:
-    case 33:
       rpm->initScen(sNum);
       break;
 

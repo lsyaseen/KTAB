@@ -147,29 +147,59 @@ void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, cons
   }
 
   es1->setUENdx();
-  es1->step = [es1] { return es1->stepMCN(); };
 
   // test instantiation of templates
   auto sFn0 = [es1] { return es1->stepSUSN(); };
   auto sFn1 = [es1] { return es1->stepBCN(); };
   auto sFn2 = [es1] { return es1->stepMCN(); };
 
+  es1->step = sFn2;
   eKEM->addState(es1);
 
   cout << "--------------" << endl;
   cout << "First state:" << endl;
   es1->show();
 
-
-  // just a test
-  //auto tmpState = es1->stepMCN();
-
   eKEM->run();
 
   const unsigned int histLen = eKEM->history.size();
   PMatrixState* esA = (PMatrixState*)(eKEM->history[histLen - 1]);
+  cout << endl << flush;
   printf("Last State %i \n", histLen - 1);
   esA->show();
+  esA->setAUtil(-1, ReportingLevel::Medium);
+  auto lastPDU = esA->pDist(-1);
+  KMatrix pd = get<0>(lastPDU);
+  VUI un = get<1>(lastPDU);
+  KMatrix umh = esA->uMatH(-1);
+  auto eu = umh*pd;
+
+  cout << "Unique indices:" << endl;
+  for (unsigned int i : un){
+    printf(" %2u ", i);
+  }
+  
+  cout << endl ;
+  cout << "Corresponding policies:  ";
+  cout << endl ;
+  for (unsigned int i : un){
+    auto posI = (EPosition<unsigned int>*)(esA->pstns[i]);
+    auto ni = posI->getIndex();
+    printf(" %2u ",ni);
+  }
+  cout << endl << endl;
+  cout << "Policy probabilities:" << endl;
+  for (unsigned int j=0; j<un.size(); j++){
+    unsigned int i = un[j];
+    auto posI = (EPosition<unsigned int>*)(esA->pstns[i]);
+    auto ni = posI->getIndex();
+    double probI = pd(j, 0);
+    printf("%2u:  %.4f \n", ni, probI);
+  }
+  cout << endl;
+  cout << "Actor expected utilities:" << endl;
+  trans(eu).mPrintf(" %.4f ");
+  cout << endl << flush;
   return;
 }
 

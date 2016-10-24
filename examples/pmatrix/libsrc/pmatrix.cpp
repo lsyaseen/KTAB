@@ -456,6 +456,16 @@ EState<unsigned int>* PMatrixState::makeNewEState() const {
 }
 
 
+VUI PMatrixState::similarPol(unsigned int, unsigned int ) const {
+  const unsigned int numOpt = eMod->numOptions();
+  VUI sp = {};
+  sp.resize(numOpt);
+  for (unsigned int i = 0; i < numOpt; i++) {
+    sp[i] = i;
+  }
+  return sp;
+}
+
 vector<double> PMatrixState::actorUtilVectFn(int h, int tj) const {
   // no difference in perspective for this demo
   const unsigned int na = eMod->numAct;

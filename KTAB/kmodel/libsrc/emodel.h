@@ -59,9 +59,10 @@ using std::string;
 using std::tuple;
 using std::vector;
 
-
+// -------------------------------------------------
 
 template <class PT> class EState;
+
 // -------------------------------------------------
 // this model relies on an explicit enumeration of all possible
 // outcomes/positions: a few tens of thousands of discrete choices.
@@ -80,6 +81,9 @@ public:
   unsigned int numOptions() const;
   PT nthOption(unsigned int i) const;
 
+  // number of similar policies to use in searches.
+  // default is to use all known policies.
+  unsigned int nSim = 0;
 
   // two states are equivalent if all actors have the same EPosition in each.
   // derived classes may need to extend this to take into account the
@@ -149,8 +153,16 @@ public:
   //(i.e. get actual probabilities, not one actor's beliefs)
   tuple <KMatrix, VUI> pDist(int persp) const;
 
+  // get the matrix of utility for unique occupied positions,
+  // as estimated by h (which might be -1).
+  KMatrix uMatH(int h) const;
+
   // determine if the i-th position in this state is equivalent to the j-th position
   virtual bool equivNdx(unsigned int i, unsigned int j) const;
+
+  // given an index into Theta, find the N policies most similar.
+  // If N=0 or |Theta|<N, then it just returns all of Theta
+  virtual VUI similarPol(unsigned int ti, unsigned int numPol = 0) const = 0;
 
   // get the index into Theta from the i-th position of this state.
   unsigned int posNdx(const unsigned int i) const;

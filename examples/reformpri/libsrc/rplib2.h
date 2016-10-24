@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // --------------------------------------------
 
-#ifndef POLMATRIX_H
-#define POLMATRIX_H
+#ifndef RP2_MATRIX_H
+#define RP2_MATRIX_H
 
 #include "kutils.h"
 #include "prng.h"
@@ -35,7 +35,7 @@
 
 
 
-namespace PMatDemo {
+namespace RfrmPri2 {
 using std::string;
 using std::vector;
 using std::tuple;
@@ -49,38 +49,29 @@ using KBase::EState;
 
 // --------------------------------------------
 
-typedef tuple <vector<string>,  // aNames,
-vector<bool>,           // maxVect,
-KMatrix,                // outcomes,
-KMatrix,                // caseWeights,
-KMatrix,                // probWeight,
-vector<double>,         // threshVal,
-vector<bool>>           // overThresh
-FittingParameters;
+void initScen(uint64_t sd);
 
 // --------------------------------------------
-//class PMatrixPos;
-class PMatrixState;
+class RP2State;
 // --------------------------------------------
-// The Policy Matrix model uses a pre-specified matrix
-// of actor-vs-policy utilities.
-// The utility matrix provides a (basic) linkage to offline
-// models such as KEM/GAMS.
+// The RP2Model uses a pre-specified matrix
+// of actor-vs-policy utilities, utility of a different
+// order of reform priority items.
 // The unsigned int in the template is just the column of a policy.
-class PMatrixModel : public EModel<unsigned int> {
+class RP2Model : public EModel<unsigned int> {
 public:
-  explicit PMatrixModel(string d = "", uint64_t s = KBase::dSeed, vector<bool> = {});
-  virtual ~PMatrixModel();
+  explicit RP2Model(string d = "", uint64_t s = KBase::dSeed, vector<bool> = {});
+  virtual ~RP2Model();
 
   // check the matrix and set as utilities,
   // if valid for [numAct,numOpt] utilities in [0,1] range.
-  void setPMatrix(const KMatrix & pm0);
+  void setRP2(const KMatrix & pm0);
 
   // check the row-matrix and set as weight,
   // if valid for non-negative [numAct,1] weights
   void  setWeights(const KMatrix & w0);
 
-  // must set weights and pMatrix first
+  // must set weights and RP2 first
   void  setActors(vector<string> names, vector<string> descriptions);
 
   KMatrix getWghtVect() const {
@@ -91,37 +82,20 @@ public:
     return polUtilMat; // rectangular
   };
 
-  static KMatrix utilFromFP(const FittingParameters & fParams, double bigR);
-
-  static tuple<double, KMatrix, KMatrix> minProbError(
-      const FittingParameters & fParams,
-      double bigR, double errWeight);
 
 protected:
   KMatrix wghtVect; // column vector of actor weights
   KMatrix polUtilMat; // if set, the basic util(actor,option) matrix
 
-  // This assess and returns the sum of three kinds of costs.
-  // The 'pnt' specifies an adjustment vector and incurs
-  // a cost to the extent that the components differ from 0.
-  // The adjusted wMat is then separately adjusted for case 1 and case 2,
-  // and a cost is incurred to the extend that selected probabilities
-  // fall below their respective thresholds.
-  static tuple<double, KMatrix, KMatrix> probCost(const KMatrix& pnt,
-                                                  const KMatrix& wMat, const KMatrix& uMat,
-                                                  const KMatrix& wAdj1, const KMatrix& pSel1, double thresh1,
-                                                  const KMatrix& wAdj2, const KMatrix& pSel2, double thresh2,
-                                                  double errWeight, ReportingLevel rl);
-
 private:
 };
 
 
 
-class PMatrixPos : public EPosition<unsigned int> {
+class RP2Pos : public EPosition<unsigned int> {
 public:
-  explicit PMatrixPos(PMatrixModel* pm, int n);
-  virtual ~PMatrixPos();
+  explicit RP2Pos(RP2Model* pm, int n);
+  virtual ~RP2Pos();
 
 protected:
 
@@ -131,13 +105,13 @@ private:
 
 
 
-class PMatrixState : public EState<unsigned int> {
+class RP2State : public EState<unsigned int> {
 public:
-  explicit PMatrixState(PMatrixModel* pm);
-  virtual ~PMatrixState();
+  explicit RP2State(RP2Model* pm);
+  virtual ~RP2State();
 
-  // As we expect fairly few policies (dozens, not thousands),
-  // we just return indices to all of theta, ignoring ti and numPol
+  // We expect hundreds or even thousands policies,
+  // so we cannot use all of Theta.
   virtual VUI similarPol(unsigned int ti, unsigned int numPol = 0) const;
 
 protected:
@@ -150,9 +124,9 @@ private:
 };
 
 // --------------------------------------------
-PMatrixModel* pmmCreation(uint64_t sd);
-PMatrixPos*  pmpCreation(PMatrixModel* pmm);
-PMatrixState* pmsCreation(PMatrixModel * pmm);
+RP2Model* pmmCreation(uint64_t sd);
+RP2Pos*  pmpCreation(RP2Model* pmm);
+RP2State* pmsCreation(RP2Model * pmm);
 
 string genName(const string & prefix, unsigned int i);
 

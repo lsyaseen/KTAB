@@ -229,7 +229,7 @@ EState<PT>* EState<PT>::stepSUSN() {
 
 
 template <class PT>
-KMatrix EState<PT>::uMatH(unsigned int h) const {
+KMatrix EState<PT>::uMatH(int h) const {
   const unsigned int numA = eMod->numAct;
   const unsigned int na2 = eMod->actrs.size();
   assert(numA == na2);
@@ -242,8 +242,18 @@ KMatrix EState<PT>::uMatH(unsigned int h) const {
   const unsigned int aus = aUtil.size();
   assert (KBase::Model::minNumActor <= aus);
 
+  KMatrix u = aUtil[0];
   // Utilities to actors of the currently occupied positions.
-  const auto u = aUtil[h];
+  if (0 <= h) {
+    u = aUtil[h];
+  }
+  else {
+    for (unsigned int i = 0; i < numA; i++) { // i's est of i's utility
+      for (unsigned int j = 0; j < numA; j++) { // j's position
+        u(i, j) = aUtil[i](i, j);
+      }
+    }
+  }
   const unsigned int numP = pstns.size();
 
   // In the state, one-to-one matching of actors and actually
@@ -566,10 +576,10 @@ EState<PT>* EState<PT>::stepMCN() {
   if ((0 == uIndices.size()) || (0 == eIndices.size())) {
     setUENdx();
   }
-  setAUtil(-1, ReportingLevel::Medium);
+  setAUtil(-1, ReportingLevel::Low);
   show();
 
-  auto s2 = doMCN(ReportingLevel::Medium);
+  auto s2 = doMCN(ReportingLevel::Low);
 
   s2->step = [s2]() {
     return s2->stepMCN();
@@ -643,15 +653,15 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
 
   vector<VUI> neighbors = {};
   // the 0-neighbor, so we never take something less than the current
-  const unsigned int numZero = 1;
   neighbors.push_back(currNdcs);
 
-  unsigned int numOpt = eMod->numOptions();
+  const unsigned int numOpt = eMod->numOptions();
+  const unsigned int numSim = eMod->nSim;
 
   // add 1-neighbors
-  const unsigned int numOne = numA*(numOpt-1);
   for (unsigned int ai = 0; ai < numA; ai++) {
-    for (unsigned int hpi = 0; hpi < numOpt; hpi++) {
+    const VUI simI = similarPol(currNdcs[ai], numSim);
+    for (auto hpi : simI) {
       if (hpi != currNdcs[ai]) {
         VUI newN = currNdcs;
         newN[ai] = hpi;
@@ -659,15 +669,14 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
       }
     }
   }
-  assert ((numZero+numOne) == neighbors.size());
-
 
   // add 2-neighbors, avoiding equivalent permutations
-  const unsigned int numTwo = (numA*(numA-1)*(numOpt-1)*(numOpt-1))/2;
   for (unsigned int ai = 0; ai < numA; ai++) {
-    for (unsigned int hpi = 0; hpi < numOpt; hpi++) {
+    const VUI simI = similarPol(currNdcs[ai], numSim);
+    for (auto hpi : simI) {
       for (unsigned int aj = 0; aj < numA; aj++) {
-        for (unsigned int hpj = 0; hpj < numOpt; hpj++) {
+        const VUI simJ = similarPol(currNdcs[aj], numSim);
+        for (auto hpj : simJ) {
           if ((ai < aj) && (hpi != currNdcs[ai]) && (hpj != currNdcs[aj])) {
             VUI newN = currNdcs;
             newN[ai] = hpi;
@@ -678,32 +687,8 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
       }
     }
   }
-  assert ((numZero+numOne+numTwo) == neighbors.size());
 
-  /*
-    const unsigned int numThree = (numA*(numA-1)*(numA-2)*(numOpt-1)*(numOpt-1)*(numOpt-1))/6;
-    for (unsigned int ai = 0; ai < numA; ai++) {
-        for (unsigned int hpi = 0; hpi < numOpt; hpi++) {
-            for (unsigned int aj = 0; aj < numA; aj++) {
-                for (unsigned int hpj = 0; hpj < numOpt; hpj++) {
-                    for (unsigned int ak = 0; ak < numA; ak++) {
-                        for (unsigned int hpk = 0; hpk < numOpt; hpk++) {
-                            if ((ai < aj) && (aj < ak) && (hpi != currNdcs[ai])
-                                && (hpj != currNdcs[aj])&& (hpk != currNdcs[ak])) {
-                                VUI newN = currNdcs;
-                                newN[ai] = hpi;
-                                newN[aj] = hpj;
-                                newN[ak] = hpk;
-                                neighbors.push_back(newN);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    assert ((numZero+numOne+numTwo+numThree) == neighbors.size());
-    */
+  // three-neighbors are possible, but prohibitively expensive and not very helpful.
 
   if (ReportingLevel::Silent < rl) {
     cout << "Creating and ranking "<<neighbors.size();
@@ -842,16 +827,23 @@ tuple <KMatrix, VUI> EState<PT>::pDist(int persp) const {
 
   cout << "Number of aUtils: " << aUtil.size() << endl << flush;
 
+  /*
   const auto u = aUtil[0]; // all have same beliefs in this demo
-  assert (-1 == persp);
+  assert ((-1 == persp) || (0 == persp));
 
   auto uufn = [u, this](unsigned int i, unsigned int j1) {
     return u(i, uIndices[j1]);
   };
 
-  const auto uMat = KMatrix::map(uufn, numA, numU);
+  const auto um2 = KMatrix::map(uufn, numA, numU);
+  */
+  
+  const auto uMat = uMatH(persp);
   assert(uMat.numR() == numA); // must include all actors
   assert(uMat.numC() == numU);
+
+  // assert (norm(uMat - um2) < 1E-6);
+  // cout << "uMatH passed" << endl << flush;
 
   // vote_k ( i : j )
   auto vkij = [this, uMat](unsigned int k, unsigned int i, unsigned int j) {
@@ -865,7 +857,7 @@ tuple <KMatrix, VUI> EState<PT>::pDist(int persp) const {
   const auto c = Model::coalitions(vkij, uMat.numR(), uMat.numC());
   const auto ppv = Model::probCE2(eMod->pcem, eMod->vpm, c);
   const auto p = get<0>(ppv); // column
-  const auto pv = get<1>(ppv); // square
+  //const auto pv = get<1>(ppv); // square
   const auto eu = uMat*p; // column
   assert(numA == eu.numR());
   assert(1 == eu.numC());

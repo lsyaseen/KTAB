@@ -261,20 +261,23 @@ void RPModel::initScen(unsigned int ns)
   case 1:
     initScen1();
     break;
-  case 2:
-  case 20:
-  case 21:
-  case 22:
-  case 23:
-    initScen2Avrg(ns);
-    break;
-  case 3:
-  case 30:
-  case 31:
-  case 32:
-  case 33:
-    initScen3Top4(ns);
-    break;
+    // hard-coded cases replaced by XML
+    /*
+    case 2:
+    case 20:
+    case 21:
+    case 22:
+    case 23:
+      initScen2Avrg(ns);
+      break;
+    case 3:
+    case 30:
+    case 31:
+    case 32:
+    case 33:
+      initScen3Top4(ns);
+      break;
+      */
   default:
     printf("Unrecognized scenario number, %u \n", ns);
     break;
@@ -1035,14 +1038,14 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
   auto ts = vector<thread>();
   // Each actor, h, finds the position which maximizes their EU in this situation.
   for (unsigned int h = 0; h < numA; h++) {
-    if (parP)  { // launch all, concurrent
+    if (parP) { // launch all, concurrent
       // printf("Starting concurrent thread for new position %i \n", h);
       ts.push_back(thread([newPosFn, h]() {
         newPosFn(h);
         return;
       }));
     }
-    else   { // do each, sequential
+    else { // do each, sequential
       // printf("Calculating new position %i \n", h);
       newPosFn(h);
     }
