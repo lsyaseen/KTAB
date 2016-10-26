@@ -86,7 +86,7 @@ Model::Model(string desc, uint64_t sd, vector<bool> f) {
   }
   //get the hash
   uint64_t scenIdhash = (std::hash < std::string>() (utcBuffId));
-  sprintf(hshCode, "0x%032llX", scenIdhash);
+  sprintf(hshCode, "%032llX", scenIdhash);
   scenId = hshCode;
   delete hshCode;
   hshCode = nullptr;
