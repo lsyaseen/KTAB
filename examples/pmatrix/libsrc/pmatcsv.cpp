@@ -112,7 +112,7 @@ FittingParameters pccCSV(const string fs) {
   cout << endl << flush;
 
   cout << "Case Weights:" << endl;
-  caseWeights.mPrintf(" %5.2f ");
+  caseWeights.mPrintf("%7.3f ");
   cout << endl;
 
   cout << "Outcomes:" << endl;

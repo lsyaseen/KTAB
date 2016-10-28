@@ -183,7 +183,9 @@ void initScen(uint64_t sd) {
   const auto rpNormVal = KBase::rescaleRows(rpRawVal, 0.0, 1.0);
 
   const double bigR = 0.5;
-  auto curve = [bigR](double v) {return quadUfromV(v, bigR); };
+  auto curve = [bigR](double v) {
+    return quadUfromV(v, bigR);
+  };
 
   const auto rpUtil = KMatrix::map(curve, rpNormVal);
   cout << "done." << endl << flush;
@@ -200,19 +202,18 @@ void initScen(uint64_t sd) {
     return dij;
   };
 
-  auto tupleLess = [](TDI t1, TDI t2) {
-    double d1 = get<0>(t1);
-    double d2 = get<0>(t2);
-    return (d1 < d2);
-  };
-
-  auto diffVUI = [&rpUtil, numPos, tupleLess, diffFn](unsigned int n, unsigned int nSim) {
+  auto diffVUI = [&rpUtil, numPos, diffFn](unsigned int n, unsigned int nSim) {
     vector<TDI> vdk = {};
     for (unsigned int k = 0; k < numPos; k++) {
       double dkn = diffFn(k, n, rpUtil);
       auto dk = TDI(dkn, k);
       vdk.push_back(dk);
     }
+    auto tupleLess = [](TDI t1, TDI t2) {
+      double d1 = get<0>(t1);
+      double d2 = get<0>(t2);
+      return (d1 < d2);
+    };
     std::sort(vdk.begin(), vdk.end(), tupleLess);
     vector<TDI> sdk = {};
     for (unsigned int i = 0; ((i < nSim) && (i < numPos)); i++) {

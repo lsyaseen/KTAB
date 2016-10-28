@@ -205,6 +205,7 @@ void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, cons
 
 void fitFile(string fName, uint64_t seed) {
   const double bigR = +0.5;
+  cout << "Fitting file "<<fName<<endl;
   auto fParams = pccCSV(fName);
   vector<string> aNames = get<0>(fParams);
   auto uMat = PMatrixModel::utilFromFP(fParams, bigR);
@@ -212,7 +213,8 @@ void fitFile(string fName, uint64_t seed) {
   cout << "RA-Util from outcomes: " << endl << flush;
   uMat.mPrintf(" %.4f  ");
   cout << endl << flush;
-  auto c12 = PMatrixModel::minProbError(fParams, bigR, 250.0);
+  auto c12 = PMatrixModel::minProbError(fParams, bigR, 1100.0);
+  // 250 for 2016-08-27 results
 
   // retrieve the weight-matrices which were fitted, so we can
   // use them to assess coalitions in two different situations.
@@ -300,7 +302,7 @@ int main(int ac, char **av) {
 
   if (ac > 1) {
     for (int i = 1; i < ac; i++) {
-      cout << "Argument " << i << " is =|" << av[i] << "|=" << endl << flush;
+      //cout << "Argument " << i << " is =|" << av[i] << "|=" << endl << flush;
       if (strcmp(av[i], "--seed") == 0) {
         i++;
         seed = std::stoull(av[i]);

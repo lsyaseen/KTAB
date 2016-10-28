@@ -235,8 +235,10 @@ protected:
     // the actor's ideal, against which they judge others' positions
     vector<VctrPstn> ideals = {};
 
-    // The matrix of rates at which they adjust their ideals toward positions
+    // The matrix of rates at which they adjust their ideals toward positions.
+    // Change it ONLY via setAccomodate, so as to keep identAccMat in synch
     KMatrix accomodate = KMatrix();
+    bool identAccMat = true;
 
     // rest the new ideal points, based on other's positions and one's old ideal point
     void newIdeals();

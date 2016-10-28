@@ -406,7 +406,11 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::probCost(const KMatrix& pnt,
   auto err2 = sPlus(thresh2 - KBase::dot(pDist2, pSel2));
   double serr2 = err2 * err2;
   
-  const double totalCost = (pCost + ((serr1 + serr2)*errWeight)) / (1.0 + errWeight);
+  // count the larger error twice
+  double err3 = (err1 > err2) ? err1 : err2;
+  double serr3 = err3 * err3;
+  
+  const double totalCost = (pCost + ((serr1 + serr2 + serr3)*errWeight)) / (1.0 + errWeight);
 
   if (ReportingLevel::Silent < rl) {
     cout << "Point :";
@@ -421,8 +425,8 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::probCost(const KMatrix& pnt,
     w2.mPrintf(" %7.2f ");
     cout << endl;
 
-    printf("Total cost= %.4f = [ %f + (%f^2 + %f^2)*%.2f ] / %.2f",
-           totalCost, pCost, err1, err2, errWeight, errWeight + 1.0);
+    printf("Total cost= %.5f = [ %f + (%f^2 + %f^2 + %f^2)*%.2f ] / %.2f",
+           totalCost, pCost, err1, err2, err3, errWeight, errWeight + 1.0);
     cout << endl << flush;
   }
 
