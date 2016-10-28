@@ -1077,77 +1077,333 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
   return;
 }
 
-// JAH 20160809 let me state up front that I feel dirty passing in the pre-computed
-// inverted L matrices, rather than passing in A,B,C,K and having it all compute them.
-// I'm kind of forced to, though, since the data we have for our example has B,C,K
-// matrices with "other stuff" which I can't just delete, and which makes no sense to
-// expect for a general "prep model" function, since a general "prep model" function
-// would expect differently-sized matrices.
+// prepModel takes in a set of "real" data and sets up the IO model, and performs
+// several checks to verify all the data is internally consistent; this replicates
+// some of the functionality in makeBaseYear & makeIOModel
 // numFac = L, numCon = M, numSec = N
 void LeonModel::prepModel(unsigned int numFac, unsigned int numCon, unsigned int numSec,
-                          KMatrix & baseDemnd, KMatrix & dmndElast, KMatrix & revShare, KMatrix & lAlpha, KMatrix & lBeta)
+  KMatrix & xprt, KMatrix & cons, KMatrix & elast, KMatrix & trns, KMatrix & rev, KMatrix & expnd, KMatrix & Bmat)
 {
   using std::cout;
   using std::endl;
+  using std::flush;
+
+  using KBase::inv;
+  using KBase::iMat;
+  using KBase::norm;
 
   // check stuff first - compiler doesn't like the asserts for nullptr inequality(?), so comment out
   assert(numFac > 0);
   assert(numCon > 0);
   assert(numSec > 0);
-  //assert(nullptr != baseDemnd);
-  assert(baseDemnd.numR() == numSec);
-  assert(baseDemnd.numC() == 1);
-  //assert(dmndElast != nullptr);
-  assert(dmndElast.numR() == numSec);
-  assert(dmndElast.numC() == 1);
-  //assert(nullptr != revShare);
-  assert(revShare.numR() == numFac);
-  assert(revShare.numC() == numSec);
-  //assert(nullptr != lAlpha);
-  assert(lAlpha.numR() == numSec);
-  assert(lAlpha.numC() == numSec);
-  //assert(nullptr != lBeta);
-  assert(lBeta.numR() == numSec);
-  assert(lBeta.numC() == numSec);
+  assert(xprt.numR() == numSec);
+  assert(xprt.numC() == 1);
+  assert(cons.numR() == numSec);
+  assert(cons.numC() == numCon);
+  assert(elast.numR() == numSec);
+  assert(elast.numC() == 1);
+  assert(trns.numR() == numSec);
+  assert(trns.numC() == numSec);
+  assert(rev.numR() == numFac);
+  assert(rev.numC() == numSec);
+  assert(expnd.numR() == numCon);
+  assert(expnd.numC() == numFac);
+  assert(Bmat.numR() == numSec);
+  assert(Bmat.numC() == numSec);
+
+  auto delta = [](double x, double y) {
+    return (2 * fabs(x - y)) / (fabs(x) + fabs(y));
+  };
+
+  auto mDelta = [](const KMatrix & x, const KMatrix & y) {
+    return (2 * norm(x - y)) / (norm(x) + norm(y));
+  };
 
   // insert items into the model
   N = numSec;
   L = numFac;
   M = numCon;
 
-  x0 = baseDemnd;
-  cout << "Base Year Demand:" << endl;
+  x0 = xprt;
+  cout << "Base Year Export Demand:" << endl;
   x0.mPrintf(" %.4f ");
   cout << endl;
 
-  eps = dmndElast;
+  cout << "Base Year Domestic Demand:" << endl;
+  cons.mPrintf(" %.4f ");
+  cout << endl;
+
+  eps = elast;
   cout << "Export Elasticities:" << endl;
   eps.mPrintf(" %.4f ");
   cout << endl;
 
-  rho = revShare;
-  cout << "Factor Value-Add Shares" << endl;
-  rho.mPrintf(" %0.4f ");
-
-  aL = lAlpha;
-  cout << "Leontief Matrix for Factors: Lalpha=inverse(I-A) (solves q=d+Aq):" << endl;
-  aL.mPrintf(" %.4f  ");
+  cout << "Base Year Intra-sectoral Transactions:" << endl;
+  trns.mPrintf(" %8.4f ");
   cout << endl;
 
-  bL = lBeta;
-  cout << "Leontief Matrix for Sectors: Lbeta=inverse(I-A+BCK) (solves q=d+Aq+BCKq):" << endl;
-  bL.mPrintf(" %.4f  ");
+  cout << "Factor Value-Added Revenue:" << endl;
+  rev.mPrintf(" %8.4f ");
   cout << endl;
 
-  // this is just copied almost verbatim (vercodim?) from makeIOModel
+  // some calculations which we need for building and validating the IO model
+  // much of this copied almost verbatim (vercodim?) from makeIOModel
+  double sxc = sum(xprt);
+  auto zeta0 = KMatrix(N, M); // the CD coefficients
+  auto sumConsClms = KMatrix(M, 1);
+  double sCons = 0.0;
+  for (unsigned int m = 0; m < M; m++) {
+    double scc = 0.0;
+    for (unsigned int i = 0; i < N; i++) {
+      scc = scc + cons(i, m);
+    }
+    for (unsigned int i = 0; i < N; i++) {
+      zeta0(i, m) = cons(i, m) / scc;
+    }
+    sumConsClms(m, 0) = scc;
+    sCons = sCons + scc;
+  }
+
+  double sVA = 0.0;
+  auto sumVARows = KMatrix(L, 1);
+  for (unsigned int l = 0; l < L; l++) {
+    double svr = 0.0;
+    for (unsigned int j = 0; j < N; j++) {
+      svr = svr + rev(l, j);
+    }
+    sumVARows(l, 0) = svr;
+    sVA = sVA + svr;
+  }
+
+  auto sumVAClms = KMatrix(1, N);
+  for (unsigned int j = 0; j < N; j++) {
+    double svc = 0.0;
+    for (unsigned int l = 0; l < L; l++) {
+      svc = svc + rev(l, j);
+    }
+    sumVAClms(0, j) = svc;
+  }
+
+  auto sumTRNSClms = KMatrix(1, N);
+  for (unsigned int j = 0; j < N; j++) {
+    double stc = 0.0;
+    for (unsigned int l = 0; l < N; l++) {
+      stc = stc + trns(l, j);
+    }
+    sumTRNSClms(0, j) = stc;
+  }
+
+  // now compute the rho & vas matrices
+  auto qFromTransVA = sumVAClms + sumTRNSClms;
+  rho = KMatrix(L,N);
+  for (unsigned int l = 0; l < L; l++)
+  {
+    for (unsigned int j = 0; j < N; j++)
+    {
+        rho(l,j) = rev(l,j)/qFromTransVA(0,j);
+    }
+  }
   vas = KMatrix(1, N);
   for (unsigned int j = 0; j < N; j++) {
     double vj = 0.0;
     for (unsigned int h = 0; h < L; h++) {
-      vj = vj + revShare(h, j);
+      vj = vj + rho(h, j);
     }
     vas(0, j) = vj;
   }
+  cout << "Factor Value-Add Shares" << endl;
+  rho.mPrintf(" %0.4f ");
+  cout << endl;
+  cout << "Total Value-Add Shares" << endl;
+  vas.mPrintf(" %0.4f ");
+  cout << endl;
+
+  cout << " check (export + cons = value added) ... " << flush;
+  assert(fabs(sxc + sCons - sVA) < 0.001);
+  cout << "ok" << endl;
+
+  cout << "sumVARows" << endl;
+  sumVARows.mPrintf(" %.4f ");
+  cout << endl;
+
+  cout << "sumConsClms" << endl;
+  sumConsClms.mPrintf(" %.4f ");
+  cout << endl;
+
+  cout << "Expenditure Matrix" << endl;
+  expnd.mPrintf(" %.4f ");
+  cout << endl;
+
+  cout << "check (sumConsClm = expnd * sumVARows) ... " << flush;
+  auto expTSumVA = expnd*sumVARows;
+  expTSumVA.mPrintf(" %0.4f ");
+  assert(mDelta(sumConsClms, expTSumVA) < 1e-6);
+  cout << "ok" << endl;
+
+  // just display here the B matrix
+  printf("Scaled Complete Capital Requirements, B \n");
+  Bmat.mPrintf(" %.4f ");
+  cout << endl;
+
+  auto qClm = KMatrix(N, 1);
+  for (unsigned int i = 0; i < N; i++) {
+    double qi = xprt(i, 0);
+    for (unsigned int j = 0; j < N; j++) {
+      double tij = trns(i, j);
+      qi = qi + tij;
+    }
+    for (unsigned int k = 0; k < M; k++) {
+      double cik = cons(i, k);
+      qi = qi + cik;
+    }
+    qClm(i, 0) = qi;
+  }
+  printf("Column vector of total outputs (export+trans+cons) \n");
+  qClm.mPrintf(" %.4f ");
+  cout << endl;
+
+  // row matrix of column-sums
+  auto qRow = KMatrix(1, N);
+  for (unsigned int j = 0; j < N; j++) {
+    double qj = 0;
+    for (unsigned int i = 0; i < N; i++) {
+      double tij = trns(i, j);
+      qj = qj + tij;
+    }
+    for (unsigned int h = 0; h < L; h++) {
+      double rhj = rev(h, j);
+      qj = qj + rhj;
+    }
+    qRow(0, j) = qj;
+  }
+  cout << "check row-sums == clm-sums ... " << flush;
+  double tol = 0.001; // tolerance in matching row and column sums
+  for (unsigned int n = 0; n < N; n++) {
+    assert(delta(qClm(n, 0), qRow(0, n)) < tol);
+  }
+  cout << "ok" << endl;
+
+  auto A = KMatrix(N, N);
+  for (unsigned int j = 0; j < N; j++) {
+    double qj = qRow(0, j);
+    for (unsigned int i = 0; i < N; i++) {
+      double aij = trns(i, j) / qj;
+      A(i, j) = aij;
+    }
+  }
+  cout << "A matrix:" << endl;
+  A.mPrintf(" %.4f ");
+  cout << endl;
+
+  // ------------------------------------------
+  cout << "Shares of GDP to VA factors (labor groups)" << endl;
+  cout << " check budgetL == rho x qClm:" << endl;
+  auto budgetL = rho * qClm;
+  budgetL.mPrintf(" %.4f "); //  these are the VA to factors
+  assert(mDelta(sumVARows, budgetL) < tol);
+  cout << "ok" << endl;
+  cout << endl;
+
+  auto budgetS = KMatrix(1, N);
+  for (unsigned int j = 0; j < N; j++) {
+    double vs = qClm(j, 0) * vas(0, j);
+    budgetS(0, j) = vs;
+  }
+  cout << "Shares of GDP to industry sectors (using Alpha, not Beta)" << endl;
+  cout << "budgetS:" << endl;
+  budgetS.mPrintf(" %.4f ");
+  assert(mDelta(sumVAClms, budgetS) < tol);
+  cout << "ok" << endl;
+  cout << endl;
+
+  cout << "GDP:" << endl;
+  (vas*qClm).mPrintf(" %.4f ");
+  cout << endl;
+
+  auto budgetC = KMatrix(M, 1); // column-vector budget of each consumption category
+  for (unsigned int k = 0; k < M; k++) {
+    double bk = 0;
+    for (unsigned int i = 0; i < N; i++) {
+      double cik = cons(i, k);
+      bk = bk + cik;
+    }
+    budgetC(k, 0) = bk;
+  }
+  cout << "budgetC" << endl << flush;
+  budgetC.mPrintf(" %.4f ");
+  assert(mDelta(budgetC, sumConsClms) < tol);
+  cout << "ok" << endl;
+  cout << endl;
+
+  // because the initial prices are all 1, zeta_ik = theta_ik/P_i is
+  // just theta_ik, which is C_ik/BC_k
+  auto zeta = KMatrix(N, M);
+  for (unsigned int k = 0; k < M; k++) {
+    double bck = budgetC(k, 0);
+    for (unsigned int i = 0; i < N; i++) {
+      zeta(i, k) = cons(i, k) / bck;
+    }
+  }
+  cout << "zeta" << endl << flush;
+  zeta.mPrintf(" %.4f "); // OK
+  cout << endl;
+
+  cout << "Domestic Demand computed from zeta*budgetC" << endl << flush;
+  (zeta * budgetC).mPrintf(" %.4f "); // OK
+  cout << endl;
+
+  cout << "check budgetC == expnd x budgetL" << endl << flush;
+  (expnd*budgetL).mPrintf(" %.4f ");
+  assert(mDelta(budgetC, expnd*budgetL) < tol);
+  cout << "ok" << endl;
+  cout << endl;
+
+  // compute & validate alpha, then invert & validate I-alpha
+  auto alpha = A + (zeta * expnd * rho);
+  cout << "alpha " << endl << flush;
+  alpha.mPrintf(" %.4f ");
+  for (auto a : alpha) {
+    assert(0.0 < a);
+  }
+  cout << endl;
+
+  auto id = iMat(N);
+  aL = inv(id - alpha);
+  cout << "check aL * X == qClm" << endl << flush;
+  (aL*xprt).mPrintf(" %.4f ");
+  assert(mDelta(aL*xprt, qClm) < tol);
+  for (auto x : aL) {
+    assert(0.0 < x);
+  }
+  cout << "ok" << endl;
+  cout << endl;
+
+  // compute beta, then invert & validate I-beta
+  auto beta = alpha + Bmat;
+  cout << "beta " << endl << flush;
+  beta.mPrintf(" %.4f ");
+  cout << endl;
+
+  bL = inv(id - beta);
+  auto betaQX = bL*xprt;
+  cout << "check bL * X" << endl << flush;
+  betaQX.mPrintf(" %.4f ");
+  for (auto x : bL) {
+    assert(0.0 < x);
+  }
+  cout << "ok" << endl;
+  cout << endl;
+
+  auto budgetBS = KMatrix(1, N);
+  for (unsigned int j = 0; j < N; j++) {
+    double vbs = betaQX(j, 0) * vas(0, j);
+    budgetBS(0, j) = vbs;;
+  }
+  cout << "Shares of GDP to industry sectors (using Beta, not Alpha)" << endl;
+  cout << "budgetBS:" << endl;
+  budgetBS.mPrintf(" %.4f ");
+  cout << endl;
+
 
   return;
 }
@@ -1336,7 +1592,6 @@ KMatrix  LeonModel::vaShares(const KMatrix & tax, bool normalizeSharesP) const {
 
   auto qA = aL * xt; // N-by-1 column vector
   auto budgetL = rho * qA;
-
 
   auto qB = bL * xt; // N-by-1 column vector
   auto budgetS = KMatrix(1, N);
@@ -1755,8 +2010,6 @@ void demoRealEcon(uint64_t s, PRNG* rng)
   const unsigned int maxIter = 50; // TODO: realistic limit
   double qf = 1000.0;
 
-
-
   eMod0->stop = [maxIter, qf](unsigned int iter, const State * s) {
     bool tooLong = (maxIter <= iter);
     bool quiet = false;
@@ -1793,62 +2046,66 @@ void demoRealEcon(uint64_t s, PRNG* rng)
 
   // SETUP THE DATA NOW - THIS IS THE NEW STUFF
   const unsigned int N = 9;
-  const unsigned int M = 1; // DEBUG correct?
+  const unsigned int M = 1;
   const unsigned int L = 3;
 
-  // x0 base year demand by sector
-  // this is from '[IO-USA-1981.xlsx]C+E'!K6:K14
-  vector<double> x0Input = { 22.7533, 10.8967, 303.6836, 371.6834, 459.8229, 142.8963, 447.9898, 689.6980, 761.5760 };
-  auto baseDemnd = KMatrix::vecToKmat(x0Input, N, 1);
+  // base year export by sector
+  // this is from '[IO-USA-1981.xlsx]C+E'!F6:F14
+  vector<double> xInput = {7.2451, 1.3015, 0.0228, 76.4894, 94.6275, 20.3296,
+    23.5439, 27.6867, 19.9283};
+  auto xprt = KMatrix::vecToKmat(xInput, N, 1);
+
+  // base year domestic demand by sector
+  // this is from '[IO-USA-1981.xlsx]C+E'!E6:E14
+  vector<double> cInput = {15.5082, 9.5952, 303.6608, 295.1940, 365.1954, 122.5666,
+    424.4459, 662.0114, 741.6478};
+  auto cons = KMatrix::vecToKmat(cInput, N, M);
 
   // export demand price elasticities - still have to simulate
-  auto dmndElast = KMatrix::uniform(rng, N, 1, 2.0, 3.0);
+  auto eps = KMatrix::uniform(rng, N, 1, 2.0, 3.0);
+  //auto eps = KMatrix(N,1,3.0);
 
-  // aL Leontief factors matrix
-  // this is from '[IO-USA-1981.xlsx]A'!M33:U41
-  vector<double> aLinput = { 1.3513, 0.0088, 0.0281, 0.0341, 0.1747, 0.0282, 0.0174, 0.0112, 0.0329,
-                             0.0733, 1.0705, 0.0571, 0.0712, 0.2776, 0.1585, 0.0302, 0.0137, 0.0486,
-                             0.0305, 0.0460, 1.0192, 0.0262, 0.0343, 0.0535, 0.0208, 0.0437, 0.0331,
-                             0.0845, 0.0939, 0.4882, 1.5812, 0.1313, 0.1038, 0.0447, 0.0340, 0.0983,
-                             0.3590, 0.0663, 0.1927, 0.1984, 1.5308, 0.2326, 0.1121, 0.0489, 0.2017,
-                             0.0969, 0.0505, 0.1050, 0.1295, 0.1488, 1.2582, 0.1068, 0.0467, 0.1074,
-                             0.0862, 0.0280, 0.1266, 0.1041, 0.0981, 0.0542, 1.0390, 0.0168, 0.0581,
-                             0.1284, 0.0705, 0.0566, 0.0577, 0.0722, 0.0617, 0.0963, 1.1826, 0.0889,
-                             0.0854, 0.0455, 0.1695, 0.1146, 0.1216, 0.1074, 0.1771, 0.0889, 1.1485 };
-  auto lAlpha = KMatrix::vecToKmat(aLinput, N, N);
+  // base year transactions between all sectors
+  // this is from '[IO-USA-1981.xlsx]Trans-L'!C2:K10
+  vector<double> tInput = {41.7728, 0.0000, 0.4084, 4.6623, 95.9681, 0.0000,
+    1.3071, 3.0326, 7.0988, 0.1770, 13.3697, 2.4507, 13.9868, 180.7771, 43.3691,
+    0.0000, 0.0000, 2.3663, 1.9470, 9.8936, 0.8169, 7.4596, 7.8114, 15.7706,
+    5.2285, 33.3587, 22.4796, 3.1861, 10.4283, 119.2672, 327.2914, 37.9409, 12.8136,
+    5.2285, 2.0217, 42.5929, 28.8516, 6.1500, 26.1408, 59.6771, 330.3087, 51.7472,
+    26.1427, 11.1196, 115.9473, 5.1331, 6.4174, 12.2535, 45.6902, 64.7227, 87.2310,
+    41.1748, 22.2391, 65.0724, 7.2571, 3.2087, 32.2675, 48.4876, 50.2158, 10.3494,
+    13.0714, 4.0435, 36.6772, 11.5052, 12.8349, 5.7183, 14.9193, 13.3909, 11.3351,
+    41.1748, 147.5870, 62.7062, 3.8941, 4.8131, 38.8027, 39.1631, 49.0999, 24.6415,
+    87.5781, 57.6196, 115.9473};
+  auto trns = KMatrix::vecToKmat(tInput,N,N);
 
-  // bL Leontief sectors matrix
-  // this is from '[IO-USA-1981.xlsx]Omega'!D26:N34
-  vector<double> bLinput = { 1.4070, 0.0152, 0.0346, 0.0431, 0.1902, 0.0424, 0.0236, 0.0265, 0.0389,
-                             0.1015, 1.0854, 0.0688, 0.0880, 0.2981, 0.1872, 0.0418, 0.0439, 0.0589,
-                             0.1678, 0.1353, 1.0690, 0.0847, 0.1142, 0.1776, 0.0856, 0.4307, 0.0884,
-                             0.4487, 0.2635, 0.6520, 1.8212, 0.3751, 0.5158, 0.1937, 0.3591, 0.2381,
-                             0.4455, 0.1039, 0.2265, 0.2460, 1.5909, 0.3140, 0.1466, 0.1452, 0.2321,
-                             0.1536, 0.0767, 0.1294, 0.1644, 0.1865, 1.3220, 0.1320, 0.1054, 0.1288,
-                             0.1644, 0.0639, 0.1622, 0.1525, 0.1505, 0.1379, 1.0969, 0.0928, 0.0881,
-                             0.1577, 0.0832, 0.0680, 0.0738, 0.0902, 0.0896, 0.1094, 1.2125, 0.0990,
-                             0.1399, 0.0728, 0.1923, 0.1460, 0.1567, 0.1627, 0.2040, 0.1673, 1.1698 };
-  auto lBeta = KMatrix::vecToKmat(bLinput, N, N);
+  // base year factor value-added
+  // this is from '[IO-USA-1981.xlsx]Trans-L'!C11:K13
+  vector<double> vInput = {32.7324, 100.9019, 69.5304, 127.6188, 98.2364, 105.2256,
+    254.0997, 401.0373, 391.3663, 16.0422, 44.2612, 19.9704, 56.0749, 43.1645,
+    51.5711, 145.4282, 209.2748, 204.2281, 24.5049, 55.1145, 80.8226, 187.4229,
+    144.2715, 78.7763, 33.1342, 119.5358, 116.6532};
+  auto rev = KMatrix::vecToKmat(vInput,L,N);
 
-  //    // transactions matrix - think I don't really need this, in fact
-  //    // from '[IO-USA-1981.xlsx]Trans-O'!C29:K37
-  //    vector<double> transO = {54.5599, 0.0000, 0.8421, 8.3292, 111.4680, 0.0000, 1.6436, 3.2026, 7.8575,
-  //      0.2745, 16.9755, 5.1045, 25.2678, 210.1173, 53.9029, 0.0876, 0.1198, 2.7220,
-  //      11.0784, 27.3947, 5.9957, 23.8326, 16.5904, 50.8224, 17.4627, 352.7097, 32.5168,
-  //      20.8095, 26.3265, 259.7468, 658.6728, 82.6806, 91.4987, 29.9324, 34.0753, 74.5726,
-  //      34.5284, 7.6392, 54.0495, 107.4505, 388.2805, 64.8286, 33.1338, 12.1021, 128.6472,
-  //      6.8535, 8.4077, 25.8689, 84.5289, 76.8644, 112.9855, 52.7938, 24.8829, 73.2268,
-  //      11.7001, 6.3596, 69.0192, 98.2826, 65.2734, 26.4137, 41.1844, 10.0193, 45.5339,
-  //      13.8841, 15.7759, 11.9451, 27.3992, 15.9873, 14.8652, 52.0347, 156.2178, 69.7162,
-  //      4.6344, 5.8584, 79.9983, 70.0523, 57.0329, 30.4654, 110.1180, 60.8488, 128.9934};
-  //     auto secTrans = KMatrix::vecToKmat(transO,N,N);
 
-  // revenue share vector
-  // from '[IO-USA-1981.xlsx]A'!C32:K34
-  vector<double> rho = { 0.1849, 0.3774, 0.1702, 0.1369, 0.0880, 0.2135, 0.3888, 0.3967, 0.3308,
-                         0.0906, 0.1655, 0.0489, 0.0601, 0.0387, 0.1046, 0.2225, 0.2070, 0.1726,
-                         0.1384, 0.2061, 0.1979, 0.2010, 0.1293, 0.1598, 0.0507, 0.1183, 0.0986 };
-  auto revShare = KMatrix::vecToKmat(rho, L, N);
+  // vector of expenditures by factor into consumption group(s)
+  // this is from '[IO-USA-1981.xlsx]JAH'!C11:K13
+  vector<double> eInput = {0.951327802789937, 0.875269217592669, 0.886106910793789};
+  auto expnd = KMatrix::vecToKmat(eInput,M,L);
+
+  // scaled (d+g)B matrix
+  // this is from '[IO-USA-1981.xlsx]BCK'!C4:K12
+  double regul = 0.02457; // this is from '[IO-USA-1981.xlsx]JAH'!H99
+  vector<double> bInput = {0.0230, 0.0000, 0.0000, 0.0000, 0.0004, 0.0000, 0.0000,
+    0.0000, 0.0000, 0.0003, 0.0022, 0.0001, 0.0003, 0.0008, 0.0005, 0.0001, 0.0001,
+    0.0001, 0.0416, 0.0472, 0.0051, 0.0064, 0.0059, 0.0514, 0.0133, 0.2974, 0.0058,
+    0.0808, 0.0419, 0.0165, 0.0482, 0.0301, 0.1242, 0.0284, 0.0299, 0.0209, 0.0009,
+    0.0005, 0.0002, 0.0011, 0.0049, 0.0014, 0.0003, 0.0003, 0.0002, 0.0035, 0.0018,
+    0.0007, 0.0022, 0.0016, 0.0084, 0.0012, 0.0013, 0.0009, 0.0145, 0.0075, 0.0030,
+    0.0076, 0.0056, 0.0224, 0.0301, 0.0054, 0.0038, 0.0009, 0.0005, 0.0002, 0.0006,
+    0.0004, 0.0014, 0.0003, 0.0003, 0.0002, 0.0000, 0.0000, 0.0000, 0.0005, 0.0002,
+    0.0000, 0.0000, 0.0000, 0.0005};
+  auto Bmat = regul*KMatrix::vecToKmat(bInput,N,N);
 
   // set up for scenarios of capacities
   // 0 = random, 1 = equal, 2 = self-weighted, 3 = input-weighted
@@ -1864,6 +2121,7 @@ void demoRealEcon(uint64_t s, PRNG* rng)
     caps = KMatrix(N + L, N, 1.0);
     cout << "Capabilities Matrix (Scen 1)" << endl;
     caps.mPrintf(" %0.3f ");
+    cout << endl;
     break;
   }
   case 2:
@@ -1885,6 +2143,7 @@ void demoRealEcon(uint64_t s, PRNG* rng)
     caps = KBase::joinV(KMatrix(L, N, 1.0 / N), eye);
     cout << "Capabilities Matrix (Scen 2)" << endl;
     caps.mPrintf(" %0.3f ");
+    cout << endl;
     break;
     // P.S. JAH 20160830 looking through the existing code, I determined that this
     // is wasted effort, as the vector of weights for each actor is simply summed
@@ -1894,25 +2153,26 @@ void demoRealEcon(uint64_t s, PRNG* rng)
   {
     // JAH 20161003 weight each sector according to it's total VA
     // from '[IO-USA-1981.xlsx]Trans-O'!C26:N26
-    vector<double> compVA = { 1537.2745, 750.0555, 923.6700,
-                              62.8064, 205.5044, 249.9203, 458.6496, 275.9301, 199.5496, 458.0236, 571.5965, 729.0196 };
+    vector<double> compVA = { 1537.2745, 750.0555, 923.6700, 62.8064, 205.5044,
+      249.9203, 458.6496, 275.9301, 199.5496, 458.0236, 571.5965, 729.0196 };
     caps = KMatrix::vecToKmat(compVA, N + L, 1);
     cout << "Capabilities Matrix (Scen 3)" << endl;
     caps.mPrintf(" %0.3f ");
+    cout << endl;
     break;
   }
   }
 
   // now prep it all
-  eMod0->prepModel(L, M, N, baseDemnd, dmndElast, revShare, lAlpha, lBeta);
+  eMod0->prepModel(L, M, N, xprt, cons, eps, trns, rev, expnd, Bmat);
 
   // factors and sectors - JAH 20161003 changed order of actors
   vector<string> actNames = { "HH Pay", "Other Pay", "Imports",
-                              "Agr", "Ming", "Const", "DurGood", "NDurGood", "Trans,C,U","W&R Trade", "Fin,Ins,RE", "Other Srv" };
+    "Agr", "Ming", "Const", "DurGood", "NDurGood", "Trans,C,U","W&R Trade", "Fin,Ins,RE", "Other Srv" };
   vector<string> actDescs = { "HH Pay", "Other Pay", "Imports", "Agriculture",
-                              "Mining", "Construction", "Durable goods manufacturing", "Nondurable goods manufacturing",
-                              "Transportation, communication and utilities", "Wholesale and retail trade",
-                              "Finance, insurance and real estate", "Other services" };
+    "Mining", "Construction", "Durable goods manufacturing", "Nondurable goods manufacturing",
+    "Transportation, communication and utilities", "Wholesale and retail trade",
+    "Finance, insurance and real estate", "Other services" };
 
   // NOW BACK TO STUFF COPIED FROM demoSetup (with obvious edits)
   // determine the reference level, as well as upper and lower

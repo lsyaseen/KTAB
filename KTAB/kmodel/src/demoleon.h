@@ -199,8 +199,8 @@ public:
   void makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMatrix & xprt, const KMatrix & cons, PRNG* rng);
 
   // JAH 20160809 added
-  void prepModel(unsigned int numFac, unsigned int numCon, unsigned int numSec,
-                 KMatrix & baseDemnd, KMatrix & dmndElast, KMatrix & revShare, KMatrix & lAlpha, KMatrix & lBeta);
+  void prepModel(unsigned int numFac, unsigned int numCon, unsigned int numSec, KMatrix & xprt, KMatrix & cons,
+    KMatrix & elast, KMatrix & trns, KMatrix & rev, KBase::KMatrix &expnd, KBase::KMatrix &Bmat);
 
   // Estimate vector of export demands, given a vector tau of tax/subsidy rates.
   // assuming base year prices of 1.0
