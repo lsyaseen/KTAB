@@ -1,10 +1,6 @@
 # ===========================================
 # Copyright KAPSARC. Open Source MIT License 
 # ===========================================
-# Even though ComSel does not use csv-parser, smplib does.
-# So csv-parser cannot be removed from this until
-# after it is removed from smplib.
-# ===========================================
 
 project(comsel)
 
@@ -75,25 +71,6 @@ set (FLUID_DIR
 
 # --------------------------------------------------------
 
-set (CSVPARSER_PATHS
-    ${PROJECT_SOURCE_DIR}/../../csv-parser/
-    )
-
-
-find_path(CSVP_DIR csv_parser.hpp 
-  PATHS ${CSVPARSER_PATHS}
-  )
-
-if(CSVP_DIR)
-  message(STATUS "Found csv-parser headers: ${CSVP_DIR}")
-endif(CSVP_DIR)
-
-if(NOT CSVP_DIR)
-  message(FATAL "Could not fid csv-parser headers")
-endif(NOT CSVP_DIR)
-
-# -------------------------------------------------
-
 if (ENABLE_EFENCE)
   find_package(efence)
   if (NOT EFENCE_FOUND)
@@ -142,7 +119,6 @@ include_directories (
   ${PROJECT_SOURCE_DIR}/src/
   ${FLUID_DIR}
   ${FLTK_INCLUDE_DIR}
-  ${CSVP_DIR}
   ${SQLITE_INCLUDE_DIR}
   )
 
@@ -180,7 +156,6 @@ set (CSG_LIBS
 
 add_executable (csg 
   ${CSG_SRCS}
-  ${CSVP_DIR}/csv_parser.cpp
 )
 target_link_libraries(csg
   comsel

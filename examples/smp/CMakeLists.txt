@@ -123,25 +123,6 @@ if(NOT MINICSV_DIR)
   message(FATAL "Could not find minicsv headers")
 endif(NOT MINICSV_DIR)
 
-# -------------------------------------------------
-
-set (CSVPARSER_PATHS
-  ${PROJECT_SOURCE_DIR}/../../csv-parser/
-  )
-
-find_path(CSVP_DIR csv_parser.hpp 
-  PATHS ${CSVPARSER_PATHS}
-  )
-
-if(CSVP_DIR)
-  message(STATUS "Found csv-parser headers: ${CSVP_DIR}")
-endif(CSVP_DIR)
-
-if(NOT CSVP_DIR)
-  message(FATAL "Could not find csv-parser headers")
-endif(NOT CSVP_DIR)
-
-
 # -------------------------------------------------    
 
 include_directories (
@@ -153,7 +134,6 @@ include_directories (
   ${FLUID_DIR}
   ${FLTK_INCLUDE_DIR}
   ${MINICSV_DIR}
-  ${CSVP_DIR}
   ${SQLITE_INCLUDE_DIR}
   )
 
@@ -242,7 +222,6 @@ endif (ENABLE_FLTK_GUI)
 
 add_executable (smpc
   src/demosmp.cpp
-  ${CSVP_DIR}/csv_parser.cpp
   )
 
 target_link_libraries (smpc
@@ -283,7 +262,7 @@ if(ENABLE_QT_GUI)
   target_link_libraries (QtProjectLib Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Sql Qt5::PrintSupport)
 
   # WIN32 to suppress the console window under Windows
-  add_executable(smpq WIN32 ${QtProjectBin_src} ${CSVP_DIR}/csv_parser.cpp  ${QtProjectLib_qrc_rcc})
+  add_executable(smpq WIN32 ${QtProjectBin_src} ${QtProjectLib_qrc_rcc})
 
   target_link_libraries (smpq QtProjectLib smp ${KMODEL_LIBRARY} ${KUTILS_LIBRARY} ${SQLITE_LIBRARIES} ${EFENCE_LIBRARIES})
 
@@ -299,7 +278,6 @@ endif (ENABLE_QT_GUI)
 message (STATUS "Using PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
 message (STATUS "KUTILS_INCLUDE_DIR: " ${KUTILS_INCLUDE_DIR})
 message (STATUS "KMODEL_INCLUDE_DIR: " ${KMODEL_INCLUDE_DIR})
-message (STATUS "CSVP_DIR: " ${CSVP_DIR})
 message (STATUS "MINICSV_DIR: " ${MINICSV_DIR})
 message (STATUS "QCUSTOMPLOT_DIR: " ${QCUSTOMPLOT_DIR})
 

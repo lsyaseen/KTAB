@@ -134,7 +134,7 @@ void executeSMP(SMPModel * md0)
 void readEUSpatial(uint64_t seed, string inputCSV,  vector<bool> f, string dbFilePath) {
     SMPModel::setDBPath(dbFilePath); // setting DB Name
     // JAH 20160711 added rng seed 20160730 JAH added sql flags
-    auto md0 = SMPModel::readCSV(inputCSV, seed, f);
+    auto md0 = SMPModel::readCSVStream(inputCSV, seed, f);
 
     // JAH 20160802 added call to executeSMP
     executeSMP(md0);

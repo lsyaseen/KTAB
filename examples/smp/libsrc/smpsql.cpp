@@ -27,7 +27,6 @@
 
 #include "smp.h"
 #include "sqlite3.h"
-#include "csv_parser.hpp"
 
 
 namespace SMPLib {

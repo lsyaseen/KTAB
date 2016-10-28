@@ -26,8 +26,6 @@
 // --------------------------------------------
 
 #include "smp.h"
-#include "csv_parser.hpp"
-
 
 namespace SMPLib {
 using std::cout;
