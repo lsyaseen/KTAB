@@ -47,7 +47,7 @@ const W64 MASK32 = 0xffffffff; // obviously 2^32 - 1
 // The constant e, left-shifted up to 62 bits.
 // 2718281828459045235 == 0x25B946EBC0B36173
 // Shifting one more decimal would be 65 bits.
-const W64 Q64A = 0x25B946EBC0B36173; // C++14 digit separators
+const W64 Q64A = 0x25B946EBC0B36173;
 
 // The constant pi, left shifted up to 62 bits (+1)
 // 3141592653589793238 + 1 == 0x2B992DDFA23249D7
