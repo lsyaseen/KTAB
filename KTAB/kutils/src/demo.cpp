@@ -1032,7 +1032,8 @@ void demoVHC00(uint64_t sd) {
   trans(pBest).mPrintf(" %+.4f ");
   cout << endl;
 
-  printf("Used PRNG seed:  %020" PRIu64 "\n", sd);
+  // JAH 20161103 changed back to llu
+  printf("Used PRNG seed:  %020llu\n", sd);
   cout << "Target point was originally "<<endl;
   trans(trgt).mPrintf(" %+.4f ");
 
@@ -2024,9 +2025,9 @@ int main(int ac, char **av) {
   //printf("Same seed in hex:   0x%016llX \n", seed);
   // Unix correctly prints all digits with lu, lX, llu, and llX.
   // Windows only prints part, with lu, lX, llu, and llX.
-
-  printf("Using PRNG seed:  %020" PRIu64 "\n", seed);
-  printf("Same seed in hex:   0x%016" PRIX64" \n", seed);
+  // JAH 20161103 changed back to llu/llx
+  printf("Using PRNG seed:  %020llu\n", seed);
+  printf("Same seed in hex:   0x%016llx\n", seed);
 
 
   //    UDemo::demoCoords(rng);
