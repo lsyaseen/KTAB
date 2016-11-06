@@ -24,8 +24,8 @@ set(CMAKE_BUILD_TYPE Debug)
 set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
-set (ENABLE_FLTK_GUI false CACHE  BOOL "Build app with FLTK GUI")
-set (ENABLE_QT_GUI false CACHE  BOOL "Build app with QT GUI")
+set (ENABLE_FLTK_GUI true CACHE  BOOL "Build app with FLTK GUI")
+set (ENABLE_QT_GUI true CACHE  BOOL "Build app with QT GUI")
 set (ENABLE_COPY_QT_LIBS false CACHE  BOOL "Copy Qt LIBS after build")
 
 if (UNIX)
@@ -106,22 +106,22 @@ endif (ENABLE_FLTK_GUI)
 # any application or testing code goes in src
 # -------------------------------------------------
 
-set (CSVPARSER_PATHS
-  ${PROJECT_SOURCE_DIR}/../../csv-parser/
+set (MINICSV_PATHS
+    ${PROJECT_SOURCE_DIR}/../../minicsv/
+    )
+
+
+find_path(MINICSV_DIR minicsv.h
+  PATHS ${MINICSV_PATHS}
   )
 
-find_path(CSVP_DIR csv_parser.hpp 
-  PATHS ${CSVPARSER_PATHS}
-  )
+if(MINICSV_DIR)
+  message(STATUS "Found minicsv headers: ${MINICSV_DIR}")
+endif(MINICSV_DIR)
 
-if(CSVP_DIR)
-  message(STATUS "Found csv-parser headers: ${CSVP_DIR}")
-endif(CSVP_DIR)
-
-if(NOT CSVP_DIR)
-  message(FATAL "Could not find csv-parser headers")
-endif(NOT CSVP_DIR)
-
+if(NOT MINICSV_DIR)
+  message(FATAL "Could not find minicsv headers")
+endif(NOT MINICSV_DIR)
 
 # -------------------------------------------------    
 
@@ -133,7 +133,7 @@ include_directories (
   ${PROJECT_SOURCE_DIR}/src/
   ${FLUID_DIR}
   ${FLTK_INCLUDE_DIR}
-  ${CSVP_DIR}
+  ${MINICSV_DIR}
   ${SQLITE_INCLUDE_DIR}
   )
 
@@ -141,6 +141,7 @@ include_directories (
 set(SMPLIB_SRCS
   ${PROJECT_SOURCE_DIR}/libsrc/smp.cpp
   ${PROJECT_SOURCE_DIR}/libsrc/smpbcn.cpp
+  ${PROJECT_SOURCE_DIR}/libsrc/smpread.cpp
   ${PROJECT_SOURCE_DIR}/libsrc/smpsql.cpp
   )
 
@@ -221,7 +222,6 @@ endif (ENABLE_FLTK_GUI)
 
 add_executable (smpc
   src/demosmp.cpp
-  ${CSVP_DIR}/csv_parser.cpp
   )
 
 target_link_libraries (smpc
@@ -262,7 +262,7 @@ if(ENABLE_QT_GUI)
   target_link_libraries (QtProjectLib Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Sql Qt5::PrintSupport)
 
   # WIN32 to suppress the console window under Windows
-  add_executable(smpq WIN32 ${QtProjectBin_src} ${CSVP_DIR}/csv_parser.cpp  ${QtProjectLib_qrc_rcc})
+  add_executable(smpq WIN32 ${QtProjectBin_src} ${QtProjectLib_qrc_rcc})
 
   target_link_libraries (smpq QtProjectLib smp ${KMODEL_LIBRARY} ${KUTILS_LIBRARY} ${SQLITE_LIBRARIES} ${EFENCE_LIBRARIES})
 
@@ -278,7 +278,7 @@ endif (ENABLE_QT_GUI)
 message (STATUS "Using PROJECT_SOURCE_DIR: " ${PROJECT_SOURCE_DIR})
 message (STATUS "KUTILS_INCLUDE_DIR: " ${KUTILS_INCLUDE_DIR})
 message (STATUS "KMODEL_INCLUDE_DIR: " ${KMODEL_INCLUDE_DIR})
-message (STATUS "CSVP_DIR: " ${CSVP_DIR})
+message (STATUS "MINICSV_DIR: " ${MINICSV_DIR})
 message (STATUS "QCUSTOMPLOT_DIR: " ${QCUSTOMPLOT_DIR})
 
 if (ENABLE_FLTK_GUI)
@@ -291,9 +291,8 @@ endif (ENABLE_FLTK_GUI)
 # -------------------------------------------------
 # As of early 2014, C++11 is still not the default
 # for g++, so I have to provide it here.
-# Also on Unix, the C++14 thread library relies on pthreads
 if (UNIX OR MINGW)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++14 ")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 ")
   if (ENABLE_EFFCPP)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++ ")
   endif (ENABLE_EFFCPP)

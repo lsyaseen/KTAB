@@ -32,84 +32,144 @@
 
 namespace KBase {
 
-  using std::cout;
-  using std::endl;
-  using std::flush;
+using std::cout;
+using std::endl;
+using std::flush;
 
-  // -------------------------------------------------
+// -------------------------------------------------
 
-  // for historical reasons, the second, quadratic power is called "square"
-  double sqr(const double& x) {
-    return (x*x);
-  }
-
-  // the fourth power is the quartic
-  double qrtc(const double& x) {
-    return (x*x*x*x);
-  }
-  
-  VUI uiSeq(const unsigned int n1, const unsigned int n2, const unsigned int ns) {
-    VUI uis = {};
-    assert (n1 <= n2);
-    assert (0 < ns);
-    for (unsigned int i = n1; i <= n2; i=i+ns) 
-      uis.push_back(i);
-    return uis;
-  }
-  
-  void printVUI(const VUI& p) {
-    cout << "[VUI ";
-    for (auto i : p) {
-        printf("%2i ", i);
-    }
-    cout << "]";
-    return;
+// for historical reasons, the second, quadratic power is called "square"
+double sqr(const double& x) {
+  return (x*x);
 }
-  // -------------------------------------------------
 
-  std::chrono::time_point<std::chrono::system_clock>  displayProgramStart(string appName, string appVersion) {
-    std::chrono::time_point<std::chrono::system_clock> st;
-    st = std::chrono::system_clock::now();
-    std::time_t start_time = std::chrono::system_clock::to_time_t(st);
-    cout << "  Software version: " << appName << " " << appVersion <<endl; 
-    cout << "  Start time: " << std::ctime(&start_time) << endl;
-    return st;
+// the fourth power is the quartic
+double qrtc(const double& x) {
+  return (x*x*x*x);
+}
+
+double quadUfromV(double v, double bigR) {
+  assert (-1.0 <= bigR);
+  assert(bigR <= +1.0);
+
+  // We tolerate some round-off error, but not much.
+  // In SMP,  v>1 corresponds to distance < 0, which is impossible.
+  // In general von Neumann rescaling, v=(X-minX)/(maxX-minX), so
+  // v>1 corresponds to X > maxX, which is similarly impossible.
+  const double tol = 1E-10;
+  if (1 < v) {
+    assert (v <= 1.0 + tol);
+    v=1.0;
+  }
+  // because searches try silly values, we have to deal with
+  // distances like 1.01, on a scale of [0,1], hence v=1-d of about -0.01
+
+  double u = 0.0;
+  if (0< v) {
+    u = v + (bigR * v * (1.0-v));
+    assert (0.0 <= u);
+  }
+  else {
+    // straightline interpolation past v=0
+    u = (1.0+bigR)*v;
+  }
+  assert (u <= 1.0);
+  return u;
+}
+
+double nProd(double x, double y) {
+  if ((0.0 < x) && (0.0 < y)) {
+    return (x * y);
+  }
+  if ((x < 0.0) && (y < 0.0)) {
+    return (x + y);
+  }
+  return ((x < y) ? x : y);
+}
+
+
+
+double trim(double x, double minX, double maxX, bool strict) {
+  double x2 = x;
+
+  if (strict) {
+    assert (minX <= x);
+    assert (x <= maxX);
   }
 
-  void displayProgramEnd(std::chrono::time_point<std::chrono::system_clock> st) {
-    std::chrono::time_point<std::chrono::system_clock> ft;
-    ft = std::chrono::system_clock::now();
-    std::chrono::duration<double> eTime = ft - st;
-    std::time_t fTime = std::chrono::system_clock::to_time_t(ft);
-    cout << "  Finish time: " << std::ctime(&fTime) << endl << flush;
-    printf("  Elapsed time: %.4f seconds \n", eTime.count());
-    return;
+  if (x < minX) {
+    x2 = minX;
+  }
+  if (maxX < x) {
+    x2 = maxX;
   }
 
+  return x2;
+}
 
-  char* newChars(unsigned int len) {
-    auto rslt = new char[len];
-    for (unsigned int i = 0; i < len; i++) {
-      rslt[i] = ((char)0);
-    }
-    return rslt;
-  };
 
-  double rescale(double x, double x0, double x1, double y0, double y1) {
-    assert((x0 < x1) || (x1 < x0));
-    const double f = (x - x0) / (x1 - x0);
-    return y0 + (y1 - y0)*f;
+VUI uiSeq(const unsigned int n1, const unsigned int n2, const unsigned int ns) {
+  VUI uis = {};
+  assert (n1 <= n2);
+  assert (0 < ns);
+  for (unsigned int i = n1; i <= n2; i=i+ns)
+    uis.push_back(i);
+  return uis;
+}
+
+void printVUI(const VUI& p) {
+  cout << "[VUI ";
+  for (auto i : p) {
+    printf("%2u ", i);
   }
+  cout << "]";
+  return;
+}
+// -------------------------------------------------
+
+std::chrono::time_point<std::chrono::system_clock>  displayProgramStart(string appName, string appVersion) {
+  std::chrono::time_point<std::chrono::system_clock> st;
+  st = std::chrono::system_clock::now();
+  std::time_t start_time = std::chrono::system_clock::to_time_t(st);
+  cout << "  Software version: " << appName << " " << appVersion <<endl;
+  cout << "  Start time: " << std::ctime(&start_time) << endl;
+  return st;
+}
+
+void displayProgramEnd(std::chrono::time_point<std::chrono::system_clock> st) {
+  std::chrono::time_point<std::chrono::system_clock> ft;
+  ft = std::chrono::system_clock::now();
+  std::chrono::duration<double> eTime = ft - st;
+  std::time_t fTime = std::chrono::system_clock::to_time_t(ft);
+  cout << "  Finish time: " << std::ctime(&fTime) << endl << flush;
+  printf("  Elapsed time: %.4f seconds \n", eTime.count());
+  return;
+}
 
 
-  // -------------------------------------------------
-  KException::KException(string m) {
-    msg = m;
+char* newChars(unsigned int len) {
+  auto rslt = new char[len];
+  for (unsigned int i = 0; i < len; i++) {
+    rslt[i] = ((char)0);
   }
+  return rslt;
+};
 
-  KException::~KException() { 
-    msg = "";
-  }
+double rescale(double x, double x0, double x1, double y0, double y1) {
+  assert((x0 < x1) || (x1 < x0));
+  const double f = (x - x0) / (x1 - x0);
+  return y0 + (y1 - y0)*f;
+}
+
+
+// -------------------------------------------------
+KException::KException(string m) {
+  msg = m;
+}
+
+KException::~KException() {
+  msg = "";
+}
 
 
 }; // namespace

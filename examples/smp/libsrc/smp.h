@@ -27,7 +27,6 @@
 #include <iostream>
 #include <string>
 
-#include "csv_parser.hpp"
 #include "sqlite3.h"
 #include "kutils.h"
 #include "prng.h"
@@ -36,38 +35,39 @@
 #include "kmodel.h"
 
 namespace SMPLib {
-  // namespace to which KBase has no access
-  using std::function;
-  using std::ostream;
-  using std::shared_ptr;
-  using std::string;
-  using std::tuple;
-  using std::vector;
-  using KBase::newChars;
-  using KBase::KMatrix;
-  using KBase::PRNG;
-  using KBase::Actor;
-  using KBase::Position;
-  using KBase::State;
-  using KBase::Model;
-  using KBase::VotingRule;
-  using KBase::ReportingLevel;
-  using KBase::VctrPstn;
-  using KBase::VUI;
-  using KBase::BigRAdjust;
-  using KBase::BigRRange;
-  using KBase::KTable; // JAH 20160728
+// namespace to which KBase has no access
+using std::function;
+using std::ostream;
+using std::shared_ptr;
+using std::string;
+using std::tuple;
+using std::vector;
+using KBase::newChars;
+using KBase::KMatrix;
+using KBase::PRNG;
+using KBase::Actor;
+using KBase::Position;
+using KBase::State;
+using KBase::Model;
+using KBase::VotingRule;
+using KBase::ReportingLevel;
+using KBase::VctrPstn;
+using KBase::VUI;
+using KBase::BigRAdjust;
+using KBase::BigRRange;
+using KBase::KTable; // JAH 20160728
 
-  class SMPActor;
-  class SMPState;
-  class SMPModel;
+class SMPActor;
+class SMPState;
+class SMPModel;
 
-  const string appVersion = "0.1.1";
+const string appVersion = "0.1.1";
+//const bool testProbPCE = true;
 
-  // -------------------------------------------------
-  // Plain-Old-Data
-  struct BargainSMP {
-  public:
+// -------------------------------------------------
+// Plain-Old-Data
+struct BargainSMP {
+public:
     BargainSMP(const SMPActor* ai, const SMPActor* ar, const VctrPstn & pi, const VctrPstn & pr);
     ~BargainSMP();
 
@@ -77,31 +77,31 @@ namespace SMPLib {
     VctrPstn posInit = VctrPstn();
     VctrPstn posRcvr = VctrPstn();
     uint64_t getID() const;
-  protected:
+protected:
     static uint64_t highestBargainID;
     uint64_t myBargainID = 0;
-  };
+};
 
-  enum class SMPBargnModel {
+enum class SMPBargnModel {
     InitOnlyInterpSMPBM,   // Init interpolates, I&R get same one
     InitRcvrInterpSMPBM,   // Init interpolates, so does Rcvr, each both from other
     PWCompInterSMPBM       // Power-weighted compromise of I-interp and R-interp, I&R both get same one
-  };
-  string bModName(const SMPBargnModel& bMod);
-  ostream& operator<< (ostream& os, const SMPBargnModel& bMod);
+};
+string bModName(const SMPBargnModel& bMod);
+ostream& operator<< (ostream& os, const SMPBargnModel& bMod);
 
-  // -------------------------------------------------
-  // Trivial, SMP-like actor with fixed attributes
-  // the old smp.cpp file, SpatialState::developTwoPosBargain, for a discussion of
-  // the interpolative bargaining rule used there. Note that the demoutil
-  // results indicate that weighting by (P^2 * S^2) better approximates the NBS
-  // does weighting by (P * S)
-  class SMPActor : public Actor {
+// -------------------------------------------------
+// Trivial, SMP-like actor with fixed attributes
+// the old smp.cpp file, SpatialState::developTwoPosBargain, for a discussion of
+// the interpolative bargaining rule used there. Note that the demoutil
+// results indicate that weighting by (P^2 * S^2) better approximates the NBS
+// does weighting by (P * S)
+class SMPActor : public Actor {
 
-  public:
+public:
 
     enum class InterVecBrgn {
-      S1P1, S2P2, S2PMax
+        S1P1, S2P2, S2PMax
     };
     // See the documentation in kutils/doc: eS2P2, dS2P2, and eS1P1 were the best, in that order.
     // Both estimators involving PMax were the least accurate.
@@ -137,7 +137,7 @@ namespace SMPLib {
                                        double prbI, double prbJ, InterVecBrgn ivb);
 
 
-  protected:
+protected:
     static void interpBrgnSnPm(unsigned int n, unsigned int m,
                                double tik, double sik, double prbI,
                                double tjk, double sjk, double prbJ,
@@ -147,11 +147,11 @@ namespace SMPLib {
                                  double & bik, double & bjk);
 
 
-  };
+};
 
-  class SMPState : public State {
+class SMPState : public State {
 
-  public:
+public:
     explicit SMPState(Model * m);
     virtual ~SMPState();
 
@@ -188,7 +188,7 @@ namespace SMPLib {
     void showOneBargain(const BargainSMP* b) const;
 
     virtual bool equivNdx(unsigned int i, unsigned int j) const;
-    
+
     void setNRA(); // TODO: this just sets risk neutral, for now
     // return actor's normalized risk attitude (if set)
     double aNRA(unsigned int i) const;
@@ -196,34 +196,34 @@ namespace SMPLib {
     SMPBargnModel bMod = SMPBargnModel::InitOnlyInterpSMPBM;
     // PWCompInterSMPBM, InitOnlyInterpSMPBM or InitRcvrInterpSMPBM;
 
-    
+
     void setAccomodate(double adjRate = 1.0);
     // set ideal-accomodation matrix to scaled identity matrix, for current number of actors
-    
+
     void setAccomodate(const KMatrix & aMat);
     // set ideal-accomodation matrix to given matrix
 
     // initialize the actors' ideals from the given list of VctrPstn.
     // If the list is omitted or empty, it uses their current positions
     void idealsFromPstns(const vector<VctrPstn> &  ps = {});
-    
-  protected:
+
+protected:
 
     // this sets the values in all the AUtil matrices
     virtual void setAllAUtil(ReportingLevel rl);
-    
+
     virtual void setOneAUtil(unsigned int perspH, ReportingLevel rl);
-    
+
     KMatrix vDiff = KMatrix(); // vDiff(i,j) = difference between idl[i] and pos[j], using actor i's saliences as weights
     KMatrix rnProb = KMatrix(); // probability of each Unique state, when actors are treated as risk-neutral
 
     // risk-aware probabilities are uProb
-    
+
     KMatrix nra = KMatrix();
 
 
     SMPState* doBCN() const;
-    
+
 
     // returns estimated probability k wins (given likely coaltiions), and expected delta-util of that challenge.
     // If desired, record in SQLite.
@@ -231,30 +231,32 @@ namespace SMPLib {
 
     // return best j, p[i>j], edu[i->j]
     tuple<int, double, double> bestChallenge(unsigned int i, bool sqlP) const;
-    
+
     // the actor's ideal, against which they judge others' positions
     vector<VctrPstn> ideals = {};
-    
-    // The matrix of rates at which they adjust their ideals toward positions
+
+    // The matrix of rates at which they adjust their ideals toward positions.
+    // Change it ONLY via setAccomodate, so as to keep identAccMat in synch
     KMatrix accomodate = KMatrix();
-    
+    bool identAccMat = true;
+
     // rest the new ideal points, based on other's positions and one's old ideal point
     void newIdeals();
 
     // return RMS distance between ideals and positions
     double posIdealDist(ReportingLevel rl = ReportingLevel::Silent) const;
-    
+
     // for now,set it to a scaled identity matrix.
     void setupAccomodateMatrix(double adjRate);
 
     void bindExecute(sqlite3_stmt *updateStmt, size_t turn, int bargnID,
                      int initActor, double initProb, bool isInitSelected,
                      int recvActor, double recvProb, bool isRecvSelected) const;
-  };
+};
 
-  class SMPModel : public Model {
-  public:
-    explicit SMPModel(PRNG * rng, string desc = "", uint64_t s=0, vector<bool> f={}); // JAH 20160711 added rng seed
+class SMPModel : public Model {
+public:
+    explicit SMPModel( string desc = "", uint64_t s=KBase::dSeed, vector<bool> f={}); // JAH 20160711 added rng seed
     virtual ~SMPModel();
 
     static string dbPath; //to store db file name from SMPQ GUI, default is testsmp.db
@@ -266,12 +268,13 @@ namespace SMPLib {
     static double bvDiff(const KMatrix & vd, const  KMatrix & vs);
     static double bvUtil(const KMatrix & vd, const  KMatrix & vs, double R);
 
-    static SMPModel * readCSV(string fName, PRNG * rng, uint64_t s, vector<bool> f); // JAH 20160711 added rng seed
+    static SMPModel * readCSVStream(string fName, uint64_t s, vector<bool> f);
+    static SMPModel * readXML(string fName, uint64_t s, vector<bool> f);
 
     static  SMPModel * initModel(vector<string> aName, vector<string> aDesc, vector<string> dName,
                                  const KMatrix & cap, const KMatrix & pos, const KMatrix & sal,
                                  const KMatrix & accM, // 20160720 BPW added accomodation matrix
-                                 PRNG * rng, uint64_t s, vector<bool> f); // JAH 20160711 added rng seed 20160730 JAH added sql flags
+                                 uint64_t s, vector<bool> f); // JAH 20160711 added rng seed 20160730 JAH added sql flags
 
     // print history of each actor in CSV (might want to generalize to arbitrary VctrPstn)
     void showVPHistory() const;
@@ -294,13 +297,13 @@ namespace SMPLib {
     // this does not set AUtil, just output it to SQLite
     //virtual void sqlAUtil(unsigned int t);
 
-  protected:
+protected:
     //sqlite3 *smpDB = nullptr; // keep this protected, to ease multi-threading
     //string scenName = "Scen";
     static const int NumTables = 4; // TODO : Add one to this num when new table is added
 
-    static const int NumSQLLogGrps = 0; // TODO : Add one to this num when new logging group is added
-  protected:
+    static const int NumSQLLogGrps = 1; // TODO : Add one to this num when new logging group is added
+protected:
     // note that the function to write to table #k must be kept
     // synchronized with the result of createTableSQL(k) !
     void sqlTest();
@@ -308,9 +311,9 @@ namespace SMPLib {
     // compute several useful items implied by the risk attitudes, saliences, and the matrix of differences
     static void setUtilProb(const KMatrix& vR, const KMatrix& vS, const KMatrix& vD, KBase::VotingRule vr);
 
-  private:
+private:
 
-  };
+};
 
 
 

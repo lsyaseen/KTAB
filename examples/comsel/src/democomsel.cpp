@@ -104,17 +104,19 @@ namespace DemoComSel {
   }
 
 
-  void demoCSC(unsigned int numA, unsigned int nDim, bool cpP, bool siP, const uint64_t s, PRNG* rng) {
+  void demoCSC(unsigned int numA, unsigned int nDim, 
+               bool cpP, bool siP, const uint64_t s) {
     // need a template for ...
     // position type  (each is a committee)
     // utility to an actor of a position (committee)
     // getting actor's scalar capability
 
     printf("Using PRNG seed: %020llu \n", s);
-    rng->setSeed(s);
+    auto trng = new PRNG();
+    trng->setSeed(s);
 
-    if (0 == numA) { numA = 2 + (rng->uniform() % 4); } // i.e. [2,6] inclusive 
-    if (0 == nDim) { nDim = 1 + (rng->uniform() % 7); } // i.e. [1,7] inclusive 
+    if (0 == numA) { numA = 2 + (trng->uniform() % 4); } // i.e. [2,6] inclusive 
+    if (0 == nDim) { nDim = 1 + (trng->uniform() % 7); } // i.e. [1,7] inclusive 
 
     printf("Num parties: %u \n", numA);
     printf("Num dimensions: %u \n", nDim);
@@ -146,12 +148,12 @@ namespace DemoComSel {
     };
 
     // create a model to hold some random actors
-    auto csm = new CSModel(nDim, rng, "csm0");
+    auto csm = new CSModel(nDim, "csm0", s);
 
     cout << "Configuring actors: randomizing" << endl;
     for (unsigned int i = 0; i < numA; i++) {
       auto ai = new CSActor(ndfn("csa-", i), ndfn("csaDesc-", i), csm);
-      ai->randomize(rng, nDim);
+      ai->randomize(csm->rng, nDim);
       csm->addActor(ai);
     }
     assert(csm->numAct == numA);
@@ -160,9 +162,9 @@ namespace DemoComSel {
 
     if ((9 == numA) && (2 == nDim)) {
       for (unsigned int i = 0; i < 3; i++) {
-        auto ci = KMatrix::uniform(rng, nDim, 1, 0.1, 0.9);
+        auto ci = KMatrix::uniform(csm->rng, nDim, 1, 0.1, 0.9);
         for (unsigned int j = 0; j < 3; j++) {
-          auto ej = KMatrix::uniform(rng, nDim, 1, -0.05, +0.05);
+          auto ej = KMatrix::uniform(csm->rng, nDim, 1, -0.05, +0.05);
           const KMatrix pij = clip(ci + ej, 0.0, 1.0);
           unsigned int n = (3 * i) + j;
           auto an = ((CSActor *)(csm->actrs[n]));
@@ -199,14 +201,17 @@ namespace DemoComSel {
 
     cout << "Computing utilities of positions ... " << endl;
     for (unsigned int i = 0; i < numA; i++) {
-      double uii = csm->getActorCSPstnUtil(i, i); // (0,0) causes computation of entire table
+      // (0,0) causes computation of entire table
+      double uii = csm->getActorCSPstnUtil(i, i); 
     }
 
     // At this point, we have almost a generic enumerated model,
     // so much of the code below should be easily adaptable to EModel.
 
-    KMatrix uij = KMatrix(numA, numPos);  // rows are actors, columns are all possible position
-    cout << "Complete (normalized) utility matrix of all possible positions (rows) versus actors (columns)" << endl << flush;
+    // rows are actors, columns are all possible position
+    KMatrix uij = KMatrix(numA, numPos);  
+    cout << "Complete (normalized) utility matrix of all possible positions (rows)";
+    cout <<" versus actors (columns)" << endl << flush;
     for (unsigned int pj = 0; pj < numPos; pj++) {
       printf("%3i  ", pj);
       auto pstn = positions[pj];
@@ -240,7 +245,10 @@ namespace DemoComSel {
     trans(aCap).mPrintf("%5.2f ");
     cout << endl << flush;
 
-    cout << "Computing zeta ... " << endl; // which happens to indicate the PCW *if* proportional voting, when we actually use PropBin
+    
+    // which happens to indicate the PCW *if* proportional voting,
+    // when we actually use PropBin
+    cout << "Computing zeta ... " << endl; 
     KMatrix zeta = aCap * uij;
     assert((1 == zeta.numR()) && (numPos == zeta.numC()));
 
@@ -330,8 +338,9 @@ namespace DemoComSel {
     return;
   }
 
-  void demoCSG(unsigned int nParty, unsigned int nDim, const uint64_t s, PRNG* rng) {
+  void demoCSG(unsigned int nParty, unsigned int nDim, const uint64_t s) {
     printf("Using PRNG seed: %020llu \n", s);
+    auto rng = new PRNG();
     rng->setSeed(s);
 
     if (0 == nParty) {
@@ -420,14 +429,18 @@ int main(int ac, char **av) {
     return 0;
   }
 
-  PRNG * rng = new PRNG();
-  seed = rng->setSeed(seed); // 0 == get a random number
+  if (0 == seed) {
+    PRNG * rng = new PRNG();
+    seed = rng->setSeed(0); // 0 == get a random number
+    delete rng;
+    rng = nullptr;
+  }
   printf("Using PRNG seed: %020llu \n", seed);
   printf("Same seed in hex: 0x%016llX \n", seed);
 
 
   cout << "Creating objects from SMPLib ... " << endl << flush;
-  auto sm = new SMPLib::SMPModel(rng); // , "SMPScen-010101"
+  auto sm = new SMPLib::SMPModel("", seed); // , "SMPScen-010101"
   auto sa = new SMPLib::SMPActor("Bob", "generic spatial actor");
   delete sm;
   sm = nullptr;
@@ -437,7 +450,7 @@ int main(int ac, char **av) {
   cout << "Done creating objects from SMPLib." << endl << flush;
 
   if (guiP) { // dummy GUI
-    DemoComSel::demoCSG(6, 5, seed, rng);
+    DemoComSel::demoCSG(6, 5, seed);
   }
   else {
     // note that we reset the seed every time, so that in case something
@@ -446,10 +459,9 @@ int main(int ac, char **av) {
     DemoComSel::demoCSC(9, // actors trying to get onto committee
       2, // issues to be addressed by the committee
       cpP, siP,
-      seed, rng);
+      seed);
   }
-
-  delete rng;
+   
   KBase::displayProgramEnd(sTime);
   return 0;
 }
