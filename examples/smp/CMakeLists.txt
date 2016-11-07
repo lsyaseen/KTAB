@@ -25,7 +25,7 @@ set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
 set (ENABLE_FLTK_GUI true CACHE  BOOL "Build app with FLTK GUI")
-set (ENABLE_QT_GUI false CACHE  BOOL "Build app with QT GUI")
+set (ENABLE_QT_GUI true CACHE  BOOL "Build app with QT GUI")
 set (ENABLE_COPY_QT_LIBS false CACHE  BOOL "Copy Qt LIBS after build")
 
 if (UNIX)
