@@ -745,8 +745,8 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
     assert (0.0 < zi);
     double delta = (zi - bestZeta)/(zi + bestZeta);
     // Empirically, delta seems to be either at least E-4, or at most 1E-13.
-    // So I put the cut-off around the (logarithmic) mid point.
-    const double sigDelta = 1E-8;
+    // So I put the cut-off two orders below "significant".
+    const double sigDelta = 1E-6;
     if ((bestZeta < zi) && (delta > sigDelta)) {
       bestZeta = zi;
       bestNghbr = i;
@@ -788,8 +788,8 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
   }
 
   VUI nghbr = neighbors[bestNghbr];
-  if (ReportingLevel::Low < rl) {
-    printf("Highest zeta is %.3f for state %u: \n", bestZeta, bestNghbr);
+  if (ReportingLevel::Silent < rl) {
+    printf("Highest zeta is %.5f for state %u: \n", bestZeta, bestNghbr);
     printVUI(nghbr);
   }
 
@@ -807,6 +807,47 @@ KMatrix EState<PT>::hypExpUtilMat () const {
   assert(false);
 
   return eu;
+}
+
+template<class PT>
+VUI EState<PT>::powerWeightedSimilarity(const KMatrix& uMat, unsigned int ti, unsigned int nSim) const
+{
+  const unsigned int numPos = eMod->numOptions();
+  const unsigned int numAct = eMod->numAct;
+
+  const auto colI = KBase::vSlice(uMat, ti);
+  vector<TDI> vdk = {};
+  vdk.resize(numPos);
+  for (unsigned int k = 0; k < numPos; k++) {
+    double dk = 0.0;
+    //const auto colK = KBase::vSlice(uMat, k);
+    //assert (numAct == colK.numR());
+    for (unsigned int j=0; j<numAct; j++) {
+      auto ej = (const KBase::EActor<unsigned int>*)(eMod->actrs[j]);
+      double sj = ej->sCap;
+      //auto duj = colI(j,0)-colK(j,0);
+      const double duj = uMat(j,ti) - uMat(j, k);
+      dk = dk + (sj*duj*duj);
+    }
+    //printf("%2u PW %.4f \n", k, dk);
+    vdk[k] = TDI(dk, k);
+  }
+
+  auto tupleLess = [](TDI t1, TDI t2) {
+    const double d1 = get<0>(t1);
+    const double d2 = get<0>(t2);
+    return (d1 < d2);
+  };
+  std::sort(vdk.begin(), vdk.end(), tupleLess);
+
+  const unsigned int num = (nSim < numPos) ? nSim : numPos;
+  VUI sdk = {};
+  sdk.resize(num);
+  for (unsigned int i = 0; i < num; i++) {
+    unsigned int ki = get<1>(vdk[i]);
+    sdk[i] = ki;
+  }
+  return sdk;
 }
 
 
@@ -828,16 +869,16 @@ tuple <KMatrix, VUI> EState<PT>::pDist(int persp) const {
   cout << "Number of aUtils: " << aUtil.size() << endl << flush;
 
   /*
-  const auto u = aUtil[0]; // all have same beliefs in this demo
-  assert ((-1 == persp) || (0 == persp));
+    const auto u = aUtil[0]; // all have same beliefs in this demo
+    assert ((-1 == persp) || (0 == persp));
 
-  auto uufn = [u, this](unsigned int i, unsigned int j1) {
-    return u(i, uIndices[j1]);
-  };
+    auto uufn = [u, this](unsigned int i, unsigned int j1) {
+      return u(i, uIndices[j1]);
+    };
 
-  const auto um2 = KMatrix::map(uufn, numA, numU);
-  */
-  
+    const auto um2 = KMatrix::map(uufn, numA, numU);
+    */
+
   const auto uMat = uMatH(persp);
   assert(uMat.numR() == numA); // must include all actors
   assert(uMat.numC() == numU);

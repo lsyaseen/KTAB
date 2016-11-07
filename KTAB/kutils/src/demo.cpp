@@ -873,9 +873,12 @@ void demoGA(PRNG* rng) {
   };
 
 
+  // NOTE WELL: with multi-threading, the order of cross-over and evaluation
+  // varies from run to run, so the order of PRNG generation varies,
+  // as do the results.
   unsigned int pS = 50; // size of the gene pool
-  double cf = 2.0; // everything crosses over exactly twice, 1<cf allowed
-  double mf = 1.0; // everything mutates exactly once, 1<mf allowed
+  double cf = 2.2; // 2.2 == everything crosses over twice, plus random 20%
+  double mf = 1.5; // 1.5 == everything mutates once, plus random 50%
 
   printf("Population size: %u \n", pS);
 

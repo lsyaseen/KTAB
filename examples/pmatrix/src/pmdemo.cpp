@@ -59,6 +59,13 @@ void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, cons
   eKEM->setPMatrix(uMat);
   eKEM->setActors(aNames, aNames);
 
+  const unsigned int numSimPol = 20;
+  if (eKEM->numOptions() < numSimPol) {
+    eKEM->nSim = 0;
+  } else {
+    eKEM->nSim = numSimPol;
+  }
+
   const unsigned int maxIter = 1000;
 
   eKEM->stop = [maxIter, eKEM](unsigned int iter, const KBase::State * s) {
@@ -175,21 +182,21 @@ void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, cons
   auto eu = umh*pd;
 
   cout << "Unique indices:" << endl;
-  for (unsigned int i : un){
+  for (unsigned int i : un) {
     printf(" %2u ", i);
   }
-  
+
   cout << endl ;
   cout << "Corresponding policies:  ";
   cout << endl ;
-  for (unsigned int i : un){
+  for (unsigned int i : un) {
     auto posI = (EPosition<unsigned int>*)(esA->pstns[i]);
     auto ni = posI->getIndex();
     printf(" %2u ",ni);
   }
   cout << endl << endl;
   cout << "Policy probabilities:" << endl;
-  for (unsigned int j=0; j<un.size(); j++){
+  for (unsigned int j=0; j<un.size(); j++) {
     unsigned int i = un[j];
     auto posI = (EPosition<unsigned int>*)(esA->pstns[i]);
     auto ni = posI->getIndex();

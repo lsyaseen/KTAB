@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // --------------------------------------------
 // Define a few generally useful functions.
-// -------------------------------------------------
+// --------------------------------------------
 
 #include <assert.h>
 #include <iostream>
@@ -125,7 +125,65 @@ void printVUI(const VUI& p) {
   cout << "]";
   return;
 }
-// -------------------------------------------------
+
+// --------------------------------------------
+
+void groupThreads(function<void(unsigned int)> tfn,
+                  unsigned int numLow, unsigned int numHigh, unsigned int numPar) {
+  const auto rl = ReportingLevel::Silent;
+  using std::thread;
+  const unsigned int threadsPerHWC = 4;
+  unsigned int numHWC = 0;
+  unsigned int dfltNumThreads = 10;
+  if (0 == numPar) { // no specific number requested, so guess
+
+    // As of OCt. 2016, this function might or might not have one or two
+    // of the following problems, depending on your implementation.
+    // 1: It might not be implemented, and just return 0.
+    // 2: It might not take into account "hyperthreading", and return
+    //    half the expected number.
+    numHWC = std::thread::hardware_concurrency();
+    if (0 == numHWC) {
+      numPar = dfltNumThreads; // arbitrary default
+    }
+    else {
+      // four times the number of threads is not too inefficient,
+      // and 2 times the number of hyperthreads is not too wasteful.
+      numPar = threadsPerHWC * numHWC;
+    }
+  }
+  if (ReportingLevel::Silent < rl) {
+    if (0 == numHWC) {
+      cout << "Could not detect hardware concurrency" << endl;
+    }
+    else {
+      cout << "Detected hardware concurrency: " << numHWC << endl;
+    }
+    cout << "Using groups of " << numPar << endl;
+  }
+
+  unsigned int cntr = numLow;
+  while (cntr <= numHigh) {
+    vector<thread> myThreads = {};
+    for (unsigned int i = 0; ((i < numPar) && (cntr <= numHigh)); i++) {
+      if (ReportingLevel::Medium < rl) {
+        printf("Launching thread %3u / %3u / [%3u,%3u]", i, cntr, numLow, numHigh);
+        cout << endl << flush;
+      }
+      myThreads.push_back(thread(tfn, cntr));
+      cntr++;
+    }
+    if (ReportingLevel::Low < rl) {
+      cout << "Joining ..." << endl;
+    }
+    for (auto& ti : myThreads) {
+      ti.join();
+    }
+  }
+  return;
+}
+
+// --------------------------------------------
 
 std::chrono::time_point<std::chrono::system_clock>  displayProgramStart(string appName, string appVersion) {
   std::chrono::time_point<std::chrono::system_clock> st;

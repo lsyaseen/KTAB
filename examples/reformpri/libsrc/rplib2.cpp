@@ -36,6 +36,7 @@ using std::get;
 using std::tuple;
 
 using KBase::PRNG;
+using KBase::TDI;
 using KBase::VUI;
 using KBase::KMatrix;
 
@@ -45,7 +46,6 @@ using KBase::Model;
 using KBase::EActor;
 using KBase::EState;
 
-typedef tuple<double, unsigned int> TDI;
 // --------------------------------------------
 
 string genName(const string & prefix, unsigned int i) {
@@ -198,6 +198,8 @@ void initScen(uint64_t sd) {
   auto diffFn = [](unsigned int i, unsigned int j, const KMatrix& uMat) {
     const auto colI = KBase::vSlice(uMat, i);
     const auto colJ = KBase::vSlice(uMat, j);
+    for (unsigned int k=0;k<colI.numR(); k++){
+    }
     double dij = KBase::norm(colI - colJ);
     return dij;
   };
@@ -231,6 +233,8 @@ void initScen(uint64_t sd) {
   unsigned int numClose = 50;
   unsigned int rand1 = rng->uniform(0, numPos);
   auto rslt1 = diffVUI(rand1, numClose);
+  
+  
   cout << "Permutations with outcomes most similar to " << rand1 << endl;
   for (unsigned int i = 0; i < rslt1.size(); i++) {
     auto dp = rslt1[i];
@@ -364,38 +368,9 @@ RP2State::~RP2State() {
 
 
 VUI RP2State::similarPol(unsigned int ti, unsigned int nSim) const {
-  // This is an attempt to define a domain-independent measure of similarity,
-  // by looking at the difference in outcomes to actors.
-  // Notice that if we sort the columns by difference from #ti,
-  // those with small differences in outcome might do it by very different
-  // means, so that columns from all over the matrix are placed near ti.
   auto rp2m = (const RP2Model*)(eMod);
   auto uMat = rp2m->getPolUtilMat();
-
-  const auto colI = KBase::vSlice(uMat, ti);
-  const unsigned int numPos = eMod->numOptions();
-  vector<TDI> vdk = {};
-  vdk.resize(numPos);
-  for (unsigned int k = 0; k < numPos; k++) {
-    const auto colK = KBase::vSlice(uMat, k);
-    const double dk = KBase::norm(colI - colK);
-    vdk[k] = TDI(dk, k);
-  }
-
-  auto tupleLess = [](TDI t1, TDI t2) {
-    const double d1 = get<0>(t1);
-    const double d2 = get<0>(t2);
-    return (d1 < d2);
-  };
-  std::sort(vdk.begin(), vdk.end(), tupleLess);
-
-  const unsigned int num = (nSim < numPos) ? nSim : numPos;
-  VUI sdk = {};
-  sdk.resize(num);
-  for (unsigned int i = 0; i < num; i++) {
-    unsigned int ki = get<1>(vdk[i]);
-    sdk[i] = ki;
-  }
+  VUI sdk = powerWeightedSimilarity(uMat,  ti,  nSim);
   return sdk;
 }
 
