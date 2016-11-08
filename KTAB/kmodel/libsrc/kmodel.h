@@ -247,10 +247,10 @@ public:
   static const unsigned int sqlBuffSize = 250; // big enough buffer to build all desired SQLite statements
 
 
-  // default 'victory probability model' is Linear
+  // default 'victory probability model' for bargains and coalitions
   VPModel vpm = VPModel::Linear;
 
-  // default 'probabilistic Condorcet election' model is Conditional
+  // default 'probabilistic Condorcet election' model for bargains and coalitions
   PCEModel pcem = PCEModel::ConditionalPCM;
 
   // default state transition mode is deterministic, not stochastic
