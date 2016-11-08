@@ -1,13 +1,19 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<Scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="smp.xsd">
+<Scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="smpSchema.xsd">
   <name>DummyData_3Dim</name>
   <desc>A very simple test of multi-dim SMP, using psuedonyms</desc>
   <prngSeed>100</prngSeed>
   
   <ModelParameters>
+    <VictoryProbModel>Linear</VictoryProbModel>
+    <PCEModel>MarkovIncentive</PCEModel>
     <StateTransitions>Deterministic</StateTransitions>
-    <ResolutionVoting>CubicProportional</ResolutionVoting>
-    <ResolutionPCE>Markov</ResolutionPCE>
+    
+    <VotingRule>CubicProportional</VotingRule>
+    <BigRAdjust>OneThird</BigRAdjust>
+    <BigRRange>Mid</BigRRange>
+    <InterVecBrgn>S2P2</InterVecBrgn>
+    <BargnModel>InitOnlyInterp</BargnModel>
   </ModelParameters>
   
   <Dimensions>
