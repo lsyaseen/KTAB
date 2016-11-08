@@ -629,7 +629,7 @@ SMPState* SMPState::doBCN() const {
     s2->setAccomodate(1.0); // set to identity matrix
   }
   else {
-    s2->accomodate = accomodate;
+    s2->setAccomodate(accomodate);
   }
 
   if (0 == ideals.size()) { // nothing to copy
