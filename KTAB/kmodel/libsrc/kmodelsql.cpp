@@ -102,6 +102,18 @@ void Model::demoSQLite()
   // Open database
   cout << endl << flush;
   sOpen(1);
+  
+  // try some pragmas. these should speed up operations on larger tables,
+  // at the expense of making the table vulnerable to corruption if the
+  // application abruptly terminates mid-operation.
+  sql = "PRAGMA synchronous = off;";
+  rc = sExec(sql, "Set synchronous to off \n");
+  
+  sql = "PRAGMA journal_mode = off;";
+  rc = sExec(sql, "Set journal_mode to off \n");
+  
+  sql = "PRAGMA locking_mode = exclusive;";
+  rc = sExec(sql, "Set locking_mode to exclusive \n");
 
   // Create SQL statement
   sql = "create table if not exists PETS("  \
@@ -118,6 +130,7 @@ void Model::demoSQLite()
 
   cout << endl << flush;
   sOpen(2);
+  
 
   // This SQL statement has one deliberate error.
   sql = "INSERT INTO PETS (ID, NAME, AGE, BREED, COLOR) "   \
