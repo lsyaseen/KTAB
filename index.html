@@ -46,6 +46,7 @@ ga('send', 'pageview');
 <section>
 <h1>KAPSARC Toolkit for Behavioral Analysis (KTAB)</h1>
 <p>KTAB is an open-source toolkit for assembling models that allow the systematic and rigorous analysis of Collective Decision-Making Processes (CDMPs). KTAB has been developed to meet the need for widely available, state-of-the-art, supported, and open-source software that facilitates the modeling and analysis of collective decision making.</p>
+<p><img src="./smp_screenshot_20161108.png" /></p>
 <p>The main development site for KTAB is the <a href="http://www.kapsarc.org">King Abdullah Center for Petroleum Studies and Research</a>. Research is distributed at <a href="https://www.kapsarc.org/openkapsarc/">OpenKAPSARC</a>, and the main page for KTAB research and other information is <a href="https://www.kapsarc.org/openkapsarc/kapsarc-toolkit-for-behavioral-analysis-ktab/">here</a>.</p>
 <p>All KTAB models represent stochastic decision-making among comparatively small numbers of actors or stakeholder groups (more than one, but less than hundreds), within the paradigm of &quot;Probabilistic Condorcet Elections&quot;. PCEs are used to estimate the likelihood of different outcomes from a CDMP, depending on the options each agent has or can generate, how they value those options, and the coalitions they can form to support or oppose each option. Details can be found in the online documentation as well as articles on the <a href="https://www.kapsarc.org/openkapsarc/kapsarc-toolkit-for-behavioral-analysis-ktab/">main KTAB page</a>.</p>
 <p>KTAB is intended to be a platform that contains a number of models that can simulate CDMPs. The initial model that has been instantiated in KTAB is called the Spatial Model of Politics (SMP). The class of models represented by the SMP has a long history in the academic discipline of political science. More detail on the SMP, and references to the appropriate literature, can again be found in articles available for download on the main KTAB page. The majority of the development team’s current efforts are focused on producing a GUI for the SMP. A beta version with a working GUI is now available for download.</p>
@@ -72,16 +73,18 @@ ga('send', 'pageview');
 <p>These are merely illustrative examples.  For rigorous work, one could make whatever local modifications are needed to produce a model which met one's own standards for validation.</p>
 
 <h3>Building KTAB</h3>
-<p>KTAB is written in portable, cross-platform C++14.</p>
+<p>KTAB is written in portable, cross-platform C++11.</p>
 <p>KTAB uses CMake for configuration; downloads and instructions can be obtained <a href="http://www.cmake.org">here</a>. The basic procedure is to configure kutils with CMake, then build the library and examples with your favorite IDE. Then configure kmodel with CMake and build it. Detailed build instructions can be found in the subdirectories, starting with kutils' <a href="KTAB/kutils/README.md">README</a>. After building kutils, you can follow kmodel's <a href="KTAB/kmodel/README.md">README</a>. Following these instructions, under both Windows and Linux, it is not necessary to modify your PATH at any point of the installation.</p>
 <p>Example of how to build models outside the main library structure, as one would do for a custom model, are in the examples directories; see the overall <a href="examples/README.md">README</a> and the README files for each.</p>
-<p>The code is compiled, linked, and tested with absolutely no modification, simultaneously on both Windows and Linux: there is one single body of cross-platform code, not  separate versions for each OS. All platform- or system-specific configuration is done by CMake. Because no platform-specific code is allowed, porting to Mac or other platforms should be feasible. It was developed and tested on 64-bit Windows and Linux platforms, including the following:</p>
+<p>The code is compiled, linked, and tested with absolutely no modification, simultaneously on both Windows and Linux: there is one single body of cross-platform code, not separate versions for each OS. All platform- or system-specific configuration is done by CMake. Because no platform-specific code is allowed, porting to Mac or other platforms should be feasible. It was developed and tested on 64-bit Windows and Linux platforms, including the following:</p>
 <ul>
 <li>Windows</li>
 <ul>
 <li>Windows 7 Professional with Visual Studio 2010 Express,</li>
+<li>Windows 7 Professional with Visual Studio 2013, Update 5,</li>
 <li>Windows 8 with Visual Studio 2013 Express,</li>
 <li>Windows 8 &amp; 10 Professional with Visual Studio 2015 Community,</li>
+<li>Windows Server 2012 with Visual Studio 2015 Community,
 </ul>
 <li>Linux</li>
 <ul>
@@ -93,12 +96,12 @@ ga('send', 'pageview');
 </ul>
 
 <h4>Language Versions</h4>
-<p>The C++14 standard is supported by the following versions of 
+<p>The C++11 standard is supported by the following versions of 
 these common compilers:</p>
 <ul>
 <li>GCC 4.9.0, or higher</li>
 <li>Clang 3.5.0, or higher</li>
-<li>Visual Studio 2015, or higher</li>
+<li>Visual Studio 2013, or higher</li>
 </ul>
 <p>We expect to upgrade to C++17 when it becomes well-supported by gcc, clang, and VS, especially structured bindings, aka parallel assignment with pattern matching.</p>
 
