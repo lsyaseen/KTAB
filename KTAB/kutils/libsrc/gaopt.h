@@ -2,22 +2,22 @@
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------
 // The MIT License (MIT)
-// 
+//
 // Copyright (c) 2015 King Abdullah Petroleum Studies and Research Center
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 // and associated documentation files (the "Software"), to deal in the Software without
 // restriction, including without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom 
+// distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom
 // the Software is furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all copies or
 // substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
-// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+// BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // -------------------------------------------------
 // Define a few generally useful optimizers.
@@ -44,10 +44,8 @@ using std::function;
 using std::get;
 using std::tuple;
 using std::vector;
-using KBase::VBool;
 
-class PRNG;
-class KMatrix;
+// -------------------------------------------------
 
 unsigned int crossSite(PRNG* rng, unsigned int nc);
 
@@ -100,6 +98,10 @@ protected:
   tuple<GAP*, GAP*> crossPair(const GAP* g1, const GAP* g2, PRNG* rng);
   void cyclicApply(function <void(unsigned int i)> fn, double f);
   PRNG* rng = nullptr;
+  std::mutex cycAppMtx;
+
+private:
+  // nothing yet
 };
 
 template<class GAP>
@@ -207,25 +209,36 @@ tuple<double, GAP* > GAOpt<GAP>::getNth(unsigned int n) {
 
 template<class GAP>
 void GAOpt<GAP>::sortPop() {
-  auto ps = ((const unsigned int)(gpool.size()));
-  for (unsigned int i = 0; i < ps; i++) {
-    for (unsigned int j = i + 1; j < ps; j++) {
-      auto pri = getNth(i);
-      double vi = get<0>(pri);
-      auto prj = getNth(j);
-      double vj = get<0>(prj);
-      if (vi < vj) {
-        gpool[i] = prj;
-        gpool[j] = pri;
-      }
+  auto prBefore = [this] (tuple<double, GAP*> pri, tuple<double, GAP*> prj) {
+    double vi = get<0>(pri);
+    double vj = get<0>(prj);
+    bool pb = (vi > vj);
+    return pb;
+  };
+
+  /*
+    auto ps = ((const unsigned int)(gpool.size()));
+    for (unsigned int i = 0; i < ps; i++) {
+        for (unsigned int j = i + 1; j < ps; j++) {
+            auto pri = getNth(i);
+            double vi = get<0>(pri);
+            auto prj = getNth(j);
+            double vj = get<0>(prj);
+            if (vi < vj) {
+                gpool[i] = prj;
+                gpool[j] = pri;
+            }
+        }
     }
-  }
+    */
+
+  std::sort(gpool.begin(), gpool.end(), prBefore);
+
   return;
 }
 
 template<class GAP>
 void GAOpt<GAP>::dropDups() {
-  using KBase::popBack;
   auto cSize = ((const unsigned int)(gpool.size()));
   VBool unique = {};
   unique.resize(cSize);
@@ -248,6 +261,7 @@ void GAOpt<GAP>::dropDups() {
       newGP.push_back(pri);
     }
     else {
+      get<0>(pri) = 0.0;
       GAP* gi = get<1>(pri);
       delete gi;
       get<1>(pri) = nullptr;
@@ -280,10 +294,9 @@ void GAOpt<GAP>::selectPop() {
 template <class GAP>
 void GAOpt<GAP>::cyclicApply(function <void(unsigned int i)> fn, double f) {
   while (1 <= f) {
-    for (unsigned int i = 0; i < pSize; i++) {
-      fn(i);
-    }
-    f = f - 1;
+    groupThreads(fn, 0, pSize-1, 0);
+    // for (unsigned int i = 0; i < pSize; i++) { fn(i); }
+    f = f - 1.0;
   }
 
   if (f <= 0.0) {
@@ -291,33 +304,53 @@ void GAOpt<GAP>::cyclicApply(function <void(unsigned int i)> fn, double f) {
   }
 
   // now (0 < f < 1)
-  unsigned int n = ((unsigned int)(0.5 + f * pSize));
-  for (unsigned int i = 0; i < n; i++) {
-    unsigned int j = rng->uniform() % pSize;
+  const unsigned int n = ((unsigned int)(0.5 + (f * pSize)));
+
+  const function <void(unsigned int i)> gn = [this, fn] (unsigned int) {
+    unsigned int j = rng->uniform() % pSize; // 'existing' pool, not unevaluated additions
     fn(j);
-  }
+    return;
+  };
+
+  groupThreads(gn, 0, n-1, 0);
+  /*
+    for (unsigned int i = 0; i < n; i++) {
+        unsigned int j = rng->uniform() % pSize; // 'existing' pool, not unevaluated additions
+        fn(j);
+    }
+    */
+
   return;
 }
 
 
 template <class GAP>
 void GAOpt<GAP>::crossPop() {
-  auto add = [this](GAP* g) {
+
+  auto bundle = [this](GAP* g) {
     double v = eval(g);
     auto pr = tuple<double, GAP*>(v, g);
-    gpool.push_back(pr);
-    return;
+    return pr;
   };
 
-  auto cFn = [this, add](unsigned int i) {
-    unsigned int j = rng->uniform() % gpool.size();
+  auto cFn = [this, bundle](unsigned int i) {
+    assert (i <pSize);
+    unsigned int j = rng->uniform() % pSize; // 'existing' pool, not unevaluated additions
     GAP* gi = get<1>(getNth(i));
     GAP* gj = get<1>(getNth(j));
     auto pr = cross(gi, gj, rng);
-    add(get<0>(pr));
-    add(get<1>(pr));
+    auto pr0 = bundle(get<0>(pr));
+    auto pr1 = bundle(get<1>(pr));
+    cycAppMtx.lock();
+    const unsigned int s1 = gpool.size();
+    gpool.push_back(pr0);
+    gpool.push_back(pr1);
+    const unsigned int s2 = gpool.size();
+    assert (s2 == 2 + s1); // correct locking?
+    cycAppMtx.unlock();
     return;
   };
+
   cyclicApply(cFn, cFrac);
   return;
 }
@@ -330,7 +363,12 @@ void GAOpt<GAP>::mutatePop() {
     GAP* mg = mutate(gi, rng);
     double mgv = eval(mg);
     auto mpr = tuple<double, GAP*>(mgv, mg);
+    cycAppMtx.lock();
+    const unsigned int s1 = gpool.size();
     gpool.push_back(mpr);
+    const unsigned int s2 = gpool.size();
+    assert (s2 == 1 + s1);
+    cycAppMtx.unlock();
     return;
   };
   cyclicApply(mFn, mFrac);

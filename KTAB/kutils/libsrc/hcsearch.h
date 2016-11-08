@@ -51,14 +51,6 @@ using std::tuple;
 using KBase::ReportingLevel;
 // ----------------------------------------------
 
-// This launches a number of threads, but no more than numPar at a time.
-// The function is given unsigned ints in a range, like [0, n-1] inclusive.
-// If no value is given for numPar, it will guess from the number of cores.
-void groupThreads(function<void(unsigned int)> tfn,
-                  unsigned int numLow, unsigned int numHigh, unsigned int numPar=0);
-
-// ----------------------------------------------
-
 // Setup and manage maximization of scalar function of a column-vector.
 // Subclassing from GHCSearch would have been nice.
 class  VHCSearch {

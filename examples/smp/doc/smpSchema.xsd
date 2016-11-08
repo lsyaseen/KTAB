@@ -16,9 +16,15 @@
   <xs:element name="ModelParameters">
     <xs:complexType>
       <xs:sequence>
+        <xs:element name="VictoryProbModel" type="xs:string"/>
+        <xs:element name="PCEModel" type="xs:string"/>
         <xs:element name="StateTransitions" type="xs:string"/>
-        <xs:element name="ResolutionVoting" type="xs:string"/>
-        <xs:element name="ResolutionPCE" type="xs:string"/>
+        
+        <xs:element name="VotingRule" type="xs:string"/>
+        <xs:element name="BigRAdjust" type="xs:string"/>
+        <xs:element name="BigRRange" type="xs:string"/>
+        <xs:element name="InterVecBrgn" type="xs:string"/>
+        <xs:element name="BargnModel" type="xs:string"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>

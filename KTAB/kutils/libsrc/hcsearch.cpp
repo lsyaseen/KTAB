@@ -28,61 +28,6 @@
 namespace KBase {
 using std::tuple;
 using std::get;
-
-// --------------------------------------------
-
-void groupThreads(function<void(unsigned int)> tfn,
-                  unsigned int numLow, unsigned int numHigh, unsigned int numPar) {
-  const auto rl = ReportingLevel::Low;
-  using std::thread;
-  unsigned numThreads = 0;
-  if (0 == numPar) {
-    // As of OCt. 2016, this function might or might not have one or two
-    // of the following problems, depending on your implementation.
-    // 1: It might not be implemented, and just return 0.
-    // 2: It might not take into account "hyperthreading", and return
-    //    half the expected number.
-    numThreads = std::thread::hardware_concurrency();
-    if (0 == numThreads) {
-      numPar = 10; // arbitrary default
-    }
-    else {
-      // three times the number of threads is not too inefficient,
-      // and 1.5 times the number of hyperthreads is not too wasteful.
-      numPar = 3 * numThreads;
-    }
-  }
-  if (ReportingLevel::Silent < rl) {
-    if (0 == numThreads) {
-      cout << "Could not detect hardware concurrency" << endl;
-    }
-    else {
-      cout << "Detected hardware concurrency: " << numThreads << endl;
-    }
-    cout << "Using groups of " << numPar << endl;
-  }
-
-  unsigned int cntr = numLow;
-  while (cntr <= numHigh) {
-    vector<thread> myThreads = {};
-    for (unsigned int i = 0; ((i < numPar) && (cntr <= numHigh)); i++) {
-      if (ReportingLevel::Medium < rl) {
-        printf("Launching thread %3u / %3u / [%3u,%3u]", i, cntr, numLow, numHigh);
-        cout << endl << flush;
-      }
-      myThreads.push_back(thread(tfn, cntr));
-      cntr++;
-    }
-    if (ReportingLevel::Low < rl) {
-      cout << "Joining ..." << endl;
-    }
-    for (auto& ti : myThreads) {
-      ti.join();
-    }
-  }
-  return;
-}
-
 // --------------------------------------------
 
 
@@ -244,7 +189,7 @@ VHCSearch::run(KMatrix p0,
   }
 
   assert(vInitial <= v0); // either stay at orig point or improve it: never less
-  tuple<double, KMatrix, unsigned int, unsigned int> rslt{ v0, p0, iter, sIter };
+  tuple<double, KMatrix, unsigned int, unsigned int> rslt { v0, p0, iter, sIter };
 
   if (ReportingLevel::Low <= rl) {
     cout << endl << flush;

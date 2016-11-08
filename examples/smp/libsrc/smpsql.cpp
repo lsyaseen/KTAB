@@ -169,11 +169,15 @@ void SMPModel::sqlTest() {
   cout << endl << flush;
   sOpen(1,dbPath); //passing DB FileName
 
-  // we are not dealing with a long-term, mission-critical database,
-  // so we can shut off some of the journaling stuff intended to protect
-  // the DB in case the system crashes in mid-operation
-  sqlite3_exec(db, "PRAGMA synchronous = OFF", NULL, NULL, &zErrMsg);
+  // As we are not dealing with a long-term, mission-critical database,
+  // we can shut off some of the journaling stuff intended to protect
+  // the DB in case the system crashes in mid-operation.
+  // Eliminating these checks can significantly speed operations.
   sqlite3_exec(db, "PRAGMA journal_mode = MEMORY", NULL, NULL, &zErrMsg);
+  sqlite3_exec(db, "PRAGMA locking_mode = EXCLUSIVE", NULL, NULL, &zErrMsg);
+  sqlite3_exec(db, "PRAGMA synchronous = OFF", NULL, NULL, &zErrMsg);
+  
+  // not a performance issue, but necessary for the data layout
   sqlite3_exec(db, "PRAGMA foreign_keys = ON", NULL, NULL, &zErrMsg);
 
   // Create & execute SQL statements

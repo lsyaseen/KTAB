@@ -252,8 +252,9 @@ void SMPState::setVDiff(const vector<VctrPstn> & vPos) {
   return;
 }
 
-
-void SMPModel::setUtilProb(const KMatrix& vR, const KMatrix& vS, const KMatrix& vD, KBase::VotingRule vr) {
+/*
+void SMPModel::setUtilProb(const KMatrix& vR, const KMatrix& vS, const KMatrix& vD,
+  KBase::VotingRule vr, KBase::VPModel vpm) {
   // vR(i,0) = risk attitude used for actor i (possibly 0, possibly someone's estimate)
   // vS(i,0) = overall salience for actor i
   // vD(i,j) = difference, using i's salience, between i's position and j's position
@@ -302,7 +303,7 @@ void SMPModel::setUtilProb(const KMatrix& vR, const KMatrix& vS, const KMatrix& 
   }
 
   // calculate pairwise victory probabilities
-  auto vpm = VPModel::Linear;
+  //auto vpm = VPModel::Linear;
   auto vP = KMatrix(na, na);
   for (unsigned int i = 0; i < na; i++) {
     for (unsigned int j = 0; j < i; j++) {
@@ -317,12 +318,10 @@ void SMPModel::setUtilProb(const KMatrix& vR, const KMatrix& vS, const KMatrix& 
       assert(fabs(vP(i, j) + vP(j, i) - 1.0) < aeTol);
     }
   }
-
-
   return;
 };
 
-
+*/
 
 double SMPState::estNRA(unsigned int h, unsigned int i, BigRAdjust ra) const {
   double rh = nra(h, 0);
@@ -337,22 +336,18 @@ KMatrix SMPState::actrCaps() const {
     return aj->sCap;
 
   };
-
-
   auto w = KMatrix::map(wFn, 1, model->numAct);
   return w;
 }
 
 
 void SMPState::setAllAUtil(ReportingLevel rl) {
-  // you can change these parameters
-  auto vr = VotingRule::Proportional;
-  auto ra = BigRAdjust::OneThirdRA;
-  auto rr = BigRRange::Mid; // use [-0.5, +1.0] scale
-  auto vpm = VPModel::Linear;
-
-
+  const auto vpmCoalition = model->vpm;
   const unsigned int na = model->numAct;
+  auto smod = (const SMPModel*)model;
+  const auto vrCoalition = smod->vrCltn;
+  const auto ra = smod->bigRAdj;
+  const auto rr = smod->bigRRng;
 
   // make sure prerequisities are at least somewhat setup
   assert(na == eIndices.size());
@@ -375,34 +370,15 @@ void SMPState::setAllAUtil(ReportingLevel rl) {
   }
 
 
-  auto vfn = [vr, &w_j, &rnUtil_ij](unsigned int k, unsigned int i, unsigned int j) {
-    double vkij = Model::vote(vr, w_j(0, k), rnUtil_ij(k, i), rnUtil_ij(k, j));
+  auto vfn = [vrCoalition, &w_j, &rnUtil_ij](unsigned int k, unsigned int i, unsigned int j) {
+    double vkij = Model::vote(vrCoalition, w_j(0, k), rnUtil_ij(k, i), rnUtil_ij(k, j));
     return vkij;
   };
   const auto c = Model::coalitions(vfn, na, na); // c(i,j) = strength of coaltion for i against j
-  const auto pv2 = Model::probCE2(model->pcem, vpm, c);
+  const auto pv2 = Model::probCE2(model->pcem, vpmCoalition, c);
   const auto p_i = get<0>(pv2); // column
   const auto pv_ij = get<1>(pv2); // square
-  //auto pv_ij = Model::vProb(vr, vpm, w_j, rnUtil_ij); // square
-  //auto p_i = Model::probCE(model->pcem, pv_ij); // column
-  /*
-    if (KBase::testProbCE) {
-      auto vfn = [vr, &w_j, &rnUtil_ij](unsigned int k, unsigned int i, unsigned int j) {
-        double vkij = Model::vote(vr, w_j(0, k), rnUtil_ij(k, i), rnUtil_ij(k, j));
-        return vkij;
-      };
-      const auto c = Model::coalitions(vfn, na, na); // c(i,j) = strength of coaltion for i against j
-      const auto pv2 = Model::probCE2(model->pcem, vpm, c);
-      const auto p = get<0>(pv2); // column
-      const auto pv = get<1>(pv2); // square
-
-      assert(KBase::norm(p - p_i) < 1E-6);
-      assert(KBase::norm(pv - pv_ij) < 1E-6);
-    }
-    */
-
   nra = Model::bigRfromProb(p_i, rr);
-
 
   if (ReportingLevel::Silent < rl) {
     cout << "Inferred risk attitudes: " << endl;

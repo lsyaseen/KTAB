@@ -20,9 +20,11 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // --------------------------------------------
-//
 // Demonstrate a very basic, but highly parameterizable, Spatial Model of Politics.
-//
+// --------------------------------------------
+// TODO: consolidate error checking for read functions.
+// These reader functions to a lot of very similar error checking,
+// so triplicate code should be put in sub-functions.
 // --------------------------------------------
 
 #include "smp.h"
@@ -53,11 +55,6 @@ using KBase::VotingRule;
 using KBase::PCEModel;
 using KBase::ReportingLevel;
 
-// --------------------------------------------
-// TODO: consolidate error checking for read functions.
-// These reader functions to a lot of very similar
-// error checking, so triplicate code should be put
-// in sub-functions.
 // --------------------------------------------
 
 SMPModel * SMPModel::readCSVStream(string fName, uint64_t s, vector<bool> f) {

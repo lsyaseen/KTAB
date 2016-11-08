@@ -30,6 +30,7 @@
 #define KBASE_UTIL_H
 
 #include <inttypes.h> // especially uint64_t
+#include <algorithm>
 #include <assert.h>
 #include <chrono>
 #include <cstdint>
@@ -56,6 +57,7 @@ using std::tuple;
 using std::vector;
 
 typedef vector<unsigned int> VUI;
+typedef tuple<double, unsigned int> TDI;
 typedef vector<bool> VBool;
 
 void printVUI(const VUI& p);
@@ -77,6 +79,14 @@ double quadUfromV(double v, double bigR) ;
 double nProd(double x, double y);
 
 double trim(double x, double minX, double maxX, bool strict = false);
+
+// This launches a number of threads, but no more than numPar at a time.
+// The function is given unsigned ints in a range, like [0, n-1] inclusive.
+// If no value is given for numPar, it will guess from the number of cores.
+void groupThreads(function<void(unsigned int)> tfn,
+                  unsigned int numLow, unsigned int numHigh, unsigned int numPar=0);
+
+// ----------------------------------------------
 
 std::chrono::time_point<std::chrono::system_clock>  displayProgramStart(string appName = "", string appVersion = "");
 void displayProgramEnd(std::chrono::time_point<std::chrono::system_clock> st);

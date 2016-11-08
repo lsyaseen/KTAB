@@ -460,7 +460,12 @@ EState<unsigned int>* PMatrixState::makeNewEState() const {
 }
 
 
-VUI PMatrixState::similarPol(unsigned int, unsigned int ) const {
+VUI PMatrixState::similarPol(unsigned int ti, unsigned int nSim) const {
+  auto pmm = (const PMatrixModel*)(eMod);
+  auto uMat = pmm->getPolUtilMat();
+  VUI sdk = powerWeightedSimilarity(uMat,  ti,  nSim);
+  return sdk;
+  /*
   const unsigned int numOpt = eMod->numOptions();
   VUI sp = {};
   sp.resize(numOpt);
@@ -468,6 +473,7 @@ VUI PMatrixState::similarPol(unsigned int, unsigned int ) const {
     sp[i] = i;
   }
   return sp;
+  */
 }
 
 vector<double> PMatrixState::actorUtilVectFn(int h, int tj) const {

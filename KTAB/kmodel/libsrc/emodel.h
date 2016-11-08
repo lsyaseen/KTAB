@@ -46,6 +46,8 @@
 #ifndef KTAB_EMODEL_H
 #define KTAB_EMODEL_H
 
+
+
 #include <sqlite3.h>
 
 #include "kutils.h"
@@ -161,7 +163,9 @@ public:
   virtual bool equivNdx(unsigned int i, unsigned int j) const;
 
   // given an index into Theta, find the N policies most similar.
-  // If N=0 or |Theta|<N, then it just returns all of Theta
+  // If |Theta|<N, then it just returns all of Theta.
+  // If N=0, then it returns a domain-dependent number of "similar" options.
+  // EState::powerWeightedSimilarity is an obvious candidate similarity-measure.
   virtual VUI similarPol(unsigned int ti, unsigned int numPol = 0) const = 0;
 
   // get the index into Theta from the i-th position of this state.
@@ -206,6 +210,14 @@ protected:
   KMatrix hypExpUtilMat () const;
 
   EModel<PT>*  eMod = nullptr; // saves a lot of type-casting later
+  
+  
+  // This is an attempt to define a domain-independent measure of similarity,
+  // by looking at the difference in outcomes to actors.
+  // Notice that if we sort the columns by difference from #ti,
+  // those with small differences in outcome might do it by very different
+  // means, so that columns from all over the matrix are placed near ti.
+  VUI powerWeightedSimilarity(const KMatrix& uMat, unsigned int ti, unsigned int nSim) const;
 
 private:
 };

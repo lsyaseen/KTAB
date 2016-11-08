@@ -128,12 +128,16 @@ SMPState* SMPState::doBCN() const {
   const int t = myTurn();
   assert(0 <= t); // need to be in the model's history list
 
-  auto ivb = SMPActor::InterVecBrgn::S2P2;
-  //sqlite3_stmt* stmt = NULL; // never used
-  // int rowtoupdate = 0; // never used
-  //int rc = 0; // never used
-  // For each actor, identify good targets, and propose bargains to them.
-  // (This loop would be an excellent place for high-level parallelism)
+  const KBase::VPModel vpmBargains = model->vpm;
+  const KBase::PCEModel pcemBargains = model->pcem;
+  const KBase::StateTransMode stm = model->stm;
+
+  auto smod = (const SMPModel*)model;
+  const KBase::VotingRule vrBargains = smod->vrCltn;
+  const SMPActor::InterVecBrgn ivb = smod->ivBrgn;
+  const SMPBargnModel bMod = smod->brgnMod;
+
+  // TODO: use groupThreads on *this* loop for high-level parallelism
   for (unsigned int i = 0; i < na; i++) {
     auto ai = ((const SMPActor*)(model->actrs[i]));
     auto posI = ((const VctrPstn*)pstns[i]);
@@ -331,22 +335,12 @@ SMPState* SMPState::doBCN() const {
     }
   }
 
-  // PRNG* rng = model->rng; // was never used
-
   cout << endl << "Bargains to be resolved" << endl << flush;
   showBargains(brgns);
 
   auto w = actrCaps();
   cout << "w:" << endl;
   w.mPrintf(" %6.2f ");
-
-  const KBase::VPModel vpm = model->vpm;
-  const KBase::PCEModel pcem = model->pcem;
-  const KBase::StateTransMode stm = model->stm;
-
-  // of course, you can change these parameters.
-  // ideally, they should be read from the surrounding Model object.
-  auto vr = VotingRule::Proportional;
 
   auto ndxMaxProb = [](const KMatrix & cv) {
     const double pTol = 1E-8;
@@ -424,7 +418,7 @@ SMPState* SMPState::doBCN() const {
     u_im.mPrintf(" %.5f ");
 
     cout << "Doing scalarPCE for the " << nb << " bargains of actor " << k << " ... " << flush;
-    auto p = Model::scalarPCE(na, nb, w, u_im, vr, vpm, pcem, ReportingLevel::Medium);
+    auto p = Model::scalarPCE(na, nb, w, u_im, vrBargains, vpmBargains, pcemBargains, ReportingLevel::Medium);
     assert(nb == p.numR());
     assert(1 == p.numC());
     actorBargains.insert(map<unsigned int, KBase::KMatrix>::value_type(k, p));
@@ -629,7 +623,7 @@ SMPState* SMPState::doBCN() const {
     s2->setAccomodate(1.0); // set to identity matrix
   }
   else {
-    s2->accomodate = accomodate;
+    s2->setAccomodate(accomodate);
   }
 
   if (0 == ideals.size()) { // nothing to copy
