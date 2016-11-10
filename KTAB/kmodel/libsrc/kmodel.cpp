@@ -35,7 +35,11 @@ using std::flush;
 using std::get;
 using std::tuple;
 
+using KBase::nameFromEnum;
+
 // --------------------------------------------
+
+
 // JAH 20160711 added seed 20160730 JAH added sql flags
 // BPW 2016-09-28 removed redundant PRNG input variable
 Model::Model(string desc, uint64_t sd, vector<bool> f) {
@@ -160,37 +164,6 @@ void Model::run() {
   return;
 }
 
-string vpmName(const VPModel& vpm) {
-  string s = "";
-  switch (vpm) {
-  case  VPModel::Linear:
-    s = "Linear";
-    break;
-  case VPModel::Square:
-    s = "Square";
-    break;
-  case VPModel::Quartic:
-    s = "Quartic";
-    break;
-  case VPModel::Octic:
-    s = "Octic";
-    break;
-  case VPModel::Binary:
-    s = "Binary";
-    break;
-  default:
-    cout << "VPMName: unrecognized VPModel" << endl;
-    assert(false);
-    break;
-  }
-  return s;
-}
-
-ostream& operator<< (ostream& os, const VPModel& vpm) {
-  os << vpmName(vpm);
-  return os;
-}
-
 unsigned int Model::addActor(Actor* a) {
   assert(nullptr != a);
   actrs.push_back(a);
@@ -277,169 +250,53 @@ int Model::actrNdx(const Actor* a) const {
   return ai; // negative iff this "actor" was not found
 }
 
-string vrName(const VotingRule& vr) {
-  string vrn = "";
-  switch (vr) {
-  case VotingRule::Binary:
-    vrn = "Binary";
-    break;
-  case VotingRule::PropBin:
-    vrn = "PropBin";
-    break;
-  case VotingRule::Proportional:
-    vrn = "Prop";
-    break;
-  case VotingRule::PropCbc:
-    vrn = "PropCbc";
-    break;
-  case VotingRule::Cubic:
-    vrn = "Cubic";
-    break;
-  case VotingRule::ASymProsp:
-    vrn = "ASymProsp";
-    break;
-  default:
-    throw KException("vrName - Unrecognized VotingRule");
-    break;
-  }
-  return vrn;
-}
 
-ostream& operator<< (ostream& os, const VotingRule& vr) {
-  os << vrName(vr);
+
+ostream& operator<< (ostream& os, const VPModel& vpm) {
+  string s = nameFromEnum<VPModel>(vpm, KBase::VPModelNames);
+  os << s;
   return os;
 }
 
 
-string stmName(const StateTransMode& stm) {
-  string stmName = "";
-  switch (stm) {
-  case StateTransMode::DeterminsticSTM:
-    stmName = "DeterminsticSTM";
-    break;
-  case StateTransMode::StochasticSTM:
-    stmName = "StochasticSTM";
-    break;
-  default:
-    throw KException("stmName - Unrecognized StateTransMode");
-    break;
-  }
-  return stmName;
+ostream& operator<< (ostream& os, const VotingRule& vr) {
+  string s = nameFromEnum<VotingRule>(vr, KBase::VotingRuleNames);
+  os << s;
+  return os;
 }
+
+
+//   auto et = KBase::enumFromName<VotingRule>(s, KBase::VotingRuleNames);
+//   string s2 = KBase::nameFromEnum<VotingRule>(vr, KBase::VotingRuleNames);
 
 
 ostream& operator<< (ostream& os, const StateTransMode& stm) {
-  os << stmName(stm);
+  string s = nameFromEnum<StateTransMode>(stm, KBase::StateTransModeNames);
+  os << s;
   return os;
-}
-
-
-// At this point, the LISP keyword 'defmacro' should leap to mind, again.
-string pcmName(const PCEModel& pcm) {
-  string s = "";
-  switch (pcm) {
-  case PCEModel::ConditionalPCM:
-    s = "ConditionalPCM";
-    break;
-  case PCEModel::MarkovIPCM:
-    s = "MarkovIPCM";
-    break;
-  case PCEModel::MarkovUPCM:
-    s = "MarkovUPCM";
-    break;
-  default:
-    throw KException("pcmName - Unrecognized PCEModel");
-    break;
-
-  }
-  return s;
 }
 
 ostream& operator<< (ostream& os, const PCEModel& pcm) {
-  os << pcmName(pcm);
+  string s = nameFromEnum<PCEModel>(pcm, KBase::PCEModelNames);
+  os << s;
   return os;
-}
-
-
-string tpcName(const ThirdPartyCommit& tpc) {
-  string tpcn = "";
-  switch (tpc) {
-  case ThirdPartyCommit::FullCommit:
-    tpcn = "FullCommit";
-    break;
-  case ThirdPartyCommit::SemiCommit:
-    tpcn = "SemiCommit";
-    break;
-  case ThirdPartyCommit::NoCommit:
-    tpcn = "NoCommit";
-    break;
-
-  default:
-    throw KException("tpcName - Unrecognized ThirdPartyCommit");
-    break;
-
-  }
-
-  return tpcn;
 }
 
 ostream& operator<< (ostream& os, const ThirdPartyCommit& tpc) {
-  os << tpcName(tpc);
+  string s = nameFromEnum<ThirdPartyCommit>(tpc, KBase::ThirdPartyCommitNames);
+  os << s;
   return os;
-}
-
-string bigRRName(const BigRRange & rRng) {
-  string s = "";
-  switch (rRng) {
-  case BigRRange::Min:
-    s = "Min";
-    break;
-  case BigRRange::Mid:
-    s = "Mid";
-    break;
-  case BigRRange::Max:
-    s = "Max";
-    break;
-  default:
-    cout << "bigRRName:: unknown BigRRange" << endl;
-    assert(false);
-    break;
-  }
-  return s;
-}
+} 
 
 ostream& operator << (ostream& os, const BigRRange& rRng) {
-  os << bigRRName(rRng);
+  string s = nameFromEnum<BigRRange>(rRng, KBase::BigRRangeNames);
+  os << s;
   return os;
 }
 
-string bigRAName(const BigRAdjust & rAdj) {
-  string s = "";
-  switch (rAdj) {
-  case BigRAdjust::FullRA:
-    s = "FullRA";
-    break;
-  case BigRAdjust::TwoThirdsRA:
-    s = "TwoThirdsRA";
-    break;
-  case BigRAdjust::HalfRA:
-    s = "HalfRA";
-    break;
-  case BigRAdjust::OneThirdRA:
-    s = "OneThirdRA";
-    break;
-  case BigRAdjust::NoRA:
-    s = "NoRA";
-    break;
-  default:
-    cout << "bigRAName: unrecognized BigRAdjust" << endl;
-    assert(false);
-    break;
-  }
-  return s;
-}
 ostream& operator << (ostream& os, const BigRAdjust& rAdj) {
-  os << bigRAName(rAdj);
+  string s = nameFromEnum<BigRAdjust>(rAdj, KBase::BigRAdjustNames);
+  os << s;
   return os;
 }
 
@@ -715,7 +572,9 @@ KMatrix Model::markovIncentivePCE(const KMatrix & coalitions, VPModel vpm) {
     const double epsSupport = 1E-10;
     const double sij = coalitions(i, j);
     double inctv = sij * victProbMatrix(i,j);
-    if (i == j) { inctv = inctv + epsSupport; }
+    if (i == j) {
+      inctv = inctv + epsSupport;
+    }
     return inctv;
   };
 

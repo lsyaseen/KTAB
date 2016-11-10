@@ -2,16 +2,17 @@
 <Scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="smpSchema.xsd">
   <name>DummyData_3Dim</name>
   <desc>A very simple test of multi-dim SMP, using psuedonyms</desc>
-  <prngSeed>100</prngSeed>
+  <prngSeed>03507583219545544127</prngSeed>
   
-  <ModelParameters>
+ <ModelParameters>
     <VictoryProbModel>Linear</VictoryProbModel>
     <PCEModel>MarkovIncentive</PCEModel>
-    <StateTransitions>Deterministic</StateTransitions>
+    <StateTransitions>Deterministic</StateTransitions> 
     
-    <VotingRule>CubicProportional</VotingRule>
+    <VotingRule>PropCbc</VotingRule>
     <BigRAdjust>OneThird</BigRAdjust>
     <BigRRange>Mid</BigRRange>
+    <ThirdPartyCommit>SemiCommit</ThirdPartyCommit>
     <InterVecBrgn>S2P2</InterVecBrgn>
     <BargnModel>InitOnlyInterp</BargnModel>
   </ModelParameters>
@@ -65,6 +66,20 @@
       </Salience>
     </Actor>
     
+    <Actor>
+      <name>David</name>
+      <description>Fourth SMP actor</description>
+      <capability>63.8</capability>
+      <Position>
+        <dCoord>55.9</dCoord>
+        <dCoord>39.8</dCoord>
+      </Position>
+      <Salience>
+        <dSal>11.2</dSal>
+        <dSal>63.8</dSal>
+      </Salience>
+    </Actor>
+    
   </Actors>
   
   
@@ -74,11 +89,13 @@
       <referencePos>Alice</referencePos>
       <adjust>0.87</adjust>
     </iaPair>
+    
     <iaPair>
       <adjustingIdeal>Bob</adjustingIdeal>
       <referencePos>Bob</referencePos>
       <adjust>0.75</adjust>
     </iaPair>
+    
     <iaPair>
       <adjustingIdeal>Bob</adjustingIdeal>
       <referencePos>Alice</referencePos>

@@ -60,6 +60,51 @@ class State;
 class Actor;
 class KTable;
 
+// -------------------------------------------------
+// The enum classes are quite repetitive.
+// It would be nice to eliminate that, but because "enum class"
+// is not really a class in C++11, it is non-obvious.
+//
+// NOTE WELL: Names in each vector<string> must be synchronized with smpSchema.xsd
+//
+// -------------------------------------------------
+
+// convert back and forth betwwen strings and the enum class items
+
+template <class ET>
+ET enumFromName (const string& ets, const vector<string>& etNames) {
+  auto et = static_cast<ET>(0);
+  unsigned int ns = etNames.size();
+  bool found = false;
+  for (unsigned int i=0; i<ns; i++) {
+    if (etNames[i] == ets) {
+      found = true;
+      et = static_cast<ET>(i);
+    }
+  }
+  if (!found) {
+    std::cout << "unrecognized enum-type name:  " << ets << std::endl<< std::flush;
+    throw(KException("enumFromName: unrecognized enum-type name"));
+  }
+  return et;
+}
+
+
+
+template <class ET>
+string nameFromEnum (ET et, const vector<string>& etNames) {
+  auto n = static_cast<unsigned int>(et);
+  bool found = (n < etNames.size());
+  if (!found) {
+    throw(KException("nameFromEnum: unrecognized enum-type"));
+  }
+
+  string ets = etNames[n];
+  return ets;
+}
+
+
+// --------------------------------------------
 
 // How much influence to exert (vote) given a difference in [0,1] utility.
 // NOTE WELL: ASymProsp is asymmetric in the sense that v(i:k) + v(k:i) != 0.
@@ -67,25 +112,31 @@ class KTable;
 // in line with "prospect theory". It is there largely to ensure that we are
 // ready to handle more realistic asymmetric rules, and not always assume symmetry.
 enum class VotingRule {
-  Binary, PropBin, Proportional, PropCbc, Cubic, ASymProsp
+  Binary=0, PropBin, Proportional, PropCbc, Cubic, ASymProsp
 };
-const unsigned int NumVotingRule = 6;
-string vrName(const VotingRule& vr);
-ostream& operator<< (ostream& os, const VotingRule& vr);
+const vector<string> VotingRuleNames = {
+  "Binary", "PropBin", "Prop", "PropCbc", "Cubic", "ASymProsp"};
+ostream& operator<< (ostream& os, const VotingRule& vr); 
+
 
 // Will state transitions be in deterministic or stochastic mode
 enum class StateTransMode {
-  DeterminsticSTM, StochasticSTM
+  DeterminsticSTM=0, StochasticSTM
 };
-string stmName(const StateTransMode& stm);
+const vector<string> StateTransModeNames = {
+  "Deterministic", "Stochastic" };
 ostream& operator<< (ostream& os, const StateTransMode& stm);
 
+
 // At this point, the LISP keyword 'defmacro' should leap to mind.
+// Take in a list of strings, and template out everything else.
+
 // Will this PCE be Conditional or Markov-Incentive or Markov-Uniform or  ...
 enum class PCEModel {
-  ConditionalPCM, MarkovIPCM, MarkovUPCM
+  ConditionalPCM=0, MarkovIPCM, MarkovUPCM
 };
-string pcmName(const PCEModel& pcm);
+const vector<string> PCEModelNames = {
+  "Conditional", "MarkovIncentive", "MarkovUniform" };
 ostream& operator<< (ostream& os, const PCEModel& pcm);
 
 
@@ -105,34 +156,36 @@ enum class VPModel {
   //            guaranteed success (or loss), with linear interpolation between
   //            to avoid weird round-off effects.
 
-  Linear,  // first power
-  Square,  // second power
-  Quartic, // fourth power
-  Octic,   // eighth power
-  Binary   // threshold, limit of N-th power
+  Linear=0,  // first power
+  Square,    // second power
+  Quartic,   // fourth power
+  Octic,     // eighth power
+  Binary     // threshold, limit of N-th power
 };
-string vpmName(const VPModel& vpm);
+const vector<string> VPModelNames = {
+  "Linear", "Square", "Quartic", "Octic", "Binary" };
 ostream& operator<< (ostream& os, const VPModel& vpm);
 
 
 enum class ThirdPartyCommit {
-  NoCommit, SemiCommit, FullCommit
+  NoCommit=0, SemiCommit, FullCommit
 };
-string tpcName(const ThirdPartyCommit& tpc);
+const vector<string> ThirdPartyCommitNames = {
+  "NoCommit", "SemiCommit", "FullCommit" };
 ostream& operator<< (ostream& os, const ThirdPartyCommit& tpc);
 
 
 // estimating risk attitudes from probabilities might have use outside the SMP
 enum class BigRRange {
-  Min, Mid, Max
-};
-string bigRRName(const BigRRange & rRng);
+  Min=0, Mid, Max };
+const vector<string> BigRRangeNames = {
+  "Min", "Mid", "Max" };
 ostream& operator << (ostream& os, const BigRRange& rRng);
 
 enum class BigRAdjust {
-  NoRA, OneThirdRA, HalfRA, TwoThirdsRA, FullRA
-};
-string bigRAName(const BigRAdjust & rAdj);
+  NoRA=0, OneThirdRA, HalfRA, TwoThirdsRA, FullRA };
+const vector<string> BigRAdjustNames = {
+  "None", "OneThird", "Half", "TwoThirds", "Full"};
 ostream& operator << (ostream& os, const BigRAdjust& rAdj);
 
 // -------------------------------------------------

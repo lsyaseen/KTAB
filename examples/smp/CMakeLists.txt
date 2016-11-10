@@ -42,7 +42,14 @@ if (ENABLE_EFENCE)
   endif (NOT EFENCE_FOUND)
 endif (ENABLE_EFENCE)
 
-# --------------------------------------------------------
+# -------------------------------------------------
+ 
+find_package(TinyXML2)
+if (NOT TINYXML2_FOUND)
+  message(FATAL_ERROR "Could not find TinyXML2")
+endif (NOT TINYXML2_FOUND) 
+
+# -------------------------------------------------
 find_package(Sqlite)
 if (NOT SQLITE_FOUND)
   message(FATAL_ERROR "Could not find SQLite")
@@ -135,6 +142,7 @@ include_directories (
   ${FLTK_INCLUDE_DIR}
   ${MINICSV_DIR}
   ${SQLITE_INCLUDE_DIR}
+  ${TINYXML2_INCLUDE_DIR}
   )
 
 # note that we do not put the csv_parser into smp lib.
@@ -207,6 +215,7 @@ if (ENABLE_FLTK_GUI)
     ${SMPG_LIBS}
     ${SQLITE_LIBRARIES}
     ${EFENCE_LIBRARIES}
+    ${TINYXML2_LIBRARIES}
     )
 
   # suppress the console window under Windows
@@ -230,11 +239,8 @@ target_link_libraries (smpc
   ${KUTILS_LIBRARY}
   ${SQLITE_LIBRARIES}
   ${EFENCE_LIBRARIES}
+  ${TINYXML2_LIBRARIES}
   )
-
-# -------------------------------------------------
-
-
 #--------------------------------------------------
 #smpq qt based application
 
@@ -259,12 +265,24 @@ if(ENABLE_QT_GUI)
 
   add_library (QtProjectLib STATIC ${QtProjectLib_src} ${QtProjectLib_hdr_moc} ${QtProjectLib_ui_uic})
 
-  target_link_libraries (QtProjectLib Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Sql Qt5::PrintSupport)
+  target_link_libraries (QtProjectLib 
+    Qt5::Core 
+    Qt5::Gui 
+    Qt5::Widgets 
+    Qt5::Sql 
+    Qt5::PrintSupport)
 
   # WIN32 to suppress the console window under Windows
   add_executable(smpq WIN32 ${QtProjectBin_src} ${QtProjectLib_qrc_rcc})
 
-  target_link_libraries (smpq QtProjectLib smp ${KMODEL_LIBRARY} ${KUTILS_LIBRARY} ${SQLITE_LIBRARIES} ${EFENCE_LIBRARIES})
+  target_link_libraries (smpq 
+    QtProjectLib 
+    smp 
+    ${KMODEL_LIBRARY} 
+    ${KUTILS_LIBRARY} 
+    ${SQLITE_LIBRARIES} 
+    ${EFENCE_LIBRARIES}
+    ${TINYXML2_LIBRARIES})
 
   if(ENABLE_COPY_QT_LIBS AND WIN32)
     find_package(qtdlls)

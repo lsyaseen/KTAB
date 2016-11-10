@@ -52,7 +52,7 @@ using KBase::StateTransMode;
 using KBase::VotingRule;
 using KBase::PCEModel;
 using KBase::ReportingLevel;
-
+using KBase::nameFromEnum;
 
 // --------------------------------------------
 uint64_t BargainSMP::highestBargainID = 1000;
@@ -61,31 +61,18 @@ uint64_t BargainSMP::highestBargainID = 1000;
 const unsigned int sqlBuffSize = 250;
 
 // --------------------------------------------
-string bModName(const SMPBargnModel& bMod) {
-  string rs = "Unrecognized SMPBargnModel";
-  switch (bMod) {
-  case SMPBargnModel::InitOnlyInterpSMPBM:
-    rs = "InitOnlyInterpSMPBM";
-    break;
-
-  case SMPBargnModel::InitRcvrInterpSMPBM:
-    rs = "InitRcvrInterpSMPBM";
-    break;
-
-  case SMPBargnModel::PWCompInterSMPBM:
-    rs = "PWCompInterSMPBM";
-    break;
-  default:
-    cout << "bModName: Unrecognized SMPBargnModel"<<endl<<flush;
-    break;
-  }
-  return rs;
-}
-
 ostream& operator<< (ostream& os, const SMPBargnModel& bMod) {
-  os << bModName(bMod);
+  string s = nameFromEnum<SMPBargnModel>(bMod, SMPBargnModelNames);
+  os << s;
   return os;
 }
+
+ostream& operator<< (ostream& os, const InterVecBrgn& ivb) {
+  string s = nameFromEnum<InterVecBrgn>(ivb, InterVecBrgnNames);
+  os << s;
+  return os;
+}
+
 // --------------------------------------------
 
 BargainSMP::BargainSMP(const SMPActor* ai, const SMPActor* ar, const VctrPstn & pi, const VctrPstn & pr) {
@@ -128,13 +115,13 @@ SMPState* SMPState::doBCN() const {
   const int t = myTurn();
   assert(0 <= t); // need to be in the model's history list
 
-  const KBase::VPModel vpmBargains = model->vpm;
-  const KBase::PCEModel pcemBargains = model->pcem;
-  const KBase::StateTransMode stm = model->stm;
+  const VPModel vpmBargains = model->vpm;
+  const PCEModel pcemBargains = model->pcem;
+  const StateTransMode stm = model->stm;
 
   auto smod = (const SMPModel*)model;
-  const KBase::VotingRule vrBargains = smod->vrCltn;
-  const SMPActor::InterVecBrgn ivb = smod->ivBrgn;
+  const VotingRule vrBargains = smod->vrCltn;
+  const InterVecBrgn ivb = smod->ivBrgn;
   const SMPBargnModel bMod = smod->brgnMod;
 
   // TODO: use groupThreads on *this* loop for high-level parallelism
@@ -308,7 +295,7 @@ SMPState* SMPState::doBCN() const {
         break;
 
 
-      case SMPBargnModel::PWCompInterSMPBM:
+      case SMPBargnModel::PWCompInterpSMPBM:
         // record the only one used into SQLite JAH 20160802 use the flag
         if(model->sqlFlags[3])
         {
@@ -424,7 +411,7 @@ SMPState* SMPState::doBCN() const {
     actorBargains.insert(map<unsigned int, KBase::KMatrix>::value_type(k, p));
     cout << "done" << endl << flush;
 
-    int maxArrcount = p.numR();
+    //int maxArrcount = p.numR();
     //int rslt = 0; // never used
     unsigned int mMax = nb; // indexing actors by i, bargains by m
     switch (stm) {
@@ -509,11 +496,11 @@ SMPState* SMPState::doBCN() const {
     double initProb = -0.1;
     int initSelected = -1;
     auto bargains_i = brgns[i];
-    size_t initBgnNdx = 0;
+    int initBgnNdx = 0;
     auto initActr = -1;
     auto rcvrActr = -1;
-    uint64_t bgID;
-    size_t countDown = 2; // Stop iterating if cases for i:i and i:j processed
+    //uint64_t bgID = 0; // tag uninitialized value
+    int countDown = 2; // Stop iterating if cases for i:i and i:j processed
     for (auto bg : bargains_i) {
       assert(nullptr != bg);
       if (bg->actInit == bg->actRcvr) { // For SQ case
@@ -522,8 +509,8 @@ SMPState* SMPState::doBCN() const {
         initProb = (actorBargains[initActr])(initBgnNdx, 0);
         initSelected = initBgnNdx == actorMaxBrgNdx[initActr] ? 1 : 0;
         /*cout << __LINE__ << " " << "SQ" << " " << bg->getID() \
-                << " " << initActr << ":" << rcvrActr << " " \
-                << initProb << " " << initSelected << endl;*/
+                        << " " << initActr << ":" << rcvrActr << " " \
+                        << initProb << " " << initSelected << endl;*/
 
         bindExecute(updateStmt, t, bg->getID(),
                     initActr, initProb, initSelected,
@@ -539,11 +526,11 @@ SMPState* SMPState::doBCN() const {
           initProb = (actorBargains[initActr])(initBgnNdx, 0);
           initSelected = initBgnNdx == actorMaxBrgNdx[initActr] ? 1 : 0;
           rcvrActr = model->actrNdx(bg->actRcvr);
-          bgID = bg->getID();
+          //bgID = bg->getID();
 
           // Get the bargains of receiver actor
           auto brgnRcvr = brgns[rcvrActr];
-          size_t rcvrBgNdx = 0;
+          int rcvrBgNdx = 0;
           double rcvrProb = -1.0;
           int rcvrSelected = -1;
           for (auto bgRcv : brgnRcvr) {
@@ -555,13 +542,13 @@ SMPState* SMPState::doBCN() const {
               rcvrSelected = actorMaxBrgNdx[rcvrActr] == rcvrBgNdx ? 1 : 0;
 
               /*std::cout.precision(4);
-                            cout << std::fixed;
-                            cout << "Line " << __LINE__ << " " << bgID << " " \
-                            << initActr << ":" << rcvrActr \
-                            << " init_prob: " << initProb \
-                            << " init_selected: " << initSelected \
-                            << " rcvr_prob: " << rcvrProb \
-                            << " rcvr_selected: " << rcvrSelected << endl << endl;*/
+                                          cout << std::fixed;
+                                          cout << "Line " << __LINE__ << " " << bgID << " " \
+                                          << initActr << ":" << rcvrActr \
+                                          << " init_prob: " << initProb \
+                                          << " init_selected: " << initSelected \
+                                          << " rcvr_prob: " << rcvrProb \
+                                          << " rcvr_selected: " << rcvrSelected << endl << endl;*/
 
               --countDown;
               bindExecute(updateStmt, t, bg->getID(),
@@ -640,8 +627,8 @@ SMPState* SMPState::doBCN() const {
 }
 
 void SMPState::bindExecute(sqlite3_stmt *updateStmt, size_t turn, int bargnID,
-						   int initActor, double initProb, bool isInitSelected,
-						   int recvActor, double recvProb, bool isRecvSelected) const {
+                           int initActor, double initProb, bool isInitSelected,
+                           int recvActor, double recvProb, bool isRecvSelected) const {
   int rslt = 0;
 
   rslt = sqlite3_bind_double(updateStmt, 1, initProb);
@@ -689,8 +676,9 @@ void SMPState::bindExecute(sqlite3_stmt *updateStmt, size_t turn, int bargnID,
 tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsigned int i, unsigned int j, bool sqlP) const {
 
   // you could make other choices for these two sub-models
-  auto vr = VotingRule::Proportional;
-  auto tpc = KBase::ThirdPartyCommit::SemiCommit;
+  auto sMod = (const SMPModel*)model;
+  auto vr = sMod->vrCltn; //VotingRule::Proportional;
+  auto tpc = sMod->tpCommit;// KBase::ThirdPartyCommit::SemiCommit;
 
   double uii = aUtil[h](i, i);
   double uij = aUtil[h](i, j);

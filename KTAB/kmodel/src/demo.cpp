@@ -58,7 +58,6 @@ using KBase::State;
 using KBase::PCEModel;
 using KBase::VotingRule;
 using KBase::VPModel;
-using KBase::vrName;
 
 using KBase::GAOpt;
 using KBase::GHCSearch;

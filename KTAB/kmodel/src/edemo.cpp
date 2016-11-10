@@ -45,7 +45,6 @@ using KBase::Model;
 using KBase::Position;
 using KBase::State;
 using KBase::VotingRule;
-using KBase::vrName;
 
 // --------------------------------------------
 
