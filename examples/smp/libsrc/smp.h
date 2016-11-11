@@ -26,6 +26,7 @@
 
 #include <iostream>
 #include <string>
+#include <map>
 
 #include "sqlite3.h"
 #include "kutils.h"
@@ -37,6 +38,7 @@
 namespace SMPLib {
 // namespace to which KBase has no access
 using std::function;
+using std::map;
 using std::ostream;
 using std::shared_ptr;
 using std::string;
@@ -251,10 +253,11 @@ private:
 
   // return RMS distance between ideals and positions
   double posIdealDist(ReportingLevel rl = ReportingLevel::Silent) const;
-  // bind one particular kind of update statement, and execute it.
-  void bindExecute(sqlite3_stmt *updateStmt, size_t turn, int bargnID,
-                   int initActor, double initProb, bool isInitSelected,
-                   int recvActor, double recvProb, bool isRecvSelected) const;
+
+  void updateBargnTable(const vector<vector<BargainSMP*>> & brgns,
+                        map<unsigned int, KBase::KMatrix>  actorBargains,
+                        map<unsigned int, unsigned int>  actorMaxBrgNdx) const;
+
 };
 
 class SMPModel : public Model {

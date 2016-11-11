@@ -101,5 +101,26 @@
       <referencePos>Alice</referencePos>
       <adjust>0.07</adjust>
     </iaPair>
+    
+    
+    <iaPair>
+      <adjustingIdeal>Carol</adjustingIdeal>
+      <referencePos>Carol</referencePos>
+      <adjust>0.65</adjust>
+    </iaPair>
+    
+    
+    <iaPair>
+      <adjustingIdeal>Carol</adjustingIdeal>
+      <referencePos>David</referencePos>
+      <adjust>0.13</adjust>
+    </iaPair>
+    
+    
+    <iaPair>
+      <adjustingIdeal>David</adjustingIdeal>
+      <referencePos>David</referencePos>
+      <adjust>0.57</adjust>
+    </iaPair>
   </IdealAdjustment>
 </Scenario>
