@@ -89,13 +89,16 @@ before_install:  # necessary because Travis overwrites CXX and CC!
 install:
   - if [[ $TRAVIS_OS_NAME == linux ]]; then sudo apt-get install qt5-default; fi #install Qt5 libraries
   - if [[ $TRAVIS_OS_NAME == linux ]]; then sudo bash ./install-linux-deps.sh; fi  # Why do I need permission?
-  - if [[ $TRAVIS_OS_NAME == osx ]]; then bash ./install-osx-deps.sh; fi
 
   # install tinyxml2
   - git clone https://github.com/leethomason/tinyxml2.git
   - cd tinyxml2
   - cmake . -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_STATIC_LIBS:BOOL=ON && sudo make install
   - cd ..
+
+before_script:
+#Set the script to execute
+  - chmod a+x reconfig.sh
 
 script:
   - ./reconfig.sh
@@ -104,3 +107,4 @@ script:
   #- ./examples/smp/smpc --csv ./examples/smp/doc/SOE-Pol-Comp.csv
   #- ./examples/smp/smpc --csv ./examples/smp/doc/dummyData_3Dim.csv
   #- ./KTAB/kmodel/demomodel --emod
+
