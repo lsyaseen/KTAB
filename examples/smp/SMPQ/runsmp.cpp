@@ -109,6 +109,9 @@ void MainWindow::runPushButtonClicked(bool bl)
 
         statusBar()->showMessage(" Please wait !! Executing SMP ....  This may take a while ....");
 
+        QApplication::setOverrideCursor(QCursor(QPixmap("://images/hourglass.png")));
+        QApplication::processEvents();
+
         // A code snippet from Demosmp.cpp to run the model
 
         using KBase::dSeed;
@@ -124,13 +127,13 @@ void MainWindow::runPushButtonClicked(bool bl)
         // Notice that we NEVER use anything but the default seed.
         printf("Using PRNG seed:  %020llu \n", seed);
         printf("Same seed in hex:   0x%016llX \n", seed);
-
         SMPLib::SMPModel::csvReadExec(seed, csvPath.toStdString(),sqlFlags, dbFilePath.toStdString());
-
         KBase::displayProgramEnd(sTime);
+
+        QApplication::restoreOverrideCursor();
+
         statusBar()->showMessage(" Process Completed !! ");
         smpDBPath(dbFilePath);
-
     }
     else
     {

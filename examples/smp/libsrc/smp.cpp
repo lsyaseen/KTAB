@@ -533,7 +533,6 @@ void  SMPState::setAccomodate(const KMatrix & aMat) {
   assert(na == aMat.numR());
   assert(na == aMat.numC());
   accomodate = aMat;
-  identAccMat = KBase::iMatP(accomodate);
   return;
 }
 

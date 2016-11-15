@@ -103,7 +103,7 @@ void MainWindow::initializeLineGraphDock()
   lineGraphGridLayout->addWidget(lineGraphControlsFrame,1,1,Qt::AlignRight);
 }
 
-void MainWindow::initializeLineGraphPlot()
+    void MainWindow::initializeLineGraphPlot()
 {
 
   QFont font("Helvetica[Adobe]",15);
