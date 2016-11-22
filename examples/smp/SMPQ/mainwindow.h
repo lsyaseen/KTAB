@@ -207,6 +207,8 @@ private:
     //graph - customplot
 
     int numAct;
+    int prevTurn;
+    bool firstVal;
     //    to  edit headers
 
     QLineEdit* headerEditor;
@@ -228,7 +230,6 @@ private:
     QList <QString> actorsSal[3];
 
     QStringList dimensionList;
-
 
 private slots:
     void titleDoubleClick(QMouseEvent *event, QCPPlotTitle *barGraphTitle);

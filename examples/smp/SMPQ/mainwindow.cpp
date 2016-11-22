@@ -120,6 +120,8 @@ MainWindow::MainWindow()
     yAxisLen=100;
     prevScenario="None";
     initiatorTip=0;
+    prevTurn=0;
+    firstVal=false;
 }
 
 MainWindow::~MainWindow()
@@ -186,6 +188,7 @@ void MainWindow::dbGetFilePAth(bool bl, QString smpDBPath, bool run)
         populateLineGraphDimensions(dimensionsLineEdit->text().toInt());
         //To populate Bar Graph Dimensions combo box
         populateBarGraphDimensions(dimensionsLineEdit->text().toInt());
+
     }
     statusBar()->showMessage(tr(" "));
 }
@@ -264,8 +267,14 @@ void MainWindow::sliderStateValueToQryDB(int value)
     if(mScenarioIds.length()>0)
     {
         scenarioBox = mScenarioIds.at(scenarioComboBox->currentIndex());
-        removeAllGraphs();
+        lineCustomGraph->clearGraphs();
+        lineCustomGraph->xAxis->setRange(-1,turnSlider->value()+1);
         emit getScenarioRunValues(value,scenarioBox,dimension);
+
+        lineGraphTitle->setText(QString(lineGraphDimensionComboBox->currentText()
+                                        + " vs Time, Iteration " +
+                                        QString::number(value)));
+        lineCustomGraph->yAxis->setLabel(lineGraphDimensionComboBox->currentText());
         lineCustomGraph->replot();
 
         //csv- DB
@@ -678,7 +687,7 @@ void MainWindow::createNewCSV(bool bl)
     stackWidget->addWidget(csvTableWidget);
     stackWidget->setCurrentIndex(1);
 
-    removeAllGraphs();
+    //removeAllGraphs();
 
     actorsLineEdit->setEnabled(true);
     dimensionsLineEdit->setEnabled(true);
