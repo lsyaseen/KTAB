@@ -98,6 +98,78 @@ uint64_t BargainSMP::getID() const {
   return myBargainID;
 }
 
+// --------------------------------------------
+void recordUtility(unsigned int i /* actor id */, const SMPState* obj) {
+  obj->calcUtils(i);
+}
+  
+// --------------------------------------------
+/*
+ * Calculate all the utilities and record in database. utitlity for (i,i,i,j)
+ * combination is getting calculated and recorded in a separate method
+ */
+void SMPState::calcUtils(unsigned int i /* actor id */) const {
+  const unsigned int na = model->numAct;
+  const bool recordTmpSQLP = true;  // Record this in SQLite
+  auto pFn = [this, recordTmpSQLP](unsigned int h, unsigned int k, unsigned int i, unsigned int j) {
+    probEduChlg(h, k, i, j, recordTmpSQLP); // H's estimate of the effect on K of I->J
+  };
+
+  auto getUtils = [this, na, pFn, i](unsigned int j) {
+    if( i != j ) {
+      for (unsigned int m = 0; m < na; m++) {
+        if(m == i) {
+          /* Note:
+           * pFn(i, i, i, j) = pFn(m, m, i, j) = pFn(m,i,i,j)
+           * pFn(i, i, i, j) would be calculated in a different method
+           * bestChallengeUtils in the main thread so that the required
+           * utilities are ready before the call to bestChallenge()
+           */
+          pFn(m, j, i, j); // m's estimate of the effect on J of I->J
+        } else if (m == j) {
+          pFn(m, i, i, j); // m's estimate of the effect on I of I->J
+          pFn(m, m, i, j); // pFn(m,j,i,j) would produce a duplicate result
+        } else {
+          pFn(m, i, i, j); // m's estimate of the effect on I of I->J
+          pFn(m, m, i, j); // m's estimate of the effect on I of I->J
+          pFn(m, j, i, j); // m's estimate of the effect on J of I->J
+        }
+      }
+    }
+  };
+
+  for (unsigned int j = 0; j < bestJ; j++) {
+    getUtils(j);
+  }
+
+  // Some computes for best J need to be avoided here to prevent duplicate entries in DB
+  if( i != bestJ ) {
+    for (unsigned int m = 0; m < na; m++) {
+      if((m != i) && (m != bestJ)) {
+        pFn(m, i, i, bestJ); // m's estimate of the effect on I of I->J
+        pFn(m, m, i, bestJ); // m's estimate of the effect on I of I->J
+        pFn(m, bestJ, i, bestJ); // m's estimate of the effect on J of I->J
+      }
+    }
+  }
+
+  for (unsigned int j = bestJ+1; j < na; j++) {
+    getUtils(j);
+  }
+}
+
+// --------------------------------------------
+void SMPState::bestChallengeUtils(unsigned int i /* actor id */) const {
+  const unsigned int na = model->numAct;
+  const bool recordTmpSQLP = true;  // Record this in SQLite
+  eduChlgsJ eduJ;
+  for (unsigned int j = 0; j < na; j++) {
+    if( i != j ) {
+        eduJ[j] = probEduChlg(i, i, i, j, recordTmpSQLP);
+    }
+  }
+  eduChlgsIJ[i] = eduJ;
+}
 
 // --------------------------------------------
 
@@ -135,10 +207,12 @@ SMPState* SMPState::doBCN() const {
       model->sqlBargainEntries(t, sqBrgnI->getID(), i, i, 0);
     }
 
-    auto chlgI = bestChallenge(i, recordBargainingP);
+    bestChallengeUtils(i);
+
+    auto chlgI = bestChallenge(i);
     const double bestEU = get<2>(chlgI);
     if (0 < bestEU) {
-      const int bestJ = get<0>(chlgI); //
+      bestJ = get<0>(chlgI); //
       const double piiJ = get<1>(chlgI); // i's estimate of probability i defeats j
       assert(0 <= bestJ);
       const unsigned int j = bestJ; // for consistency in code below
@@ -160,10 +234,11 @@ SMPState* SMPState::doBCN() const {
         //assert(0.5 <= piiJ);
       }
 
+      std::thread thr(recordUtility, i, this);
 
       {   // make the variables local to lexical scope of this block.
         // for testing, calculate and print out a block of data showing each's perspective
-        const bool recordTmpSQLP = false;  // Do not record this in SQLite
+        bool recordTmpSQLP = true;  // Record this in SQLite
         auto pFn = [this, recordTmpSQLP](unsigned int h, unsigned int k, unsigned int i, unsigned int j) {
           auto est = probEduChlg(h, k, i, j, recordTmpSQLP); // H's estimate of the effect on K of I->J
           double phij = get<0>(est);
@@ -172,11 +247,14 @@ SMPState* SMPState::doBCN() const {
                  h, phij, i, j, k, edu_hk_ij);
         };
 
-        pFn(i, i, i, j); // I's estimate of the effect on I of I->J
+        // I's estimate of the effect on I of I->J
+        printf("Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f \n",
+               i, piiJ, i, j, i, get<2>(chlgI));
+
         pFn(i, j, i, j); // I's estimate of the effect on J of I->J
 
         pFn(j, i, i, j); // J's estimate of the effect on I of I->J
-        pFn(j, j, i, j); // J's estimate of the effect on I of I->J
+        pFn(j, j, i, j); // J's estimate of the effect on J of I->J
       }
 
       // interpolate a bargain from I's perspective
@@ -313,6 +391,7 @@ SMPState* SMPState::doBCN() const {
         assert(false);
       }
 
+      thr.join();
     }
     else {
       printf("Actor %u has no advantageous targets \n", i);
@@ -672,9 +751,10 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
 
     auto sqlBuff = newChars(sqlBuffSize);
     // prepare the sql statement to insert. as it does not depend on tpk, keep it outside the loop.
+
     sprintf(sqlBuff,
-            "INSERT INTO TP_Prob_Vict_Loss (ScenarioId, Turn_t, Est_h,Init_i,ThrdP_k,Rcvr_j,Prob,Util_V,Util_L) VALUES ('%s', ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
-            model->getScenarioID().c_str());
+            "INSERT INTO TP_Prob_Vict_Loss (ScenarioId, Turn_t, Est_h,Init_i,ThrdP_k,Rcvr_j,Prob,Util_V,Util_L) VALUES ('%s', %u, %u, %u, ?1, %u, ?2, ?3, ?4)",
+            model->getScenarioID().c_str(), t, h, i, j);
 
     // The whole point of a prepared statement is to reuse it.
     // Therefore, we prepare it before the loop, and reuse it inside the loop:
@@ -691,31 +771,22 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
       auto an = ((const SMPActor*)(model->actrs[tpk]));
       int rslt = 0;
 
-      // bind the indices
-      rslt = sqlite3_bind_int(insStmt, 1, t);
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_bind_int(insStmt, 2, h);
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_bind_int(insStmt, 3, i);
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_bind_int(insStmt, 4, tpk);
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_bind_int(insStmt, 5, j);
+      rslt = sqlite3_bind_int(insStmt, 1, tpk);
       assert(SQLITE_OK == rslt);
 
       // bind the data
-      rslt = sqlite3_bind_double(insStmt, 6, tpvArray(tpk, 0));
+      rslt = sqlite3_bind_double(insStmt, 2, tpvArray(tpk, 0));
       assert(SQLITE_OK == rslt);
-      rslt = sqlite3_bind_double(insStmt, 7, tpvArray(tpk, 1));
+      rslt = sqlite3_bind_double(insStmt, 3, tpvArray(tpk, 1));
       assert(SQLITE_OK == rslt);
-      rslt = sqlite3_bind_double(insStmt, 8, tpvArray(tpk, 2));
+      rslt = sqlite3_bind_double(insStmt, 4, tpvArray(tpk, 2));
       assert(SQLITE_OK == rslt);
 
       // actually record it
       rslt = sqlite3_step(insStmt);
       assert(SQLITE_DONE == rslt);
-      sqlite3_clear_bindings(insStmt);
-      assert(SQLITE_DONE == rslt);
+      rslt = sqlite3_clear_bindings(insStmt);
+      assert(SQLITE_OK == rslt);
       rslt = sqlite3_reset(insStmt);
       assert(SQLITE_OK == rslt);
     }
@@ -748,7 +819,7 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
 }
 
 
-tuple<int, double, double> SMPState::bestChallenge(unsigned int i, bool sqlP) const {
+tuple<int, double, double> SMPState::bestChallenge(unsigned int i) const {
   int bestJ = -1;
   double pIJ = 0;
   double bestEU = -1.00;
@@ -757,16 +828,13 @@ tuple<int, double, double> SMPState::bestChallenge(unsigned int i, bool sqlP) co
   // I take a fraction of the minimum.
   const double minSigEDU = 1e-5; // TODO: 1/20 of the minimum, or 0.0005
 
-  for (unsigned int j = 0; j < model->numAct; j++) {
-    if (j != i) {
-      auto peij = probEduChlg(i, i, i, j, sqlP);
-      const double pij = get<0>(peij); // i's estimate of the victory-Prob for i challenging j
-      const double edu = get<1>(peij); // i's estimate of the change in utility to i of i challenging j, compared to SQ
-      if ((minSigEDU < edu) && (bestEU < edu)) {
-        bestJ = j;
-        pIJ = pij;
-        bestEU = edu;
-      }
+  for(const auto& eduJ : eduChlgsIJ[i]) {
+    double pij = get<0>(eduJ.second);
+    double edu = get<1>(eduJ.second);
+    if ((minSigEDU < edu) && (bestEU < edu)) {
+      bestJ = eduJ.first;
+      pIJ = pij;
+      bestEU = edu;
     }
   }
   if (0 <= bestJ) {

@@ -215,6 +215,8 @@ public:
   // If the list is omitted or empty, it uses their current positions
   void idealsFromPstns(const vector<VctrPstn> &  ps = {});
 
+  void calcUtils(unsigned int i /* actor id */) const;
+
 protected:
 
 private:
@@ -238,7 +240,7 @@ private:
   tuple<double, double> probEduChlg(unsigned int h, unsigned int k, unsigned int i, unsigned int j, bool sqlP) const;
 
   // return best j, p[i>j], edu[i->j]
-  tuple<int, double, double> bestChallenge(unsigned int i, bool sqlP) const;
+  tuple<int, double, double> bestChallenge(unsigned int i) const;
 
   // the actor's ideal, against which they judge others' positions
   vector<VctrPstn> ideals = {};
@@ -258,6 +260,16 @@ private:
                         map<unsigned int, KBase::KMatrix>  actorBargains,
                         map<unsigned int, unsigned int>  actorMaxBrgNdx) const;
 
+  /**
+   * Calculate all challenge utilities (i, i, i, j) which would be used to find the best challenge
+   */
+  void bestChallengeUtils(unsigned int i /* actor id */) const;
+  
+  using eduChlgsJ = std::map<unsigned int /*j*/, tuple<double, double> >;
+  
+  mutable std::map<unsigned int /*i*/, eduChlgsJ> eduChlgsIJ;
+  
+  mutable int bestJ;
 };
 
 class SMPModel : public Model {
