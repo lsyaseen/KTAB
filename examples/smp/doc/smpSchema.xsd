@@ -93,7 +93,7 @@
   <xs:simpleType name="BargnModelEnum">
     <xs:restriction base="xs:string">
       <xs:enumeration value="InitOnlyInterp"/>
-      <xs:enumeration value="InitRcvrInter"/>
+      <xs:enumeration value="InitRcvrInterp"/>
       <xs:enumeration value="PWCompInterp"/>
     </xs:restriction>
   </xs:simpleType>
