@@ -48,6 +48,8 @@ if (ENABLE_EFENCE)
 endif (ENABLE_EFENCE)
 
 # ------------------------------------------------- 
+# find libraries on which this project depends
+# ------------------------------------------------- 
  
 find_package(TinyXML2)
 if (NOT TINYXML2_FOUND)
@@ -55,8 +57,6 @@ if (NOT TINYXML2_FOUND)
 endif (NOT TINYXML2_FOUND) 
 
 # -------------------------------------------------
-# find libraries on which this project depends
-# ------------------------------------------------- 
  
 find_package(Sqlite)
 if (NOT SQLITE_FOUND)

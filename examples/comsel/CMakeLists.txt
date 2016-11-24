@@ -35,6 +35,13 @@ if (ENABLE_EFENCE)
   endif (NOT EFENCE_FOUND)
 endif (ENABLE_EFENCE)
 
+# -------------------------------------------------
+ 
+find_package(TinyXML2)
+if (NOT TINYXML2_FOUND)
+  message(FATAL_ERROR "Could not find TinyXML2")
+endif (NOT TINYXML2_FOUND) 
+
 # --------------------------------------------------------
 find_package(Sqlite)
 if (NOT SQLITE_FOUND)
@@ -120,6 +127,7 @@ include_directories (
   ${FLUID_DIR}
   ${FLTK_INCLUDE_DIR}
   ${SQLITE_INCLUDE_DIR}
+  ${TINYXML2_INCLUDE_DIR}
   )
 
 
@@ -165,6 +173,7 @@ target_link_libraries(csg
   ${KUTILS_LIBRARIES}
   ${SQLITE_LIBRARIES}
   ${EFENCE_LIBRARIES}
+  ${TINYXML2_LIBRARIES}
   )
   
 # suppress the console window under Windows

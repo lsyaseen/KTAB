@@ -55,6 +55,8 @@ using std::function;
 using std::string;
 using std::tuple;
 using std::vector;
+using std::ostream;  
+
 
 typedef vector<unsigned int> VUI;
 typedef tuple<double, unsigned int> TDI;
@@ -166,6 +168,26 @@ public:
   string msg = "";
 };
 
+/*
+class EnumType {
+public:
+  explicit EnumType(int i);
+  explicit EnumType(const char* n);
+  explicit EnumType(const string& s);
+
+  virtual ~EnumType();
+
+ // ostream& operator<< (ostream& os, const EnumType& et);
+
+protected:
+  unsigned int ndx = 0;
+  unsigned int addName(string etn);
+  vector<string> *names = nullptr; // pointer to shared data structure
+  string name(const EnumType& et);
+
+private:
+};
+*/
 
 }; // end of namespace
 

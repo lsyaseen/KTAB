@@ -58,83 +58,6 @@ using SMPLib::SMPActor;
 using SMPLib::SMPState;
 
 // -------------------------------------------------
-// this binds the given parameters and returns the λ-fn necessary to stop the SMP appropriately
-function<bool(unsigned int, const State *)>
-smpStopFn(unsigned int minIter, unsigned int maxIter, double minDeltaRatio, double minSigDelta) {
-  auto  sfn = [minIter, maxIter, minDeltaRatio, minSigDelta](unsigned int iter, const State * s) {
-    bool tooLong = (maxIter <= iter);
-    bool longEnough = (minIter <= iter);
-    bool quiet = false;
-    auto sf = [](unsigned int i1, unsigned int i2, double d12) {
-      printf("sDist [%2i,%2i] = %.2E   ", i1, i2, d12);
-      return;
-    };
-    auto s0 = ((const SMPState*)(s->model->history[0]));
-    auto s1 = ((const SMPState*)(s->model->history[1]));
-    auto d01 = SMPModel::stateDist(s0, s1) + minSigDelta;
-    sf(0, 1, d01);
-    auto sx = ((const SMPState*)(s->model->history[iter - 0]));
-    auto sy = ((const SMPState*)(s->model->history[iter - 1]));
-    auto dxy = SMPModel::stateDist(sx, sy);
-    sf(iter - 1, iter - 0, dxy);
-    const double aRatio = dxy / d01;
-    quiet = (aRatio < minDeltaRatio);
-    printf("\nFractional change compared to first step: %.4f  (target=%.4f) \n\n", aRatio, minDeltaRatio);
-    return tooLong || (longEnough && quiet);
-  };
-  return sfn;
-};
-
-// JAH 20160802 added this new function to actually run a model
-// this is all copied from old readEUSpatial and demoEUSpatial
-void executeSMP(SMPModel * md0)
-{
-  // setup the stopping criteria and lambda function
-  const unsigned int minIter = 2;
-  const unsigned int maxIter = 100;
-  const double minDeltaRatio = 0.02;
-  // suppose that, on a [0,100] scale, the first move was the most extreme possible,
-  // i.e. 100 points. One fiftieth of that is just 2, which seems to about the limit
-  // of what people consider significant.
-  const double minSigDelta = 1E-4;
-  // typical first shifts are on the order of numAct/10, so this is low
-  // enough not to affect anything while guarding against the theoretical
-  // possiblity of 0/0 errors
-  md0->stop = [maxIter](unsigned int iter, const State * s) {
-    return (maxIter <= iter);
-  };
-  md0->stop = smpStopFn(minIter, maxIter, minDeltaRatio, minSigDelta);
-
-  // execute
-  cout << "Starting model run" << endl << flush;
-  md0->run();
-  const unsigned int nState = md0->history.size();
-
-  // log data, or not
-  // JAH 20160731 added to either log all information tables or none
-  // this takes care of info re. actors, dimensions, scenario, capabilities, and saliences
-  if (md0->sqlFlags[0])
-  {
-    md0->LogInfoTables();
-  }
-  // JAH 20160802 added logging control flag for the last state
-  // also added the sqlPosVote and sqlPosEquiv calls to get the final state
-  if (md0->sqlFlags[1])
-  {
-    md0->sqlAUtil(nState - 1);
-    md0->sqlPosProb(nState - 1);
-    md0->sqlPosEquiv(nState-1);
-    md0->sqlPosVote(nState-1);
-  }
-
-  // finish up
-  cout << "Completed model run" << endl << endl;
-  printf("There were %u states, with %i steps between them\n", nState, nState - 1);
-  cout << "History of actor positions over time" << endl;
-  md0->showVPHistory();
-
-  return;
-}
 
 void demoEUSpatial(unsigned int numA, unsigned int sDim, bool accP, uint64_t s,  vector<bool> f) {
   printf("Using PRNG seed: %020llu \n", s);
@@ -201,7 +124,8 @@ void demoEUSpatial(unsigned int numA, unsigned int sDim, bool accP, uint64_t s, 
     auto ai = ((SMPActor*)(md0->actrs[i]));
     double ri = 0.0; // st0->aNRA(i);
     printf("%2u: %s , %s \n", i, ai->name.c_str(), ai->desc.c_str());
-    cout << "voting rule: " << vrName(ai->vr) << endl;
+    string vrs = KBase::nameFromEnum<VotingRule>(ai->vr, KBase::VotingRuleNames);
+    cout << "voting rule: " << vrs << endl;
     cout << "Pos vector: ";
     VctrPstn * pi = ((VctrPstn*)(st0->pstns[i]));
     trans(*pi).mPrintf(" %+7.4f ");
@@ -255,7 +179,8 @@ void demoEUSpatial(unsigned int numA, unsigned int sDim, bool accP, uint64_t s, 
   // arbitrary but illustrates that we can do an election with arbitrary
   // voting rules - not necessarily the same as the actors would do.
   auto vr = VotingRule::Binary;
-  cout << "Using voting rule " << vrName(vr) << endl;
+  string vrs = KBase::nameFromEnum<VotingRule>(vr, KBase::VotingRuleNames);
+  cout << "Using voting rule " << vrs << endl;
 
   const KBase::VPModel vpm = md0->vpm;
   const KBase::PCEModel pcem = md0->pcem;
@@ -282,8 +207,7 @@ void demoEUSpatial(unsigned int numA, unsigned int sDim, bool accP, uint64_t s, 
   printf("L-corr of prob and net support: %+.4f \n", KBase::lCorr((w*u), trans(p)));
   printf("A-corr of prob and net support: %+.4f \n", aCorr((w*u), trans(p)));
 
-  // JAH 20160802 added call to executeSMP
-  executeSMP(md0);
+  SMPModel::configExec(md0);
 
   delete md0;
   md0 = nullptr;
@@ -291,18 +215,7 @@ void demoEUSpatial(unsigned int numA, unsigned int sDim, bool accP, uint64_t s, 
   return;
 }
 
-void readEUSpatial(uint64_t seed, string inputCSV,  vector<bool> f) {
-  // JAH 20160711 added rng seed 20160730 JAH added sql flags
-  auto md0 = SMPModel::readCSVStream(inputCSV, seed,  f);
 
-  // JAH 20160802 added call to executeSMP
-  executeSMP(md0);
-  // output what R needs for Sankey diagrams
-  md0->sankeyOutput(inputCSV);
-
-  delete md0;
-  return;
-}
 
 } // end of namespace
 
@@ -319,6 +232,10 @@ int main(int ac, char **av) {
   bool randAccP = false;
   bool csvP = false;
   string inputCSV = "";
+
+  bool xmlP = false;
+  string inputXML = "";
+
   bool logMin = false;
 
   auto showHelp = []() {
@@ -327,17 +244,15 @@ int main(int ac, char **av) {
     printf("--help            print this message\n");
     printf("--euSMP           exp. util. of spatial model of politics\n");
     printf("--ra              randomize the adjustment of ideal points with euSMP \n");
-    printf("--csv <f>         read a scenario from CSV\n");
+    printf("--csv <f>         read a scenario from CSV \n");
+    printf("--xml <f>         read a scenario from XML \n");
     printf("--logmin          log only scenario information + position histories\n");
     printf("--seed <n>        set a 64bit seed\n");
     printf("                  0 means truly random\n");
     printf("                  default: %020llu \n", dSeed);
   };
 
-  // tmp args
-  //euSmpP = true;
-
-  if (ac > 1) {
+  if (ac > 0) {
     for (int i = 1; i < ac; i++) {
       if (strcmp(av[i], "--seed") == 0) {
         i++;
@@ -347,6 +262,11 @@ int main(int ac, char **av) {
         csvP = true;
         i++;
         inputCSV = av[i];
+      }
+      else if (strcmp(av[i], "--xml") == 0) {
+        xmlP = true;
+        i++;
+        inputXML = av[i];
       }
       else if (strcmp(av[i], "--euSMP") == 0) {
         euSmpP = true;
@@ -365,6 +285,9 @@ int main(int ac, char **av) {
         printf("Unrecognized argument %s\n", av[i]);
       }
     }
+  }
+  else {
+    run = false; // no arguments supplied
   }
 
   // JAH 20160730 vector of SQL logging flags for 5 groups of tables:
@@ -399,11 +322,15 @@ int main(int ac, char **av) {
   // seed required to reproduce the bug.
   if (euSmpP) {
     cout << "-----------------------------------" << endl;
-    DemoSMP::demoEUSpatial(0, 0, randAccP, seed,sqlFlags);
+    DemoSMP::demoEUSpatial(0, 0, randAccP, seed, sqlFlags);
   }
   if (csvP) {
     cout << "-----------------------------------" << endl;
-    DemoSMP::readEUSpatial(seed, inputCSV,sqlFlags);
+    SMPLib::SMPModel::csvReadExec(seed, inputCSV, sqlFlags, "testSMP.db");
+  }
+  if (xmlP) {
+    cout << "-----------------------------------" << endl;
+    SMPLib::SMPModel::xmlReadExec(inputXML, sqlFlags, "testSMP.db");
   }
   cout << "-----------------------------------" << endl;
 

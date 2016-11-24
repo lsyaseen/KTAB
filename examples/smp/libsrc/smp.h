@@ -26,6 +26,7 @@
 
 #include <iostream>
 #include <string>
+#include <map>
 
 #include "sqlite3.h"
 #include "kutils.h"
@@ -37,6 +38,7 @@
 namespace SMPLib {
 // namespace to which KBase has no access
 using std::function;
+using std::map;
 using std::ostream;
 using std::shared_ptr;
 using std::string;
@@ -51,6 +53,7 @@ using KBase::State;
 using KBase::Model;
 using KBase::VotingRule;
 using KBase::ReportingLevel;
+using KBase::ThirdPartyCommit;
 using KBase::VctrPstn;
 using KBase::VUI;
 using KBase::BigRAdjust;
@@ -63,6 +66,29 @@ class SMPModel;
 
 const string appVersion = "0.1.1";
 //const bool testProbPCE = true;
+
+// -------------------------------------------------
+// See kmodel.h for explanation of why the enum classes are so repetitive.
+
+enum class SMPBargnModel {
+  InitOnlyInterpSMPBM = 0, // Init interpolates, I&R get same one
+  InitRcvrInterpSMPBM,   // Init interpolates, so does Rcvr, each both from other
+  PWCompInterpSMPBM      // Power-weighted compromise of I-interp and R-interp, I&R both get same one
+};
+const vector<string> SMPBargnModelNames = {
+  "InitOnlyInterp", "InitRcvrInterp", "PWCompInterp" };
+ostream& operator<< (ostream& os, const SMPBargnModel& bMod);
+
+
+
+// See the documentation in kutils/doc: eS2P2, dS2P2, and eS1P1 were the best, in that order.
+// Both estimators involving PMax were the least accurate.
+enum class InterVecBrgn {
+  S1P1, S2P2, S2PMax
+};
+const vector<string> InterVecBrgnNames = {
+  "S1P1", "S2P2", "S2PMax" };
+ostream& operator<< (ostream& os, const InterVecBrgn& ivb);
 
 // -------------------------------------------------
 // Plain-Old-Data
@@ -82,14 +108,6 @@ protected:
   uint64_t myBargainID = 0;
 };
 
-enum class SMPBargnModel {
-  InitOnlyInterpSMPBM,   // Init interpolates, I&R get same one
-  InitRcvrInterpSMPBM,   // Init interpolates, so does Rcvr, each both from other
-  PWCompInterSMPBM       // Power-weighted compromise of I-interp and R-interp, I&R both get same one
-};
-string bModName(const SMPBargnModel& bMod);
-ostream& operator<< (ostream& os, const SMPBargnModel& bMod);
-
 // -------------------------------------------------
 // Trivial, SMP-like actor with fixed attributes
 // the old smp.cpp file, SpatialState::developTwoPosBargain, for a discussion of
@@ -99,12 +117,6 @@ ostream& operator<< (ostream& os, const SMPBargnModel& bMod);
 class SMPActor : public Actor {
 
 public:
-
-  enum class InterVecBrgn {
-    S1P1, S2P2, S2PMax
-  };
-  // See the documentation in kutils/doc: eS2P2, dS2P2, and eS1P1 were the best, in that order.
-  // Both estimators involving PMax were the least accurate.
 
   SMPActor(string n, string d);
   ~SMPActor();
@@ -203,7 +215,11 @@ public:
   // If the list is omitted or empty, it uses their current positions
   void idealsFromPstns(const vector<VctrPstn> &  ps = {});
 
+  void calcUtils(unsigned int i /* actor id */) const;
+
 protected:
+
+private:
 
   // this sets the values in all the AUtil matrices
   virtual void setAllAUtil(ReportingLevel rl);
@@ -224,7 +240,7 @@ protected:
   tuple<double, double> probEduChlg(unsigned int h, unsigned int k, unsigned int i, unsigned int j, bool sqlP) const;
 
   // return best j, p[i>j], edu[i->j]
-  tuple<int, double, double> bestChallenge(unsigned int i, bool sqlP) const;
+  tuple<int, double, double> bestChallenge(unsigned int i) const;
 
   // the actor's ideal, against which they judge others' positions
   vector<VctrPstn> ideals = {};
@@ -240,12 +256,20 @@ protected:
   // return RMS distance between ideals and positions
   double posIdealDist(ReportingLevel rl = ReportingLevel::Silent) const;
 
-  // for now,set it to a scaled identity matrix.
-  void setupAccomodateMatrix(double adjRate);
+  void updateBargnTable(const vector<vector<BargainSMP*>> & brgns,
+                        map<unsigned int, KBase::KMatrix>  actorBargains,
+                        map<unsigned int, unsigned int>  actorMaxBrgNdx) const;
 
-  void bindExecute(sqlite3_stmt *updateStmt, size_t turn, int bargnID,
-                   int initActor, double initProb, bool isInitSelected,
-                   int recvActor, double recvProb, bool isRecvSelected) const;
+  /**
+   * Calculate all challenge utilities (i, i, i, j) which would be used to find the best challenge
+   */
+  void bestChallengeUtils(unsigned int i /* actor id */) const;
+  
+  using eduChlgsJ = std::map<unsigned int /*j*/, tuple<double, double> >;
+  
+  mutable std::map<unsigned int /*i*/, eduChlgsJ> eduChlgsIJ;
+  
+  mutable int bestJ;
 };
 
 class SMPModel : public Model {
@@ -263,13 +287,22 @@ public:
   static double bvDiff(const KMatrix & vd, const  KMatrix & vs);
   static double bvUtil(const KMatrix & vd, const  KMatrix & vs, double R);
 
-  static SMPModel * readCSVStream(string fName, uint64_t s, vector<bool> f);
-  static SMPModel * readXML(string fName, uint64_t s, vector<bool> f);
+  // this sets up a standard configuration and runs it
+  static void configExec(SMPModel * md0);
+
+  // read, configure, and run from CSV
+  static void csvReadExec(uint64_t seed, string inputCSV, vector<bool> f, string dbFilePath);
+
+  // read, configure, and run from XML
+  static void xmlReadExec(string inputXML, vector<bool> f, string dbFilePath);
+
+  static SMPModel * csvRead(string fName, uint64_t s, vector<bool> f);
+  static SMPModel * xmlRead(string fName,vector<bool> f);
 
   static  SMPModel * initModel(vector<string> aName, vector<string> aDesc, vector<string> dName,
                                const KMatrix & cap, const KMatrix & pos, const KMatrix & sal,
-                               const KMatrix & accM, // 20160720 BPW added accomodation matrix
-                               uint64_t s, vector<bool> f); // JAH 20160711 added rng seed 20160730 JAH added sql flags
+                               const KMatrix & accM,
+                               uint64_t s, vector<bool> f);
 
   // print history of each actor in CSV (might want to generalize to arbitrary VctrPstn)
   void showVPHistory() const;
@@ -310,6 +343,8 @@ protected:
   // voting rule for actors when forming coalitions over positions or bargains
   VotingRule vrCltn = VotingRule::Proportional;
 
+  ThirdPartyCommit tpCommit = ThirdPartyCommit::SemiCommit;
+
   // anchoring and adjustment of perceived risk attitudes
   BigRAdjust bigRAdj = BigRAdjust::OneThirdRA;
 
@@ -317,7 +352,7 @@ protected:
   BigRRange bigRRng = BigRRange::Mid; // Mid == use [-0.5, +1.0] scale
 
   // how actors interpolate their bargains
-  SMPActor::InterVecBrgn ivBrgn = SMPActor::InterVecBrgn::S2P2;
+  InterVecBrgn ivBrgn = InterVecBrgn::S2P2;
 
   // different ways to combine bargaining perspectives
   SMPBargnModel brgnMod = SMPBargnModel::InitOnlyInterpSMPBM;

@@ -2061,9 +2061,32 @@ void demoRealEcon(uint64_t s, PRNG* rng)
     424.4459, 662.0114, 741.6478};
   auto cons = KMatrix::vecToKmat(cInput, N, M);
 
-  // export demand price elasticities - still have to simulate
-  auto eps = KMatrix::uniform(rng, N, 1, 2.0, 3.0);
-  //auto eps = KMatrix(N,1,3.0);
+  // export demand price elasticities - different scenarios
+  unsigned int epsscen = 1;
+  KMatrix eps = KMatrix();  // must declare it here even if capscen == 0 because of scope
+  switch (epsscen)
+  {
+    case 0: // simulated
+      eps = KMatrix::uniform(rng, N, 1, 2.0, 3.0);
+      break;
+    case 1: // equal
+      eps = KMatrix(N,1,2.5);
+      break;
+    case 2: // positively correlated with VA - most value-add linked with most elastic
+    {
+      vector<double> eInput = {3.000, 2.750, 2.625, 2.250, 2.500, 2.875, 2.375, 2.125, 2.000};
+      eps = KMatrix::vecToKmat(eInput,N,1);
+      break;
+    }
+    case 3: // negatively correlated with VA - most value-add linked with least elastic
+    {
+      vector<double> eInput = {2.000, 2.250, 2.375, 2.750, 2.500, 2.125, 2.625, 2.875, 3.000};
+      eps = KMatrix::vecToKmat(eInput,N,1);
+      break;
+    }
+  }
+  // scenarios 2 & 3 calcs are from '[IO-USA-1981.xlsx]Trans-O'!V29:W37
+  printf("Export Price Elasticities Generated with Scenario %u\n", epsscen);
 
   // base year transactions between all sectors
   // this is from '[IO-USA-1981.xlsx]Trans-L'!C2:K10

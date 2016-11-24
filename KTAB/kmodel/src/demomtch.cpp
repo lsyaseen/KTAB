@@ -286,7 +286,9 @@ MtchModel* MtchModel::randomMS(unsigned int numA, unsigned int numI, VotingRule 
 
     printf("%2u: %s,  %s \n", i, ai->name.c_str(), ai->desc.c_str());
     printf("Scalar capability: %.2f \n", ai->sCap);
-    printf("Voting rule: %s \n", KBase::vrName(ai->vr).c_str());
+    string vrs = KBase::nameFromEnum<VotingRule>(ai->vr, KBase::VotingRuleNames);
+    printf("Voting rule: %s \n", vrs.c_str());
+    
     printf("Values assigned to each sweet: \n");
     for (unsigned int j = 0; j < numI; j++) {
       printf(" %.4f ", ai->vals[j]);

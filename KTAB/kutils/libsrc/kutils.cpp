@@ -219,8 +219,8 @@ double rescale(double x, double x0, double x1, double y0, double y1) {
   return y0 + (y1 - y0)*f;
 }
 
-
 // -------------------------------------------------
+
 KException::KException(string m) {
   msg = m;
 }
@@ -229,8 +229,45 @@ KException::~KException() {
   msg = "";
 }
 
+/*
 
-}; // namespace
+EnumType::EnumType(int i) {
+  assert(0 <= i);
+  assert(i < names->size());
+  ndx = i;
+}
+
+EnumType::EnumType(const char* n) {
+  // nothing yet
+}
+
+EnumType::EnumType(const string& s) {
+  // nothing yet
+}
+
+EnumType::~EnumType() {
+  names = nullptr;
+  ndx = 0;
+}
+
+
+unsigned int EnumType::addName(string etn) {
+  assert(nullptr != names);
+  names->push_back(etn);
+  return names->size();
+}
+
+string EnumType::name(const EnumType& et) {
+  const unsigned int en = et.ndx;
+  assert(0 <= en);
+  assert(en < names->size());
+  return (*names)[en];
+}
+*/
+
+
+}; 
+// end of namespace
 
 
 // --------------------------------------------
