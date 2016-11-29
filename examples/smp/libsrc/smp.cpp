@@ -137,7 +137,7 @@ void SMPActor::randomize(PRNG* rng, unsigned int numD) {
   assert(fabs(s - sum(vSal)) < 1E-4);
 
   // Note that we randomly assign different voting rules
-  vr = VotingRule::Proportional;
+  //vr = VotingRule::Proportional;
   const unsigned int numVR = KBase::VotingRuleNames.size();
   const unsigned int vrNum = ((unsigned int)(rng->uniform(0.0, numVR -0.01)));
   vr = VotingRule(vrNum);
@@ -1045,21 +1045,37 @@ void SMPModel::showVPHistory() const {
   return;
 }
 
-// JAH 20160711 added rng seed 20160730 JAH added sql flags
+
 SMPModel * SMPModel::initModel(vector<string> aName, vector<string> aDesc, vector<string> dName,
-                               const KMatrix & cap, const KMatrix & pos, const KMatrix & sal,
+                               const KMatrix & cap, // one row per actor
+                               const KMatrix & pos, // one row per actor, one column per dimension
+                               const KMatrix & sal, // one row per actor, one column per dimension
                                const KMatrix & accM,
                                uint64_t s, vector<bool> f)
 {
+    
+     cout << "Num aName "<< aName.size() << endl;
+    cout << "Num aDesc "<< aDesc.size() << endl;
+    cout << "Num dName "<< dName.size() << endl;
+    auto sfn = [](const string str, const KMatrix & m) { 
+    cout << "Dim "<<str<<": "<<m.numR() << ", "<<m.numC() <<endl;
+    m.mPrintf(" %.4f ");
+    return;
+    };
+    sfn("cap", cap);
+    sfn("pos", pos);
+    sfn("sal", sal);
+    sfn("accM", accM);
+    cout << flush; 
+    
   assert(f.size() == Model::NumSQLLogGrps + NumSQLLogGrps);
   SMPModel * sm0 = new SMPModel("", s, f); // JAH 20160711 added rng seed 20160730 JAH added sql flags
   SMPState * st0 = new SMPState(sm0);
+  sm0->addState(st0);
+
   st0->step = [st0]() {
     return st0->stepBCN();
   };
-
-  sm0->addState(st0);
-
 
   auto na = ((const unsigned int)(aName.size()));
   auto nd = ((const unsigned int)(dName.size()));
@@ -1068,7 +1084,7 @@ SMPModel * SMPModel::initModel(vector<string> aName, vector<string> aDesc, vecto
   for (auto dn : dName) {
     sm0->addDim(dn);
   }
-
+  
   for (unsigned int i = 0; i < na; i++) {
     auto ai = new SMPActor(aName[i], aDesc[i]);
     ai->sCap = cap(i, 0);
@@ -1104,8 +1120,8 @@ void SMPModel::csvReadExec(uint64_t seed, string inputCSV, vector<bool> f, strin
 void SMPModel::xmlReadExec(string inputXML, vector<bool> f, string dbFilePath) {
   SMPModel::setDBPath(dbFilePath);
   auto md0 = SMPModel::xmlRead(inputXML, f);
-  cout << "NOT executing model" << endl << flush;
-  //configExec(md0);
+  cout << "Executing model" << endl << flush;
+  configExec(md0);
   delete md0;
   return;
 }

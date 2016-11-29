@@ -215,7 +215,7 @@ public:
   // If the list is omitted or empty, it uses their current positions
   void idealsFromPstns(const vector<VctrPstn> &  ps = {});
 
-  void calcUtils(unsigned int i /* actor id */) const;
+  void calcUtils(unsigned int i) const;  // i == actor id 
 
 protected:
 
@@ -300,9 +300,11 @@ public:
   static SMPModel * xmlRead(string fName,vector<bool> f);
 
   static  SMPModel * initModel(vector<string> aName, vector<string> aDesc, vector<string> dName,
-                               const KMatrix & cap, const KMatrix & pos, const KMatrix & sal,
-                               const KMatrix & accM,
-                               uint64_t s, vector<bool> f);
+    const KMatrix & cap, // one row per actor
+    const KMatrix & pos, // one row per actor, one column per dimension
+    const KMatrix & sal, // one row per actor, one column per dimension
+    const KMatrix & accM,
+    uint64_t s, vector<bool> f);
 
   // print history of each actor in CSV (might want to generalize to arbitrary VctrPstn)
   void showVPHistory() const;
