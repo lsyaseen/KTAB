@@ -291,7 +291,8 @@ public:
   static void configExec(SMPModel * md0);
 
   // read, configure, and run from CSV
-  static void csvReadExec(uint64_t seed, string inputCSV, vector<bool> f, string dbFilePath);
+  static void csvReadExec(uint64_t seed, string inputCSV, vector<bool> f, string dbFilePath,
+                          vector<int> par=vector<int>());
 
   // read, configure, and run from XML
   static void xmlReadExec(string inputXML, vector<bool> f, string dbFilePath);
@@ -326,6 +327,9 @@ public:
 
   // this does not set AUtil, just output it to SQLite
   //virtual void sqlAUtil(unsigned int t);
+
+  //Model Parameters
+  static void updateModelParameters(SMPModel *md0, vector<int> parameters);
 
 protected:
   //sqlite3 *smpDB = nullptr; // keep this protected, to ease multi-threading
