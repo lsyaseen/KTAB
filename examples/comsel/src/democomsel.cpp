@@ -25,14 +25,9 @@
 //
 // --------------------------------------------
 
-
+#include <iostream>
 #include <cstdio>
-#include <FL/Fl.H>
-#include <FL/Fl_Window.H>
-#include <FL/Fl_Tabs.H>
-#include <FL/Fl_Group.H>
-#include <FL/Fl_Button.H>
-
+ 
 #include "kutils.h"
 #include "kmatrix.h"
 #include "prng.h"
@@ -40,10 +35,10 @@
 
 #include "smp.h"
 #include "comsel.h"
-#include "csmain.h"
+//#include "csmain.h"
 #include "democomsel.h"
 
-
+using namespace std;
 using KBase::VUI;
 using KBase::PRNG;
 using KBase::KMatrix;
@@ -338,33 +333,7 @@ namespace DemoComSel {
     return;
   }
 
-  void demoCSG(unsigned int nParty, unsigned int nDim, const uint64_t s) {
-    printf("Using PRNG seed: %020llu \n", s);
-    auto rng = new PRNG();
-    rng->setSeed(s);
-
-    if (0 == nParty) {
-      nParty = 2 + (rng->uniform() % 4); // i.e. [2,6] inclusive
-    }
-    if (0 == nDim) {
-      nDim = 1 + (rng->uniform() % 7); // i.e. [1,7] inclusive
-    }
-
-    printf("Num parties: %u \n", nParty);
-    printf("Num dimensions: %u \n", nDim);
-
-    Fl::scheme("standard"); // standard, plastic, gtk+, gleam
-
-    auto mw = new CSMain();
-    mw->mainWindow->show();
-    Fl::run();
-    delete mw;
-    mw = nullptr;
-
-    return;
-  }
-
-
+  
 } // end of namespace
 
 
@@ -376,14 +345,12 @@ int main(int ac, char **av) {
   auto sTime = KBase::displayProgramStart(DemoComSel::appName, DemoComSel::appVersion);
   uint64_t seed = dSeed; // arbitrary
   bool run = true;
-  bool guiP = false;
-  bool cpP = false;
+   bool cpP = false;
   bool siP = true;
 
   auto showHelp = []() {
     printf("\n");
     printf("Usage: specify one or more of these options\n");
-    printf("--gui       show empty GUI \n");
     printf("--cp        start each actor from the central position \n");
     printf("--si        start each actor from their most self-interested position \n");
     printf("            If neither cp nor si are specified, it will use si \n");
@@ -402,9 +369,6 @@ int main(int ac, char **av) {
       if (strcmp(av[i], "--seed") == 0) {
         i++;
         seed = std::stoull(av[i]);
-      }
-      else if (strcmp(av[i], "--gui") == 0) {
-        guiP = true;
       }
       else if (strcmp(av[i], "--cp") == 0) {
         siP = false;
@@ -449,10 +413,7 @@ int main(int ac, char **av) {
   cout << endl;
   cout << "Done creating objects from SMPLib." << endl << flush;
 
-  if (guiP) { // dummy GUI
-    DemoComSel::demoCSG(6, 5, seed);
-  }
-  else {
+  
     // note that we reset the seed every time, so that in case something
     // goes wrong, we need not scroll back too far to find the
     // seed required to reproduce the bug.
@@ -460,8 +421,6 @@ int main(int ac, char **av) {
       2, // issues to be addressed by the committee
       cpP, siP,
       seed);
-  }
-   
   KBase::displayProgramEnd(sTime);
   return 0;
 }
