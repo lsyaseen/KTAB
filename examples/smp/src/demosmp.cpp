@@ -59,8 +59,9 @@ using SMPLib::SMPState;
 
 // -------------------------------------------------
 
-void demoRandSMP(unsigned int numA, unsigned int sDim, bool accP, uint64_t s,  vector<bool> f) {
+void demoRandSMP(unsigned int numA, unsigned int sDim, bool accP, uint64_t s,  vector<bool> f, string inputDBname) {
   printf("Using PRNG seed: %020llu \n", s);
+  SMPModel::setDBPath(inputDBname);
   // JAH 20160711 added rng seed 20160730 JAH added sql flags
   auto md0 = new SMPModel( "", s, f);
   //rng->setSeed(s); // seed is now set in Model::Model
@@ -219,7 +220,28 @@ void demoRandSMP(unsigned int numA, unsigned int sDim, bool accP, uint64_t s,  v
 
 } // end of namespace
 
+void ReplaceStringInPlace(std::string& subject, const std::string& search,
+	const std::string& replace) {
+	size_t pos = 0;
+	while ((pos = subject.find(search, pos)) != std::string::npos) {
+		subject.replace(pos, search.length(), replace);
+		pos += replace.length();
+	}
+}
+std::string GenarateDBNameWithTimeStamp()
+{
+	using namespace std::chrono;
+	system_clock::time_point today = system_clock::now();
+	time_t tt;
+	tt = system_clock::to_time_t(today);
+	std::string s = ctime(&tt);
+	ReplaceStringInPlace(s, " ", "_");
+	ReplaceStringInPlace(s, ":", "_");
+	ReplaceStringInPlace(s, "\n", "");
+	s += "_GMT.db";
+	return s;
 
+}
 int main(int ac, char **av) {
   using std::cout;
   using std::endl;
@@ -232,6 +254,7 @@ int main(int ac, char **av) {
   bool randAccP = false;
   bool csvP = false;
   string inputCSV = "";
+  string inputDBname = "";
 
   bool xmlP = false;
   string inputXML = "";
@@ -241,17 +264,19 @@ int main(int ac, char **av) {
   auto showHelp = []() {
     printf("\n");
     printf("Usage: specify one or more of these options\n");
-    printf("--help            print this message\n");
-    printf("--euSMP           exp. util. of spatial model of politics\n");
-    printf("--ra              randomize the adjustment of ideal points with euSMP \n");
-    printf("--csv <f>         read a scenario from CSV \n");
-    printf("--xml <f>         read a scenario from XML \n");
-    printf("--logmin          log only scenario information + position histories\n");
-    printf("--seed <n>        set a 64bit seed\n");
-    printf("                  0 means truly random\n");
-    printf("                  default: %020llu \n", dSeed);
+    printf("--help			print this message\n");
+    printf("--euSMP			exp. util. of spatial model of politics\n");
+    printf("--ra			randomize the adjustment of ideal points with euSMP \n");
+    printf("--csv <f>               read a scenario from CSV \n");
+    printf("--xml <f>               read a scenario from XML \n");
+	printf("--dbname <f>            specify a db file name for logging \n");
+    printf("--logmin                log only scenario information + position histories\n");
+    printf("--seed <n>              set a 64bit seed\n");
+    printf("                        0 means truly random\n");
+    printf("                        default: %020llu \n", dSeed);
   };
 
+  bool isdbflagexist = false;
   if (ac > 1) {
     for (int i = 1; i < ac; i++) {
       if (strcmp(av[i], "--seed") == 0) {
@@ -261,13 +286,44 @@ int main(int ac, char **av) {
       else if (strcmp(av[i], "--csv") == 0) {
         csvP = true;
         i++;
-        inputCSV = av[i];
+		if (av[i] != NULL)
+		{
+			inputCSV = av[i];
+		}
+		else
+		{
+			run = false;
+			break;
+		}
       }
       else if (strcmp(av[i], "--xml") == 0) {
         xmlP = true;
         i++;
-        inputXML = av[i];
+		if (av[i] != NULL)
+		{
+			inputXML = av[i];
+		}
+		else
+		{
+			run = false;
+			break;
+		}
       }
+	  else if (strcmp(av[i], "--dbname") == 0) {
+		  //csvP = true;
+		  i++;
+		  if (av[i] != NULL)
+		  {
+			  inputDBname = av[i];
+			  isdbflagexist = true;
+		  }
+		  else
+		  {
+			  isdbflagexist = false;
+//			  run = false;
+			  //break;
+		  }
+	  }
       else if (strcmp(av[i], "--euSMP") == 0) {
         euSmpP = true;
       }
@@ -289,7 +345,7 @@ int main(int ac, char **av) {
   else {
     run = false; // no arguments supplied
   }
-
+  
   // JAH 20160730 vector of SQL logging flags for 5 groups of tables:
   // 0 = Information Tables, 1 = Position Tables, 2 = Challenge Tables,
   // 3 = Bargain Resolution Tables, 4 = VectorPosition table
@@ -320,17 +376,22 @@ int main(int ac, char **av) {
   // note that we reset the seed every time, so that in case something
   // goes wrong, we need not scroll back too far to find the
   // seed required to reproduce the bug.
+  if (!isdbflagexist)
+  {
+	  inputDBname = GenarateDBNameWithTimeStamp();
+  }
   if (euSmpP) {
     cout << "-----------------------------------" << endl;
-    DemoSMP::demoRandSMP(0, 0, randAccP, seed, sqlFlags);
+    DemoSMP::demoRandSMP(0, 0, randAccP, seed, sqlFlags, inputDBname);
   }
   if (csvP) {
     cout << "-----------------------------------" << endl;
-    SMPLib::SMPModel::csvReadExec(seed, inputCSV, sqlFlags, "testSMP.db");
+    SMPLib::SMPModel::csvReadExec(seed, inputCSV, sqlFlags, inputDBname);
   }
   if (xmlP) {
     cout << "-----------------------------------" << endl;
-    SMPLib::SMPModel::xmlReadExec(inputXML, sqlFlags, "testSMP.db");
+//    SMPLib::SMPModel::xmlReadExec(inputXML, sqlFlags, "testSMP.db");
+	SMPLib::SMPModel::xmlReadExec(inputXML, sqlFlags, inputDBname);
   }
   cout << "-----------------------------------" << endl;
 
@@ -338,6 +399,9 @@ int main(int ac, char **av) {
   KBase::displayProgramEnd(sTime);
   return 0;
 }
+
+
+
 
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.
