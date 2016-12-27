@@ -257,7 +257,7 @@ void SMPModel::LogInfoTables()
 
   sqlite3_stmt *insStmtScene=nullptr;
   sqlite3_prepare_v2(smpDB, sqlBuffScene, strlen(sqlBuffScene), &insStmtScene, NULL);
-  assert(nullptr != insStmtS);
+  assert(nullptr != insStmtScene);
 
   sqlite3_exec(smpDB, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
   // Dimension Description Table
