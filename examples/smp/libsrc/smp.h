@@ -352,7 +352,7 @@ public:
 protected:
   //sqlite3 *smpDB = nullptr; // keep this protected, to ease multi-threading
   //string scenName = "Scen";
-  static const int NumTables = 4; // TODO : Add one to this num when new table is added
+  static const int NumTables = 5; // TODO : Add one to this num when new table is added
 
   static const int NumSQLLogGrps = 0; // TODO : Add one to this num when new logging group is added
 
@@ -392,6 +392,8 @@ private:
 
   // fieldVals is used to store the result of select sql queries
   static std::vector<string> fieldVals;
+
+  static KMatrix accM; // size 0-by-0
 };
 
 
