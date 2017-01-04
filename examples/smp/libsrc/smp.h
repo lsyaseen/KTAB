@@ -334,6 +334,7 @@ public:
 
   //Model Parameters
   static void updateModelParameters(SMPModel *md0, vector<int> parameters);
+  static void displayModelPrams(SMPModel *md0);
 
   //default parameters for SMPQ
   static vector<int> getDefaultModelParameters();
@@ -389,6 +390,7 @@ protected:
 private:
   void releaseDB();
 
+  
   static tuple<double, double> calcContribs(VotingRule vrCltn, double wi, double wj, tuple<double, double, double, double>(utils));
 
   // Method used in sqlite execution for callback functionality

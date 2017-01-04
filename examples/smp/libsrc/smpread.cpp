@@ -93,8 +93,6 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
 
     printf("Number of actors: %u \n", numActor);
     printf("Number of dimensions: %u \n", numDim);
-    cout << endl << flush;
-
     if (numDim < 1) { // lower limit
         throw(KBase::KException("SMPModel::readCSVStream: Invalid number of dimensions"));
     }
@@ -289,17 +287,7 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
         auto modelParamsEl = getFirstChild(scenEl, "ModelParameters");
         if (nullptr == modelParamsEl) {
             cout << "No model parameters in XML scenario. Using defaults:" << endl << flush;
-            cout << smp->vpm <<endl;
-            cout << smp->vrCltn <<endl;
-            cout << smp->pcem  <<endl;
-            cout << smp->stm  <<endl;
-            cout << smp->bigRRng  <<endl;
-            cout << smp->bigRAdj  <<endl;
-            cout << smp->tpCommit  <<endl;
-            cout << smp->ivBrgn  <<endl;
-            cout << smp->brgnMod  <<endl;
-            cout << flush;
-        }
+           }
         else {
             function <string (const char*)> showChild = [getFirstChild, modelParamsEl](const char* name ) {
                 auto el = getFirstChild(modelParamsEl, name);
@@ -310,8 +298,7 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
                 cout << "  " << name << ":  " << s << endl << flush;
                 return s;
             };
-
-            cout << "Reading model parameters from XML scenario ..." << endl << flush;
+			cout << "Reading model parameters from XML scenario ..." << endl << flush;
             auto vpmScen = enumFromName<VPModel>(showChild("VictoryProbModel"), KBase::VPModelNames);
             auto vrScen = enumFromName<VotingRule>(showChild("VotingRule"), KBase::VotingRuleNames);
             auto pcemScen = enumFromName<PCEModel>(showChild("PCEModel"), KBase::PCEModelNames);
