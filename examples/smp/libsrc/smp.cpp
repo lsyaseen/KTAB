@@ -541,7 +541,7 @@ void  SMPState::setAccomodate(const KMatrix & aMat) {
 
 VctrPstn SMPState::getIdeal(unsigned int n) const
 {
-	return ideals[n];
+    return ideals[n];
 }
 void SMPState::addPstn(Position* ap) {
     auto sp = (VctrPstn*)ap;
@@ -784,6 +784,9 @@ tuple< KMatrix, VUI> SMPState::pDist(int persp) const {
     return tuple< KMatrix, VUI>(upd, uIndices);
 }
 
+KMatrix SMPState::getAccomodate() {
+    return accomodate;
+}
 
 // -------------------------------------------------
 
@@ -933,129 +936,129 @@ void SMPModel::sankeyOutput(string inputCSV) const {
 // JAH 20160801 changed to refer to model sqlFlags vector to decide
 // whether or not to populate the table
 void SMPModel::showVPHistory() const {
-	assert(numAct == actrs.size());
-	assert(numDim == dimName.size());
+    assert(numAct == actrs.size());
+    assert(numDim == dimName.size());
 
-	// first need to get the group ID for this table
-	// so then we can get the flag to populate the table or not
-	// note the implicit assumption that there will never be 43+ groups :-)
-	unsigned int grpID = 42;
-	for (unsigned int t = 0; t<KTables.size(); t++)
-	{
-		if (KTables[t]->tabName == "VectorPosition")
-		{
-			grpID = KTables[t]->tabGrpID;
-			break;
-		}
-	}
-	// be sure that it found this table
-	assert(grpID != 42);
-	assert(grpID < sqlFlags.size());
+    // first need to get the group ID for this table
+    // so then we can get the flag to populate the table or not
+    // note the implicit assumption that there will never be 43+ groups :-)
+    unsigned int grpID = 42;
+    for (unsigned int t = 0; t<KTables.size(); t++)
+    {
+        if (KTables[t]->tabName == "VectorPosition")
+        {
+            grpID = KTables[t]->tabGrpID;
+            break;
+        }
+    }
+    // be sure that it found this table
+    assert(grpID != 42);
+    assert(grpID < sqlFlags.size());
 
-	// JAH 20160801 only populate the table if this group is turned on
-	if (sqlFlags[grpID])
-	{
-		assert(nullptr != smpDB);
-		char* zErrMsg = nullptr;
+    // JAH 20160801 only populate the table if this group is turned on
+    if (sqlFlags[grpID])
+    {
+        assert(nullptr != smpDB);
+        char* zErrMsg = nullptr;
 
-		//createSQL(Model::NumTables + 0); // Make sure VectorPosition table is present
-		auto sqlBuff = newChars(sqlBuffSize);
-		sprintf(sqlBuff,
-			"INSERT INTO VectorPosition (ScenarioId, Turn_t, Act_i, Dim_k, Pos_Coord, Idl_Coord) VALUES ('%s', ?1, ?2, ?3, ?4, ?5)",
-			scenId.c_str());
+        //createSQL(Model::NumTables + 0); // Make sure VectorPosition table is present
+        auto sqlBuff = newChars(sqlBuffSize);
+        sprintf(sqlBuff,
+            "INSERT INTO VectorPosition (ScenarioId, Turn_t, Act_i, Dim_k, Pos_Coord, Idl_Coord) VALUES ('%s', ?1, ?2, ?3, ?4, ?5)",
+            scenId.c_str());
 
-		assert(nullptr != smpDB);
-		const char* insStr = sqlBuff;
-		sqlite3_stmt *insStmt;
-		sqlite3_prepare_v2(smpDB, insStr, strlen(insStr), &insStmt, NULL);
-		assert(nullptr != insStmt); //make sure it is ready
+        assert(nullptr != smpDB);
+        const char* insStr = sqlBuff;
+        sqlite3_stmt *insStmt;
+        sqlite3_prepare_v2(smpDB, insStr, strlen(insStr), &insStmt, NULL);
+        assert(nullptr != insStmt); //make sure it is ready
 
-									// Prepared statements cache the execution plan for a query after the query optimizer has
-									// found the best plan, so there is no big gain with simple insertions.
-									// What makes a huge difference is bundling a few hundred into one atomic "transaction".
-									// For this case, runtime droped from 62-65 seconds to 0.5-0.6 (vs. 0.30-0.33 with no SQL at all).
+        // Prepared statements cache the execution plan for a query after the query optimizer has
+        // found the best plan, so there is no big gain with simple insertions.
+        // What makes a huge difference is bundling a few hundred into one atomic "transaction".
+        // For this case, runtime droped from 62-65 seconds to 0.5-0.6 (vs. 0.30-0.33 with no SQL at all).
 
-		sqlite3_exec(smpDB, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+        sqlite3_exec(smpDB, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 
-		// show positions over time
-		for (unsigned int i = 0; i < numAct; i++) {
-			for (unsigned int k = 0; k < numDim; k++) {
-				printf("%s , %s , ", actrs[i]->name.c_str(), dimName[k].c_str());
-				for (unsigned int t = 0; t < history.size(); t++) {
-					auto st = history[t];
-					auto pit = st->pstns[i];
-					auto vpit = (const VctrPstn*)pit;
-					auto sst = ((const SMPState*)st);
-					auto vidl = sst->getIdeal(i);
-					assert(1 == vpit->numC());
-					assert(numDim == vpit->numR());
-					printf("%5.1f , ", 100 * (*vpit)(k, 0)); // have to print "100.0" sometimes
-					int rslt = 0;
-					rslt = sqlite3_bind_int(insStmt, 1, t);
-					assert(SQLITE_OK == rslt);
-					rslt = sqlite3_bind_int(insStmt, 2, i);
-					assert(SQLITE_OK == rslt);
-					rslt = sqlite3_bind_int(insStmt, 3, k);
-					assert(SQLITE_OK == rslt);
-					const double pCoord = (*vpit)(k, 0);
-					rslt = sqlite3_bind_double(insStmt, 4, pCoord);
-					assert(SQLITE_OK == rslt);
-					const double iCoord = vidl(k, 0);
-					rslt = sqlite3_bind_double(insStmt, 5, iCoord);
-					assert(SQLITE_OK == rslt);
-					rslt = sqlite3_step(insStmt);
-					assert(SQLITE_DONE == rslt);
-					sqlite3_clear_bindings(insStmt);
-					assert(SQLITE_DONE == rslt);
-					rslt = sqlite3_reset(insStmt);
-					assert(SQLITE_OK == rslt);
-				}
-				cout << endl;
-			}
-		}
+        // show positions over time
+        for (unsigned int i = 0; i < numAct; i++) {
+            for (unsigned int k = 0; k < numDim; k++) {
+                printf("%s , %s , ", actrs[i]->name.c_str(), dimName[k].c_str());
+                for (unsigned int t = 0; t < history.size(); t++) {
+                    auto st = history[t];
+                    auto pit = st->pstns[i];
+                    auto vpit = (const VctrPstn*)pit;
+                    auto sst = ((const SMPState*)st);
+                    auto vidl = sst->getIdeal(i);
+                    assert(1 == vpit->numC());
+                    assert(numDim == vpit->numR());
+                    printf("%5.1f , ", 100 * (*vpit)(k, 0)); // have to print "100.0" sometimes
+                    int rslt = 0;
+                    rslt = sqlite3_bind_int(insStmt, 1, t);
+                    assert(SQLITE_OK == rslt);
+                    rslt = sqlite3_bind_int(insStmt, 2, i);
+                    assert(SQLITE_OK == rslt);
+                    rslt = sqlite3_bind_int(insStmt, 3, k);
+                    assert(SQLITE_OK == rslt);
+                    const double pCoord = (*vpit)(k, 0);
+                    rslt = sqlite3_bind_double(insStmt, 4, pCoord);
+                    assert(SQLITE_OK == rslt);
+                    const double iCoord = vidl(k, 0);
+                    rslt = sqlite3_bind_double(insStmt, 5, iCoord);
+                    assert(SQLITE_OK == rslt);
+                    rslt = sqlite3_step(insStmt);
+                    assert(SQLITE_DONE == rslt);
+                    sqlite3_clear_bindings(insStmt);
+                    assert(SQLITE_DONE == rslt);
+                    rslt = sqlite3_reset(insStmt);
+                    assert(SQLITE_OK == rslt);
+                }
+                cout << endl;
+            }
+        }
 
-		sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
-		sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-		cout << endl;
+        sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
+        sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
+        cout << endl;
 
-		delete sqlBuff;
-		sqlBuff = nullptr;
-	}
+        delete sqlBuff;
+        sqlBuff = nullptr;
+    }
 
-	// show probabilities over time.
-	// Note that we have to set the aUtil matrices for the last one.
-	vector<KMatrix> prbHist = {};
-	vector<VUI> unqHist = {};
-	for (unsigned int t = 0; t < history.size(); t++) {
-		auto sst = (SMPState*)history[t];
-		assert(numAct == sst->aUtil.size()); // should be fully initialized
-		auto pn = sst->pDist(-1);
-		auto pdt = std::get<0>(pn); // note that these are unique positions
-		auto unq = std::get<1>(pn);
-		prbHist.push_back(pdt);
-		unqHist.push_back(unq);
-	}
+    // show probabilities over time.
+    // Note that we have to set the aUtil matrices for the last one.
+    vector<KMatrix> prbHist = {};
+    vector<VUI> unqHist = {};
+    for (unsigned int t = 0; t < history.size(); t++) {
+        auto sst = (SMPState*)history[t];
+        assert(numAct == sst->aUtil.size()); // should be fully initialized
+        auto pn = sst->pDist(-1);
+        auto pdt = std::get<0>(pn); // note that these are unique positions
+        auto unq = std::get<1>(pn);
+        prbHist.push_back(pdt);
+        unqHist.push_back(unq);
+    }
 
-	auto probIT = [this, prbHist, unqHist](unsigned int i, unsigned int t) {
-		auto pdt = prbHist[t];
-		auto unq = unqHist[t];
-		auto sst = ((const SMPState*)(history[t]));
-		double pr = sst->posProb(i, unq, pdt);
-		return pr;
-	};
+    auto probIT = [this, prbHist, unqHist](unsigned int i, unsigned int t) {
+        auto pdt = prbHist[t];
+        auto unq = unqHist[t];
+        auto sst = ((const SMPState*)(history[t]));
+        double pr = sst->posProb(i, unq, pdt);
+        return pr;
+    };
 
-	// TODO: displaying the probabilities of actors winning is a bit odd,
-	// as we display the probability of their position winning. As multiple
-	// actors often occupy the equivalent positions, this means the displayed probabilities
-	// will often add up to more than 1.
-	for (unsigned int i = 0; i < numAct; i++) {
-		printf("%s , prob , ", actrs[i]->name.c_str());
-		for (unsigned int t = 0; t < history.size(); t++) {
-			printf("%.4f , ", probIT(i, t)); //  prbHist[t](i, 0),
-		}
-		cout << endl << flush;
-	}
-	return;
+    // TODO: displaying the probabilities of actors winning is a bit odd,
+    // as we display the probability of their position winning. As multiple
+    // actors often occupy the equivalent positions, this means the displayed probabilities
+    // will often add up to more than 1.
+    for (unsigned int i = 0; i < numAct; i++) {
+        printf("%s , prob , ", actrs[i]->name.c_str());
+        for (unsigned int t = 0; t < history.size(); t++) {
+            printf("%.4f , ", probIT(i, t)); //  prbHist[t](i, 0),
+        }
+        cout << endl << flush;
+    }
+    return;
 }
 
 SMPModel * SMPModel::initModel(vector<string> aName, vector<string> aDesc, vector<string> dName,
@@ -1120,21 +1123,66 @@ void SMPModel::setDBPath(std::string dbName)
 {
     dbPath = dbName;
 }
-void SMPModel::displayModelPrams(SMPModel *md0)
+void SMPModel::displayModelParams(SMPModel *md0)
 {
-	cout << "Displaying model parameters...\n";
-	//md0->vpm
-	cout << "  VictoryProbModel:  " << md0->vpm << endl;
-	cout << "  VotingRule:  " << md0->vrCltn << endl;
-	cout << "  PCEModel:  " << md0->pcem << endl;
-	cout << "  StateTransitions:  " << md0->stm << endl;
-	cout << "  BigRRange:  " << md0->bigRRng << endl;
-	cout << "  BigRAdjust:  " << md0->bigRAdj << endl;
-	cout << "  ThirdPartyCommit:  " << md0->tpCommit << endl;
-	cout << "  InterVecBrgn:  " << md0->ivBrgn << endl;
-	cout << "  BargnModel:  " << md0->brgnMod << endl;
-	cout << flush;
+    cout << "Model Paramaters to run the model...\n";
+    cout << "VictoryProbModel:  " << md0->vpm << endl;
+    cout << "VotingRule:  " << md0->vrCltn << endl;
+    cout << "PCEModel:  " << md0->pcem << endl;
+    cout << "StateTransitions:  " << md0->stm << endl;
+    cout << "BigRRange:  " << md0->bigRRng << endl;
+    cout << "BigRAdjust:  " << md0->bigRAdj << endl;
+    cout << "ThirdPartyCommit:  " << md0->tpCommit << endl;
+    cout << "InterVecBrgn:  " << md0->ivBrgn << endl;
+    cout << "BargnModel:  " << md0->brgnMod << endl;
+    cout << flush;
 }
+
+string SMPModel::runModel(vector<bool> sqlFlags, string dbFilePath,
+    string inputDataFile, uint64_t seed, vector<int> modelParams) {
+    SMPModel::setDBPath(dbFilePath);
+    if (md0 != nullptr) {
+        delete md0;
+        md0 = nullptr;
+    }
+
+    // Supported files for input data: xml, csv
+    size_t dotPos = inputDataFile.find_last_of(".");
+    assert(dotPos != string::npos); // A file name without extension
+
+    string fileExt = inputDataFile.substr(dotPos+1);
+
+    // convert to all lower case for easy comparison
+    std::transform(fileExt.begin(), fileExt.end(), fileExt.begin(), ::tolower);
+
+    // Make sure the file extension is either csv or xml only
+    assert((fileExt == "csv") || (fileExt == "xml"));
+
+    if (fileExt == "xml") {
+        md0 = xmlRead(inputDataFile, sqlFlags);
+
+        if (-1 != seed) {
+            md0->setSeed(seed);
+            printf("Using PRNG seed provided by the user: %020llu \n", md0->getSeed());
+        }
+        else {
+            printf("Using PRNG seed provided by xml file: %020llu \n", md0->getSeed());
+        }
+    }
+    else if (fileExt == "csv") {
+        md0 = csvRead(inputDataFile, seed, sqlFlags);
+    }
+
+    if (!modelParams.empty()) {
+        SMPModel::updateModelParameters(md0, modelParams);
+    }
+
+    displayModelParams(md0);
+    configExec(md0);
+    md0->releaseDB();
+    return md0->getScenarioID();
+}
+
 string SMPModel::csvReadExec(uint64_t seed, string inputCSV, vector<bool> f, string dbFilePath, vector<int> par) {
     SMPModel::setDBPath(dbFilePath);
     if (md0 != nullptr) {
@@ -1146,8 +1194,8 @@ string SMPModel::csvReadExec(uint64_t seed, string inputCSV, vector<bool> f, str
     if (false == par.empty()) {
         SMPModel::updateModelParameters(md0, par);
     }
-	SMPModel::displayModelPrams(md0);
-	configExec(md0);
+    displayModelParams(md0);
+    configExec(md0);
     md0->releaseDB();
     return md0->getScenarioID();
 }
@@ -1155,7 +1203,7 @@ string SMPModel::csvReadExec(uint64_t seed, string inputCSV, vector<bool> f, str
 string SMPModel::xmlReadExec(string inputXML, vector<bool> f, string dbFilePath) {
     SMPModel::setDBPath(dbFilePath);
     md0 = SMPModel::xmlRead(inputXML, f);
-	SMPModel::displayModelPrams(md0);
+    displayModelParams(md0);
     configExec(md0);
     md0->releaseDB();
     return md0->getScenarioID();

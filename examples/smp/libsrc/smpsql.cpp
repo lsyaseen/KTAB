@@ -286,6 +286,11 @@ void SMPModel::LogInfoTables()
 
   sqlite3_exec(smpDB, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 
+  // Retrieve accommodation matrix
+  auto st = dynamic_cast<SMPState *>(history.back());
+  assert(st != nullptr);
+  auto accM = st->getAccomodate();
+
   // Accomodation table to record affinities
   assert((accM.numR() == numAct) && (accM.numC() == numAct));
   for (unsigned int Act_i = 0; Act_i < numAct; ++Act_i) {

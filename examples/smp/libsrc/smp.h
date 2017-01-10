@@ -211,6 +211,9 @@ public:
   void setAccomodate(const KMatrix & aMat);
   // set ideal-accomodation matrix to given matrix
 
+  // get the ideal-accommodation matrix
+  KMatrix getAccomodate();
+
   // initialize the actors' ideals from the given list of VctrPstn.
   // If the list is omitted or empty, it uses their current positions
   void idealsFromPstns(const vector<VctrPstn> &  ps = {});
@@ -291,6 +294,9 @@ public:
   static double bvDiff(const KMatrix & vd, const  KMatrix & vs);
   static double bvUtil(const KMatrix & vd, const  KMatrix & vs, double R);
 
+  static std::string runModel(std::vector<bool> sqlFlags, std::string dbFilePath,
+      std::string inputDataFile, uint64_t seed, std::vector<int> modelParams = std::vector<int>());
+
   // this sets up a standard configuration and runs it
   static void configExec(SMPModel * md0);
 
@@ -334,7 +340,7 @@ public:
 
   //Model Parameters
   static void updateModelParameters(SMPModel *md0, vector<int> parameters);
-  static void displayModelPrams(SMPModel *md0);
+  static void displayModelParams(SMPModel *md0);
 
   //default parameters for SMPQ
   static vector<int> getDefaultModelParameters();
@@ -398,8 +404,6 @@ private:
 
   // fieldVals is used to store the result of select sql queries
   static std::vector<string> fieldVals;
-
-  static KMatrix accM; // size 0-by-0
 };
 
 

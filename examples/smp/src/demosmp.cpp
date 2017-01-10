@@ -248,7 +248,7 @@ int main(int ac, char **av) {
   using std::string;
   using KBase::dSeed;
   auto sTime = KBase::displayProgramStart(DemoSMP::appName, DemoSMP::appVersion);
-  uint64_t seed = dSeed;
+  uint64_t seed = -1;
   bool run = true;
   bool euSmpP = false;
   bool randAccP = false;
@@ -370,8 +370,16 @@ int main(int ac, char **av) {
     rng = nullptr;
   }
 
-  printf("Using PRNG seed:  %020llu \n", seed);
-  printf("Same seed in hex:   0x%016llX \n", seed);
+  //printf("Using PRNG seed:  %020llu \n", seed);
+  //printf("Same seed in hex:   0x%016llX \n", seed);
+
+  // JAH 20170109 we set the seed first to -1 then change it to dseed
+  // here only if input is not xml, so as to ensure that a manually
+  // input seed on the cmdline can override the seed in an xml file,
+  // but the dseed coming from no seed input can't override it
+  if ((seed == -1) && (!xmlP)) {
+      seed = KBase::dSeed;
+  }
 
   // note that we reset the seed every time, so that in case something
   // goes wrong, we need not scroll back too far to find the
@@ -386,13 +394,14 @@ int main(int ac, char **av) {
   }
   if (csvP) {
     cout << "-----------------------------------" << endl;
-    SMPLib::SMPModel::csvReadExec(seed, inputCSV, sqlFlags, inputDBname);
+    //SMPLib::SMPModel::csvReadExec(seed, inputCSV, sqlFlags, inputDBname);
+    SMPLib::SMPModel::runModel(sqlFlags, inputDBname, inputCSV, seed);
     SMPLib::SMPModel::destroyModel();
   }
   if (xmlP) {
     cout << "-----------------------------------" << endl;
-//    SMPLib::SMPModel::xmlReadExec(inputXML, sqlFlags, "testSMP.db");
-	SMPLib::SMPModel::xmlReadExec(inputXML, sqlFlags, inputDBname);
+	//SMPLib::SMPModel::xmlReadExec(inputXML, sqlFlags, inputDBname);
+    SMPLib::SMPModel::runModel(sqlFlags, inputDBname, inputXML, seed);
     SMPLib::SMPModel::destroyModel();
   }
   cout << "-----------------------------------" << endl;

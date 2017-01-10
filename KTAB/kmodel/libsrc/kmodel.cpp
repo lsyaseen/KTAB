@@ -42,112 +42,101 @@ using KBase::nameFromEnum;
 
 // JAH 20160711 added seed 20160730 JAH added sql flags
 // BPW 2016-09-28 removed redundant PRNG input variable
-
 Model::Model(string desc, uint64_t sd, vector<bool> f, string Name) {
 
-	history = vector<State*>();
-	actrs = vector<Actor*>();
-	numAct = 0;
-	stop = nullptr;
-	rng = nullptr;
+  history = vector<State*>();
+  actrs = vector<Actor*>();
+  numAct = 0;
+  stop = nullptr;
+  rng = nullptr;
 
-	sqlFlags = f; // JAH 20160730 save the vec of SQL flags
-	printf("SQL Logging Flags\n");
-	for (unsigned int i = 0; i < sqlFlags.size(); i++)
-	{
-		printf("Grp %u = %u\n", i, sqlFlags[i] ? 1 : 0);
-	}
+  sqlFlags = f; // JAH 20160730 save the vec of SQL flags
+  printf("SQL Logging Flags\n");
+  for (unsigned int i = 0; i < sqlFlags.size(); i++)
+  {
+    printf("Grp %u = %u\n", i, sqlFlags[i] ? 1 : 0);
+  }
 
-	// Record the UTC time so it can be used as the default scenario name
-	std::chrono::time_point<std::chrono::system_clock> st;
-	st = std::chrono::system_clock::now();
-	std::time_t start_time = std::chrono::system_clock::to_time_t(st);
+  // Record the UTC time so it can be used as the default scenario name
+  std::chrono::time_point<std::chrono::system_clock> st;
+  st = std::chrono::system_clock::now();
+  std::time_t start_time = std::chrono::system_clock::to_time_t(st);
 
-	const std::chrono::duration<double> tse = st.time_since_epoch();
-	std::chrono::seconds::rep microSeconds = std::chrono::duration_cast<std::chrono::microseconds>(tse).count() % 1000000;
+  const std::chrono::duration<double> tse = st.time_since_epoch();
+  std::chrono::seconds::rep microSeconds = std::chrono::duration_cast<std::chrono::microseconds>(tse).count() % 1000000;
 
+  auto utcBuffId = newChars(500);
+  auto hshCode = newChars(100);
+  auto utcBuff = newChars(200);
 
-	auto utcBuffId = newChars(500);
-	auto hshCode = newChars(100);
-	  if (0 == desc.length()) {
-	auto utcBuff = newChars(200);
+  if (0 == desc.length() || 0 == Name.length()) {
+    std::strftime(utcBuff, 150, "Scenario-UTC-%Y-%m-%u-%H%M-%S", gmtime(&start_time));
+  }
 
-	std::strftime(utcBuff, 150, "Scenario-UTC-%Y-%m-%u-%H%M-%S", gmtime(&start_time));
-	cout << "No scenario description provided to Model::Model, " << endl;
-	cout << "generating default name from UTC start time." << endl << flush;
-	scenDesc = utcBuff;
-	// Scenario Id Generation  include the microsecond
+  if (0 == desc.length()) {
+    cout << "No scenario description provided to Model::Model, " << endl;
+    cout << "Using default description generated from UTC start time." << endl;
 
-	sprintf(utcBuffId, "%s_%u", utcBuff, microSeconds);
+    scenDesc = utcBuff;
+  }
+  else {
+    scenDesc = desc;
+  }
 
+  if (0 == Name.length()) {
+    cout << "No scenario name provided to Model::Model " << endl;
+    cout << "Using default description generated from UTC start time." << endl;
 
-//	scenDesc = desc;
+    scenName = utcBuff;
+  }
+  else
+  {
+    scenName = Name;
+  }
 
-	delete utcBuff;
-	utcBuff = nullptr;
+  sprintf(utcBuffId, "%s_%u", scenName.c_str(), microSeconds);
 
-	 }
-	else
-	{
-	scenDesc = desc;
-	sprintf(utcBuffId, "%s_%u", desc.c_str(), microSeconds);
+  delete utcBuff;
+  utcBuff = nullptr;
 
-	}
-	  if (0 == Name.length()) {
-		  auto utcBuff = newChars(200);
+  //get the hash
+  uint64_t scenIdhash = (std::hash < std::string>() (utcBuffId));
+  sprintf(hshCode, "%032llX", scenIdhash);
+  scenId = hshCode;
+  delete hshCode;
+  hshCode = nullptr;
+  delete utcBuffId;
+  utcBuffId = nullptr;
 
-		  std::strftime(utcBuff, 150, "Scenario-UTC-%Y-%m-%u-%H%M-%S", gmtime(&start_time));
-		  cout << "No scenario name provided to Model::Model " << endl;
-		  cout << "generating default name from UTC start time." << endl << flush;
-		  scenName = utcBuff;
-		  // Scenario Id Generation  include the microsecond
+  // BPW 20160717
+  // (a) record a reproducible seed even we were given '0'
+  // (b) make sure that the given value really is the initial seed
+  // (c) at this point, the PRNG* is almost irrelevant, except that someone
+  // might, in the future, provide an object which was a new subclass of PRNG*
 
-		  sprintf(utcBuffId, "%s_%u", utcBuff, microSeconds);
+  rng = new PRNG();
+  if (0 == sd) {
+    rng->setSeed(0); // random and irreproducible
+    sd = rng->uniform(); // random and irreproducible 64-bits
+  }
 
+  // JAH 20160711 save the seed for the rng
+  setSeed(sd);
 
-		  //	scenDesc = desc;
-
-		  delete utcBuff;
-		  utcBuff = nullptr;
-
-	  }
-	  else
-	  {
-		  scenName = Name;
-		  sprintf(utcBuffId, "%s_%u", desc.c_str(), microSeconds);
-
-	  }
-	//get the hash
-	uint64_t scenIdhash = (std::hash < std::string>() (utcBuffId));
-	sprintf(hshCode, "%032llX", scenIdhash);
-	scenId = hshCode;
-	delete hshCode;
-	hshCode = nullptr;
-	delete utcBuffId;
-	utcBuffId = nullptr;
-
-	// BPW 20160717
-	// (a) record a reproducible seed even we were given '0'
-	// (b) make sure that the given value really is the initial seed
-	// (c) at this point, the PRNG* is almost irrelevant, except that someone
-	// might, in the future, provide an object which was a new subclass of PRNG*
-
-	rng = new PRNG();
-	if (0 == sd) {
-		rng->setSeed(0); // random and irreproducible
-		sd = rng->uniform(); // random and irreproducible 64-bits
-	}
-
-	// JAH 20160711 save the seed for the rng
-	rngSeed = sd;
-	rng->setSeed(rngSeed);
-
-	// BPW 20160928 print out the seed actually used (non-zero) instead of the one given (e.g. 0)
-	printf("Using PRNG seed: %020llu \n", rngSeed);
-
-	cout << "Scenario assigned name: -|" << scenName.c_str() << "|-" << endl << flush;
+  // BPW 20160928 print out the seed actually used (non-zero) instead of the one given (e.g. 0)
+  printf("Using PRNG seed: %020llu \n", rngSeed);
+  cout << "Scenario Description: " << scenDesc << endl;
+  cout << "Scenario assigned name: -|" << scenName << "|-" << endl << flush;
 }
 
+void Model::setSeed(uint64_t seed) {
+    rngSeed = seed;
+    rng->setSeed(rngSeed);
+}
+
+uint64_t Model::getSeed() {
+    return rngSeed;
+}
 
 Model::~Model() {
   while (0 < history.size()) {

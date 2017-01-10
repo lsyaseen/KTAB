@@ -409,6 +409,10 @@ public:
     return scenName;
   };
 
+  void setSeed(uint64_t seed);
+
+  uint64_t getSeed();
+
   static KTable * createSQL(unsigned int n);
 protected:
   //static string createTableSQL(unsigned int tn);

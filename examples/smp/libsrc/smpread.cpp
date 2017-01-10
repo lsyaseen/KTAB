@@ -64,7 +64,6 @@ using tinyxml2::XMLElement;
 using tinyxml2::XMLDocument;
 
 // --------------------------------------------
-KMatrix SMPModel::accM;
 
 // --------------------------------------------
 
@@ -210,7 +209,7 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
     sal = sal / 100.0;
 
     cout << "Setting ideal-accomodation matrix to identity matrix" << endl;
-    accM = KBase::iMat(numActor);
+    auto accM = KBase::iMat(numActor);
 
     // now that it is read and verified, use the data
     auto sm0 = initModel(actorNames, actorDescs, dNames, cap, pos, sal, accM,  s, f, scenDesc, scenName);
@@ -237,52 +236,52 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
     vector<string> actorNames = {};
     vector<string> actorDescs = {};
     vector<string> dNames = {};
-    KMatrix capM, posM, salM; // all size 0-by-0
+    KMatrix capM, posM, salM, accM; // all size 0-by-0
 
-	const char * sName = new char[512];
-	//strcpy(sName, "");
-	const char* sn2 = "";
+    string sName;
+    string sDesc;
+
+    bool modelHasParams = false;
+
+    KBase::VPModel vpmScen;
+    KBase::VotingRule vrScen;
+    KBase::PCEModel pcemScen;
+    KBase::StateTransMode stmScen;
+    KBase::BigRRange bigRRangScen;
+    KBase::BigRAdjust bigRAdjScen;
+    KBase::ThirdPartyCommit tpcScen;
+    SMPLib::InterVecBrgn ivbScen;
+    SMPLib::SMPBargnModel bModScen;
+
 
     try {
         d1.LoadFile(fName.c_str());
         auto eid = d1.ErrorID();
         if (0 != eid) {
-            cout << "tinyxml2 ErrorID: " << eid << endl;
-            throw KException(d1.GetErrorStr1());
+            string errMsg = string("Tinyxml2 ErrorID: ") + std::to_string(eid)
+                + ", Error Name: " + d1.ErrorName() 
+                + " " + d1.GetErrorStr1();
+            throw KException(errMsg);
         }
         // missing data causes the missing XMLElement* to come back as nullptr
         XMLElement* scenEl = d1.FirstChildElement("Scenario");
         assert(nullptr != scenEl);
         auto scenNameEl = getFirstChild(scenEl, "name");
-		try {
-            sName = scenNameEl->GetText();
-			if (sName == NULL)
-			{
-				sName = new char[512];
-				strcpy((char *)sName, "");
-			}
-            printf("Name of scenario: %s\n", sName);
+        const char *name = scenNameEl->GetText();
+        if (name) {
+            sName = name;
         }
-        catch (...) {
-            throw (KException("Error reading file header"));
-        }
+        cout << "Name of scenario: " << sName << endl;
         auto scenDescEl = getFirstChild(scenEl, "desc");
-		sn2 = scenDescEl->GetText();
-		if (sn2 == NULL)
-		{
-			sn2 = new char[512];
-			strcpy((char *)sn2, "");
-		}
-        assert(nullptr != sn2);
+        const char *desc = scenDescEl->GetText();
+        if (desc) {
+            sDesc = desc;
+        }
         auto seedEl = getFirstChild(scenEl, "prngSeed");
         const char* sd2 = seedEl->GetText();
         assert(nullptr != sd2);
         seed = std::stoull(sd2);
         printf("Read PRNG seed:  %020llu \n", seed);
-
-        smp = new SMPModel(sn2, seed);
-        SMPState* sms = new SMPState(smp);
-        smp->addState(sms);
 
         auto modelParamsEl = getFirstChild(scenEl, "ModelParameters");
         if (nullptr == modelParamsEl) {
@@ -292,32 +291,23 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
             function <string (const char*)> showChild = [getFirstChild, modelParamsEl](const char* name ) {
                 auto el = getFirstChild(modelParamsEl, name);
                 if (nullptr == el) {
-                    throw (KException("SMPModel::xmlRead - failed to find required XML element"));
+                    throw (KException(string("SMPModel::xmlRead - failed to find required XML element: ") + name));
                 }
                 string s = el->GetText();
-                cout << "  " << name << ":  " << s << endl << flush;
                 return s;
             };
-			cout << "Reading model parameters from XML scenario ..." << endl << flush;
-            auto vpmScen = enumFromName<VPModel>(showChild("VictoryProbModel"), KBase::VPModelNames);
-            auto vrScen = enumFromName<VotingRule>(showChild("VotingRule"), KBase::VotingRuleNames);
-            auto pcemScen = enumFromName<PCEModel>(showChild("PCEModel"), KBase::PCEModelNames);
-            auto stmScen = enumFromName<StateTransMode>(showChild("StateTransitions"), KBase::StateTransModeNames);
-            auto bigRRangScen = enumFromName<BigRRange>(showChild("BigRRange"), KBase::BigRRangeNames);
-            auto bigRAdjScen = enumFromName<BigRAdjust>(showChild("BigRAdjust"), KBase::BigRAdjustNames);
-            auto tpcScen = enumFromName<ThirdPartyCommit>(showChild("ThirdPartyCommit"), KBase::ThirdPartyCommitNames);
-            auto ivbScen = enumFromName<InterVecBrgn>(showChild("InterVecBrgn"), InterVecBrgnNames);
-            auto bModScen = enumFromName<SMPBargnModel>(showChild("BargnModel"), SMPBargnModelNames);
-            cout << "Setting SMPModel parameters from XML scenario ..." << endl << flush;
-            smp->vpm = vpmScen;
-            smp->vrCltn = vrScen;
-            smp->pcem = pcemScen;
-            smp->stm = stmScen;
-            smp->bigRRng = bigRRangScen;
-            smp->bigRAdj = bigRAdjScen;
-            smp->tpCommit = tpcScen;
-            smp->ivBrgn = ivbScen;
-            smp->brgnMod = bModScen;
+            cout << "Reading model parameters from XML scenario ..." << endl << flush;
+            vpmScen = enumFromName<VPModel>(showChild("VictoryProbModel"), KBase::VPModelNames);
+            vrScen = enumFromName<VotingRule>(showChild("VotingRule"), KBase::VotingRuleNames);
+            pcemScen = enumFromName<PCEModel>(showChild("PCEModel"), KBase::PCEModelNames);
+            stmScen = enumFromName<StateTransMode>(showChild("StateTransitions"), KBase::StateTransModeNames);
+            bigRRangScen = enumFromName<BigRRange>(showChild("BigRRange"), KBase::BigRRangeNames);
+            bigRAdjScen = enumFromName<BigRAdjust>(showChild("BigRAdjust"), KBase::BigRAdjustNames);
+            tpcScen = enumFromName<ThirdPartyCommit>(showChild("ThirdPartyCommit"), KBase::ThirdPartyCommitNames);
+            ivbScen = enumFromName<InterVecBrgn>(showChild("InterVecBrgn"), InterVecBrgnNames);
+            bModScen = enumFromName<SMPBargnModel>(showChild("BargnModel"), SMPBargnModelNames);
+
+            modelHasParams = true;
         }
 
         // read all the dimensions
@@ -330,14 +320,11 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
             while (nullptr != dEl) {
                 const char* dn = dEl->GetText();
                 dNames.push_back(string(dn));
-                cout << "Adding dimension "<<dn<<endl;
-                smp->addDim(dn);
                 // move to the next, if any
                 numDim++;
                 dEl = dEl->NextSiblingElement("dName");
             }
-            printf("Found %u dimensions \n", numDim);
-            assert(smp->numDim == numDim);
+            cout << "Found " << numDim << " dimensions" << endl;
         }
         catch (...)
         {
@@ -361,8 +348,7 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
         {
           throw (KException("SMPModel::readXML: Error reading Actors data"));
         }
-        printf("Found %u actors \n", numAct);
-        cout << endl;
+        cout << "Found " << numAct << " actors" << endl;
         
  
         capM = KMatrix(numAct, 1);
@@ -402,10 +388,6 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
                 printf("Read %u dimensional components \n", dimCntr);
                 assert(numDim == dimCntr);
 
-                auto vpp = new VctrPstn(vPos);
-                sms->addPstn(vpp);
-                
-
                 auto  salEl = aEl->FirstChildElement("Salience");
                 auto vSal = KMatrix(numDim, 1);
                 dimCntr = 0;
@@ -421,11 +403,6 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
                 printf("Read %u salience components \n", dimCntr);
                 assert(numDim == dimCntr);
 
-                auto ri = new SMPActor(aName, aDesc);
-                ri->sCap = cap;
-                ri->vr = smp->vrCltn;
-                ri->vSal = vSal;
-                smp->addActor(ri);
                 capM(actCntr,0)=cap;
                 for (unsigned int i=0; i<numDim; i++){
                     salM(actCntr, i)=vSal(i,0);
@@ -487,19 +464,34 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
     catch (const KException& ke)
     {
         cout << "Caught KException in SMPModel::readXML: " << ke.msg << endl << flush;
+        exit(-1);
     }
     catch (...)
     {
         cout << "Caught unidentified exception in SMPModel::readXML" << endl << flush;
+        exit(-1);
     }
 
     posM = posM / 100.0;
     salM = salM / 100.0;
     cout << "End SMPModel::readXML of " << fName << endl;
     // now that it is read and verified, use the data  
-    delete smp;
-    smp = initModel(actorNames, actorDescs, dNames, capM, posM, salM, accM, seed, f, sn2, sName);
+    smp = initModel(actorNames, actorDescs, dNames, capM, posM, salM, accM, seed, f, sDesc, sName);
     assert (smp != nullptr);
+
+    if (modelHasParams) {
+        cout << "Setting SMPModel parameters from XML scenario ..." << endl << flush;
+        smp->vpm = vpmScen;
+        smp->vrCltn = vrScen;
+        smp->pcem = pcemScen;
+        smp->stm = stmScen;
+        smp->bigRRng = bigRRangScen;
+        smp->bigRAdj = bigRAdjScen;
+        smp->tpCommit = tpcScen;
+        smp->ivBrgn = ivbScen;
+        smp->brgnMod = bModScen;
+    }
+
     return smp;
 }
 // end of readXML
