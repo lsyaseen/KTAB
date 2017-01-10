@@ -41,6 +41,10 @@ Database::~Database()
 
 void Database::openDB(QString dbPath, bool run)
 {
+    if(db.isOpen())
+    {
+        db.close();
+    }
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(dbPath);
 
@@ -71,6 +75,10 @@ void Database::openDB(QString dbPath, bool run)
 
 void Database::openDBEdit(QString dbPath)
 {
+    if(db.isOpen())
+    {
+        db.close();
+    }
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(dbPath);
 
@@ -92,6 +100,9 @@ void Database::openDBEdit(QString dbPath)
 void Database::getScenarioData(int turn, QString scenario,int dim)
 {
     scenarioM=scenario;
+    //model parameters for current scenario
+    getModelParameters();
+
     readVectorPositionTable(turn,scenarioM,dim);//turn
 }
 
@@ -229,7 +240,7 @@ void Database::getAffinityDB()
         actorJ.append(qry.value(1).toInt());
         actorAffinity.append(qry.value(2).toString());
     }
-    qDebug()<<actorAffinity.length() << actorI.length() << actorJ.length();
+//    qDebug()<<actorAffinity.length() << actorI.length() << actorJ.length();
     emit actorsAffinity(actorAffinity,actorI,actorJ);
 }
 
@@ -468,6 +479,7 @@ void Database::getScenarioList(bool run)
     }
 
     if(scenarioList->length()>0)
+    {
         if(run)
         {
             scenarioM =  scenarioIdList->at(scenarioIdList->length()-1);
@@ -478,9 +490,43 @@ void Database::getScenarioList(bool run)
             scenarioM =  scenarioIdList->at(0);
             emit scenarios(scenarioList,scenarioIdList,scenarioDescList,0);
         }
+        //model parameters for current scenario
+        getModelParameters();
+    }
     else
         Message("Database","there are no Scenario's");
 
+}
+
+void Database::getModelParameters()
+{
+    scenarioModelParam.clear();
+
+    QSqlQuery qry;
+    QString query= QString("select * from ScenarioDesc where ScenarioId='%1' ").arg(scenarioM);
+
+    qry.exec(query);
+
+    while(qry.next())
+    {
+        seedDB = qry.value(3).toString();
+        scenarioModelParam.append(qry.value(4).toInt());
+        scenarioModelParam.append(qry.value(5).toInt());
+        scenarioModelParam.append(qry.value(6).toInt());
+        scenarioModelParam.append(qry.value(7).toInt());
+        scenarioModelParam.append(qry.value(8).toInt());
+        scenarioModelParam.append(qry.value(9).toInt());
+        scenarioModelParam.append(qry.value(10).toInt());
+        scenarioModelParam.append(qry.value(11).toInt());
+        scenarioModelParam.append(qry.value(12).toInt());
+    }
+
+    if(scenarioModelParam.length()==9)
+    {
+        emit scenModelParameters(scenarioModelParam, seedDB);
+    }
+    else
+        Message("Database","there are no/insufficient model parameters");
 }
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.

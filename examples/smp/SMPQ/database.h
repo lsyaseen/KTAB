@@ -71,6 +71,7 @@ signals:
     void dimensionsCount(int value,QStringList *dimensions);
     void dimensList(QStringList *dimensions);
     void scenarios(QStringList *scenariosList,QStringList *scenariosIdList, QStringList *scenarioDesc, int indx);
+    void scenModelParameters(QList<int> scenModelparam, QString seedDB);
 
     //DB to CSV
     void actorsNameDesc(QList <QString>, QList <QString>);
@@ -99,6 +100,8 @@ private:
     QStringList * scenarioList;
     QStringList * scenarioIdList;
     QStringList * scenarioDescList;
+    QList<int> scenarioModelParam;
+    QString seedDB;
     QString scenarioM;
 
     //DB to CSV
@@ -136,6 +139,8 @@ private:
     void getNumStates();
     // Scenarios list in db
     void getScenarioList(bool run);
+    //model parameters
+    void getModelParameters();
 
     void readVectorPositionTableEdit(QString scenario);
 };

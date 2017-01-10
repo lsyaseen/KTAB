@@ -125,6 +125,7 @@ void MainWindow::runPushButtonClicked(bool bl)
         if(seedRand->text().length()>0 && !seedRand->text().isNull())
         {
             seed = seedRand->text().toULongLong();
+
         }
         if (0 == seed)
         {
@@ -132,6 +133,13 @@ void MainWindow::runPushButtonClicked(bool bl)
             seed = rng->setSeed(seed); // 0 == get a random number
             delete rng;
             rng = nullptr;
+            seedRand->setText(QString::number(seed));
+            statusBar()->showMessage("Random Seed generated for SMP Model Run "+QString::number(seed));
+        }
+        if(seed==dSeed)
+        {
+            seedRand->setText(QString::number(seed));
+            statusBar()->showMessage("Default Seed Used for SMP Model Run "+QString::number(seed));
         }
 
         // JAH 20160730 vector of SQL logging flags for 5 groups of tables:
@@ -147,20 +155,20 @@ void MainWindow::runPushButtonClicked(bool bl)
         }
 
         // Notice that we NEVER use anything but the default seed.
-        printf("Using PRNG seed:  %020llu \n", seed);
-        printf("Same seed in hex:   0x%016llX \n", seed);
+//        printf("Using PRNG seed:  %020llu \n", seed);
+//        printf("Same seed in hex:   0x%016llX \n", seed);
 
         if(savedAsXml==true)
         {
-            currentScenarioId =QString::fromStdString(SMPLib::SMPModel::xmlReadExec
-                                                      (xmlPath.toStdString(),sqlFlags,
-                                                       dbFilePath.toStdString()));
+            currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
+                                                      (sqlFlags, dbFilePath.toStdString(),
+                                                       xmlPath.toStdString(),seed,parameters));
         }
         else
         {
-            currentScenarioId =QString::fromStdString(SMPLib::SMPModel::csvReadExec
-                                                      (seed, csvPath.toStdString(),sqlFlags,
-                                                       dbFilePath.toStdString(),parameters));
+            currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
+                                                      (sqlFlags, dbFilePath.toStdString(),
+                                                       csvPath.toStdString(),seed,parameters));
         }
 
         KBase::displayProgramEnd(sTime);

@@ -46,9 +46,7 @@ void MainWindow::createXmlTable()
     xmlTabWidget->addTab(xmlImportDataTableView,"Xml SMP Data");
     xmlTabWidget->addTab(xmlAffinityMatrixTableView,"Affinity Matrix");
 
-    qDebug()<<stackWidget->count()<<stackWidget->currentWidget() <<stackWidget->currentIndex();
     stackWidget->addWidget(xmlTabWidget);
-    qDebug()<<stackWidget->count()<<stackWidget->currentWidget() <<stackWidget->currentIndex();
 
 }
 
@@ -117,6 +115,9 @@ void MainWindow::savedXmlName(QString fileName)
 void MainWindow::populateXmlTable(QStandardItemModel *actorsVal)
 {
     tableType="XML";
+
+    plotQuadMap->setEnabled(false);
+    removeAllScatterPoints();
 
     turnSlider->hide();
     xmlSmpDataModel = new QStandardItemModel;

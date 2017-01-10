@@ -109,6 +109,7 @@ private slots:
     void actorsPosition(QList<QString> actorPosition, int dim);
     void actorsSalience(QList<QString> actorSalience, int dim);
     void actAffinity(QList<QString> actorAff, QList<int> actorI, QList<int> actorJ);
+    void scenarioModelParameters(QList<int> modParaDB, QString seedDB);
 
 signals:
     //CSV

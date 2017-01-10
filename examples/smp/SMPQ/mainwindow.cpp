@@ -83,7 +83,7 @@ MainWindow::MainWindow()
     //received dimension Values
     connect(dbObj,SIGNAL(dimensionsCount(int, QStringList*)),this,SLOT(updateDimensionCount(int, QStringList*)));
 
-    //DB to CSV
+    //DB to Tables
     connect(this, SIGNAL(getActorsDesc()),dbObj,SLOT(getActorsDescriptionDB()));
     connect(dbObj,SIGNAL(actorsNameDesc(QList <QString> ,QList <QString>)),this,SLOT(actorsNameDesc(QList  <QString> ,QList  <QString>)));
     connect(this, SIGNAL(getInfluence(int)),dbObj,SLOT(getInfluenceDB(int)));
@@ -94,6 +94,9 @@ MainWindow::MainWindow()
     connect(dbObj,SIGNAL(actorsSalnce(QList<QString>,int)),this,SLOT(actorsSalience(QList<QString>,int)));
     connect(dbObj,SIGNAL(actorsAffinity(QList<QString>,QList<int>,QList<int>)),
             this,SLOT(actAffinity(QList<QString>,QList<int>,QList<int>)));
+    connect(dbObj,SIGNAL(scenModelParameters(QList<int>,QString)),
+            this,SLOT(scenarioModelParameters(QList<int>,QString)));
+
 
     //BAR Charts
     connect(this,SIGNAL(getActorIdsInRange(double,double,int,int)),dbObj,SLOT(getActorsInRangeFromDB(double,double,int,int)));
@@ -167,6 +170,7 @@ void MainWindow::csvGetFilePAth(bool bl)
         // to pass csvfile path to smp
         csvPath = csvFilePth;
         clearAllGraphs();
+        seedRand->clear();
     }
     statusBar()->showMessage(tr(" "));
 }
@@ -542,6 +546,9 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model, QStringList scenario
 {
     savedAsXml=false;
 
+    plotQuadMap->setEnabled(false);
+    removeAllScatterPoints();
+
     if (stackWidget->count()>1)
     {
         stackWidget->removeWidget(smpDataTab);
@@ -666,6 +673,9 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
 
     if(tableType=="Database")
     {
+        plotQuadMap->setEnabled(false);
+        removeAllScatterPoints();
+
         if(stackWidget->count()>1) // 1 is csv_table view
         {
             stackWidget->removeWidget(smpDataTab);
@@ -779,6 +789,27 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
                                         new QTableWidgetItem(QString::number((actorsSal[2].at(row).toDouble())*100)));
             }
         }
+        //Affinity Matrix
+        for(int i =0 ; i < actorsLineEdit->text().toInt(); ++i)
+        {
+            QString actorHeader;
+            actorHeader=csvTableWidget->item(i,0)->text();
+            affinityMatrix->insertColumn(affinityMatrix->columnCount());
+            affinityMatrix->insertRow(affinityMatrix->rowCount());
+            affinityMatrix->setHorizontalHeaderItem(affinityMatrix->columnCount()-1,new QTableWidgetItem(actorHeader));
+            affinityMatrix->setVerticalHeaderItem(affinityMatrix->rowCount()-1,new QTableWidgetItem(actorHeader));
+
+            //         initializeAffinityMatrixRowCol(affinityMatrix->rowCount()-1,"DatabaseEdit");
+        }
+
+        int index=0;
+        for(int acti =0 ; acti < actorsName.length(); ++acti)
+        {
+            for ( int actj =0; actj < actorsName.length(); ++actj)
+            {
+                affinityMatrix->setItem(acti,actj,new QTableWidgetItem(actorAffinity.at(index++)));
+            }
+        }
         runButton->setEnabled(false);
     }
     else
@@ -787,27 +818,7 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
                        "Import a Database first, then Click on \n - Edit Database to Save as CSV");
     }
 
-    //Affinity Matrix
-    for(int i =0 ; i < actorsLineEdit->text().toInt(); ++i)
-    {
-        QString actorHeader;
-        actorHeader=csvTableWidget->item(i,0)->text();
-        affinityMatrix->insertColumn(affinityMatrix->columnCount());
-        affinityMatrix->insertRow(affinityMatrix->rowCount());
-        affinityMatrix->setHorizontalHeaderItem(affinityMatrix->columnCount()-1,new QTableWidgetItem(actorHeader));
-        affinityMatrix->setVerticalHeaderItem(affinityMatrix->rowCount()-1,new QTableWidgetItem(actorHeader));
 
-        //         initializeAffinityMatrixRowCol(affinityMatrix->rowCount()-1,"DatabaseEdit");
-    }
-
-    int index=0;
-    for(int acti =0 ; acti < actorsName.length(); ++acti)
-    {
-        for ( int actj =0; actj < actorsName.length(); ++actj)
-        {
-            affinityMatrix->setItem(acti,actj,new QTableWidgetItem(actorAffinity.at(index++)));
-        }
-    }
     //csv_tableWidget->hideColumn(0); //hiding the scenario column
 
     //updating scenario combobox with scenario name
@@ -825,6 +836,7 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
 void MainWindow::setDBItemModel(QStandardItemModel *model)
 {
     tableType="Database";
+    plotQuadMap->setEnabled(true);
 
     if( stackWidget->count()>1 ) // 1 is csv_table view
     {
@@ -846,6 +858,7 @@ void MainWindow::setDBItemModel(QStandardItemModel *model)
 
     //Disable Editing
     csvTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    affinityMatrix->setEditTriggers(QAbstractItemView::NoEditTriggers);
     csvTableViewTabWidget->addTab(csvTableView, "Actor Data from DB");
     csvTableViewTabWidget->addTab(affinityMatrix," Affinity Matrix ");
     stackWidget->addWidget(csvTableViewTabWidget);
@@ -915,27 +928,6 @@ void MainWindow::setDBItemModel(QStandardItemModel *model)
 
     updateDBViewColumns();
 
-    //Affinity Matrix
-    for(int i =0 ; i < actorsLineEdit->text().toInt(); ++i)
-    {
-        QString actorHeader;
-        actorHeader=modeltoDB->item(i,2)->text();
-        affinityMatrix->insertColumn(affinityMatrix->columnCount());
-        affinityMatrix->insertRow(affinityMatrix->rowCount());
-        affinityMatrix->setHorizontalHeaderItem(affinityMatrix->columnCount()-1,new QTableWidgetItem(actorHeader));
-        affinityMatrix->setVerticalHeaderItem(affinityMatrix->rowCount()-1,new QTableWidgetItem(actorHeader));
-
-        //         initializeAffinityMatrixRowCol(affinityMatrix->rowCount()-1,"DatabaseEdit");
-    }
-
-    int index=0;
-    for(int acti =0 ; acti < actorsName.length(); ++acti)
-    {
-        for ( int actj =0; actj < actorsName.length(); ++actj)
-        {
-            affinityMatrix->setItem(acti,actj,new QTableWidgetItem(actorAffinity.at(index++)));
-        }
-    }
 }
 
 void MainWindow::createNewSMPData(bool bl)
@@ -945,6 +937,9 @@ void MainWindow::createNewSMPData(bool bl)
     tableType="NewSMPData";
 
     clearAllGraphs();
+    plotQuadMap->setEnabled(false);
+    removeAllScatterPoints();
+    seedRand->clear();
 
     setDefaultParameters();//Default Model Parameters
 
@@ -2077,6 +2072,21 @@ void MainWindow::actAffinity(QList<QString> actorAff, QList<int> actorI, QList<i
     actJ = actorJ;
 }
 
+void MainWindow::scenarioModelParameters(QList<int> modParaDB, QString seedDB)
+{
+    victProbModelComboBox->setCurrentIndex(modParaDB.at(0));
+    pCEModelComboBox->setCurrentIndex(modParaDB.at(1));
+    stateTransitionsComboBox->setCurrentIndex(modParaDB.at(2));
+    votingRuleComboBox->setCurrentIndex(modParaDB.at(3));
+    bigRAdjustComboBox->setCurrentIndex(modParaDB.at(4));
+    bigRRangeComboBox->setCurrentIndex(modParaDB.at(5));
+    thirdPartyCommitComboBox->setCurrentIndex(modParaDB.at(6));
+    interVecBrgnComboBox->setCurrentIndex(modParaDB.at(7));
+    bargnModelComboBox->setCurrentIndex(modParaDB.at(8));
+
+    seedRand->setText(seedDB.trimmed());
+}
+
 void MainWindow::clearAllGraphs()
 {
     lineCustomGraph->clearGraphs();
@@ -2103,6 +2113,7 @@ void MainWindow::clearAllGraphs()
     disconnect(barGraphSelectAllCheckBox,SIGNAL(clicked(bool)),this,SLOT(barGraphSelectAllActorsCheckBoxClicked(bool)));
     disconnect(barGraphBinWidthButton,SIGNAL(clicked(bool)),this, SLOT(barGraphBinWidthButtonClicked(bool)));
 
+    removeAllScatterPoints();
 }
 
 void MainWindow :: reconnectPlotWidgetSignals()
