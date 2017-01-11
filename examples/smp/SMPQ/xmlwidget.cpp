@@ -52,6 +52,8 @@ void MainWindow::createXmlTable()
 
 void MainWindow::importXmlGetFilePath(bool bl)
 {
+    emit releaseDatabase();
+
     QString filename;
     filename = QFileDialog::getOpenFileName(this,tr("Xml File"), QDir::homePath() , tr("Xml File (*.xml)"));
 

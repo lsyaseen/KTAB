@@ -96,7 +96,7 @@ MainWindow::MainWindow()
             this,SLOT(actAffinity(QList<QString>,QList<int>,QList<int>)));
     connect(dbObj,SIGNAL(scenModelParameters(QList<int>,QString)),
             this,SLOT(scenarioModelParameters(QList<int>,QString)));
-
+    connect(this,SIGNAL(releaseDatabase()),dbObj,SLOT(releaseDB()));
 
     //BAR Charts
     connect(this,SIGNAL(getActorIdsInRange(double,double,int,int)),dbObj,SLOT(getActorsInRangeFromDB(double,double,int,int)));
@@ -156,6 +156,8 @@ MainWindow::~MainWindow()
 void MainWindow::csvGetFilePAth(bool bl)
 {
     Q_UNUSED(bl)
+    emit releaseDatabase();
+
     statusBar()->showMessage(tr("Looking for CSV file"));
     //Get  *.csv file path
     QString csvFilePth;
@@ -934,6 +936,7 @@ void MainWindow::createNewSMPData(bool bl)
 {
     Q_UNUSED(bl)
 
+    emit releaseDatabase();
     tableType="NewSMPData";
 
     clearAllGraphs();

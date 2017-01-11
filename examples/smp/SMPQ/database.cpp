@@ -41,12 +41,10 @@ Database::~Database()
 
 void Database::openDB(QString dbPath, bool run)
 {
-    if(db.isOpen())
-    {
-        db.close();
-    }
+    releaseDB();
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(dbPath);
+    dbName=dbPath;
 
     if(!db.open())
     {
@@ -75,12 +73,10 @@ void Database::openDB(QString dbPath, bool run)
 
 void Database::openDBEdit(QString dbPath)
 {
-    if(db.isOpen())
-    {
-        db.close();
-    }
+    releaseDB();
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(dbPath);
+    dbName=dbPath;
 
     if(!db.open())
     {
@@ -240,7 +236,7 @@ void Database::getAffinityDB()
         actorJ.append(qry.value(1).toInt());
         actorAffinity.append(qry.value(2).toString());
     }
-//    qDebug()<<actorAffinity.length() << actorI.length() << actorJ.length();
+    //    qDebug()<<actorAffinity.length() << actorI.length() << actorJ.length();
     emit actorsAffinity(actorAffinity,actorI,actorJ);
 }
 
@@ -338,6 +334,15 @@ void Database::getUtilChlgAndSQvalues(QList<int> VHAxisValues)
             vCord=qry.value(1).toDouble();
         }
         emit utilChlngAndSQ(VHAxisValues[0],hCord,vCord,VHAxisValues[4]);
+    }
+}
+
+void Database::releaseDB()
+{
+    if(db.isOpen())
+    {
+        db.close();
+        QSqlDatabase::removeDatabase(dbName);
     }
 }
 

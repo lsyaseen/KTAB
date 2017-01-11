@@ -61,6 +61,9 @@ public slots :
     //QuadMap
     void getUtilChlgAndSQvalues(QList<int> VHAxisValues);
 
+    //DB
+    void releaseDB();
+
 signals:
     void Message(QString , QString );
     void vectorPosition(QVector<double> x, QVector<double> y, QString actor,int turn);
@@ -88,6 +91,7 @@ signals:
 
 private:
     QSqlDatabase db;
+    QString dbName;
     //    QSqlTableModel * sqlmodel;
     QSqlTableModel * sqlmodelEdit;
     QStandardItemModel * sqlmodel;

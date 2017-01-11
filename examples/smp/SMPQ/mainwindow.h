@@ -125,6 +125,8 @@ signals:
     void getDimensionCountfromDB();
     void getDimforBar();
 
+    void releaseDatabase();
+
     //save DB to csv
     void getActorsDesc();
     void getInfluence(int turn);
