@@ -122,7 +122,8 @@ double SMPActor::posUtil(const Position * ap1, const SMPState* as) const {
     int ai = as->model->actrNdx(this);
     double ri = as->aNRA(ai); //as->nra(ai, 0);
     assert(0 <= ai);
-    const VctrPstn* p0 = ((const VctrPstn*)(as->pstns[ai]));
+	const VctrPstn actorIdeal = as->getIdeal(ai);
+	const VctrPstn* p0 = &actorIdeal;
     assert(nullptr != p0);
     auto p1 = ((const VctrPstn*)ap1);
     assert(nullptr != p1);
