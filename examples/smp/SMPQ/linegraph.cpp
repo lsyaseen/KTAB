@@ -183,7 +183,7 @@ void MainWindow::initializeLineGraphPlot()
 
     // setup policy and connect slot for context menu popup:
     lineCustomGraph->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(lineCustomGraph, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenuRequest(QPoint)));
+    connect(lineCustomGraph, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(linePlotContextMenuRequest(QPoint)));
 }
 
 void MainWindow::populateLineGraphActorsList()
@@ -345,15 +345,15 @@ void MainWindow::lineGraphDimensionChanged(int value)
 void MainWindow::lineGraphTurnSliderChanged(int value)
 {
 
-//    lineGraphTitle->setText(QString(lineGraphDimensionComboBox->currentText()
-//                                    + " vs Time, Iteration " +
-//                                    QString::number(value)));
-//    lineCustomGraph->yAxis->setLabel(lineGraphDimensionComboBox->currentText());
+    //    lineGraphTitle->setText(QString(lineGraphDimensionComboBox->currentText()
+    //                                    + " vs Time, Iteration " +
+    //                                    QString::number(value)));
+    //    lineCustomGraph->yAxis->setLabel(lineGraphDimensionComboBox->currentText());
 
-//    lineCustomGraph->xAxis->setRange(-1,lineGraphTurnSlider->value()+1);
-//    lineCustomGraph->replot();
+    //    lineCustomGraph->xAxis->setRange(-1,lineGraphTurnSlider->value()+1);
+    //    lineCustomGraph->replot();
 
-//  emit getScenarioRunValues(lineGraphTurnSlider->value(),scenarioBox,dimension);
+    //  emit getScenarioRunValues(lineGraphTurnSlider->value(),scenarioBox,dimension);
 }
 
 void MainWindow::lineGraphActorsCheckboxClicked(bool click)
@@ -534,29 +534,28 @@ void MainWindow::removeAllGraphs()
     lineCustomGraph->clearGraphs();
 }
 
-void MainWindow::contextMenuRequest(QPoint pos)
+void MainWindow::linePlotContextMenuRequest(QPoint pos)
 {
     QMenu *menu = new QMenu(this);
-    menu->setAttribute(Qt::WA_DeleteOnClose);
 
-    if (lineCustomGraph->legend->selectTest(pos, false) >= 0) // context menu on legend requested
-    {
-        //      menu->addAction("Move to top left", this, SLOT(moveLegend()))->setData((int)(Qt::AlignTop|Qt::AlignLeft));
-        //      menu->addAction("Move to top center", this, SLOT(moveLegend()))->setData((int)(Qt::AlignTop|Qt::AlignHCenter));
-        //      menu->addAction("Move to top right", this, SLOT(moveLegend()))->setData((int)(Qt::AlignTop|Qt::AlignRight));
-        //      menu->addAction("Move to bottom right", this, SLOT(moveLegend()))->setData((int)(Qt::AlignBottom|Qt::AlignRight));
-        //      menu->addAction("Move to bottom left", this, SLOT(moveLegend()))->setData((int)(Qt::AlignBottom|Qt::AlignLeft));
-    }
-    else  // general context menu on graphs requested
-    {
-        //      menu->addAction("Add random graph", this, SLOT(addGraphOnModule1()));
-        //      if (lineCustomGraph->selectedGraphs().size() > 0)
-        //        menu->addAction("Remove selected graph", this, SLOT(removeSelectedGraph()));
-        //      if (lineCustomGraph->graphCount() > 0)
-        //        menu->addAction("Remove all graphs", this, SLOT(removeAllGraphs()));
-    }
+    menu->addAction("Save As BMP", this, SLOT(saveLinePlotAsBMP()));
+    menu->addAction("Save As PDF", this, SLOT(saveLinePlotAsPDF()));
 
     menu->popup(lineCustomGraph->mapToGlobal(pos));
+
+}
+
+void MainWindow::saveLinePlotAsBMP()
+{
+    QString fileName = getImageFileName("BMP File (*.bmp)","LinePlot",".bmp");
+    if(!fileName.isEmpty())
+        lineCustomGraph->saveBmp(fileName);
+}
+void MainWindow::saveLinePlotAsPDF()
+{
+    QString fileName = getImageFileName("PDF File (*.pdf)","LinePlot",".pdf");
+    if(!fileName.isEmpty())
+        lineCustomGraph->savePdf(fileName);
 }
 
 void MainWindow::moveLegend()

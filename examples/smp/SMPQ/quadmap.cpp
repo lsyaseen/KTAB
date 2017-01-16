@@ -172,6 +172,11 @@ void MainWindow::initializeQuadMapPlot()
     xRectItemPM->bottomRight->setType(QCPItemPosition::ptPlotCoords);
     xRectItemPM->bottomRight->setCoords(500, 0);// +x
     xRectItemPM->setClipToAxisRect(true);
+
+    // setup policy and connect slot for context menu popup:
+    quadMapCustomGraph->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(quadMapCustomGraph, SIGNAL(customContextMenuRequested(QPoint)),
+            this, SLOT(quadPlotContextMenuRequest(QPoint)));
 }
 
 void MainWindow::populateInitiatorsAndReceiversRadioButtonsAndCheckBoxes()
@@ -680,7 +685,7 @@ void MainWindow::quadMapUtilChlgandSQValues(int turn, double hor, double ver , i
 
     actorIdIndexH.append(actorID);
 
-//    qDebug() << "hor" << hor << "ver" << ver << actorID <<actorsQueriedCount << deltaUtilV.length() << "del len";
+    //    qDebug() << "hor" << hor << "ver" << ver << actorID <<actorsQueriedCount << deltaUtilV.length() << "del len";
 
     if(actorsQueriedCount==deltaUtilV.length())
     {
@@ -766,5 +771,30 @@ void MainWindow::quadMapPlotPoints(bool status)
 void MainWindow::dbImported(bool bl)
 {
     useHistory=false;
+}
+
+void MainWindow::quadPlotContextMenuRequest(QPoint pos)
+{
+    QMenu *menu = new QMenu(this);
+
+    menu->addAction("Save As BMP", this, SLOT(saveQuadPlotAsBMP()));
+    menu->addAction("Save As PDF", this, SLOT(saveQuadPlotAsPDF()));
+
+    menu->popup(quadMapCustomGraph->mapToGlobal(pos));
+}
+
+void MainWindow::saveQuadPlotAsBMP()
+{
+    QString fileName = getImageFileName("BMP File (*.bmp)","QuadMap",".bmp");
+    if(!fileName.isEmpty())
+        quadMapCustomGraph->saveBmp(fileName);
+}
+
+
+void MainWindow::saveQuadPlotAsPDF()
+{
+    QString fileName = getImageFileName("PDF File (*.pdf)","QuadMap",".pdf");
+    if(!fileName.isEmpty())
+        quadMapCustomGraph->savePdf(fileName);
 }
 

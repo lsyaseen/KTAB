@@ -144,6 +144,7 @@ private:
     void saveTableViewToCSV();
     void saveAsDialog();
     int validateControlButtons(QString viewName);
+    QString getImageFileName(QString imgType, QString imgFileName, QString imgExt);
 
     void updateDBViewColumns();
     QString checkForHeaderString(QString header);
@@ -269,10 +270,12 @@ private slots:
     void addGraphOnModule1(const QVector<double> &x, const QVector<double> &y, QString Actor, int turn);
     //    void removeSelectedGraph();
     void removeAllGraphs();
-    void contextMenuRequest(QPoint pos);
     void moveLegend();
     void graphClicked(QCPAbstractPlottable *plottable);
     void updateBarDimension(QStringList* dims);
+    void linePlotContextMenuRequest(QPoint pos);
+    void saveLinePlotAsBMP();
+    void saveLinePlotAsPDF();
 
     //Bar Charts
 private :
@@ -336,6 +339,9 @@ private slots:
     void barGraphActorsSalienceCapability(QList<int> aId, QList<double> sal, QList<double>cap, double r1, double r2);
     void xAxisRangeChanged( const QCPRange &newRange, const QCPRange &oldRange );
     void yAxisRangeChanged( const QCPRange &newRange, const QCPRange &oldRange );
+    void barPlotContextMenuRequest(QPoint pos);
+    void saveBarPlotAsBMP();
+    void saveBarPlotAsPDF();
 
     //line Graph
 private :
@@ -489,6 +495,9 @@ private slots :
     void quadMapAutoScale(bool status);
     void quadMapPlotPoints(bool status);
     void dbImported(bool bl);
+    void quadPlotContextMenuRequest(QPoint pos);
+    void saveQuadPlotAsBMP();
+    void saveQuadPlotAsPDF();
 
 signals :
     void getUtilChlgAndUtilSQfromDB(QList <int > VHAxisList);
@@ -541,6 +550,7 @@ signals:
     void saveNewSMPDataToXMLFile(QStringList parameters, QTableWidget
                                  * smpDataWidget, QTableWidget * affModelWidget);
 };
+
 
 
 #endif // MAINWINDOW_H

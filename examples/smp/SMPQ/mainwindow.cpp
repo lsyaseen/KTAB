@@ -1659,6 +1659,20 @@ int MainWindow::validateControlButtons(QString viewName)
     return ret;
 }
 
+QString MainWindow::getImageFileName(QString imgType, QString imgFileName, QString imgExt)
+{
+    QString imgFilePath = QFileDialog::getSaveFileName(this, tr("Save Image File to "),imgFileName,
+                                                       imgType);
+    if(!imgFilePath.isEmpty())
+    {
+        if(!imgFilePath.endsWith(imgExt))
+            imgFilePath.append(imgExt);
+
+    }
+    return imgFilePath;
+
+}
+
 void MainWindow::updateDBViewColumns()
 {
     //Updating values
