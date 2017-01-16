@@ -307,6 +307,8 @@ public:
   // read, configure, and run from XML
   static string xmlReadExec(string inputXML, vector<bool> f, string dbFilePath);
 
+  static void randomSMP(unsigned int numA, unsigned int sDim, bool accP, uint64_t s, vector<bool> f, string inputDBname);
+
   static SMPModel * csvRead(string fName, uint64_t s, vector<bool> f);
   static SMPModel * xmlRead(string fName,vector<bool> f);
 
