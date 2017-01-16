@@ -1136,7 +1136,7 @@ void SMPModel::displayModelParams(SMPModel *md0)
     cout << "ThirdPartyCommit:  " << md0->tpCommit << endl;
     cout << "InterVecBrgn:  " << md0->ivBrgn << endl;
     cout << "BargnModel:  " << md0->brgnMod << endl;
-    cout << flush;
+    cout << endl << flush;
 }
 
 string SMPModel::runModel(vector<bool> sqlFlags, string dbFilePath,

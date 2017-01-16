@@ -125,8 +125,8 @@ Model::Model(string desc, uint64_t sd, vector<bool> f, string Name) {
 
   // BPW 20160928 print out the seed actually used (non-zero) instead of the one given (e.g. 0)
   printf("Using PRNG seed: %020llu \n", rngSeed);
+  cout << "Scenario Name: -|" << scenName << "|-" << endl << flush;
   cout << "Scenario Description: " << scenDesc << endl;
-  cout << "Scenario assigned name: -|" << scenName << "|-" << endl << flush;
 }
 
 void Model::setSeed(uint64_t seed) {

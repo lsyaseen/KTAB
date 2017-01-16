@@ -158,6 +158,10 @@ void MainWindow::runPushButtonClicked(bool bl)
 //        printf("Using PRNG seed:  %020llu \n", seed);
 //        printf("Same seed in hex:   0x%016llX \n", seed);
 
+        using std::cout;
+        using std::endl;
+        using std::flush;
+        cout << "-----------------------------------" << endl << flush;
         if(savedAsXml==true)
         {
             currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
@@ -170,8 +174,10 @@ void MainWindow::runPushButtonClicked(bool bl)
                                                       (sqlFlags, dbFilePath.toStdString(),
                                                        csvPath.toStdString(),seed,parameters));
         }
+        cout << "-----------------------------------" << endl;
 
         KBase::displayProgramEnd(sTime);
+        cout << flush;
 
         QApplication::restoreOverrideCursor();
 

@@ -85,9 +85,9 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
     inStream.read_line();
     inStream >> scenName >> scenDesc >> numActor >> numDim;
 
+    cout << "Scenario Name: -|" << scenName << "|-" << endl << flush;
+    cout << "Scenario Description: " << scenDesc << endl;
 
-    cout << "Scenario name: |" << scenName << "|" << endl;
-    cout << flush;
     assert(scenName.length() <= Model::maxScenNameLen);
 
     printf("Number of actors: %u \n", numActor);
@@ -271,12 +271,14 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
         if (name) {
             sName = name;
         }
-        cout << "Name of scenario: " << sName << endl;
+        cout << "Scenario Name: -|" << sName << "|-" << endl << flush;
         auto scenDescEl = getFirstChild(scenEl, "desc");
         const char *desc = scenDescEl->GetText();
         if (desc) {
             sDesc = desc;
-        }
+        }        
+        cout << "Scenario Description: " << sDesc << endl;
+
         auto seedEl = getFirstChild(scenEl, "prngSeed");
         const char* sd2 = seedEl->GetText();
         assert(nullptr != sd2);

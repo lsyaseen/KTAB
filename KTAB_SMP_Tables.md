@@ -1,10 +1,19 @@
 # SQL Logging Group 0 - Information Tables
-## `ScenarioDesc(Scenario, Desc, ScenarioId*, RNGSeed)`
-    Scenario    Text(512)  the scenario name which is created as a function of the UTC date & time of when the scenario was begun
-    Desc        Text(512)  the long description of the scenario is either input from a model .csv file or set to be the same as Scenario if not present
-    ScenarioId  Text(32)  the UTC time down to milliseconds of when the scenario was begun, hashed to a 32-character hex string
-    RNGSeed     Text(20)   the seed which sets the initial state for the random number generator
-This table stores all the scenarios for which the model was run and for which results are stored in this database file.
+## `ScenarioDesc(Scenario, Desc, ScenarioId*, RNGSeed, VictoryProbModel, ProbCondorcetElection, StateTransition, VotingRule, BigRAdjust, BigRRange, ThirdPartyCommit, IntervecBargn, BargnModel)`
+    Scenario               Text(512)  the scenario name which is created as a function of the UTC date & time of when the scenario was begun
+    Desc                   Text(512)  the long description of the scenario is either input from a model .csv file or set to be the same as Scenario if not present
+    ScenarioId             Text(32)  the UTC time down to milliseconds of when the scenario was begun, hashed to a 32-character hex string
+    RNGSeed                Text(20)  the seed which sets the initial state for the random number generator
+    VictoryProbModel       Integer   index into the enum ["Linear","Square","Quartic","Octic","Binary"]
+    ProbCondorcetElection  Integer  index into the enum ["Conditional","MarkovIncentive","MarkovUniform"]
+    StateTransition        Integer  index into the enum ["Deterministic","Stochastic"]
+    VotingRule             Integer  index into the enum ["Binary","PropBin","Proportional","PropCbc","Cubic","ASymProsp"]
+    BigRAdjust             Integer  index into the enum ["None","OneThirdRA","HalfRA","TwoThirdsRA","FullRA"]
+    BigRRange              Integer  index into the enum ["Min",'Mid","Max"]
+    ThirdPartyCommit       Integer  index into the enum ["NoCommit","SemiCommit","FullCommit"]
+    IntervecBargn          Integer  index into the enum ["S1P1","S2P2","S2PMax"]
+    BargnModel             Integer  index into the enum ["InitOnlyInterp","InitRcvrInterp","PWCompInterp"]
+This table stores all the scenarios for which the model was run and for which results are stored in this database file.  This information includes the random number generator seed used, and all model parameters.
 
 ## `ActorDescription(ScenarioId*, Act_i*, Name, Desc)`
     ScenarioId  Text(32)  Foreign Key into ScenarioDesc; id number for the scenario
@@ -27,6 +36,13 @@ Capabilities for all actors are stored in `SpatialCapability`. While capability 
     Dim_k       Integer   dimension number for which the salience is recorded; [0, number dimensions-1]
     Sal         Real    salience for actor Act_i in dimension Dim_k during iteration Turn_t; [0,1]
 Actors saliences are all stored in this table.  As with `SpatialCapability`, they are stored by iteration, though they don't currently change as a model progresses.
+
+## `Accomodation(ScenarioID*, Act_i*, Act_j*,Affinity)`
+    ScenarioId  Text(32)  Foreign Key into ScenarioDesc; id number for the scenario
+    Act_i       Integer   Foreign Key into ActorDescription; actor from whom the affinity is recorded; [0,number actors-1]
+    Act_j       Integer   Foreign Key into ActorDescription; actor to whom the affinity is recorded; [0,number actors-1]
+    Affinity    Real; affinity which actor Act_i feels towards the position of actor Act_j
+This table stores the accommodation matrix, which records the affinities between all pairs of actors.
 
 # SQL Logging Group 1 - Position Tables
 ## `PosUtil(ScenarioId*, Turn_t*, Est_h*, Act_i*, Pos_j*, Util)`

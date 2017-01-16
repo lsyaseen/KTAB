@@ -406,7 +406,6 @@ int main(int ac, char **av) {
   }
   cout << "-----------------------------------" << endl;
 
-
   KBase::displayProgramEnd(sTime);
   return 0;
 }
