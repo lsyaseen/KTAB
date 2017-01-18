@@ -37,12 +37,18 @@ Capabilities for all actors are stored in `SpatialCapability`. While capability 
     Sal         Real    salience for actor Act_i in dimension Dim_k during iteration Turn_t; [0,1]
 Actors saliences are all stored in this table.  As with `SpatialCapability`, they are stored by iteration, though they don't currently change as a model progresses.
 
-## `Accomodation(ScenarioID*, Act_i*, Act_j*,Affinity)`
+## `Accomodation(ScenarioID*, Act_i*, Act_j*, Affinity)`
     ScenarioId  Text(32)  Foreign Key into ScenarioDesc; id number for the scenario
     Act_i       Integer   Foreign Key into ActorDescription; actor from whom the affinity is recorded; [0,number actors-1]
     Act_j       Integer   Foreign Key into ActorDescription; actor to whom the affinity is recorded; [0,number actors-1]
     Affinity    Real; affinity which actor Act_i feels towards the position of actor Act_j
 This table stores the accommodation matrix, which records the affinities between all pairs of actors.
+
+## `DimensionDescription(ScenarioID*, Dim_k*, Desc)`
+    ScenarioId  Text(32)  Foreign Key into ScenarioDesc; id number for the scenario
+    Dim_k       Integer   dimension number for which the salience is recorded; [0, number dimensions-1]
+    Desc        Text(256) name of the dimension
+Records the name of each dimension.
 
 # SQL Logging Group 1 - Position Tables
 ## `PosUtil(ScenarioId*, Turn_t*, Est_h*, Act_i*, Pos_j*, Util)`
