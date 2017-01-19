@@ -66,7 +66,6 @@ void Database::openDB(QString dbPath, bool run)
         //Affinty
         getAffinityDB();
 
-
         readVectorPositionTable(0,scenarioM,0);//turn
     }
 }
@@ -236,7 +235,7 @@ void Database::getAffinityDB()
         actorJ.append(qry.value(1).toInt());
         actorAffinity.append(qry.value(2).toString());
     }
-    //    qDebug()<<actorAffinity.length() << actorI.length() << actorJ.length();
+    //      qDebug()<<actorAffinity.length() << actorI.length() << actorJ.length();
     emit actorsAffinity(actorAffinity,actorI,actorJ);
 }
 

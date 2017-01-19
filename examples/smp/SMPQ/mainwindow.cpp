@@ -62,7 +62,7 @@ MainWindow::MainWindow()
     connect(dbObj,SIGNAL(Message(QString,QString)),this,SLOT(displayMessage(QString,QString)));
     //To get vector positions of actors to plot a graph on GUI
     connect(dbObj,SIGNAL(vectorPosition(QVector<double>,QVector<double>,QString,int))
-            ,this,SLOT(addGraphOnModule1(QVector<double>,QVector<double>,QString,int)));
+            ,this,SLOT(addGraphOnLinePlot(QVector<double>,QVector<double>,QString,int)));
     //To get number of states to set the max values of slider
     connect(dbObj,SIGNAL(statesCount(int)),this,SLOT(updateStateCountSliderRange(int)));
 
@@ -930,6 +930,26 @@ void MainWindow::setDBItemModel(QStandardItemModel *model)
 
     updateDBViewColumns();
 
+    //Affinity Matrix
+    for(int i =0 ; i < actorsLineEdit->text().toInt(); ++i)
+    {
+        QString actorHeader;
+        actorHeader=modeltoDB->item(i,2)->text();
+        affinityMatrix->insertColumn(affinityMatrix->columnCount());
+        affinityMatrix->insertRow(affinityMatrix->rowCount());
+        affinityMatrix->setHorizontalHeaderItem(affinityMatrix->columnCount()-1,new QTableWidgetItem(actorHeader));
+        affinityMatrix->setVerticalHeaderItem(affinityMatrix->rowCount()-1,new QTableWidgetItem(actorHeader));
+
+    }
+
+    int index=0;
+    for(int acti =0 ; acti < actorsName.length(); ++acti)
+    {
+        for ( int actj =0; actj < actorsName.length(); ++actj)
+        {
+            affinityMatrix->setItem(acti,actj,new QTableWidgetItem(actorAffinity.at(index++)));
+        }
+    }
 }
 
 void MainWindow::createNewSMPData(bool bl)

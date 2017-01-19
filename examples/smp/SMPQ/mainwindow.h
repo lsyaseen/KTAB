@@ -267,7 +267,7 @@ private slots:
     //    void selectionChanged();
     void mousePress();
     void mouseWheel();
-    void addGraphOnModule1(const QVector<double> &x, const QVector<double> &y, QString Actor, int turn);
+    void addGraphOnLinePlot(const QVector<double> &x, const QVector<double> &y, QString Actor, int turn);
     //    void removeSelectedGraph();
     void removeAllGraphs();
     void moveLegend();
