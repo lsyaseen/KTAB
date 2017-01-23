@@ -868,7 +868,6 @@ void MainWindow::setDBItemModel(QStandardItemModel *model)
     stackWidget->setCurrentIndex(0);
     disconnect(csvTableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(displayMenuTableView(QPoint)));
 
-    turnSlider->hide();
     tableControlsFrame->show();
 
     scenarioComboBox->setEditable(false);
