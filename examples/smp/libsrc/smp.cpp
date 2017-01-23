@@ -1223,9 +1223,9 @@ void SMPModel::configExec(SMPModel * md0)
     // typical first shifts are on the order of numAct/10, so this is low
     // enough not to affect anything while guarding against the theoretical
     // possiblity of 0/0 errors
-    md0->stop = [maxIter](unsigned int iter, const State * s) {
-        return (maxIter <= iter);
-    };
+    //md0->stop = [maxIter](unsigned int iter, const State * s) {
+    //    return (maxIter <= iter);
+    //};
     md0->stop = smpStopFn(minIter, maxIter, minDeltaRatio, minSigDelta);
 
     // Drop the indices of the tables before the model run
