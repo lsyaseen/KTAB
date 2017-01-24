@@ -104,7 +104,7 @@ void MainWindow::initializeBarGraphDock()
 
 void MainWindow::initializeBarGraphPlot()
 {
-    QFont font("Helvetica[Adobe]",15);
+    QFont font("Helvetica[Adobe]",10);
     barGraphTitle = new QCPPlotTitle(barCustomGraph," ");
     barGraphTitle->setFont(font);
     barGraphTitle->setTextColor(QColor(51,51,255));
@@ -132,15 +132,13 @@ void MainWindow::initializeBarGraphPlot()
 
     // setup legend:
     barCustomGraph->legend->setVisible(false);
-    //    barCustomGraph->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignTop|Qt::AlignHCenter);
-    //    barCustomGraph->legend->setBrush(QColor(255, 255, 255, 200));
-    //    QPen legendPen;
-    //    legendPen.setColor(QColor(130, 130, 130, 200));
-    //    barCustomGraph->legend->setBorderPen(legendPen);
-    //    QFont legendFont = font("Helvetica[Adobe]",12);
-    //    legendFont.setPointSize(20);
-    //    barCustomGraph->legend->setFont(legendFont);
     barCustomGraph->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+
+    // setup policy and connect slot for context menu popup:
+    barCustomGraph->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(barCustomGraph, SIGNAL(customContextMenuRequested(QPoint)),
+            this, SLOT(barPlotContextMenuRequest(QPoint)));
+
 }
 
 void MainWindow::xAxisRangeChanged( const QCPRange &newRange, const QCPRange &oldRange )
@@ -177,6 +175,30 @@ void MainWindow::yAxisRangeChanged( const QCPRange &newRange, const QCPRange &ol
         //         barCustomGraph->yAxis->setTicks(true);
         //        barCustomGraph->yAxis->setRangeUpper( newRange.upper );
     }
+}
+
+void MainWindow::barPlotContextMenuRequest(QPoint pos)
+{
+    QMenu *menu = new QMenu(this);
+
+    menu->addAction("Save As BMP", this, SLOT(saveBarPlotAsBMP()));
+    menu->addAction("Save As PDF", this, SLOT(saveBarPlotAsPDF()));
+
+    menu->popup(barCustomGraph->mapToGlobal(pos));
+}
+
+void MainWindow::saveBarPlotAsBMP()
+{
+    QString fileName = getImageFileName("BMP File (*.bmp)","BarPlot",".bmp");
+    if(!fileName.isEmpty())
+        barCustomGraph->saveBmp(fileName);
+}
+
+void MainWindow::saveBarPlotAsPDF()
+{
+    QString fileName = getImageFileName("PDF File (*.pdf)","BarPlot",".pdf");
+    if(!fileName.isEmpty())
+        barCustomGraph->savePdf(fileName);
 }
 
 void MainWindow::populateBarGraphActorsList()

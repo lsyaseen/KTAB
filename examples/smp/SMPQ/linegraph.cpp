@@ -106,7 +106,7 @@ void MainWindow::initializeLineGraphDock()
 void MainWindow::initializeLineGraphPlot()
 {
 
-    QFont font("Helvetica[Adobe]",15);
+    QFont font("Helvetica[Adobe]",10);
     lineGraphTitle = new QCPPlotTitle(lineCustomGraph," ");
     lineGraphTitle->setFont(font);
     lineGraphTitle->setTextColor(QColor(255,51,51));
@@ -183,7 +183,7 @@ void MainWindow::initializeLineGraphPlot()
 
     // setup policy and connect slot for context menu popup:
     lineCustomGraph->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(lineCustomGraph, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenuRequest(QPoint)));
+    connect(lineCustomGraph, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(linePlotContextMenuRequest(QPoint)));
 }
 
 void MainWindow::populateLineGraphActorsList()
@@ -265,6 +265,7 @@ void MainWindow::updateLineDimension(QStringList *dims)
 
 void MainWindow::toggleLabels()
 {
+
     if(lineLabelToggleList.contains(true))
     {
         for(int i=0; i <lineLabelList.length();++i)
@@ -277,8 +278,16 @@ void MainWindow::toggleLabels()
     {
         for(int i=0; i <lineLabelList.length();++i)
         {
-            lineLabelList.at(i)->setVisible(true);
-            lineLabelToggleList[i]=true;
+            if(lineActorCBList.at(i)->isChecked()==true)
+            {
+                lineLabelList.at(i)->setVisible(true);
+                lineLabelToggleList[i]=true;
+            }
+            else
+            {
+                lineLabelList.at(i)->setVisible(false);
+                lineLabelToggleList[i]=false;
+            }
         }
     }
     lineCustomGraph->replot();
@@ -299,7 +308,9 @@ void MainWindow::populateLineGraphStateRange(int states)
 void MainWindow::clearAllLabels()
 {
     for(int i=0; i <lineLabelList.length();++i)
+    {
         lineLabelList.at(i)->setVisible(false);
+    }
 
     lineLabelList.clear();
     lineLabelToggleList.clear();
@@ -310,20 +321,39 @@ void MainWindow::clearAllLabels()
 void MainWindow::lineGraphSelectAllActorsCheckBoxClicked(bool click)
 {
     for(int index=0; index < lineActorCBList.length();++ index)
-        disconnect(lineActorCBList.at(index),SIGNAL(toggled(bool)),this,SLOT(lineGraphActorsCheckboxClicked(bool)));
-
+    {
+        disconnect(lineActorCBList.at(index),SIGNAL(toggled(bool)),
+                   this,SLOT(lineGraphActorsCheckboxClicked(bool)));
+    }
     for(int actors = 0 ; actors < lineGraphCheckedActorsIdList.length(); ++actors)
     {
         lineGraphCheckedActorsIdList[actors]=click;
         lineGraphActorsCheckBoxList[actors]->setChecked(click);
-    }
-    for(int index=0; index < lineActorCBList.length();++ index)
-        connect(lineActorCBList.at(index),SIGNAL(toggled(bool)),this,SLOT(lineGraphActorsCheckboxClicked(bool)));
 
+        lineLabelList.at(actors)->setVisible(false);
+        lineLabelToggleList[actors]=false;
+    }
+
+    //    if(lineLabelToggleList.contains(true))
+    //    {
+    //        for(int i=0; i <lineLabelList.length();++i)
+    //        {
+    //             if(lineLabelToggleList.at(i)==true)
+    //            {
+    //                lineLabelList.at(i)->setVisible(false);
+    //                lineLabelToggleList[i]=false;
+    //            }
+    //        }
+    //    }
     lineCustomGraph->clearGraphs();
     emit getScenarioRunValues(lineGraphTurnSlider->value(),scenarioBox,dimension);
     lineCustomGraph->replot();
 
+    for(int index=0; index < lineActorCBList.length();++ index)
+    {
+        connect(lineActorCBList.at(index),SIGNAL(toggled(bool)),
+                this,SLOT(lineGraphActorsCheckboxClicked(bool)));
+    }
 }
 
 void MainWindow::lineGraphDimensionChanged(int value)
@@ -344,16 +374,15 @@ void MainWindow::lineGraphDimensionChanged(int value)
 
 void MainWindow::lineGraphTurnSliderChanged(int value)
 {
+    //    lineGraphTitle->setText(QString(lineGraphDimensionComboBox->currentText()
+    //                                    + " vs Time, Iteration " +
+    //                                    QString::number(value)));
+    //    lineCustomGraph->yAxis->setLabel(lineGraphDimensionComboBox->currentText());
 
-//    lineGraphTitle->setText(QString(lineGraphDimensionComboBox->currentText()
-//                                    + " vs Time, Iteration " +
-//                                    QString::number(value)));
-//    lineCustomGraph->yAxis->setLabel(lineGraphDimensionComboBox->currentText());
+    //    lineCustomGraph->xAxis->setRange(-1,lineGraphTurnSlider->value()+1);
+    //    lineCustomGraph->replot();
 
-//    lineCustomGraph->xAxis->setRange(-1,lineGraphTurnSlider->value()+1);
-//    lineCustomGraph->replot();
-
-//  emit getScenarioRunValues(lineGraphTurnSlider->value(),scenarioBox,dimension);
+    //  emit getScenarioRunValues(lineGraphTurnSlider->value(),scenarioBox,dimension);
 }
 
 void MainWindow::lineGraphActorsCheckboxClicked(bool click)
@@ -361,9 +390,12 @@ void MainWindow::lineGraphActorsCheckboxClicked(bool click)
     QCheckBox * actorCheckBox = qobject_cast<QCheckBox *>(sender());
     quint8 actorId = actorCheckBox->objectName().toInt();
 
-    lineGraphCheckedActorsIdList[actorId]=click;
+    lineLabelList.at(actorId)->setVisible(false);
+    lineLabelToggleList[actorId]=false;
 
-    //    lineGraphTurnSliderChanged(lineGraphTurnSlider->value());
+
+
+    lineGraphCheckedActorsIdList[actorId]=click;
 
     lineCustomGraph->clearGraphs();
     emit getScenarioRunValues(lineGraphTurnSlider->value(),scenarioBox,dimension);
@@ -491,7 +523,6 @@ void MainWindow::createSpline(const QVector<double> &x, const QVector<double> &y
         lineCustomGraph->graph()->setData(xNew,yNew);
         lineCustomGraph->graph()->setScatterStyle(QCPScatterStyle((QCPScatterStyle::ScatterShape)(0)));
 
-
     }
 
     lineCustomGraph->graph()->setName(Actor);
@@ -511,9 +542,10 @@ void MainWindow::createSpline(const QVector<double> &x, const QVector<double> &y
 
 }
 
-void MainWindow::addGraphOnModule1(const QVector<double> &x, const QVector<double> &y,QString Actor,int turn)
+void MainWindow::addGraphOnLinePlot(const QVector<double> &x, const QVector<double> &y,
+                                    QString Actor,int turn)
 {
-    if(lineLabelList.length() <= actorsName.length())
+    if(lineLabelList.length() < actorsName.length())
     {
         textLabel = new QCPItemText(lineCustomGraph);
         textLabel->setText(Actor);
@@ -529,34 +561,35 @@ void MainWindow::addGraphOnModule1(const QVector<double> &x, const QVector<doubl
         createSpline(x,y,Actor,turn);
     }
 }
+
 void MainWindow::removeAllGraphs()
 {
     lineCustomGraph->clearGraphs();
 }
 
-void MainWindow::contextMenuRequest(QPoint pos)
+void MainWindow::linePlotContextMenuRequest(QPoint pos)
 {
     QMenu *menu = new QMenu(this);
-    menu->setAttribute(Qt::WA_DeleteOnClose);
 
-    if (lineCustomGraph->legend->selectTest(pos, false) >= 0) // context menu on legend requested
-    {
-        //      menu->addAction("Move to top left", this, SLOT(moveLegend()))->setData((int)(Qt::AlignTop|Qt::AlignLeft));
-        //      menu->addAction("Move to top center", this, SLOT(moveLegend()))->setData((int)(Qt::AlignTop|Qt::AlignHCenter));
-        //      menu->addAction("Move to top right", this, SLOT(moveLegend()))->setData((int)(Qt::AlignTop|Qt::AlignRight));
-        //      menu->addAction("Move to bottom right", this, SLOT(moveLegend()))->setData((int)(Qt::AlignBottom|Qt::AlignRight));
-        //      menu->addAction("Move to bottom left", this, SLOT(moveLegend()))->setData((int)(Qt::AlignBottom|Qt::AlignLeft));
-    }
-    else  // general context menu on graphs requested
-    {
-        //      menu->addAction("Add random graph", this, SLOT(addGraphOnModule1()));
-        //      if (lineCustomGraph->selectedGraphs().size() > 0)
-        //        menu->addAction("Remove selected graph", this, SLOT(removeSelectedGraph()));
-        //      if (lineCustomGraph->graphCount() > 0)
-        //        menu->addAction("Remove all graphs", this, SLOT(removeAllGraphs()));
-    }
+    menu->addAction("Save As BMP", this, SLOT(saveLinePlotAsBMP()));
+    menu->addAction("Save As PDF", this, SLOT(saveLinePlotAsPDF()));
 
     menu->popup(lineCustomGraph->mapToGlobal(pos));
+
+}
+
+void MainWindow::saveLinePlotAsBMP()
+{
+    QString fileName = getImageFileName("BMP File (*.bmp)","LinePlot",".bmp");
+    if(!fileName.isEmpty())
+        lineCustomGraph->saveBmp(fileName);
+}
+
+void MainWindow::saveLinePlotAsPDF()
+{
+    QString fileName = getImageFileName("PDF File (*.pdf)","LinePlot",".pdf");
+    if(!fileName.isEmpty())
+        lineCustomGraph->savePdf(fileName);
 }
 
 void MainWindow::moveLegend()
@@ -587,7 +620,6 @@ void MainWindow::graphClicked(QCPAbstractPlottable *plottable)
         lineLabelList.at(actorsName.indexOf(plottable->name()))->setVisible(true);
         lineLabelToggleList[actorsName.indexOf(plottable->name())]=true;
     }
-
     lineCustomGraph->replot();
 }
 

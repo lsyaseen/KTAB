@@ -287,7 +287,8 @@ public:
   sqlite3 *smpDB = nullptr; // keep this protected, to ease later multi-threading
   // JAH 20160711 added seed 20160730 JAH added sql flags
   // BPW 2016-09-28 removed redundant PRNG input variable
-  explicit Model(string d, uint64_t s, vector<bool> f);
+  //explicit Model(string d, uint64_t s, vector<bool> f);
+  explicit Model(string d, uint64_t s, vector<bool> f, string Name = "");
   virtual ~Model();
 
   static const unsigned int minNumActor = 3;
@@ -377,15 +378,22 @@ public:
   void sqlAUtil(unsigned int t);
   // output an existing PosEquiv table, for the given turn, to SQLite
   void sqlPosEquiv(unsigned int t);
-  // output an existing actor posprob table, for the given turn, to SQLite
-  void sqlPosProb(unsigned int t);
-  void sqlPosVote(unsigned int t);
-  void sqlBargainEntries(unsigned int t, int bargainId, int initiator, int receiver, double val);
-  void sqlBargainCoords(unsigned int t, int bargnID,  const KBase::VctrPstn & initPos, const KBase::VctrPstn & rcvrPos);
-  void sqlBargainUtil(unsigned int t, int Bargn_i,  KBase::KMatrix Util_mat);
-  void sqlBargainVote(unsigned int t, int Bargn_i, int Bargn_j, KBase::KMatrix Util_mat, unsigned int act_i);
+  // output an existing PosEquiv table, for the given turn, to SQLite
+    void sqlPosProb(unsigned int t);
+    void sqlPosVote(unsigned int t);
+    void sqlBargainEntries(unsigned int t, int bargainId, int initiator, int receiver, double val);
+    void sqlBargainCoords(unsigned int t, int bargnID,  const KBase::VctrPstn & initPos, const KBase::VctrPstn & rcvrPos);
+    //void sqlBargainUtil(unsigned int t, vector<uint64_t> bargnIds,  KBase::KMatrix Util_mat);
+	void sqlBargainUtil(unsigned int t, vector<uint64_t> bargnIds, KBase::KMatrix Util_mat);
+	
+
+	void sqlBargainVote(unsigned int t, vector< std::tuple<uint64_t, uint64_t>> barginidspair_i_j, vector<double> Vote_mat, unsigned int act_k);
 
   void LogInfoTables(); // JAH 20160731
+
+  void createTableIndices();
+
+  void dropTableIndices();
 
   static void demoSQLite();
 
@@ -401,11 +409,15 @@ public:
     return scenName;
   };
 
+  void setSeed(uint64_t seed);
+
+  uint64_t getSeed();
+
   static KTable * createSQL(unsigned int n);
 protected:
   //static string createTableSQL(unsigned int tn);
   static const int NumTables = 13; //TODO: constant need to be redefined when new table is added
-  static const int NumSQLLogGrps = 4; // TODO : Add one to this num when new logging group is added
+  static const int NumSQLLogGrps = 5; // TODO : Add one to this num when new logging group is added
   // note that the function to write to table #k must be kept
   // synchronized with the result of createSQL(k) !
 
@@ -413,6 +425,7 @@ protected:
   // TODO: rename this from 'smpDB' to 'scenarioDB'
   // Note that, with composite models, there many be dozens interacting.
   string scenName = "Scen"; // default is set from UTC time
+  string scenDesc = ""; // default is set from UTC time
   string scenId = "none";
   uint64_t rngSeed = 0; // JAH 20160711 rng seed
 

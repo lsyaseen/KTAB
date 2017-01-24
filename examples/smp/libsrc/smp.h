@@ -211,11 +211,15 @@ public:
   void setAccomodate(const KMatrix & aMat);
   // set ideal-accomodation matrix to given matrix
 
+  // get the ideal-accommodation matrix
+  KMatrix getAccomodate();
+
   // initialize the actors' ideals from the given list of VctrPstn.
   // If the list is omitted or empty, it uses their current positions
   void idealsFromPstns(const vector<VctrPstn> &  ps = {});
+  VctrPstn getIdeal(unsigned int n) const;
 
-  void calcUtils(unsigned int i /* actor id */) const;
+  void calcUtils(unsigned int i) const;  // i == actor id 
 
 protected:
 
@@ -270,12 +274,15 @@ private:
   mutable std::map<unsigned int /*i*/, eduChlgsJ> eduChlgsIJ;
   
   mutable int bestJ;
+
+	private:
+		vector<double> calcVotes(KMatrix w, KMatrix u, int actor) const;
 };
 
 class SMPModel : public Model {
   friend class SMPState;
 public:
-  explicit SMPModel( string desc = "", uint64_t s=KBase::dSeed, vector<bool> f={}); // JAH 20160711 added rng seed
+  explicit SMPModel( string desc = "", uint64_t s=KBase::dSeed, vector<bool> f={}, string sceName = ""); // JAH 20160711 added rng seed
   virtual ~SMPModel();
 
   static string dbPath; //to store db file name from SMPQ GUI, default is testsmp.db
@@ -287,22 +294,30 @@ public:
   static double bvDiff(const KMatrix & vd, const  KMatrix & vs);
   static double bvUtil(const KMatrix & vd, const  KMatrix & vs, double R);
 
+  static std::string runModel(std::vector<bool> sqlFlags, std::string dbFilePath,
+      std::string inputDataFile, uint64_t seed, std::vector<int> modelParams = std::vector<int>());
+
   // this sets up a standard configuration and runs it
   static void configExec(SMPModel * md0);
 
   // read, configure, and run from CSV
-  static void csvReadExec(uint64_t seed, string inputCSV, vector<bool> f, string dbFilePath);
+  static string csvReadExec(uint64_t seed, string inputCSV, vector<bool> f, string dbFilePath,
+                          vector<int> par=vector<int>());
 
   // read, configure, and run from XML
-  static void xmlReadExec(string inputXML, vector<bool> f, string dbFilePath);
+  static string xmlReadExec(string inputXML, vector<bool> f, string dbFilePath);
+
+  static void randomSMP(unsigned int numA, unsigned int sDim, bool accP, uint64_t s, vector<bool> f, string inputDBname);
 
   static SMPModel * csvRead(string fName, uint64_t s, vector<bool> f);
   static SMPModel * xmlRead(string fName,vector<bool> f);
 
   static  SMPModel * initModel(vector<string> aName, vector<string> aDesc, vector<string> dName,
-                               const KMatrix & cap, const KMatrix & pos, const KMatrix & sal,
-                               const KMatrix & accM,
-                               uint64_t s, vector<bool> f);
+	  const KMatrix & cap, // one row per actor
+	  const KMatrix & pos, // one row per actor, one column per dimension
+	  const KMatrix & sal, // one row per actor, one column per dimension
+	  const KMatrix & accM,
+	  uint64_t s, vector<bool> f, string scenName, string scenDesc);
 
   // print history of each actor in CSV (might want to generalize to arbitrary VctrPstn)
   void showVPHistory() const;
@@ -325,12 +340,34 @@ public:
   // this does not set AUtil, just output it to SQLite
   //virtual void sqlAUtil(unsigned int t);
 
+  //Model Parameters
+  static void updateModelParameters(SMPModel *md0, vector<int> parameters);
+  static void displayModelParams(SMPModel *md0);
+
+  //default parameters for SMPQ
+  static vector<int> getDefaultModelParameters();
+
+  static void destroyModel();
+
+  /**
+   * This version of getQuadMapPoint is meant to be used after a model run is finished
+   * but the model objest still exists so that the history could be used
+   */
+  static double getQuadMapPoint(size_t t, size_t est_h, size_t aff_k, size_t init_i, size_t rcvr_j);
+
+  /**
+  * This version of getQuadMapPoint is meant to be used on a db file which contains the results
+  * of at least one model run
+  */
+  static double getQuadMapPoint(string dbname, string scenarioID, size_t turn, size_t est_h,
+      size_t aff_k, size_t init_i, size_t rcvr_j);
+
 protected:
   //sqlite3 *smpDB = nullptr; // keep this protected, to ease multi-threading
   //string scenName = "Scen";
-  static const int NumTables = 4; // TODO : Add one to this num when new table is added
+  static const int NumTables = 5; // TODO : Add one to this num when new table is added
 
-  static const int NumSQLLogGrps = 1; // TODO : Add one to this num when new logging group is added
+  static const int NumSQLLogGrps = 0; // TODO : Add one to this num when new logging group is added
 
   // note that the function to write to table #k must be kept
   // synchronized with the result of createTableSQL(k) !
@@ -359,7 +396,16 @@ protected:
   // PWCompInterSMPBM, InitOnlyInterpSMPBM or InitRcvrInterpSMPBM;
 
 private:
+  void releaseDB();
 
+  
+  static tuple<double, double> calcContribs(VotingRule vrCltn, double wi, double wj, tuple<double, double, double, double>(utils));
+
+  // Method used in sqlite execution for callback functionality
+  static int callBack(void *data, int numCol, char **stringFields, char **colNames);
+
+  // fieldVals is used to store the result of select sql queries
+  static std::vector<string> fieldVals;
 };
 
 

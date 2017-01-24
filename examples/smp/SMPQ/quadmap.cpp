@@ -22,8 +22,11 @@
 // -------------------------------------------------
 
 #include "mainwindow.h"
+#include "smp.h"
 
-
+using SMPLib::SMPModel;
+using SMPLib::SMPActor;
+using SMPLib::SMPState;
 void MainWindow::initializeQuadMapDock()
 {
     quadMapCustomGraph= new QCustomPlot;
@@ -99,7 +102,7 @@ void MainWindow::initializeQuadMapDock()
 
 void MainWindow::initializeQuadMapPlot()
 {
-    QFont font("Helvetica[Adobe]",15);
+    QFont font("Helvetica[Adobe]",10);
     quadMapTitle = new QCPPlotTitle(quadMapCustomGraph,"Quad Map");
     quadMapTitle->setFont(font);
     quadMapTitle->setTextColor(QColor(0,128,0));
@@ -169,6 +172,11 @@ void MainWindow::initializeQuadMapPlot()
     xRectItemPM->bottomRight->setType(QCPItemPosition::ptPlotCoords);
     xRectItemPM->bottomRight->setCoords(500, 0);// +x
     xRectItemPM->setClipToAxisRect(true);
+
+    // setup policy and connect slot for context menu popup:
+    quadMapCustomGraph->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(quadMapCustomGraph, SIGNAL(customContextMenuRequested(QPoint)),
+            this, SLOT(quadPlotContextMenuRequest(QPoint)));
 }
 
 void MainWindow::populateInitiatorsAndReceiversRadioButtonsAndCheckBoxes()
@@ -389,14 +397,35 @@ void MainWindow::getUtilChlgHorizontalVerticalAxisData(int turn)
                 VHAxisValues.append(initI);
                 VHAxisValues.append(recdJ);
             }
-            emit getUtilChlgAndUtilSQfromDB(VHAxisValues);
+            //            emit getUtilChlgAndUtilSQfromDB(VHAxisValues);
+            double x,y;
+            if(useHistory)
+            {
+                y =SMPLib::SMPModel::getQuadMapPoint(VHAxisValues.at(0),VHAxisValues.at(1),VHAxisValues.at(2),
+                                                     VHAxisValues.at(3),VHAxisValues.at(4));
+                x =SMPLib::SMPModel::getQuadMapPoint(VHAxisValues.at(5),VHAxisValues.at(6),VHAxisValues.at(7),
+                                                     VHAxisValues.at(8),VHAxisValues.at(9));
+
+            }
+            else
+            {
+                y =SMPLib::SMPModel::getQuadMapPoint(dbPath.toStdString(),scenarioBox.toStdString(),VHAxisValues.at(0),
+                                                     VHAxisValues.at(1),VHAxisValues.at(2),VHAxisValues.at(3),
+                                                     VHAxisValues.at(4));
+                x =SMPLib::SMPModel::getQuadMapPoint(dbPath.toStdString(),scenarioBox.toStdString(),VHAxisValues.at(5),
+                                                     VHAxisValues.at(6),VHAxisValues.at(7),VHAxisValues.at(8),
+                                                     VHAxisValues.at(9));
+
+                qDebug()<<VHAxisValues << scenarioBox;
+            }
+
+            quadMapUtilChlgandSQValues(VHAxisValues.at(0),x,y,VHAxisValues.at(4));
         }
     }
 }
 
 void MainWindow::plotScatterPointsOnGraph(QVector <double> x,QVector <double> y, int actIndex)
 {
-    qDebug()<<x <<y <<actIndex;
 
     quadMapCustomGraph->addGraph();
     quadMapCustomGraph->graph()->setData(x,y);
@@ -453,6 +482,7 @@ void MainWindow::plotDeltaValues()
 void MainWindow::removeAllScatterPoints()
 {
     quadMapCustomGraph->clearGraphs();
+    quadMapCustomGraph->replot();
 }
 
 void MainWindow::populateVHComboBoxPerspective(int index)
@@ -655,7 +685,7 @@ void MainWindow::quadMapUtilChlgandSQValues(int turn, double hor, double ver , i
 
     actorIdIndexH.append(actorID);
 
-    qDebug() << "hor" << hor << "ver" << ver << actorID <<actorsQueriedCount << deltaUtilV.length() << "del len";
+    //    qDebug() << "hor" << hor << "ver" << ver << actorID <<actorsQueriedCount << deltaUtilV.length() << "del len";
 
     if(actorsQueriedCount==deltaUtilV.length())
     {
@@ -734,7 +764,37 @@ void MainWindow::quadMapPlotPoints(bool status)
             quadMapAutoScale(false);
         }
         plotQuadMap->setEnabled(true);
-        QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+        QApplication::restoreOverrideCursor();
     }
+}
+
+void MainWindow::dbImported(bool bl)
+{
+    useHistory=false;
+}
+
+void MainWindow::quadPlotContextMenuRequest(QPoint pos)
+{
+    QMenu *menu = new QMenu(this);
+
+    menu->addAction("Save As BMP", this, SLOT(saveQuadPlotAsBMP()));
+    menu->addAction("Save As PDF", this, SLOT(saveQuadPlotAsPDF()));
+
+    menu->popup(quadMapCustomGraph->mapToGlobal(pos));
+}
+
+void MainWindow::saveQuadPlotAsBMP()
+{
+    QString fileName = getImageFileName("BMP File (*.bmp)","QuadMap",".bmp");
+    if(!fileName.isEmpty())
+        quadMapCustomGraph->saveBmp(fileName);
+}
+
+
+void MainWindow::saveQuadPlotAsPDF()
+{
+    QString fileName = getImageFileName("PDF File (*.pdf)","QuadMap",".pdf");
+    if(!fileName.isEmpty())
+        quadMapCustomGraph->savePdf(fileName);
 }
 

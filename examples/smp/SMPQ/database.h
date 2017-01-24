@@ -52,6 +52,7 @@ public slots :
     void getInfluenceDB(int turn =0);
     void getPositionDB(int dim,int turn =0);
     void getSalienceDB(int dim,int turn =0);
+    void getAffinityDB();
 
     //BarCharts
     void getActorsInRangeFromDB(double lowerRng, double higherRng, int dim, int turn);
@@ -59,6 +60,9 @@ public slots :
 
     //QuadMap
     void getUtilChlgAndSQvalues(QList<int> VHAxisValues);
+
+    //DB
+    void releaseDB();
 
 signals:
     void Message(QString , QString );
@@ -70,12 +74,14 @@ signals:
     void dimensionsCount(int value,QStringList *dimensions);
     void dimensList(QStringList *dimensions);
     void scenarios(QStringList *scenariosList,QStringList *scenariosIdList, QStringList *scenarioDesc, int indx);
+    void scenModelParameters(QList<int> scenModelparam, QString seedDB);
 
     //DB to CSV
     void actorsNameDesc(QList <QString>, QList <QString>);
     void actorsInflu(QList <QString>);
     void actorsPostn(QList<QString>,int);
     void actorsSalnce(QList<QString>,int);
+    void actorsAffinity(QList<QString>,QList<int>,QList<int>);
 
     //BarCharts
     void listActorsSalienceCapability(QList<int>,QList<double>,QList<double>,double r1,double r2);
@@ -85,6 +91,7 @@ signals:
 
 private:
     QSqlDatabase db;
+    QString dbName;
     //    QSqlTableModel * sqlmodel;
     QSqlTableModel * sqlmodelEdit;
     QStandardItemModel * sqlmodel;
@@ -97,6 +104,8 @@ private:
     QStringList * scenarioList;
     QStringList * scenarioIdList;
     QStringList * scenarioDescList;
+    QList<int> scenarioModelParam;
+    QString seedDB;
     QString scenarioM;
 
     //DB to CSV
@@ -105,6 +114,9 @@ private:
     QList <QString> actorInfluence;
     QList <QString> actorPosition;
     QList <QString> actorSalience;
+    QList <QString> actorAffinity;
+    QList <int>     actorI;
+    QList <int>     actorJ;
 
     //BarChart
     QList <int> actorIdsList;
@@ -131,6 +143,8 @@ private:
     void getNumStates();
     // Scenarios list in db
     void getScenarioList(bool run);
+    //model parameters
+    void getModelParameters();
 
     void readVectorPositionTableEdit(QString scenario);
 };

@@ -27,6 +27,7 @@
 #include <QMainWindow>
 #include "csv.h"
 #include "database.h"
+#include "xmlparser.h"
 #include "../qcustomplot/qcustomplot.h"
 
 #include <QtSql>
@@ -60,8 +61,6 @@ namespace Ui {
 class MainWindow;
 }
 
-static const int N = 2;
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -91,21 +90,26 @@ private slots:
     //Central-  Controls Frame
     void sliderStateValueToQryDB(int value);
     void scenarioComboBoxValue(int scenarioBox);
-    void createNewCSV(bool bl);
+    void createNewSMPData(bool bl);
     void cellSelected(QStandardItem *in);
     void insertNewRowCSV();
     void insertNewColumnCSV();
     void donePushButtonClicked(bool bl);
+    void saveTableWidgetToCSV(bool bl);
 
     //    bool eventFilter(QObject*, QEvent*);
     void displayMenuTableWidget(QPoint pos);
     void displayMenuTableView(QPoint pos);
+    //    void displayAffinityMenuTableWidget(QPoint pos);
+    //    void displayCsvAffinityMenuTableView(QPoint pos);
 
     //DB to CSV
     void actorsNameDesc(QList<QString> actorName, QList<QString> actorDescription);
     void actorsInfluence(QList<QString> ActorInfluence);
     void actorsPosition(QList<QString> actorPosition, int dim);
     void actorsSalience(QList<QString> actorSalience, int dim);
+    void actAffinity(QList<QString> actorAff, QList<int> actorI, QList<int> actorJ);
+    void scenarioModelParameters(QList<int> modParaDB, QString seedDB);
 
 signals:
     //CSV
@@ -121,6 +125,8 @@ signals:
     void getDimensionCountfromDB();
     void getDimforBar();
 
+    void releaseDatabase();
+
     //save DB to csv
     void getActorsDesc();
     void getInfluence(int turn);
@@ -134,10 +140,11 @@ private:
     void createLinePlotsDockWindows();
     void createBarPlotsDockWindows();
     void createQuadMapDockWindows();
-    void createModuleParametersDockWindow();
+    void createModelParametersDockWindow();
     void saveTableViewToCSV();
-    void saveTableWidgetToCSV();
+    void saveAsDialog();
     int validateControlButtons(QString viewName);
+    QString getImageFileName(QString imgType, QString imgFileName, QString imgExt);
 
     void updateDBViewColumns();
     QString checkForHeaderString(QString header);
@@ -158,32 +165,51 @@ private:
     QSlider * turnSlider;
 
     //Model parameters
-    QFrame * frames[N];
+    QFrame * frames;
     QPushButton * runButton;
 
-    QRadioButton * rparam1;
-    QRadioButton * rparam2;
-    QRadioButton * rparam3;
+    QComboBox * victProbModelComboBox;
+    QComboBox * pCEModelComboBox;
+    QComboBox * stateTransitionsComboBox;
+    QComboBox * votingRuleComboBox;
+    QComboBox * bigRAdjustComboBox;
+    QComboBox * bigRRangeComboBox;
+    QComboBox * thirdPartyCommitComboBox;
+    QComboBox * interVecBrgnComboBox;
+    QComboBox * bargnModelComboBox;
 
-    QCheckBox * cparam1;
-    QCheckBox * cparam2;
-    QCheckBox * cparam3;
+    int victProbModel;
+    int pCEModel;
+    int stateTransitions;
+    int votingRule;
+    int bigRAdjust;
+    int bigRRange;
+    int thirdPartyCommit;
+    int interVecBrgn;
+    int bargnModel;
+
+    std::vector<int> parameters;
 
     //csv window
+    QTabWidget * csvTableViewTabWidget;
     QTableView * csvTableView;
+    QTableView * csvTableAffinityView;
+    QStandardItemModel * csvAffinityModel;
     CSV *csvObj;
 
     QTableWidget * csvTableWidget;
+    QTabWidget * smpDataTab;
+    QTableWidget * affinityMatrix;
 
     QMenu *viewMenu;
 
-    QDockWidget * moduleParametersDock;
+    QDockWidget * modelParametersDock;
     QDockWidget * lineGraphDock;
     QDockWidget * barGraphDock;
     QDockWidget * quadMapDock;
 
     QGridLayout * VLayout;
-    QFrame * moduleFrame;
+    QFrame * modelParametersFrame;
 
     //Database Obj
     Database * dbObj ;
@@ -214,7 +240,7 @@ private:
     QLineEdit* headerEditor;
     int editorIndex;
 
-    QString  tableType; // CSV, Database, NewCSV
+    QString  tableType; // CSV, Database, NewSMPData
     QStandardItemModel *modeltoCSV;
     QStandardItemModel *modeltoDB;
 
@@ -228,6 +254,9 @@ private:
     QList <QString> actorsInfl;
     QList <QString> actorsPos[3];
     QList <QString> actorsSal[3];
+    QList <QString> actorAffinity;
+    QList <int>     actI;
+    QList <int>     actJ;
 
     QStringList dimensionList;
 
@@ -238,13 +267,15 @@ private slots:
     //    void selectionChanged();
     void mousePress();
     void mouseWheel();
-    void addGraphOnModule1(const QVector<double> &x, const QVector<double> &y, QString Actor, int turn);
+    void addGraphOnLinePlot(const QVector<double> &x, const QVector<double> &y, QString Actor, int turn);
     //    void removeSelectedGraph();
     void removeAllGraphs();
-    void contextMenuRequest(QPoint pos);
     void moveLegend();
     void graphClicked(QCPAbstractPlottable *plottable);
     void updateBarDimension(QStringList* dims);
+    void linePlotContextMenuRequest(QPoint pos);
+    void saveLinePlotAsBMP();
+    void saveLinePlotAsPDF();
 
     //Bar Charts
 private :
@@ -308,6 +339,9 @@ private slots:
     void barGraphActorsSalienceCapability(QList<int> aId, QList<double> sal, QList<double>cap, double r1, double r2);
     void xAxisRangeChanged( const QCPRange &newRange, const QCPRange &oldRange );
     void yAxisRangeChanged( const QCPRange &newRange, const QCPRange &oldRange );
+    void barPlotContextMenuRequest(QPoint pos);
+    void saveBarPlotAsBMP();
+    void saveBarPlotAsPDF();
 
     //line Graph
 private :
@@ -354,9 +388,14 @@ private slots :
     void splineValues(const QVector<double> &x, const QVector<double> &y);
 
     //run smp
-
 private :
     QString csvPath;
+    QCheckBox * logMinimum;
+    QLineEdit * seedRand;
+
+    void initializeModelParametersDock();
+    void getParametersValues();
+    //    QStandardItemModel *initializeComboBox(int rows, QStringList items);
 
 private slots :
     void runPushButtonClicked(bool bl);
@@ -422,6 +461,9 @@ private :
     QPushButton * plotQuadMap;
     int initiatorTip;
 
+    bool useHistory;
+    QString currentScenarioId;
+
     void initializeQuadMapDock();
     void initializeQuadMapPlot();
 
@@ -452,11 +494,64 @@ private slots :
 
     void quadMapAutoScale(bool status);
     void quadMapPlotPoints(bool status);
+    void dbImported(bool bl);
+    void quadPlotContextMenuRequest(QPoint pos);
+    void saveQuadPlotAsBMP();
+    void saveQuadPlotAsPDF();
 
 signals :
     void getUtilChlgAndUtilSQfromDB(QList <int > VHAxisList);
 
+
+    //Xmlparser
+private :
+    QString xmlPath;
+    Xmlparser *xmlparser;
+    QTabWidget *xmlTabWidget;
+    QTableView *xmlImportDataTableView;
+    QTableView *xmlAffinityMatrixTableView;
+
+    QStandardItemModel * xmlSmpDataModel;
+    QStandardItemModel * xmlAffinityMatrixModel;
+
+    QStringList dimensionsXml;
+    QVector<int> defParameters;
+
+    QAbstractButton * CSVButton;
+    QAbstractButton * XMLButton;
+    QDialogButtonBox * saveAsDial;
+
+    bool savedAsXml;
+
+    void createXmlTable();
+    void populateXmlTable(QStandardItemModel *actorsVal);
+    void populateAffinityMatrix(QList<QStringList> idealAdj, QVector<QString> actors);
+    void updateControlsBar(QStringList modelDesc);
+    void updateModelParameters(QStringList modPara);
+    void initializeAffinityMatrixRowCol(int count, QString table);
+    void saveTableViewToXML();
+    void setDefaultParameters();
+
+private slots:
+    void displayMenuXmlTableView(QPoint pos);
+    //    void displayMenuXmlAffTableView(QPoint pos);
+    void importXmlGetFilePath(bool bl);
+    void openStatusXml(bool status);
+    void xmlDataParsedFromFile(QStringList modelDesc, QStringList modpara, QStringList dims,
+                               QStandardItemModel *actModel, QList <QStringList> idealAdj);
+    void savedXmlName(QString fileName);
+    void saveTableWidgetToXML(bool bl);
+    void xmlCellSelected(QStandardItem *in);
+signals:
+    bool openXMLFile(QString file);
+    void readXMLFile();
+    void saveXMLDataToFile(QStringList parameters, QStandardItemModel * smpData,
+                           QStandardItemModel * affModel);
+    void saveNewSMPDataToXMLFile(QStringList parameters, QTableWidget
+                                 * smpDataWidget, QTableWidget * affModelWidget);
 };
+
+
 
 #endif // MAINWINDOW_H
 

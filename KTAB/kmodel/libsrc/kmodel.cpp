@@ -42,7 +42,8 @@ using KBase::nameFromEnum;
 
 // JAH 20160711 added seed 20160730 JAH added sql flags
 // BPW 2016-09-28 removed redundant PRNG input variable
-Model::Model(string desc, uint64_t sd, vector<bool> f) {
+Model::Model(string desc, uint64_t sd, vector<bool> f, string Name) {
+
   history = vector<State*>();
   actrs = vector<Actor*>();
   numAct = 0;
@@ -64,30 +65,40 @@ Model::Model(string desc, uint64_t sd, vector<bool> f) {
   const std::chrono::duration<double> tse = st.time_since_epoch();
   std::chrono::seconds::rep microSeconds = std::chrono::duration_cast<std::chrono::microseconds>(tse).count() % 1000000;
 
-
   auto utcBuffId = newChars(500);
   auto hshCode = newChars(100);
-  if (0 == desc.length()) {
-    auto utcBuff = newChars(200);
+  auto utcBuff = newChars(200);
 
+  if (0 == desc.length() || 0 == Name.length()) {
     std::strftime(utcBuff, 150, "Scenario-UTC-%Y-%m-%u-%H%M-%S", gmtime(&start_time));
+  }
+
+  if (0 == desc.length()) {
     cout << "No scenario description provided to Model::Model, " << endl;
-    cout << "generating default name from UTC start time." << endl << flush;
+    cout << "Using default description generated from UTC start time." << endl;
+
+    scenDesc = utcBuff;
+  }
+  else {
+    scenDesc = desc;
+  }
+
+  if (0 == Name.length()) {
+    cout << "No scenario name provided to Model::Model " << endl;
+    cout << "Using default description generated from UTC start time." << endl;
+
     scenName = utcBuff;
-    // Scenario Id Generation  include the microsecond
-
-    sprintf(utcBuffId, "%s_%u", utcBuff, microSeconds);
-
-    delete utcBuff;
-    utcBuff = nullptr;
-
   }
   else
   {
-    scenName = desc;
-    sprintf(utcBuffId, "%s_%u", desc.c_str(), microSeconds);
-
+    scenName = Name;
   }
+
+  sprintf(utcBuffId, "%s_%u", scenName.c_str(), microSeconds);
+
+  delete utcBuff;
+  utcBuff = nullptr;
+
   //get the hash
   uint64_t scenIdhash = (std::hash < std::string>() (utcBuffId));
   sprintf(hshCode, "%032llX", scenIdhash);
@@ -110,15 +121,22 @@ Model::Model(string desc, uint64_t sd, vector<bool> f) {
   }
 
   // JAH 20160711 save the seed for the rng
-  rngSeed = sd;
-  rng->setSeed(rngSeed);
+  setSeed(sd);
 
   // BPW 20160928 print out the seed actually used (non-zero) instead of the one given (e.g. 0)
   printf("Using PRNG seed: %020llu \n", rngSeed);
-
-  cout << "Scenario assigned name: -|" << scenName.c_str() << "|-" << endl << flush;
+  cout << "Scenario Name: -|" << scenName << "|-" << endl << flush;
+  cout << "Scenario Description: " << scenDesc << endl;
 }
 
+void Model::setSeed(uint64_t seed) {
+    rngSeed = seed;
+    rng->setSeed(rngSeed);
+}
+
+uint64_t Model::getSeed() {
+    return rngSeed;
+}
 
 Model::~Model() {
   while (0 < history.size()) {
@@ -458,6 +476,7 @@ KMatrix Model::coalitions(function<double(unsigned int ak, unsigned int pi, unsi
       double cji = minC;
       for (unsigned int k = 0; k < numAct; k++) {
         double vkij = vfn(k, i, j);
+		
         if (vkij > 0) {
           cij = cij + vkij;
         }
@@ -469,7 +488,7 @@ KMatrix Model::coalitions(function<double(unsigned int ak, unsigned int pi, unsi
       c(j, i) = cji;  // set the upper right coalition
 
     }
-    c(i, i) = minC; // set the diagonal coalition
+	c(i, i) = minC; // set the diagonal coalition
   }
   return c;
 }

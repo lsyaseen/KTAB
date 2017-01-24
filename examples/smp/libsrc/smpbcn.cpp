@@ -108,7 +108,7 @@ void recordUtility(unsigned int i /* actor id */, const SMPState* obj) {
  * Calculate all the utilities and record in database. utitlity for (i,i,i,j)
  * combination is getting calculated and recorded in a separate method
  */
-void SMPState::calcUtils(unsigned int i /* actor id */) const {
+void SMPState::calcUtils(unsigned int i ) const { // i == actor id 
   const unsigned int na = model->numAct;
   const bool recordTmpSQLP = true;  // Record this in SQLite
   auto pFn = [this, recordTmpSQLP](unsigned int h, unsigned int k, unsigned int i, unsigned int j) {
@@ -172,7 +172,27 @@ void SMPState::bestChallengeUtils(unsigned int i /* actor id */) const {
 }
 
 // --------------------------------------------
-
+vector<double> SMPState::calcVotes(KMatrix w, KMatrix u, int k) const
+{
+	auto vfn = [&w, &u](VotingRule vr, unsigned int k, unsigned int i, unsigned int j) {
+		double vkij = Model::vote(vr, w(0, k), u(k, i), u(k, j));
+		return vkij;
+	};
+	auto li = u.numC();  
+	auto lj = w.numC();
+	vector<double> votes = {};
+	for (unsigned int i = 0; i < li; i++) //li is the number of bargains
+	{
+		for (unsigned int j = 0; j < i; j++)
+		{
+			auto vr = ((const SMPActor*)(model->actrs[k]))->vr;
+			double vkij = vfn(vr, k, i, j);
+			votes.push_back(vkij);
+			
+		}
+	}
+	return votes;
+}
 
 SMPState* SMPState::doBCN() const {
   const bool recordBargainingP = true;
@@ -236,26 +256,27 @@ SMPState* SMPState::doBCN() const {
 
       std::thread thr(recordUtility, i, this);
 
-      {   // make the variables local to lexical scope of this block.
-        // for testing, calculate and print out a block of data showing each's perspective
-        bool recordTmpSQLP = true;  // Record this in SQLite
-        auto pFn = [this, recordTmpSQLP](unsigned int h, unsigned int k, unsigned int i, unsigned int j) {
-          auto est = probEduChlg(h, k, i, j, recordTmpSQLP); // H's estimate of the effect on K of I->J
-          double phij = get<0>(est);
-          double edu_hk_ij = get<1>(est);
-          printf("Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f \n",
-                 h, phij, i, j, k, edu_hk_ij);
-        };
-
-        // I's estimate of the effect on I of I->J
+      // make the variables local to lexical scope of this block.
+      // for testing, calculate and print out a block of data showing each's perspective
+      bool recordTmpSQLP = true;  // Record this in SQLite
+      auto pFn = [this, recordTmpSQLP](unsigned int h, unsigned int k, unsigned int i, unsigned int j) {
+        auto est = probEduChlg(h, k, i, j, recordTmpSQLP); // H's estimate of the effect on K of I->J
+        double phij = get<0>(est);
+        double edu_hk_ij = get<1>(est);
         printf("Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f \n",
-               i, piiJ, i, j, i, get<2>(chlgI));
+               h, phij, i, j, k, edu_hk_ij);
+		return est;
+      };
 
-        pFn(i, j, i, j); // I's estimate of the effect on J of I->J
+      // I's estimate of the effect on I of I->J
+      printf("Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f \n",
+             i, piiJ, i, j, i, get<2>(chlgI));
 
-        pFn(j, i, i, j); // J's estimate of the effect on I of I->J
-        pFn(j, j, i, j); // J's estimate of the effect on J of I->J
-      }
+      pFn(i, j, i, j); // I's estimate of the effect on J of I->J
+
+      auto Vjij = pFn(j, i, i, j); // J's estimate of the effect on I of I->J
+
+      pFn(j, j, i, j); // J's estimate of the effect on J of I->J
 
       // interpolate a bargain from I's perspective
       BargainSMP* brgnIIJ = SMPActor::interpolateBrgn(ai, aj, posI, posJ, piiJ, 1 - piiJ, ivb);
@@ -266,7 +287,6 @@ SMPState* SMPState::doBCN() const {
       assert(naj == j);
 
       // interpolate a bargain from targeted J's perspective
-      auto Vjij = probEduChlg(j, i, i, j, recordBargainingP);
       double pjiJ = get<1>(Vjij); // j's estimate of the probability that i defeats j
       BargainSMP* brgnJIJ = SMPActor::interpolateBrgn(ai, aj, posI, posJ, pjiJ, 1 - pjiJ, ivb);
 
@@ -508,11 +528,32 @@ SMPState* SMPState::doBCN() const {
 
     //populate the Bargain Vote & Util tables
     // JAH added sql flag logging control
-    if (model->sqlFlags[3])
-    {
-      // model->sqlBargainVote(t, k, k, w);
-      model->sqlBargainUtil(t, k, u_im);
-    }
+	if (model->sqlFlags[3])
+	{
+		auto brgns_k = brgns[k];
+		vector< std::tuple<uint64_t, uint64_t>> barginIDsPair_i_j;
+		vector<uint64_t> bargnIdsRows = {};
+		for (int j = 0; j < nb; j++)
+		{
+			bargnIdsRows.push_back(brgns[k][j]->getID());
+		}
+		for (unsigned int brgnFirst = 0; brgnFirst < nb; brgnFirst++)
+		{
+			for (unsigned int brgnSecond = 0; brgnSecond < brgnFirst; brgnSecond++)
+			{
+				barginIDsPair_i_j.push_back(tuple<uint64_t, uint64_t>(brgns_k[brgnFirst]->getID(), brgns_k[brgnSecond]->getID()));
+			}
+		}
+
+		for (unsigned int actor = 0; actor < na; ++actor) {
+			auto pv_ij = calcVotes(w, u_im, actor);
+
+			model->sqlBargainVote(t, barginIDsPair_i_j, pv_ij, actor);
+		}
+		model->sqlBargainUtil(t, bargnIdsRows, u_im);
+	}
+
+
 
     // TODO: create a fresh position for k, from the selected bargain mMax.
     VctrPstn * pk = nullptr;

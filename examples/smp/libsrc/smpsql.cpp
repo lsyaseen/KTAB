@@ -69,13 +69,14 @@ KTable * SMPModel::createSQL(unsigned int n)  {
   {
     switch (n-Model::NumTables) {
     case  0: // coordinates of each actor's position
-      sql = "create table if not exists VectorPosition ("  \
-            "ScenarioId TEXT(32) NOT NULL DEFAULT 'None', "\
-            "Turn_t		INTEGER NOT NULL DEFAULT 0, "\
-            "Act_i		INTEGER NOT NULL DEFAULT 0, "\
-            "Dim_k		INTEGER NOT NULL DEFAULT 0, "\
-            "Coord		REAL NOT NULL DEFAULT 0"\
-            ");";
+		sql = "create table if not exists VectorPosition ("  \
+			"ScenarioId TEXT(32) NOT NULL DEFAULT 'None', "\
+			"Turn_t		INTEGER NOT NULL DEFAULT 0, "\
+			"Act_i		INTEGER NOT NULL DEFAULT 0, "\
+			"Dim_k		INTEGER NOT NULL DEFAULT 0, "\
+			"Pos_Coord		REAL NOT NULL DEFAULT 0,"\
+			"Idl_Coord		REAL NOT NULL DEFAULT 0"\
+			");";
       name = "VectorPosition";
       grpID = 4;// JAH 20161010 put in group 4 all by itself
       break;
@@ -120,6 +121,18 @@ KTable * SMPModel::createSQL(unsigned int n)  {
       grpID = 0;
     }
       break;
+    case 4: // affinities of actors, so the GUI can use it
+    {
+        sql = "create table if not exists Accommodation ("  \
+            "ScenarioId TEXT(32) NOT NULL DEFAULT 'None', "\
+            "Act_i      INTEGER NOT NULL DEFAULT 0, "\
+            "Act_j      INTEGER NOT NULL DEFAULT 0, "\
+            "Affinity   REAL NOT NULL DEFAULT 0.0"\
+            ");";
+        name = "Accommodation";
+        grpID = 0;
+        break;
+    }
     default:
       throw(KException("SMPModel::createSQL unrecognized table number"));
     }
@@ -229,15 +242,29 @@ void SMPModel::LogInfoTables()
 
   // for efficiency sake, we'll do all tables in a single transaction
   // form insert commands
-  auto sqlBuffD = newChars(sqlBuffSize);
-  sprintf(sqlBuffD,"INSERT INTO DimensionDescription (ScenarioId,Dim_k,Desc) VALUES ('%s', ?1, ?2)",
-          scenId.c_str());
-  auto sqlBuffC = newChars(sqlBuffSize);
-  sprintf(sqlBuffC,"INSERT INTO SpatialCapability (ScenarioId, Turn_t, Act_i, Cap) VALUES ('%s', ?1, ?2, ?3)",
-          scenId.c_str());
-  auto sqlBuffS = newChars(sqlBuffSize);
-  sprintf(sqlBuffS,"INSERT INTO SpatialSalience (ScenarioId, Turn_t, Act_i, Dim_k,Sal) VALUES ('%s', ?1, ?2, ?3, ?4)",
-          scenId.c_str());
+  string sqlD = string("INSERT INTO DimensionDescription (ScenarioId,Dim_k,Desc) VALUES ('")
+      + scenId + "', ?1, ?2)";
+  char *sqlBuffD = const_cast<char *>(sqlD.c_str());
+
+  string sqlC = string("INSERT INTO SpatialCapability (ScenarioId, Turn_t, Act_i, Cap) VALUES ('")
+      + scenId + "', ?1, ?2, ?3)";
+  char *sqlBuffC = const_cast<char *>(sqlC.c_str());
+
+  string sqlS = string("INSERT INTO SpatialSalience (ScenarioId, Turn_t, Act_i, Dim_k,Sal) VALUES ('")
+      + scenId + "', ?1, ?2, ?3, ?4)";
+  char *sqlBuffS = const_cast<char *>(sqlS.c_str());
+
+  string sqlSc = string("UPDATE ScenarioDesc SET VotingRule = ?1, BigRAdjust = ?2, "
+      "BigRRange = ?3, ThirdPartyCommit = ?4, InterVecBrgn = ?5, BargnModel = ?6 "
+      " WHERE ScenarioId = '")
+      + scenId + "'";
+  char *sqlBuffScene = const_cast<char *>(sqlSc.c_str());
+
+  string sqlAcc = string("INSERT INTO Accommodation (ScenarioId, Act_i, Act_j, Affinity) VALUES ('")
+      + scenId
+      + "', ?1, ?2, ?3)";
+  char *sqlAccomod = const_cast<char *>(sqlAcc.c_str());
+
   // prepare the prepared statement statements
   sqlite3_stmt *insStmtD;
   sqlite3_prepare_v2(smpDB, sqlBuffD, strlen(sqlBuffD), &insStmtD, NULL);
@@ -249,7 +276,42 @@ void SMPModel::LogInfoTables()
   sqlite3_prepare_v2(smpDB, sqlBuffS, strlen(sqlBuffS), &insStmtS, NULL);
   assert(nullptr != insStmtS);
 
+  sqlite3_stmt *insStmtScene=nullptr;
+  sqlite3_prepare_v2(smpDB, sqlBuffScene, strlen(sqlBuffScene), &insStmtScene, NULL);
+  assert(nullptr != insStmtScene);
+
+  sqlite3_stmt *insStmtAccomod = nullptr;
+  sqlite3_prepare_v2(smpDB, sqlAccomod, strlen(sqlAccomod), &insStmtAccomod, NULL);
+  assert(nullptr != insStmtAccomod);
+
   sqlite3_exec(smpDB, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+
+  // Retrieve accommodation matrix
+  auto st = dynamic_cast<SMPState *>(history.back());
+  assert(st != nullptr);
+  auto accM = st->getAccomodate();
+
+  // Accomodation table to record affinities
+  assert((accM.numR() == numAct) && (accM.numC() == numAct));
+  for (unsigned int Act_i = 0; Act_i < numAct; ++Act_i) {
+      for (unsigned int Act_j = 0; Act_j < numAct; ++Act_j) {
+          //bind the data
+          rslt = sqlite3_bind_int(insStmtAccomod, 1, Act_i);
+          assert(SQLITE_OK == rslt);
+          rslt = sqlite3_bind_int(insStmtAccomod, 2, Act_j);
+          assert(SQLITE_OK == rslt);
+          rslt = sqlite3_bind_double(insStmtAccomod, 3, accM(Act_i, Act_j));
+          assert(SQLITE_OK == rslt);
+          // record
+          rslt = sqlite3_step(insStmtAccomod);
+          assert(SQLITE_DONE == rslt);
+          sqlite3_clear_bindings(insStmtAccomod);
+          assert(SQLITE_DONE == rslt);
+          rslt = sqlite3_reset(insStmtAccomod);
+          assert(SQLITE_OK == rslt);
+      }
+  }
+
   // Dimension Description Table
   for (unsigned int k = 0; k < dimName.size(); k++)
   {
@@ -326,18 +388,35 @@ void SMPModel::LogInfoTables()
     }
   }
 
+  //ScenarioDesc table
+  rslt = sqlite3_bind_int(insStmtScene, 1, static_cast<int>(vrCltn));
+  assert(SQLITE_OK == rslt);
+  rslt = sqlite3_bind_int(insStmtScene, 2, static_cast<int>(bigRAdj));
+  assert(SQLITE_OK == rslt);
+  rslt = sqlite3_bind_int(insStmtScene, 3, static_cast<int>(bigRRng));
+  assert(SQLITE_OK == rslt);
+  rslt = sqlite3_bind_int(insStmtScene, 4, static_cast<int>(tpCommit));
+  assert(SQLITE_OK == rslt);
+  rslt = sqlite3_bind_int(insStmtScene, 5, static_cast<int>(ivBrgn));
+  assert(SQLITE_OK == rslt);
+  rslt = sqlite3_bind_int(insStmtScene, 6, static_cast<int>(brgnMod));
+  assert(SQLITE_OK == rslt);
+
+  rslt = sqlite3_step(insStmtScene);
+  assert(SQLITE_DONE == rslt);
+  sqlite3_clear_bindings(insStmtScene);
+  assert(SQLITE_DONE == rslt);
+  rslt = sqlite3_reset(insStmtScene);
+  assert(SQLITE_OK == rslt);
+
   // finish
   sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
   // finalize statement to avoid resource leaks
   sqlite3_finalize(insStmtD);
   sqlite3_finalize(insStmtC);
   sqlite3_finalize(insStmtS);
-  delete sqlBuffD;
-  sqlBuffD = nullptr;
-  delete sqlBuffC;
-  sqlBuffC = nullptr;
-  delete sqlBuffS;
-  sqlBuffS = nullptr;
+  sqlite3_finalize(insStmtScene);
+  sqlite3_finalize(insStmtAccomod);
 
   return;
 }
