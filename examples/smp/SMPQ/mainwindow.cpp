@@ -1616,6 +1616,34 @@ int MainWindow::validateControlButtons(QString viewName)
                     }
                     return ++ret;
                 }
+                else
+                {
+                    if(colIndex==0)
+                    {
+                        if(csvTableWidget->item(rowIndex,0)->text().length()>25)// actor name
+                        {
+                            QMessageBox::about(0,"Actor Name",
+                                               "Actor Name can be a maximum of 25 characters, Row : "+
+                                               QString::number(rowIndex+1));
+                            return ++ret;
+                        }
+                    }
+                    else if(colIndex==1)
+                    {
+                        if(csvTableWidget->item(rowIndex,1)->text().length()>256)// actor name
+                        {
+                            QTableWidgetItem* actorName = csvTableWidget->item(rowIndex,0);// actor name
+                            QTableWidgetItem* columnHeaderName = csvTableWidget->horizontalHeaderItem(colIndex); //column hdr
+                            QMessageBox::about(0,columnHeaderName->text() +" Length",
+                                               "The \""  +columnHeaderName->text() +
+                                               "\" length can be a maximum of "
+                                               "256 characters for \""+ actorName->text() +
+                                               "\" at Row : " + QString::number(rowIndex+1));
+
+                            return ++ret;
+                        }
+                    }
+                }
             }
         }
     }
@@ -1643,6 +1671,34 @@ int MainWindow::validateControlButtons(QString viewName)
                                            QString::number(rowIndex+1));
                     }
                     return ++ret;
+                }
+                else
+                {
+                    if(colIndex==0)
+                    {
+                        if(modeltoCSV->data(modeltoCSV->index(rowIndex,0)).toString().length()>25)// actor name
+                        {
+                            QMessageBox::about(0,"Actor Name",
+                                               "Actor Name can be a maximum of 25 characters, Row : "+
+                                               QString::number(rowIndex+1));
+                            return ++ret;
+                        }
+                    }
+                    else if(colIndex==1)
+                    {
+                        if(modeltoCSV->data(modeltoCSV->index(rowIndex,1)).toString().length()>256)// actor name
+                        {
+                            QString actorName = modeltoCSV->data(modeltoCSV->index(rowIndex,0)).toString();// actor name
+                            QString columnHeaderName = modeltoCSV->headerData(colIndex,Qt::Horizontal).toString();
+                            QMessageBox::about(0,columnHeaderName +" Length",
+                                               "The \""  +columnHeaderName +
+                                               "\" length can be a maximum of "
+                                               "256 characters for \""+ actorName +
+                                               "\" at Row : " + QString::number(rowIndex+1));
+
+                            return ++ret;
+                        }
+                    }
                 }
             }
         }
@@ -1672,6 +1728,33 @@ int MainWindow::validateControlButtons(QString viewName)
                     }
                     return ++ret;
                 }
+                else
+                {
+                    if(colIndex==0)
+                    {
+                        if(xmlSmpDataModel->data(xmlSmpDataModel->index(rowIndex,0)).toString().length()>25)// actor name
+                        {
+                            QMessageBox::about(0,"Actor Name",
+                                               "Actor Name can be a maximum of 25 characters, Row : "+
+                                               QString::number(rowIndex+1));
+                            return ++ret;
+                        }
+                    }
+                    else if(colIndex==1)
+                    {
+                        if(xmlSmpDataModel->data(xmlSmpDataModel->index(rowIndex,1)).toString().length()>256)// actor name
+                        {
+                            QString actorName = xmlSmpDataModel->data(xmlSmpDataModel->index(rowIndex,0)).toString();// actor name
+                            QString columnHeaderName = xmlSmpDataModel->headerData(colIndex,Qt::Horizontal).toString();
+                            QMessageBox::about(0,columnHeaderName +" Length",
+                                               "The \""  +columnHeaderName +
+                                               "\" length can be a maximum of "
+                                               "256 characters for \""+ actorName +
+                                               "\" at Row : " + QString::number(rowIndex+1));
+                            return ++ret;
+                        }
+                    }
+                }
             }
         }
     }
@@ -1689,7 +1772,6 @@ QString MainWindow::getImageFileName(QString imgType, QString imgFileName, QStri
 
     }
     return imgFilePath;
-
 }
 
 void MainWindow::updateDBViewColumns()
