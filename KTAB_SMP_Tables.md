@@ -162,7 +162,7 @@ Every proposed bargain is evaluated in at least two queues: the initiating actor
 Every proposed bargain is evaluated in two queues: the initiating actor's queue, and the receiving actor's queue.  Status quo bargains are evaluated in every actor's queue. In each queue, all actors vote on **all pairs of all bargains**.  Hence, if there are three bargains in a queue, named *A*, *B*, *C*, all actors will compute the following votes: *A vs B*, *A vs C*, *B vs C*, *B vs A*, *C vs A*, and *C vs B*.  These votes are stored in this table, looping over all queues, all pairs of bargains (in each queue), and all actors.  Calculations with these votes are then used to compute the coalition strengths, which are then used to compute the select probabilities (and results) which are stored in `Bargn.Init_Prob`, `Bargn.Recd_Prob`, `Bargn.Init_Seld`, and `Bargn.Recd_Seld`.
 
 # SQL Logging Group 4 - Position History Table
-## `VectorPosition(ScenarioId*, Turn_t*, Act_i*, Dim_k*, Coord)`
+## `VectorPosition(ScenarioId*, Turn_t*, Act_i*, Dim_k*, Pos_Coord, Idl_Coord)`
     ScenarioId  Text(32)  Foreign Key into ScenarioDesc; id number for the scenario
     Turn_t      Integer   iteration number, begins with 0 and increments by 1 each iteration; [0,infty)
     Act_i       Integer   Foreign Key into ActorDescription; actor whose position is recorded; [0,number actors-1]
