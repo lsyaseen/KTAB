@@ -295,7 +295,7 @@ public:
   static double bvUtil(const KMatrix & vd, const  KMatrix & vs, double R);
 
   static std::string runModel(std::vector<bool> sqlFlags, std::string dbFilePath,
-      std::string inputDataFile, uint64_t seed, std::vector<int> modelParams = std::vector<int>());
+      std::string inputDataFile, uint64_t seed, bool saveHist, std::vector<int> modelParams = std::vector<int>());
 
   // this sets up a standard configuration and runs it
   static void configExec(SMPModel * md0);

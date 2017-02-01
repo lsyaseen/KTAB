@@ -166,13 +166,13 @@ void MainWindow::runPushButtonClicked(bool bl)
         {
             currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
                                                       (sqlFlags, dbFilePath.toStdString(),
-                                                       xmlPath.toStdString(),seed,parameters));
+                                                       xmlPath.toStdString(),seed,false,parameters));
         }
         else
         {
             currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
                                                       (sqlFlags, dbFilePath.toStdString(),
-                                                       csvPath.toStdString(),seed,parameters));
+                                                       csvPath.toStdString(),seed,false,parameters));
         }
         cout << "-----------------------------------" << endl;
 

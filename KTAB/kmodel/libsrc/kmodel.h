@@ -411,7 +411,7 @@ public:
 
   void setSeed(uint64_t seed);
 
-  uint64_t getSeed();
+  uint64_t getSeed() const;
 
   static KTable * createSQL(unsigned int n);
 protected:

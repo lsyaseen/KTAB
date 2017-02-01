@@ -882,56 +882,80 @@ double SMPModel::bvUtil(const  KMatrix & vd, const  KMatrix & vs, double R) {
     return u;
 };
 
-void SMPModel::sankeyOutput(string inputCSV) const {
+void SMPModel::sankeyOutput(string outputFile) const {
     assert(numAct == actrs.size());
     assert(numDim == dimName.size());
-    if (1 == numDim) {
-        unsigned int nameLen = inputCSV.length();
-        cout << endl;
-        const char* appendEffPwr = "_effPow.csv";
-        char* epName = newChars(nameLen + strlen(appendEffPwr) + 1);
-        sprintf(epName, "%s%s", inputCSV.c_str(), appendEffPwr);
-        cout << "Record effective power in " << epName << "  ...  " << flush;
-        FILE* f1 = fopen(epName, "w");
-        for (unsigned int i = 0; i < numAct; i++) {
-            auto ai = ((const SMPActor*)actrs[i]);
-            double ci = ai->sCap;
-            assert(0.0 < ci);
-            double si = KBase::sum(ai->vSal);
-            assert(0.0 < si);
-            assert(si <= 1.0);
-            double epi = ci * si;
-            fprintf(f1, "%s,%5.1f\n", ai->name.c_str(), epi);
-        }
-        fclose(f1);
-        f1 = nullptr;
-        cout << "done" << endl;
-        delete epName;
-        epName = nullptr;
 
-        const char* appendPosLog = "_posLog.csv";
-        char* plName = newChars(nameLen + strlen(appendPosLog) + 1);
-        sprintf(plName, "%s%s", inputCSV.c_str(), appendPosLog);
-        cout << "Record 1D positions over time, without dimension-name in " << plName << "  ...  " << flush;
-        FILE* f2 = fopen(plName, "w");
-        for (unsigned int i = 0; i < numAct; i++) {
-            fprintf(f2, "%s", actrs[i]->name.c_str());
-            for (unsigned int t = 0; t < history.size(); t++) {
-                auto st = history[t];
-                auto pit = st->pstns[i];
-                auto vpit = (const VctrPstn*)pit;
-                assert(1 == vpit->numC());
-                assert(numDim == vpit->numR());
-                fprintf(f2, ",%5.1f", 100 * (*vpit)(0, 0)); // have to print "100.0" sometimes
-            }
-            fprintf(f2, "\n");
+    // first prepare the header line
+    char* headLine = newChars(300);
+    sprintf(headLine,"PRNG Seed:%20llu;VictoryProbModel:%s;VotingRule:%s;PCEModel:%s;StateTransitions:%s;BigRRange:%s;BigRAdjust:%s;ThirdPartyCommit:%s;InterVecBrgn:%s;BargnModel:%s",
+            getSeed(),KBase::nameFromEnum<VPModel>(vpm,KBase::VPModelNames).c_str(),
+            KBase::nameFromEnum<VotingRule>(vrCltn,KBase::VotingRuleNames).c_str(),
+            KBase::nameFromEnum<PCEModel>(pcem,KBase::PCEModelNames).c_str(),
+            KBase::nameFromEnum<StateTransMode>(stm,KBase::StateTransModeNames).c_str(),
+            KBase::nameFromEnum<BigRRange>(bigRRng,KBase::BigRRangeNames).c_str(),
+            KBase::nameFromEnum<BigRAdjust>(bigRAdj,KBase::BigRAdjustNames).c_str(),
+            KBase::nameFromEnum<ThirdPartyCommit>(tpCommit,KBase::ThirdPartyCommitNames).c_str(),
+            KBase::nameFromEnum<InterVecBrgn>(ivBrgn,InterVecBrgnNames).c_str(),
+            KBase::nameFromEnum<SMPBargnModel>(brgnMod,SMPBargnModelNames).c_str());
+
+    unsigned int nameLen = outputFile.length();
+    cout << endl;
+    const char* appendEffPwr = "_effPow.csv";
+    char* epName = newChars(nameLen + strlen(appendEffPwr) + 1);
+    sprintf(epName, "%s%s", outputFile.c_str(), appendEffPwr);
+    cout << "Record effective power in " << epName << "  ...  " << flush;
+    FILE* f1 = fopen(epName, "w");
+    fprintf(f1,"%s\n",headLine);
+    for (unsigned int i = 0; i < numAct; i++) {
+        auto ai = ((const SMPActor*)actrs[i]);
+        double ci = ai->sCap;
+        assert(0.0 < ci);
+        fprintf(f1, "%s", ai->name.c_str());
+        // loop through dimensions now
+        for (unsigned int k = 0; k < numDim; k++) {
+          double si = (ai->vSal)(k, 0);
+          assert(0.0 < si);
+          assert(si <= 1.0);
+          double epi = ci * si;
+          // increased precision since we divided by 100 when the saliences were import
+          fprintf(f1, ",%5.2f", epi);
         }
-        fclose(f2);
-        f2 = nullptr;
-        cout << "done." << endl;
-        delete plName;
-        plName = nullptr;
+        fprintf(f1, "\n");
     }
+    fclose(f1);
+    f1 = nullptr;
+    cout << "done" << endl;
+    delete epName;
+    epName = nullptr;
+
+    const char* appendPosLog = "_posLog.csv";
+    char* plName = newChars(nameLen + strlen(appendPosLog) + 1);
+    sprintf(plName, "%s%s", outputFile.c_str(), appendPosLog);
+    cout << "Record 1D positions over time, without dimension-name in " << plName << "  ...  " << flush;
+    FILE* f2 = fopen(plName, "w");
+    fprintf(f2,"%s\n",headLine);
+    for (unsigned int i = 0; i < numAct; i++) {
+        fprintf(f2, "%s", actrs[i]->name.c_str());
+        for (unsigned int k = 0; k<numDim; k++) {
+          for (unsigned int t = 0; t < history.size(); t++) {
+              auto st = history[t];
+              auto pit = st->pstns[i];
+              auto vpit = (const VctrPstn*)pit;
+              assert(numDim == vpit->numR());
+              fprintf(f2, ",%5.2f", 100 * (*vpit)(k, 0)); // have to print "100.0" sometimes
+          }
+        }
+        fprintf(f2, "\n");
+    }
+    fclose(f2);
+    f2 = nullptr;
+    cout << "done." << endl;
+    delete plName;
+    plName = nullptr;
+    delete headLine;
+    headLine = nullptr;
+
     return;
 }
 
@@ -1141,7 +1165,7 @@ void SMPModel::displayModelParams(SMPModel *md0)
 }
 
 string SMPModel::runModel(vector<bool> sqlFlags, string dbFilePath,
-    string inputDataFile, uint64_t seed, vector<int> modelParams) {
+    string inputDataFile, uint64_t seed, bool saveHist, vector<int> modelParams) {
     SMPModel::setDBPath(dbFilePath);
     if (md0 != nullptr) {
         delete md0;
@@ -1153,6 +1177,7 @@ string SMPModel::runModel(vector<bool> sqlFlags, string dbFilePath,
     assert(dotPos != string::npos); // A file name without extension
 
     string fileExt = inputDataFile.substr(dotPos+1);
+    string fileName= inputDataFile.substr(0,dotPos);
 
     // convert to all lower case for easy comparison
     std::transform(fileExt.begin(), fileExt.end(), fileExt.begin(), ::tolower);
@@ -1182,6 +1207,10 @@ string SMPModel::runModel(vector<bool> sqlFlags, string dbFilePath,
     displayModelParams(md0);
     configExec(md0);
     md0->releaseDB();
+    if (saveHist)
+    {
+      md0->sankeyOutput(fileName);
+    }
     return md0->getScenarioID();
 }
 

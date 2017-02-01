@@ -134,7 +134,7 @@ void Model::setSeed(uint64_t seed) {
     rng->setSeed(rngSeed);
 }
 
-uint64_t Model::getSeed() {
+uint64_t Model::getSeed() const {
     return rngSeed;
 }
 
