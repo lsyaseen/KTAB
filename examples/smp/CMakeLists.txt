@@ -196,9 +196,9 @@ if(ENABLE_QT_GUI)
     Qt5::PrintSupport)
 
   # WIN32 to suppress the console window under Windows
-  add_executable(smpq WIN32 ${QtProjectBin_src} ${QtProjectLib_qrc_rcc})
+  add_executable(KTAB_SMP WIN32 ${QtProjectBin_src} ${QtProjectLib_qrc_rcc})
 
-  target_link_libraries (smpq 
+  target_link_libraries (KTAB_SMP
     QtProjectLib 
     smp 
     ${KMODEL_LIBRARY} 

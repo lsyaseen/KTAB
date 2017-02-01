@@ -36,7 +36,7 @@ MainWindow::MainWindow()
     createBarPlotsDockWindows();
     createQuadMapDockWindows();
 
-    setWindowTitle(tr("KTAB"));
+    setWindowTitle(tr("KTAB: Spatial Model of Politics (SMP)"));
 
     //CSV class obj
     csvObj = new CSV;
@@ -166,6 +166,10 @@ void MainWindow::csvGetFilePAth(bool bl)
     //emit path to csv class for processing
     if(!csvFilePth.isEmpty())
     {
+        lineGraphDock->setVisible(false);
+        barGraphDock->setVisible(false);
+        quadMapDock->setVisible(false);
+
         modeltoCSV->clear();
         emit csvFilePath(csvFilePth);
 
@@ -195,6 +199,9 @@ void MainWindow::dbGetFilePAth(bool bl, QString smpDBPath, bool run)
     //emit path to db class for processing
     if(!dbPath.isEmpty())
     {
+        lineGraphDock->setVisible(true);
+        barGraphDock->setVisible(true);
+
         lineGraphDock->setEnabled(true);
         barGraphDock->setEnabled(true);
 
@@ -229,6 +236,10 @@ void MainWindow::dbEditGetFilePAth(bool bl)
     }
     else
     {
+        lineGraphDock->setVisible(false);
+        barGraphDock->setVisible(false);
+        quadMapDock->setVisible(false);
+
         emit getActorsDesc();
         emit getInfluence(0);
 
@@ -302,7 +313,7 @@ void MainWindow::sliderStateValueToQryDB(int value)
         emit getScenarioRunValues(value,scenarioBox,dimension);
 
         lineGraphTitle->setText(QString(lineGraphDimensionComboBox->currentText()
-                                        + " vs Time, Iteration " +
+                                        + ", Turn " +
                                         QString::number(value)));
         lineCustomGraph->yAxis->setLabel(lineGraphDimensionComboBox->currentText());
         lineCustomGraph->replot();
@@ -589,6 +600,8 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model, QStringList scenario
     turnSlider->setVisible(false);
     scenarioDescriptionLineEdit->setVisible(true);
     scenarioDescriptionLineEdit->setEnabled(true);
+    scenarioComboBox->lineEdit()->setPlaceholderText("Dataset/Scenario name");
+    scenarioDescriptionLineEdit->setPlaceholderText("Dataset/Scenario Description");
 
     actorsLineEdit->setEnabled(true);
     dimensionsLineEdit->setEnabled(true);
@@ -606,6 +619,7 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model, QStringList scenario
     csvTableView->showMaximized();
     csvTableView->resizeColumnsToContents();
     csvTableView->resizeColumnToContents(1);
+    csvTableView->setWordWrap(true);
 
     //    csv_tableView->setAlternatingRowColors(true);
     //    csv_tableView->resizeRowsToContents();
@@ -651,14 +665,13 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model, QStringList scenario
         //        qDebug()<<rowCount <<"rowcount" << csvAffinityModel->rowCount();
         for(int rows = rowCount; rows < csvAffinityModel->rowCount();++ rows)
         {
-            actorHeader=modeltoCSV->item(rows,0)->text();
+            actorHeader=modeltoCSV->item(rows,0)->text().trimmed();
             csvAffinityModel->setHorizontalHeaderItem(rows, new QStandardItem(actorHeader));
             csvAffinityModel->setVerticalHeaderItem(rows, new QStandardItem(actorHeader));
             initializeAffinityMatrixRowCol(rows,"CSV");
             actorHeader.clear();
         }
     }
-
 
     csvTableAffinityView->setContextMenuPolicy(Qt::CustomContextMenu);
     //    connect(csvTableAffinityView, SIGNAL(customContextMenuRequested(QPoint)),
@@ -732,8 +745,8 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
         scenarioDescriptionLineEdit->setEnabled(true);
         turnSlider->setVisible(false);
         scenarioDescriptionLineEdit->setVisible(true);
-        scenarioComboBox->lineEdit()->setPlaceholderText("Enter Scenario...");
-        scenarioDescriptionLineEdit->setPlaceholderText("Enter Scenario Description here ... ");
+        scenarioComboBox->lineEdit()->setPlaceholderText("Dataset/Scenario name ");
+        scenarioDescriptionLineEdit->setPlaceholderText("Dataset/Scenario Description ");
 
         csvTableWidget->resizeColumnsToContents();
 
@@ -757,8 +770,8 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
             QString heading = dimensionList.at(k);
             heading = checkForHeaderString(heading);
 
-            csvTableWidget->setHorizontalHeaderItem(i ,new QTableWidgetItem(heading +" Position"));
-            csvTableWidget->setHorizontalHeaderItem(i+1,new QTableWidgetItem(heading +" Salience"));
+            csvTableWidget->setHorizontalHeaderItem(i ,new QTableWidgetItem(heading +" \n Position"));
+            csvTableWidget->setHorizontalHeaderItem(i+1,new QTableWidgetItem(heading +" \n Salience"));
             ++k;
         }
         //Updating values
@@ -767,28 +780,28 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
             int col=0;
             csvTableWidget->setItem(row,col,new QTableWidgetItem(actorsName.at(row)));
             csvTableWidget->setItem(row,++col,new QTableWidgetItem(actorsDescription.at(row)));
-            csvTableWidget->setItem(row,++col,new QTableWidgetItem(actorsInfl.at(row)));
+            csvTableWidget->setItem(row,++col,new QTableWidgetItem(QString::number(actorsInfl.at(row).toDouble(),'f',1)));
 
             if(dimensionsLineEdit->text().toInt()>=1)
             {
                 csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsPos[0].at(row).toDouble())*100)));
+                                        new QTableWidgetItem(QString::number((actorsPos[0].at(row).toDouble())*100,'f',1)));
                 csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsSal[0].at(row).toDouble())*100)));
+                                        new QTableWidgetItem(QString::number((actorsSal[0].at(row).toDouble())*100,'f',1)));
             }
             if(dimensionsLineEdit->text().toInt()>=2)
             {
                 csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsPos[1].at(row).toDouble())*100)));
+                                        new QTableWidgetItem(QString::number((actorsPos[1].at(row).toDouble())*100,'f',1)));
                 csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsSal[1].at(row).toDouble())*100)));
+                                        new QTableWidgetItem(QString::number((actorsSal[1].at(row).toDouble())*100,'f',1)));
             }
             if(dimensionsLineEdit->text().toInt()==3)
             {
                 csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsPos[2].at(row).toDouble())*100)));
+                                        new QTableWidgetItem(QString::number((actorsPos[2].at(row).toDouble())*100,'f',1)));
                 csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsSal[2].at(row).toDouble())*100)));
+                                        new QTableWidgetItem(QString::number((actorsSal[2].at(row).toDouble())*100,'f',1)));
             }
         }
         //Affinity Matrix
@@ -889,6 +902,7 @@ void MainWindow::setDBItemModel(QStandardItemModel *model)
 
     csvTableView->resizeColumnsToContents();
     csvTableView->hideColumn(0);
+    csvTableView->setWordWrap(true);
 
     //Enable run button, which is disabled by default
     runButton->setEnabled(false);
@@ -912,8 +926,8 @@ void MainWindow::setDBItemModel(QStandardItemModel *model)
         QString heading = dimensionList.at(k);
         heading = checkForHeaderString(heading);
 
-        modeltoDB->setHeaderData(i,Qt::Horizontal ,( heading +" Position" ));
-        modeltoDB->setHeaderData(i+1,Qt::Horizontal,( heading +" Salience" ));
+        modeltoDB->setHeaderData(i,Qt::Horizontal ,( heading +" \n Position" ));
+        modeltoDB->setHeaderData(i+1,Qt::Horizontal,( heading +" \n Salience" ));
         ++k;
     }
     //to create csv like view
@@ -960,6 +974,10 @@ void MainWindow::createNewSMPData(bool bl)
 
     clearAllGraphs();
     plotQuadMap->setEnabled(false);
+    lineGraphDock->setVisible(false);
+    barGraphDock->setVisible(false);
+    quadMapDock->setVisible(false);
+
     removeAllScatterPoints();
     seedRand->clear();
 
@@ -1001,8 +1019,8 @@ void MainWindow::createNewSMPData(bool bl)
     turnSlider->setVisible(false);
     scenarioDescriptionLineEdit->setVisible(true);
     scenarioDescriptionLineEdit->setEnabled(true);
-    scenarioComboBox->lineEdit()->setPlaceholderText("Enter Scenario...");
-    scenarioDescriptionLineEdit->setPlaceholderText("Enter Scenario Description here ... ");
+    scenarioComboBox->lineEdit()->setPlaceholderText("Dataset/Scenario name");
+    scenarioDescriptionLineEdit->setPlaceholderText("Dataset/Scenario Description");
 
     turnSlider->hide();
     tableControlsFrame->show();
@@ -1011,8 +1029,7 @@ void MainWindow::createNewSMPData(bool bl)
     //        csv_tableWidget->removeColumn(i);
 
     csvTableWidget->setShowGrid(true);
-
-    csvTableWidget->resizeColumnsToContents();
+    csvTableWidget->setWordWrap(true);
 
     //csv_tableWidget->setHorizontalHeaderLabels(QString("HEADER;HEADER;HEADER;HEADER;HEADER").split(";"));
 
@@ -1026,8 +1043,6 @@ void MainWindow::createNewSMPData(bool bl)
 
     actorsLineEdit->setText(QString::number(3));
     dimensionsLineEdit->setText(QString::number(1));
-
-    //   csv_tableWidget->horizontalHeader()->hide();
 
     insertNewRowCSV();
 
@@ -1060,7 +1075,13 @@ void MainWindow::createNewSMPData(bool bl)
 
 void MainWindow::initializeCentralViewFrame()
 {
+    QGroupBox * centralBox = new QGroupBox("Input Data");
     central = new QFrame;
+
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->addWidget(central);
+    centralBox->setLayout(vbox);
+
     central->setFrameShape(QFrame::StyledPanel);
 
     gLayout = new QGridLayout;
@@ -1120,7 +1141,7 @@ void MainWindow::initializeCentralViewFrame()
     donePushButton->setFixedWidth(130);
     gCLayout->addWidget(donePushButton,1,2);
 
-    setCentralWidget(central);
+    setCentralWidget(centralBox);
 
     modeltoCSV = new QStandardItemModel;
     modeltoDB = new QStandardItemModel;
@@ -1170,7 +1191,20 @@ void MainWindow::initializeCentralViewFrame()
 void MainWindow::about()
 {
     QMessageBox::about(this, tr("About SMP "),
-                       tr("SMP !! "));
+                       tr("KTAB is an open-source toolkit for assembling models that allow "
+                          "systematic and rigorous analysis of Collective Decision-Making "
+                          "Processes (CDMPs).  KTAB is intended to be a platform that contains "
+                          "a number of models that can simulate CDMPs.  The initial model that "
+                          "has been instantiated in KTAB is called the Spatial Model of Politics(SMP)."
+                          "\n \n"
+                          "More information can be found at http://kapsarc.github.io/KTAB/"
+                          "\n \n"
+                          "Copyright © KAPSARC"
+                          "\n \n"
+                          "KTAB is released as open source software under the terms of the MIT License (Expat)"
+                          "\n \n"
+                          "Please email comments, bug reports, and any feedback to ktab@kapsarc.org"));
+
 }
 
 void MainWindow::createActions()
@@ -1303,7 +1337,7 @@ void MainWindow::createLinePlotsDockWindows()
     viewMenu->addAction(lineGraphDock->toggleViewAction());
 
     connect(lineGraphDock,SIGNAL(dockLocationChanged(Qt::DockWidgetArea)),this,SLOT(dockWindowChanged()));
-    lineGraphDock->setVisible(true);
+    lineGraphDock->setVisible(false);
 }
 
 void MainWindow::createBarPlotsDockWindows()
@@ -1320,7 +1354,7 @@ void MainWindow::createBarPlotsDockWindows()
     viewMenu->addAction(barGraphDock->toggleViewAction());
 
     connect(barGraphDock,SIGNAL(dockLocationChanged(Qt::DockWidgetArea)),this,SLOT(dockWindowChanged()));
-    barGraphDock->setVisible(true);
+    barGraphDock->setVisible(false);
 }
 
 void MainWindow::createQuadMapDockWindows()
@@ -1378,7 +1412,7 @@ void MainWindow::saveTableViewToCSV()
             //Appending a header
             for( int col = 0; col < modeltoCSV->columnCount(); ++col )
             {
-                strList <<modeltoCSV->horizontalHeaderItem(col)->data(Qt::DisplayRole).toString();
+                strList <<modeltoCSV->horizontalHeaderItem(col)->data(Qt::DisplayRole).toString().remove("\n");
             }
             data << strList.join(",") << "," <<"\n";
 
@@ -1454,7 +1488,7 @@ void MainWindow::saveTableWidgetToCSV(bool bl)
             //Appending a header
             for( int col = 0; col < csvTableWidget->columnCount(); ++col )
             {
-                strList << csvTableWidget->horizontalHeaderItem(col)->data(Qt::DisplayRole).toString();
+                strList << csvTableWidget->horizontalHeaderItem(col)->data(Qt::DisplayRole).toString().remove("\n");
             }
             data << strList.join(",") << "," <<"\n";
 
@@ -1580,13 +1614,13 @@ int MainWindow::validateControlButtons(QString viewName)
     if(0==scenarioComboBox->count() && true==scenarioComboBox->lineEdit()->text().isEmpty())
     {
         ++ret;
-        displayMessage("Scenario", "Enter Scenario name");
+        displayMessage("Dataset/Scenario", "Enter Dataset/Scenario name");
     }
 
     if(true==scenarioDescriptionLineEdit->text().isEmpty())
     {
         ++ret;
-        displayMessage("Scenario Description", "Enter Scenario Description");
+        displayMessage("Dataset/Scenario Description", "Enter Dataset/Scenario Description");
     }
 
     if("csv_tableWidget"==viewName)
@@ -1785,22 +1819,29 @@ void MainWindow::updateDBViewColumns()
         {
             modeltoDB->setItem(row,col,new QStandardItem(actorsName.at(row)));
             modeltoDB->setItem(row,++col,new QStandardItem(actorsDescription.at(row)));
-            modeltoDB->setItem(row,++col,new QStandardItem(actorsInfl.at(row)));
+            modeltoDB->setItem(row,++col,new QStandardItem(
+                                   QString::number(actorsInfl.at(row).toDouble(),'f',1)));
 
             if(dimensionsLineEdit->text().toInt()>=1)
             {
-                modeltoDB->setItem(row,++col,new QStandardItem(actorsPos[0].at(row)));
-                modeltoDB->setItem(row,++col,new QStandardItem(actorsSal[0].at(row)));
+                modeltoDB->setItem(row,++col,new QStandardItem(
+                                       QString::number(actorsPos[0].at(row).toDouble(),'f',1)));
+                modeltoDB->setItem(row,++col,new QStandardItem(
+                                       QString::number(actorsSal[0].at(row).toDouble(),'f',1)));
             }
             if(dimensionsLineEdit->text().toInt()>=2)
             {
-                modeltoDB->setItem(row,++col,new QStandardItem(actorsPos[1].at(row)));
-                modeltoDB->setItem(row,++col,new QStandardItem(actorsSal[1].at(row)));
+                modeltoDB->setItem(row,++col,new QStandardItem(
+                                       QString::number(actorsPos[1].at(row).toDouble(),'f',1)));
+                modeltoDB->setItem(row,++col,new QStandardItem(
+                                       QString::number(actorsSal[1].at(row).toDouble(),'f',1)));
             }
             if(dimensionsLineEdit->text().toInt()==3)
             {
-                modeltoDB->setItem(row,++col,new QStandardItem(actorsPos[2].at(row)));
-                modeltoDB->setItem(row,++col,new QStandardItem(actorsSal[2].at(row)));
+                modeltoDB->setItem(row,++col,new QStandardItem(
+                                       QString::number(actorsPos[2].at(row).toDouble(),'f',1)));
+                modeltoDB->setItem(row,++col,new QStandardItem(
+                                       QString::number(actorsSal[2].at(row).toDouble(),'f',1)));
             }
         }
     }
@@ -1863,12 +1904,39 @@ void MainWindow::displayMenuTableWidget(QPoint pos)
                 if(csvTableWidget->currentColumn()%2!=0)
                 {
                     if(!(text.contains("Position") || text.contains("position")))
-                        text = "Position";
+                    {
+                        if(!text.contains("\n"))
+                            text = text.append(" \n Position");
+                        else
+                            text = text.append(" Position");
+                    }
+                    else
+                    {
+                        QString header = text;
+                        header.remove("Position").remove("position");
+                        header.remove("\n");
+                        header.append("\n Position");
+                        text = header;
+                    }
+
                 }
                 else
                 {
-                    if(!(text.contains("Salience")|| text.contains("salience")))
-                        text = "Salience";
+                    if(!(text.contains("Salience") || text.contains("salience")))
+                         {
+                            if(!text.contains("\n"))
+                                text = text.append(" \n Salience");
+                            else
+                                text = text.append(" Salience");
+                        }
+                    else
+                    {
+                        QString header = text;
+                        header.remove("Salience").remove("salience");
+                        header.remove("\n");
+                        header.append("\n Salience");
+                        text = header;
+                    }
                 }
                 csvTableWidget->setHorizontalHeaderItem(csvTableWidget->currentColumn(),new QTableWidgetItem(text));
                 statusBar()->showMessage("Header changed");
@@ -1980,13 +2048,39 @@ void MainWindow::displayMenuTableView(QPoint pos)
                 if(csvTableView->currentIndex().column()%2!=0)
                 {
                     if(!(text.contains("Position") || text.contains("position")))
-                        text = "Position";
-                }
+                    {
+                        if(!text.contains("\n"))
+                            text = text.append(" \n Position");
+                        else
+                            text = text.append(" Position");
+                    }
+                    else
+                    {
+                        QString header = text;
+                        header.remove("Position").remove("position");
+                        header.remove("\n");
+                        header.append("\n Position");
+                        text = header;
+                    }
+                 }
                 else
                 {
                     if(!(text.contains("Salience")|| text.contains("salience")))
-                        text = "Salience";
-                }
+                    {
+                        if(!text.contains("\n"))
+                            text = text.append(" \n Salience");
+                        else
+                            text = text.append(" Salience");
+                    }
+                    else
+                    {
+                        QString header = text;
+                        header.remove("Salience").remove("salience");
+                        header.remove("\n");
+                        header.append("\n Salience");
+                        text = header;
+                    }
+                 }
                 modeltoCSV->setHeaderData(csvTableView->currentIndex().column(),Qt::Horizontal,text);
                 statusBar()->showMessage("Header changed");
             }

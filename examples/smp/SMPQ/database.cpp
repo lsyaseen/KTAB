@@ -498,7 +498,7 @@ void Database::getScenarioList(bool run)
         getModelParameters();
     }
     else
-        Message("Database","there are no Scenario's");
+        Message("Database","there is no Dataset/Scenario's");
 
 }
 

@@ -59,6 +59,10 @@ void MainWindow::importXmlGetFilePath(bool bl)
 
     if(!filename.isEmpty())
     {
+        lineGraphDock->setVisible(false);
+        barGraphDock->setVisible(false);
+        quadMapDock->setVisible(false);
+
         xmlPath=filename;
         emit openXMLFile(filename);
     }
@@ -135,8 +139,8 @@ void MainWindow::populateXmlTable(QStandardItemModel *actorsVal)
     int dim=0;
     for(int col = 3 ; col <xmlSmpDataModel->columnCount(); col+=2)
     {
-        QString pos(" Position ");
-        QString sal(" Salience ");
+        QString pos(" \n Position ");
+        QString sal(" \n Salience ");
 
         pos.prepend(dimensionsXml.at(dim));
         sal.prepend(dimensionsXml.at(dim));
@@ -148,6 +152,8 @@ void MainWindow::populateXmlTable(QStandardItemModel *actorsVal)
 
     actorsLineEdit->setText(QString::number(xmlSmpDataModel->rowCount()));
     actorsLineEdit->setEnabled(true);
+    scenarioComboBox->lineEdit()->setPlaceholderText("Dataset/Scenario name");
+    scenarioDescriptionLineEdit->setPlaceholderText("Dataset/Scenario Description");
     xmlImportDataTableView->setModel(xmlSmpDataModel);
     xmlImportDataTableView->showMaximized();
     xmlImportDataTableView->resizeColumnsToContents();
@@ -429,12 +435,37 @@ void MainWindow::displayMenuXmlTableView(QPoint pos)
                 if(xmlImportDataTableView->currentIndex().column()%2!=0)
                 {
                     if(!(text.contains("Position") || text.contains("position")))
-                        text = "Position";
+                    {
+                        if(!text.contains("\n"))
+                            text = text.append("\n Position");
+                        else
+                            text = text.append(" Position");
+                    }
+                    else
+                    {   QString header = text;
+                        header.remove("Position").remove("position");
+                        header.remove("\n");
+                        header.append("\n Position");
+                        text = header;
+                    }
                 }
                 else
                 {
                     if(!(text.contains("Salience")|| text.contains("salience")))
-                        text = "Salience";
+                    {
+                        if(!text.contains("\n"))
+                            text = text.append("\n Salience");
+                        else
+                            text = text.append(" Salience");
+                    }
+                    else
+                    {
+                        QString header = text;
+                        header.remove("Salience").remove("salience");
+                        header.remove("\n");
+                        header.append("\n Salience");
+                        text = header;
+                    }
                 }
                 xmlSmpDataModel->setHeaderData(xmlImportDataTableView->currentIndex().column(),Qt::Horizontal,text);
                 statusBar()->showMessage("Header changed");

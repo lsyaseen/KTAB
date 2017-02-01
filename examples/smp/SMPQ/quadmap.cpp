@@ -116,13 +116,14 @@ void MainWindow::initializeQuadMapPlot()
     quadMapCustomGraph->xAxis->setSubTickCount(0);
     quadMapCustomGraph->xAxis->setTickLength(0,0.1);
     quadMapCustomGraph->xAxis->grid()->setVisible(true);
+    quadMapCustomGraph->xAxis->setLabel("E[ΔU] to Receiver");
 
     quadMapCustomGraph->yAxis->setAutoTicks(true);
     quadMapCustomGraph->yAxis->setAutoTickLabels(true);
 
     quadMapCustomGraph->yAxis->setRange(-1, 1);
     quadMapCustomGraph->yAxis->setPadding(0); // a bit more space to the left border
-    quadMapCustomGraph->yAxis->setLabel(" ");
+    quadMapCustomGraph->yAxis->setLabel("E[ΔU] to Initiator");
     quadMapCustomGraph->yAxis->grid()->setSubGridVisible(false);
 
     connect(quadMapCustomGraph->xAxis, SIGNAL(rangeChanged(QCPRange,QCPRange)), this, SLOT(xAxisRangeChangedQuad(QCPRange,QCPRange)));
@@ -752,7 +753,7 @@ void MainWindow::quadMapPlotPoints(bool status)
         plotQuadMap->setEnabled(false);
         removeAllScatterPoints();
         getUtilChlgHorizontalVerticalAxisData(turnSlider->value());
-        quadMapTitle->setText(QString("Expected Utility Quad Map for Actor %1, Iteration "
+        quadMapTitle->setText(QString(" E[ΔU] Quad Map for Actor %1, Turn "
                                       +QString::number(turnSlider->value())).arg(actorsName.at(initiatorTip)));
         quadMapCustomGraph->replot();
         if(true==autoScale->isChecked())

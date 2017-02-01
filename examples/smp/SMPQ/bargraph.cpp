@@ -118,13 +118,15 @@ void MainWindow::initializeBarGraphPlot()
     barCustomGraph->xAxis->setSubTickCount(0);
     barCustomGraph->xAxis->setTickLength(0,5);
     barCustomGraph->xAxis->grid()->setVisible(true);
+    barCustomGraph->setMinimumWidth(250);
+    barCustomGraph->xAxis->setLabel("Position");
 
     barCustomGraph->yAxis->setAutoTicks(true);
     barCustomGraph->yAxis->setAutoTickLabels(true);
 
     barCustomGraph->yAxis->setRange(0, 100);
     barCustomGraph->yAxis->setPadding(5); // a bit more space to the left border
-    barCustomGraph->yAxis->setLabel(" ");
+    barCustomGraph->yAxis->setLabel("Strength");
     barCustomGraph->yAxis->grid()->setSubGridVisible(false);
 
     connect( barCustomGraph->xAxis, SIGNAL(rangeChanged(QCPRange,QCPRange)), this, SLOT(xAxisRangeChanged(QCPRange,QCPRange)) );
@@ -249,7 +251,8 @@ void MainWindow::populateBarGraphDimensions(int dim)
     barGraphDimensionComboBox->addItem(" ");
     for(int dims = 0; dims < dimensionList.length(); ++ dims )
     {
-        barGraphDimensionComboBox->addItem(dimensionList.at(dims));
+        QString dim = dimensionList.at(dims);
+        barGraphDimensionComboBox->addItem(dim.remove("\n"));
     }
     connect(barGraphDimensionComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(barGraphDimensionChanged(int)));
     barGraphDimensionComboBox->removeItem(0);
@@ -374,7 +377,7 @@ void MainWindow::barGraphDimensionChanged(int value)
 {
     dimension=value;
     lineGraphDimensionComboBox->setCurrentIndex(value);
-    barGraphTitle->setText(QString(barGraphDimensionComboBox->currentText() +" Iteration " +QString::number(barGraphTurnSlider->value())));
+    barGraphTitle->setText(QString(barGraphDimensionComboBox->currentText() +", Turn " +QString::number(barGraphTurnSlider->value())));
     getActorsInRange(dimension);
     barCustomGraph->xAxis->setRange(0,110);
     barCustomGraph->yAxis->setRange(0,yAxisLen+20);
@@ -384,7 +387,7 @@ void MainWindow::barGraphDimensionChanged(int value)
 
 void MainWindow::barGraphTurnSliderChanged(int value)
 {
-    barGraphTitle->setText(QString(barGraphDimensionComboBox->currentText() +" Iteration " +QString::number(value)));
+    barGraphTitle->setText(QString(barGraphDimensionComboBox->currentText() +", Turn " +QString::number(value)));
     getActorsInRange(dimension);
     barCustomGraph->xAxis->setRange(0,110);
     barCustomGraph->yAxis->setRange(0,yAxisLen+20);

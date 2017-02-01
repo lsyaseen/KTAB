@@ -60,13 +60,35 @@ void CSV::readCSVFile(QString path)
                     // load parsed data to model accordingly
                     for (int j = 0; j < lineToken.size(); j++)
                     {
-                        QString value = lineToken.at(j);
-                        QStandardItem *item = new QStandardItem(value.trimmed());
-                        model->setItem(rowindex-2, j, item);
+                        if(j > 1)
+                        {
+                            QString value = lineToken.at(j);
+                            value = QString::number(value.toFloat(),'f',1);
+                            QStandardItem *item = new QStandardItem(value.trimmed());
+                            model->setItem(rowindex-2, j, item);
+                        }
+                        else
+                        {
+                            QString value = lineToken.at(j);
+                            QStandardItem *item = new QStandardItem(value.trimmed());
+                            model->setItem(rowindex-2, j, item);
+                        }
                     }
                 }
                 else if(rowindex == 1)
                 {
+                    for(int i=3; i< lineToken.length(); ++i)
+                    {
+                        QString header = lineToken.at(i);
+                        QStringList headerList = header.split(" ");
+                        if(headerList.length()>1)
+                        {
+                            header = headerList.at(0);
+                            header.append(" \n").append(headerList.at(1));
+                            lineToken[i]=header;
+                        }
+                    }
+
                     model->setHorizontalHeaderLabels(lineToken);
                 }
                 else if(rowindex == 0)

@@ -119,7 +119,7 @@ void MainWindow::initializeLineGraphPlot()
     lineCustomGraph->plotLayout()->insertRow(0);
     lineCustomGraph->plotLayout()->addElement(0, 0,lineGraphTitle);
 
-    lineCustomGraph->xAxis->setLabel("Time");
+    lineCustomGraph->xAxis->setLabel("Turn");
     lineCustomGraph->yAxis->setLabel(" ");
     lineCustomGraph->legend->setVisible(false);
 
@@ -137,7 +137,7 @@ void MainWindow::initializeLineGraphPlot()
     }
     lineCustomGraph->xAxis->setTickVector(xAxisTicks);
     lineCustomGraph->xAxis->setTickVectorLabels(xAxisLabels);
-    lineCustomGraph->xAxis->setRange(-1,2);
+    lineCustomGraph->xAxis->setRange(-1,1);
 
     QVector<double> yAxisTicks;
     QVector<QString> yAxisLabels;
@@ -153,6 +153,7 @@ void MainWindow::initializeLineGraphPlot()
     lineCustomGraph->yAxis->setTickVector(yAxisTicks);
     lineCustomGraph->yAxis->setTickVectorLabels(yAxisLabels);
     lineCustomGraph->yAxis->setRange(0,100);
+    lineCustomGraph->setMinimumWidth(250);
 
     lineCustomGraph->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
@@ -235,7 +236,8 @@ void MainWindow::populateLineGraphDimensions(int dim)
     lineGraphDimensionComboBox->addItem(" ");
     for(int dims = 0; dims < dimensionList.length(); ++ dims )
     {
-        lineGraphDimensionComboBox->addItem(dimensionList.at(dims));
+        QString dim = dimensionList.at(dims);
+        lineGraphDimensionComboBox->addItem(dim.remove("\n"));
     }
     connect(lineGraphDimensionComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(lineGraphDimensionChanged(int)));
     lineGraphDimensionComboBox->removeItem(0);
@@ -363,7 +365,7 @@ void MainWindow::lineGraphDimensionChanged(int value)
     barGraphDimensionComboBox->setCurrentIndex(value);
 
     lineGraphTitle->setText(QString(lineGraphDimensionComboBox->currentText()
-                                    + " vs Time, Iteration " +
+                                    + ", Turn " +
                                     QString::number(lineGraphTurnSlider->value())));
     lineCustomGraph->yAxis->setLabel(lineGraphDimensionComboBox->currentText());
 
@@ -375,7 +377,7 @@ void MainWindow::lineGraphDimensionChanged(int value)
 void MainWindow::lineGraphTurnSliderChanged(int value)
 {
     //    lineGraphTitle->setText(QString(lineGraphDimensionComboBox->currentText()
-    //                                    + " vs Time, Iteration " +
+    //                                    + ", Turn " +
     //                                    QString::number(value)));
     //    lineCustomGraph->yAxis->setLabel(lineGraphDimensionComboBox->currentText());
 
