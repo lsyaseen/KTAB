@@ -308,20 +308,20 @@ SMPState* SMPState::doBCN() const {
       showOneBargain(brgnIIJ);
       printf(" from %2u's perspective (brgnIIJ) \n", i);
       printf("  %2u proposes %2u adopt: ", i, i);
-      KBase::trans(brgnIIJ->posInit).mPrintf(" %.3f ");
+      (KBase::trans(brgnIIJ->posInit) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
 
 
       printf("  %2u proposes %2u adopt: ", i, j);
-      KBase::trans(brgnIIJ->posRcvr).mPrintf(" %.3f ");
+      (KBase::trans(brgnIIJ->posRcvr) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
       printf("\n");
       printf("Bargain  ");
       showOneBargain(brgnJIJ);
       printf(" from %2u's perspective (brgnJIJ) \n", j);
       printf("  %2u proposes %2u adopt: ", j, i);
 
-      KBase::trans(brgnJIJ->posInit).mPrintf(" %.3f ");
+      (KBase::trans(brgnJIJ->posInit) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
       printf("  %2u proposes %2u adopt: ", j, j);
-      KBase::trans(brgnJIJ->posRcvr).mPrintf(" %.3f ");
+      (KBase::trans(brgnJIJ->posRcvr) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
       //Brgn table base entries
 
 
@@ -330,9 +330,9 @@ SMPState* SMPState::doBCN() const {
       showOneBargain(brgnIJ);
       printf(" bargain (brgnIJ) \n");
       printf("  compromise proposes %2u adopt: ", i);
-      KBase::trans(brgnIJ->posInit).mPrintf(" %.3f ");
+      (KBase::trans(brgnIJ->posInit) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
       printf("  compromise proposes %2u adopt: ", j);
-      KBase::trans(brgnIJ->posRcvr).mPrintf(" %.3f ");
+      (KBase::trans(brgnIJ->posRcvr) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
       printf("\n");
 
 

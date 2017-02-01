@@ -785,23 +785,23 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
             if(dimensionsLineEdit->text().toInt()>=1)
             {
                 csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsPos[0].at(row).toDouble())*100,'f',1)));
+                                        new QTableWidgetItem(QString::number((actorsPos[0].at(row).toDouble()),'f',1)));
                 csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsSal[0].at(row).toDouble())*100,'f',1)));
+                                        new QTableWidgetItem(QString::number((actorsSal[0].at(row).toDouble()),'f',1)));
             }
             if(dimensionsLineEdit->text().toInt()>=2)
             {
                 csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsPos[1].at(row).toDouble())*100,'f',1)));
+                                        new QTableWidgetItem(QString::number((actorsPos[1].at(row).toDouble()),'f',1)));
                 csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsSal[1].at(row).toDouble())*100,'f',1)));
+                                        new QTableWidgetItem(QString::number((actorsSal[1].at(row).toDouble()),'f',1)));
             }
             if(dimensionsLineEdit->text().toInt()==3)
             {
                 csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsPos[2].at(row).toDouble())*100,'f',1)));
+                                        new QTableWidgetItem(QString::number((actorsPos[2].at(row).toDouble()),'f',1)));
                 csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsSal[2].at(row).toDouble())*100,'f',1)));
+                                        new QTableWidgetItem(QString::number((actorsSal[2].at(row).toDouble()),'f',1)));
             }
         }
         //Affinity Matrix

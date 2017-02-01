@@ -418,7 +418,7 @@ void MainWindow::barGraphActorsSalienceCapability(QList<int> aId, QList<double> 
             double barHeight = 0;
 
             QList <QVector <double> > values ;
-            range<< ((r1+r2)/2) *100 ;
+            range<< ((r1+r2)/2);
 
             for (int stackedActorsInOneBar = 0 ; stackedActorsInOneBar < aId.length(); ++ stackedActorsInOneBar)
             {

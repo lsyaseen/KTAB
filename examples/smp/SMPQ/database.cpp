@@ -241,8 +241,8 @@ void Database::getAffinityDB()
 
 void Database::getActorsInRangeFromDB(double lowerRng, double higherRng, int dim, int turn)
 {
-    double lwr = lowerRng/100;
-    double upr = higherRng/100;
+    double lwr = lowerRng;
+    double upr = higherRng;
     actorIdsList.clear();
     actorSalienceList.clear();
     actorCapabilityList.clear();
@@ -360,7 +360,7 @@ void Database::getVectorPosition(int actor, int dim, int turn, QString scenario)
     while(qry.next())
     {
         x[i]=qry.value(1).toDouble();
-        y[i]=qry.value(4).toDouble()*100;// y scales from 0 to 100
+        y[i]=qry.value(4).toDouble();// y scales from 0 to 100
         ++i;
     }
 

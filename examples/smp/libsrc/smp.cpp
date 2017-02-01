@@ -701,13 +701,13 @@ double SMPState::posIdealDist(ReportingLevel rl) const {
 
         if (rl > ReportingLevel::Low) {
             printf("postn %2u, %2u ", i, t);
-            trans(pI).mPrintf(" %.4f ");
+            (trans(pI) * 100.0).mPrintf(" %.4f "); // print on the scale of [0,100]
             printf("ideal %2u, %2u ", i, t);
-            trans(iI).mPrintf(" %.4f ");
+            (trans(iI) * 100.0).mPrintf(" %.4f "); // print on the scale of [0,100]
         }
         double dI = KBase::norm(pI - iI);
         if (rl > ReportingLevel::Silent) {
-            printf("postn-ideal distance %2u, %2u: %.5f \n", i, t, dI);
+            printf("postn-ideal distance %2u, %2u: %.5f \n", i, t, dI * 100.0); // print on the scale of [0,100]
         }
         rmsDist = rmsDist + (dI*dI);
     }
@@ -1018,7 +1018,8 @@ void SMPModel::showVPHistory() const {
                     auto vidl = sst->getIdeal(i);
                     assert(1 == vpit->numC());
                     assert(numDim == vpit->numR());
-                    printf("%5.1f , ", 100 * (*vpit)(k, 0)); // have to print "100.0" sometimes
+                    const double pCoord = (*vpit)(k, 0) * 100.0; // Use the scale of [0,100]
+                    printf("%5.1f , ", pCoord); // have to print "100.0" sometimes
                     int rslt = 0;
                     rslt = sqlite3_bind_int(insStmt, 1, t);
                     assert(SQLITE_OK == rslt);
@@ -1026,10 +1027,9 @@ void SMPModel::showVPHistory() const {
                     assert(SQLITE_OK == rslt);
                     rslt = sqlite3_bind_int(insStmt, 3, k);
                     assert(SQLITE_OK == rslt);
-                    const double pCoord = (*vpit)(k, 0);
-                    rslt = sqlite3_bind_double(insStmt, 4, pCoord);
+                    rslt = sqlite3_bind_double(insStmt, 4, pCoord); // Log at the scale of [0,100]
                     assert(SQLITE_OK == rslt);
-                    const double iCoord = vidl(k, 0);
+                    const double iCoord = vidl(k, 0) * 100.0; // Log at the scale of [0,100];
                     rslt = sqlite3_bind_double(insStmt, 5, iCoord);
                     assert(SQLITE_OK == rslt);
                     rslt = sqlite3_step(insStmt);
@@ -1715,7 +1715,7 @@ void SMPModel::randomSMP(unsigned int numA, unsigned int sDim, bool accP, uint64
         cout << "voting rule: " << vrs << endl;
         cout << "Pos vector: ";
         VctrPstn * pi = ((VctrPstn*)(st0->pstns[i]));
-        trans(*pi).mPrintf(" %+7.4f ");
+        (trans(*pi) * 100.0).mPrintf(" %+7.4f "); // print on the scale of [0,100]
         cout << "Sal vector: ";
         trans(ai->vSal).mPrintf(" %+7.4f ");
         printf("Capability: %.3f \n", ai->sCap);
