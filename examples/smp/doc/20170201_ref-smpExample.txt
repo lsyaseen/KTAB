@@ -1,5 +1,5 @@
   Software version: smpc 0.1
-  Start time: Wed Jan 11 11:19:51 2017
+  Start time: Wed Feb  1 20:24:06 2017
 
 -----------------------------------
 Start SMPModel::readXML of ./doc/smpExample.xml
@@ -63,7 +63,7 @@ Reading IdealAdjustment matrix
   Carol (2) :   David  (3) = 0.130 
   David (3) :   David  (3) = 0.570 
 Found 6 iaPair
-End SMPModel::readXML of ./doc/smpExample.xml
+End SMPModel::readXML of /home/lyaseen/KTAB/KTAB_run/examples/smp/doc/smpExample.xml
 SQL Logging Flags
 Grp 0 = 1
 Grp 1 = 0
@@ -78,7 +78,7 @@ Successfully opened database #1
 
 
 Setting SMPModel parameters from XML scenario ...
-Using PRNG seed provided by xml file: 03507583219545544127 
+Using PRNG seed provided by the user: 03507583219545544127 
 Model Paramaters to run the model...
 VictoryProbModel:  Linear
 VotingRule:  PropCbc
@@ -166,17 +166,17 @@ Est by  0 of prob 0.5257 that [ 0> 4], with expected gain to  4 of -0.0311
 Est by  4 of prob 0.6967 that [ 0> 4], with expected gain to  0 of +0.0974 
 Est by  4 of prob 0.6967 that [ 0> 4], with expected gain to  4 of -0.1343 
 
-Bargain [1001, 0:4] from  0's perspective (brgnIIJ) 
-   0 proposes  0 adopt:  0.641  0.481  0.325 
-   0 proposes  4 adopt:  0.641  0.481  0.325 
+Bargain [2646, 0:4] from  0's perspective (brgnIIJ) 
+   0 proposes  0 adopt:  64.110  48.130  32.540 
+   0 proposes  4 adopt:  64.110  48.130  32.540 
 
-Bargain  [1002, 0:4] from  4's perspective (brgnJIJ) 
-   4 proposes  0 adopt:  0.731  0.608  0.264 
-   4 proposes  4 adopt:  0.731  0.608  0.264 
+Bargain  [2647, 0:4] from  4's perspective (brgnJIJ) 
+   4 proposes  0 adopt:  73.140  60.790  26.410 
+   4 proposes  4 adopt:  73.140  60.790  26.410 
 
-Power-weighted compromise  [1003, 0:4] bargain (brgnIJ) 
-  compromise proposes  0 adopt:  0.689  0.548  0.293 
-  compromise proposes  4 adopt:  0.689  0.548  0.293 
+Power-weighted compromise  [2648, 0:4] bargain (brgnIJ) 
+  compromise proposes  0 adopt:  68.855  54.782  29.319 
+  compromise proposes  4 adopt:  68.855  54.782  29.319 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 0 actor 1 has most advantageous target 2 worth 0.231
@@ -185,17 +185,17 @@ Est by  1 of prob 0.7180 that [ 1> 2], with expected gain to  2 of -0.2579
 Est by  2 of prob 0.7164 that [ 1> 2], with expected gain to  1 of +0.2399 
 Est by  2 of prob 0.7164 that [ 1> 2], with expected gain to  2 of -0.2666 
 
-Bargain [1005, 1:2] from  1's perspective (brgnIIJ) 
-   1 proposes  1 adopt:  0.235  0.638  0.701 
-   1 proposes  2 adopt:  0.235  0.638  0.701 
+Bargain [2650, 1:2] from  1's perspective (brgnIIJ) 
+   1 proposes  1 adopt:  23.480  63.810  70.130 
+   1 proposes  2 adopt:  23.480  63.810  70.130 
 
-Bargain  [1006, 1:2] from  2's perspective (brgnJIJ) 
-   2 proposes  1 adopt:  0.579  0.833  0.493 
-   2 proposes  2 adopt:  0.579  0.833  0.493 
+Bargain  [2651, 1:2] from  2's perspective (brgnJIJ) 
+   2 proposes  1 adopt:  57.900  83.320  49.290 
+   2 proposes  2 adopt:  57.900  83.320  49.290 
 
-Power-weighted compromise  [1007, 1:2] bargain (brgnIJ) 
-  compromise proposes  1 adopt:  0.396  0.729  0.604 
-  compromise proposes  2 adopt:  0.396  0.729  0.604 
+Power-weighted compromise  [2652, 1:2] bargain (brgnIJ) 
+  compromise proposes  1 adopt:  39.563  72.926  60.393 
+  compromise proposes  2 adopt:  39.563  72.926  60.393 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 0 actor 2 has most advantageous target 0 worth 0.098
@@ -206,17 +206,17 @@ Est by  2 of prob 0.4396 that [ 2> 0], with expected gain to  0 of -0.0617
 Est by  0 of prob 0.6698 that [ 2> 0], with expected gain to  2 of +0.1098 
 Est by  0 of prob 0.6698 that [ 2> 0], with expected gain to  0 of -0.0373 
 
-Bargain [1009, 2:0] from  2's perspective (brgnIIJ) 
-   2 proposes  2 adopt:  0.555  0.632  0.422 
-   2 proposes  0 adopt:  0.555  0.632  0.422 
+Bargain [2654, 2:0] from  2's perspective (brgnIIJ) 
+   2 proposes  2 adopt:  55.530  63.190  42.210 
+   2 proposes  0 adopt:  55.530  63.190  42.210 
 
-Bargain  [1010, 2:0] from  0's perspective (brgnJIJ) 
-   0 proposes  2 adopt:  0.529  0.409  0.397 
-   0 proposes  0 adopt:  0.529  0.409  0.397 
+Bargain  [2655, 2:0] from  0's perspective (brgnJIJ) 
+   0 proposes  2 adopt:  52.900  40.930  39.730 
+   0 proposes  0 adopt:  52.900  40.930  39.730 
 
-Power-weighted compromise  [1011, 2:0] bargain (brgnIJ) 
-  compromise proposes  2 adopt:  0.543  0.526  0.410 
-  compromise proposes  0 adopt:  0.543  0.526  0.410 
+Power-weighted compromise  [2656, 2:0] bargain (brgnIJ) 
+  compromise proposes  2 adopt:  54.284  52.641  41.035 
+  compromise proposes  0 adopt:  54.284  52.641  41.035 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 0 actor 3 has most advantageous target 2 worth 0.432
@@ -225,17 +225,17 @@ Est by  3 of prob 0.7837 that [ 3> 2], with expected gain to  2 of -0.3758
 Est by  2 of prob 0.7786 that [ 3> 2], with expected gain to  3 of +0.4779 
 Est by  2 of prob 0.7786 that [ 3> 2], with expected gain to  2 of -0.4268 
 
-Bargain [1013, 3:2] from  3's perspective (brgnIIJ) 
-   3 proposes  3 adopt:  0.335  0.189  0.190 
-   3 proposes  2 adopt:  0.335  0.189  0.190 
+Bargain [2658, 3:2] from  3's perspective (brgnIIJ) 
+   3 proposes  3 adopt:  33.480  18.890  19.040 
+   3 proposes  2 adopt:  33.480  18.890  19.040 
 
-Bargain  [1014, 3:2] from  2's perspective (brgnJIJ) 
-   2 proposes  3 adopt:  0.542  0.414  0.347 
-   2 proposes  2 adopt:  0.542  0.414  0.347 
+Bargain  [2659, 3:2] from  2's perspective (brgnJIJ) 
+   2 proposes  3 adopt:  54.230  41.440  34.750 
+   2 proposes  2 adopt:  54.240  41.440  34.750 
 
-Power-weighted compromise  [1015, 3:2] bargain (brgnIJ) 
-  compromise proposes  3 adopt:  0.441  0.304  0.271 
-  compromise proposes  2 adopt:  0.441  0.304  0.271 
+Power-weighted compromise  [2660, 3:2] bargain (brgnIJ) 
+  compromise proposes  3 adopt:  44.115  30.448  27.092 
+  compromise proposes  2 adopt:  44.120  30.448  27.092 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 0 actor 4 has most advantageous target 2 worth 0.063
@@ -244,26 +244,26 @@ Est by  4 of prob 0.5467 that [ 4> 2], with expected gain to  2 of -0.0798
 Est by  2 of prob 0.5363 that [ 4> 2], with expected gain to  4 of +0.0654 
 Est by  2 of prob 0.5363 that [ 4> 2], with expected gain to  2 of -0.0822 
 
-Bargain [1017, 4:2] from  4's perspective (brgnIIJ) 
-   4 proposes  4 adopt:  0.701  0.760  0.350 
-   4 proposes  2 adopt:  0.701  0.760  0.350 
+Bargain [2662, 4:2] from  4's perspective (brgnIIJ) 
+   4 proposes  4 adopt:  70.060  76.000  34.980 
+   4 proposes  2 adopt:  70.060  76.010  34.980 
 
-Bargain  [1018, 4:2] from  2's perspective (brgnJIJ) 
-   2 proposes  4 adopt:  0.612  0.864  0.444 
-   2 proposes  2 adopt:  0.612  0.864  0.444 
+Bargain  [2663, 4:2] from  2's perspective (brgnJIJ) 
+   2 proposes  4 adopt:  61.210  86.440  44.430 
+   2 proposes  2 adopt:  61.210  86.440  44.430 
 
-Power-weighted compromise  [1019, 4:2] bargain (brgnIJ) 
-  compromise proposes  4 adopt:  0.656  0.812  0.397 
-  compromise proposes  2 adopt:  0.656  0.812  0.397 
+Power-weighted compromise  [2664, 4:2] bargain (brgnIJ) 
+  compromise proposes  4 adopt:  65.629  81.227  39.711 
+  compromise proposes  2 adopt:  65.629  81.232  39.711 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [1000, 0:0][1001, 0:4][1009, 2:0]
-Bargains involving actor  1: [1004, 1:1][1005, 1:2]
-Bargains involving actor  2: [1005, 1:2][1008, 2:2][1009, 2:0][1013, 3:2][1017, 4:2]
-Bargains involving actor  3: [1012, 3:3][1013, 3:2]
-Bargains involving actor  4: [1001, 0:4][1016, 4:4][1017, 4:2]
+Bargains involving actor  0: [2645, 0:0][2646, 0:4][2654, 2:0]
+Bargains involving actor  1: [2649, 1:1][2650, 1:2]
+Bargains involving actor  2: [2650, 1:2][2653, 2:2][2654, 2:0][2658, 3:2][2662, 4:2]
+Bargains involving actor  3: [2657, 3:3][2658, 3:2]
+Bargains involving actor  4: [2646, 0:4][2661, 4:4][2662, 4:2]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -446,20 +446,20 @@ Found stable PCE distribution
 done
 Chosen bargain (Stochastic): 1 out of 3 bargains
 
-postn  0,  0  0.6411  0.4813  0.3254 
-ideal  0,  0  0.6264  0.4705  0.3346 
-postn-ideal distance  0,  0: 0.02044 
-postn  1,  0  0.2348  0.6381  0.7013 
-ideal  1,  0  0.2496  0.6228  0.6784 
-postn-ideal distance  1,  0: 0.03131 
-postn  2,  0  0.5553  0.6319  0.4221 
-ideal  2,  0  0.5296  0.6225  0.3929 
-postn-ideal distance  2,  0: 0.04003 
-postn  3,  0  0.2630  0.1650  0.1590 
-ideal  3,  0  0.2630  0.1650  0.1590 
+postn  0,  0  64.1100  48.1300  32.5400 
+ideal  0,  0  62.6397  47.0471  33.4578 
+postn-ideal distance  0,  0: 2.04372 
+postn  1,  0  23.4800  63.8100  70.1300 
+ideal  1,  0  24.9597  62.2786  67.8353 
+postn-ideal distance  1,  0: 3.13055 
+postn  2,  0  55.5300  63.1900  42.2100 
+ideal  2,  0  52.9555  62.2485  39.2935 
+postn-ideal distance  2,  0: 4.00255 
+postn  3,  0  26.3000  16.5000  15.9000 
+ideal  3,  0  26.3000  16.5000  15.9000 
 postn-ideal distance  3,  0: 0.00000 
-postn  4,  0  0.6411  0.4813  0.3254 
-ideal  4,  0  0.6411  0.4813  0.3254 
+postn  4,  0  64.1100  48.1300  32.5400 
+ideal  4,  0  64.1100  48.1300  32.5400 
 postn-ideal distance  4,  0: 0.00000 
 postn-ideal distance RMS  0: 0.02449 
 rms (pstn, ideal) = 0.02449 
@@ -543,17 +543,17 @@ Est by  0 of prob 0.3212 that [ 0> 3], with expected gain to  3 of -0.0030
 Est by  3 of prob 0.3282 that [ 0> 3], with expected gain to  0 of +0.0055 
 Est by  3 of prob 0.3282 that [ 0> 3], with expected gain to  3 of -0.0060 
 
-Bargain [1021, 0:3] from  0's perspective (brgnIIJ) 
-   0 proposes  0 adopt:  0.448  0.184  0.186 
-   0 proposes  3 adopt:  0.448  0.184  0.186 
+Bargain [2666, 0:3] from  0's perspective (brgnIIJ) 
+   0 proposes  0 adopt:  44.820  18.400  18.640 
+   0 proposes  3 adopt:  44.820  18.390  18.630 
 
-Bargain  [1022, 0:3] from  3's perspective (brgnJIJ) 
-   3 proposes  0 adopt:  0.263  0.165  0.159 
-   3 proposes  3 adopt:  0.263  0.165  0.159 
+Bargain  [2667, 0:3] from  3's perspective (brgnJIJ) 
+   3 proposes  0 adopt:  26.310  16.500  15.900 
+   3 proposes  3 adopt:  26.300  16.500  15.900 
 
-Power-weighted compromise  [1023, 0:3] bargain (brgnIJ) 
-  compromise proposes  0 adopt:  0.353  0.174  0.172 
-  compromise proposes  3 adopt:  0.353  0.174  0.172 
+Power-weighted compromise  [2668, 0:3] bargain (brgnIJ) 
+  compromise proposes  0 adopt:  35.314  17.424  17.233 
+  compromise proposes  3 adopt:  35.309  17.419  17.228 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 1 actor 1 has most advantageous target 4 worth 0.214
@@ -562,17 +562,17 @@ Est by  1 of prob 0.7270 that [ 1> 4], with expected gain to  4 of -0.2181
 Est by  4 of prob 0.7872 that [ 1> 4], with expected gain to  1 of +0.1195 
 Est by  4 of prob 0.7872 that [ 1> 4], with expected gain to  4 of -0.0933 
 
-Bargain [1025, 1:4] from  1's perspective (brgnIIJ) 
-   1 proposes  1 adopt:  0.340  0.631  0.683 
-   1 proposes  4 adopt:  0.340  0.631  0.683 
+Bargain [2670, 1:4] from  1's perspective (brgnIIJ) 
+   1 proposes  1 adopt:  34.010  63.110  68.340 
+   1 proposes  4 adopt:  34.010  63.110  68.340 
 
-Bargain  [1026, 1:4] from  4's perspective (brgnJIJ) 
-   4 proposes  1 adopt:  0.638  0.489  0.344 
-   4 proposes  4 adopt:  0.638  0.489  0.344 
+Bargain  [2671, 1:4] from  4's perspective (brgnJIJ) 
+   4 proposes  1 adopt:  63.810  48.950  34.390 
+   4 proposes  4 adopt:  63.810  48.950  34.390 
 
-Power-weighted compromise  [1027, 1:4] bargain (brgnIJ) 
-  compromise proposes  1 adopt:  0.479  0.565  0.525 
-  compromise proposes  4 adopt:  0.479  0.565  0.525 
+Power-weighted compromise  [2672, 1:4] bargain (brgnIJ) 
+  compromise proposes  1 adopt:  47.914  56.503  52.499 
+  compromise proposes  4 adopt:  47.914  56.503  52.499 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 1 actor 2 has most advantageous target 4 worth 0.026
@@ -583,17 +583,17 @@ Est by  2 of prob 0.4981 that [ 2> 4], with expected gain to  4 of -0.0192
 Est by  4 of prob 0.6054 that [ 2> 4], with expected gain to  2 of +0.0184 
 Est by  4 of prob 0.6054 that [ 2> 4], with expected gain to  4 of -0.0042 
 
-Bargain [1029, 2:4] from  2's perspective (brgnIIJ) 
-   2 proposes  2 adopt:  0.612  0.582  0.380 
-   2 proposes  4 adopt:  0.612  0.582  0.380 
+Bargain [2674, 2:4] from  2's perspective (brgnIIJ) 
+   2 proposes  2 adopt:  61.180  58.230  38.020 
+   2 proposes  4 adopt:  61.180  58.230  38.020 
 
-Bargain  [1030, 2:4] from  4's perspective (brgnJIJ) 
-   4 proposes  2 adopt:  0.641  0.481  0.325 
-   4 proposes  4 adopt:  0.641  0.481  0.325 
+Bargain  [2675, 2:4] from  4's perspective (brgnJIJ) 
+   4 proposes  2 adopt:  64.110  48.140  32.540 
+   4 proposes  4 adopt:  64.110  48.140  32.540 
 
-Power-weighted compromise  [1031, 2:4] bargain (brgnIJ) 
-  compromise proposes  2 adopt:  0.626  0.532  0.353 
-  compromise proposes  4 adopt:  0.626  0.532  0.353 
+Power-weighted compromise  [2676, 2:4] bargain (brgnIJ) 
+  compromise proposes  2 adopt:  62.643  53.192  35.284 
+  compromise proposes  4 adopt:  62.643  53.192  35.284 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 1 actor 3 has most advantageous target 2 worth 0.193
@@ -602,17 +602,17 @@ Est by  3 of prob 0.7937 that [ 3> 2], with expected gain to  2 of -0.1751
 Est by  2 of prob 0.7990 that [ 3> 2], with expected gain to  3 of +0.2817 
 Est by  2 of prob 0.7990 that [ 3> 2], with expected gain to  2 of -0.2499 
 
-Bargain [1033, 3:2] from  3's perspective (brgnIIJ) 
-   3 proposes  3 adopt:  0.318  0.179  0.185 
-   3 proposes  2 adopt:  0.318  0.179  0.185 
+Bargain [2678, 3:2] from  3's perspective (brgnIIJ) 
+   3 proposes  3 adopt:  31.770  17.920  18.500 
+   3 proposes  2 adopt:  31.770  17.920  18.500 
 
-Bargain  [1034, 3:2] from  2's perspective (brgnJIJ) 
-   2 proposes  3 adopt:  0.543  0.516  0.399 
-   2 proposes  2 adopt:  0.543  0.516  0.399 
+Bargain  [2679, 3:2] from  2's perspective (brgnJIJ) 
+   2 proposes  3 adopt:  54.270  51.560  39.930 
+   2 proposes  2 adopt:  54.270  51.560  39.930 
 
-Power-weighted compromise  [1035, 3:2] bargain (brgnIJ) 
-  compromise proposes  3 adopt:  0.433  0.352  0.295 
-  compromise proposes  2 adopt:  0.433  0.352  0.295 
+Power-weighted compromise  [2680, 3:2] bargain (brgnIJ) 
+  compromise proposes  3 adopt:  43.302  35.162  29.484 
+  compromise proposes  2 adopt:  43.302  35.162  29.484 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 1 actor 4 has most advantageous target 2 worth 0.001
@@ -623,26 +623,26 @@ Est by  4 of prob 0.3946 that [ 4> 2], with expected gain to  2 of -0.0038
 Est by  2 of prob 0.5019 that [ 4> 2], with expected gain to  4 of +0.0195 
 Est by  2 of prob 0.5019 that [ 4> 2], with expected gain to  2 of -0.0268 
 
-Bargain [1037, 4:2] from  4's perspective (brgnIIJ) 
-   4 proposes  4 adopt:  0.594  0.606  0.399 
-   4 proposes  2 adopt:  0.594  0.606  0.399 
+Bargain [2682, 4:2] from  4's perspective (brgnIIJ) 
+   4 proposes  4 adopt:  59.360  60.620  39.860 
+   4 proposes  2 adopt:  59.360  60.620  39.860 
 
-Bargain  [1038, 4:2] from  2's perspective (brgnJIJ) 
-   2 proposes  4 adopt:  0.555  0.632  0.422 
-   2 proposes  2 adopt:  0.555  0.632  0.422 
+Bargain  [2683, 4:2] from  2's perspective (brgnJIJ) 
+   2 proposes  4 adopt:  55.540  63.190  42.210 
+   2 proposes  2 adopt:  55.540  63.190  42.210 
 
-Power-weighted compromise  [1039, 4:2] bargain (brgnIJ) 
-  compromise proposes  4 adopt:  0.574  0.619  0.410 
-  compromise proposes  2 adopt:  0.574  0.619  0.410 
+Power-weighted compromise  [2684, 4:2] bargain (brgnIJ) 
+  compromise proposes  4 adopt:  57.447  61.907  41.037 
+  compromise proposes  2 adopt:  57.447  61.907  41.037 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [1020, 0:0][1021, 0:3]
-Bargains involving actor  1: [1024, 1:1][1025, 1:4]
-Bargains involving actor  2: [1028, 2:2][1029, 2:4][1033, 3:2][1037, 4:2]
-Bargains involving actor  3: [1021, 0:3][1032, 3:3][1033, 3:2]
-Bargains involving actor  4: [1025, 1:4][1029, 2:4][1036, 4:4][1037, 4:2]
+Bargains involving actor  0: [2665, 0:0][2666, 0:3]
+Bargains involving actor  1: [2669, 1:1][2670, 1:4]
+Bargains involving actor  2: [2673, 2:2][2674, 2:4][2678, 3:2][2682, 4:2]
+Bargains involving actor  3: [2666, 0:3][2677, 3:3][2678, 3:2]
+Bargains involving actor  4: [2670, 1:4][2674, 2:4][2681, 4:4][2682, 4:2]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -825,20 +825,20 @@ Found stable PCE distribution
 done
 Chosen bargain (Stochastic): 2 out of 4 bargains
 
-postn  0,  0  0.6411  0.4813  0.3254 
-ideal  0,  0  0.6392  0.4799  0.3266 
-postn-ideal distance  0,  0: 0.00266 
-postn  1,  0  0.2348  0.6381  0.7013 
-ideal  1,  0  0.2659  0.6244  0.6709 
-postn-ideal distance  1,  0: 0.04564 
-postn  2,  0  0.3177  0.1792  0.1850 
-ideal  2,  0  0.3813  0.2773  0.2309 
-postn-ideal distance  2,  0: 0.12562 
-postn  3,  0  0.4482  0.1839  0.1863 
-ideal  3,  0  0.3686  0.1758  0.1746 
-postn-ideal distance  3,  0: 0.08091 
-postn  4,  0  0.6118  0.5823  0.3802 
-ideal  4,  0  0.6118  0.5823  0.3802 
+postn  0,  0  64.1100  48.1300  32.5400 
+ideal  0,  0  63.9189  47.9892  32.6593 
+postn-ideal distance  0,  0: 0.26568 
+postn  1,  0  23.4800  63.8100  70.1300 
+ideal  1,  0  26.5904  62.4367  67.0857 
+postn-ideal distance  1,  0: 4.56385 
+postn  2,  0  31.7700  17.9200  18.5000 
+ideal  2,  0  38.1273  27.7334  23.0915 
+postn-ideal distance  2,  0: 12.56182 
+postn  3,  0  44.8200  18.3900  18.6300 
+ideal  3,  0  36.8564  17.5773  17.4561 
+postn-ideal distance  3,  0: 8.09058 
+postn  4,  0  61.1800  58.2300  38.0200 
+ideal  4,  0  61.1800  58.2300  38.0200 
 postn-ideal distance  4,  0: 0.00000 
 postn-ideal distance RMS  0: 0.06988 
 rms (pstn, ideal) = 0.06988 
@@ -920,17 +920,17 @@ Est by  0 of prob 0.8227 that [ 0> 2], with expected gain to  2 of -0.0503
 Est by  2 of prob 0.8582 that [ 0> 2], with expected gain to  0 of +0.1643 
 Est by  2 of prob 0.8582 that [ 0> 2], with expected gain to  2 of -0.0977 
 
-Bargain [1041, 0:2] from  0's perspective (brgnIIJ) 
-   0 proposes  0 adopt:  0.630  0.460  0.314 
-   0 proposes  2 adopt:  0.630  0.460  0.314 
+Bargain [2686, 0:2] from  0's perspective (brgnIIJ) 
+   0 proposes  0 adopt:  62.960  46.000  31.430 
+   0 proposes  2 adopt:  62.960  46.000  31.430 
 
-Bargain  [1042, 0:2] from  2's perspective (brgnJIJ) 
-   2 proposes  0 adopt:  0.333  0.186  0.188 
-   2 proposes  2 adopt:  0.333  0.186  0.188 
+Bargain  [2687, 0:2] from  2's perspective (brgnJIJ) 
+   2 proposes  0 adopt:  33.270  18.620  18.790 
+   2 proposes  2 adopt:  33.270  18.620  18.790 
 
-Power-weighted compromise  [1043, 0:2] bargain (brgnIJ) 
-  compromise proposes  0 adopt:  0.473  0.316  0.248 
-  compromise proposes  2 adopt:  0.473  0.316  0.248 
+Power-weighted compromise  [2688, 0:2] bargain (brgnIJ) 
+  compromise proposes  0 adopt:  47.340  31.595  24.780 
+  compromise proposes  2 adopt:  47.340  31.595  24.780 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 2 actor 1 has most advantageous target 2 worth 0.387
@@ -939,17 +939,17 @@ Est by  1 of prob 0.8677 that [ 1> 2], with expected gain to  2 of -0.2234
 Est by  2 of prob 0.8669 that [ 1> 2], with expected gain to  1 of +0.3111 
 Est by  2 of prob 0.8669 that [ 1> 2], with expected gain to  2 of -0.1729 
 
-Bargain [1045, 1:2] from  1's perspective (brgnIIJ) 
-   1 proposes  1 adopt:  0.237  0.631  0.696 
-   1 proposes  2 adopt:  0.237  0.631  0.696 
+Bargain [2690, 1:2] from  1's perspective (brgnIIJ) 
+   1 proposes  1 adopt:  23.720  63.090  69.570 
+   1 proposes  2 adopt:  23.720  63.090  69.570 
 
-Bargain  [1046, 1:2] from  2's perspective (brgnJIJ) 
-   2 proposes  1 adopt:  0.306  0.284  0.341 
-   2 proposes  2 adopt:  0.306  0.284  0.341 
+Bargain  [2691, 1:2] from  2's perspective (brgnJIJ) 
+   2 proposes  1 adopt:  30.650  28.420  34.090 
+   2 proposes  2 adopt:  30.650  28.420  34.080 
 
-Power-weighted compromise  [1047, 1:2] bargain (brgnIJ) 
-  compromise proposes  1 adopt:  0.270  0.469  0.530 
-  compromise proposes  2 adopt:  0.270  0.469  0.530 
+Power-weighted compromise  [2692, 1:2] bargain (brgnIJ) 
+  compromise proposes  1 adopt:  26.958  46.891  52.992 
+  compromise proposes  2 adopt:  26.958  46.891  52.988 
 
 Using InitOnlyInterp to form proposed bargains
 Actor 2 has no advantageous targets 
@@ -959,17 +959,17 @@ Est by  3 of prob 0.7900 that [ 3> 4], with expected gain to  4 of -0.0792
 Est by  4 of prob 0.7837 that [ 3> 4], with expected gain to  3 of +0.1812 
 Est by  4 of prob 0.7837 that [ 3> 4], with expected gain to  4 of -0.1361 
 
-Bargain [1050, 3:4] from  3's perspective (brgnIIJ) 
-   3 proposes  3 adopt:  0.500  0.190  0.202 
-   3 proposes  4 adopt:  0.500  0.190  0.202 
+Bargain [2695, 3:4] from  3's perspective (brgnIIJ) 
+   3 proposes  3 adopt:  49.960  19.010  20.170 
+   3 proposes  4 adopt:  49.960  19.010  20.170 
 
-Bargain  [1051, 3:4] from  4's perspective (brgnJIJ) 
-   4 proposes  3 adopt:  0.611  0.511  0.373 
-   4 proposes  4 adopt:  0.611  0.511  0.373 
+Bargain  [2696, 3:4] from  4's perspective (brgnJIJ) 
+   4 proposes  3 adopt:  61.060  51.090  37.270 
+   4 proposes  4 adopt:  61.060  51.100  37.270 
 
-Power-weighted compromise  [1052, 3:4] bargain (brgnIJ) 
-  compromise proposes  3 adopt:  0.556  0.354  0.289 
-  compromise proposes  4 adopt:  0.556  0.354  0.289 
+Power-weighted compromise  [2697, 3:4] bargain (brgnIJ) 
+  compromise proposes  3 adopt:  55.642  35.431  28.923 
+  compromise proposes  4 adopt:  55.642  35.436  28.923 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 2 actor 4 has most advantageous target 2 worth 0.181
@@ -978,26 +978,26 @@ Est by  4 of prob 0.7712 that [ 4> 2], with expected gain to  2 of -0.1041
 Est by  2 of prob 0.7710 that [ 4> 2], with expected gain to  4 of +0.1805 
 Est by  2 of prob 0.7710 that [ 4> 2], with expected gain to  2 of -0.1036 
 
-Bargain [1054, 4:2] from  4's perspective (brgnIIJ) 
-   4 proposes  4 adopt:  0.599  0.520  0.360 
-   4 proposes  2 adopt:  0.599  0.520  0.360 
+Bargain [2699, 4:2] from  4's perspective (brgnIIJ) 
+   4 proposes  4 adopt:  59.880  52.030  35.980 
+   4 proposes  2 adopt:  59.880  52.030  35.980 
 
-Bargain  [1055, 4:2] from  2's perspective (brgnJIJ) 
-   2 proposes  4 adopt:  0.343  0.189  0.192 
-   2 proposes  2 adopt:  0.343  0.188  0.192 
+Bargain  [2700, 4:2] from  2's perspective (brgnJIJ) 
+   2 proposes  4 adopt:  34.250  18.850  19.190 
+   2 proposes  2 adopt:  34.250  18.840  19.190 
 
-Power-weighted compromise  [1056, 4:2] bargain (brgnIJ) 
-  compromise proposes  4 adopt:  0.470  0.354  0.276 
-  compromise proposes  2 adopt:  0.470  0.354  0.276 
+Power-weighted compromise  [2701, 4:2] bargain (brgnIJ) 
+  compromise proposes  4 adopt:  47.048  35.418  27.574 
+  compromise proposes  2 adopt:  47.048  35.413  27.574 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [1040, 0:0][1041, 0:2]
-Bargains involving actor  1: [1044, 1:1][1045, 1:2]
-Bargains involving actor  2: [1041, 0:2][1045, 1:2][1048, 2:2][1054, 4:2]
-Bargains involving actor  3: [1049, 3:3][1050, 3:4]
-Bargains involving actor  4: [1050, 3:4][1053, 4:4][1054, 4:2]
+Bargains involving actor  0: [2685, 0:0][2686, 0:2]
+Bargains involving actor  1: [2689, 1:1][2690, 1:2]
+Bargains involving actor  2: [2686, 0:2][2690, 1:2][2693, 2:2][2699, 4:2]
+Bargains involving actor  3: [2694, 3:3][2695, 3:4]
+Bargains involving actor  4: [2695, 3:4][2698, 4:4][2699, 4:2]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -1174,20 +1174,20 @@ Found stable PCE distribution
 done
 Chosen bargain (Stochastic): 3 out of 3 bargains
 
-postn  0,  0  0.6296  0.4600  0.3143 
-ideal  0,  0  0.6308  0.4626  0.3159 
-postn-ideal distance  0,  0: 0.00329 
-postn  1,  0  0.2372  0.6309  0.6957 
-ideal  1,  0  0.2698  0.6178  0.6645 
-postn-ideal distance  1,  0: 0.04700 
-postn  2,  0  0.5988  0.5203  0.3598 
-ideal  2,  0  0.5314  0.4231  0.3089 
-postn-ideal distance  2,  0: 0.12878 
-postn  3,  0  0.4482  0.1839  0.1863 
-ideal  3,  0  0.4140  0.1804  0.1813 
-postn-ideal distance  3,  0: 0.03479 
-postn  4,  0  0.5988  0.5203  0.3598 
-ideal  4,  0  0.5988  0.5203  0.3598 
+postn  0,  0  62.9600  46.0000  31.4300 
+ideal  0,  0  63.0847  46.2586  31.5898 
+postn-ideal distance  0,  0: 0.32856 
+postn  1,  0  23.7200  63.0900  69.5700 
+ideal  1,  0  26.9835  61.7761  66.4530 
+postn-ideal distance  1,  0: 4.70023 
+postn  2,  0  59.8800  52.0300  35.9800 
+ideal  2,  0  53.1366  42.3115  30.8890 
+postn-ideal distance  2,  0: 12.87788 
+postn  3,  0  44.8200  18.3900  18.6300 
+ideal  3,  0  41.3957  18.0405  18.1252 
+postn-ideal distance  3,  0: 3.47895 
+postn  4,  0  59.8800  52.0300  35.9800 
+ideal  4,  0  59.8800  52.0300  35.9800 
 postn-ideal distance  4,  0: 0.00000 
 postn-ideal distance RMS  0: 0.06327 
 rms (pstn, ideal) = 0.06327 
@@ -1269,17 +1269,17 @@ Est by  0 of prob 0.5023 that [ 0> 2], with expected gain to  2 of +0.0012
 Est by  2 of prob 0.9585 that [ 0> 2], with expected gain to  0 of +0.0252 
 Est by  2 of prob 0.9585 that [ 0> 2], with expected gain to  2 of +0.0101 
 
-Bargain [1058, 0:2] from  0's perspective (brgnIIJ) 
-   0 proposes  0 adopt:  0.616  0.497  0.344 
-   0 proposes  2 adopt:  0.616  0.497  0.344 
+Bargain [2703, 0:2] from  0's perspective (brgnIIJ) 
+   0 proposes  0 adopt:  61.610  49.710  34.360 
+   0 proposes  2 adopt:  61.610  49.710  34.360 
 
-Bargain  [1059, 0:2] from  2's perspective (brgnJIJ) 
-   2 proposes  0 adopt:  0.599  0.520  0.360 
-   2 proposes  2 adopt:  0.599  0.520  0.360 
+Bargain  [2704, 0:2] from  2's perspective (brgnJIJ) 
+   2 proposes  0 adopt:  59.880  52.030  35.980 
+   2 proposes  2 adopt:  59.880  52.030  35.980 
 
-Power-weighted compromise  [1060, 0:2] bargain (brgnIJ) 
-  compromise proposes  0 adopt:  0.607  0.509  0.352 
-  compromise proposes  2 adopt:  0.607  0.509  0.352 
+Power-weighted compromise  [2705, 0:2] bargain (brgnIJ) 
+  compromise proposes  0 adopt:  60.700  50.931  35.212 
+  compromise proposes  2 adopt:  60.700  50.931  35.212 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 3 actor 1 has most advantageous target 2 worth 0.208
@@ -1288,17 +1288,17 @@ Est by  1 of prob 0.8074 that [ 1> 2], with expected gain to  2 of -0.1731
 Est by  2 of prob 0.8049 that [ 1> 2], with expected gain to  1 of +0.1678 
 Est by  2 of prob 0.8049 that [ 1> 2], with expected gain to  2 of -0.1400 
 
-Bargain [1062, 1:2] from  1's perspective (brgnIIJ) 
-   1 proposes  1 adopt:  0.262  0.627  0.687 
-   1 proposes  2 adopt:  0.262  0.627  0.687 
+Bargain [2707, 1:2] from  1's perspective (brgnIIJ) 
+   1 proposes  1 adopt:  26.220  62.670  68.690 
+   1 proposes  2 adopt:  26.220  62.670  68.690 
 
-Bargain  [1063, 1:2] from  2's perspective (brgnJIJ) 
-   2 proposes  1 adopt:  0.588  0.526  0.387 
-   2 proposes  2 adopt:  0.588  0.526  0.387 
+Bargain  [2708, 1:2] from  2's perspective (brgnJIJ) 
+   2 proposes  1 adopt:  58.790  52.650  38.650 
+   2 proposes  2 adopt:  58.790  52.650  38.650 
 
-Power-weighted compromise  [1064, 1:2] bargain (brgnIJ) 
-  compromise proposes  1 adopt:  0.414  0.580  0.547 
-  compromise proposes  2 adopt:  0.414  0.580  0.547 
+Power-weighted compromise  [2709, 1:2] bargain (brgnIJ) 
+  compromise proposes  1 adopt:  41.438  57.988  54.654 
+  compromise proposes  2 adopt:  41.438  57.988  54.654 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 3 actor 2 has most advantageous target 0 worth 0.003
@@ -1309,17 +1309,17 @@ Est by  2 of prob 0.0415 that [ 2> 0], with expected gain to  0 of +0.0082
 Est by  0 of prob 0.4977 that [ 2> 0], with expected gain to  2 of -0.0015 
 Est by  0 of prob 0.4977 that [ 2> 0], with expected gain to  0 of -0.0006 
 
-Bargain [1066, 2:0] from  2's perspective (brgnIIJ) 
-   2 proposes  2 adopt:  0.630  0.460  0.315 
-   2 proposes  0 adopt:  0.630  0.460  0.315 
+Bargain [2711, 2:0] from  2's perspective (brgnIIJ) 
+   2 proposes  2 adopt:  62.960  46.020  31.450 
+   2 proposes  0 adopt:  62.960  46.020  31.450 
 
-Bargain  [1067, 2:0] from  0's perspective (brgnJIJ) 
-   0 proposes  2 adopt:  0.630  0.460  0.314 
-   0 proposes  0 adopt:  0.630  0.460  0.314 
+Bargain  [2712, 2:0] from  0's perspective (brgnJIJ) 
+   0 proposes  2 adopt:  62.960  46.000  31.430 
+   0 proposes  0 adopt:  62.960  46.000  31.430 
 
-Power-weighted compromise  [1068, 2:0] bargain (brgnIJ) 
-  compromise proposes  2 adopt:  0.630  0.460  0.314 
-  compromise proposes  0 adopt:  0.630  0.460  0.314 
+Power-weighted compromise  [2713, 2:0] bargain (brgnIJ) 
+  compromise proposes  2 adopt:  62.960  46.011  31.441 
+  compromise proposes  0 adopt:  62.960  46.011  31.441 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 3 actor 3 has most advantageous target 2 worth 0.102
@@ -1328,17 +1328,17 @@ Est by  3 of prob 0.9046 that [ 3> 2], with expected gain to  2 of -0.0425
 Est by  2 of prob 0.9200 that [ 3> 2], with expected gain to  3 of +0.2087 
 Est by  2 of prob 0.9200 that [ 3> 2], with expected gain to  2 of -0.0786 
 
-Bargain [1070, 3:2] from  3's perspective (brgnIIJ) 
-   3 proposes  3 adopt:  0.454  0.186  0.189 
-   3 proposes  2 adopt:  0.454  0.186  0.189 
+Bargain [2715, 3:2] from  3's perspective (brgnIIJ) 
+   3 proposes  3 adopt:  45.370  18.560  18.940 
+   3 proposes  2 adopt:  45.370  18.560  18.940 
 
-Bargain  [1071, 3:2] from  2's perspective (brgnJIJ) 
-   2 proposes  3 adopt:  0.596  0.476  0.353 
-   2 proposes  2 adopt:  0.596  0.476  0.353 
+Bargain  [2716, 3:2] from  2's perspective (brgnJIJ) 
+   2 proposes  3 adopt:  59.580  47.640  35.270 
+   2 proposes  2 adopt:  59.580  47.640  35.270 
 
-Power-weighted compromise  [1072, 3:2] bargain (brgnIJ) 
-  compromise proposes  3 adopt:  0.527  0.335  0.273 
-  compromise proposes  2 adopt:  0.527  0.335  0.273 
+Power-weighted compromise  [2717, 3:2] bargain (brgnIJ) 
+  compromise proposes  3 adopt:  52.653  33.465  27.310 
+  compromise proposes  2 adopt:  52.653  33.465  27.310 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 3 actor 4 has most advantageous target 0 worth 0.009
@@ -1349,26 +1349,26 @@ Est by  4 of prob 0.4409 that [ 4> 0], with expected gain to  0 of -0.0064
 Est by  0 of prob 0.7109 that [ 4> 0], with expected gain to  4 of +0.0084 
 Est by  0 of prob 0.7109 that [ 4> 0], with expected gain to  0 of -0.0011 
 
-Bargain [1074, 4:0] from  4's perspective (brgnIIJ) 
-   4 proposes  4 adopt:  0.615  0.480  0.335 
-   4 proposes  0 adopt:  0.615  0.480  0.335 
+Bargain [2719, 4:0] from  4's perspective (brgnIIJ) 
+   4 proposes  4 adopt:  61.470  47.990  33.540 
+   4 proposes  0 adopt:  61.470  47.990  33.540 
 
-Bargain  [1075, 4:0] from  0's perspective (brgnJIJ) 
-   0 proposes  4 adopt:  0.630  0.460  0.314 
-   0 proposes  0 adopt:  0.630  0.460  0.314 
+Bargain  [2720, 4:0] from  0's perspective (brgnJIJ) 
+   0 proposes  4 adopt:  62.960  46.000  31.430 
+   0 proposes  0 adopt:  62.960  46.000  31.430 
 
-Power-weighted compromise  [1076, 4:0] bargain (brgnIJ) 
-  compromise proposes  4 adopt:  0.622  0.470  0.325 
-  compromise proposes  0 adopt:  0.622  0.470  0.325 
+Power-weighted compromise  [2721, 4:0] bargain (brgnIJ) 
+  compromise proposes  4 adopt:  62.177  47.046  32.539 
+  compromise proposes  0 adopt:  62.177  47.046  32.539 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [1057, 0:0][1058, 0:2][1066, 2:0][1074, 4:0]
-Bargains involving actor  1: [1061, 1:1][1062, 1:2]
-Bargains involving actor  2: [1058, 0:2][1062, 1:2][1065, 2:2][1066, 2:0][1070, 3:2]
-Bargains involving actor  3: [1069, 3:3][1070, 3:2]
-Bargains involving actor  4: [1073, 4:4][1074, 4:0]
+Bargains involving actor  0: [2702, 0:0][2703, 0:2][2711, 2:0][2719, 4:0]
+Bargains involving actor  1: [2706, 1:1][2707, 1:2]
+Bargains involving actor  2: [2703, 0:2][2707, 1:2][2710, 2:2][2711, 2:0][2715, 3:2]
+Bargains involving actor  3: [2714, 3:3][2715, 3:2]
+Bargains involving actor  4: [2718, 4:4][2719, 4:0]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -1551,20 +1551,20 @@ Found stable PCE distribution
 done
 Chosen bargain (Stochastic): 2 out of 2 bargains
 
-postn  0,  0  0.6147  0.4799  0.3354 
-ideal  0,  0  0.6168  0.4776  0.3329 
-postn-ideal distance  0,  0: 0.00399 
-postn  1,  0  0.2372  0.6309  0.6957 
-ideal  1,  0  0.2695  0.6180  0.6649 
-postn-ideal distance  1,  0: 0.04649 
-postn  2,  0  0.6161  0.4971  0.3436 
-ideal  2,  0  0.5763  0.4403  0.3159 
-postn-ideal distance  2,  0: 0.07463 
-postn  3,  0  0.4537  0.1856  0.1894 
-ideal  3,  0  0.4366  0.1834  0.1859 
-postn-ideal distance  3,  0: 0.01759 
-postn  4,  0  0.6147  0.4799  0.3354 
-ideal  4,  0  0.6147  0.4799  0.3354 
+postn  0,  0  61.4700  47.9900  33.5400 
+ideal  0,  0  61.6799  47.7649  33.2865 
+postn-ideal distance  0,  0: 0.39874 
+postn  1,  0  23.7200  63.0900  69.5700 
+ideal  1,  0  26.9499  61.7965  66.4868 
+postn-ideal distance  1,  0: 4.64881 
+postn  2,  0  61.6100  49.7100  34.3600 
+ideal  2,  0  57.6347  44.0328  31.5918 
+postn-ideal distance  2,  0: 7.46301 
+postn  3,  0  45.3700  18.5600  18.9400 
+ideal  3,  0  43.6610  18.3366  18.5896 
+postn-ideal distance  3,  0: 1.75875 
+postn  4,  0  61.4700  47.9900  33.5400 
+ideal  4,  0  61.4700  47.9900  33.5400 
 postn-ideal distance  4,  0: 0.00000 
 postn-ideal distance RMS  0: 0.04014 
 rms (pstn, ideal) = 0.04014 
@@ -1648,17 +1648,17 @@ Est by  0 of prob 0.3311 that [ 0> 3], with expected gain to  3 of -0.0051
 Est by  3 of prob 0.3803 that [ 0> 3], with expected gain to  0 of +0.0073 
 Est by  3 of prob 0.3803 that [ 0> 3], with expected gain to  3 of -0.0082 
 
-Bargain [1078, 0:3] from  0's perspective (brgnIIJ) 
-   0 proposes  0 adopt:  0.536  0.205  0.215 
-   0 proposes  3 adopt:  0.536  0.205  0.215 
+Bargain [2723, 0:3] from  0's perspective (brgnIIJ) 
+   0 proposes  0 adopt:  53.620  20.480  21.530 
+   0 proposes  3 adopt:  53.620  20.480  21.530 
 
-Bargain  [1079, 0:3] from  3's perspective (brgnJIJ) 
-   3 proposes  0 adopt:  0.454  0.186  0.189 
-   3 proposes  3 adopt:  0.454  0.186  0.189 
+Bargain  [2724, 0:3] from  3's perspective (brgnJIJ) 
+   3 proposes  0 adopt:  45.370  18.560  18.940 
+   3 proposes  3 adopt:  45.370  18.560  18.940 
 
-Power-weighted compromise  [1080, 0:3] bargain (brgnIJ) 
-  compromise proposes  0 adopt:  0.494  0.195  0.202 
-  compromise proposes  3 adopt:  0.494  0.195  0.202 
+Power-weighted compromise  [2725, 0:3] bargain (brgnIJ) 
+  compromise proposes  0 adopt:  49.383  19.494  20.200 
+  compromise proposes  3 adopt:  49.383  19.494  20.200 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 4 actor 1 has most advantageous target 2 worth 0.205
@@ -1667,17 +1667,17 @@ Est by  1 of prob 0.7693 that [ 1> 2], with expected gain to  2 of -0.1997
 Est by  2 of prob 0.7701 that [ 1> 2], with expected gain to  1 of +0.1724 
 Est by  2 of prob 0.7701 that [ 1> 2], with expected gain to  2 of -0.1673 
 
-Bargain [1082, 1:2] from  1's perspective (brgnIIJ) 
-   1 proposes  1 adopt:  0.277  0.623  0.681 
-   1 proposes  2 adopt:  0.277  0.623  0.681 
+Bargain [2727, 1:2] from  1's perspective (brgnIIJ) 
+   1 proposes  1 adopt:  27.700  62.310  68.140 
+   1 proposes  2 adopt:  27.700  62.310  68.140 
 
-Bargain  [1083, 1:2] from  2's perspective (brgnJIJ) 
-   2 proposes  1 adopt:  0.604  0.505  0.373 
-   2 proposes  2 adopt:  0.604  0.505  0.373 
+Bargain  [2728, 1:2] from  2's perspective (brgnJIJ) 
+   2 proposes  1 adopt:  60.390  50.500  37.330 
+   2 proposes  2 adopt:  60.390  50.500  37.330 
 
-Power-weighted compromise  [1084, 1:2] bargain (brgnIJ) 
-  compromise proposes  1 adopt:  0.430  0.568  0.537 
-  compromise proposes  2 adopt:  0.430  0.568  0.537 
+Power-weighted compromise  [2729, 1:2] bargain (brgnIJ) 
+  compromise proposes  1 adopt:  42.974  56.792  53.744 
+  compromise proposes  2 adopt:  42.974  56.792  53.744 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 4 actor 2 has most advantageous target 4 worth 0.005
@@ -1688,17 +1688,17 @@ Est by  2 of prob 0.0000 that [ 2> 4], with expected gain to  4 of +0.0034
 Est by  4 of prob 0.0000 that [ 2> 4], with expected gain to  2 of +0.0033 
 Est by  4 of prob 0.0000 that [ 2> 4], with expected gain to  4 of +0.0018 
 
-Bargain [1086, 2:4] from  2's perspective (brgnIIJ) 
-   2 proposes  2 adopt:  0.615  0.480  0.335 
-   2 proposes  4 adopt:  0.615  0.480  0.335 
+Bargain [2731, 2:4] from  2's perspective (brgnIIJ) 
+   2 proposes  2 adopt:  61.470  47.990  33.540 
+   2 proposes  4 adopt:  61.470  47.990  33.540 
 
-Bargain  [1087, 2:4] from  4's perspective (brgnJIJ) 
-   4 proposes  2 adopt:  0.615  0.480  0.335 
-   4 proposes  4 adopt:  0.615  0.480  0.335 
+Bargain  [2732, 2:4] from  4's perspective (brgnJIJ) 
+   4 proposes  2 adopt:  61.470  47.990  33.540 
+   4 proposes  4 adopt:  61.470  47.990  33.540 
 
-Power-weighted compromise  [1088, 2:4] bargain (brgnIJ) 
-  compromise proposes  2 adopt:  0.615  0.480  0.335 
-  compromise proposes  4 adopt:  0.615  0.480  0.335 
+Power-weighted compromise  [2733, 2:4] bargain (brgnIJ) 
+  compromise proposes  2 adopt:  61.470  47.990  33.540 
+  compromise proposes  4 adopt:  61.470  47.990  33.540 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 4 actor 3 has most advantageous target 2 worth 0.059
@@ -1707,17 +1707,17 @@ Est by  3 of prob 0.8013 that [ 3> 2], with expected gain to  2 of -0.0502
 Est by  2 of prob 0.8602 that [ 3> 2], with expected gain to  3 of +0.1761 
 Est by  2 of prob 0.8602 that [ 3> 2], with expected gain to  2 of -0.1166 
 
-Bargain [1090, 3:2] from  3's perspective (brgnIIJ) 
-   3 proposes  3 adopt:  0.482  0.194  0.203 
-   3 proposes  2 adopt:  0.482  0.194  0.203 
+Bargain [2735, 3:2] from  3's perspective (brgnIIJ) 
+   3 proposes  3 adopt:  48.180  19.420  20.340 
+   3 proposes  2 adopt:  48.190  19.420  20.340 
 
-Bargain  [1091, 3:2] from  2's perspective (brgnJIJ) 
-   2 proposes  3 adopt:  0.614  0.469  0.339 
-   2 proposes  2 adopt:  0.614  0.469  0.339 
+Bargain  [2736, 3:2] from  2's perspective (brgnJIJ) 
+   2 proposes  3 adopt:  61.390  46.920  33.940 
+   2 proposes  2 adopt:  61.400  46.920  33.940 
 
-Power-weighted compromise  [1092, 3:2] bargain (brgnIJ) 
-  compromise proposes  3 adopt:  0.550  0.335  0.273 
-  compromise proposes  2 adopt:  0.550  0.335  0.273 
+Power-weighted compromise  [2737, 3:2] bargain (brgnIJ) 
+  compromise proposes  3 adopt:  54.951  33.515  27.311 
+  compromise proposes  2 adopt:  54.961  33.515  27.311 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 4 actor 4 has most advantageous target 2 worth 0.004
@@ -1726,26 +1726,26 @@ Est by  4 of prob 1.0000 that [ 4> 2], with expected gain to  2 of +0.0065
 Est by  2 of prob 1.0000 that [ 4> 2], with expected gain to  4 of +0.0066 
 Est by  2 of prob 1.0000 that [ 4> 2], with expected gain to  2 of +0.0100 
 
-Bargain [1094, 4:2] from  4's perspective (brgnIIJ) 
-   4 proposes  4 adopt:  0.615  0.480  0.335 
-   4 proposes  2 adopt:  0.615  0.480  0.335 
+Bargain [2739, 4:2] from  4's perspective (brgnIIJ) 
+   4 proposes  4 adopt:  61.470  47.990  33.540 
+   4 proposes  2 adopt:  61.470  47.990  33.540 
 
-Bargain  [1095, 4:2] from  2's perspective (brgnJIJ) 
-   2 proposes  4 adopt:  0.616  0.497  0.344 
-   2 proposes  2 adopt:  0.616  0.497  0.344 
+Bargain  [2740, 4:2] from  2's perspective (brgnJIJ) 
+   2 proposes  4 adopt:  61.610  49.710  34.360 
+   2 proposes  2 adopt:  61.610  49.710  34.360 
 
-Power-weighted compromise  [1096, 4:2] bargain (brgnIJ) 
-  compromise proposes  4 adopt:  0.615  0.489  0.340 
-  compromise proposes  2 adopt:  0.615  0.489  0.340 
+Power-weighted compromise  [2741, 4:2] bargain (brgnIJ) 
+  compromise proposes  4 adopt:  61.540  48.851  33.951 
+  compromise proposes  2 adopt:  61.540  48.851  33.951 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [1077, 0:0][1078, 0:3]
-Bargains involving actor  1: [1081, 1:1][1082, 1:2]
-Bargains involving actor  2: [1082, 1:2][1085, 2:2][1086, 2:4][1090, 3:2][1094, 4:2]
-Bargains involving actor  3: [1078, 0:3][1089, 3:3][1090, 3:2]
-Bargains involving actor  4: [1086, 2:4][1093, 4:4][1094, 4:2]
+Bargains involving actor  0: [2722, 0:0][2723, 0:3]
+Bargains involving actor  1: [2726, 1:1][2727, 1:2]
+Bargains involving actor  2: [2727, 1:2][2730, 2:2][2731, 2:4][2735, 3:2][2739, 4:2]
+Bargains involving actor  3: [2723, 0:3][2734, 3:3][2735, 3:2]
+Bargains involving actor  4: [2731, 2:4][2738, 4:4][2739, 4:2]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -1928,20 +1928,20 @@ Found stable PCE distribution
 done
 Chosen bargain (Stochastic): 2 out of 3 bargains
 
-postn  0,  0  0.6147  0.4799  0.3354 
-ideal  0,  0  0.6150  0.4796  0.3351 
-postn-ideal distance  0,  0: 0.00052 
-postn  1,  0  0.2770  0.6231  0.6814 
-ideal  1,  0  0.2993  0.6122  0.6542 
-postn-ideal distance  1,  0: 0.03683 
-postn  2,  0  0.6147  0.4799  0.3354 
-ideal  2,  0  0.5890  0.4341  0.3140 
-postn-ideal distance  2,  0: 0.05677 
-postn  3,  0  0.4818  0.1942  0.2034 
-ideal  3,  0  0.4624  0.1895  0.1959 
-postn-ideal distance  3,  0: 0.02135 
-postn  4,  0  0.6147  0.4799  0.3354 
-ideal  4,  0  0.6147  0.4799  0.3354 
+postn  0,  0  61.4700  47.9900  33.5400 
+ideal  0,  0  61.4973  47.9607  33.5070 
+postn-ideal distance  0,  0: 0.05184 
+postn  1,  0  27.7000  62.3100  68.1400 
+ideal  1,  0  29.9289  61.2152  65.4204 
+postn-ideal distance  1,  0: 3.68275 
+postn  2,  0  61.4700  47.9900  33.5400 
+ideal  2,  0  58.8985  43.4053  31.3954 
+postn-ideal distance  2,  0: 5.67724 
+postn  3,  0  48.1800  19.4200  20.3400 
+ideal  3,  0  46.2368  18.9542  19.5873 
+postn-ideal distance  3,  0: 2.13527 
+postn  4,  0  61.4700  47.9900  33.5400 
+ideal  4,  0  61.4700  47.9900  33.5400 
 postn-ideal distance  4,  0: 0.00000 
 postn-ideal distance RMS  0: 0.03174 
 rms (pstn, ideal) = 0.03174 
@@ -2025,17 +2025,17 @@ Est by  0 of prob 0.3448 that [ 0> 3], with expected gain to  3 of -0.0093
 Est by  3 of prob 0.4320 that [ 0> 3], with expected gain to  0 of +0.0134 
 Est by  3 of prob 0.4320 that [ 0> 3], with expected gain to  3 of -0.0131 
 
-Bargain [1098, 0:3] from  0's perspective (brgnIIJ) 
-   0 proposes  0 adopt:  0.554  0.215  0.229 
-   0 proposes  3 adopt:  0.554  0.215  0.229 
+Bargain [2743, 0:3] from  0's perspective (brgnIIJ) 
+   0 proposes  0 adopt:  55.390  21.510  22.920 
+   0 proposes  3 adopt:  55.390  21.510  22.920 
 
-Bargain  [1099, 0:3] from  3's perspective (brgnJIJ) 
-   3 proposes  0 adopt:  0.482  0.194  0.203 
-   3 proposes  3 adopt:  0.482  0.194  0.203 
+Bargain  [2744, 0:3] from  3's perspective (brgnJIJ) 
+   3 proposes  0 adopt:  48.190  19.420  20.340 
+   3 proposes  3 adopt:  48.190  19.420  20.340 
 
-Power-weighted compromise  [1100, 0:3] bargain (brgnIJ) 
-  compromise proposes  0 adopt:  0.517  0.204  0.216 
-  compromise proposes  3 adopt:  0.517  0.204  0.216 
+Power-weighted compromise  [2745, 0:3] bargain (brgnIJ) 
+  compromise proposes  0 adopt:  51.692  20.437  21.595 
+  compromise proposes  3 adopt:  51.692  20.437  21.595 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 5 actor 1 has most advantageous target 2 worth 0.211
@@ -2044,17 +2044,17 @@ Est by  1 of prob 0.7860 that [ 1> 2], with expected gain to  2 of -0.1926
 Est by  2 of prob 0.7937 that [ 1> 2], with expected gain to  1 of +0.1546 
 Est by  2 of prob 0.7937 that [ 1> 2], with expected gain to  2 of -0.1357 
 
-Bargain [1102, 1:2] from  1's perspective (brgnIIJ) 
-   1 proposes  1 adopt:  0.307  0.616  0.670 
-   1 proposes  2 adopt:  0.307  0.616  0.670 
+Bargain [2747, 1:2] from  1's perspective (brgnIIJ) 
+   1 proposes  1 adopt:  30.680  61.620  66.970 
+   1 proposes  2 adopt:  30.680  61.620  66.970 
 
-Bargain  [1103, 1:2] from  2's perspective (brgnJIJ) 
-   2 proposes  1 adopt:  0.606  0.486  0.358 
-   2 proposes  2 adopt:  0.606  0.486  0.358 
+Bargain  [2748, 1:2] from  2's perspective (brgnJIJ) 
+   2 proposes  1 adopt:  60.630  48.650  35.830 
+   2 proposes  2 adopt:  60.630  48.650  35.830 
 
-Power-weighted compromise  [1104, 1:2] bargain (brgnIJ) 
-  compromise proposes  1 adopt:  0.447  0.556  0.524 
-  compromise proposes  2 adopt:  0.447  0.556  0.524 
+Power-weighted compromise  [2749, 1:2] bargain (brgnIJ) 
+  compromise proposes  1 adopt:  44.674  55.560  52.420 
+  compromise proposes  2 adopt:  44.674  55.560  52.420 
 
 Using InitOnlyInterp to form proposed bargains
 Actor 2 has no advantageous targets 
@@ -2064,27 +2064,27 @@ Est by  3 of prob 0.8193 that [ 3> 2], with expected gain to  2 of -0.0406
 Est by  2 of prob 0.8584 that [ 3> 2], with expected gain to  3 of +0.1269 
 Est by  2 of prob 0.8584 that [ 3> 2], with expected gain to  2 of -0.0855 
 
-Bargain [1107, 3:2] from  3's perspective (brgnIIJ) 
-   3 proposes  3 adopt:  0.501  0.201  0.213 
-   3 proposes  2 adopt:  0.501  0.201  0.213 
+Bargain [2752, 3:2] from  3's perspective (brgnIIJ) 
+   3 proposes  3 adopt:  50.070  20.050  21.300 
+   3 proposes  2 adopt:  50.070  20.050  21.310 
 
-Bargain  [1108, 3:2] from  2's perspective (brgnJIJ) 
-   2 proposes  3 adopt:  0.614  0.468  0.334 
-   2 proposes  2 adopt:  0.614  0.468  0.334 
+Bargain  [2753, 3:2] from  2's perspective (brgnJIJ) 
+   2 proposes  3 adopt:  61.390  46.750  33.370 
+   2 proposes  2 adopt:  61.390  46.750  33.370 
 
-Power-weighted compromise  [1109, 3:2] bargain (brgnIJ) 
-  compromise proposes  3 adopt:  0.559  0.337  0.275 
-  compromise proposes  2 adopt:  0.559  0.337  0.275 
+Power-weighted compromise  [2754, 3:2] bargain (brgnIJ) 
+  compromise proposes  3 adopt:  55.872  33.735  27.486 
+  compromise proposes  2 adopt:  55.872  33.735  27.491 
 
 Using InitOnlyInterp to form proposed bargains
 Actor 4 has no advantageous targets 
 
 Bargains to be resolved
-Bargains involving actor  0: [1097, 0:0][1098, 0:3]
-Bargains involving actor  1: [1101, 1:1][1102, 1:2]
-Bargains involving actor  2: [1102, 1:2][1105, 2:2][1107, 3:2]
-Bargains involving actor  3: [1098, 0:3][1106, 3:3][1107, 3:2]
-Bargains involving actor  4: [1110, 4:4]
+Bargains involving actor  0: [2742, 0:0][2743, 0:3]
+Bargains involving actor  1: [2746, 1:1][2747, 1:2]
+Bargains involving actor  2: [2747, 1:2][2750, 2:2][2752, 3:2]
+Bargains involving actor  3: [2743, 0:3][2751, 3:3][2752, 3:2]
+Bargains involving actor  4: [2755, 4:4]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -2255,20 +2255,20 @@ Found stable PCE distribution
 done
 Chosen bargain (Stochastic): 1 out of 1 bargains
 
-postn  0,  0  0.6147  0.4799  0.3354 
-ideal  0,  0  0.6147  0.4799  0.3354 
-postn-ideal distance  0,  0: 0.00007 
-postn  1,  0  0.3068  0.6162  0.6697 
-ideal  1,  0  0.3270  0.6059  0.6435 
-postn-ideal distance  1,  0: 0.03463 
-postn  2,  0  0.3068  0.6162  0.6697 
-ideal  2,  0  0.3916  0.5213  0.5308 
-postn-ideal distance  2,  0: 0.18841 
-postn  3,  0  0.4818  0.1942  0.2034 
-ideal  3,  0  0.4734  0.1922  0.2002 
-postn-ideal distance  3,  0: 0.00918 
-postn  4,  0  0.6147  0.4799  0.3354 
-ideal  4,  0  0.6147  0.4799  0.3354 
+postn  0,  0  61.4700  47.9900  33.5400 
+ideal  0,  0  61.4735  47.9862  33.5357 
+postn-ideal distance  0,  0: 0.00674 
+postn  1,  0  30.6800  61.6200  66.9700 
+ideal  1,  0  32.7001  60.5930  64.3510 
+postn-ideal distance  1,  0: 3.46334 
+postn  2,  0  30.6800  61.6200  66.9700 
+ideal  2,  0  39.1631  52.1268  53.0817 
+postn-ideal distance  2,  0: 18.84063 
+postn  3,  0  48.1800  19.4200  20.3400 
+ideal  3,  0  47.3444  19.2197  20.0164 
+postn-ideal distance  3,  0: 0.91816 
+postn  4,  0  61.4700  47.9900  33.5400 
+ideal  4,  0  61.4700  47.9900  33.5400 
 postn-ideal distance  4,  0: 0.00000 
 postn-ideal distance RMS  0: 0.08577 
 rms (pstn, ideal) = 0.08577 
@@ -2350,17 +2350,17 @@ Est by  0 of prob 0.8682 that [ 0> 2], with expected gain to  2 of -0.0393
 Est by  2 of prob 0.9066 that [ 0> 2], with expected gain to  0 of +0.2452 
 Est by  2 of prob 0.9066 that [ 0> 2], with expected gain to  2 of -0.0790 
 
-Bargain [1112, 0:2] from  0's perspective (brgnIIJ) 
-   0 proposes  0 adopt:  0.609  0.485  0.349 
-   0 proposes  2 adopt:  0.609  0.485  0.349 
+Bargain [2757, 0:2] from  0's perspective (brgnIIJ) 
+   0 proposes  0 adopt:  60.920  48.480  34.900 
+   0 proposes  2 adopt:  60.920  48.480  34.910 
 
-Bargain  [1113, 0:2] from  2's perspective (brgnJIJ) 
-   2 proposes  0 adopt:  0.343  0.608  0.652 
-   2 proposes  2 adopt:  0.343  0.608  0.652 
+Bargain  [2758, 0:2] from  2's perspective (brgnJIJ) 
+   2 proposes  0 adopt:  34.290  60.790  65.160 
+   2 proposes  2 adopt:  34.290  60.790  65.160 
 
-Power-weighted compromise  [1114, 0:2] bargain (brgnIJ) 
-  compromise proposes  0 adopt:  0.469  0.550  0.508 
-  compromise proposes  2 adopt:  0.469  0.550  0.508 
+Power-weighted compromise  [2759, 0:2] bargain (brgnIJ) 
+  compromise proposes  0 adopt:  46.910  54.956  50.820 
+  compromise proposes  2 adopt:  46.910  54.956  50.824 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 6 actor 1 has most advantageous target 4 worth 0.160
@@ -2369,17 +2369,17 @@ Est by  1 of prob 0.6948 that [ 1> 4], with expected gain to  4 of -0.1628
 Est by  4 of prob 0.7535 that [ 1> 4], with expected gain to  1 of +0.0978 
 Est by  4 of prob 0.7535 that [ 1> 4], with expected gain to  4 of -0.0773 
 
-Bargain [1116, 1:4] from  1's perspective (brgnIIJ) 
-   1 proposes  1 adopt:  0.406  0.608  0.648 
-   1 proposes  4 adopt:  0.406  0.608  0.648 
+Bargain [2761, 1:4] from  1's perspective (brgnIIJ) 
+   1 proposes  1 adopt:  40.650  60.800  64.820 
+   1 proposes  4 adopt:  40.650  60.800  64.820 
 
-Bargain  [1117, 1:4] from  4's perspective (brgnJIJ) 
-   4 proposes  1 adopt:  0.613  0.485  0.346 
-   4 proposes  4 adopt:  0.613  0.484  0.346 
+Bargain  [2762, 1:4] from  4's perspective (brgnJIJ) 
+   4 proposes  1 adopt:  61.320  48.460  34.610 
+   4 proposes  4 adopt:  61.320  48.450  34.610 
 
-Power-weighted compromise  [1118, 1:4] bargain (brgnIJ) 
-  compromise proposes  1 adopt:  0.503  0.550  0.507 
-  compromise proposes  4 adopt:  0.503  0.550  0.507 
+Power-weighted compromise  [2763, 1:4] bargain (brgnIJ) 
+  compromise proposes  1 adopt:  50.294  55.042  50.724 
+  compromise proposes  4 adopt:  50.294  55.038  50.724 
 
 Using InitOnlyInterp to form proposed bargains
 Actor 2 has no advantageous targets 
@@ -2389,17 +2389,17 @@ Est by  3 of prob 0.8426 that [ 3> 2], with expected gain to  2 of -0.0807
 Est by  2 of prob 0.8870 that [ 3> 2], with expected gain to  3 of +0.3358 
 Est by  2 of prob 0.8870 that [ 3> 2], with expected gain to  2 of -0.1713 
 
-Bargain [1121, 3:2] from  3's perspective (brgnIIJ) 
-   3 proposes  3 adopt:  0.463  0.201  0.228 
-   3 proposes  2 adopt:  0.463  0.201  0.228 
+Bargain [2766, 3:2] from  3's perspective (brgnIIJ) 
+   3 proposes  3 adopt:  46.320  20.090  22.830 
+   3 proposes  2 adopt:  46.320  20.090  22.840 
 
-Bargain  [1122, 3:2] from  2's perspective (brgnJIJ) 
-   2 proposes  3 adopt:  0.319  0.466  0.606 
-   2 proposes  2 adopt:  0.319  0.466  0.606 
+Bargain  [2767, 3:2] from  2's perspective (brgnJIJ) 
+   2 proposes  3 adopt:  31.900  46.620  60.610 
+   2 proposes  2 adopt:  31.900  46.620  60.610 
 
-Power-weighted compromise  [1123, 3:2] bargain (brgnIJ) 
-  compromise proposes  3 adopt:  0.389  0.337  0.422 
-  compromise proposes  2 adopt:  0.389  0.337  0.422 
+Power-weighted compromise  [2768, 3:2] bargain (brgnIJ) 
+  compromise proposes  3 adopt:  38.929  33.688  42.194 
+  compromise proposes  2 adopt:  38.929  33.688  42.199 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 6 actor 4 has most advantageous target 2 worth 0.089
@@ -2408,26 +2408,26 @@ Est by  4 of prob 0.8150 that [ 4> 2], with expected gain to  2 of -0.0353
 Est by  2 of prob 0.8657 that [ 4> 2], with expected gain to  4 of +0.2403 
 Est by  2 of prob 0.8657 that [ 4> 2], with expected gain to  2 of -0.0733 
 
-Bargain [1125, 4:2] from  4's perspective (brgnIIJ) 
-   4 proposes  4 adopt:  0.607  0.493  0.357 
-   4 proposes  2 adopt:  0.607  0.493  0.357 
+Bargain [2770, 4:2] from  4's perspective (brgnIIJ) 
+   4 proposes  4 adopt:  60.660  49.300  35.680 
+   4 proposes  2 adopt:  60.660  49.300  35.680 
 
-Bargain  [1126, 4:2] from  2's perspective (brgnJIJ) 
-   2 proposes  4 adopt:  0.356  0.610  0.646 
-   2 proposes  2 adopt:  0.356  0.610  0.646 
+Bargain  [2771, 4:2] from  2's perspective (brgnJIJ) 
+   2 proposes  4 adopt:  35.600  60.990  64.620 
+   2 proposes  2 adopt:  35.600  60.990  64.630 
 
-Power-weighted compromise  [1127, 4:2] bargain (brgnIJ) 
-  compromise proposes  4 adopt:  0.481  0.552  0.502 
-  compromise proposes  2 adopt:  0.481  0.552  0.502 
+Power-weighted compromise  [2772, 4:2] bargain (brgnIJ) 
+  compromise proposes  4 adopt:  48.113  55.153  50.169 
+  compromise proposes  2 adopt:  48.113  55.153  50.174 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [1111, 0:0][1112, 0:2]
-Bargains involving actor  1: [1115, 1:1][1116, 1:4]
-Bargains involving actor  2: [1112, 0:2][1119, 2:2][1121, 3:2][1125, 4:2]
-Bargains involving actor  3: [1120, 3:3][1121, 3:2]
-Bargains involving actor  4: [1116, 1:4][1124, 4:4][1125, 4:2]
+Bargains involving actor  0: [2756, 0:0][2757, 0:2]
+Bargains involving actor  1: [2760, 1:1][2761, 1:4]
+Bargains involving actor  2: [2757, 0:2][2764, 2:2][2766, 3:2][2770, 4:2]
+Bargains involving actor  3: [2765, 3:3][2766, 3:2]
+Bargains involving actor  4: [2761, 1:4][2769, 4:4][2770, 4:2]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -2604,20 +2604,20 @@ Found stable PCE distribution
 done
 Chosen bargain (Stochastic): 1 out of 3 bargains
 
-postn  0,  0  0.6092  0.4848  0.3490 
-ideal  0,  0  0.6099  0.4842  0.3472 
-postn-ideal distance  0,  0: 0.00202 
-postn  1,  0  0.4065  0.6080  0.6482 
-ideal  1,  0  0.4064  0.5990  0.6264 
-postn-ideal distance  1,  0: 0.02357 
-postn  2,  0  0.3068  0.6162  0.6697 
-ideal  2,  0  0.3458  0.5413  0.5818 
-postn-ideal distance  2,  0: 0.12190 
-postn  3,  0  0.4632  0.2009  0.2283 
-ideal  3,  0  0.4676  0.1972  0.2162 
-postn-ideal distance  3,  0: 0.01341 
-postn  4,  0  0.4065  0.6080  0.6482 
-ideal  4,  0  0.4065  0.6080  0.6482 
+postn  0,  0  60.9200  48.4800  34.9000 
+ideal  0,  0  60.9920  48.4158  34.7226 
+postn-ideal distance  0,  0: 0.20188 
+postn  1,  0  40.6500  60.8000  64.8200 
+ideal  1,  0  40.6379  59.9003  62.6412 
+postn-ideal distance  1,  0: 2.35729 
+postn  2,  0  30.6800  61.6200  66.9700 
+ideal  2,  0  34.5795  54.1326  58.1764 
+postn-ideal distance  2,  0: 12.18996 
+postn  3,  0  46.3200  20.0900  22.8300 
+ideal  3,  0  46.7605  19.7158  21.6201 
+postn-ideal distance  3,  0: 1.34085 
+postn  4,  0  40.6500  60.8000  64.8200 
+ideal  4,  0  40.6500  60.8000  64.8200 
 postn-ideal distance  4,  0: 0.00000 
 postn-ideal distance RMS  0: 0.05586 
 rms (pstn, ideal) = 0.05586 
@@ -2699,17 +2699,17 @@ Est by  0 of prob 0.7821 that [ 0> 2], with expected gain to  2 of -0.0639
 Est by  2 of prob 0.8496 that [ 0> 2], with expected gain to  0 of +0.2143 
 Est by  2 of prob 0.8496 that [ 0> 2], with expected gain to  2 of -0.1411 
 
-Bargain [1129, 0:2] from  0's perspective (brgnIIJ) 
-   0 proposes  0 adopt:  0.592  0.500  0.389 
-   0 proposes  2 adopt:  0.592  0.500  0.389 
+Bargain [2774, 0:2] from  0's perspective (brgnIIJ) 
+   0 proposes  0 adopt:  59.160  49.960  38.920 
+   0 proposes  2 adopt:  59.160  49.960  38.920 
 
-Bargain  [1130, 0:2] from  2's perspective (brgnJIJ) 
-   2 proposes  0 adopt:  0.333  0.611  0.657 
-   2 proposes  2 adopt:  0.333  0.611  0.657 
+Bargain  [2775, 0:2] from  2's perspective (brgnJIJ) 
+   2 proposes  0 adopt:  33.270  61.050  65.730 
+   2 proposes  2 adopt:  33.270  61.050  65.730 
 
-Power-weighted compromise  [1131, 0:2] bargain (brgnIJ) 
-  compromise proposes  0 adopt:  0.455  0.558  0.530 
-  compromise proposes  2 adopt:  0.455  0.558  0.530 
+Power-weighted compromise  [2776, 0:2] bargain (brgnIJ) 
+  compromise proposes  0 adopt:  45.539  55.794  53.025 
+  compromise proposes  2 adopt:  45.539  55.794  53.025 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 7 actor 1 has most advantageous target 3 worth 0.033
@@ -2720,17 +2720,17 @@ Est by  1 of prob 0.3904 that [ 1> 3], with expected gain to  3 of -0.0320
 Est by  3 of prob 0.4096 that [ 1> 3], with expected gain to  1 of +0.0254 
 Est by  3 of prob 0.4096 that [ 1> 3], with expected gain to  3 of -0.0230 
 
-Bargain [1133, 1:3] from  1's perspective (brgnIIJ) 
-   1 proposes  1 adopt:  0.434  0.289  0.474 
-   1 proposes  3 adopt:  0.434  0.289  0.474 
+Bargain [2778, 1:3] from  1's perspective (brgnIIJ) 
+   1 proposes  1 adopt:  43.390  28.910  47.390 
+   1 proposes  3 adopt:  43.390  28.910  47.380 
 
-Bargain  [1134, 1:3] from  3's perspective (brgnJIJ) 
-   3 proposes  1 adopt:  0.463  0.201  0.229 
-   3 proposes  3 adopt:  0.463  0.201  0.229 
+Bargain  [2779, 1:3] from  3's perspective (brgnJIJ) 
+   3 proposes  1 adopt:  46.310  20.110  22.930 
+   3 proposes  3 adopt:  46.310  20.110  22.930 
 
-Power-weighted compromise  [1135, 1:3] bargain (brgnIJ) 
-  compromise proposes  1 adopt:  0.447  0.249  0.363 
-  compromise proposes  3 adopt:  0.447  0.249  0.363 
+Power-weighted compromise  [2780, 1:3] bargain (brgnIJ) 
+  compromise proposes  1 adopt:  44.718  24.908  36.266 
+  compromise proposes  3 adopt:  44.718  24.908  36.261 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 7 actor 2 has most advantageous target 1 worth 0.001
@@ -2741,17 +2741,17 @@ Est by  2 of prob 0.0000 that [ 2> 1], with expected gain to  1 of +0.0379
 Est by  1 of prob 0.0000 that [ 2> 1], with expected gain to  2 of +0.0007 
 Est by  1 of prob 0.0000 that [ 2> 1], with expected gain to  1 of +0.0222 
 
-Bargain [1137, 2:1] from  2's perspective (brgnIIJ) 
-   2 proposes  2 adopt:  0.406  0.608  0.648 
-   2 proposes  1 adopt:  0.406  0.608  0.648 
+Bargain [2782, 2:1] from  2's perspective (brgnIIJ) 
+   2 proposes  2 adopt:  40.650  60.800  64.820 
+   2 proposes  1 adopt:  40.650  60.800  64.820 
 
-Bargain  [1138, 2:1] from  1's perspective (brgnJIJ) 
-   1 proposes  2 adopt:  0.406  0.608  0.648 
-   1 proposes  1 adopt:  0.406  0.608  0.648 
+Bargain  [2783, 2:1] from  1's perspective (brgnJIJ) 
+   1 proposes  2 adopt:  40.650  60.800  64.820 
+   1 proposes  1 adopt:  40.650  60.800  64.820 
 
-Power-weighted compromise  [1139, 2:1] bargain (brgnIJ) 
-  compromise proposes  2 adopt:  0.406  0.608  0.648 
-  compromise proposes  1 adopt:  0.406  0.608  0.648 
+Power-weighted compromise  [2784, 2:1] bargain (brgnIJ) 
+  compromise proposes  2 adopt:  40.650  60.800  64.820 
+  compromise proposes  1 adopt:  40.650  60.800  64.820 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 7 actor 3 has most advantageous target 4 worth 0.120
@@ -2760,17 +2760,17 @@ Est by  3 of prob 0.8585 that [ 3> 4], with expected gain to  4 of -0.0725
 Est by  4 of prob 0.8474 that [ 3> 4], with expected gain to  3 of +0.1998 
 Est by  4 of prob 0.8474 that [ 3> 4], with expected gain to  4 of -0.1332 
 
-Bargain [1141, 3:4] from  3's perspective (brgnIIJ) 
-   3 proposes  3 adopt:  0.455  0.203  0.242 
-   3 proposes  4 adopt:  0.455  0.203  0.242 
+Bargain [2786, 3:4] from  3's perspective (brgnIIJ) 
+   3 proposes  3 adopt:  45.470  20.340  24.180 
+   3 proposes  4 adopt:  45.470  20.340  24.180 
 
-Bargain  [1142, 3:4] from  4's perspective (brgnJIJ) 
-   4 proposes  3 adopt:  0.407  0.519  0.628 
-   4 proposes  4 adopt:  0.407  0.519  0.628 
+Bargain  [2787, 3:4] from  4's perspective (brgnJIJ) 
+   4 proposes  3 adopt:  40.700  51.950  62.780 
+   4 proposes  4 adopt:  40.700  51.950  62.780 
 
-Power-weighted compromise  [1143, 3:4] bargain (brgnIJ) 
-  compromise proposes  3 adopt:  0.430  0.365  0.439 
-  compromise proposes  4 adopt:  0.430  0.365  0.439 
+Power-weighted compromise  [2788, 3:4] bargain (brgnIJ) 
+  compromise proposes  3 adopt:  43.028  36.521  43.939 
+  compromise proposes  4 adopt:  43.028  36.521  43.939 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 7 actor 4 has most advantageous target 2 worth 0.061
@@ -2779,26 +2779,26 @@ Est by  4 of prob 1.0000 that [ 4> 2], with expected gain to  2 of +0.0010
 Est by  2 of prob 1.0000 that [ 4> 2], with expected gain to  4 of +0.1022 
 Est by  2 of prob 1.0000 that [ 4> 2], with expected gain to  2 of +0.0014 
 
-Bargain [1145, 4:2] from  4's perspective (brgnIIJ) 
-   4 proposes  4 adopt:  0.406  0.608  0.648 
-   4 proposes  2 adopt:  0.406  0.608  0.648 
+Bargain [2790, 4:2] from  4's perspective (brgnIIJ) 
+   4 proposes  4 adopt:  40.650  60.800  64.820 
+   4 proposes  2 adopt:  40.650  60.800  64.820 
 
-Bargain  [1146, 4:2] from  2's perspective (brgnJIJ) 
-   2 proposes  4 adopt:  0.309  0.616  0.669 
-   2 proposes  2 adopt:  0.309  0.616  0.669 
+Bargain  [2791, 4:2] from  2's perspective (brgnJIJ) 
+   2 proposes  4 adopt:  30.920  61.610  66.950 
+   2 proposes  2 adopt:  30.920  61.610  66.950 
 
-Power-weighted compromise  [1147, 4:2] bargain (brgnIJ) 
-  compromise proposes  4 adopt:  0.358  0.612  0.659 
-  compromise proposes  2 adopt:  0.358  0.612  0.659 
+Power-weighted compromise  [2792, 4:2] bargain (brgnIJ) 
+  compromise proposes  4 adopt:  35.779  61.206  65.886 
+  compromise proposes  2 adopt:  35.779  61.206  65.886 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [1128, 0:0][1129, 0:2]
-Bargains involving actor  1: [1132, 1:1][1133, 1:3][1137, 2:1]
-Bargains involving actor  2: [1129, 0:2][1136, 2:2][1137, 2:1][1145, 4:2]
-Bargains involving actor  3: [1133, 1:3][1140, 3:3][1141, 3:4]
-Bargains involving actor  4: [1141, 3:4][1144, 4:4][1145, 4:2]
+Bargains involving actor  0: [2773, 0:0][2774, 0:2]
+Bargains involving actor  1: [2777, 1:1][2778, 1:3][2782, 2:1]
+Bargains involving actor  2: [2774, 0:2][2781, 2:2][2782, 2:1][2790, 4:2]
+Bargains involving actor  3: [2778, 1:3][2785, 3:3][2786, 3:4]
+Bargains involving actor  4: [2786, 3:4][2789, 4:4][2790, 4:2]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -2981,20 +2981,20 @@ Found stable PCE distribution
 done
 Chosen bargain (Stochastic): 2 out of 3 bargains
 
-postn  0,  0  0.5916  0.4996  0.3892 
-ideal  0,  0  0.5940  0.4976  0.3837 
-postn-ideal distance  0,  0: 0.00628 
-postn  1,  0  0.4339  0.2891  0.4739 
-ideal  1,  0  0.4400  0.3596  0.4954 
-postn-ideal distance  1,  0: 0.07398 
-postn  2,  0  0.5916  0.4996  0.3892 
-ideal  2,  0  0.5170  0.4814  0.4426 
-postn-ideal distance  2,  0: 0.09349 
-postn  3,  0  0.4339  0.2891  0.4738 
-ideal  3,  0  0.4484  0.2496  0.3630 
-postn-ideal distance  3,  0: 0.11850 
-postn  4,  0  0.4065  0.6080  0.6482 
-ideal  4,  0  0.4065  0.6080  0.6482 
+postn  0,  0  59.1600  49.9600  38.9200 
+ideal  0,  0  59.3982  49.7593  38.3743 
+postn-ideal distance  0,  0: 0.62830 
+postn  1,  0  43.3900  28.9100  47.3900 
+ideal  1,  0  43.9985  35.9618  49.5423 
+postn-ideal distance  1,  0: 7.39798 
+postn  2,  0  59.1600  49.9600  38.9200 
+ideal  2,  0  51.7022  48.1415  44.2562 
+postn-ideal distance  2,  0: 9.34886 
+postn  3,  0  43.3900  28.9100  47.3800 
+ideal  3,  0  44.8393  24.9565  36.3033 
+postn-ideal distance  3,  0: 11.85011 
+postn  4,  0  40.6500  60.8000  64.8200 
+ideal  4,  0  40.6500  60.8000  64.8200 
 postn-ideal distance  4,  0: 0.00000 
 postn-ideal distance RMS  0: 0.07523 
 rms (pstn, ideal) = 0.07523 
@@ -3076,17 +3076,17 @@ Est by  0 of prob 0.7936 that [ 0> 1], with expected gain to  1 of -0.0236
 Est by  1 of prob 0.8377 that [ 0> 1], with expected gain to  0 of +0.0361 
 Est by  1 of prob 0.8377 that [ 0> 1], with expected gain to  1 of -0.0113 
 
-Bargain [1149, 0:1] from  0's perspective (brgnIIJ) 
-   0 proposes  0 adopt:  0.585  0.470  0.407 
-   0 proposes  1 adopt:  0.585  0.470  0.407 
+Bargain [2794, 0:1] from  0's perspective (brgnIIJ) 
+   0 proposes  0 adopt:  58.540  47.050  40.690 
+   0 proposes  1 adopt:  58.540  47.050  40.690 
 
-Bargain  [1150, 0:1] from  1's perspective (brgnJIJ) 
-   1 proposes  0 adopt:  0.434  0.289  0.474 
-   1 proposes  1 adopt:  0.434  0.289  0.474 
+Bargain  [2795, 0:1] from  1's perspective (brgnJIJ) 
+   1 proposes  0 adopt:  43.430  28.920  47.390 
+   1 proposes  1 adopt:  43.430  28.920  47.390 
 
-Power-weighted compromise  [1151, 0:1] bargain (brgnIJ) 
-  compromise proposes  0 adopt:  0.501  0.369  0.444 
-  compromise proposes  1 adopt:  0.501  0.369  0.444 
+Power-weighted compromise  [2796, 0:1] bargain (brgnIJ) 
+  compromise proposes  0 adopt:  50.099  36.922  44.433 
+  compromise proposes  1 adopt:  50.099  36.922  44.433 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 8 actor 1 has most advantageous target 2 worth 0.006
@@ -3095,17 +3095,17 @@ Est by  1 of prob 0.6099 that [ 1> 2], with expected gain to  2 of -0.0104
 Est by  2 of prob 0.6483 that [ 1> 2], with expected gain to  1 of +0.0172 
 Est by  2 of prob 0.6483 that [ 1> 2], with expected gain to  2 of -0.0212 
 
-Bargain [1153, 1:2] from  1's perspective (brgnIIJ) 
-   1 proposes  1 adopt:  0.489  0.335  0.460 
-   1 proposes  2 adopt:  0.489  0.335  0.460 
+Bargain [2798, 1:2] from  1's perspective (brgnIIJ) 
+   1 proposes  1 adopt:  48.880  33.530  46.020 
+   1 proposes  2 adopt:  48.880  33.530  46.020 
 
-Bargain  [1154, 1:2] from  2's perspective (brgnJIJ) 
-   2 proposes  1 adopt:  0.592  0.499  0.389 
-   2 proposes  2 adopt:  0.592  0.499  0.389 
+Bargain  [2799, 1:2] from  2's perspective (brgnJIJ) 
+   2 proposes  1 adopt:  59.160  49.950  38.930 
+   2 proposes  2 adopt:  59.160  49.950  38.930 
 
-Power-weighted compromise  [1155, 1:2] bargain (brgnIJ) 
-  compromise proposes  1 adopt:  0.537  0.412  0.427 
-  compromise proposes  2 adopt:  0.537  0.412  0.427 
+Power-weighted compromise  [2800, 1:2] bargain (brgnIJ) 
+  compromise proposes  1 adopt:  53.683  41.202  42.707 
+  compromise proposes  2 adopt:  53.683  41.202  42.707 
 
 Using InitOnlyInterp to form proposed bargains
 Actor 2 has no advantageous targets 
@@ -3115,17 +3115,17 @@ Est by  3 of prob 0.7292 that [ 3> 4], with expected gain to  4 of -0.0505
 Est by  4 of prob 0.7501 that [ 3> 4], with expected gain to  3 of +0.1763 
 Est by  4 of prob 0.7501 that [ 3> 4], with expected gain to  4 of -0.1320 
 
-Bargain [1158, 3:4] from  3's perspective (brgnIIJ) 
-   3 proposes  3 adopt:  0.421  0.299  0.499 
-   3 proposes  4 adopt:  0.421  0.299  0.499 
+Bargain [2803, 3:4] from  3's perspective (brgnIIJ) 
+   3 proposes  3 adopt:  42.100  29.870  49.890 
+   3 proposes  4 adopt:  42.100  29.870  49.890 
 
-Bargain  [1159, 3:4] from  4's perspective (brgnJIJ) 
-   4 proposes  3 adopt:  0.407  0.554  0.642 
-   4 proposes  4 adopt:  0.407  0.554  0.642 
+Bargain  [2804, 3:4] from  4's perspective (brgnJIJ) 
+   4 proposes  3 adopt:  40.670  55.390  64.190 
+   4 proposes  4 adopt:  40.670  55.400  64.190 
 
-Power-weighted compromise  [1160, 3:4] bargain (brgnIJ) 
-  compromise proposes  3 adopt:  0.414  0.429  0.572 
-  compromise proposes  4 adopt:  0.414  0.429  0.572 
+Power-weighted compromise  [2805, 3:4] bargain (brgnIJ) 
+  compromise proposes  3 adopt:  41.368  42.933  57.210 
+  compromise proposes  4 adopt:  41.368  42.938  57.210 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 8 actor 4 has most advantageous target 2 worth 0.206
@@ -3134,26 +3134,26 @@ Est by  4 of prob 0.8638 that [ 4> 2], with expected gain to  2 of -0.0739
 Est by  2 of prob 0.8784 that [ 4> 2], with expected gain to  4 of +0.1263 
 Est by  2 of prob 0.8784 that [ 4> 2], with expected gain to  2 of -0.0379 
 
-Bargain [1162, 4:2] from  4's perspective (brgnIIJ) 
-   4 proposes  4 adopt:  0.409  0.603  0.640 
-   4 proposes  2 adopt:  0.409  0.603  0.640 
+Bargain [2807, 4:2] from  4's perspective (brgnIIJ) 
+   4 proposes  4 adopt:  40.890  60.270  63.990 
+   4 proposes  2 adopt:  40.890  60.270  63.990 
 
-Bargain  [1163, 4:2] from  2's perspective (brgnJIJ) 
-   2 proposes  4 adopt:  0.585  0.501  0.393 
-   2 proposes  2 adopt:  0.585  0.501  0.393 
+Bargain  [2808, 4:2] from  2's perspective (brgnJIJ) 
+   2 proposes  4 adopt:  58.450  50.070  39.320 
+   2 proposes  2 adopt:  58.450  50.070  39.320 
 
-Power-weighted compromise  [1164, 4:2] bargain (brgnIJ) 
-  compromise proposes  4 adopt:  0.497  0.552  0.516 
-  compromise proposes  2 adopt:  0.497  0.552  0.516 
+Power-weighted compromise  [2809, 4:2] bargain (brgnIJ) 
+  compromise proposes  4 adopt:  49.682  55.163  51.639 
+  compromise proposes  2 adopt:  49.682  55.163  51.639 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [1148, 0:0][1149, 0:1]
-Bargains involving actor  1: [1149, 0:1][1152, 1:1][1153, 1:2]
-Bargains involving actor  2: [1153, 1:2][1156, 2:2][1162, 4:2]
-Bargains involving actor  3: [1157, 3:3][1158, 3:4]
-Bargains involving actor  4: [1158, 3:4][1161, 4:4][1162, 4:2]
+Bargains involving actor  0: [2793, 0:0][2794, 0:1]
+Bargains involving actor  1: [2794, 0:1][2797, 1:1][2798, 1:2]
+Bargains involving actor  2: [2798, 1:2][2801, 2:2][2807, 4:2]
+Bargains involving actor  3: [2802, 3:3][2803, 3:4]
+Bargains involving actor  4: [2803, 3:4][2806, 4:4][2807, 4:2]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -3330,20 +3330,20 @@ Found stable PCE distribution
 done
 Chosen bargain (Stochastic): 1 out of 3 bargains
 
-postn  0,  0  0.5854  0.4705  0.4069 
-ideal  0,  0  0.5865  0.4740  0.4039 
-postn-ideal distance  0,  0: 0.00477 
-postn  1,  0  0.5854  0.4705  0.4069 
-ideal  1,  0  0.5592  0.4505  0.4228 
-postn-ideal distance  1,  0: 0.03657 
-postn  2,  0  0.5916  0.4996  0.3892 
-ideal  2,  0  0.5530  0.4695  0.4152 
-postn-ideal distance  2,  0: 0.05542 
-postn  3,  0  0.4210  0.2987  0.4989 
-ideal  3,  0  0.4328  0.2776  0.4405 
-postn-ideal distance  3,  0: 0.06323 
-postn  4,  0  0.4210  0.2987  0.4989 
-ideal  4,  0  0.4210  0.2987  0.4989 
+postn  0,  0  58.5400  47.0500  40.6900 
+ideal  0,  0  58.6516  47.4022  40.3890 
+postn-ideal distance  0,  0: 0.47657 
+postn  1,  0  58.5400  47.0500  40.6900 
+ideal  1,  0  55.9225  45.0541  42.2834 
+postn-ideal distance  1,  0: 3.65700 
+postn  2,  0  59.1600  49.9600  38.9200 
+ideal  2,  0  55.3015  46.9482  41.5201 
+postn-ideal distance  2,  0: 5.54250 
+postn  3,  0  42.1000  29.8700  49.8900 
+ideal  3,  0  43.2779  27.7572  44.0477 
+postn-ideal distance  3,  0: 6.32328 
+postn  4,  0  42.1000  29.8700  49.8900 
+ideal  4,  0  42.1000  29.8700  49.8900 
 postn-ideal distance  4,  0: 0.00000 
 postn-ideal distance RMS  0: 0.04106 
 rms (pstn, ideal) = 0.04106 
@@ -3425,17 +3425,17 @@ Est by  0 of prob 0.5866 that [ 0> 4], with expected gain to  4 of -0.0111
 Est by  4 of prob 0.5862 that [ 0> 4], with expected gain to  0 of +0.0107 
 Est by  4 of prob 0.5862 that [ 0> 4], with expected gain to  4 of -0.0095 
 
-Bargain [1166, 0:4] from  0's perspective (brgnIIJ) 
-   0 proposes  0 adopt:  0.515  0.422  0.445 
-   0 proposes  4 adopt:  0.515  0.422  0.445 
+Bargain [2811, 0:4] from  0's perspective (brgnIIJ) 
+   0 proposes  0 adopt:  51.490  42.210  44.450 
+   0 proposes  4 adopt:  51.490  42.210  44.450 
 
-Bargain  [1167, 0:4] from  4's perspective (brgnJIJ) 
-   4 proposes  0 adopt:  0.421  0.299  0.499 
-   4 proposes  4 adopt:  0.421  0.299  0.499 
+Bargain  [2812, 0:4] from  4's perspective (brgnJIJ) 
+   4 proposes  0 adopt:  42.100  29.870  49.890 
+   4 proposes  4 adopt:  42.100  29.870  49.890 
 
-Power-weighted compromise  [1168, 0:4] bargain (brgnIJ) 
-  compromise proposes  0 adopt:  0.466  0.357  0.473 
-  compromise proposes  4 adopt:  0.466  0.357  0.473 
+Power-weighted compromise  [2813, 0:4] bargain (brgnIJ) 
+  compromise proposes  0 adopt:  46.556  35.726  47.308 
+  compromise proposes  4 adopt:  46.556  35.726  47.308 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 9 actor 1 has most advantageous target 4 worth 0.004
@@ -3446,17 +3446,17 @@ Est by  1 of prob 0.4638 that [ 1> 4], with expected gain to  4 of -0.0056
 Est by  4 of prob 0.4607 that [ 1> 4], with expected gain to  1 of +0.0034 
 Est by  4 of prob 0.4607 that [ 1> 4], with expected gain to  4 of -0.0047 
 
-Bargain [1170, 1:4] from  1's perspective (brgnIIJ) 
-   1 proposes  1 adopt:  0.459  0.418  0.436 
-   1 proposes  4 adopt:  0.459  0.418  0.436 
+Bargain [2815, 1:4] from  1's perspective (brgnIIJ) 
+   1 proposes  1 adopt:  45.910  41.760  43.650 
+   1 proposes  4 adopt:  45.910  41.760  43.650 
 
-Bargain  [1171, 1:4] from  4's perspective (brgnJIJ) 
-   4 proposes  1 adopt:  0.421  0.299  0.499 
-   4 proposes  4 adopt:  0.421  0.299  0.499 
+Bargain  [2816, 1:4] from  4's perspective (brgnJIJ) 
+   4 proposes  1 adopt:  42.100  29.870  49.890 
+   4 proposes  4 adopt:  42.100  29.870  49.890 
 
-Power-weighted compromise  [1172, 1:4] bargain (brgnIJ) 
-  compromise proposes  1 adopt:  0.441  0.362  0.466 
-  compromise proposes  4 adopt:  0.441  0.362  0.466 
+Power-weighted compromise  [2817, 1:4] bargain (brgnIJ) 
+  compromise proposes  1 adopt:  44.132  36.212  46.561 
+  compromise proposes  4 adopt:  44.132  36.212  46.561 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 9 actor 2 has most advantageous target 4 worth 0.026
@@ -3467,17 +3467,17 @@ Est by  2 of prob 0.4466 that [ 2> 4], with expected gain to  4 of -0.0283
 Est by  4 of prob 0.6774 that [ 2> 4], with expected gain to  2 of +0.0332 
 Est by  4 of prob 0.6774 that [ 2> 4], with expected gain to  4 of -0.0150 
 
-Bargain [1174, 2:4] from  2's perspective (brgnIIJ) 
-   2 proposes  2 adopt:  0.465  0.414  0.448 
-   2 proposes  4 adopt:  0.465  0.414  0.448 
+Bargain [2819, 2:4] from  2's perspective (brgnIIJ) 
+   2 proposes  2 adopt:  46.450  41.390  44.810 
+   2 proposes  4 adopt:  46.450  41.390  44.810 
 
-Bargain  [1175, 2:4] from  4's perspective (brgnJIJ) 
-   4 proposes  2 adopt:  0.421  0.299  0.499 
-   4 proposes  4 adopt:  0.421  0.299  0.499 
+Bargain  [2820, 2:4] from  4's perspective (brgnJIJ) 
+   4 proposes  2 adopt:  42.110  29.920  49.870 
+   4 proposes  4 adopt:  42.110  29.920  49.870 
 
-Power-weighted compromise  [1176, 2:4] bargain (brgnIJ) 
-  compromise proposes  2 adopt:  0.443  0.357  0.473 
-  compromise proposes  4 adopt:  0.443  0.357  0.473 
+Power-weighted compromise  [2821, 2:4] bargain (brgnIJ) 
+  compromise proposes  2 adopt:  44.283  35.663  47.337 
+  compromise proposes  4 adopt:  44.283  35.663  47.337 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 9 actor 3 has most advantageous target 1 worth 0.018
@@ -3486,17 +3486,17 @@ Est by  3 of prob 0.7552 that [ 3> 1], with expected gain to  1 of -0.0105
 Est by  1 of prob 0.7463 that [ 3> 1], with expected gain to  3 of +0.0198 
 Est by  1 of prob 0.7463 that [ 3> 1], with expected gain to  1 of -0.0118 
 
-Bargain [1178, 3:1] from  3's perspective (brgnIIJ) 
-   3 proposes  3 adopt:  0.456  0.310  0.474 
-   3 proposes  1 adopt:  0.456  0.310  0.474 
+Bargain [2823, 3:1] from  3's perspective (brgnIIJ) 
+   3 proposes  3 adopt:  45.640  31.010  47.450 
+   3 proposes  1 adopt:  45.640  31.010  47.450 
 
-Bargain  [1179, 3:1] from  1's perspective (brgnJIJ) 
-   1 proposes  3 adopt:  0.585  0.470  0.407 
-   1 proposes  1 adopt:  0.585  0.470  0.407 
+Bargain  [2824, 3:1] from  1's perspective (brgnJIJ) 
+   1 proposes  3 adopt:  58.540  47.040  40.690 
+   1 proposes  1 adopt:  58.540  47.040  40.690 
 
-Power-weighted compromise  [1180, 3:1] bargain (brgnIJ) 
-  compromise proposes  3 adopt:  0.527  0.397  0.438 
-  compromise proposes  1 adopt:  0.527  0.397  0.438 
+Power-weighted compromise  [2825, 3:1] bargain (brgnIJ) 
+  compromise proposes  3 adopt:  52.673  39.750  43.764 
+  compromise proposes  1 adopt:  52.673  39.750  43.764 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 9 actor 4 has most advantageous target 1 worth 0.005
@@ -3505,26 +3505,26 @@ Est by  4 of prob 0.5393 that [ 4> 1], with expected gain to  1 of -0.0037
 Est by  1 of prob 0.5362 that [ 4> 1], with expected gain to  4 of +0.0059 
 Est by  1 of prob 0.5362 that [ 4> 1], with expected gain to  1 of -0.0042 
 
-Bargain [1182, 4:1] from  4's perspective (brgnIIJ) 
-   4 proposes  4 adopt:  0.458  0.417  0.437 
-   4 proposes  1 adopt:  0.458  0.417  0.437 
+Bargain [2827, 4:1] from  4's perspective (brgnIIJ) 
+   4 proposes  4 adopt:  45.840  41.670  43.700 
+   4 proposes  1 adopt:  45.840  41.670  43.700 
 
-Bargain  [1183, 4:1] from  1's perspective (brgnJIJ) 
-   1 proposes  4 adopt:  0.585  0.470  0.407 
-   1 proposes  1 adopt:  0.585  0.470  0.407 
+Bargain  [2828, 4:1] from  1's perspective (brgnJIJ) 
+   1 proposes  4 adopt:  58.540  47.050  40.690 
+   1 proposes  1 adopt:  58.540  47.050  40.690 
 
-Power-weighted compromise  [1184, 4:1] bargain (brgnIJ) 
-  compromise proposes  4 adopt:  0.526  0.445  0.421 
-  compromise proposes  1 adopt:  0.526  0.445  0.421 
+Power-weighted compromise  [2829, 4:1] bargain (brgnIJ) 
+  compromise proposes  4 adopt:  52.614  44.540  42.094 
+  compromise proposes  1 adopt:  52.614  44.540  42.094 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [1165, 0:0][1166, 0:4]
-Bargains involving actor  1: [1169, 1:1][1170, 1:4][1178, 3:1][1182, 4:1]
-Bargains involving actor  2: [1173, 2:2][1174, 2:4]
-Bargains involving actor  3: [1177, 3:3][1178, 3:1]
-Bargains involving actor  4: [1166, 0:4][1170, 1:4][1174, 2:4][1181, 4:4][1182, 4:1]
+Bargains involving actor  0: [2810, 0:0][2811, 0:4]
+Bargains involving actor  1: [2814, 1:1][2815, 1:4][2823, 3:1][2827, 4:1]
+Bargains involving actor  2: [2818, 2:2][2819, 2:4]
+Bargains involving actor  3: [2822, 3:3][2823, 3:1]
+Bargains involving actor  4: [2811, 0:4][2815, 1:4][2819, 2:4][2826, 4:4][2827, 4:1]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -3707,20 +3707,20 @@ Found stable PCE distribution
 done
 Chosen bargain (Stochastic): 3 out of 5 bargains
 
-postn  0,  0  0.5149  0.4221  0.4445 
-ideal  0,  0  0.5242  0.4288  0.4392 
-postn-ideal distance  0,  0: 0.01265 
-postn  1,  0  0.4584  0.4167  0.4370 
-ideal  1,  0  0.4805  0.4232  0.4350 
-postn-ideal distance  1,  0: 0.02312 
-postn  2,  0  0.4645  0.4139  0.4481 
-ideal  2,  0  0.4783  0.4112  0.4475 
-postn-ideal distance  2,  0: 0.01410 
-postn  3,  0  0.4210  0.2987  0.4989 
-ideal  3,  0  0.4261  0.2896  0.4738 
-postn-ideal distance  3,  0: 0.02719 
-postn  4,  0  0.4645  0.4139  0.4481 
-ideal  4,  0  0.4645  0.4139  0.4481 
+postn  0,  0  51.4900  42.2100  44.4500 
+ideal  0,  0  52.4210  42.8850  43.9221 
+postn-ideal distance  0,  0: 1.26534 
+postn  1,  0  45.8400  41.6700  43.7000 
+ideal  1,  0  48.0504  42.3169  43.4975 
+postn-ideal distance  1,  0: 2.31197 
+postn  2,  0  46.4500  41.3900  44.8100 
+ideal  2,  0  47.8318  41.1152  44.7466 
+postn-ideal distance  2,  0: 1.41031 
+postn  3,  0  42.1000  29.8700  49.8900 
+ideal  3,  0  42.6065  28.9615  47.3778 
+postn-ideal distance  3,  0: 2.71901 
+postn  4,  0  46.4500  41.3900  44.8100 
+ideal  4,  0  46.4500  41.3900  44.8100 
 postn-ideal distance  4,  0: 0.00000 
 postn-ideal distance RMS  0: 0.01807 
 rms (pstn, ideal) = 0.01807 
@@ -3802,17 +3802,17 @@ Est by  0 of prob 0.8908 that [ 0> 1], with expected gain to  1 of -0.0034
 Est by  1 of prob 0.9368 that [ 0> 1], with expected gain to  0 of +0.0421 
 Est by  1 of prob 0.9368 that [ 0> 1], with expected gain to  1 of -0.0079 
 
-Bargain [1186, 0:1] from  0's perspective (brgnIIJ) 
-   0 proposes  0 adopt:  0.514  0.422  0.444 
-   0 proposes  1 adopt:  0.514  0.422  0.444 
+Bargain [2831, 0:1] from  0's perspective (brgnIIJ) 
+   0 proposes  0 adopt:  51.440  42.190  44.410 
+   0 proposes  1 adopt:  51.440  42.190  44.410 
 
-Bargain  [1187, 0:1] from  1's perspective (brgnJIJ) 
-   1 proposes  0 adopt:  0.459  0.417  0.437 
-   1 proposes  1 adopt:  0.459  0.417  0.437 
+Bargain  [2832, 0:1] from  1's perspective (brgnJIJ) 
+   1 proposes  0 adopt:  45.860  41.670  43.700 
+   1 proposes  1 adopt:  45.860  41.670  43.700 
 
-Power-weighted compromise  [1188, 0:1] bargain (brgnIJ) 
-  compromise proposes  0 adopt:  0.483  0.419  0.440 
-  compromise proposes  1 adopt:  0.483  0.419  0.440 
+Power-weighted compromise  [2833, 0:1] bargain (brgnIJ) 
+  compromise proposes  0 adopt:  48.323  41.900  44.013 
+  compromise proposes  1 adopt:  48.323  41.900  44.013 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 10 actor 1 has most advantageous target 3 worth 0.019
@@ -3823,17 +3823,17 @@ Est by  1 of prob 0.4109 that [ 1> 3], with expected gain to  3 of -0.0158
 Est by  3 of prob 0.7182 that [ 1> 3], with expected gain to  1 of +0.0279 
 Est by  3 of prob 0.7182 that [ 1> 3], with expected gain to  3 of -0.0077 
 
-Bargain [1190, 1:3] from  1's perspective (brgnIIJ) 
-   1 proposes  1 adopt:  0.442  0.328  0.460 
-   1 proposes  3 adopt:  0.442  0.328  0.460 
+Bargain [2835, 1:3] from  1's perspective (brgnIIJ) 
+   1 proposes  1 adopt:  44.190  32.790  46.020 
+   1 proposes  3 adopt:  44.190  32.790  46.020 
 
-Bargain  [1191, 1:3] from  3's perspective (brgnJIJ) 
-   3 proposes  1 adopt:  0.421  0.299  0.499 
-   3 proposes  3 adopt:  0.421  0.299  0.499 
+Bargain  [2836, 1:3] from  3's perspective (brgnJIJ) 
+   3 proposes  1 adopt:  42.110  29.880  49.870 
+   3 proposes  3 adopt:  42.110  29.880  49.870 
 
-Power-weighted compromise  [1192, 1:3] bargain (brgnIJ) 
-  compromise proposes  1 adopt:  0.432  0.315  0.478 
-  compromise proposes  3 adopt:  0.432  0.315  0.478 
+Power-weighted compromise  [2837, 1:3] bargain (brgnIJ) 
+  compromise proposes  1 adopt:  43.244  31.467  47.771 
+  compromise proposes  3 adopt:  43.244  31.467  47.771 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 10 actor 2 has most advantageous target 1 worth 0.002
@@ -3842,17 +3842,17 @@ Est by  2 of prob 0.9915 that [ 2> 1], with expected gain to  1 of -0.0003
 Est by  1 of prob 0.9941 that [ 2> 1], with expected gain to  2 of +0.0056 
 Est by  1 of prob 0.9941 that [ 2> 1], with expected gain to  1 of -0.0005 
 
-Bargain [1194, 2:1] from  2's perspective (brgnIIJ) 
-   2 proposes  2 adopt:  0.465  0.414  0.448 
-   2 proposes  1 adopt:  0.465  0.414  0.448 
+Bargain [2839, 2:1] from  2's perspective (brgnIIJ) 
+   2 proposes  2 adopt:  46.450  41.390  44.810 
+   2 proposes  1 adopt:  46.450  41.390  44.810 
 
-Bargain  [1195, 2:1] from  1's perspective (brgnJIJ) 
-   1 proposes  2 adopt:  0.458  0.417  0.437 
-   1 proposes  1 adopt:  0.458  0.417  0.437 
+Bargain  [2840, 2:1] from  1's perspective (brgnJIJ) 
+   1 proposes  2 adopt:  45.840  41.670  43.700 
+   1 proposes  1 adopt:  45.840  41.670  43.700 
 
-Power-weighted compromise  [1196, 2:1] bargain (brgnIJ) 
-  compromise proposes  2 adopt:  0.461  0.415  0.442 
-  compromise proposes  1 adopt:  0.461  0.415  0.442 
+Power-weighted compromise  [2841, 2:1] bargain (brgnIJ) 
+  compromise proposes  2 adopt:  46.125  41.539  44.219 
+  compromise proposes  1 adopt:  46.125  41.539  44.219 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 10 actor 3 has most advantageous target 4 worth 0.009
@@ -3861,17 +3861,17 @@ Est by  3 of prob 0.8146 that [ 3> 4], with expected gain to  4 of -0.0094
 Est by  4 of prob 0.8411 that [ 3> 4], with expected gain to  3 of +0.0300 
 Est by  4 of prob 0.8411 that [ 3> 4], with expected gain to  4 of -0.0237 
 
-Bargain [1198, 3:4] from  3's perspective (brgnIIJ) 
-   3 proposes  3 adopt:  0.432  0.300  0.496 
-   3 proposes  4 adopt:  0.432  0.300  0.496 
+Bargain [2843, 3:4] from  3's perspective (brgnIIJ) 
+   3 proposes  3 adopt:  43.190  30.000  49.590 
+   3 proposes  4 adopt:  43.190  30.000  49.590 
 
-Bargain  [1199, 3:4] from  4's perspective (brgnJIJ) 
-   4 proposes  3 adopt:  0.465  0.413  0.448 
-   4 proposes  4 adopt:  0.465  0.413  0.448 
+Bargain  [2844, 3:4] from  4's perspective (brgnJIJ) 
+   4 proposes  3 adopt:  46.450  41.340  44.810 
+   4 proposes  4 adopt:  46.450  41.340  44.810 
 
-Power-weighted compromise  [1200, 3:4] bargain (brgnIJ) 
-  compromise proposes  3 adopt:  0.449  0.358  0.471 
-  compromise proposes  4 adopt:  0.449  0.358  0.471 
+Power-weighted compromise  [2845, 3:4] bargain (brgnIJ) 
+  compromise proposes  3 adopt:  44.859  35.805  47.143 
+  compromise proposes  4 adopt:  44.859  35.805  47.143 
 
 Using InitOnlyInterp to form proposed bargains
 In turn 10 actor 4 has most advantageous target 1 worth 0.003
@@ -3880,26 +3880,26 @@ Est by  4 of prob 0.9925 that [ 4> 1], with expected gain to  1 of -0.0003
 Est by  1 of prob 0.9948 that [ 4> 1], with expected gain to  4 of +0.0074 
 Est by  1 of prob 0.9948 that [ 4> 1], with expected gain to  1 of -0.0005 
 
-Bargain [1202, 4:1] from  4's perspective (brgnIIJ) 
-   4 proposes  4 adopt:  0.465  0.414  0.448 
-   4 proposes  1 adopt:  0.465  0.414  0.448 
+Bargain [2847, 4:1] from  4's perspective (brgnIIJ) 
+   4 proposes  4 adopt:  46.450  41.390  44.810 
+   4 proposes  1 adopt:  46.450  41.390  44.810 
 
-Bargain  [1203, 4:1] from  1's perspective (brgnJIJ) 
-   1 proposes  4 adopt:  0.458  0.417  0.437 
-   1 proposes  1 adopt:  0.458  0.417  0.437 
+Bargain  [2848, 4:1] from  1's perspective (brgnJIJ) 
+   1 proposes  4 adopt:  45.840  41.670  43.700 
+   1 proposes  1 adopt:  45.840  41.670  43.700 
 
-Power-weighted compromise  [1204, 4:1] bargain (brgnIJ) 
-  compromise proposes  4 adopt:  0.461  0.415  0.442 
-  compromise proposes  1 adopt:  0.461  0.415  0.442 
+Power-weighted compromise  [2849, 4:1] bargain (brgnIJ) 
+  compromise proposes  4 adopt:  46.125  41.539  44.218 
+  compromise proposes  1 adopt:  46.125  41.539  44.218 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [1185, 0:0][1186, 0:1]
-Bargains involving actor  1: [1186, 0:1][1189, 1:1][1190, 1:3][1194, 2:1][1202, 4:1]
-Bargains involving actor  2: [1193, 2:2][1194, 2:1]
-Bargains involving actor  3: [1190, 1:3][1197, 3:3][1198, 3:4]
-Bargains involving actor  4: [1198, 3:4][1201, 4:4][1202, 4:1]
+Bargains involving actor  0: [2830, 0:0][2831, 0:1]
+Bargains involving actor  1: [2831, 0:1][2834, 1:1][2835, 1:3][2839, 2:1][2847, 4:1]
+Bargains involving actor  2: [2838, 2:2][2839, 2:1]
+Bargains involving actor  3: [2835, 1:3][2842, 3:3][2843, 3:4]
+Bargains involving actor  4: [2843, 3:4][2846, 4:4][2847, 4:1]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -4082,20 +4082,20 @@ Found stable PCE distribution
 done
 Chosen bargain (Stochastic): 3 out of 3 bargains
 
-postn  0,  0  0.5149  0.4221  0.4445 
-ideal  0,  0  0.5161  0.4230  0.4438 
-postn-ideal distance  0,  0: 0.00164 
-postn  1,  0  0.4645  0.4139  0.4481 
-ideal  1,  0  0.4709  0.4161  0.4455 
-postn-ideal distance  1,  0: 0.00728 
-postn  2,  0  0.4645  0.4139  0.4481 
-ideal  2,  0  0.4619  0.3983  0.4546 
-postn-ideal distance  2,  0: 0.01707 
-postn  3,  0  0.4210  0.2987  0.4989 
-ideal  3,  0  0.4232  0.2948  0.4881 
-postn-ideal distance  3,  0: 0.01169 
-postn  4,  0  0.4645  0.4139  0.4481 
-ideal  4,  0  0.4645  0.4139  0.4481 
+postn  0,  0  51.4900  42.2100  44.4500 
+ideal  0,  0  51.6110  42.2977  44.3814 
+postn-ideal distance  0,  0: 0.16449 
+postn  1,  0  46.4500  41.3900  44.8100 
+ideal  1,  0  47.0909  41.6142  44.5486 
+postn-ideal distance  1,  0: 0.72756 
+postn  2,  0  46.4500  41.3900  44.8100 
+ideal  2,  0  46.1885  39.8319  45.4565 
+postn-ideal distance  2,  0: 1.70699 
+postn  3,  0  42.1000  29.8700  49.8900 
+ideal  3,  0  42.3178  29.4793  48.8098 
+postn-ideal distance  3,  0: 1.16918 
+postn  4,  0  46.4500  41.3900  44.8100 
+ideal  4,  0  46.4500  41.3900  44.8100 
 postn-ideal distance  4,  0: 0.00000 
 postn-ideal distance RMS  0: 0.00984 
 rms (pstn, ideal) = 0.00984 
@@ -4190,14 +4190,14 @@ Ellie , FirstDim ,  73.3 ,  64.1 ,  61.2 ,  59.9 ,  61.5 ,  61.5 ,  61.5 ,  40.6
 Ellie , SecondDim ,  61.1 ,  48.1 ,  58.2 ,  52.0 ,  48.0 ,  48.0 ,  48.0 ,  60.8 ,  60.8 ,  29.9 ,  41.4 ,  41.4 , 
 Ellie , YADN ,  26.3 ,  32.5 ,  38.0 ,  36.0 ,  33.5 ,  33.5 ,  33.5 ,  64.8 ,  64.8 ,  49.9 ,  44.8 ,  44.8 , 
 
-Alice , prob , 0.3438 , 0.2978 , 0.2668 , 0.2797 , 0.4276 , 0.6416 , 0.4007 , 0.2414 , 0.4300 , 0.6267 , 0.3018 , 0.4620 , 
-Bob , prob , 0.1551 , 0.2301 , 0.1770 , 0.2216 , 0.2496 , 0.2679 , 0.4825 , 0.5233 , 0.3029 , 0.6267 , 0.1389 , 0.5365 , 
-Carol , prob , 0.1060 , 0.3079 , 0.1185 , 0.3844 , 0.2524 , 0.6416 , 0.4825 , 0.1136 , 0.4300 , 0.1131 , 0.5455 , 0.5365 , 
-David , prob , 0.2101 , 0.1641 , 0.2100 , 0.1143 , 0.0704 , 0.0905 , 0.1168 , 0.1217 , 0.3029 , 0.2602 , 0.0138 , 0.0015 , 
-Ellie , prob , 0.1851 , 0.2978 , 0.2277 , 0.3844 , 0.4276 , 0.6416 , 0.4007 , 0.5233 , 0.2671 , 0.2602 , 0.5455 , 0.5365 , 
+Alice , prob , 0.3154 , 0.2791 , 0.2536 , 0.2716 , 0.4108 , 0.6298 , 0.3856 , 0.2374 , 0.4201 , 0.6313 , 0.3021 , 0.4624 , 
+Bob , prob , 0.1668 , 0.2606 , 0.2142 , 0.2462 , 0.2702 , 0.2883 , 0.5086 , 0.5311 , 0.2953 , 0.6313 , 0.1388 , 0.5361 , 
+Carol , prob , 0.1082 , 0.3000 , 0.1132 , 0.3766 , 0.2556 , 0.6298 , 0.5086 , 0.1129 , 0.4201 , 0.1119 , 0.5455 , 0.5361 , 
+David , prob , 0.2216 , 0.1603 , 0.1970 , 0.1056 , 0.0634 , 0.0819 , 0.1058 , 0.1186 , 0.2953 , 0.2568 , 0.0136 , 0.0015 , 
+Ellie , prob , 0.1880 , 0.2791 , 0.2220 , 0.3766 , 0.4108 , 0.6298 , 0.3856 , 0.5311 , 0.2846 , 0.2568 , 0.5455 , 0.5361 , 
 SMPModel: Closing database
 SMPModel: Closing database succeeded.
 -----------------------------------
-  Finish time: Wed Jan 11 11:19:51 2017
+  Finish time: Wed Feb  1 20:24:06 2017
 
-  Elapsed time: 0.0537 seconds 
+  Elapsed time: 0.0634 seconds 
