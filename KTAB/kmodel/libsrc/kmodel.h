@@ -295,6 +295,7 @@ public:
   static const unsigned int maxNumActor = 250; //quite generous, as we expect 10-30.
 
   static const unsigned int maxScenNameLen = 512; // might be auto-generated in sensitivy analysis
+  static const unsigned int maxScenDescLen = 512; // see above
   static const unsigned int maxActNameLen = 25; // quite generous, as we expect 1-5
   static const unsigned int maxActDescLen = 256;
 
