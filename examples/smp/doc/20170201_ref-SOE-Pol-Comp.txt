@@ -1,9 +1,9 @@
   Software version: smpc 0.1
-  Start time: Wed Feb  1 16:50:29 2017
+  Start time: Tue Feb  7 16:10:07 2017
 
 -----------------------------------
-Scenario Name: -|Scenario-0002|-
-Scenario Description: Combined Policy and Competitive
+Scenario Name: -|China Policy/Competitive; scen 2|-
+Scenario Description: Scenario-0002;Combined Policy and Competitive
 Number of actors: 13 
 Number of dimensions: 2 
 Dimension  0: Policy Position 
@@ -152,8 +152,8 @@ Grp 2 = 0
 Grp 3 = 0
 Grp 4 = 1
 Using PRNG seed: 15455440707583219804 
-Scenario Name: -|Scenario-0002|-
-Scenario Description: Combined Policy and Competitive
+Scenario Name: -|China Policy/Competitive; scen 2|-
+Scenario Description: Scenario-0002;Combined Policy and Competitive
 
 Successfully opened database #1
 
@@ -34328,6 +34328,6 @@ WY , prob , 0.0005 , 0.0002 , 0.0001 , 0.0000 , 0.0000 , 0.0000 , 0.0000 , 0.000
 SMPModel: Closing database
 SMPModel: Closing database succeeded.
 -----------------------------------
-  Finish time: Wed Feb  1 16:50:30 2017
+  Finish time: Tue Feb  7 16:10:08 2017
 
-  Elapsed time: 1.3076 seconds 
+  Elapsed time: 1.0126 seconds 
