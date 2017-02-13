@@ -327,6 +327,10 @@ public:
   // output the two files needed to draw Sankey diagrams
   void sankeyOutput(string inputCSV) const;
 
+  // output the two files needed to draw Sankey diagram for Database
+  static void sankeyOutput(string outputFile, string dbName, std::string scenarioId) ;
+
+
   // number of spatial dimensions in this SMP
   void addDim(string dn);
   unsigned int numDim = 0;
@@ -406,10 +410,16 @@ private:
 
   // fieldVals is used to store the result of select sql queries
   static std::vector<string> fieldVals;
-};
+
+  // Method used in sqlite execution for callback functionality for sankeyOoutput
+  static int sankeyCallBack(void *data, int numCol, char **stringFields, char **colNames);
+
+  // fieldVals is used to store the result of select sql queries
+  static std::vector<string> dbFieldVals;
+ };
 
 
-
+extern SMPModel * md0 ;
 };// end of namespace
 
 // --------------------------------------------

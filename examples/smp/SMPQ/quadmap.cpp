@@ -772,6 +772,7 @@ void MainWindow::quadMapPlotPoints(bool status)
 void MainWindow::dbImported(bool bl)
 {
     useHistory=false;
+    sankeyOutputHistory=true;
 }
 
 void MainWindow::quadPlotContextMenuRequest(QPoint pos)

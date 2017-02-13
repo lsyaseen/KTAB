@@ -146,6 +146,7 @@ MainWindow::MainWindow()
     firstVal=false;
     useHistory =true;
     currentScenarioId = "dummy";
+    sankeyOutputHistory=true;
 }
 
 MainWindow::~MainWindow()
@@ -871,6 +872,9 @@ void MainWindow::setDBItemModel(QStandardItemModel *model)
     //        connect(affinityMatrix, SIGNAL(customContextMenuRequested(QPoint)), this,
     //                SLOT(displayAffinityMenuTableWidget(QPoint)));
 
+    csvTableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(csvTableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(displayMenuTableView(QPoint)));
+
     //Disable Editing
     csvTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     affinityMatrix->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -879,7 +883,7 @@ void MainWindow::setDBItemModel(QStandardItemModel *model)
     stackWidget->addWidget(csvTableViewTabWidget);
 
     stackWidget->setCurrentIndex(0);
-    disconnect(csvTableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(displayMenuTableView(QPoint)));
+    //    disconnect(csvTableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(displayMenuTableView(QPoint)));
 
     tableControlsFrame->show();
 
@@ -1923,12 +1927,12 @@ void MainWindow::displayMenuTableWidget(QPoint pos)
                 else
                 {
                     if(!(text.contains("Salience") || text.contains("salience")))
-                         {
-                            if(!text.contains("\n"))
-                                text = text.append(" \n Salience");
-                            else
-                                text = text.append(" Salience");
-                        }
+                    {
+                        if(!text.contains("\n"))
+                            text = text.append(" \n Salience");
+                        else
+                            text = text.append(" Salience");
+                    }
                     else
                     {
                         QString header = text;
@@ -2008,128 +2012,144 @@ void MainWindow::displayMenuTableWidget(QPoint pos)
 
 void MainWindow::displayMenuTableView(QPoint pos)
 {
-    QMenu menu(this);
-    QAction *posCol = menu.addAction("Insert Position Column");
-    QAction *salCol = menu.addAction("Insert Salience Column");
-    menu.addSeparator();
-    QAction *newRow = menu.addAction("Insert Row");
-    menu.addSeparator();
-    QAction *col = menu.addAction("Remove Column");
-    QAction *row = menu.addAction("Remove Row");
-    menu.addSeparator();
-    QAction *rename = menu.addAction("Rename Column Header");
+    if(tableType!="Database")
+    {
+        QMenu menu(this);
+        QAction *posCol = menu.addAction("Insert Position Column");
+        QAction *salCol = menu.addAction("Insert Salience Column");
+        menu.addSeparator();
+        QAction *newRow = menu.addAction("Insert Row");
+        menu.addSeparator();
+        QAction *col = menu.addAction("Remove Column");
+        QAction *row = menu.addAction("Remove Row");
+        menu.addSeparator();
+        QAction *rename = menu.addAction("Rename Column Header");
 
-    QAction *act = menu.exec(csvTableView->viewport()->mapToGlobal(pos));
+        QAction *act = menu.exec(csvTableView->viewport()->mapToGlobal(pos));
 
-    if (act == col)
-    {
-        if(csvTableView->currentIndex().column()>2)
-            modeltoCSV->removeColumn(csvTableView->currentIndex().column());
-        else
-            statusBar()->showMessage("No Permission ! You cannot delete Actor, Description and Influence Columns");
-    }
-    if (act == row)
-    {
-        csvAffinityModel->removeColumn(csvTableView->currentIndex().row());
-        csvAffinityModel->removeRow(csvTableView->currentIndex().row());
-        modeltoCSV->removeRow(csvTableView->currentIndex().row());
-    }
-    if (act == rename)
-    {
-        if(csvTableView->currentIndex().column()>2)
+        if (act == col)
         {
-            bool ok;
-            QString text = QInputDialog::getText(this, tr("Plesase Enter the Header Name"),
-                                                 tr("Header Name"), QLineEdit::Normal,
-                                                 modeltoCSV->headerData(csvTableView->currentIndex().column(),Qt::Horizontal).toString(), &ok);
-
-            if (ok && !text.isEmpty())
+            if(csvTableView->currentIndex().column()>2)
+                modeltoCSV->removeColumn(csvTableView->currentIndex().column());
+            else
+                statusBar()->showMessage("No Permission ! You cannot delete Actor, Description and Influence Columns");
+        }
+        if (act == row)
+        {
+            csvAffinityModel->removeColumn(csvTableView->currentIndex().row());
+            csvAffinityModel->removeRow(csvTableView->currentIndex().row());
+            modeltoCSV->removeRow(csvTableView->currentIndex().row());
+        }
+        if (act == rename)
+        {
+            if(csvTableView->currentIndex().column()>2)
             {
-                if(csvTableView->currentIndex().column()%2!=0)
+                bool ok;
+                QString text = QInputDialog::getText(this, tr("Plesase Enter the Header Name"),
+                                                     tr("Header Name"), QLineEdit::Normal,
+                                                     modeltoCSV->headerData(csvTableView->currentIndex().column(),Qt::Horizontal).toString(), &ok);
+
+                if (ok && !text.isEmpty())
                 {
-                    if(!(text.contains("Position") || text.contains("position")))
+                    if(csvTableView->currentIndex().column()%2!=0)
                     {
-                        if(!text.contains("\n"))
-                            text = text.append(" \n Position");
+                        if(!(text.contains("Position") || text.contains("position")))
+                        {
+                            if(!text.contains("\n"))
+                                text = text.append(" \n Position");
+                            else
+                                text = text.append(" Position");
+                        }
                         else
-                            text = text.append(" Position");
+                        {
+                            QString header = text;
+                            header.remove("Position").remove("position");
+                            header.remove("\n");
+                            header.append("\n Position");
+                            text = header;
+                        }
                     }
                     else
                     {
-                        QString header = text;
-                        header.remove("Position").remove("position");
-                        header.remove("\n");
-                        header.append("\n Position");
-                        text = header;
-                    }
-                 }
-                else
-                {
-                    if(!(text.contains("Salience")|| text.contains("salience")))
-                    {
-                        if(!text.contains("\n"))
-                            text = text.append(" \n Salience");
+                        if(!(text.contains("Salience")|| text.contains("salience")))
+                        {
+                            if(!text.contains("\n"))
+                                text = text.append(" \n Salience");
+                            else
+                                text = text.append(" Salience");
+                        }
                         else
-                            text = text.append(" Salience");
+                        {
+                            QString header = text;
+                            header.remove("Salience").remove("salience");
+                            header.remove("\n");
+                            header.append("\n Salience");
+                            text = header;
+                        }
                     }
-                    else
-                    {
-                        QString header = text;
-                        header.remove("Salience").remove("salience");
-                        header.remove("\n");
-                        header.append("\n Salience");
-                        text = header;
-                    }
-                 }
-                modeltoCSV->setHeaderData(csvTableView->currentIndex().column(),Qt::Horizontal,text);
-                statusBar()->showMessage("Header changed");
+                    modeltoCSV->setHeaderData(csvTableView->currentIndex().column(),Qt::Horizontal,text);
+                    statusBar()->showMessage("Header changed");
+                }
             }
+            else
+                statusBar()->showMessage("No Permission !  You cannot Edit Headers of"
+                                         " Actor, Description and Influence Columns");
         }
-        else
-            statusBar()->showMessage("No Permission !  You cannot Edit Headers of"
-                                     " Actor, Description and Influence Columns");
-    }
-    if (act == posCol)
-    {
-        if(csvTableView->currentIndex().column()>2)
+        if (act == posCol)
         {
-            modeltoCSV->insertColumn(csvTableView->currentIndex().column());
-            modeltoCSV->setHeaderData(csvTableView->currentIndex().column()-1,Qt::Horizontal,"Position");
-            statusBar()->showMessage("Column Inserted, Header changed");
+            if(csvTableView->currentIndex().column()>2)
+            {
+                modeltoCSV->insertColumn(csvTableView->currentIndex().column());
+                modeltoCSV->setHeaderData(csvTableView->currentIndex().column()-1,Qt::Horizontal,"Position");
+                statusBar()->showMessage("Column Inserted, Header changed");
+            }
+            else
+                statusBar()->showMessage("No Permission !  You cannot Edit Headers of"
+                                         " Actor, Description and Influence Columns");
         }
-        else
-            statusBar()->showMessage("No Permission !  You cannot Edit Headers of"
-                                     " Actor, Description and Influence Columns");
-    }
-    if (act == salCol)
-    {
-        if(csvTableView->currentIndex().column()>2)
+        if (act == salCol)
         {
-            modeltoCSV->insertColumn(csvTableView->currentIndex().column());
-            modeltoCSV->setHeaderData(csvTableView->currentIndex().column()-1,Qt::Horizontal,"Salience");
-            statusBar()->showMessage("Column Inserted, Header changed");
+            if(csvTableView->currentIndex().column()>2)
+            {
+                modeltoCSV->insertColumn(csvTableView->currentIndex().column());
+                modeltoCSV->setHeaderData(csvTableView->currentIndex().column()-1,Qt::Horizontal,"Salience");
+                statusBar()->showMessage("Column Inserted, Header changed");
+            }
+            else
+                statusBar()->showMessage("No Permission !  You cannot Edit Headers of"
+                                         " Actor, Description and Influence Columns");
         }
-        else
-            statusBar()->showMessage("No Permission !  You cannot Edit Headers of"
-                                     " Actor, Description and Influence Columns");
-    }
 
-    if(act == newRow)
+        if(act == newRow)
+        {
+            csvAffinityModel->insertColumn(csvTableView->currentIndex().row());
+            csvAffinityModel->insertRow(csvTableView->currentIndex().row());
+
+            QString actorHeader;
+            actorHeader.append(" Actor ")/*.append(QString::number(rows+1))*/;
+            csvAffinityModel->setHorizontalHeaderItem(csvTableView->currentIndex().row(),
+                                                      new QStandardItem(actorHeader));
+            csvAffinityModel->setVerticalHeaderItem(csvTableView->currentIndex().row(),
+                                                    new QStandardItem(actorHeader));
+            initializeAffinityMatrixRowCol(csvTableView->currentIndex().row(),"CSV");
+            actorHeader.clear();
+
+            modeltoCSV->insertRow(csvTableView->currentIndex().row());
+        }
+    }
+    else
     {
-        csvAffinityModel->insertColumn(csvTableView->currentIndex().row());
-        csvAffinityModel->insertRow(csvTableView->currentIndex().row());
+        QMenu menu(this);
+        QAction *expData = menu.addAction("Export Data");
 
-        QString actorHeader;
-        actorHeader.append(" Actor ")/*.append(QString::number(rows+1))*/;
-        csvAffinityModel->setHorizontalHeaderItem(csvTableView->currentIndex().row(),
-                                                  new QStandardItem(actorHeader));
-        csvAffinityModel->setVerticalHeaderItem(csvTableView->currentIndex().row(),
-                                                new QStandardItem(actorHeader));
-        initializeAffinityMatrixRowCol(csvTableView->currentIndex().row(),"CSV");
-        actorHeader.clear();
+        QAction *act = menu.exec(csvTableView->viewport()->mapToGlobal(pos));
 
-        modeltoCSV->insertRow(csvTableView->currentIndex().row());
+        if (act == expData)
+        {
+            saveTurnHistoryToCSV();
+        }
     }
+
 }
 
 //void MainWindow::displayCsvAffinityMenuTableView(QPoint pos)

@@ -155,8 +155,8 @@ void MainWindow::runPushButtonClicked(bool bl)
         }
 
         // Notice that we NEVER use anything but the default seed.
-//        printf("Using PRNG seed:  %020llu \n", seed);
-//        printf("Same seed in hex:   0x%016llX \n", seed);
+        //        printf("Using PRNG seed:  %020llu \n", seed);
+        //        printf("Same seed in hex:   0x%016llX \n", seed);
 
         using std::cout;
         using std::endl;
@@ -195,6 +195,7 @@ void MainWindow::runPushButtonClicked(bool bl)
 void MainWindow::smpDBPath(QString smpdbPath)
 {
     useHistory=true;
+    sankeyOutputHistory=false;
     dbGetFilePAth(true,smpdbPath,true);
 }
 
@@ -235,7 +236,7 @@ void MainWindow::logSMPDataOptionsAnalysis()
         QString logFileNewName = name;
         logFileNewName.append("Log");
         QString saveLogFilePath = QFileDialog::getSaveFileName(this, tr("Save Log File to "),logFileNewName,
-                                                               tr("TextT File (*.txt)"),0,QFileDialog::DontConfirmOverwrite);
+                                                               tr("Text File (*.txt)"),0,QFileDialog::DontConfirmOverwrite);
         if(!saveLogFilePath.isEmpty())
         {
             if(!saveLogFilePath.endsWith(".txt"))
@@ -471,6 +472,33 @@ void MainWindow::setDefaultParameters()
     thirdPartyCommitComboBox->setCurrentIndex(defParameters.at(6));
     interVecBrgnComboBox->setCurrentIndex(defParameters.at(7));
     bargnModelComboBox->setCurrentIndex(defParameters.at(8));
+
+}
+
+void MainWindow::saveTurnHistoryToCSV()
+{
+    QString csvFileNameLocation = QFileDialog::getSaveFileName(
+                this, tr("Save Log File to "),"","CSV File (*.csv)");
+
+    if(!csvFileNameLocation.isEmpty())
+    {
+        qDebug()<<csvFileNameLocation.remove(".csv") << dbPath <<scenarioBox ;
+        if(sankeyOutputHistory==true)
+        {
+            SMPLib::md0->sankeyOutput(csvFileNameLocation.toStdString()
+                                      ,dbPath.toStdString(),scenarioBox.toStdString());
+            statusBar()->showMessage("Turn History is stored in : " +
+                                     csvFileNameLocation+ "_effPow.csv and " + " " +
+                                     csvFileNameLocation+ "_posLog.csv files",2000);
+        }
+        else
+        {
+            SMPLib::md0->sankeyOutput(csvFileNameLocation.toStdString());
+            statusBar()->showMessage("Turn History is stored in : " +
+                                     csvFileNameLocation+ "_effPow.csv and " + " " +
+                                     csvFileNameLocation+ "_posLog.csv files",2000);
+        }
+    }
 
 }
 

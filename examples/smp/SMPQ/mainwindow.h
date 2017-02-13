@@ -462,6 +462,7 @@ private :
     int initiatorTip;
 
     bool useHistory;
+    bool sankeyOutputHistory;
     QString currentScenarioId;
 
     void initializeQuadMapDock();
@@ -531,6 +532,7 @@ private :
     void initializeAffinityMatrixRowCol(int count, QString table);
     void saveTableViewToXML();
     void setDefaultParameters();
+    void saveTurnHistoryToCSV();
 
 private slots:
     void displayMenuXmlTableView(QPoint pos);
