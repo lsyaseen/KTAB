@@ -22,16 +22,13 @@
 // --------------------------------------------
 
 #include <assert.h>
-#include <iostream>
+//#include <iostream>
 
 #include <time.h>
 #include "kmodel.h"
 
 namespace KBase {
 
-using std::cout;
-using std::endl;
-using std::flush;
 using std::get;
 using std::tuple;
 
@@ -51,10 +48,10 @@ Model::Model(string desc, uint64_t sd, vector<bool> f, string Name) {
   rng = nullptr;
 
   sqlFlags = f; // JAH 20160730 save the vec of SQL flags
-  printf("SQL Logging Flags\n");
+  LOG(DEBUG) << "SQL Logging Flags";
   for (unsigned int i = 0; i < sqlFlags.size(); i++)
   {
-    printf("Grp %u = %u\n", i, sqlFlags[i] ? 1 : 0);
+    LOG(DEBUG) << "Grp" << i << "=" << sqlFlags[i] ? 1 : 0;
   }
 
   // Record the UTC time so it can be used as the default scenario name
@@ -74,8 +71,8 @@ Model::Model(string desc, uint64_t sd, vector<bool> f, string Name) {
   }
 
   if (0 == desc.length()) {
-    cout << "No scenario description provided to Model::Model, " << endl;
-    cout << "Using default description generated from UTC start time." << endl;
+    LOG(WARNING) << "No scenario description provided to Model::Model";
+    LOG(DEBUG) << "Using default description generated from UTC start time.";
 
     scenDesc = utcBuff;
   }
@@ -84,8 +81,8 @@ Model::Model(string desc, uint64_t sd, vector<bool> f, string Name) {
   }
 
   if (0 == Name.length()) {
-    cout << "No scenario name provided to Model::Model " << endl;
-    cout << "Using default description generated from UTC start time." << endl;
+    LOG(WARNING) << "No scenario description provided to Model::Model";
+    LOG(DEBUG) << "Using default description generated from UTC start time.";
 
     scenName = utcBuff;
   }
@@ -124,9 +121,9 @@ Model::Model(string desc, uint64_t sd, vector<bool> f, string Name) {
   setSeed(sd);
 
   // BPW 20160928 print out the seed actually used (non-zero) instead of the one given (e.g. 0)
-  printf("Using PRNG seed: %020llu \n", rngSeed);
-  cout << "Scenario Name: -|" << scenName << "|-" << endl << flush;
-  cout << "Scenario Description: " << scenDesc << endl;
+  LOG(DEBUG) << KBase::getFormattedString("Using PRNG seed: %020llu", rngSeed);
+  LOG(DEBUG) << "Scenario Name: -|" << scenName << "|-";
+  LOG(DEBUG) << "Scenario Description: " << scenDesc;
 }
 
 void Model::setSeed(uint64_t seed) {
@@ -173,7 +170,7 @@ void Model::run() {
     assert(nullptr != s0);
     assert(nullptr != s0->step);
     iter++;
-    cout << "Starting Model::run iteration " << iter << endl;
+    LOG(DEBUG) << "Starting Model::run iteration " << iter;
     auto s1 = s0->step();
     addState(s1);
     done = stop(iter, s1);
@@ -629,12 +626,10 @@ KMatrix Model::markovIncentivePCE(const KMatrix & coalitions, VPModel vpm) {
   // do the markov calculation
   while (pTol < change)  { // && (iter < iMax)
     if (printP) {
-      printf("Iteration  %u / %u \n", iter, iMax);
-      cout << "pDist:" << endl;
+      LOG(DEBUG) << "Iteration" << iter << "/" << iMax;
+      LOG(DEBUG) << "pDist:";
       trans(p).mPrintf(" %.4f");
-      cout << endl;
-      printf("change: %.4e \n", change);
-      cout << endl << flush;
+      LOG(DEBUG) << KBase::getFormattedString("change: %.4e", change);
     }
     auto ct = KMatrix(numOpt, numOpt);
     for (unsigned int i = 0; i < numOpt; i++) {
@@ -644,9 +639,8 @@ KMatrix Model::markovIncentivePCE(const KMatrix & coalitions, VPModel vpm) {
       }
     }
     if (printP) {
-      cout << "Ct:" << endl;
+      LOG(DEBUG) << "Ct:";
       ct.mPrintf("  %.3f");
-      cout << endl << flush;
     }
     change = 0.0;
     for (unsigned int i = 0; i < numOpt; i++) {
@@ -743,6 +737,8 @@ KMatrix Model::condPCE(const KMatrix & pv) {
   return p;
 }
 
+std::mutex mtxLock_spce;
+
 // calculate the [option,1] column vector of option-probabilities.
 // w is a [1,actor] row-vector of actor strengths, u is [act,option] utilities.
 // This assumes scalar capabilities of actors (w), so that the voting strength
@@ -762,33 +758,31 @@ KMatrix Model::scalarPCE(unsigned int numAct, unsigned int numOpt, const KMatrix
   const auto pv2 = Model::probCE2(pcem, vpm, c);
   const auto p = get<0>(pv2); //column
   const auto pv = get<1>(pv2); // square
-  if (ReportingLevel::Low < rl) {
-    printf("Num actors: %i \n", numAct);
-    printf("Num options: %i \n", numOpt);
 
+  mtxLock_spce.lock();
+  if (ReportingLevel::Low < rl) {
+    LOG(DEBUG) << "Num actors:" << numAct;
+    LOG(DEBUG) << "Num options:" << numOpt;
 
     if ((numAct <= 20) && (numOpt <= 20)) {
-      cout << "Actor strengths: " << endl;
+      LOG(DEBUG) << "Actor strengths:";
       w.mPrintf(" %6.2f ");
-      cout << endl << flush;
-      cout << "Voting rule: " << vr << endl;
+      LOG(DEBUG) << "Voting rule:" << vr;
       // printf("         aka %s \n", KBase::vrName(vr).c_str());
-      cout << flush;
-      cout << "Utility to actors of options: " << endl;
+      LOG(DEBUG) << "Utility to actors of options:";
       u.mPrintf(" %+8.3f ");
-      cout << endl << flush;
 
-      cout << "Coalition strengths of (i:j): " << endl;
+      LOG(DEBUG) << "Coalition strengths of (i:j):";
       c.mPrintf(" %8.3f ");
-      cout << endl;
 
-      cout << "Probability Opt_i > Opt_j" << endl;
+      LOG(DEBUG) << "Probability Opt_i > Opt_j";
       pv.mPrintf(" %.4f ");
-      cout << "Probability Opt_i" << endl;
+      LOG(DEBUG) << "Probability Opt_i";
       p.mPrintf(" %.4f ");
     }
-    cout << "Found stable PCE distribution" << endl << flush;
+    LOG(DEBUG) << "Found stable PCE distribution";
   }
+  mtxLock_spce.unlock();
   return p;
 }
 

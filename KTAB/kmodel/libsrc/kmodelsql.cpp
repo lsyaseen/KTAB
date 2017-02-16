@@ -22,7 +22,7 @@
 // --------------------------------------------
 
 #include <assert.h>
-#include <iostream>
+//#include <iostream>
 
 #include "kmodel.h"
 

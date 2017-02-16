@@ -28,9 +28,6 @@
 #include "smp.h"
 
 namespace SMPLib {
-using std::cout;
-using std::endl;
-using std::flush;
 using std::function;
 using std::get;
 using std::string;
@@ -72,7 +69,8 @@ smpStopFn(unsigned int minIter, unsigned int maxIter, double minDeltaRatio, doub
         bool longEnough = (minIter <= iter);
         bool quiet = false;
         auto sf = [](unsigned int i1, unsigned int i2, double d12) {
-            printf("sDist [%2i,%2i] = %.2E   ", i1, i2, d12);
+            LOG(DEBUG) << KBase::getFormattedString(
+              "sDist [%2i,%2i] = %.2E   ", i1, i2, d12);
             return;
         };
         auto s0 = ((const SMPState*)(s->model->history[0]));
@@ -85,7 +83,9 @@ smpStopFn(unsigned int minIter, unsigned int maxIter, double minDeltaRatio, doub
         sf(iter - 1, iter - 0, dxy);
         const double aRatio = dxy / d01;
         quiet = (aRatio < minDeltaRatio);
-        printf("\nFractional change compared to first step: %.4f  (target=%.4f) \n\n", aRatio, minDeltaRatio);
+        LOG(DEBUG) << KBase::getFormattedString(
+          "Fractional change compared to first step: %.4f  (target=%.4f)",
+          aRatio, minDeltaRatio);
         return tooLong || (longEnough && quiet);
     };
     return sfn;
@@ -400,9 +400,8 @@ void SMPState::setAllAUtil(ReportingLevel rl) {
     auto rnUtil_ij = KMatrix::map(uFn1, na, na);
 
     if (ReportingLevel::Silent < rl) {
-        cout << "Raw actor-pos value matrix (risk neutral)" << endl;
+        LOG(DEBUG) << "Raw actor-pos value matrix (risk neutral):";
         rnUtil_ij.mPrintf(" %+.3f ");
-        cout << endl << flush;
     }
 
 
@@ -417,18 +416,16 @@ void SMPState::setAllAUtil(ReportingLevel rl) {
     nra = Model::bigRfromProb(p_i, rr);
 
     if (ReportingLevel::Silent < rl) {
-        cout << "Inferred risk attitudes: " << endl;
+        LOG(DEBUG) << "Inferred risk attitudes:";
         nra.mPrintf(" %+.3f ");
-        cout << endl << flush;
     }
 
     auto raUtil_ij = KMatrix::map(uFn1, na, na);
 
     if (ReportingLevel::Silent < rl) {
-        cout << "Risk-aware actor-pos utility matrix (objective):" << endl;
+        LOG(DEBUG) << "Risk-aware actor-pos utility matrix (objective):";
         raUtil_ij.mPrintf(" %+.4f ");
-        cout << endl;
-        cout << "RMS change in value vs utility: " << norm(rnUtil_ij - raUtil_ij) / na << endl << flush;
+        LOG(DEBUG) << "RMS change in value vs utility: " << norm(rnUtil_ij - raUtil_ij) / na;
     }
 
     const double duTol = 1E-6;
@@ -438,23 +435,23 @@ void SMPState::setAllAUtil(ReportingLevel rl) {
     if (ReportingLevel::Silent < rl) {
         switch (ra) {
         case BigRAdjust::FullRA:
-            cout << "Using " << ra << ": r^h_i = ri" << endl;
+            LOG(DEBUG) << "Using" << ra << ": r^h_i = ri";
             break;
         case BigRAdjust::TwoThirdsRA:
-            cout << "Using " << ra << ": r^h_i = (rh + 2*ri)/3" << endl;
+            LOG(DEBUG) << "Using" << ra << ": r^h_i = (rh + 2*ri)/3";
             break;
         case BigRAdjust::HalfRA:
-            cout << "Using " << ra << ": r^h_i = (rh + ri)/2" << endl;
+            LOG(DEBUG) << "Using" << ra << ": r^h_i = (rh + ri)/2";
             break;
         case BigRAdjust::OneThirdRA:
-            cout << "Using " << ra << ": r^h_i = (2*rh + ri)/3" << endl;
+            LOG(DEBUG) << "Using" << ra << ": r^h_i = (2*rh + ri)/3";
             break;
         case BigRAdjust::NoRA:
-            cout << "Using " << ra << ": r^h_i = rh " << endl;
+            LOG(DEBUG) << "Using" << ra << ": r^h_i = rh ";
             break;
         default:
-            cout << "Unrecognized BigRAdjust" << endl;
-            assert(false);
+            LOG(ERROR) << "Unrecognized BigRAdjust";
+            exit(-1);
             break;
         }
     }
@@ -473,12 +470,10 @@ void SMPState::setAllAUtil(ReportingLevel rl) {
 
 
         if (ReportingLevel::Silent < rl) {
-            cout << "Estimate by " << h << " of risk-aware utility matrix:" << endl;
+            LOG(DEBUG) << "Estimate by" << h << "of risk-aware utility matrix:";
             u_h_ij.mPrintf(" %+.4f ");
-            cout << endl;
 
-            cout << "RMS change in util^h vs utility: " << norm(u_h_ij - raUtil_ij) / na << endl;
-            cout << endl;
+            LOG(DEBUG) << "RMS change in util^h vs utility:" << norm(u_h_ij - raUtil_ij) / na;
         }
 
         assert(duTol < norm(u_h_ij - raUtil_ij)); // I've never seen it below 0.03
@@ -488,32 +483,48 @@ void SMPState::setAllAUtil(ReportingLevel rl) {
 
 
 void SMPState::setOneAUtil(unsigned int perspH, ReportingLevel rl) {
-    cout << "SMPState::setOneAUtil - not yet implemented" << endl << flush;
+    LOG(DEBUG) << "SMPState::setOneAUtil - not yet implemented";
 
 
     return;
 }
 
 void SMPState::showBargains(const vector < vector < BargainSMP* > > & brgns) const {
+    string msg = "Bargains involving actor %2u: ";
+    string brgnFormat = "[%llu, %u:%u]"; // [bargainID, initAct:recvAct]
+    string actorBargains;
+
+    auto printOneBargain = [this, &brgns, &actorBargains, &brgnFormat](unsigned int i, unsigned int j) {
+      BargainSMP* bij = brgns[i][j];
+      assert(nullptr != bij);
+      actorBargains += 
+        KBase::getFormattedString
+        (
+          brgnFormat.c_str(),
+          bij->getID(),
+          model->actrNdx(bij->actInit),
+          model->actrNdx(bij->actRcvr)
+        );
+    };
+
     for (unsigned int i = 0; i < brgns.size(); i++) {
-        printf("Bargains involving actor %2u: ", i);
+        actorBargains += KBase::getFormattedString(msg.c_str(), i);
         for (unsigned int j = 0; j < brgns[i].size(); j++) {
-            BargainSMP* bij = brgns[i][j];
-            assert(nullptr != bij);
-            showOneBargain(bij);
+            printOneBargain(i, j);
         }
-        cout << endl << flush;
+        LOG(DEBUG) << actorBargains;
+        actorBargains.clear();
     }
     return;
 }
 
-void SMPState::showOneBargain(const BargainSMP* b) const {
+string SMPState::showOneBargain(const BargainSMP* b) const {
     assert(nullptr != b);
     unsigned int ai = model->actrNdx(b->actInit);
     unsigned int aj = model->actrNdx(b->actRcvr);
     uint64_t bid = b->getID();
-    printf("[%llu, %u:%u]", bid, ai, aj);
-    return;
+    string bargain = KBase::getFormattedString("[%llu, %u:%u]", bid, ai, aj);
+    return bargain;
 }
 
 void SMPState::setNRA() {
@@ -701,22 +712,24 @@ double SMPState::posIdealDist(ReportingLevel rl) const {
         auto iI = ideals[i];
 
         if (rl > ReportingLevel::Low) {
-            printf("postn %2u, %2u ", i, t);
+            LOG(DEBUG) << "postn" << i << "," << t << ":";
             (trans(pI) * 100.0).mPrintf(" %.4f "); // print on the scale of [0,100]
-            printf("ideal %2u, %2u ", i, t);
+            LOG(DEBUG) << "ideal" << i << "," << t << ":";
             (trans(iI) * 100.0).mPrintf(" %.4f "); // print on the scale of [0,100]
         }
         double dI = KBase::norm(pI - iI);
         if (rl > ReportingLevel::Silent) {
-            printf("postn-ideal distance %2u, %2u: %.5f \n", i, t, dI * 100.0); // print on the scale of [0,100]
+            // print on the scale of [0,100]
+            LOG(DEBUG) << KBase::getFormattedString(
+              "postn-ideal distance %2u, %2u: %.5f", i, t, dI * 100.0);
         }
         rmsDist = rmsDist + (dI*dI);
     }
     rmsDist = rmsDist / ((double)na);
     rmsDist = sqrt(rmsDist);
     if (rl > ReportingLevel::Silent) {
-        printf("postn-ideal distance RMS %2u: %.5f \n", t, rmsDist);
-        cout << flush;
+        LOG(DEBUG) << KBase::getFormattedString(
+          "postn-ideal distance RMS %2u: %.5f", t, rmsDist);
     }
     return rmsDist;
 }
@@ -729,7 +742,8 @@ void SMPState::setAccomodate(double adjRate) {
     assert(adjRate <= 1.0);
     const unsigned int na = model->numAct;
 
-    printf("Setting SMPState::accomodate to %.3f * identity matrix \n", adjRate);
+    LOG(DEBUG) << KBase::getFormattedString(
+      "Setting SMPState::accomodate to %.3f * identity matrix", adjRate);
 
     // A standard Identity matrix is helpful here because it
     // should keep the behavior same as the original "cynical" model:
@@ -764,8 +778,8 @@ tuple< KMatrix, VUI> SMPState::pDist(int persp) const {
         }
     }
     else {
-        cout << "SMPState::pDist: unrecognized perspective, " << persp << endl << flush;
-        assert(false);
+        LOG(ERROR) << "SMPState::pDist: unrecognized perspective," << persp;
+        exit(-1);
     }
 
     assert(0 < uIndices.size()); // should have been set with setUENdx();

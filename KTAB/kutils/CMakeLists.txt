@@ -68,12 +68,17 @@ if (ENABLE_EFENCE)
 endif (ENABLE_EFENCE) 
 
 # -------------------------------------------------
+
+find_package(easyloggingpp)
+
+# -------------------------------------------------
 # files to be built into a library go in libsrc/
 # any application or testing code goes in src
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/libsrc/
   ${EFENCE_INCLUDE_DIR} 
+  ${LOGGER_INCLUDE_DIR}
 )
 
 set(KTABBASIC_SRCS

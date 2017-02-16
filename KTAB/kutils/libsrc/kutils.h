@@ -38,7 +38,6 @@
 #include <cstring>
 #include <ctime>
 #include <iomanip>
-#include <iostream>
 #include <functional>
 #include <future>
 #include <math.h>
@@ -49,6 +48,7 @@
 #include <thread>
 #include <tuple>
 #include <vector>
+#include <easylogging++.h>
 
 namespace KBase {
 using std::function;
@@ -167,6 +167,18 @@ public:
   virtual ~KException();
   string msg = "";
 };
+
+template <typename... Args>
+string getFormattedString(const char* formatSpec, const Args&... args) {
+  // Find the size of the buffer required to hold the formatted string
+  int bufferSize = snprintf(nullptr, 0, formatSpec, args...) + 1;
+
+  using arr_ptr_type = std::unique_ptr<char[]>;
+  arr_ptr_type msg = arr_ptr_type(new char[bufferSize]);
+  snprintf(msg.get(), bufferSize, formatSpec, args...);
+  string logMsg = string(const_cast<const char*>(msg.get()));
+  return logMsg;
+}
 
 /*
 class EnumType {

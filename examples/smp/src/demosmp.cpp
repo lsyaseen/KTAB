@@ -28,8 +28,9 @@
 #include "smp.h"
 #include "demosmp.h"
 #include <functional>
+#include <easylogging++.h>
 
-
+INITIALIZE_EASYLOGGINGPP
 
 using KBase::PRNG;
 using KBase::KMatrix;
@@ -63,8 +64,10 @@ std::string GenerateDBNameWithTimeStamp()
 
 }
 int main(int ac, char **av) {
-  using std::cout;
-  using std::endl;
+  // Set logging configuration from a file
+  el::Configurations confFromFile("./conf/smpc-logger.conf");
+  el::Loggers::reconfigureAllLoggers(confFromFile);
+
   using std::string;
   using KBase::dSeed;
   auto sTime = KBase::displayProgramStart(DemoSMP::appName, DemoSMP::appVersion);
@@ -213,22 +216,18 @@ int main(int ac, char **av) {
     inputDBname = GenerateDBNameWithTimeStamp();
   }
   if (euSmpP) {
-    cout << "-----------------------------------" << endl;
     SMPLib::SMPModel::randomSMP(0, 0, randAccP, seed, sqlFlags, inputDBname);
   }
   if (csvP) {
-    cout << "-----------------------------------" << endl;
     //SMPLib::SMPModel::csvReadExec(seed, inputCSV, sqlFlags, inputDBname);
     SMPLib::SMPModel::runModel(sqlFlags, inputDBname, inputCSV, seed, saveHist);
     SMPLib::SMPModel::destroyModel();
   }
   if (xmlP) {
-    cout << "-----------------------------------" << endl;
     //SMPLib::SMPModel::xmlReadExec(inputXML, sqlFlags, inputDBname);
     SMPLib::SMPModel::runModel(sqlFlags, inputDBname, inputXML, seed, saveHist);
     SMPLib::SMPModel::destroyModel();
   }
-  cout << "-----------------------------------" << endl;
 
   KBase::displayProgramEnd(sTime);
   return 0;

@@ -101,6 +101,10 @@ if (NOT SQLITE_FOUND)
 endif (NOT SQLITE_FOUND) 
 
 # -------------------------------------------------
+
+find_package(easyloggingpp)
+
+# -------------------------------------------------
 # See "Findkutils.cmake" in cmakemodules to figure
 # out where it looks and what variables it sets
 
@@ -117,6 +121,7 @@ include_directories(
   ${KUTILS_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}/libsrc/
   ${SQLITE_INCLUDE_DIR}
+  ${LOGGER_INCLUDE_DIR}
   )
 set(KTABMODEL_SRCS
   libsrc/kmodel.cpp

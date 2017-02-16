@@ -30,9 +30,6 @@
 
 
 namespace SMPLib {
-using std::cout;
-using std::endl;
-using std::flush;
 using std::function;
 using std::get;
 using std::string;
@@ -150,9 +147,9 @@ void SMPModel::sqlTest() {
 
   auto callBack = [](void *NotUsed, int argc, char **argv, char **azColName) {
     for (int i = 0; i < argc; i++) {
-      printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+      LOG(DEBUG) << KBase::getFormattedString(
+        "%s = %s", azColName[i], (argv[i] ? argv[i] : "NULL"));
     }
-    printf("\n");
     return ((int)0);
   };
 
@@ -164,30 +161,28 @@ void SMPModel::sqlTest() {
   auto sOpen = [&db](unsigned int n, string dbPath) {
     int rc = sqlite3_open(dbPath.c_str(), &db);
     if (rc != SQLITE_OK) {
-      fprintf(stdout, "Can't open database: %s\n", sqlite3_errmsg(db));
+      LOG(ERROR) << "Can't open database:" << sqlite3_errmsg(db);
       exit(0);
     }
     else {
-      fprintf(stdout, "Successfully opened database #%i\n", n);
+      LOG(DEBUG) << "Successfully opened database #" << n;
     }
-    cout << endl << flush;
     return;
   };
 
   auto sExec = [&db, callBack, &zErrMsg](string sql, string msg) {
     int rc = sqlite3_exec(db, sql.c_str(), callBack, nullptr, &zErrMsg);
     if (rc != SQLITE_OK) {
-      fprintf(stdout, "SQL error: %s\n", zErrMsg);
+      LOG(ERROR) << "SQL error:" << zErrMsg;
       sqlite3_free(zErrMsg);
     }
     else {
-      fprintf(stdout, msg.c_str());
+      LOG(DEBUG) << msg;
     }
     return rc;
   };
 
   // Open database
-  cout << endl << flush;
   sOpen(1,dbPath); //passing DB FileName
 
   // As we are not dealing with a long-term, mission-critical database,
@@ -209,15 +204,12 @@ void SMPModel::sqlTest() {
     assert(nullptr != thistable);
     KTables.push_back(thistable);
     // create the table
-    auto buff = newChars(100);
-    sExec(thistable->tabSQL, buff); // ignore return-code
-    // talk a little now
-    sprintf(buff, "Created SMPModel table %s(%u) successfully \n", thistable->tabName.c_str(),i);
-    delete buff;
-    buff = nullptr;
-    cout << flush;
+
+    string msgTblCreated;
+    msgTblCreated += "Created SMPModel table " + thistable->tabName
+      "(" + std::to_string(i) + ") successfully";
+    sExec(thistable->tabSQL, msgTblCreated); // ignore return-code
   }
-  cout << endl << flush;
 
   smpDB = db;
   return;
@@ -520,9 +512,6 @@ void SMPState::updateBargnTable(const vector<vector<BargainSMP*>> & brgns,
         rcvrActr = initActr;
         initProb = (actorBargains[initActr])(initBgnNdx, 0);
         initSelected = initBgnNdx == actorMaxBrgNdx[initActr] ? 1 : 0;
-        /*cout << __LINE__ << " " << "SQ" << " " << bg->getID() \
-          << " " << initActr << ":" << rcvrActr << " " \
-          << initProb << " " << initSelected << endl;*/
 
         bindExecuteBargnTableUpdate(updateStmt, t, bg->getID(),
                                     initActr, initProb, initSelected,
@@ -552,15 +541,6 @@ void SMPState::updateBargnTable(const vector<vector<BargainSMP*>> & brgns,
 
               // Check if it is the selected bargain for receiver actor
               rcvrSelected = actorMaxBrgNdx[rcvrActr] == rcvrBgNdx ? 1 : 0;
-
-              /*std::cout.precision(4);
-                cout << std::fixed;
-                cout << "Line " << __LINE__ << " " << bgID << " " \
-                << initActr << ":" << rcvrActr \
-                << " init_prob: " << initProb \
-                << " init_selected: " << initSelected \
-                << " rcvr_prob: " << rcvrProb \
-                << " rcvr_selected: " << rcvrSelected << endl << endl;*/
 
               --countDown;
               bindExecuteBargnTableUpdate(updateStmt, t, bg->getID(),

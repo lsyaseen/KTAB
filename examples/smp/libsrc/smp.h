@@ -24,10 +24,10 @@
 #ifndef SMP_LIB_H
 #define SMP_LIB_H
 
-#include <iostream>
 #include <string>
 #include <map>
 
+#include <easylogging++.h>
 #include "sqlite3.h"
 #include "kutils.h"
 #include "prng.h"
@@ -197,7 +197,7 @@ public:
   // use the parameters of your state to compute the relative probability of each actor's position
   virtual tuple< KMatrix, VUI> pDist(int persp) const;
   void showBargains(const vector < vector < BargainSMP* > > & brgns) const;
-  void showOneBargain(const BargainSMP* b) const;
+  string showOneBargain(const BargainSMP* b) const;
 
   virtual bool equivNdx(unsigned int i, unsigned int j) const;
 
@@ -286,7 +286,7 @@ private:
   
   mutable int bestJ;
 
-	private:
+  private:
 		vector<double> calcVotes(KMatrix w, KMatrix u, int actor) const;
 };
 

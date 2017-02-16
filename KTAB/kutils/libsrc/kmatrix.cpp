@@ -22,10 +22,10 @@
 // -------------------------------------------------
 
 #include <assert.h>
-#include <stdio.h>
+//#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <iostream>
+//#include <iostream>
 #include <string.h>
 #include <vector>
 
@@ -34,11 +34,6 @@
 
 
 namespace KBase {
-
-using std::printf;
-using std::cout;
-using std::endl;
-using std::flush;
 
 KMatrix subMatrix(const KMatrix & m1,
                   unsigned int i1, unsigned int i2,
@@ -220,13 +215,16 @@ KMatrix KMatrix::arrayInit(const double mv[], const unsigned int & nr, const uns
 
 void KMatrix::mPrintf(string fs) const {
     const char * fc = fs.c_str();
-    auto pf = [fc, this](unsigned int i, unsigned int j) {
-        std::printf(fc, (*this)(i, j));
+    string rowVals;
+    auto pf = [fc, this, &rowVals](unsigned int i, unsigned int j) {
+        rowVals += KBase::getFormattedString(fc, (*this)(i, j));
         if (j == (this->numC() - 1)) {
-            std::printf("\n");
+            LOG(DEBUG) << rowVals;
+            // Reset the string object before processing next row in the matrix
+            rowVals.clear();
         }
         return;
-    };
+    }
     mapV(pf, rows, clms);
     return;
 }

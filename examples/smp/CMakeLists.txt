@@ -56,6 +56,10 @@ endif (NOT SQLITE_FOUND)
 
 # --------------------------------------------------------
 
+find_package(easyloggingpp)
+
+# --------------------------------------------------------
+
 set (SMP_XLIBS  )
 
 # --------------------------------------------------------
@@ -107,6 +111,7 @@ include_directories (
   ${MINICSV_DIR}
   ${SQLITE_INCLUDE_DIR}
   ${TINYXML2_INCLUDE_DIR}
+  ${LOGGER_INCLUDE_DIR}
   )
 
 # note that we do not put the csv_parser into smp lib.
@@ -163,6 +168,7 @@ target_link_libraries (smpc
   ${SQLITE_LIBRARIES}
   ${EFENCE_LIBRARIES}
   ${TINYXML2_LIBRARIES}
+  ${LOGGER_LIBRARY}
   )
 #--------------------------------------------------
 #smpq qt based application
