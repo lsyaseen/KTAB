@@ -343,22 +343,13 @@ SMPState* SMPState::doBCN() const {
       //brgnIJ = tIIJ;
       //brgnIIJ = tIJ;
 
-      // TODO: what does this data represent?
-      //Brgn table base entries
-      // JAH 20160802 control logging added
-      if (model->sqlFlags[3])
-      {
-        //model->sqlBargainEntries(t, brgnJIJ->getID(), i, i, i, bestEU);
-        //model->sqlBargainEntries(t, brgnIIJ->getID(), i, i, j, bestEU);
-        model->sqlBargainEntries(t, brgnIJ->getID(), i, j, bestEU);
-      }
-
       cout << "Using "<<bMod<<" to form proposed bargains" << endl;
       switch (bMod) {
       case SMPBargnModel::InitOnlyInterpSMPBM:
         // record the only one used into SQLite JAH 20160802 use the flag
         if(model->sqlFlags[3])
         {
+          model->sqlBargainEntries(t, brgnIIJ->getID(), i, j, bestEU);
           model->sqlBargainCoords(t, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr);
         }
         // record this one onto BOTH the initiator and receiver queues
@@ -376,6 +367,8 @@ SMPState* SMPState::doBCN() const {
         // record the pair used into SQLite JAH 20160802 use the flag
         if(model->sqlFlags[3])
         {
+          model->sqlBargainEntries(t, brgnIIJ->getID(), i, j, bestEU);
+          model->sqlBargainEntries(t, brgnJIJ->getID(), i, j, bestEU);
           model->sqlBargainCoords(t, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr);
           model->sqlBargainCoords(t, brgnJIJ->getID(), brgnJIJ->posInit, brgnJIJ->posRcvr);
         }
@@ -394,6 +387,7 @@ SMPState* SMPState::doBCN() const {
         // record the only one used into SQLite JAH 20160802 use the flag
         if(model->sqlFlags[3])
         {
+          model->sqlBargainEntries(t, brgnIJ->getID(), i, j, bestEU);
           model->sqlBargainCoords(t, brgnIJ->getID(), brgnIJ->posInit, brgnIJ->posRcvr);
         }
         // record this one onto BOTH the initiator and receiver queues
@@ -584,8 +578,11 @@ SMPState* SMPState::doBCN() const {
     cout << endl << flush;
   }
 
-  // record data so far
-  updateBargnTable(brgns, actorBargains, actorMaxBrgNdx);
+  if (model->sqlFlags[3])
+  {
+    // record data so far
+    updateBargnTable(brgns, actorBargains, actorMaxBrgNdx);
+  }
 
   // Some bargains are nullptr, and there are two copies of every non-nullptr randomly
   // arranged. If we delete them as we find them, then the second occurance will be corrupted,
