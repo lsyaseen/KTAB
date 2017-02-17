@@ -28,9 +28,6 @@
 #include "smp.h"
 
 namespace SMPLib {
-using std::cout;
-using std::endl;
-using std::flush;
 using std::function;
 using std::get;
 using std::string;
@@ -254,20 +251,20 @@ SMPState* SMPState::doBCN() const {
       const unsigned int j = bestJ; // for consistency in code below
 
       const unsigned int t = myTurn(); // need to be on model's history list
-      printf("In turn %i actor %u has most advantageous target %u worth %.3f\n", t, i, j, bestEU);
+      LOG(INFO) << KBase::getFormattedString(
+        "In turn %i actor %u has most advantageous target %u worth %.3f",
+        t, i, j, bestEU);
 
       auto aj = ((const SMPActor*)(model->actrs[j]));
       auto posJ = ((const VctrPstn*)pstns[j]);
 
       // Look for counter-intuitive cases
       if (piiJ < 0.5) {
-        cout << "turn " << t << " , ";
-        cout << "i " << i << " , ";
-        cout << "j " << j << " , ";
-        cout << "bestEU worth " << bestEU << " , ";
-        cout << "piiJ " << piiJ << endl;
-        cout << endl << flush; // get it printed
-        //assert(0.5 <= piiJ);
+        LOG(DEBUG) << "turn" << t << ","
+            << "i" << i << ","
+            << "j" << j << ","
+            << "bestEU worth" << bestEU << ","
+            << "piiJ " << piiJ;
       }
 
       std::thread thr(recordUtility, i, this);
@@ -279,14 +276,16 @@ SMPState* SMPState::doBCN() const {
         auto est = probEduChlg(h, k, i, j, recordTmpSQLP); // H's estimate of the effect on K of I->J
         double phij = get<0>(est);
         double edu_hk_ij = get<1>(est);
-        printf("Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f \n",
-               h, phij, i, j, k, edu_hk_ij);
-		return est;
+        LOG(DEBUG) << KBase::getFormattedString(
+          "Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f",
+          h, phij, i, j, k, edu_hk_ij);
+        return est;
       };
 
       // I's estimate of the effect on I of I->J
-      printf("Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f \n",
-             i, piiJ, i, j, i, get<2>(chlgI));
+      LOG(DEBUG) << KBase::getFormattedString(
+        "Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f",
+        i, piiJ, i, j, i, get<2>(chlgI));
 
       pFn(i, j, i, j); // I's estimate of the effect on J of I->J
 
@@ -319,37 +318,29 @@ SMPState* SMPState::doBCN() const {
       auto bpj = VctrPstn((wi*brgnIIJ->posRcvr + wj*brgnJIJ->posRcvr) / (wi + wj));
       BargainSMP *brgnIJ = new  BargainSMP(brgnIIJ->actInit, brgnIIJ->actRcvr, bpi, bpj);
 
-      printf("\n");
-      printf("Bargain ");
-      showOneBargain(brgnIIJ);
-      printf(" from %2u's perspective (brgnIIJ) \n", i);
-      printf("  %2u proposes %2u adopt: ", i, i);
+      // Bargain positions from i's perspective
+      LOG(INFO) << "Bargain (brgnIIJ)" << showOneBargain(brgnIIJ)
+        << "from the perspective of" << i;
+      LOG(INFO) << i << "proposes" << i << "adopt:";
       (KBase::trans(brgnIIJ->posInit) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
-
-
-      printf("  %2u proposes %2u adopt: ", i, j);
+      LOG(INFO) << i << "proposes" << j << "adopt:";
       (KBase::trans(brgnIIJ->posRcvr) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
-      printf("\n");
-      printf("Bargain  ");
-      showOneBargain(brgnJIJ);
-      printf(" from %2u's perspective (brgnJIJ) \n", j);
-      printf("  %2u proposes %2u adopt: ", j, i);
 
+      // Bargain positions from j's perspective
+      LOG(INFO) << "Bargain (brgnJIJ)" << showOneBargain(brgnJIJ)
+        << "from the perpective of" << j;
+      LOG(INFO) << j << "proposes" << i << "adopt:";
       (KBase::trans(brgnJIJ->posInit) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
-      printf("  %2u proposes %2u adopt: ", j, j);
+      LOG(INFO) << j << "proposes" << j << "adopt:";
       (KBase::trans(brgnJIJ->posRcvr) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
-      //Brgn table base entries
 
-
-      printf("\n");
-      printf("Power-weighted compromise  ");
-      showOneBargain(brgnIJ);
-      printf(" bargain (brgnIJ) \n");
-      printf("  compromise proposes %2u adopt: ", i);
+      // Power-weighted compromise
+      LOG(INFO) << "Power-weighted compromise" << showOneBargain(brgnIJ) << "bargain (brgnIJ)";
+      LOG(INFO) << "  Compromise proposes" << i << "adopt: ";
       (KBase::trans(brgnIJ->posInit) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
-      printf("  compromise proposes %2u adopt: ", j);
+
+      LOG(INFO) << "  Compromise proposes" << j << "adopt: ";
       (KBase::trans(brgnIJ->posRcvr) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
-      printf("\n");
 
 
       // TODO: make one-perspective an option.
@@ -359,7 +350,7 @@ SMPState* SMPState::doBCN() const {
       //brgnIJ = tIIJ;
       //brgnIIJ = tIJ;
 
-      cout << "Using "<<bMod<<" to form proposed bargains" << endl;
+      LOG(INFO) << "Using" << bMod << "to form proposed bargains";
       switch (bMod) {
       case SMPBargnModel::InitOnlyInterpSMPBM:
         // record the only one used into SQLite JAH 20160802 use the flag
@@ -426,22 +417,22 @@ SMPState* SMPState::doBCN() const {
         break;
 
       default:
-        cout << "SMPState::doBCN unrecognized SMPBargnModel" << endl << flush;
-        assert(false);
+        LOG(ERROR) << "SMPState::doBCN unrecognized SMPBargnModel";
+        exit(-1);
       }
 
       thr.join();
     }
     else {
-      printf("Actor %u has no advantageous targets \n", i);
+      LOG(INFO) << "Actor" << i << "has no advantageous targets";
     }
   }
 
-  cout << endl << "Bargains to be resolved" << endl << flush;
+  LOG(DEBUG) << "Bargains to be resolved";
   showBargains(brgns);
 
   auto w = actrCaps();
-  cout << "w:" << endl;
+  LOG(DEBUG) << "w:";
   w.mPrintf(" %6.2f ");
 
   auto ndxMaxProb = [](const KMatrix & cv) {
@@ -516,10 +507,10 @@ SMPState* SMPState::doBCN() const {
     };
     auto u_im = KMatrix::map(buk, na, nb);
 
-    cout << "u_im: " << endl;
+    LOG(DEBUG) << "u_im:";
     u_im.mPrintf(" %.5f ");
 
-    cout << "Doing scalarPCE for the " << nb << " bargains of actor " << k << " ... " << flush;
+    LOG(INFO) << "Doing scalarPCE for the" << nb << "bargains of actor" << k << "...";
     auto p = Model::scalarPCE(na, nb, w, u_im, vrBargains, vpmBargains, pcemBargains, ReportingLevel::Medium);
     assert(nb == p.numR());
     assert(1 == p.numC());
@@ -571,8 +562,8 @@ SMPState* SMPState::doBCN() const {
     // TODO: create a fresh position for k, from the selected bargain mMax.
     VctrPstn * pk = nullptr;
     auto bkm = brgns[k][mMax];
-    cout << "Chosen bargain (" << stm << "): " << bkm->getID()
-      << " " << mMax + 1 << " out of " << nb << " bargains" << endl;
+    LOG(DEBUG) << "Chosen bargain (" << stm << "): " << bkm->getID()
+      << " " << mMax + 1 << " out of " << nb << " bargains";
     auto oldPK = dynamic_cast<VctrPstn *>(pstns[k]);
     if (bkm->actInit == bkm->actRcvr) { // SQ
       pk = new VctrPstn(*oldPK);
@@ -587,8 +578,8 @@ SMPState* SMPState::doBCN() const {
         pk = new VctrPstn(bkm->posRcvr);
       }
       else {
-        cout << "SMPState::doBCN: unrecognized actor in bargain" << endl;
-        assert(false);
+        LOG(ERROR) << "SMPState::doBCN: unrecognized actor in bargain";
+        exit(-1);
       }
 
       // If the actor has changed its position, record the bargain id
@@ -604,8 +595,6 @@ SMPState* SMPState::doBCN() const {
 
     assert(k == s2->pstns.size());
     s2->pstns.push_back(pk);
-
-    cout << endl << flush;
   }
 
   if (model->sqlFlags[3])
@@ -660,8 +649,7 @@ SMPState* SMPState::doBCN() const {
   }
   s2->newIdeals(); // adjust s2 ideals toward new ones
   double ipDist = s2->posIdealDist(ReportingLevel::Medium);
-  printf("rms (pstn, ideal) = %.5f \n", ipDist);
-  cout << flush;
+  LOG(DEBUG) << KBase::getFormattedString("rms (pstn, ideal) = %.5f", ipDist);
   return s2;
 }
 
@@ -877,8 +865,6 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
 
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
     sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-    //printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
-    //cout << flush; // so this prints before subsequent assertion failures
 
     delete sqlBuff;
     sqlBuff = nullptr;

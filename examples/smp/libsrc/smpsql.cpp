@@ -207,7 +207,7 @@ void SMPModel::sqlTest() {
 
     string msgTblCreated;
     msgTblCreated += "Created SMPModel table " + thistable->tabName
-      "(" + std::to_string(i) + ") successfully";
+      + "(" + std::to_string(i) + ") successfully";
     sExec(thistable->tabSQL, msgTblCreated); // ignore return-code
   }
 

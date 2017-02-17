@@ -138,14 +138,14 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
         assert(0 < aName.length());
         assert(aName.length() <= Model::maxActNameLen);
         actorNames.push_back(aName);
-        LOG(DEBUG) << "Actor" << i << "name:" << actorNames[i];
+        LOG(DEBUG) << "Actor:" << i << "name:" << actorNames[i];
 
         // empty descriptions are allowed
         assert(aDesc.length() <= Model::maxActDescLen);
         actorDescs.push_back(aDesc);
-        LOG(DEBUG) << "Actor" << i << "desc:" << actorDescs[i];
+        LOG(DEBUG) << "Actor:" << i << "desc:" << actorDescs[i];
 
-        LOG(DEBUG) << KBase::getFormattedString("Actor %3u power: %5.1f", i, aCap);
+        LOG(DEBUG) << KBase::getFormattedString("Actor: %u power: %5.1f", i, aCap);
         assert(0 <= aCap); // zero weight is pointless, but not incorrect
         assert(aCap < 1E8); // no real upper limit, so this is just a sanity-check
         cap(i, 0) = aCap;
@@ -158,7 +158,7 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
             double dSal = 0.0; // on [0, 100] scale
             inStream >> dPos >> dSal;
 
-            LOG(DEBUG) << KBase::getFormattedString("pos[%3u , %3u] =  %5.3f", i, d, dPos);
+            LOG(DEBUG) << KBase::getFormattedString("pos[%u, %u] =  %5.3f", i, d, dPos);
             if ((dPos < 0.0) || (+100.0 < dPos)) { // lower and upper limit
                 string err = KBase::getFormattedString(
                   "SMPModel::readCSVStream: Out-of-bounds position for actor %u on dimension %u:  %f",
@@ -177,7 +177,7 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
             }
             assert(0.0 <= dSal);
             salI = salI + dSal;
-            LOG(DEBUG) << KBase::getFormattedString("sal[%3u, %3u] = %5.3f", i, d, dSal);
+            LOG(DEBUG) << KBase::getFormattedString("sal[%u, %u] = %5.3f", i, d, dSal);
             if (+100.0 < salI) { // upper limit: no more than 100% of attention to all issues
                 string err = KBase::getFormattedString(
                   "SMPModel::readCSVStream: Out-of-bounds total salience for actor %u:  %f",
