@@ -22,7 +22,6 @@
 // --------------------------------------------
 
 #include <assert.h>
-//#include <iostream>
 
 #include <time.h>
 #include "kmodel.h"

@@ -28,7 +28,6 @@
 #include <assert.h>
 #include <chrono>
 #include <functional>
-#include <iostream>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -37,9 +36,6 @@
 #include "kutils.h"
 
 namespace KBase {
-using std::cout;
-using std::endl;
-using std::flush;
 using std::function;
 using std::get;
 using std::tuple;

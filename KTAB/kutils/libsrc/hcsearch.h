@@ -26,7 +26,6 @@
 #define KBASE_HCSEARCH_H
 
 #include <functional>   // function
-#include <iostream>     // cout, etc.
 #include <tuple>        // tuple, get, etc.
 #include <vector>
 
@@ -43,9 +42,6 @@
 
 namespace KBase {
 
-using std::cout;
-using std::endl;
-using std::flush;
 using std::tuple;
 
 using KBase::ReportingLevel;
