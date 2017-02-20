@@ -34,6 +34,8 @@
 
 #include <inttypes.h>
 #include "demo.h"
+#include <easylogging++.h>
+INITIALIZE_EASYLOGGINGPP
 
 using KBase::newChars;
 using KBase::PRNG;
@@ -1615,7 +1617,6 @@ void demoVHC02(uint64_t sd) {
     //  stdv    0.0268  0.0554  0.0446  0.0409  0.0495  0.0488  0.0449  0.0268  0.0387  0.0356  0.0446  0.0374
     //  min     0.0333  0.0345  0.0044  0.0003  0.0615  0.0001  0.2196  0.0333  0.0666  0.2227  0.0044  0.0383
     //  max     0.1499  0.252   0.1645  0.1528  0.2657  0.1622  0.4209  0.1499  0.2373  0.3846  0.1645  0.2257
-
     //
     // So, in terms of mean & stdv of the RMS estimation error
     // eS2P2 and dS2P2 were significantly better than the other others,
@@ -2082,6 +2083,9 @@ void parallelMatrixMult(PRNG * rng) {
 // -------------------------------------------------
 
 int main(int ac, char **av) {
+    // Set logging configuration from a file
+    el::Configurations confFromFile("./conf/logger.conf");
+    el::Loggers::reconfigureAllLoggers(confFromFile);
     using KBase::dSeed;
     using UDemo::TargetedBV;
     auto sTime = KBase::displayProgramStart();

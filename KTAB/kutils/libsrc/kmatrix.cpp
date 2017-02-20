@@ -30,6 +30,7 @@
 
 #include "prng.h"
 #include "kmatrix.h"
+#include <easylogging++.h>
 
 
 namespace KBase {
@@ -223,7 +224,7 @@ void KMatrix::mPrintf(string fs) const {
             rowVals.clear();
         }
         return;
-    }
+    };
     mapV(pf, rows, clms);
     return;
 }

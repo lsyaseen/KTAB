@@ -26,6 +26,7 @@
 // -------------------------------------------------
 
 #include "vimcp.h"
+#include <easylogging++.h>
 
 namespace KBase {
 

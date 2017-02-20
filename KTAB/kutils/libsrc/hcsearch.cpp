@@ -24,6 +24,7 @@
 
 #include "kutils.h"
 #include "hcsearch.h"
+#include <easylogging++.h>
 
 namespace KBase {
 using std::tuple;

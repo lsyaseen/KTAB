@@ -25,6 +25,7 @@
 
 #include <assert.h>
 #include <tuple>
+#include <easylogging++.h>
 
 #include "kutils.h"
 #include "prng.h"

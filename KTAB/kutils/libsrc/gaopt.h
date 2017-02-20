@@ -34,6 +34,7 @@
 
 #include "prng.h"
 #include "kutils.h"
+#include <easylogging++.h>
 
 namespace KBase {
 using std::function;
@@ -160,6 +161,7 @@ void GAOpt<GAP>::run(PRNG* rng, double c, double m,
     return vi;
   };
   sortPop();
+  el::Loggers::removeFlag(el::LoggingFlag::AutoSpacing);
   while (runP) {
     auto pri = getNth(0);
     double oldBest = get<0>(pri);
@@ -174,25 +176,26 @@ void GAOpt<GAP>::run(PRNG* rng, double c, double m,
     runP = (iter < maxI) && (sIter < maxS);
 
     if (ReportingLevel::Low < srl) {
-      printf("%u/%u iterations    %u/%u stable \n", iter, maxI, sIter, maxS);
-      printf("newBest value: %+.4f up %+.4f  \n", newBest, dv);
-      cout << "newBest gene: ";
+      LOG(DEBUG) << iter << "/" << maxI << " iterations and "
+        << sIter << "/" << maxS << " stable";
+      LOG(DEBUG) << getFormattedString("newBest value: %+.4f up %+.4f", newBest, dv);
+      LOG(DEBUG) << "newBest gene:";
       showGene(get<1>(pri));
-      cout << endl;
       if (ReportingLevel::Medium < srl) {
         show();
       }
-      cout << endl << endl << flush;
     }
   }
   if (ReportingLevel::Silent < srl) {
     auto pri = getNth(0);
-    printf("Search completed after %u/%u iterations    %u/%u stable \n", iter, maxI, sIter, maxS);
-    printf("best value: %+.4f  \n", get<0>(pri));
-    cout << "best gene: ";
+    LOG(DEBUG) << "Search completed after "
+      << iter << "/" << maxI << " iterations and "
+      << sIter << "/" << maxS << " stable";
+    LOG(DEBUG) << getFormattedString("best value: %+.4f", get<0>(pri));
+    LOG(DEBUG) << "best gene: ";
     showGene(get<1>(pri));
-    cout << endl << endl << flush;
   }
+  el::Loggers::addFlag(el::LoggingFlag::AutoSpacing);
   return;
 }
 
@@ -377,11 +380,9 @@ void GAOpt<GAP>::show() {
     auto pri = gpool[i];
     auto vi = get<0>(pri);
     auto gi = get<1>(pri);
-    printf("%4u  %8.3f   ", i, vi);
-    cout << flush;
+    LOG(DEBUG) << getFormattedString("%4u  %8.3f", i, vi);
     assert(nullptr != gi);
     showGene(gi);
-    cout << endl << flush;
   }
   return;
 }

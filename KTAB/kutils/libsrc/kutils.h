@@ -48,14 +48,12 @@
 #include <thread>
 #include <tuple>
 #include <vector>
-#include <easylogging++.h>
 
 namespace KBase {
 using std::function;
 using std::string;
 using std::tuple;
 using std::vector;
-using std::ostream;  
 
 
 typedef vector<unsigned int> VUI;
