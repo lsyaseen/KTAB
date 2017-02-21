@@ -28,6 +28,7 @@
 #include "csv.h"
 #include "database.h"
 #include "xmlparser.h"
+#include "colorpickerdialog.h"
 #include "../qcustomplot/qcustomplot.h"
 
 #include <QtSql>
@@ -72,6 +73,11 @@ public:
 
 private slots:
     void about();
+    void chooseActorColors();
+    void importActorColors();
+    void exportActorColors();
+    void resetActorColors();
+    void updateColors(QList<QColor> updatedColors);
     void dockWindowChanged();
     //CSV
     void setCSVItemModel(QStandardItemModel * model, QStringList scenarioName);
@@ -133,6 +139,10 @@ signals:
     void getPosition(int dim,int turn);
     void getSalience(int dim,int turn);
 
+    //colors
+    void exportColors(QString path, QList<int> actorIds, QList<QString> colorCode);
+    void importColors(QString path, int actorCount);
+
 private:
     //MainWindow
     void createActions();
@@ -148,6 +158,8 @@ private:
 
     void updateDBViewColumns();
     QString checkForHeaderString(QString header);
+
+    void changesActorsStyleSheet();
 
     // Central Main Frame
     QFrame *central;

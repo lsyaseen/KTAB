@@ -23,6 +23,7 @@
 // --------------------------------------------
 
 #include "csv.h"
+#include <QDebug>
 
 CSV::CSV()
 {
@@ -109,6 +110,84 @@ void CSV::readCSVFile(QString path)
         }
     }
     emit csvModel(model,scenarioName);
+}
+
+
+void CSV::exportActorColors(QString path, QList<int> actorIds, QList<QString> colorCode)
+{
+    QFile f(path);
+
+    if (f.open(QFile::WriteOnly | QFile::Truncate))
+    {
+        QTextStream data( &f );
+        QStringList strList;
+
+        //appending data
+        for (int row=0; row < actorIds.length(); row++)
+        {
+            strList.clear();
+
+            strList << QString::number(actorIds.at(row));
+            strList << colorCode.at(row);
+            data << strList.join(",") + "\n";
+            qDebug() << strList;
+        }
+        f.close();
+
+    }
+
+
+
+}
+
+void CSV::importActorColors(QString path, int actCount)
+{
+    QRegExp space("^\\s*$");
+
+    //getting the csv file path
+    QList<QColor> colorCodeList;
+    if(!path.isEmpty())
+    {
+        QFile file(path);
+        if (file.open(QIODevice::ReadOnly) && file.size() > 0)
+        {
+            // file row counter
+            QTextStream in(&file);                 // read to text stream
+
+            while (!in.atEnd())
+            {
+                // read one line from textstream(separated by "\n")
+                QString fileLine = in.readLine();
+
+                // parse the read line into separate pieces(tokens) with "," as the delimiter
+                QStringList lineToken = fileLine.split(",", QString::SkipEmptyParts);
+                QString lastField = lineToken.at(lineToken.length()-1);
+                if(lastField.contains(space))
+                    lineToken.removeLast();
+
+
+                // load parsed data to model accordingly
+                for (int j = 0; j < lineToken.size(); j++)
+                {
+                    if(j == 1)
+                    {
+                        colorCodeList.append(lineToken.at(j));
+                    }
+                }
+            }
+            file.close();
+        }
+        qDebug()<<colorCodeList.length() << actCount;
+
+        emit(importedColors(colorCodeList));
+
+
+    }
+    else
+    {
+        emit sendMessage("CSV","File is Empty ! ");
+        return;
+    }
 }
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.

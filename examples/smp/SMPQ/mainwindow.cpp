@@ -135,6 +135,11 @@ MainWindow::MainWindow()
     connect(this,SIGNAL(saveNewSMPDataToXMLFile(QStringList,QTableWidget*,QTableWidget*)),
             xmlparser,SLOT(saveNewDataToXmlFile(QStringList,QTableWidget*,QTableWidget*)));
 
+    //colorpalette
+    connect(this,SIGNAL(exportColors(QString,QList<int>, QList<QString>)),
+            csvObj,SLOT(exportActorColors(QString,QList<int>,QList<QString>)));
+    connect(this ,SIGNAL(importColors(QString,int)),csvObj,SLOT(importActorColors(QString,int)));
+    connect(csvObj,SIGNAL(importedColors(QList<QColor>)),this,SLOT(updateColors(QList<QColor>)));
 
     //editable headers of TableWidget and TableView
     headerEditor = 0;
@@ -147,6 +152,7 @@ MainWindow::MainWindow()
     useHistory =true;
     currentScenarioId = "dummy";
     sankeyOutputHistory=true;
+
 }
 
 MainWindow::~MainWindow()
@@ -1211,6 +1217,107 @@ void MainWindow::about()
 
 }
 
+void MainWindow::chooseActorColors()
+{
+    if(actorsName.length()>0)
+    {
+        QList<QColor> colors;
+
+        for(int i=0; i < actorsName.length(); ++i)
+            colors.append(colorsList.at(i));
+
+        ColorPickerDialog *colorPicker = new ColorPickerDialog;
+        connect(colorPicker,SIGNAL(changedColors(QList<QColor>)),this,SLOT(updateColors(QList<QColor>)));
+        colorPicker->intializeActors(actorsName,colors);
+        colorPicker->show();
+    }
+    else
+        displayMessage("Actors color picker","Please Import DB or RUN SMP Model");
+
+}
+
+void MainWindow::importActorColors()
+{
+    if(actorsName.length()>0)
+    {
+        QString colorCodeCsvFilePth;
+        colorCodeCsvFilePth = QFileDialog::getOpenFileName(this,tr("Open CSV File"), QDir::homePath() , tr("CSV File (*.csv)"));
+
+        //emit path to csv class for processing
+        if(!colorCodeCsvFilePth.isEmpty())
+        {
+            emit importColors(colorCodeCsvFilePth,actorsName.length());
+        }
+    }
+    else
+        displayMessage("Actors color picker","Please Import DB or RUN SMP Model");
+}
+
+void MainWindow::exportActorColors()
+{
+    if(actorsName.length()>0)
+    {
+        QString colorPaletteCsvFileNameLocation = QFileDialog::getSaveFileName(
+                    this, tr("Save Log File to "),"","CSV File (*.csv)");
+
+        if(!colorPaletteCsvFileNameLocation.endsWith(".csv"))
+            colorPaletteCsvFileNameLocation.append(".csv");
+
+        QList<int> actorIdList;
+        QList<QString> actorColorsList;
+        for(int act=0; act < actorsName.length(); ++act)
+        {
+            actorIdList.append(act);
+            actorColorsList.append(colorsList.at(act).name());
+        }
+        emit exportColors(colorPaletteCsvFileNameLocation,actorIdList,actorColorsList);
+
+    }
+    else
+        displayMessage("Actors color picker","Please Import DB or RUN SMP Model");
+}
+
+void MainWindow::resetActorColors()
+{
+    if(actorsName.length()>0)
+    {
+        generateColors();
+        changesActorsStyleSheet();
+    }
+    else
+        displayMessage("Actors color picker","Please Import DB or RUN SMP Model");
+}
+
+void MainWindow::updateColors(QList<QColor> updatedColors)
+{
+    for(int i=0; i < updatedColors.length(); ++i)
+        colorsList[i]=updatedColors.at(i);
+
+    changesActorsStyleSheet();
+}
+
+void MainWindow::changesActorsStyleSheet()
+{
+    for(int actId=0; actId < actorsName.length(); ++actId)
+    {
+        QColor mycolor =colorsList.at(actId);
+
+        QString style = "background: rgb(%1, %2, %3);";
+        style = style.arg(mycolor.red()).arg(mycolor.green()).arg(mycolor.blue());
+        style += "color:white; font-size:15px;";
+        style += "font-weight:bold;";
+
+        barGraphActorsCheckBoxList.at(actId)->setStyleSheet(style);
+        lineGraphActorsCheckBoxList.at(actId)->setStyleSheet(style);
+        quadMapReceiversCheckBoxList.at(actId)->setStyleSheet(style);
+        quadMapInitiatorsRadioButtonList.at(actId)->setStyleSheet(style);
+
+        lineLabelList.at(actId)->setColor(colorsList.at(actId));
+    }
+    turnSlider->valueChanged(turnSlider->value());
+    barGraphTurnSlider->valueChanged(barGraphTurnSlider->value());
+}
+
 void MainWindow::createActions()
 {
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
@@ -1313,6 +1420,34 @@ void MainWindow::createActions()
     logNoneAct->setStatusTip(tr("Log nothing"));
     logActions->addAction(logNoneAct);
 
+    menuBar()->addSeparator();
+
+    QMenu *actorColors = menuBar()->addMenu(tr("&Colors Options"));
+
+    const QIcon colorIcon = QIcon::fromTheme("ColorPicker ", QIcon("://images/colorpicker.png"));
+    QAction *colorAct =new QAction(colorIcon,tr("&Change Actor Colors"), this);
+    actorColors->addAction(colorAct);
+    connect(colorAct, SIGNAL(triggered(bool)),this,SLOT(chooseActorColors()));
+    colorAct->setStatusTip(tr("Pick colors for Actors"));
+
+    QAction *importActorColorAct =new QAction(tr("&Import Actor Colors"), this);
+    actorColors->addAction(importActorColorAct);
+    connect(importActorColorAct, SIGNAL(triggered(bool)),this,SLOT(importActorColors()));
+    importActorColorAct->setStatusTip(tr("Import Actor colors from CSV"));
+
+    QAction *exportActorColorAct =new QAction(tr("&Export Actor Colors"), this);
+    actorColors->addAction(exportActorColorAct);
+    connect(exportActorColorAct, SIGNAL(triggered(bool)),this,SLOT(exportActorColors()));
+    exportActorColorAct->setStatusTip(tr("Export Actor colors to CSV"));
+
+    QAction *resetActorColorAct =new QAction(tr("&Reset Actor Colors"), this);
+    actorColors->addAction(resetActorColorAct);
+    connect(resetActorColorAct, SIGNAL(triggered(bool)),this,SLOT(resetActorColors()));
+    resetActorColorAct->setStatusTip(tr("Reset Actor colors to Default"));
+
+    fileToolBar->addAction(colorAct);
+
+    menuBar()->addSeparator();
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
 
     QAction *aboutAct =new QAction(tr("&About"), this);

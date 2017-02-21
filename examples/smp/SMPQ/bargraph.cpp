@@ -266,6 +266,7 @@ void MainWindow::populateBarGraphStateRange(int states)
 
 void MainWindow::generateColors()
 {
+    colorsList.clear();
     colorsList << QColor(220,20,60)<< QColor(255,215,0)<< QColor(175,238,238)<<QColor(0,0,205)
                << QColor(165,42,42)<<QColor(34,139,34)<<QColor(218,165,32)<< QColor (95,158,160)
                << QColor(199,21,133)<<QColor(205,50,205)<<QColor(245,205,250)<<QColor(0,206,209)
