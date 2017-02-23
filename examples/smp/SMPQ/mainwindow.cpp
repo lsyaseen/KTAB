@@ -522,9 +522,13 @@ void MainWindow::insertNewColumnCSV()
             {
                 modeltoCSV->insertColumns(modeltoCSV->columnCount(),1);
                 modeltoCSV->setHorizontalHeaderItem(modeltoCSV->columnCount()-1,new QStandardItem("Position"));
+                modeltoCSV->horizontalHeaderItem(modeltoCSV->columnCount()-1)->
+                        setToolTip("The policy position of an actor regarding the question (with or against)");
 
                 modeltoCSV->insertColumns(modeltoCSV->columnCount(),1);
                 modeltoCSV->setHorizontalHeaderItem(modeltoCSV->columnCount()-1,new QStandardItem("Salience"));
+                modeltoCSV->horizontalHeaderItem(modeltoCSV->columnCount()-1)->
+                        setToolTip("How much the actor cares about the question");
             }
             else
                 return;
@@ -536,6 +540,16 @@ void MainWindow::createSeperateColumn(QTableWidgetItem * hdr)
 {
     csvTableWidget->insertColumn(csvTableWidget->columnCount());
     csvTableWidget->setHorizontalHeaderItem(csvTableWidget->columnCount()-1,hdr);
+    if(hdr->text()=="Position")
+    {
+        csvTableWidget->horizontalHeaderItem(csvTableWidget->columnCount()-1)->
+                setToolTip("The policy position of an actor regarding the question ( with or against)");
+    }
+    else
+    {
+        csvTableWidget->horizontalHeaderItem(csvTableWidget->columnCount()-1)->
+                setToolTip("How much the actor cares about the question");
+    }
 }
 
 void MainWindow::donePushButtonClicked(bool bl)
@@ -651,6 +665,17 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model, QStringList scenario
     actorsLineEdit->setText(QString::number(modeltoCSV->rowCount()));
     dimensionsLineEdit->setText(QString::number((modeltoCSV->columnCount()-3)/2));
 
+    modeltoCSV->horizontalHeaderItem(0)->setToolTip("An individual, institution or group");
+    modeltoCSV->horizontalHeaderItem(1)->setToolTip("A description of the actor");
+    modeltoCSV->horizontalHeaderItem(2)->setToolTip("How much can the actor influence other actors");
+    for(int col=3; col <modeltoCSV->columnCount()-1; ++col)
+    {
+        modeltoCSV->horizontalHeaderItem(col)->
+                setToolTip("The policy position of an actor regarding the question ( with or against)");
+        modeltoCSV->horizontalHeaderItem(++col)->
+                setToolTip("How much the actor cares about the question");
+
+    }
 
     csvAffinityModel = new QStandardItemModel;
     csvTableAffinityView->setModel(csvAffinityModel);
@@ -768,8 +793,11 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
 
         //Headers Label
         csvTableWidget->setHorizontalHeaderItem(0,new QTableWidgetItem("Actor"));
+        csvTableWidget->horizontalHeaderItem(0)->setToolTip("An individual, institution or group");
         csvTableWidget->setHorizontalHeaderItem(1,new QTableWidgetItem("Description"));
+        csvTableWidget->horizontalHeaderItem(1)->setToolTip("A description of the actor");
         csvTableWidget->setHorizontalHeaderItem(2,new QTableWidgetItem("Influence"));
+        csvTableWidget->horizontalHeaderItem(2)->setToolTip("How much can the actor influence other actors");
 
         int k=0;
         for(int i=3 ; i <csvTableWidget->columnCount(); i=i+2)
@@ -778,7 +806,11 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
             heading = checkForHeaderString(heading);
 
             csvTableWidget->setHorizontalHeaderItem(i ,new QTableWidgetItem(heading +" \n Position"));
+            csvTableWidget->horizontalHeaderItem(i)->
+                    setToolTip("The policy position of an actor regarding the question ( with or against)");
             csvTableWidget->setHorizontalHeaderItem(i+1,new QTableWidgetItem(heading +" \n Salience"));
+            csvTableWidget->horizontalHeaderItem(i+1)->
+                    setToolTip("How much the actor cares about the question");
             ++k;
         }
         //Updating values
@@ -927,8 +959,11 @@ void MainWindow::setDBItemModel(QStandardItemModel *model)
     //Headers Label
     modeltoDB->setHeaderData(1,Qt::Horizontal,("Turn"));
     modeltoDB->setHeaderData(2,Qt::Horizontal,("Actor"));
+    modeltoDB->horizontalHeaderItem(2)->setToolTip("An individual, institution or group");
     modeltoDB->setHeaderData(3,Qt::Horizontal,("Description"));
+    modeltoDB->horizontalHeaderItem(3)->setToolTip("A description of the actor");
     modeltoDB->setHeaderData(4,Qt::Horizontal,("Influence"));
+    modeltoDB->horizontalHeaderItem(4)->setToolTip("How much can the actor influence other actors");
 
     int k=0;
     for(int i=5 ; i <modeltoDB->columnCount(); i=i+2)
@@ -937,9 +972,13 @@ void MainWindow::setDBItemModel(QStandardItemModel *model)
         heading = checkForHeaderString(heading);
 
         modeltoDB->setHeaderData(i,Qt::Horizontal ,( heading +" \n Position" ));
+        modeltoDB->horizontalHeaderItem(i)->
+                setToolTip("The policy position of an actor regarding the question ( with or against)");
         modeltoDB->setHeaderData(i+1,Qt::Horizontal,( heading +" \n Salience" ));
+        modeltoDB->horizontalHeaderItem(i+1)->setToolTip("How much the actor cares about the question");
         ++k;
     }
+
     //to create csv like view
     emit getActorsDesc();
 
@@ -1058,10 +1097,14 @@ void MainWindow::createNewSMPData(bool bl)
 
     csvTableWidget->insertColumn(csvTableWidget->columnCount());
     csvTableWidget->setHorizontalHeaderItem(0,new QTableWidgetItem("Actor"));
+    csvTableWidget->horizontalHeaderItem(0)->setToolTip("An individual, institution or group");
     csvTableWidget->insertColumn(csvTableWidget->columnCount());
     csvTableWidget->setHorizontalHeaderItem(1,new QTableWidgetItem("Description"));
+    csvTableWidget->horizontalHeaderItem(1)->setToolTip("A description of the actor");
     csvTableWidget->insertColumn(csvTableWidget->columnCount());
     csvTableWidget->setHorizontalHeaderItem(2,new QTableWidgetItem("Influence"));
+    csvTableWidget->horizontalHeaderItem(2)->setToolTip("How much can the actor influence other actors");
+
     insertNewColumnCSV();
 
     /*   affinityMatrix->insertColumn(affinityMatrix->columnCount());
@@ -1109,6 +1152,7 @@ void MainWindow::initializeCentralViewFrame()
     scenarioComboBox->setFixedWidth(150);
     gCLayout->addWidget(scenarioComboBox,0,2);
     scenarioComboBox->setEditable(true);
+    scenarioComboBox->setToolTip("Enter the Scenario / Project Name");
     connect(scenarioComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(scenarioComboBoxValue(int)));
 
     turnSlider = new QSlider(Qt::Horizontal,central);
@@ -1122,26 +1166,31 @@ void MainWindow::initializeCentralViewFrame()
     actorsPushButton = new QPushButton("Actors",tableControlsFrame);
     actorsPushButton->setMaximumWidth(120);
     actorsPushButton->setFixedWidth(90);
+    actorsPushButton->setToolTip("An individual, institution or group");
     gCLayout->addWidget(actorsPushButton,0,0);
 
     actorsLineEdit = new QLineEdit ("3",tableControlsFrame);
     actorsLineEdit->setMaximumWidth(70);
     actorsLineEdit->setFixedWidth(60);
     actorsLineEdit->setValidator( new QIntValidator(1,1000,this));
+    actorsLineEdit->setToolTip("An individual, institution or group");
     gCLayout->addWidget(actorsLineEdit,0,1);
 
     dimensionsPushButton = new QPushButton("Dimensions",tableControlsFrame);
     dimensionsPushButton->setMaximumWidth(120);
     dimensionsPushButton->setFixedWidth(90);
+    dimensionsPushButton->setToolTip("Set number of dimensions");
     gCLayout->addWidget(dimensionsPushButton,1,0);
 
     dimensionsLineEdit = new QLineEdit ("1",tableControlsFrame);
     dimensionsLineEdit->setMaximumWidth(70);
     dimensionsLineEdit->setFixedWidth(60);
     dimensionsLineEdit->setValidator( new QIntValidator(1,9,this));
+    dimensionsLineEdit->setToolTip("Set number of dimensions");
     gCLayout->addWidget(dimensionsLineEdit,1,1);
 
     scenarioDescriptionLineEdit = new QLineEdit(tableControlsFrame);
+    scenarioDescriptionLineEdit->setToolTip("A description of the scenario or project");
     //    scenarioDescriptionLineEdit->setMaximumWidth(150);
     //    scenarioDescriptionLineEdit->setFixedWidth(130);
     gCLayout->addWidget(scenarioDescriptionLineEdit,0,3);
@@ -1149,6 +1198,7 @@ void MainWindow::initializeCentralViewFrame()
     donePushButton = new QPushButton("Done",tableControlsFrame);
     donePushButton->setMaximumWidth(150);
     donePushButton->setFixedWidth(130);
+    donePushButton->setToolTip("Save to new CSV / XML file");
     gCLayout->addWidget(donePushButton,1,2);
 
     setCentralWidget(centralBox);
@@ -1323,6 +1373,7 @@ void MainWindow::createActions()
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
     QToolBar *fileToolBar = addToolBar(tr("File"));
     QList <QKeySequence> seq;
+    fileMenu->setToolTipsVisible(true);
 
     const QIcon NewSMPDataIcon = QIcon::fromTheme("Create New Actor Data", QIcon("://images/create.png"));
     QAction *NewSMPDataAct = new QAction(NewSMPDataIcon, tr("&Create New Actor Data"), this);
@@ -1366,7 +1417,8 @@ void MainWindow::createActions()
     const QIcon dbIcon = QIcon::fromTheme("Import Database ", QIcon("://images/import.png"));
     QAction *importDBAct = new QAction(dbIcon, tr("&Import Database"), this);
     importDBAct->setShortcuts(seq);
-    importDBAct->setStatusTip(tr("Import Database"));
+    importDBAct->setToolTip("Import a database file of a previous run");
+    importDBAct->setStatusTip(tr("Import a database file of a previous run"));
     connect(importDBAct, SIGNAL(triggered(bool)),this,SLOT(dbImported(bool)));
     connect(importDBAct, SIGNAL(triggered(bool)), this,SLOT(dbGetFilePAth(bool)));
     fileMenu->addAction(importDBAct);
@@ -1377,7 +1429,8 @@ void MainWindow::createActions()
     const QIcon modDBIcon = QIcon::fromTheme("Edit Database", QIcon("://images/editdb.png"));
     QAction *modifyDBAct = new QAction(modDBIcon, tr("&Edit DB, Save As"), this);
     modifyDBAct->setShortcuts(seq);
-    modifyDBAct->setStatusTip(tr("&Edit DB, Save As"));
+    modifyDBAct->setToolTip("Edit a database file of a previous run and \n save the data or model parameters");
+    modifyDBAct->setStatusTip(tr("Edit a database file of a previous run and save the data or model parameters"));
     connect(modifyDBAct, SIGNAL(triggered(bool)), this,SLOT(dbEditGetFilePAth(bool)));
     fileMenu->addAction(modifyDBAct);
     fileToolBar->addAction(modifyDBAct);
@@ -1393,10 +1446,12 @@ void MainWindow::createActions()
     quitAct->setStatusTip(tr("Quit the application"));
 
     viewMenu = menuBar()->addMenu(tr("&View"));
+    viewMenu->setToolTipsVisible(true);
 
     menuBar()->addSeparator();
 
     QMenu *optionMenu = menuBar()->addMenu(tr("&Log Options"));
+    optionMenu->setToolTipsVisible(true);
 
     logActions = new QActionGroup(this);
     logActions->setExclusive(true);
@@ -1404,44 +1459,52 @@ void MainWindow::createActions()
     logDefaultAct =new QAction(tr("&Default"), this);
     logDefaultAct->setCheckable(true);
     optionMenu->addAction(logDefaultAct);
-    logDefaultAct->setStatusTip(tr("Log SMP Run Data to a Default File "));
+    logDefaultAct->setToolTip("Record the SMP model log in a timestamp-named file");
+    logDefaultAct->setStatusTip(tr("Record the SMP model log in a timestamp-named file"));
     logActions->addAction(logDefaultAct);
     logDefaultAct->setChecked(true);
 
     logNewAct =new QAction(tr("&Custom"), this);
     logNewAct->setCheckable(true);
     optionMenu->addAction(logNewAct);
-    logNewAct->setStatusTip(tr("Log SMP Run Data into a Custom File "));
+    logNewAct->setToolTip("Record the SMP model log in a specific file / location");
+    logNewAct->setStatusTip(tr("Record the SMP model log in a specific file / location"));
     logActions->addAction(logNewAct);
 
     logNoneAct =new QAction(tr("&None"), this);
     logNoneAct->setCheckable(true);
     optionMenu->addAction(logNoneAct);
-    logNoneAct->setStatusTip(tr("Log nothing"));
+    logNoneAct->setToolTip(tr("Disable logging of the SMP model run"));
+    logNoneAct->setStatusTip(tr("Disable logging of the SMP model run"));
     logActions->addAction(logNoneAct);
 
     menuBar()->addSeparator();
 
     QMenu *actorColors = menuBar()->addMenu(tr("&Colors Options"));
+    actorColors->setToolTipsVisible(true);
 
     const QIcon colorIcon = QIcon::fromTheme("ColorPicker ", QIcon("://images/colorpicker.png"));
     QAction *colorAct =new QAction(colorIcon,tr("&Change Actor Colors"), this);
     actorColors->addAction(colorAct);
+    colorAct->setToolTip("Change actor colors displayed in charts");
     connect(colorAct, SIGNAL(triggered(bool)),this,SLOT(chooseActorColors()));
     colorAct->setStatusTip(tr("Pick colors for Actors"));
 
     QAction *importActorColorAct =new QAction(tr("&Import Actor Colors"), this);
     actorColors->addAction(importActorColorAct);
+    importActorColorAct->setToolTip("Import actor colors from CSV");
     connect(importActorColorAct, SIGNAL(triggered(bool)),this,SLOT(importActorColors()));
     importActorColorAct->setStatusTip(tr("Import Actor colors from CSV"));
 
     QAction *exportActorColorAct =new QAction(tr("&Export Actor Colors"), this);
     actorColors->addAction(exportActorColorAct);
+    exportActorColorAct->setToolTip("Export actor colors to CSV");
     connect(exportActorColorAct, SIGNAL(triggered(bool)),this,SLOT(exportActorColors()));
     exportActorColorAct->setStatusTip(tr("Export Actor colors to CSV"));
 
     QAction *resetActorColorAct =new QAction(tr("&Reset Actor Colors"), this);
     actorColors->addAction(resetActorColorAct);
+    resetActorColorAct->setToolTip("Reset colors to default");
     connect(resetActorColorAct, SIGNAL(triggered(bool)),this,SLOT(resetActorColors()));
     resetActorColorAct->setStatusTip(tr("Reset Actor colors to Default"));
 
@@ -1472,9 +1535,11 @@ void MainWindow::createLinePlotsDockWindows()
     initializeLineGraphDock();
 
     lineGraphDock->setWidget(lineGraphMainFrame);
+    lineGraphDock->setToolTip("The line plot represents the changes \n of the actors positions overtime");
     addDockWidget(Qt::BottomDockWidgetArea, lineGraphDock);
     viewMenu->addAction(lineGraphDock->toggleViewAction());
-
+    viewMenu->actions().at(1)->setToolTip("Show/hide the line plot displaying \n the positions of all actor in all turns");
+    viewMenu->actions().at(1)->setStatusTip("Show/hide the line plot displaying the positions of all actor in all turns");
     connect(lineGraphDock,SIGNAL(dockLocationChanged(Qt::DockWidgetArea)),this,SLOT(dockWindowChanged()));
     lineGraphDock->setVisible(false);
 }
@@ -1489,8 +1554,12 @@ void MainWindow::createBarPlotsDockWindows()
     initializeBarGraphDock();
 
     barGraphDock->setWidget(barGraphMainFrame);
+    barGraphDock->setToolTip("The bar plot represents the positions \n of the actors for each turn");
+
     addDockWidget(Qt::BottomDockWidgetArea, barGraphDock);
     viewMenu->addAction(barGraphDock->toggleViewAction());
+    viewMenu->actions().at(2)->setToolTip("Show/hide the bar plot displaying the position of all actors in each turn");
+    viewMenu->actions().at(2)->setStatusTip("Show/hide the bar plot displaying the position of all actors in each turn");
 
     connect(barGraphDock,SIGNAL(dockLocationChanged(Qt::DockWidgetArea)),this,SLOT(dockWindowChanged()));
     barGraphDock->setVisible(false);
@@ -1506,8 +1575,16 @@ void MainWindow::createQuadMapDockWindows()
     initializeQuadMapDock();
 
     quadMapDock->setWidget(quadMapMainFrame);
+    quadMapDock->setToolTip("This chart displays the expected utility changes for a \nselected actor challenging all other actors");
+
     addDockWidget(Qt::BottomDockWidgetArea, quadMapDock);
     viewMenu->addAction(quadMapDock->toggleViewAction());
+    viewMenu->actions().at(3)->setToolTip("Show/hide the Quad Map displaying the expected"
+                                          "\n utility changes from an actor challenging others");
+    viewMenu->actions().at(3)->setStatusTip("Show/hide the Quad Map displaying the expected"
+                                            " utility changes from an actor challenging others");
+
+
 
     connect(quadMapDock,SIGNAL(visibilityChanged(bool)),this,SLOT(dockWindowChanged()));
 
@@ -2057,7 +2134,8 @@ void MainWindow::displayMenuTableWidget(QPoint pos)
                         header.append("\n Position");
                         text = header;
                     }
-
+                    csvTableWidget->horizontalHeaderItem(csvTableWidget->currentColumn())->
+                            setToolTip("The policy position of an actor regarding the question ( with or against)");
                 }
                 else
                 {
@@ -2076,8 +2154,11 @@ void MainWindow::displayMenuTableWidget(QPoint pos)
                         header.append("\n Salience");
                         text = header;
                     }
+                    csvTableWidget->horizontalHeaderItem(csvTableWidget->currentColumn())->
+                            setToolTip("How much the actor cares about the question");
                 }
                 csvTableWidget->setHorizontalHeaderItem(csvTableWidget->currentColumn(),new QTableWidgetItem(text));
+
                 statusBar()->showMessage("Header changed");
             }
         }
@@ -2092,6 +2173,8 @@ void MainWindow::displayMenuTableWidget(QPoint pos)
         {
             csvTableWidget->insertColumn(csvTableWidget->currentColumn());
             csvTableWidget->setHorizontalHeaderItem(csvTableWidget->currentColumn()-1,new QTableWidgetItem("Position"));
+            csvTableWidget->horizontalHeaderItem(csvTableWidget->currentColumn()-1)->
+                    setToolTip("The policy position of an actor regarding the question ( with or against)");
             statusBar()->showMessage("Position Column Inserted");
         }
         else
@@ -2105,6 +2188,8 @@ void MainWindow::displayMenuTableWidget(QPoint pos)
         {
             csvTableWidget->insertColumn(csvTableWidget->currentColumn());
             csvTableWidget->setHorizontalHeaderItem(csvTableWidget->currentColumn()-1,new QTableWidgetItem("Salience"));
+            csvTableWidget->horizontalHeaderItem(csvTableWidget->currentColumn()-1)->
+                    setToolTip("How much the actor cares about the question");
             statusBar()->showMessage("Salience Column Inserted");
         }
         else
@@ -2203,6 +2288,8 @@ void MainWindow::displayMenuTableView(QPoint pos)
                             header.append("\n Position");
                             text = header;
                         }
+                        modeltoCSV->horizontalHeaderItem(csvTableView->currentIndex().column())->
+                                setToolTip("The policy position of an actor regarding the question (with or against)");
                     }
                     else
                     {
@@ -2221,6 +2308,9 @@ void MainWindow::displayMenuTableView(QPoint pos)
                             header.append("\n Salience");
                             text = header;
                         }
+                        modeltoCSV->horizontalHeaderItem(csvTableView->currentIndex().column())->
+                                setToolTip("How much the actor cares about the question");
+
                     }
                     modeltoCSV->setHeaderData(csvTableView->currentIndex().column(),Qt::Horizontal,text);
                     statusBar()->showMessage("Header changed");
@@ -2236,6 +2326,8 @@ void MainWindow::displayMenuTableView(QPoint pos)
             {
                 modeltoCSV->insertColumn(csvTableView->currentIndex().column());
                 modeltoCSV->setHeaderData(csvTableView->currentIndex().column()-1,Qt::Horizontal,"Position");
+                modeltoCSV->horizontalHeaderItem(csvTableView->currentIndex().column()-1)->
+                        setToolTip("The policy position of an actor regarding the question (with or against)");
                 statusBar()->showMessage("Column Inserted, Header changed");
             }
             else
@@ -2248,6 +2340,9 @@ void MainWindow::displayMenuTableView(QPoint pos)
             {
                 modeltoCSV->insertColumn(csvTableView->currentIndex().column());
                 modeltoCSV->setHeaderData(csvTableView->currentIndex().column()-1,Qt::Horizontal,"Salience");
+                modeltoCSV->horizontalHeaderItem(csvTableView->currentIndex().column()-1)->
+                        setToolTip("How much the actor cares about the question");
+
                 statusBar()->showMessage("Column Inserted, Header changed");
             }
             else
@@ -2284,7 +2379,6 @@ void MainWindow::displayMenuTableView(QPoint pos)
             saveTurnHistoryToCSV();
         }
     }
-
 }
 
 //void MainWindow::displayCsvAffinityMenuTableView(QPoint pos)

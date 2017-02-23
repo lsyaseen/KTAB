@@ -81,11 +81,13 @@ void MainWindow::initializeBarGraphDock()
 
     barGraphBinWidthButton = new QPushButton("No. of Bars");
     barGraphBinWidthButton->setFont(labelFont);
+    barGraphBinWidthButton->setToolTip("Number of bars displayed in the bar plot");
     barControlsVerticalLayout->addWidget(barGraphBinWidthButton);
     connect(barGraphBinWidthButton,SIGNAL(clicked(bool)),this, SLOT(barGraphBinWidthButtonClicked(bool)));
 
     barGraphGroupRangeLineEdit = new  QLineEdit;
     barGraphGroupRangeLineEdit->setText(QString::number(10));
+    barGraphGroupRangeLineEdit->setToolTip("Number of bars displayed in the bar plot");
     barControlsVerticalLayout->addWidget(barGraphGroupRangeLineEdit);
 
     barGraphTurnSlider = new QSlider(Qt::Horizontal);
@@ -134,7 +136,8 @@ void MainWindow::initializeBarGraphPlot()
 
     // setup legend:
     barCustomGraph->legend->setVisible(false);
-    barCustomGraph->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    barCustomGraph->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes |
+                                    QCP::iSelectLegend | QCP::iSelectPlottables);
 
     // setup policy and connect slot for context menu popup:
     barCustomGraph->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -253,6 +256,7 @@ void MainWindow::populateBarGraphDimensions(int dim)
     {
         QString dim = dimensionList.at(dims);
         barGraphDimensionComboBox->addItem(dim.remove("\n"));
+        barGraphDimensionComboBox->setItemData(dims+1,"Positions for Dimension "+ QString::number(dims+1),Qt::ToolTipRole);
     }
     connect(barGraphDimensionComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(barGraphDimensionChanged(int)));
     barGraphDimensionComboBox->removeItem(0);
@@ -500,6 +504,8 @@ void MainWindow::updateBarDimension(QStringList *dims)
     for(int dims = 0; dims < dimenList.length(); ++ dims )
     {
         barGraphDimensionComboBox->addItem(dimenList.at(dims));
+        barGraphDimensionComboBox->setItemData(dims+1,"Positions for Dimension "+ QString::number(dims+1),Qt::ToolTipRole);
+
     }
     connect(barGraphDimensionComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(barGraphDimensionChanged(int)));
     barGraphDimensionComboBox->currentIndexChanged(barDimIndex);

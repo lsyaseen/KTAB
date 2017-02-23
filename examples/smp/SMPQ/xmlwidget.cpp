@@ -134,7 +134,12 @@ void MainWindow::populateXmlTable(QStandardItemModel *actorsVal)
 
     xmlSmpDataModel = actorsVal;
     for(int col =0 ; col <3;++col)
+    {
         xmlSmpDataModel->setHeaderData(col,Qt::Horizontal,xmlTableHeaders.at(col));
+    }
+    xmlSmpDataModel->horizontalHeaderItem(0)->setToolTip("An individual, institution or group");
+    xmlSmpDataModel->horizontalHeaderItem(1)->setToolTip("A description of the actor");
+    xmlSmpDataModel->horizontalHeaderItem(2)->setToolTip("How much can the actor influence other actors");
 
     int dim=0;
     for(int col = 3 ; col <xmlSmpDataModel->columnCount(); col+=2)
@@ -146,7 +151,12 @@ void MainWindow::populateXmlTable(QStandardItemModel *actorsVal)
         sal.prepend(dimensionsXml.at(dim));
 
         xmlSmpDataModel->setHeaderData(col,Qt::Horizontal,pos);
+        xmlSmpDataModel->horizontalHeaderItem(col)->
+                setToolTip("The policy position of an actor regarding the question ( with or against)");
         xmlSmpDataModel->setHeaderData(col+1,Qt::Horizontal,sal);
+        xmlSmpDataModel->horizontalHeaderItem(col+1)->
+                setToolTip("How much the actor cares about the question");
+
         ++dim;
     }
 
@@ -448,6 +458,8 @@ void MainWindow::displayMenuXmlTableView(QPoint pos)
                         header.append("\n Position");
                         text = header;
                     }
+                    xmlSmpDataModel->horizontalHeaderItem(xmlImportDataTableView->currentIndex().column())->
+                            setToolTip("The policy position of an actor regarding the question ( with or against)");
                 }
                 else
                 {
@@ -466,6 +478,9 @@ void MainWindow::displayMenuXmlTableView(QPoint pos)
                         header.append("\n Salience");
                         text = header;
                     }
+
+                    xmlSmpDataModel->horizontalHeaderItem(xmlImportDataTableView->currentIndex().column())->
+                            setToolTip("How much the actor cares about the question");
                 }
                 xmlSmpDataModel->setHeaderData(xmlImportDataTableView->currentIndex().column(),Qt::Horizontal,text);
                 statusBar()->showMessage("Header changed");
@@ -481,6 +496,8 @@ void MainWindow::displayMenuXmlTableView(QPoint pos)
         {
             xmlSmpDataModel->insertColumn(xmlImportDataTableView->currentIndex().column());
             xmlSmpDataModel->setHeaderData(xmlImportDataTableView->currentIndex().column()-1,Qt::Horizontal,"Position");
+            xmlSmpDataModel->horizontalHeaderItem(xmlImportDataTableView->currentIndex().column()-1)->
+                    setToolTip("The policy position of an actor regarding the question ( with or against)");
             statusBar()->showMessage("Column Inserted, Header changed");
         }
         else
@@ -493,6 +510,7 @@ void MainWindow::displayMenuXmlTableView(QPoint pos)
         {
             xmlSmpDataModel->insertColumn(xmlImportDataTableView->currentIndex().column());
             xmlSmpDataModel->setHeaderData(xmlImportDataTableView->currentIndex().column()-1,Qt::Horizontal,"Salience");
+            xmlSmpDataModel->horizontalHeaderItem(xmlImportDataTableView->currentIndex().column()-1)->setToolTip("How much the actor cares about the question");
             statusBar()->showMessage("Column Inserted, Header changed");
         }
         else

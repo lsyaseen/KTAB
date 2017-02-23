@@ -238,6 +238,8 @@ void MainWindow::populateLineGraphDimensions(int dim)
     {
         QString dim = dimensionList.at(dims);
         lineGraphDimensionComboBox->addItem(dim.remove("\n"));
+        lineGraphDimensionComboBox->setItemData(dims+1,"Positions for Dimension "+ QString::number(dims+1),Qt::ToolTipRole);
+
     }
     connect(lineGraphDimensionComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(lineGraphDimensionChanged(int)));
     lineGraphDimensionComboBox->removeItem(0);
@@ -259,6 +261,8 @@ void MainWindow::updateLineDimension(QStringList *dims)
     for(int dims = 0; dims < dimenList.length(); ++ dims )
     {
         lineGraphDimensionComboBox->addItem(dimenList.at(dims));
+        lineGraphDimensionComboBox->setItemData(dims+1,"Positions for Dimension "+ QString::number(dims+1),Qt::ToolTipRole);
+
     }
     connect(lineGraphDimensionComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(lineGraphDimensionChanged(int)));
     lineGraphDimensionComboBox->removeItem(0);
