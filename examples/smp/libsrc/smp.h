@@ -219,6 +219,10 @@ public:
   void idealsFromPstns(const vector<VctrPstn> &  ps = {});
   VctrPstn getIdeal(unsigned int n) const;
 
+  uint64_t getPosMoverBargain(unsigned int actor) const;
+
+  void setPosMoverBargain(unsigned int actor, uint64_t bargainID);
+
   void calcUtils(unsigned int i) const;  // i == actor id 
 
 protected:
@@ -268,7 +272,14 @@ private:
    * Calculate all challenge utilities (i, i, i, j) which would be used to find the best challenge
    */
   void bestChallengeUtils(unsigned int i /* actor id */) const;
-  
+
+  // Record the bargain id that caused an actor to move in each turn
+  using moverBargains = std::map<
+    unsigned int, // actor id
+    uint64_t // bargain id
+    >;
+  mutable moverBargains positionMovers;
+
   using eduChlgsJ = std::map<unsigned int /*j*/, tuple<double, double> >;
   
   mutable std::map<unsigned int /*i*/, eduChlgsJ> eduChlgsIJ;

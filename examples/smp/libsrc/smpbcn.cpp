@@ -499,10 +499,7 @@ SMPState* SMPState::doBCN() const {
     assert(nb == p.numR());
     assert(1 == p.numC());
     actorBargains.insert(map<unsigned int, KBase::KMatrix>::value_type(k, p));
-    cout << "done" << endl << flush;
 
-    //int maxArrcount = p.numR();
-    //int rslt = 0; // never used
     unsigned int mMax = nb; // indexing actors by i, bargains by m
     switch (stm) {
     case StateTransMode::DeterminsticSTM:
@@ -518,7 +515,6 @@ SMPState* SMPState::doBCN() const {
     // 0 <= mMax assured for uint
     assert(mMax < nb);
     actorMaxBrgNdx.insert(map<unsigned int, unsigned int>::value_type(k, mMax));
-    cout << "Chosen bargain (" << stm << "): " << mMax+1 << " out of " << nb << " bargains" << endl;
 
     //populate the Bargain Vote & Util tables
     // JAH added sql flag logging control
@@ -547,13 +543,13 @@ SMPState* SMPState::doBCN() const {
 		model->sqlBargainUtil(t, bargnIdsRows, u_im);
 	}
 
-
-
     // TODO: create a fresh position for k, from the selected bargain mMax.
     VctrPstn * pk = nullptr;
     auto bkm = brgns[k][mMax];
+    cout << "Chosen bargain (" << stm << "): " << bkm->getID()
+      << " " << mMax + 1 << " out of " << nb << " bargains" << endl;
+    auto oldPK = dynamic_cast<VctrPstn *>(pstns[k]);
     if (bkm->actInit == bkm->actRcvr) { // SQ
-      auto oldPK = (VctrPstn *)pstns[k];
       pk = new VctrPstn(*oldPK);
     }
     else {
@@ -568,6 +564,15 @@ SMPState* SMPState::doBCN() const {
       else {
         cout << "SMPState::doBCN: unrecognized actor in bargain" << endl;
         assert(false);
+      }
+
+      // If the actor has changed its position, record the bargain id
+      for (int dimen = 0; dimen < pk->numR(); dimen++) {
+        auto pCoordOld = (*oldPK)(dimen, 0);
+        auto pCoord = (*pk)(dimen, 0);
+        if (pCoord != pCoordOld) {
+          s2->setPosMoverBargain(k, bkm->getID());
+        }
       }
     }
     assert(nullptr != pk);
@@ -882,8 +887,13 @@ tuple<int, double, double> SMPState::bestChallenge(unsigned int i) const {
   return rslt;
 }
 
+uint64_t SMPState::getPosMoverBargain(unsigned int actor) const {
+  return positionMovers.at(actor);
+}
 
-
+void SMPState::setPosMoverBargain(unsigned int actor, uint64_t bargainID) {
+  positionMovers.insert(moverBargains::value_type(actor, bargainID));
+}
 
 }; // end of namespace
 

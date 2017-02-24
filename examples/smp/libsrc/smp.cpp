@@ -1250,8 +1250,9 @@ void SMPModel::showVPHistory() const {
         //createSQL(Model::NumTables + 0); // Make sure VectorPosition table is present
         auto sqlBuff = newChars(sqlBuffSize);
         sprintf(sqlBuff,
-                "INSERT INTO VectorPosition (ScenarioId, Turn_t, Act_i, Dim_k, Pos_Coord, Idl_Coord) VALUES ('%s', ?1, ?2, ?3, ?4, ?5)",
-                scenId.c_str());
+          "INSERT INTO VectorPosition "
+          "(ScenarioId, Turn_t, Act_i, Dim_k, Pos_Coord, Idl_Coord, Mover_BargnId)"
+          "VALUES ('%s', ?1, ?2, ?3, ?4, ?5, ?6)", scenId.c_str());
 
         assert(nullptr != smpDB);
         const char* insStr = sqlBuff;
@@ -1292,6 +1293,14 @@ void SMPModel::showVPHistory() const {
                     const double iCoord = vidl(k, 0) * 100.0; // Log at the scale of [0,100];
                     rslt = sqlite3_bind_double(insStmt, 5, iCoord);
                     assert(SQLITE_OK == rslt);
+
+                    try {
+                      rslt = sqlite3_bind_int(insStmt, 6, sst->getPosMoverBargain(i));
+                      assert(SQLITE_OK == rslt);
+                    }
+                    catch (const std::out_of_range& oor) { // exception thrown by std::map::at()
+                      // do nothing
+                    }
                     rslt = sqlite3_step(insStmt);
                     assert(SQLITE_DONE == rslt);
                     sqlite3_clear_bindings(insStmt);

@@ -363,7 +363,7 @@ KTable * Model::createSQL(unsigned int n)
           "Recd_Seld	BOOLEAN NULL"\
           ");";
     name = "Bargn";
-    grpID = 3;
+    grpID = 4;
     break;
   case 9:  //
     // BargnCoords table
