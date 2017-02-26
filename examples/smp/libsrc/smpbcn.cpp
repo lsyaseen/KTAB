@@ -222,7 +222,23 @@ SMPState* SMPState::doBCN() const {
     auto sqBrgnI = new BargainSMP(ai, ai, *posI, *posI);
     brgns[i].push_back(sqBrgnI);
 
-    if (model->sqlFlags[3])
+    // before we can log this bargain, we need to get the group ID for this table
+    // so then we can get the flag to populate the table or not
+    // note the implicit assumption that there will never be 43+ groups :-)
+    unsigned int grpID = 42;
+    for (unsigned int t = 0; t<model->KTables.size(); t++)
+    {
+        if (model->KTables[t]->tabName == "Bargn")
+        {
+            grpID = model->KTables[t]->tabGrpID;
+            break;
+        }
+    }
+    // be sure that it found this table
+    assert(grpID != 42);
+    assert(grpID < model->sqlFlags.size());
+
+    if (model->sqlFlags[grpID])
     {
       model->sqlBargainEntries(t, sqBrgnI->getID(), i, i, 0);
     }
@@ -347,9 +363,12 @@ SMPState* SMPState::doBCN() const {
       switch (bMod) {
       case SMPBargnModel::InitOnlyInterpSMPBM:
         // record the only one used into SQLite JAH 20160802 use the flag
-        if(model->sqlFlags[3])
+        if(model->sqlFlags[grpID])
         {
           model->sqlBargainEntries(t, brgnIIJ->getID(), i, j, bestEU);
+        }
+        if(model->sqlFlags[3])
+        {          
           model->sqlBargainCoords(t, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr);
         }
         // record this one onto BOTH the initiator and receiver queues
@@ -365,10 +384,13 @@ SMPState* SMPState::doBCN() const {
 
       case SMPBargnModel::InitRcvrInterpSMPBM:
         // record the pair used into SQLite JAH 20160802 use the flag
-        if(model->sqlFlags[3])
+        if(model->sqlFlags[grpID])
         {
           model->sqlBargainEntries(t, brgnIIJ->getID(), i, j, bestEU);
           model->sqlBargainEntries(t, brgnJIJ->getID(), i, j, bestEU);
+        }
+        if(model->sqlFlags[3])
+        {
           model->sqlBargainCoords(t, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr);
           model->sqlBargainCoords(t, brgnJIJ->getID(), brgnJIJ->posInit, brgnJIJ->posRcvr);
         }
@@ -385,9 +407,12 @@ SMPState* SMPState::doBCN() const {
 
       case SMPBargnModel::PWCompInterpSMPBM:
         // record the only one used into SQLite JAH 20160802 use the flag
-        if(model->sqlFlags[3])
+        if(model->sqlFlags[grpID])
         {
           model->sqlBargainEntries(t, brgnIJ->getID(), i, j, bestEU);
+        }
+        if(model->sqlFlags[3])
+        {
           model->sqlBargainCoords(t, brgnIJ->getID(), brgnIJ->posInit, brgnIJ->posRcvr);
         }
         // record this one onto BOTH the initiator and receiver queues

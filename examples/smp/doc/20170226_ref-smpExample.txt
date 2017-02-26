@@ -1,5 +1,5 @@
   Software version: smpc 0.1
-  Start time: Wed Feb  1 20:24:06 2017
+  Start time: Sun Feb 26 09:44:35 2017
 
 -----------------------------------
 Start SMPModel::readXML of ./doc/smpExample.xml
@@ -63,7 +63,7 @@ Reading IdealAdjustment matrix
   Carol (2) :   David  (3) = 0.130 
   David (3) :   David  (3) = 0.570 
 Found 6 iaPair
-End SMPModel::readXML of /home/lyaseen/KTAB/KTAB_run/examples/smp/doc/smpExample.xml
+End SMPModel::readXML of ./doc/smpExample.xml
 SQL Logging Flags
 Grp 0 = 1
 Grp 1 = 0
@@ -78,7 +78,7 @@ Successfully opened database #1
 
 
 Setting SMPModel parameters from XML scenario ...
-Using PRNG seed provided by the user: 03507583219545544127 
+Using PRNG seed provided by xml file: 03507583219545544127 
 Model Paramaters to run the model...
 VictoryProbModel:  Linear
 VotingRule:  PropCbc
@@ -166,15 +166,15 @@ Est by  0 of prob 0.5257 that [ 0> 4], with expected gain to  4 of -0.0311
 Est by  4 of prob 0.6967 that [ 0> 4], with expected gain to  0 of +0.0974 
 Est by  4 of prob 0.6967 that [ 0> 4], with expected gain to  4 of -0.1343 
 
-Bargain [2646, 0:4] from  0's perspective (brgnIIJ) 
+Bargain [1001, 0:4] from  0's perspective (brgnIIJ) 
    0 proposes  0 adopt:  64.110  48.130  32.540 
    0 proposes  4 adopt:  64.110  48.130  32.540 
 
-Bargain  [2647, 0:4] from  4's perspective (brgnJIJ) 
+Bargain  [1002, 0:4] from  4's perspective (brgnJIJ) 
    4 proposes  0 adopt:  73.140  60.790  26.410 
    4 proposes  4 adopt:  73.140  60.790  26.410 
 
-Power-weighted compromise  [2648, 0:4] bargain (brgnIJ) 
+Power-weighted compromise  [1003, 0:4] bargain (brgnIJ) 
   compromise proposes  0 adopt:  68.855  54.782  29.319 
   compromise proposes  4 adopt:  68.855  54.782  29.319 
 
@@ -185,15 +185,15 @@ Est by  1 of prob 0.7180 that [ 1> 2], with expected gain to  2 of -0.2579
 Est by  2 of prob 0.7164 that [ 1> 2], with expected gain to  1 of +0.2399 
 Est by  2 of prob 0.7164 that [ 1> 2], with expected gain to  2 of -0.2666 
 
-Bargain [2650, 1:2] from  1's perspective (brgnIIJ) 
+Bargain [1005, 1:2] from  1's perspective (brgnIIJ) 
    1 proposes  1 adopt:  23.480  63.810  70.130 
    1 proposes  2 adopt:  23.480  63.810  70.130 
 
-Bargain  [2651, 1:2] from  2's perspective (brgnJIJ) 
+Bargain  [1006, 1:2] from  2's perspective (brgnJIJ) 
    2 proposes  1 adopt:  57.900  83.320  49.290 
    2 proposes  2 adopt:  57.900  83.320  49.290 
 
-Power-weighted compromise  [2652, 1:2] bargain (brgnIJ) 
+Power-weighted compromise  [1007, 1:2] bargain (brgnIJ) 
   compromise proposes  1 adopt:  39.563  72.926  60.393 
   compromise proposes  2 adopt:  39.563  72.926  60.393 
 
@@ -206,15 +206,15 @@ Est by  2 of prob 0.4396 that [ 2> 0], with expected gain to  0 of -0.0617
 Est by  0 of prob 0.6698 that [ 2> 0], with expected gain to  2 of +0.1098 
 Est by  0 of prob 0.6698 that [ 2> 0], with expected gain to  0 of -0.0373 
 
-Bargain [2654, 2:0] from  2's perspective (brgnIIJ) 
+Bargain [1009, 2:0] from  2's perspective (brgnIIJ) 
    2 proposes  2 adopt:  55.530  63.190  42.210 
    2 proposes  0 adopt:  55.530  63.190  42.210 
 
-Bargain  [2655, 2:0] from  0's perspective (brgnJIJ) 
+Bargain  [1010, 2:0] from  0's perspective (brgnJIJ) 
    0 proposes  2 adopt:  52.900  40.930  39.730 
    0 proposes  0 adopt:  52.900  40.930  39.730 
 
-Power-weighted compromise  [2656, 2:0] bargain (brgnIJ) 
+Power-weighted compromise  [1011, 2:0] bargain (brgnIJ) 
   compromise proposes  2 adopt:  54.284  52.641  41.035 
   compromise proposes  0 adopt:  54.284  52.641  41.035 
 
@@ -225,15 +225,15 @@ Est by  3 of prob 0.7837 that [ 3> 2], with expected gain to  2 of -0.3758
 Est by  2 of prob 0.7786 that [ 3> 2], with expected gain to  3 of +0.4779 
 Est by  2 of prob 0.7786 that [ 3> 2], with expected gain to  2 of -0.4268 
 
-Bargain [2658, 3:2] from  3's perspective (brgnIIJ) 
+Bargain [1013, 3:2] from  3's perspective (brgnIIJ) 
    3 proposes  3 adopt:  33.480  18.890  19.040 
    3 proposes  2 adopt:  33.480  18.890  19.040 
 
-Bargain  [2659, 3:2] from  2's perspective (brgnJIJ) 
+Bargain  [1014, 3:2] from  2's perspective (brgnJIJ) 
    2 proposes  3 adopt:  54.230  41.440  34.750 
    2 proposes  2 adopt:  54.240  41.440  34.750 
 
-Power-weighted compromise  [2660, 3:2] bargain (brgnIJ) 
+Power-weighted compromise  [1015, 3:2] bargain (brgnIJ) 
   compromise proposes  3 adopt:  44.115  30.448  27.092 
   compromise proposes  2 adopt:  44.120  30.448  27.092 
 
@@ -244,26 +244,26 @@ Est by  4 of prob 0.5467 that [ 4> 2], with expected gain to  2 of -0.0798
 Est by  2 of prob 0.5363 that [ 4> 2], with expected gain to  4 of +0.0654 
 Est by  2 of prob 0.5363 that [ 4> 2], with expected gain to  2 of -0.0822 
 
-Bargain [2662, 4:2] from  4's perspective (brgnIIJ) 
+Bargain [1017, 4:2] from  4's perspective (brgnIIJ) 
    4 proposes  4 adopt:  70.060  76.000  34.980 
    4 proposes  2 adopt:  70.060  76.010  34.980 
 
-Bargain  [2663, 4:2] from  2's perspective (brgnJIJ) 
+Bargain  [1018, 4:2] from  2's perspective (brgnJIJ) 
    2 proposes  4 adopt:  61.210  86.440  44.430 
    2 proposes  2 adopt:  61.210  86.440  44.430 
 
-Power-weighted compromise  [2664, 4:2] bargain (brgnIJ) 
+Power-weighted compromise  [1019, 4:2] bargain (brgnIJ) 
   compromise proposes  4 adopt:  65.629  81.227  39.711 
   compromise proposes  2 adopt:  65.629  81.232  39.711 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [2645, 0:0][2646, 0:4][2654, 2:0]
-Bargains involving actor  1: [2649, 1:1][2650, 1:2]
-Bargains involving actor  2: [2650, 1:2][2653, 2:2][2654, 2:0][2658, 3:2][2662, 4:2]
-Bargains involving actor  3: [2657, 3:3][2658, 3:2]
-Bargains involving actor  4: [2646, 0:4][2661, 4:4][2662, 4:2]
+Bargains involving actor  0: [1000, 0:0][1001, 0:4][1009, 2:0]
+Bargains involving actor  1: [1004, 1:1][1005, 1:2]
+Bargains involving actor  2: [1005, 1:2][1008, 2:2][1009, 2:0][1013, 3:2][1017, 4:2]
+Bargains involving actor  3: [1012, 3:3][1013, 3:2]
+Bargains involving actor  4: [1001, 0:4][1016, 4:4][1017, 4:2]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -299,8 +299,7 @@ Probability Opt_i
  0.2444 
  0.7502 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 3 bargains
+Chosen bargain (Stochastic): 1001 2 out of 3 bargains
 
 u_im: 
  0.94413  0.94769 
@@ -332,8 +331,7 @@ Probability Opt_i
  0.4205 
  0.5795 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 2 bargains
+Chosen bargain (Stochastic): 1005 2 out of 2 bargains
 
 u_im: 
  0.94769  0.94413  0.95113  0.95465  0.94325 
@@ -374,8 +372,7 @@ Probability Opt_i
  0.4215 
  0.0695 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 3 out of 5 bargains
+Chosen bargain (Stochastic): 1009 3 out of 5 bargains
 
 u_im: 
  0.94413  0.95465 
@@ -407,8 +404,7 @@ Probability Opt_i
  0.3948 
  0.6052 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 1 out of 2 bargains
+Chosen bargain (Stochastic): 1012 1 out of 2 bargains
 
 u_im: 
  0.94812  0.94413  0.94325 
@@ -443,8 +439,7 @@ Probability Opt_i
  0.0264 
  0.0250 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 1 out of 3 bargains
+Chosen bargain (Stochastic): 1001 1 out of 3 bargains
 
 postn  0,  0  64.1100  48.1300  32.5400 
 ideal  0,  0  62.6397  47.0471  33.4578 
@@ -543,15 +538,15 @@ Est by  0 of prob 0.3212 that [ 0> 3], with expected gain to  3 of -0.0030
 Est by  3 of prob 0.3282 that [ 0> 3], with expected gain to  0 of +0.0055 
 Est by  3 of prob 0.3282 that [ 0> 3], with expected gain to  3 of -0.0060 
 
-Bargain [2666, 0:3] from  0's perspective (brgnIIJ) 
+Bargain [1021, 0:3] from  0's perspective (brgnIIJ) 
    0 proposes  0 adopt:  44.820  18.400  18.640 
    0 proposes  3 adopt:  44.820  18.390  18.630 
 
-Bargain  [2667, 0:3] from  3's perspective (brgnJIJ) 
+Bargain  [1022, 0:3] from  3's perspective (brgnJIJ) 
    3 proposes  0 adopt:  26.310  16.500  15.900 
    3 proposes  3 adopt:  26.300  16.500  15.900 
 
-Power-weighted compromise  [2668, 0:3] bargain (brgnIJ) 
+Power-weighted compromise  [1023, 0:3] bargain (brgnIJ) 
   compromise proposes  0 adopt:  35.314  17.424  17.233 
   compromise proposes  3 adopt:  35.309  17.419  17.228 
 
@@ -562,15 +557,15 @@ Est by  1 of prob 0.7270 that [ 1> 4], with expected gain to  4 of -0.2181
 Est by  4 of prob 0.7872 that [ 1> 4], with expected gain to  1 of +0.1195 
 Est by  4 of prob 0.7872 that [ 1> 4], with expected gain to  4 of -0.0933 
 
-Bargain [2670, 1:4] from  1's perspective (brgnIIJ) 
+Bargain [1025, 1:4] from  1's perspective (brgnIIJ) 
    1 proposes  1 adopt:  34.010  63.110  68.340 
    1 proposes  4 adopt:  34.010  63.110  68.340 
 
-Bargain  [2671, 1:4] from  4's perspective (brgnJIJ) 
+Bargain  [1026, 1:4] from  4's perspective (brgnJIJ) 
    4 proposes  1 adopt:  63.810  48.950  34.390 
    4 proposes  4 adopt:  63.810  48.950  34.390 
 
-Power-weighted compromise  [2672, 1:4] bargain (brgnIJ) 
+Power-weighted compromise  [1027, 1:4] bargain (brgnIJ) 
   compromise proposes  1 adopt:  47.914  56.503  52.499 
   compromise proposes  4 adopt:  47.914  56.503  52.499 
 
@@ -583,15 +578,15 @@ Est by  2 of prob 0.4981 that [ 2> 4], with expected gain to  4 of -0.0192
 Est by  4 of prob 0.6054 that [ 2> 4], with expected gain to  2 of +0.0184 
 Est by  4 of prob 0.6054 that [ 2> 4], with expected gain to  4 of -0.0042 
 
-Bargain [2674, 2:4] from  2's perspective (brgnIIJ) 
+Bargain [1029, 2:4] from  2's perspective (brgnIIJ) 
    2 proposes  2 adopt:  61.180  58.230  38.020 
    2 proposes  4 adopt:  61.180  58.230  38.020 
 
-Bargain  [2675, 2:4] from  4's perspective (brgnJIJ) 
+Bargain  [1030, 2:4] from  4's perspective (brgnJIJ) 
    4 proposes  2 adopt:  64.110  48.140  32.540 
    4 proposes  4 adopt:  64.110  48.140  32.540 
 
-Power-weighted compromise  [2676, 2:4] bargain (brgnIJ) 
+Power-weighted compromise  [1031, 2:4] bargain (brgnIJ) 
   compromise proposes  2 adopt:  62.643  53.192  35.284 
   compromise proposes  4 adopt:  62.643  53.192  35.284 
 
@@ -602,15 +597,15 @@ Est by  3 of prob 0.7937 that [ 3> 2], with expected gain to  2 of -0.1751
 Est by  2 of prob 0.7990 that [ 3> 2], with expected gain to  3 of +0.2817 
 Est by  2 of prob 0.7990 that [ 3> 2], with expected gain to  2 of -0.2499 
 
-Bargain [2678, 3:2] from  3's perspective (brgnIIJ) 
+Bargain [1033, 3:2] from  3's perspective (brgnIIJ) 
    3 proposes  3 adopt:  31.770  17.920  18.500 
    3 proposes  2 adopt:  31.770  17.920  18.500 
 
-Bargain  [2679, 3:2] from  2's perspective (brgnJIJ) 
+Bargain  [1034, 3:2] from  2's perspective (brgnJIJ) 
    2 proposes  3 adopt:  54.270  51.560  39.930 
    2 proposes  2 adopt:  54.270  51.560  39.930 
 
-Power-weighted compromise  [2680, 3:2] bargain (brgnIJ) 
+Power-weighted compromise  [1035, 3:2] bargain (brgnIJ) 
   compromise proposes  3 adopt:  43.302  35.162  29.484 
   compromise proposes  2 adopt:  43.302  35.162  29.484 
 
@@ -623,26 +618,26 @@ Est by  4 of prob 0.3946 that [ 4> 2], with expected gain to  2 of -0.0038
 Est by  2 of prob 0.5019 that [ 4> 2], with expected gain to  4 of +0.0195 
 Est by  2 of prob 0.5019 that [ 4> 2], with expected gain to  2 of -0.0268 
 
-Bargain [2682, 4:2] from  4's perspective (brgnIIJ) 
+Bargain [1037, 4:2] from  4's perspective (brgnIIJ) 
    4 proposes  4 adopt:  59.360  60.620  39.860 
    4 proposes  2 adopt:  59.360  60.620  39.860 
 
-Bargain  [2683, 4:2] from  2's perspective (brgnJIJ) 
+Bargain  [1038, 4:2] from  2's perspective (brgnJIJ) 
    2 proposes  4 adopt:  55.540  63.190  42.210 
    2 proposes  2 adopt:  55.540  63.190  42.210 
 
-Power-weighted compromise  [2684, 4:2] bargain (brgnIJ) 
+Power-weighted compromise  [1039, 4:2] bargain (brgnIJ) 
   compromise proposes  4 adopt:  57.447  61.907  41.037 
   compromise proposes  2 adopt:  57.447  61.907  41.037 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [2665, 0:0][2666, 0:3]
-Bargains involving actor  1: [2669, 1:1][2670, 1:4]
-Bargains involving actor  2: [2673, 2:2][2674, 2:4][2678, 3:2][2682, 4:2]
-Bargains involving actor  3: [2666, 0:3][2677, 3:3][2678, 3:2]
-Bargains involving actor  4: [2670, 1:4][2674, 2:4][2681, 4:4][2682, 4:2]
+Bargains involving actor  0: [1020, 0:0][1021, 0:3]
+Bargains involving actor  1: [1024, 1:1][1025, 1:4]
+Bargains involving actor  2: [1028, 2:2][1029, 2:4][1033, 3:2][1037, 4:2]
+Bargains involving actor  3: [1021, 0:3][1032, 3:3][1033, 3:2]
+Bargains involving actor  4: [1025, 1:4][1029, 2:4][1036, 4:4][1037, 4:2]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -675,8 +670,7 @@ Probability Opt_i
  0.4921 
  0.5079 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 1 out of 2 bargains
+Chosen bargain (Stochastic): 1020 1 out of 2 bargains
 
 u_im: 
  0.95261  0.94772 
@@ -708,8 +702,7 @@ Probability Opt_i
  0.4174 
  0.5826 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 1 out of 2 bargains
+Chosen bargain (Stochastic): 1024 1 out of 2 bargains
 
 u_im: 
  0.95261  0.95333  0.94308  0.95235 
@@ -747,8 +740,7 @@ Probability Opt_i
  0.3658 
  0.2232 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 3 out of 4 bargains
+Chosen bargain (Stochastic): 1033 3 out of 4 bargains
 
 u_im: 
  0.95654  0.95261  0.94308 
@@ -783,8 +775,7 @@ Probability Opt_i
  0.4030 
  0.2528 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 1 out of 3 bargains
+Chosen bargain (Stochastic): 1021 1 out of 3 bargains
 
 u_im: 
  0.94772  0.95333  0.95261  0.95235 
@@ -822,8 +813,7 @@ Probability Opt_i
  0.2096 
  0.1323 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 4 bargains
+Chosen bargain (Stochastic): 1029 2 out of 4 bargains
 
 postn  0,  0  64.1100  48.1300  32.5400 
 ideal  0,  0  63.9189  47.9892  32.6593 
@@ -920,15 +910,15 @@ Est by  0 of prob 0.8227 that [ 0> 2], with expected gain to  2 of -0.0503
 Est by  2 of prob 0.8582 that [ 0> 2], with expected gain to  0 of +0.1643 
 Est by  2 of prob 0.8582 that [ 0> 2], with expected gain to  2 of -0.0977 
 
-Bargain [2686, 0:2] from  0's perspective (brgnIIJ) 
+Bargain [1041, 0:2] from  0's perspective (brgnIIJ) 
    0 proposes  0 adopt:  62.960  46.000  31.430 
    0 proposes  2 adopt:  62.960  46.000  31.430 
 
-Bargain  [2687, 0:2] from  2's perspective (brgnJIJ) 
+Bargain  [1042, 0:2] from  2's perspective (brgnJIJ) 
    2 proposes  0 adopt:  33.270  18.620  18.790 
    2 proposes  2 adopt:  33.270  18.620  18.790 
 
-Power-weighted compromise  [2688, 0:2] bargain (brgnIJ) 
+Power-weighted compromise  [1043, 0:2] bargain (brgnIJ) 
   compromise proposes  0 adopt:  47.340  31.595  24.780 
   compromise proposes  2 adopt:  47.340  31.595  24.780 
 
@@ -939,15 +929,15 @@ Est by  1 of prob 0.8677 that [ 1> 2], with expected gain to  2 of -0.2234
 Est by  2 of prob 0.8669 that [ 1> 2], with expected gain to  1 of +0.3111 
 Est by  2 of prob 0.8669 that [ 1> 2], with expected gain to  2 of -0.1729 
 
-Bargain [2690, 1:2] from  1's perspective (brgnIIJ) 
+Bargain [1045, 1:2] from  1's perspective (brgnIIJ) 
    1 proposes  1 adopt:  23.720  63.090  69.570 
    1 proposes  2 adopt:  23.720  63.090  69.570 
 
-Bargain  [2691, 1:2] from  2's perspective (brgnJIJ) 
+Bargain  [1046, 1:2] from  2's perspective (brgnJIJ) 
    2 proposes  1 adopt:  30.650  28.420  34.090 
    2 proposes  2 adopt:  30.650  28.420  34.080 
 
-Power-weighted compromise  [2692, 1:2] bargain (brgnIJ) 
+Power-weighted compromise  [1047, 1:2] bargain (brgnIJ) 
   compromise proposes  1 adopt:  26.958  46.891  52.992 
   compromise proposes  2 adopt:  26.958  46.891  52.988 
 
@@ -959,15 +949,15 @@ Est by  3 of prob 0.7900 that [ 3> 4], with expected gain to  4 of -0.0792
 Est by  4 of prob 0.7837 that [ 3> 4], with expected gain to  3 of +0.1812 
 Est by  4 of prob 0.7837 that [ 3> 4], with expected gain to  4 of -0.1361 
 
-Bargain [2695, 3:4] from  3's perspective (brgnIIJ) 
+Bargain [1050, 3:4] from  3's perspective (brgnIIJ) 
    3 proposes  3 adopt:  49.960  19.010  20.170 
    3 proposes  4 adopt:  49.960  19.010  20.170 
 
-Bargain  [2696, 3:4] from  4's perspective (brgnJIJ) 
+Bargain  [1051, 3:4] from  4's perspective (brgnJIJ) 
    4 proposes  3 adopt:  61.060  51.090  37.270 
    4 proposes  4 adopt:  61.060  51.100  37.270 
 
-Power-weighted compromise  [2697, 3:4] bargain (brgnIJ) 
+Power-weighted compromise  [1052, 3:4] bargain (brgnIJ) 
   compromise proposes  3 adopt:  55.642  35.431  28.923 
   compromise proposes  4 adopt:  55.642  35.436  28.923 
 
@@ -978,26 +968,26 @@ Est by  4 of prob 0.7712 that [ 4> 2], with expected gain to  2 of -0.1041
 Est by  2 of prob 0.7710 that [ 4> 2], with expected gain to  4 of +0.1805 
 Est by  2 of prob 0.7710 that [ 4> 2], with expected gain to  2 of -0.1036 
 
-Bargain [2699, 4:2] from  4's perspective (brgnIIJ) 
+Bargain [1054, 4:2] from  4's perspective (brgnIIJ) 
    4 proposes  4 adopt:  59.880  52.030  35.980 
    4 proposes  2 adopt:  59.880  52.030  35.980 
 
-Bargain  [2700, 4:2] from  2's perspective (brgnJIJ) 
+Bargain  [1055, 4:2] from  2's perspective (brgnJIJ) 
    2 proposes  4 adopt:  34.250  18.850  19.190 
    2 proposes  2 adopt:  34.250  18.840  19.190 
 
-Power-weighted compromise  [2701, 4:2] bargain (brgnIJ) 
+Power-weighted compromise  [1056, 4:2] bargain (brgnIJ) 
   compromise proposes  4 adopt:  47.048  35.418  27.574 
   compromise proposes  2 adopt:  47.048  35.413  27.574 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [2685, 0:0][2686, 0:2]
-Bargains involving actor  1: [2689, 1:1][2690, 1:2]
-Bargains involving actor  2: [2686, 0:2][2690, 1:2][2693, 2:2][2699, 4:2]
-Bargains involving actor  3: [2694, 3:3][2695, 3:4]
-Bargains involving actor  4: [2695, 3:4][2698, 4:4][2699, 4:2]
+Bargains involving actor  0: [1040, 0:0][1041, 0:2]
+Bargains involving actor  1: [1044, 1:1][1045, 1:2]
+Bargains involving actor  2: [1041, 0:2][1045, 1:2][1048, 2:2][1054, 4:2]
+Bargains involving actor  3: [1049, 3:3][1050, 3:4]
+Bargains involving actor  4: [1050, 3:4][1053, 4:4][1054, 4:2]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -1030,8 +1020,7 @@ Probability Opt_i
  0.3210 
  0.6790 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 2 bargains
+Chosen bargain (Stochastic): 1041 2 out of 2 bargains
 
 u_im: 
  0.94697  0.94189 
@@ -1063,8 +1052,7 @@ Probability Opt_i
  0.4969 
  0.5031 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 2 bargains
+Chosen bargain (Stochastic): 1045 2 out of 2 bargains
 
 u_im: 
  0.96508  0.94189  0.94697  0.96528 
@@ -1102,8 +1090,7 @@ Probability Opt_i
  0.1368 
  0.3954 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 4 out of 4 bargains
+Chosen bargain (Stochastic): 1054 4 out of 4 bargains
 
 u_im: 
  0.94697  0.94251 
@@ -1135,8 +1122,7 @@ Probability Opt_i
  0.5138 
  0.4862 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 1 out of 2 bargains
+Chosen bargain (Stochastic): 1049 1 out of 2 bargains
 
 u_im: 
  0.94251  0.94697  0.96528 
@@ -1171,8 +1157,7 @@ Probability Opt_i
  0.1274 
  0.5480 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 3 out of 3 bargains
+Chosen bargain (Stochastic): 1054 3 out of 3 bargains
 
 postn  0,  0  62.9600  46.0000  31.4300 
 ideal  0,  0  63.0847  46.2586  31.5898 
@@ -1269,15 +1254,15 @@ Est by  0 of prob 0.5023 that [ 0> 2], with expected gain to  2 of +0.0012
 Est by  2 of prob 0.9585 that [ 0> 2], with expected gain to  0 of +0.0252 
 Est by  2 of prob 0.9585 that [ 0> 2], with expected gain to  2 of +0.0101 
 
-Bargain [2703, 0:2] from  0's perspective (brgnIIJ) 
+Bargain [1058, 0:2] from  0's perspective (brgnIIJ) 
    0 proposes  0 adopt:  61.610  49.710  34.360 
    0 proposes  2 adopt:  61.610  49.710  34.360 
 
-Bargain  [2704, 0:2] from  2's perspective (brgnJIJ) 
+Bargain  [1059, 0:2] from  2's perspective (brgnJIJ) 
    2 proposes  0 adopt:  59.880  52.030  35.980 
    2 proposes  2 adopt:  59.880  52.030  35.980 
 
-Power-weighted compromise  [2705, 0:2] bargain (brgnIJ) 
+Power-weighted compromise  [1060, 0:2] bargain (brgnIJ) 
   compromise proposes  0 adopt:  60.700  50.931  35.212 
   compromise proposes  2 adopt:  60.700  50.931  35.212 
 
@@ -1288,15 +1273,15 @@ Est by  1 of prob 0.8074 that [ 1> 2], with expected gain to  2 of -0.1731
 Est by  2 of prob 0.8049 that [ 1> 2], with expected gain to  1 of +0.1678 
 Est by  2 of prob 0.8049 that [ 1> 2], with expected gain to  2 of -0.1400 
 
-Bargain [2707, 1:2] from  1's perspective (brgnIIJ) 
+Bargain [1062, 1:2] from  1's perspective (brgnIIJ) 
    1 proposes  1 adopt:  26.220  62.670  68.690 
    1 proposes  2 adopt:  26.220  62.670  68.690 
 
-Bargain  [2708, 1:2] from  2's perspective (brgnJIJ) 
+Bargain  [1063, 1:2] from  2's perspective (brgnJIJ) 
    2 proposes  1 adopt:  58.790  52.650  38.650 
    2 proposes  2 adopt:  58.790  52.650  38.650 
 
-Power-weighted compromise  [2709, 1:2] bargain (brgnIJ) 
+Power-weighted compromise  [1064, 1:2] bargain (brgnIJ) 
   compromise proposes  1 adopt:  41.438  57.988  54.654 
   compromise proposes  2 adopt:  41.438  57.988  54.654 
 
@@ -1309,15 +1294,15 @@ Est by  2 of prob 0.0415 that [ 2> 0], with expected gain to  0 of +0.0082
 Est by  0 of prob 0.4977 that [ 2> 0], with expected gain to  2 of -0.0015 
 Est by  0 of prob 0.4977 that [ 2> 0], with expected gain to  0 of -0.0006 
 
-Bargain [2711, 2:0] from  2's perspective (brgnIIJ) 
+Bargain [1066, 2:0] from  2's perspective (brgnIIJ) 
    2 proposes  2 adopt:  62.960  46.020  31.450 
    2 proposes  0 adopt:  62.960  46.020  31.450 
 
-Bargain  [2712, 2:0] from  0's perspective (brgnJIJ) 
+Bargain  [1067, 2:0] from  0's perspective (brgnJIJ) 
    0 proposes  2 adopt:  62.960  46.000  31.430 
    0 proposes  0 adopt:  62.960  46.000  31.430 
 
-Power-weighted compromise  [2713, 2:0] bargain (brgnIJ) 
+Power-weighted compromise  [1068, 2:0] bargain (brgnIJ) 
   compromise proposes  2 adopt:  62.960  46.011  31.441 
   compromise proposes  0 adopt:  62.960  46.011  31.441 
 
@@ -1328,15 +1313,15 @@ Est by  3 of prob 0.9046 that [ 3> 2], with expected gain to  2 of -0.0425
 Est by  2 of prob 0.9200 that [ 3> 2], with expected gain to  3 of +0.2087 
 Est by  2 of prob 0.9200 that [ 3> 2], with expected gain to  2 of -0.0786 
 
-Bargain [2715, 3:2] from  3's perspective (brgnIIJ) 
+Bargain [1070, 3:2] from  3's perspective (brgnIIJ) 
    3 proposes  3 adopt:  45.370  18.560  18.940 
    3 proposes  2 adopt:  45.370  18.560  18.940 
 
-Bargain  [2716, 3:2] from  2's perspective (brgnJIJ) 
+Bargain  [1071, 3:2] from  2's perspective (brgnJIJ) 
    2 proposes  3 adopt:  59.580  47.640  35.270 
    2 proposes  2 adopt:  59.580  47.640  35.270 
 
-Power-weighted compromise  [2717, 3:2] bargain (brgnIJ) 
+Power-weighted compromise  [1072, 3:2] bargain (brgnIJ) 
   compromise proposes  3 adopt:  52.653  33.465  27.310 
   compromise proposes  2 adopt:  52.653  33.465  27.310 
 
@@ -1349,26 +1334,26 @@ Est by  4 of prob 0.4409 that [ 4> 0], with expected gain to  0 of -0.0064
 Est by  0 of prob 0.7109 that [ 4> 0], with expected gain to  4 of +0.0084 
 Est by  0 of prob 0.7109 that [ 4> 0], with expected gain to  0 of -0.0011 
 
-Bargain [2719, 4:0] from  4's perspective (brgnIIJ) 
+Bargain [1074, 4:0] from  4's perspective (brgnIIJ) 
    4 proposes  4 adopt:  61.470  47.990  33.540 
    4 proposes  0 adopt:  61.470  47.990  33.540 
 
-Bargain  [2720, 4:0] from  0's perspective (brgnJIJ) 
+Bargain  [1075, 4:0] from  0's perspective (brgnJIJ) 
    0 proposes  4 adopt:  62.960  46.000  31.430 
    0 proposes  0 adopt:  62.960  46.000  31.430 
 
-Power-weighted compromise  [2721, 4:0] bargain (brgnIJ) 
+Power-weighted compromise  [1076, 4:0] bargain (brgnIJ) 
   compromise proposes  4 adopt:  62.177  47.046  32.539 
   compromise proposes  0 adopt:  62.177  47.046  32.539 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [2702, 0:0][2703, 0:2][2711, 2:0][2719, 4:0]
-Bargains involving actor  1: [2706, 1:1][2707, 1:2]
-Bargains involving actor  2: [2703, 0:2][2707, 1:2][2710, 2:2][2711, 2:0][2715, 3:2]
-Bargains involving actor  3: [2714, 3:3][2715, 3:2]
-Bargains involving actor  4: [2718, 4:4][2719, 4:0]
+Bargains involving actor  0: [1057, 0:0][1058, 0:2][1066, 2:0][1074, 4:0]
+Bargains involving actor  1: [1061, 1:1][1062, 1:2]
+Bargains involving actor  2: [1058, 0:2][1062, 1:2][1065, 2:2][1066, 2:0][1070, 3:2]
+Bargains involving actor  3: [1069, 3:3][1070, 3:2]
+Bargains involving actor  4: [1073, 4:4][1074, 4:0]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -1407,8 +1392,7 @@ Probability Opt_i
  0.2109 
  0.4416 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 4 out of 4 bargains
+Chosen bargain (Stochastic): 1074 4 out of 4 bargains
 
 u_im: 
  0.96698  0.94898 
@@ -1440,8 +1424,7 @@ Probability Opt_i
  0.6228 
  0.3772 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 1 out of 2 bargains
+Chosen bargain (Stochastic): 1061 1 out of 2 bargains
 
 u_im: 
  0.96711  0.94898  0.96698  0.96734  0.95905 
@@ -1482,8 +1465,7 @@ Probability Opt_i
  0.1896 
  0.0943 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 1 out of 5 bargains
+Chosen bargain (Stochastic): 1058 1 out of 5 bargains
 
 u_im: 
  0.96698  0.95905 
@@ -1515,8 +1497,7 @@ Probability Opt_i
  0.7096 
  0.2904 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 2 bargains
+Chosen bargain (Stochastic): 1070 2 out of 2 bargains
 
 u_im: 
  0.96698  0.96722 
@@ -1548,8 +1529,7 @@ Probability Opt_i
  0.2906 
  0.7094 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 2 bargains
+Chosen bargain (Stochastic): 1074 2 out of 2 bargains
 
 postn  0,  0  61.4700  47.9900  33.5400 
 ideal  0,  0  61.6799  47.7649  33.2865 
@@ -1648,15 +1628,15 @@ Est by  0 of prob 0.3311 that [ 0> 3], with expected gain to  3 of -0.0051
 Est by  3 of prob 0.3803 that [ 0> 3], with expected gain to  0 of +0.0073 
 Est by  3 of prob 0.3803 that [ 0> 3], with expected gain to  3 of -0.0082 
 
-Bargain [2723, 0:3] from  0's perspective (brgnIIJ) 
+Bargain [1078, 0:3] from  0's perspective (brgnIIJ) 
    0 proposes  0 adopt:  53.620  20.480  21.530 
    0 proposes  3 adopt:  53.620  20.480  21.530 
 
-Bargain  [2724, 0:3] from  3's perspective (brgnJIJ) 
+Bargain  [1079, 0:3] from  3's perspective (brgnJIJ) 
    3 proposes  0 adopt:  45.370  18.560  18.940 
    3 proposes  3 adopt:  45.370  18.560  18.940 
 
-Power-weighted compromise  [2725, 0:3] bargain (brgnIJ) 
+Power-weighted compromise  [1080, 0:3] bargain (brgnIJ) 
   compromise proposes  0 adopt:  49.383  19.494  20.200 
   compromise proposes  3 adopt:  49.383  19.494  20.200 
 
@@ -1667,15 +1647,15 @@ Est by  1 of prob 0.7693 that [ 1> 2], with expected gain to  2 of -0.1997
 Est by  2 of prob 0.7701 that [ 1> 2], with expected gain to  1 of +0.1724 
 Est by  2 of prob 0.7701 that [ 1> 2], with expected gain to  2 of -0.1673 
 
-Bargain [2727, 1:2] from  1's perspective (brgnIIJ) 
+Bargain [1082, 1:2] from  1's perspective (brgnIIJ) 
    1 proposes  1 adopt:  27.700  62.310  68.140 
    1 proposes  2 adopt:  27.700  62.310  68.140 
 
-Bargain  [2728, 1:2] from  2's perspective (brgnJIJ) 
+Bargain  [1083, 1:2] from  2's perspective (brgnJIJ) 
    2 proposes  1 adopt:  60.390  50.500  37.330 
    2 proposes  2 adopt:  60.390  50.500  37.330 
 
-Power-weighted compromise  [2729, 1:2] bargain (brgnIJ) 
+Power-weighted compromise  [1084, 1:2] bargain (brgnIJ) 
   compromise proposes  1 adopt:  42.974  56.792  53.744 
   compromise proposes  2 adopt:  42.974  56.792  53.744 
 
@@ -1688,15 +1668,15 @@ Est by  2 of prob 0.0000 that [ 2> 4], with expected gain to  4 of +0.0034
 Est by  4 of prob 0.0000 that [ 2> 4], with expected gain to  2 of +0.0033 
 Est by  4 of prob 0.0000 that [ 2> 4], with expected gain to  4 of +0.0018 
 
-Bargain [2731, 2:4] from  2's perspective (brgnIIJ) 
+Bargain [1086, 2:4] from  2's perspective (brgnIIJ) 
    2 proposes  2 adopt:  61.470  47.990  33.540 
    2 proposes  4 adopt:  61.470  47.990  33.540 
 
-Bargain  [2732, 2:4] from  4's perspective (brgnJIJ) 
+Bargain  [1087, 2:4] from  4's perspective (brgnJIJ) 
    4 proposes  2 adopt:  61.470  47.990  33.540 
    4 proposes  4 adopt:  61.470  47.990  33.540 
 
-Power-weighted compromise  [2733, 2:4] bargain (brgnIJ) 
+Power-weighted compromise  [1088, 2:4] bargain (brgnIJ) 
   compromise proposes  2 adopt:  61.470  47.990  33.540 
   compromise proposes  4 adopt:  61.470  47.990  33.540 
 
@@ -1707,15 +1687,15 @@ Est by  3 of prob 0.8013 that [ 3> 2], with expected gain to  2 of -0.0502
 Est by  2 of prob 0.8602 that [ 3> 2], with expected gain to  3 of +0.1761 
 Est by  2 of prob 0.8602 that [ 3> 2], with expected gain to  2 of -0.1166 
 
-Bargain [2735, 3:2] from  3's perspective (brgnIIJ) 
+Bargain [1090, 3:2] from  3's perspective (brgnIIJ) 
    3 proposes  3 adopt:  48.180  19.420  20.340 
    3 proposes  2 adopt:  48.190  19.420  20.340 
 
-Bargain  [2736, 3:2] from  2's perspective (brgnJIJ) 
+Bargain  [1091, 3:2] from  2's perspective (brgnJIJ) 
    2 proposes  3 adopt:  61.390  46.920  33.940 
    2 proposes  2 adopt:  61.400  46.920  33.940 
 
-Power-weighted compromise  [2737, 3:2] bargain (brgnIJ) 
+Power-weighted compromise  [1092, 3:2] bargain (brgnIJ) 
   compromise proposes  3 adopt:  54.951  33.515  27.311 
   compromise proposes  2 adopt:  54.961  33.515  27.311 
 
@@ -1726,26 +1706,26 @@ Est by  4 of prob 1.0000 that [ 4> 2], with expected gain to  2 of +0.0065
 Est by  2 of prob 1.0000 that [ 4> 2], with expected gain to  4 of +0.0066 
 Est by  2 of prob 1.0000 that [ 4> 2], with expected gain to  2 of +0.0100 
 
-Bargain [2739, 4:2] from  4's perspective (brgnIIJ) 
+Bargain [1094, 4:2] from  4's perspective (brgnIIJ) 
    4 proposes  4 adopt:  61.470  47.990  33.540 
    4 proposes  2 adopt:  61.470  47.990  33.540 
 
-Bargain  [2740, 4:2] from  2's perspective (brgnJIJ) 
+Bargain  [1095, 4:2] from  2's perspective (brgnJIJ) 
    2 proposes  4 adopt:  61.610  49.710  34.360 
    2 proposes  2 adopt:  61.610  49.710  34.360 
 
-Power-weighted compromise  [2741, 4:2] bargain (brgnIJ) 
+Power-weighted compromise  [1096, 4:2] bargain (brgnIJ) 
   compromise proposes  4 adopt:  61.540  48.851  33.951 
   compromise proposes  2 adopt:  61.540  48.851  33.951 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [2722, 0:0][2723, 0:3]
-Bargains involving actor  1: [2726, 1:1][2727, 1:2]
-Bargains involving actor  2: [2727, 1:2][2730, 2:2][2731, 2:4][2735, 3:2][2739, 4:2]
-Bargains involving actor  3: [2723, 0:3][2734, 3:3][2735, 3:2]
-Bargains involving actor  4: [2731, 2:4][2738, 4:4][2739, 4:2]
+Bargains involving actor  0: [1077, 0:0][1078, 0:3]
+Bargains involving actor  1: [1081, 1:1][1082, 1:2]
+Bargains involving actor  2: [1082, 1:2][1085, 2:2][1086, 2:4][1090, 3:2][1094, 4:2]
+Bargains involving actor  3: [1078, 0:3][1089, 3:3][1090, 3:2]
+Bargains involving actor  4: [1086, 2:4][1093, 4:4][1094, 4:2]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -1778,8 +1758,7 @@ Probability Opt_i
  0.7466 
  0.2534 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 1 out of 2 bargains
+Chosen bargain (Stochastic): 1077 1 out of 2 bargains
 
 u_im: 
  0.93446  0.90406 
@@ -1811,8 +1790,7 @@ Probability Opt_i
  0.6117 
  0.3883 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 2 bargains
+Chosen bargain (Stochastic): 1082 2 out of 2 bargains
 
 u_im: 
  0.90406  0.93446  0.93526  0.91693  0.93526 
@@ -1853,8 +1831,7 @@ Probability Opt_i
  0.0595 
  0.2290 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 3 out of 5 bargains
+Chosen bargain (Stochastic): 1086 3 out of 5 bargains
 
 u_im: 
  0.92271  0.93446  0.91693 
@@ -1889,8 +1866,7 @@ Probability Opt_i
  0.7379 
  0.1147 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 3 out of 3 bargains
+Chosen bargain (Stochastic): 1090 3 out of 3 bargains
 
 u_im: 
  0.93526  0.93446  0.93526 
@@ -1925,8 +1901,7 @@ Probability Opt_i
  0.2305 
  0.3847 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 3 bargains
+Chosen bargain (Stochastic): 1093 2 out of 3 bargains
 
 postn  0,  0  61.4700  47.9900  33.5400 
 ideal  0,  0  61.4973  47.9607  33.5070 
@@ -2025,15 +2000,15 @@ Est by  0 of prob 0.3448 that [ 0> 3], with expected gain to  3 of -0.0093
 Est by  3 of prob 0.4320 that [ 0> 3], with expected gain to  0 of +0.0134 
 Est by  3 of prob 0.4320 that [ 0> 3], with expected gain to  3 of -0.0131 
 
-Bargain [2743, 0:3] from  0's perspective (brgnIIJ) 
+Bargain [1098, 0:3] from  0's perspective (brgnIIJ) 
    0 proposes  0 adopt:  55.390  21.510  22.920 
    0 proposes  3 adopt:  55.390  21.510  22.920 
 
-Bargain  [2744, 0:3] from  3's perspective (brgnJIJ) 
+Bargain  [1099, 0:3] from  3's perspective (brgnJIJ) 
    3 proposes  0 adopt:  48.190  19.420  20.340 
    3 proposes  3 adopt:  48.190  19.420  20.340 
 
-Power-weighted compromise  [2745, 0:3] bargain (brgnIJ) 
+Power-weighted compromise  [1100, 0:3] bargain (brgnIJ) 
   compromise proposes  0 adopt:  51.692  20.437  21.595 
   compromise proposes  3 adopt:  51.692  20.437  21.595 
 
@@ -2044,15 +2019,15 @@ Est by  1 of prob 0.7860 that [ 1> 2], with expected gain to  2 of -0.1926
 Est by  2 of prob 0.7937 that [ 1> 2], with expected gain to  1 of +0.1546 
 Est by  2 of prob 0.7937 that [ 1> 2], with expected gain to  2 of -0.1357 
 
-Bargain [2747, 1:2] from  1's perspective (brgnIIJ) 
+Bargain [1102, 1:2] from  1's perspective (brgnIIJ) 
    1 proposes  1 adopt:  30.680  61.620  66.970 
    1 proposes  2 adopt:  30.680  61.620  66.970 
 
-Bargain  [2748, 1:2] from  2's perspective (brgnJIJ) 
+Bargain  [1103, 1:2] from  2's perspective (brgnJIJ) 
    2 proposes  1 adopt:  60.630  48.650  35.830 
    2 proposes  2 adopt:  60.630  48.650  35.830 
 
-Power-weighted compromise  [2749, 1:2] bargain (brgnIJ) 
+Power-weighted compromise  [1104, 1:2] bargain (brgnIJ) 
   compromise proposes  1 adopt:  44.674  55.560  52.420 
   compromise proposes  2 adopt:  44.674  55.560  52.420 
 
@@ -2064,15 +2039,15 @@ Est by  3 of prob 0.8193 that [ 3> 2], with expected gain to  2 of -0.0406
 Est by  2 of prob 0.8584 that [ 3> 2], with expected gain to  3 of +0.1269 
 Est by  2 of prob 0.8584 that [ 3> 2], with expected gain to  2 of -0.0855 
 
-Bargain [2752, 3:2] from  3's perspective (brgnIIJ) 
+Bargain [1107, 3:2] from  3's perspective (brgnIIJ) 
    3 proposes  3 adopt:  50.070  20.050  21.300 
    3 proposes  2 adopt:  50.070  20.050  21.310 
 
-Bargain  [2753, 3:2] from  2's perspective (brgnJIJ) 
+Bargain  [1108, 3:2] from  2's perspective (brgnJIJ) 
    2 proposes  3 adopt:  61.390  46.750  33.370 
    2 proposes  2 adopt:  61.390  46.750  33.370 
 
-Power-weighted compromise  [2754, 3:2] bargain (brgnIJ) 
+Power-weighted compromise  [1109, 3:2] bargain (brgnIJ) 
   compromise proposes  3 adopt:  55.872  33.735  27.486 
   compromise proposes  2 adopt:  55.872  33.735  27.491 
 
@@ -2080,11 +2055,11 @@ Using InitOnlyInterp to form proposed bargains
 Actor 4 has no advantageous targets 
 
 Bargains to be resolved
-Bargains involving actor  0: [2742, 0:0][2743, 0:3]
-Bargains involving actor  1: [2746, 1:1][2747, 1:2]
-Bargains involving actor  2: [2747, 1:2][2750, 2:2][2752, 3:2]
-Bargains involving actor  3: [2743, 0:3][2751, 3:3][2752, 3:2]
-Bargains involving actor  4: [2755, 4:4]
+Bargains involving actor  0: [1097, 0:0][1098, 0:3]
+Bargains involving actor  1: [1101, 1:1][1102, 1:2]
+Bargains involving actor  2: [1102, 1:2][1105, 2:2][1107, 3:2]
+Bargains involving actor  3: [1098, 0:3][1106, 3:3][1107, 3:2]
+Bargains involving actor  4: [1110, 4:4]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -2117,8 +2092,7 @@ Probability Opt_i
  0.7718 
  0.2282 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 1 out of 2 bargains
+Chosen bargain (Stochastic): 1097 1 out of 2 bargains
 
 u_im: 
  0.92311  0.88379 
@@ -2150,8 +2124,7 @@ Probability Opt_i
  0.6474 
  0.3526 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 2 bargains
+Chosen bargain (Stochastic): 1102 2 out of 2 bargains
 
 u_im: 
  0.88379  0.92311  0.89746 
@@ -2186,8 +2159,7 @@ Probability Opt_i
  0.5723 
  0.0949 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 1 out of 3 bargains
+Chosen bargain (Stochastic): 1102 1 out of 3 bargains
 
 u_im: 
  0.90557  0.92311  0.89746 
@@ -2222,8 +2194,7 @@ Probability Opt_i
  0.7752 
  0.0780 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 3 bargains
+Chosen bargain (Stochastic): 1106 2 out of 3 bargains
 
 u_im: 
  0.92311 
@@ -2252,8 +2223,7 @@ Probability Opt_i > Opt_j
 Probability Opt_i
  1.0000 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 1 out of 1 bargains
+Chosen bargain (Stochastic): 1110 1 out of 1 bargains
 
 postn  0,  0  61.4700  47.9900  33.5400 
 ideal  0,  0  61.4735  47.9862  33.5357 
@@ -2350,15 +2320,15 @@ Est by  0 of prob 0.8682 that [ 0> 2], with expected gain to  2 of -0.0393
 Est by  2 of prob 0.9066 that [ 0> 2], with expected gain to  0 of +0.2452 
 Est by  2 of prob 0.9066 that [ 0> 2], with expected gain to  2 of -0.0790 
 
-Bargain [2757, 0:2] from  0's perspective (brgnIIJ) 
+Bargain [1112, 0:2] from  0's perspective (brgnIIJ) 
    0 proposes  0 adopt:  60.920  48.480  34.900 
    0 proposes  2 adopt:  60.920  48.480  34.910 
 
-Bargain  [2758, 0:2] from  2's perspective (brgnJIJ) 
+Bargain  [1113, 0:2] from  2's perspective (brgnJIJ) 
    2 proposes  0 adopt:  34.290  60.790  65.160 
    2 proposes  2 adopt:  34.290  60.790  65.160 
 
-Power-weighted compromise  [2759, 0:2] bargain (brgnIJ) 
+Power-weighted compromise  [1114, 0:2] bargain (brgnIJ) 
   compromise proposes  0 adopt:  46.910  54.956  50.820 
   compromise proposes  2 adopt:  46.910  54.956  50.824 
 
@@ -2369,15 +2339,15 @@ Est by  1 of prob 0.6948 that [ 1> 4], with expected gain to  4 of -0.1628
 Est by  4 of prob 0.7535 that [ 1> 4], with expected gain to  1 of +0.0978 
 Est by  4 of prob 0.7535 that [ 1> 4], with expected gain to  4 of -0.0773 
 
-Bargain [2761, 1:4] from  1's perspective (brgnIIJ) 
+Bargain [1116, 1:4] from  1's perspective (brgnIIJ) 
    1 proposes  1 adopt:  40.650  60.800  64.820 
    1 proposes  4 adopt:  40.650  60.800  64.820 
 
-Bargain  [2762, 1:4] from  4's perspective (brgnJIJ) 
+Bargain  [1117, 1:4] from  4's perspective (brgnJIJ) 
    4 proposes  1 adopt:  61.320  48.460  34.610 
    4 proposes  4 adopt:  61.320  48.450  34.610 
 
-Power-weighted compromise  [2763, 1:4] bargain (brgnIJ) 
+Power-weighted compromise  [1118, 1:4] bargain (brgnIJ) 
   compromise proposes  1 adopt:  50.294  55.042  50.724 
   compromise proposes  4 adopt:  50.294  55.038  50.724 
 
@@ -2389,15 +2359,15 @@ Est by  3 of prob 0.8426 that [ 3> 2], with expected gain to  2 of -0.0807
 Est by  2 of prob 0.8870 that [ 3> 2], with expected gain to  3 of +0.3358 
 Est by  2 of prob 0.8870 that [ 3> 2], with expected gain to  2 of -0.1713 
 
-Bargain [2766, 3:2] from  3's perspective (brgnIIJ) 
+Bargain [1121, 3:2] from  3's perspective (brgnIIJ) 
    3 proposes  3 adopt:  46.320  20.090  22.830 
    3 proposes  2 adopt:  46.320  20.090  22.840 
 
-Bargain  [2767, 3:2] from  2's perspective (brgnJIJ) 
+Bargain  [1122, 3:2] from  2's perspective (brgnJIJ) 
    2 proposes  3 adopt:  31.900  46.620  60.610 
    2 proposes  2 adopt:  31.900  46.620  60.610 
 
-Power-weighted compromise  [2768, 3:2] bargain (brgnIJ) 
+Power-weighted compromise  [1123, 3:2] bargain (brgnIJ) 
   compromise proposes  3 adopt:  38.929  33.688  42.194 
   compromise proposes  2 adopt:  38.929  33.688  42.199 
 
@@ -2408,26 +2378,26 @@ Est by  4 of prob 0.8150 that [ 4> 2], with expected gain to  2 of -0.0353
 Est by  2 of prob 0.8657 that [ 4> 2], with expected gain to  4 of +0.2403 
 Est by  2 of prob 0.8657 that [ 4> 2], with expected gain to  2 of -0.0733 
 
-Bargain [2770, 4:2] from  4's perspective (brgnIIJ) 
+Bargain [1125, 4:2] from  4's perspective (brgnIIJ) 
    4 proposes  4 adopt:  60.660  49.300  35.680 
    4 proposes  2 adopt:  60.660  49.300  35.680 
 
-Bargain  [2771, 4:2] from  2's perspective (brgnJIJ) 
+Bargain  [1126, 4:2] from  2's perspective (brgnJIJ) 
    2 proposes  4 adopt:  35.600  60.990  64.620 
    2 proposes  2 adopt:  35.600  60.990  64.630 
 
-Power-weighted compromise  [2772, 4:2] bargain (brgnIJ) 
+Power-weighted compromise  [1127, 4:2] bargain (brgnIJ) 
   compromise proposes  4 adopt:  48.113  55.153  50.169 
   compromise proposes  2 adopt:  48.113  55.153  50.174 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [2756, 0:0][2757, 0:2]
-Bargains involving actor  1: [2760, 1:1][2761, 1:4]
-Bargains involving actor  2: [2757, 0:2][2764, 2:2][2766, 3:2][2770, 4:2]
-Bargains involving actor  3: [2765, 3:3][2766, 3:2]
-Bargains involving actor  4: [2761, 1:4][2769, 4:4][2770, 4:2]
+Bargains involving actor  0: [1111, 0:0][1112, 0:2]
+Bargains involving actor  1: [1115, 1:1][1116, 1:4]
+Bargains involving actor  2: [1112, 0:2][1119, 2:2][1121, 3:2][1125, 4:2]
+Bargains involving actor  3: [1120, 3:3][1121, 3:2]
+Bargains involving actor  4: [1116, 1:4][1124, 4:4][1125, 4:2]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -2460,8 +2430,7 @@ Probability Opt_i
  0.4786 
  0.5214 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 2 bargains
+Chosen bargain (Stochastic): 1112 2 out of 2 bargains
 
 u_im: 
  0.94160  0.93514 
@@ -2493,8 +2462,7 @@ Probability Opt_i
  0.3377 
  0.6623 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 2 bargains
+Chosen bargain (Stochastic): 1116 2 out of 2 bargains
 
 u_im: 
  0.96364  0.94160  0.95017  0.96322 
@@ -2532,8 +2500,7 @@ Probability Opt_i
  0.0842 
  0.2527 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 4 bargains
+Chosen bargain (Stochastic): 1119 2 out of 4 bargains
 
 u_im: 
  0.94160  0.95017 
@@ -2565,8 +2532,7 @@ Probability Opt_i
  0.6213 
  0.3787 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 2 bargains
+Chosen bargain (Stochastic): 1121 2 out of 2 bargains
 
 u_im: 
  0.93514  0.94160  0.96322 
@@ -2601,8 +2567,7 @@ Probability Opt_i
  0.1400 
  0.3775 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 1 out of 3 bargains
+Chosen bargain (Stochastic): 1116 1 out of 3 bargains
 
 postn  0,  0  60.9200  48.4800  34.9000 
 ideal  0,  0  60.9920  48.4158  34.7226 
@@ -2699,15 +2664,15 @@ Est by  0 of prob 0.7821 that [ 0> 2], with expected gain to  2 of -0.0639
 Est by  2 of prob 0.8496 that [ 0> 2], with expected gain to  0 of +0.2143 
 Est by  2 of prob 0.8496 that [ 0> 2], with expected gain to  2 of -0.1411 
 
-Bargain [2774, 0:2] from  0's perspective (brgnIIJ) 
+Bargain [1129, 0:2] from  0's perspective (brgnIIJ) 
    0 proposes  0 adopt:  59.160  49.960  38.920 
    0 proposes  2 adopt:  59.160  49.960  38.920 
 
-Bargain  [2775, 0:2] from  2's perspective (brgnJIJ) 
+Bargain  [1130, 0:2] from  2's perspective (brgnJIJ) 
    2 proposes  0 adopt:  33.270  61.050  65.730 
    2 proposes  2 adopt:  33.270  61.050  65.730 
 
-Power-weighted compromise  [2776, 0:2] bargain (brgnIJ) 
+Power-weighted compromise  [1131, 0:2] bargain (brgnIJ) 
   compromise proposes  0 adopt:  45.539  55.794  53.025 
   compromise proposes  2 adopt:  45.539  55.794  53.025 
 
@@ -2720,15 +2685,15 @@ Est by  1 of prob 0.3904 that [ 1> 3], with expected gain to  3 of -0.0320
 Est by  3 of prob 0.4096 that [ 1> 3], with expected gain to  1 of +0.0254 
 Est by  3 of prob 0.4096 that [ 1> 3], with expected gain to  3 of -0.0230 
 
-Bargain [2778, 1:3] from  1's perspective (brgnIIJ) 
+Bargain [1133, 1:3] from  1's perspective (brgnIIJ) 
    1 proposes  1 adopt:  43.390  28.910  47.390 
    1 proposes  3 adopt:  43.390  28.910  47.380 
 
-Bargain  [2779, 1:3] from  3's perspective (brgnJIJ) 
+Bargain  [1134, 1:3] from  3's perspective (brgnJIJ) 
    3 proposes  1 adopt:  46.310  20.110  22.930 
    3 proposes  3 adopt:  46.310  20.110  22.930 
 
-Power-weighted compromise  [2780, 1:3] bargain (brgnIJ) 
+Power-weighted compromise  [1135, 1:3] bargain (brgnIJ) 
   compromise proposes  1 adopt:  44.718  24.908  36.266 
   compromise proposes  3 adopt:  44.718  24.908  36.261 
 
@@ -2741,15 +2706,15 @@ Est by  2 of prob 0.0000 that [ 2> 1], with expected gain to  1 of +0.0379
 Est by  1 of prob 0.0000 that [ 2> 1], with expected gain to  2 of +0.0007 
 Est by  1 of prob 0.0000 that [ 2> 1], with expected gain to  1 of +0.0222 
 
-Bargain [2782, 2:1] from  2's perspective (brgnIIJ) 
+Bargain [1137, 2:1] from  2's perspective (brgnIIJ) 
    2 proposes  2 adopt:  40.650  60.800  64.820 
    2 proposes  1 adopt:  40.650  60.800  64.820 
 
-Bargain  [2783, 2:1] from  1's perspective (brgnJIJ) 
+Bargain  [1138, 2:1] from  1's perspective (brgnJIJ) 
    1 proposes  2 adopt:  40.650  60.800  64.820 
    1 proposes  1 adopt:  40.650  60.800  64.820 
 
-Power-weighted compromise  [2784, 2:1] bargain (brgnIJ) 
+Power-weighted compromise  [1139, 2:1] bargain (brgnIJ) 
   compromise proposes  2 adopt:  40.650  60.800  64.820 
   compromise proposes  1 adopt:  40.650  60.800  64.820 
 
@@ -2760,15 +2725,15 @@ Est by  3 of prob 0.8585 that [ 3> 4], with expected gain to  4 of -0.0725
 Est by  4 of prob 0.8474 that [ 3> 4], with expected gain to  3 of +0.1998 
 Est by  4 of prob 0.8474 that [ 3> 4], with expected gain to  4 of -0.1332 
 
-Bargain [2786, 3:4] from  3's perspective (brgnIIJ) 
+Bargain [1141, 3:4] from  3's perspective (brgnIIJ) 
    3 proposes  3 adopt:  45.470  20.340  24.180 
    3 proposes  4 adopt:  45.470  20.340  24.180 
 
-Bargain  [2787, 3:4] from  4's perspective (brgnJIJ) 
+Bargain  [1142, 3:4] from  4's perspective (brgnJIJ) 
    4 proposes  3 adopt:  40.700  51.950  62.780 
    4 proposes  4 adopt:  40.700  51.950  62.780 
 
-Power-weighted compromise  [2788, 3:4] bargain (brgnIJ) 
+Power-weighted compromise  [1143, 3:4] bargain (brgnIJ) 
   compromise proposes  3 adopt:  43.028  36.521  43.939 
   compromise proposes  4 adopt:  43.028  36.521  43.939 
 
@@ -2779,26 +2744,26 @@ Est by  4 of prob 1.0000 that [ 4> 2], with expected gain to  2 of +0.0010
 Est by  2 of prob 1.0000 that [ 4> 2], with expected gain to  4 of +0.1022 
 Est by  2 of prob 1.0000 that [ 4> 2], with expected gain to  2 of +0.0014 
 
-Bargain [2790, 4:2] from  4's perspective (brgnIIJ) 
+Bargain [1145, 4:2] from  4's perspective (brgnIIJ) 
    4 proposes  4 adopt:  40.650  60.800  64.820 
    4 proposes  2 adopt:  40.650  60.800  64.820 
 
-Bargain  [2791, 4:2] from  2's perspective (brgnJIJ) 
+Bargain  [1146, 4:2] from  2's perspective (brgnJIJ) 
    2 proposes  4 adopt:  30.920  61.610  66.950 
    2 proposes  2 adopt:  30.920  61.610  66.950 
 
-Power-weighted compromise  [2792, 4:2] bargain (brgnIJ) 
+Power-weighted compromise  [1147, 4:2] bargain (brgnIJ) 
   compromise proposes  4 adopt:  35.779  61.206  65.886 
   compromise proposes  2 adopt:  35.779  61.206  65.886 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [2773, 0:0][2774, 0:2]
-Bargains involving actor  1: [2777, 1:1][2778, 1:3][2782, 2:1]
-Bargains involving actor  2: [2774, 0:2][2781, 2:2][2782, 2:1][2790, 4:2]
-Bargains involving actor  3: [2778, 1:3][2785, 3:3][2786, 3:4]
-Bargains involving actor  4: [2786, 3:4][2789, 4:4][2790, 4:2]
+Bargains involving actor  0: [1128, 0:0][1129, 0:2]
+Bargains involving actor  1: [1132, 1:1][1133, 1:3][1137, 2:1]
+Bargains involving actor  2: [1129, 0:2][1136, 2:2][1137, 2:1][1145, 4:2]
+Bargains involving actor  3: [1133, 1:3][1140, 3:3][1141, 3:4]
+Bargains involving actor  4: [1141, 3:4][1144, 4:4][1145, 4:2]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -2831,8 +2796,7 @@ Probability Opt_i
  0.4563 
  0.5437 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 2 bargains
+Chosen bargain (Stochastic): 1129 2 out of 2 bargains
 
 u_im: 
  0.94025  0.94378  0.94801 
@@ -2867,8 +2831,7 @@ Probability Opt_i
  0.4567 
  0.4918 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 3 bargains
+Chosen bargain (Stochastic): 1133 2 out of 3 bargains
 
 u_im: 
  0.95952  0.94025  0.94801  0.94801 
@@ -2906,8 +2869,7 @@ Probability Opt_i
  0.2821 
  0.2821 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 1 out of 4 bargains
+Chosen bargain (Stochastic): 1129 1 out of 4 bargains
 
 u_im: 
  0.94378  0.94025  0.94010 
@@ -2942,8 +2904,7 @@ Probability Opt_i
  0.3919 
  0.0484 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 1 out of 3 bargains
+Chosen bargain (Stochastic): 1133 1 out of 3 bargains
 
 u_im: 
  0.94010  0.94025  0.94801 
@@ -2978,8 +2939,7 @@ Probability Opt_i
  0.0910 
  0.6803 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 3 bargains
+Chosen bargain (Stochastic): 1144 2 out of 3 bargains
 
 postn  0,  0  59.1600  49.9600  38.9200 
 ideal  0,  0  59.3982  49.7593  38.3743 
@@ -3076,15 +3036,15 @@ Est by  0 of prob 0.7936 that [ 0> 1], with expected gain to  1 of -0.0236
 Est by  1 of prob 0.8377 that [ 0> 1], with expected gain to  0 of +0.0361 
 Est by  1 of prob 0.8377 that [ 0> 1], with expected gain to  1 of -0.0113 
 
-Bargain [2794, 0:1] from  0's perspective (brgnIIJ) 
+Bargain [1149, 0:1] from  0's perspective (brgnIIJ) 
    0 proposes  0 adopt:  58.540  47.050  40.690 
    0 proposes  1 adopt:  58.540  47.050  40.690 
 
-Bargain  [2795, 0:1] from  1's perspective (brgnJIJ) 
+Bargain  [1150, 0:1] from  1's perspective (brgnJIJ) 
    1 proposes  0 adopt:  43.430  28.920  47.390 
    1 proposes  1 adopt:  43.430  28.920  47.390 
 
-Power-weighted compromise  [2796, 0:1] bargain (brgnIJ) 
+Power-weighted compromise  [1151, 0:1] bargain (brgnIJ) 
   compromise proposes  0 adopt:  50.099  36.922  44.433 
   compromise proposes  1 adopt:  50.099  36.922  44.433 
 
@@ -3095,15 +3055,15 @@ Est by  1 of prob 0.6099 that [ 1> 2], with expected gain to  2 of -0.0104
 Est by  2 of prob 0.6483 that [ 1> 2], with expected gain to  1 of +0.0172 
 Est by  2 of prob 0.6483 that [ 1> 2], with expected gain to  2 of -0.0212 
 
-Bargain [2798, 1:2] from  1's perspective (brgnIIJ) 
+Bargain [1153, 1:2] from  1's perspective (brgnIIJ) 
    1 proposes  1 adopt:  48.880  33.530  46.020 
    1 proposes  2 adopt:  48.880  33.530  46.020 
 
-Bargain  [2799, 1:2] from  2's perspective (brgnJIJ) 
+Bargain  [1154, 1:2] from  2's perspective (brgnJIJ) 
    2 proposes  1 adopt:  59.160  49.950  38.930 
    2 proposes  2 adopt:  59.160  49.950  38.930 
 
-Power-weighted compromise  [2800, 1:2] bargain (brgnIJ) 
+Power-weighted compromise  [1155, 1:2] bargain (brgnIJ) 
   compromise proposes  1 adopt:  53.683  41.202  42.707 
   compromise proposes  2 adopt:  53.683  41.202  42.707 
 
@@ -3115,15 +3075,15 @@ Est by  3 of prob 0.7292 that [ 3> 4], with expected gain to  4 of -0.0505
 Est by  4 of prob 0.7501 that [ 3> 4], with expected gain to  3 of +0.1763 
 Est by  4 of prob 0.7501 that [ 3> 4], with expected gain to  4 of -0.1320 
 
-Bargain [2803, 3:4] from  3's perspective (brgnIIJ) 
+Bargain [1158, 3:4] from  3's perspective (brgnIIJ) 
    3 proposes  3 adopt:  42.100  29.870  49.890 
    3 proposes  4 adopt:  42.100  29.870  49.890 
 
-Bargain  [2804, 3:4] from  4's perspective (brgnJIJ) 
+Bargain  [1159, 3:4] from  4's perspective (brgnJIJ) 
    4 proposes  3 adopt:  40.670  55.390  64.190 
    4 proposes  4 adopt:  40.670  55.400  64.190 
 
-Power-weighted compromise  [2805, 3:4] bargain (brgnIJ) 
+Power-weighted compromise  [1160, 3:4] bargain (brgnIJ) 
   compromise proposes  3 adopt:  41.368  42.933  57.210 
   compromise proposes  4 adopt:  41.368  42.938  57.210 
 
@@ -3134,26 +3094,26 @@ Est by  4 of prob 0.8638 that [ 4> 2], with expected gain to  2 of -0.0739
 Est by  2 of prob 0.8784 that [ 4> 2], with expected gain to  4 of +0.1263 
 Est by  2 of prob 0.8784 that [ 4> 2], with expected gain to  2 of -0.0379 
 
-Bargain [2807, 4:2] from  4's perspective (brgnIIJ) 
+Bargain [1162, 4:2] from  4's perspective (brgnIIJ) 
    4 proposes  4 adopt:  40.890  60.270  63.990 
    4 proposes  2 adopt:  40.890  60.270  63.990 
 
-Bargain  [2808, 4:2] from  2's perspective (brgnJIJ) 
+Bargain  [1163, 4:2] from  2's perspective (brgnJIJ) 
    2 proposes  4 adopt:  58.450  50.070  39.320 
    2 proposes  2 adopt:  58.450  50.070  39.320 
 
-Power-weighted compromise  [2809, 4:2] bargain (brgnIJ) 
+Power-weighted compromise  [1164, 4:2] bargain (brgnIJ) 
   compromise proposes  4 adopt:  49.682  55.163  51.639 
   compromise proposes  2 adopt:  49.682  55.163  51.639 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [2793, 0:0][2794, 0:1]
-Bargains involving actor  1: [2794, 0:1][2797, 1:1][2798, 1:2]
-Bargains involving actor  2: [2798, 1:2][2801, 2:2][2807, 4:2]
-Bargains involving actor  3: [2802, 3:3][2803, 3:4]
-Bargains involving actor  4: [2803, 3:4][2806, 4:4][2807, 4:2]
+Bargains involving actor  0: [1148, 0:0][1149, 0:1]
+Bargains involving actor  1: [1149, 0:1][1152, 1:1][1153, 1:2]
+Bargains involving actor  2: [1153, 1:2][1156, 2:2][1162, 4:2]
+Bargains involving actor  3: [1157, 3:3][1158, 3:4]
+Bargains involving actor  4: [1158, 3:4][1161, 4:4][1162, 4:2]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -3186,8 +3146,7 @@ Probability Opt_i
  0.3515 
  0.6485 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 2 bargains
+Chosen bargain (Stochastic): 1149 2 out of 2 bargains
 
 u_im: 
  0.95797  0.94234  0.93571 
@@ -3222,8 +3181,7 @@ Probability Opt_i
  0.0731 
  0.4595 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 1 out of 3 bargains
+Chosen bargain (Stochastic): 1149 1 out of 3 bargains
 
 u_im: 
  0.93571  0.94234  0.92374 
@@ -3258,8 +3216,7 @@ Probability Opt_i
  0.1734 
  0.2876 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 3 bargains
+Chosen bargain (Stochastic): 1156 2 out of 3 bargains
 
 u_im: 
  0.94234  0.94200 
@@ -3291,8 +3248,7 @@ Probability Opt_i
  0.4119 
  0.5881 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 2 bargains
+Chosen bargain (Stochastic): 1158 2 out of 2 bargains
 
 u_im: 
  0.94200  0.94234  0.92374 
@@ -3327,8 +3283,7 @@ Probability Opt_i
  0.2297 
  0.3015 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 1 out of 3 bargains
+Chosen bargain (Stochastic): 1158 1 out of 3 bargains
 
 postn  0,  0  58.5400  47.0500  40.6900 
 ideal  0,  0  58.6516  47.4022  40.3890 
@@ -3425,15 +3380,15 @@ Est by  0 of prob 0.5866 that [ 0> 4], with expected gain to  4 of -0.0111
 Est by  4 of prob 0.5862 that [ 0> 4], with expected gain to  0 of +0.0107 
 Est by  4 of prob 0.5862 that [ 0> 4], with expected gain to  4 of -0.0095 
 
-Bargain [2811, 0:4] from  0's perspective (brgnIIJ) 
+Bargain [1166, 0:4] from  0's perspective (brgnIIJ) 
    0 proposes  0 adopt:  51.490  42.210  44.450 
    0 proposes  4 adopt:  51.490  42.210  44.450 
 
-Bargain  [2812, 0:4] from  4's perspective (brgnJIJ) 
+Bargain  [1167, 0:4] from  4's perspective (brgnJIJ) 
    4 proposes  0 adopt:  42.100  29.870  49.890 
    4 proposes  4 adopt:  42.100  29.870  49.890 
 
-Power-weighted compromise  [2813, 0:4] bargain (brgnIJ) 
+Power-weighted compromise  [1168, 0:4] bargain (brgnIJ) 
   compromise proposes  0 adopt:  46.556  35.726  47.308 
   compromise proposes  4 adopt:  46.556  35.726  47.308 
 
@@ -3446,15 +3401,15 @@ Est by  1 of prob 0.4638 that [ 1> 4], with expected gain to  4 of -0.0056
 Est by  4 of prob 0.4607 that [ 1> 4], with expected gain to  1 of +0.0034 
 Est by  4 of prob 0.4607 that [ 1> 4], with expected gain to  4 of -0.0047 
 
-Bargain [2815, 1:4] from  1's perspective (brgnIIJ) 
+Bargain [1170, 1:4] from  1's perspective (brgnIIJ) 
    1 proposes  1 adopt:  45.910  41.760  43.650 
    1 proposes  4 adopt:  45.910  41.760  43.650 
 
-Bargain  [2816, 1:4] from  4's perspective (brgnJIJ) 
+Bargain  [1171, 1:4] from  4's perspective (brgnJIJ) 
    4 proposes  1 adopt:  42.100  29.870  49.890 
    4 proposes  4 adopt:  42.100  29.870  49.890 
 
-Power-weighted compromise  [2817, 1:4] bargain (brgnIJ) 
+Power-weighted compromise  [1172, 1:4] bargain (brgnIJ) 
   compromise proposes  1 adopt:  44.132  36.212  46.561 
   compromise proposes  4 adopt:  44.132  36.212  46.561 
 
@@ -3467,15 +3422,15 @@ Est by  2 of prob 0.4466 that [ 2> 4], with expected gain to  4 of -0.0283
 Est by  4 of prob 0.6774 that [ 2> 4], with expected gain to  2 of +0.0332 
 Est by  4 of prob 0.6774 that [ 2> 4], with expected gain to  4 of -0.0150 
 
-Bargain [2819, 2:4] from  2's perspective (brgnIIJ) 
+Bargain [1174, 2:4] from  2's perspective (brgnIIJ) 
    2 proposes  2 adopt:  46.450  41.390  44.810 
    2 proposes  4 adopt:  46.450  41.390  44.810 
 
-Bargain  [2820, 2:4] from  4's perspective (brgnJIJ) 
+Bargain  [1175, 2:4] from  4's perspective (brgnJIJ) 
    4 proposes  2 adopt:  42.110  29.920  49.870 
    4 proposes  4 adopt:  42.110  29.920  49.870 
 
-Power-weighted compromise  [2821, 2:4] bargain (brgnIJ) 
+Power-weighted compromise  [1176, 2:4] bargain (brgnIJ) 
   compromise proposes  2 adopt:  44.283  35.663  47.337 
   compromise proposes  4 adopt:  44.283  35.663  47.337 
 
@@ -3486,15 +3441,15 @@ Est by  3 of prob 0.7552 that [ 3> 1], with expected gain to  1 of -0.0105
 Est by  1 of prob 0.7463 that [ 3> 1], with expected gain to  3 of +0.0198 
 Est by  1 of prob 0.7463 that [ 3> 1], with expected gain to  1 of -0.0118 
 
-Bargain [2823, 3:1] from  3's perspective (brgnIIJ) 
+Bargain [1178, 3:1] from  3's perspective (brgnIIJ) 
    3 proposes  3 adopt:  45.640  31.010  47.450 
    3 proposes  1 adopt:  45.640  31.010  47.450 
 
-Bargain  [2824, 3:1] from  1's perspective (brgnJIJ) 
+Bargain  [1179, 3:1] from  1's perspective (brgnJIJ) 
    1 proposes  3 adopt:  58.540  47.040  40.690 
    1 proposes  1 adopt:  58.540  47.040  40.690 
 
-Power-weighted compromise  [2825, 3:1] bargain (brgnIJ) 
+Power-weighted compromise  [1180, 3:1] bargain (brgnIJ) 
   compromise proposes  3 adopt:  52.673  39.750  43.764 
   compromise proposes  1 adopt:  52.673  39.750  43.764 
 
@@ -3505,26 +3460,26 @@ Est by  4 of prob 0.5393 that [ 4> 1], with expected gain to  1 of -0.0037
 Est by  1 of prob 0.5362 that [ 4> 1], with expected gain to  4 of +0.0059 
 Est by  1 of prob 0.5362 that [ 4> 1], with expected gain to  1 of -0.0042 
 
-Bargain [2827, 4:1] from  4's perspective (brgnIIJ) 
+Bargain [1182, 4:1] from  4's perspective (brgnIIJ) 
    4 proposes  4 adopt:  45.840  41.670  43.700 
    4 proposes  1 adopt:  45.840  41.670  43.700 
 
-Bargain  [2828, 4:1] from  1's perspective (brgnJIJ) 
+Bargain  [1183, 4:1] from  1's perspective (brgnJIJ) 
    1 proposes  4 adopt:  58.540  47.050  40.690 
    1 proposes  1 adopt:  58.540  47.050  40.690 
 
-Power-weighted compromise  [2829, 4:1] bargain (brgnIJ) 
+Power-weighted compromise  [1184, 4:1] bargain (brgnIJ) 
   compromise proposes  4 adopt:  52.614  44.540  42.094 
   compromise proposes  1 adopt:  52.614  44.540  42.094 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [2810, 0:0][2811, 0:4]
-Bargains involving actor  1: [2814, 1:1][2815, 1:4][2823, 3:1][2827, 4:1]
-Bargains involving actor  2: [2818, 2:2][2819, 2:4]
-Bargains involving actor  3: [2822, 3:3][2823, 3:1]
-Bargains involving actor  4: [2811, 0:4][2815, 1:4][2819, 2:4][2826, 4:4][2827, 4:1]
+Bargains involving actor  0: [1165, 0:0][1166, 0:4]
+Bargains involving actor  1: [1169, 1:1][1170, 1:4][1178, 3:1][1182, 4:1]
+Bargains involving actor  2: [1173, 2:2][1174, 2:4]
+Bargains involving actor  3: [1177, 3:3][1178, 3:1]
+Bargains involving actor  4: [1166, 0:4][1170, 1:4][1174, 2:4][1181, 4:4][1182, 4:1]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -3557,8 +3512,7 @@ Probability Opt_i
  0.0203 
  0.9797 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 2 bargains
+Chosen bargain (Stochastic): 1166 2 out of 2 bargains
 
 u_im: 
  0.98678  0.98730  0.98378  0.98724 
@@ -3596,8 +3550,7 @@ Probability Opt_i
  0.2365 
  0.2863 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 4 out of 4 bargains
+Chosen bargain (Stochastic): 1182 4 out of 4 bargains
 
 u_im: 
  0.98678  0.98774 
@@ -3629,8 +3582,7 @@ Probability Opt_i
  0.0000 
  1.0000 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 2 bargains
+Chosen bargain (Stochastic): 1174 2 out of 2 bargains
 
 u_im: 
  0.98678  0.98378 
@@ -3662,8 +3614,7 @@ Probability Opt_i
  0.6345 
  0.3655 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 1 out of 2 bargains
+Chosen bargain (Stochastic): 1177 1 out of 2 bargains
 
 u_im: 
  0.99062  0.98730  0.98774  0.98678  0.98724 
@@ -3704,8 +3655,7 @@ Probability Opt_i
  0.0001 
  0.0127 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 3 out of 5 bargains
+Chosen bargain (Stochastic): 1174 3 out of 5 bargains
 
 postn  0,  0  51.4900  42.2100  44.4500 
 ideal  0,  0  52.4210  42.8850  43.9221 
@@ -3802,15 +3752,15 @@ Est by  0 of prob 0.8908 that [ 0> 1], with expected gain to  1 of -0.0034
 Est by  1 of prob 0.9368 that [ 0> 1], with expected gain to  0 of +0.0421 
 Est by  1 of prob 0.9368 that [ 0> 1], with expected gain to  1 of -0.0079 
 
-Bargain [2831, 0:1] from  0's perspective (brgnIIJ) 
+Bargain [1186, 0:1] from  0's perspective (brgnIIJ) 
    0 proposes  0 adopt:  51.440  42.190  44.410 
    0 proposes  1 adopt:  51.440  42.190  44.410 
 
-Bargain  [2832, 0:1] from  1's perspective (brgnJIJ) 
+Bargain  [1187, 0:1] from  1's perspective (brgnJIJ) 
    1 proposes  0 adopt:  45.860  41.670  43.700 
    1 proposes  1 adopt:  45.860  41.670  43.700 
 
-Power-weighted compromise  [2833, 0:1] bargain (brgnIJ) 
+Power-weighted compromise  [1188, 0:1] bargain (brgnIJ) 
   compromise proposes  0 adopt:  48.323  41.900  44.013 
   compromise proposes  1 adopt:  48.323  41.900  44.013 
 
@@ -3823,15 +3773,15 @@ Est by  1 of prob 0.4109 that [ 1> 3], with expected gain to  3 of -0.0158
 Est by  3 of prob 0.7182 that [ 1> 3], with expected gain to  1 of +0.0279 
 Est by  3 of prob 0.7182 that [ 1> 3], with expected gain to  3 of -0.0077 
 
-Bargain [2835, 1:3] from  1's perspective (brgnIIJ) 
+Bargain [1190, 1:3] from  1's perspective (brgnIIJ) 
    1 proposes  1 adopt:  44.190  32.790  46.020 
    1 proposes  3 adopt:  44.190  32.790  46.020 
 
-Bargain  [2836, 1:3] from  3's perspective (brgnJIJ) 
+Bargain  [1191, 1:3] from  3's perspective (brgnJIJ) 
    3 proposes  1 adopt:  42.110  29.880  49.870 
    3 proposes  3 adopt:  42.110  29.880  49.870 
 
-Power-weighted compromise  [2837, 1:3] bargain (brgnIJ) 
+Power-weighted compromise  [1192, 1:3] bargain (brgnIJ) 
   compromise proposes  1 adopt:  43.244  31.467  47.771 
   compromise proposes  3 adopt:  43.244  31.467  47.771 
 
@@ -3842,15 +3792,15 @@ Est by  2 of prob 0.9915 that [ 2> 1], with expected gain to  1 of -0.0003
 Est by  1 of prob 0.9941 that [ 2> 1], with expected gain to  2 of +0.0056 
 Est by  1 of prob 0.9941 that [ 2> 1], with expected gain to  1 of -0.0005 
 
-Bargain [2839, 2:1] from  2's perspective (brgnIIJ) 
+Bargain [1194, 2:1] from  2's perspective (brgnIIJ) 
    2 proposes  2 adopt:  46.450  41.390  44.810 
    2 proposes  1 adopt:  46.450  41.390  44.810 
 
-Bargain  [2840, 2:1] from  1's perspective (brgnJIJ) 
+Bargain  [1195, 2:1] from  1's perspective (brgnJIJ) 
    1 proposes  2 adopt:  45.840  41.670  43.700 
    1 proposes  1 adopt:  45.840  41.670  43.700 
 
-Power-weighted compromise  [2841, 2:1] bargain (brgnIJ) 
+Power-weighted compromise  [1196, 2:1] bargain (brgnIJ) 
   compromise proposes  2 adopt:  46.125  41.539  44.219 
   compromise proposes  1 adopt:  46.125  41.539  44.219 
 
@@ -3861,15 +3811,15 @@ Est by  3 of prob 0.8146 that [ 3> 4], with expected gain to  4 of -0.0094
 Est by  4 of prob 0.8411 that [ 3> 4], with expected gain to  3 of +0.0300 
 Est by  4 of prob 0.8411 that [ 3> 4], with expected gain to  4 of -0.0237 
 
-Bargain [2843, 3:4] from  3's perspective (brgnIIJ) 
+Bargain [1198, 3:4] from  3's perspective (brgnIIJ) 
    3 proposes  3 adopt:  43.190  30.000  49.590 
    3 proposes  4 adopt:  43.190  30.000  49.590 
 
-Bargain  [2844, 3:4] from  4's perspective (brgnJIJ) 
+Bargain  [1199, 3:4] from  4's perspective (brgnJIJ) 
    4 proposes  3 adopt:  46.450  41.340  44.810 
    4 proposes  4 adopt:  46.450  41.340  44.810 
 
-Power-weighted compromise  [2845, 3:4] bargain (brgnIJ) 
+Power-weighted compromise  [1200, 3:4] bargain (brgnIJ) 
   compromise proposes  3 adopt:  44.859  35.805  47.143 
   compromise proposes  4 adopt:  44.859  35.805  47.143 
 
@@ -3880,26 +3830,26 @@ Est by  4 of prob 0.9925 that [ 4> 1], with expected gain to  1 of -0.0003
 Est by  1 of prob 0.9948 that [ 4> 1], with expected gain to  4 of +0.0074 
 Est by  1 of prob 0.9948 that [ 4> 1], with expected gain to  1 of -0.0005 
 
-Bargain [2847, 4:1] from  4's perspective (brgnIIJ) 
+Bargain [1202, 4:1] from  4's perspective (brgnIIJ) 
    4 proposes  4 adopt:  46.450  41.390  44.810 
    4 proposes  1 adopt:  46.450  41.390  44.810 
 
-Bargain  [2848, 4:1] from  1's perspective (brgnJIJ) 
+Bargain  [1203, 4:1] from  1's perspective (brgnJIJ) 
    1 proposes  4 adopt:  45.840  41.670  43.700 
    1 proposes  1 adopt:  45.840  41.670  43.700 
 
-Power-weighted compromise  [2849, 4:1] bargain (brgnIJ) 
+Power-weighted compromise  [1204, 4:1] bargain (brgnIJ) 
   compromise proposes  4 adopt:  46.125  41.539  44.218 
   compromise proposes  1 adopt:  46.125  41.539  44.218 
 
 Using InitOnlyInterp to form proposed bargains
 
 Bargains to be resolved
-Bargains involving actor  0: [2830, 0:0][2831, 0:1]
-Bargains involving actor  1: [2831, 0:1][2834, 1:1][2835, 1:3][2839, 2:1][2847, 4:1]
-Bargains involving actor  2: [2838, 2:2][2839, 2:1]
-Bargains involving actor  3: [2835, 1:3][2842, 3:3][2843, 3:4]
-Bargains involving actor  4: [2843, 3:4][2846, 4:4][2847, 4:1]
+Bargains involving actor  0: [1185, 0:0][1186, 0:1]
+Bargains involving actor  1: [1186, 0:1][1189, 1:1][1190, 1:3][1194, 2:1][1202, 4:1]
+Bargains involving actor  2: [1193, 2:2][1194, 2:1]
+Bargains involving actor  3: [1190, 1:3][1197, 3:3][1198, 3:4]
+Bargains involving actor  4: [1198, 3:4][1201, 4:4][1202, 4:1]
 w:
  117.70   93.20   61.40  135.40   63.80 
 u_im: 
@@ -3932,8 +3882,7 @@ Probability Opt_i
  0.5847 
  0.4153 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 1 out of 2 bargains
+Chosen bargain (Stochastic): 1185 1 out of 2 bargains
 
 u_im: 
  0.98481  0.98195  0.98147  0.98227  0.98227 
@@ -3974,8 +3923,7 @@ Probability Opt_i
  0.2931 
  0.2931 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 4 out of 5 bargains
+Chosen bargain (Stochastic): 1194 4 out of 5 bargains
 
 u_im: 
  0.98195  0.98227 
@@ -4007,8 +3955,7 @@ Probability Opt_i
  0.0796 
  0.9204 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 2 bargains
+Chosen bargain (Stochastic): 1194 2 out of 2 bargains
 
 u_im: 
  0.98147  0.98195  0.97823 
@@ -4043,8 +3990,7 @@ Probability Opt_i
  0.8124 
  0.0266 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 2 out of 3 bargains
+Chosen bargain (Stochastic): 1197 2 out of 3 bargains
 
 u_im: 
  0.97823  0.98195  0.98227 
@@ -4079,8 +4025,7 @@ Probability Opt_i
  0.0516 
  0.8673 
 Found stable PCE distribution
-done
-Chosen bargain (Stochastic): 3 out of 3 bargains
+Chosen bargain (Stochastic): 1202 3 out of 3 bargains
 
 postn  0,  0  51.4900  42.2100  44.4500 
 ideal  0,  0  51.6110  42.2977  44.3814 
@@ -4198,6 +4143,6 @@ Ellie , prob , 0.1880 , 0.2791 , 0.2220 , 0.3766 , 0.4108 , 0.6298 , 0.3856 , 0.
 SMPModel: Closing database
 SMPModel: Closing database succeeded.
 -----------------------------------
-  Finish time: Wed Feb  1 20:24:06 2017
+  Finish time: Sun Feb 26 09:44:35 2017
 
-  Elapsed time: 0.0634 seconds 
+  Elapsed time: 0.0540 seconds 
