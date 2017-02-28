@@ -144,7 +144,7 @@ MainWindow::MainWindow()
     //editable headers of TableWidget and TableView
     headerEditor = 0;
     barsCount=0;
-    yAxisLen=100;
+    yAxisLen=50;
     prevScenario="None";
     initiatorTip=0;
     prevTurn=0;
@@ -163,7 +163,6 @@ MainWindow::~MainWindow()
 void MainWindow::csvGetFilePAth(bool bl)
 {
     Q_UNUSED(bl)
-    emit releaseDatabase();
 
     statusBar()->showMessage(tr("Looking for CSV file"));
     //Get  *.csv file path
@@ -173,6 +172,7 @@ void MainWindow::csvGetFilePAth(bool bl)
     //emit path to csv class for processing
     if(!csvFilePth.isEmpty())
     {
+        emit releaseDatabase();
         lineGraphDock->setVisible(false);
         barGraphDock->setVisible(false);
         quadMapDock->setVisible(false);
@@ -190,15 +190,17 @@ void MainWindow::csvGetFilePAth(bool bl)
 
 void MainWindow::dbGetFilePAth(bool bl, QString smpDBPath, bool run)
 {
-    clearAllLabels();
 
     Q_UNUSED(bl)
     statusBar()->showMessage(tr("Looking for Database file ..."));
 
     if(smpDBPath.isEmpty())
     {
+        QString currentPath =dbPath;
         //Get  *.db file path
         dbPath = QFileDialog::getOpenFileName(this,tr("Database File"), QDir::homePath() , tr("Database File (*.db)"));
+        if(dbPath.isEmpty())
+            dbPath=currentPath;
     }
     else
         dbPath = smpDBPath;
@@ -206,6 +208,7 @@ void MainWindow::dbGetFilePAth(bool bl, QString smpDBPath, bool run)
     //emit path to db class for processing
     if(!dbPath.isEmpty())
     {
+        clearAllLabels();
         lineGraphDock->setVisible(true);
         barGraphDock->setVisible(true);
 
@@ -218,6 +221,7 @@ void MainWindow::dbGetFilePAth(bool bl, QString smpDBPath, bool run)
         mScenarioName.clear();
         mScenarioIds.clear();
         scenarioComboBox->clear();
+        scenarioNameLineEdit->clear();
         connect(scenarioComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(scenarioComboBoxValue(int)));
         connect(turnSlider,SIGNAL(valueChanged(int)),this,SLOT(sliderStateValueToQryDB(int)));
 
@@ -230,6 +234,10 @@ void MainWindow::dbGetFilePAth(bool bl, QString smpDBPath, bool run)
         //To populate Bar Graph Dimensions combo box
         populateBarGraphDimensions(dimensionsLineEdit->text().toInt());
 
+    }
+    else
+    {
+        dbPath = smpDBPath;
     }
     statusBar()->showMessage(tr(" "));
 }
@@ -603,6 +611,9 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model, QStringList scenario
     csvTableViewTabWidget->addTab(csvTableAffinityView, "Affinity Matrix");
 
     stackWidget->addWidget(csvTableViewTabWidget);
+    csvTableViewTabWidget->setTabToolTip(1,"The affinity matrix records, for all pairwise comparisons of actors, "
+                                           "\nthe affinity which actor i has for the position of actor j");
+
 
     csvTableView->setShowGrid(true);
     stackWidget->setCurrentIndex(1);
@@ -617,11 +628,12 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model, QStringList scenario
     turnSlider->hide();
     tableControlsFrame->show();
 
-    scenarioComboBox->setEditable(true);
     turnSlider->setVisible(false);
     scenarioDescriptionLineEdit->setVisible(true);
     scenarioDescriptionLineEdit->setEnabled(true);
-    scenarioComboBox->lineEdit()->setPlaceholderText("Dataset/Scenario name");
+    scenarioComboBox->setVisible(false);
+    scenarioNameLineEdit->setVisible(true);
+    scenarioNameLineEdit->setPlaceholderText("Dataset/Scenario name");
     scenarioDescriptionLineEdit->setPlaceholderText("Dataset/Scenario Description");
 
     actorsLineEdit->setEnabled(true);
@@ -657,8 +669,9 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model, QStringList scenario
     mScenarioName.clear();
     mScenarioIds.clear();
     scenarioComboBox->clear();
+    scenarioNameLineEdit->clear();
 
-    scenarioComboBox->addItem(scenarioName.at(0));
+    scenarioNameLineEdit->setText(scenarioName.at(0));
     scenarioDescriptionLineEdit->clear();
     scenarioDescriptionLineEdit->setText(scenarioName.at(1));
 
@@ -679,6 +692,8 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model, QStringList scenario
 
     csvAffinityModel = new QStandardItemModel;
     csvTableAffinityView->setModel(csvAffinityModel);
+    csvTableAffinityView->setToolTip("The affinity matrix records, for all pairwise comparisons of actors, "
+                                     "\nthe affinity which actor i has for the position of actor j");
     //Affinity Matrix
 
     while(csvAffinityModel->rowCount() != actorsLineEdit->text().toInt()
@@ -740,9 +755,12 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
         affinityMatrix->setContextMenuPolicy(Qt::CustomContextMenu);
         //        connect(affinityMatrix, SIGNAL(customContextMenuRequested(QPoint)), this,
         //                SLOT(displayAffinityMenuTableWidget(QPoint)));
-
+        affinityMatrix->setToolTip("The affinity matrix records, for all pairwise comparisons of actors, "
+                                   "\nthe affinity which actor i has for the position of actor j");
         smpDataTab->addTab(csvTableWidget,"Actor Data ");
         smpDataTab->addTab(affinityMatrix," Affinity Matrix ");
+        smpDataTab->setTabToolTip(1,"The affinity matrix records, for all pairwise comparisons of actors, "
+                                    "\nthe affinity which actor i has for the position of actor j");
 
         //        csv_tableWidget->horizontalHeader()->viewport()->installEventFilter(this);
         //        csv_tableWidget->verticalHeader()->viewport()->installEventFilter(this);
@@ -768,16 +786,18 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
         mScenarioIds.clear();
         mScenarioDesc.clear();
         scenarioComboBox->clear();
+        scenarioNameLineEdit->clear();
 
-        scenarioComboBox->addItem(currentScenario);
+        scenarioNameLineEdit->setText(currentScenario);
         //        scenarioDescriptionLineEdit->clear();
         //        scenarioDescriptionLineEdit->setText(mScenarioDesc.at(index));
 
-        scenarioComboBox->setEditable(true);
+        scenarioComboBox->setVisible(false);
+        scenarioNameLineEdit->setVisible(true);
         scenarioDescriptionLineEdit->setEnabled(true);
         turnSlider->setVisible(false);
         scenarioDescriptionLineEdit->setVisible(true);
-        scenarioComboBox->lineEdit()->setPlaceholderText("Dataset/Scenario name ");
+        scenarioNameLineEdit->setPlaceholderText("Dataset/Scenario name ");
         scenarioDescriptionLineEdit->setPlaceholderText("Dataset/Scenario Description ");
 
         csvTableWidget->resizeColumnsToContents();
@@ -826,21 +846,21 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
                 csvTableWidget->setItem(row,++col,
                                         new QTableWidgetItem(QString::number((actorsPos[0].at(row).toDouble()),'f',1)));
                 csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsSal[0].at(row).toDouble()),'f',1)));
+                                        new QTableWidgetItem(QString::number((actorsSal[0].at(row).toDouble()*100),'f',1)));
             }
             if(dimensionsLineEdit->text().toInt()>=2)
             {
                 csvTableWidget->setItem(row,++col,
                                         new QTableWidgetItem(QString::number((actorsPos[1].at(row).toDouble()),'f',1)));
                 csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsSal[1].at(row).toDouble()),'f',1)));
+                                        new QTableWidgetItem(QString::number((actorsSal[1].at(row).toDouble()*100),'f',1)));
             }
             if(dimensionsLineEdit->text().toInt()==3)
             {
                 csvTableWidget->setItem(row,++col,
                                         new QTableWidgetItem(QString::number((actorsPos[2].at(row).toDouble()),'f',1)));
                 csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsSal[2].at(row).toDouble()),'f',1)));
+                                        new QTableWidgetItem(QString::number((actorsSal[2].at(row).toDouble()*100),'f',1)));
             }
         }
         //Affinity Matrix
@@ -909,7 +929,8 @@ void MainWindow::setDBItemModel(QStandardItemModel *model)
     affinityMatrix->setContextMenuPolicy(Qt::CustomContextMenu);
     //        connect(affinityMatrix, SIGNAL(customContextMenuRequested(QPoint)), this,
     //                SLOT(displayAffinityMenuTableWidget(QPoint)));
-
+    affinityMatrix->setToolTip("The affinity matrix records, for all pairwise comparisons of actors, "
+                               "\nthe affinity which actor i has for the position of actor j");
     csvTableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(csvTableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(displayMenuTableView(QPoint)));
 
@@ -919,6 +940,8 @@ void MainWindow::setDBItemModel(QStandardItemModel *model)
     csvTableViewTabWidget->addTab(csvTableView, "Actor Data from DB");
     csvTableViewTabWidget->addTab(affinityMatrix," Affinity Matrix ");
     stackWidget->addWidget(csvTableViewTabWidget);
+    csvTableViewTabWidget->setTabToolTip(1,"The affinity matrix records, for all pairwise comparisons of actors, "
+                                           "\nthe affinity which actor i has for the position of actor j");
 
     stackWidget->setCurrentIndex(0);
     //    disconnect(csvTableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(displayMenuTableView(QPoint)));
@@ -926,6 +949,8 @@ void MainWindow::setDBItemModel(QStandardItemModel *model)
     tableControlsFrame->show();
 
     scenarioComboBox->setEditable(false);
+    scenarioNameLineEdit->setVisible(false);
+    scenarioComboBox->setVisible(true);
     turnSlider->setVisible(true);
     scenarioDescriptionLineEdit->setVisible(true);
     scenarioDescriptionLineEdit->setEnabled(false);
@@ -1049,9 +1074,14 @@ void MainWindow::createNewSMPData(bool bl)
     affinityMatrix= new QTableWidget;
     affinityMatrix->setContextMenuPolicy(Qt::CustomContextMenu);
     //    connect(affinityMatrix, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(displayAffinityMenuTableWidget(QPoint)));
+    affinityMatrix->setToolTip("The affinity matrix records, for all pairwise comparisons of actors, "
+                               "\nthe affinity which actor i has for the position of actor j");
 
     smpDataTab->addTab(csvTableWidget,"Actor Data ");
     smpDataTab->addTab(affinityMatrix,"Affinity Matrix ");
+    smpDataTab->setTabToolTip(1,"The affinity matrix records, for all pairwise comparisons of actors, "
+                                "\nthe affinity which actor i has for the position of actor j");
+
 
     stackWidget->addWidget(smpDataTab);
     stackWidget->setCurrentIndex(1);
@@ -1064,11 +1094,12 @@ void MainWindow::createNewSMPData(bool bl)
     dimensionsPushButton->setEnabled(true);
     donePushButton->setEnabled(true);
 
-    scenarioComboBox->setEditable(true);
+    scenarioComboBox->setVisible(false);
+    scenarioNameLineEdit->setVisible(true);
     turnSlider->setVisible(false);
     scenarioDescriptionLineEdit->setVisible(true);
     scenarioDescriptionLineEdit->setEnabled(true);
-    scenarioComboBox->lineEdit()->setPlaceholderText("Dataset/Scenario name");
+    scenarioNameLineEdit->setPlaceholderText("Dataset/Scenario name");
     scenarioDescriptionLineEdit->setPlaceholderText("Dataset/Scenario Description");
 
     turnSlider->hide();
@@ -1088,6 +1119,7 @@ void MainWindow::createNewSMPData(bool bl)
     mScenarioName.clear();
     mScenarioIds.clear();
     scenarioComboBox->clear();
+    scenarioNameLineEdit->clear();
     scenarioDescriptionLineEdit->clear();
 
     actorsLineEdit->setText(QString::number(3));
@@ -1154,6 +1186,13 @@ void MainWindow::initializeCentralViewFrame()
     scenarioComboBox->setEditable(true);
     scenarioComboBox->setToolTip("Enter the Scenario / Project Name");
     connect(scenarioComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(scenarioComboBoxValue(int)));
+
+    scenarioNameLineEdit = new QLineEdit(tableControlsFrame);
+    scenarioNameLineEdit->setVisible(false);
+    scenarioNameLineEdit->setMaximumWidth(200);
+    scenarioNameLineEdit->setFixedWidth(150);
+    scenarioNameLineEdit->setToolTip("Enter the Scenario / Project Name");
+    gCLayout->addWidget(scenarioNameLineEdit,0,2);
 
     turnSlider = new QSlider(Qt::Horizontal,central);
     turnSlider->setTickInterval(1);
@@ -1269,7 +1308,7 @@ void MainWindow::about()
 
 void MainWindow::chooseActorColors()
 {
-    if(actorsName.length()>0)
+    if(actorsName.length()>0 && tableType=="Database")
     {
         QList<QColor> colors;
 
@@ -1288,7 +1327,7 @@ void MainWindow::chooseActorColors()
 
 void MainWindow::importActorColors()
 {
-    if(actorsName.length()>0)
+    if(actorsName.length()>0 && tableType=="Database")
     {
         QString colorCodeCsvFilePth;
         colorCodeCsvFilePth = QFileDialog::getOpenFileName(this,tr("Open CSV File"), QDir::homePath() , tr("CSV File (*.csv)"));
@@ -1305,7 +1344,7 @@ void MainWindow::importActorColors()
 
 void MainWindow::exportActorColors()
 {
-    if(actorsName.length()>0)
+    if(actorsName.length()>0 && tableType=="Database")
     {
         QString colorPaletteCsvFileNameLocation = QFileDialog::getSaveFileName(
                     this, tr("Save Log File to "),"","CSV File (*.csv)");
@@ -1329,7 +1368,7 @@ void MainWindow::exportActorColors()
 
 void MainWindow::resetActorColors()
 {
-    if(actorsName.length()>0)
+    if(actorsName.length()>0 && tableType=="Database")
     {
         generateColors();
         changesActorsStyleSheet();
@@ -1617,8 +1656,8 @@ void MainWindow::saveTableViewToCSV()
             QTextStream data( &f );
             QStringList strList;
 
-            strList <<scenarioComboBox->currentText();
-            strList <<scenarioDescriptionLineEdit->text().trimmed();
+            strList <<scenarioNameLineEdit->text();
+                      strList <<scenarioDescriptionLineEdit->text().trimmed();
             strList <<QString::number(modeltoCSV->rowCount());
             strList <<QString::number((modeltoCSV->columnCount()-3)/2);
 
@@ -1693,8 +1732,8 @@ void MainWindow::saveTableWidgetToCSV(bool bl)
             QTextStream data( &f );
             QStringList strList;
 
-            strList <<scenarioComboBox->currentText();
-            strList <<scenarioDescriptionLineEdit->text();
+            strList <<scenarioNameLineEdit->text();
+                      strList <<scenarioDescriptionLineEdit->text();
             strList <<QString::number(csvTableWidget->rowCount());
             strList <<QString::number((csvTableWidget->columnCount()-3)/2);
 
@@ -1740,7 +1779,7 @@ void MainWindow::saveTableWidgetToXML(bool bl)
 
         QStringList parameters;
         parameters.append(xmlPath);
-        parameters.append(scenarioComboBox->currentText());
+        parameters.append(scenarioNameLineEdit->text());
         parameters.append(scenarioDescriptionLineEdit->text());
         if(!seedRand->text().isEmpty())
             parameters.append(seedRand->text());
@@ -1827,7 +1866,7 @@ int MainWindow::validateControlButtons(QString viewName)
         }
     }
 
-    if(0==scenarioComboBox->count() && true==scenarioComboBox->lineEdit()->text().isEmpty())
+    if(true==scenarioNameLineEdit->text().isEmpty())
     {
         ++ret;
         displayMessage("Dataset/Scenario", "Enter Dataset/Scenario name");
@@ -2043,21 +2082,21 @@ void MainWindow::updateDBViewColumns()
                 modeltoDB->setItem(row,++col,new QStandardItem(
                                        QString::number(actorsPos[0].at(row).toDouble(),'f',1)));
                 modeltoDB->setItem(row,++col,new QStandardItem(
-                                       QString::number(actorsSal[0].at(row).toDouble(),'f',1)));
+                                       QString::number(actorsSal[0].at(row).toDouble()*100,'f',1)));
             }
             if(dimensionsLineEdit->text().toInt()>=2)
             {
                 modeltoDB->setItem(row,++col,new QStandardItem(
                                        QString::number(actorsPos[1].at(row).toDouble(),'f',1)));
                 modeltoDB->setItem(row,++col,new QStandardItem(
-                                       QString::number(actorsSal[1].at(row).toDouble(),'f',1)));
+                                       QString::number(actorsSal[1].at(row).toDouble()*100,'f',1)));
             }
             if(dimensionsLineEdit->text().toInt()==3)
             {
                 modeltoDB->setItem(row,++col,new QStandardItem(
                                        QString::number(actorsPos[2].at(row).toDouble(),'f',1)));
                 modeltoDB->setItem(row,++col,new QStandardItem(
-                                       QString::number(actorsSal[2].at(row).toDouble(),'f',1)));
+                                       QString::number(actorsSal[2].at(row).toDouble()*100,'f',1)));
             }
         }
     }

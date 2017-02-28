@@ -96,7 +96,7 @@ private slots:
     //Central-  Controls Frame
     void sliderStateValueToQryDB(int value);
     void scenarioComboBoxValue(int scenarioBox);
-    void createNewSMPData(bool bl);
+     void createNewSMPData(bool bl);
     void cellSelected(QStandardItem *in);
     void insertNewRowCSV();
     void insertNewColumnCSV();
@@ -158,7 +158,6 @@ private:
 
     void updateDBViewColumns();
     QString checkForHeaderString(QString header);
-
     void changesActorsStyleSheet();
 
     // Central Main Frame
@@ -175,6 +174,7 @@ private:
     QPushButton * donePushButton;
     QLineEdit * scenarioDescriptionLineEdit;
     QSlider * turnSlider;
+    QLineEdit * scenarioNameLineEdit;
 
     //Model parameters
     QFrame * frames;

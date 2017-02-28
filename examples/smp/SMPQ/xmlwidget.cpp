@@ -42,23 +42,25 @@ void MainWindow::createXmlTable()
 
     xmlImportDataTableView = new QTableView;
     xmlAffinityMatrixTableView = new QTableView;
-
+    xmlAffinityMatrixTableView->setToolTip("The affinity matrix records, for all pairwise comparisons of actors, "
+                                           "\nthe affinity which actor i has for the position of actor j");
     xmlTabWidget->addTab(xmlImportDataTableView,"Xml SMP Data");
     xmlTabWidget->addTab(xmlAffinityMatrixTableView,"Affinity Matrix");
-
+    xmlTabWidget->setTabToolTip(1,"The affinity matrix records, for all pairwise comparisons of actors, "
+                                  "\nthe affinity which actor i has for the position of actor j");
     stackWidget->addWidget(xmlTabWidget);
 
 }
 
 void MainWindow::importXmlGetFilePath(bool bl)
 {
-    emit releaseDatabase();
 
     QString filename;
     filename = QFileDialog::getOpenFileName(this,tr("Xml File"), QDir::homePath() , tr("Xml File (*.xml)"));
 
     if(!filename.isEmpty())
     {
+        emit releaseDatabase();
         lineGraphDock->setVisible(false);
         barGraphDock->setVisible(false);
         quadMapDock->setVisible(false);
@@ -162,7 +164,7 @@ void MainWindow::populateXmlTable(QStandardItemModel *actorsVal)
 
     actorsLineEdit->setText(QString::number(xmlSmpDataModel->rowCount()));
     actorsLineEdit->setEnabled(true);
-    scenarioComboBox->lineEdit()->setPlaceholderText("Dataset/Scenario name");
+    scenarioNameLineEdit->setPlaceholderText("Dataset/Scenario name");
     scenarioDescriptionLineEdit->setPlaceholderText("Dataset/Scenario Description");
     xmlImportDataTableView->setModel(xmlSmpDataModel);
     xmlImportDataTableView->showMaximized();
@@ -214,8 +216,9 @@ void MainWindow::populateAffinityMatrix(QList<QStringList> idealAdj, QVector<QSt
 void MainWindow::updateControlsBar(QStringList modelDesc)
 {
     scenarioComboBox->clear();
-    scenarioComboBox->addItem(modelDesc.at(0));//name
-    scenarioComboBox->setEditable(true);
+    scenarioComboBox->setVisible(false);
+    scenarioNameLineEdit->setVisible(true);
+    scenarioNameLineEdit->setText(modelDesc.at(0));
 
     scenarioDescriptionLineEdit->setText(modelDesc.at(1));//desc
     scenarioDescriptionLineEdit->setEnabled(true);
@@ -318,7 +321,7 @@ void MainWindow::saveTableViewToXML()
     if(0==validateControlButtons("xml_tableView"))
     {
         QStringList parameters;
-        parameters.append(scenarioComboBox->currentText());
+        parameters.append(scenarioNameLineEdit->text());
         parameters.append(scenarioDescriptionLineEdit->text());
         if(!seedRand->text().isEmpty())
             parameters.append(seedRand->text());

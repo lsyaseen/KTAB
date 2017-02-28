@@ -447,19 +447,19 @@ void MainWindow::initializeModelParametersDock()
     votingRuleComboBox->addItems(votingList);
     votingRuleComboBox->setToolTip("Controls how the amount of influence an actor will exert between two options "
                                    "\ndepends on the perceived difference in utilities");
-    votingRuleComboBox->setItemData(0,"The vote is linearly proportional to the difference in utilities (default)",
+    votingRuleComboBox->setItemData(2,"The vote is linearly proportional to the difference in utilities (default)",
                                     Qt::ToolTipRole);
     votingRuleComboBox->setItemData(1,"The vote is proportional to the weighted average of Prop (80%) and Binary (20%)",
                                     Qt::ToolTipRole);
-    votingRuleComboBox->setItemData(2,"The actor exerts all influence, regardless of the difference in utilities",
+    votingRuleComboBox->setItemData(0,"The actor exerts all influence, regardless of the difference in utilities",
                                     Qt::ToolTipRole);
     votingRuleComboBox->setItemData(3,"The vote is proportional to the average of Prop and Cubic",
                                     Qt::ToolTipRole);
-    votingRuleComboBox->setItemData(4,"Influence is exerted asymmetrically: it is proportional to the difference"
+    votingRuleComboBox->setItemData(5,"Influence is exerted asymmetrically: it is proportional to the difference"
                                       "\n of utilities if negative (a loss in utility),"
                                       "\nit is proportional to 2/3 of the difference; if positive (a gain in utility)",
                                     Qt::ToolTipRole);
-    votingRuleComboBox->setItemData(5,"The vote is proportional to the cubed difference in utilities", Qt::ToolTipRole);
+    votingRuleComboBox->setItemData(4,"The vote is proportional to the cubed difference in utilities", Qt::ToolTipRole);
     v4->addWidget(votingRuleLabel,0,Qt::AlignBottom);
     v4->addWidget(votingRuleComboBox,0,Qt::AlignTop);
     parametersGLayout->addLayout(v4,1,0);
@@ -476,9 +476,9 @@ void MainWindow::initializeModelParametersDock()
     bigRAdjustComboBox->setItemData(2,"Actor i estimates actor j's risk attitude by interpolating midway between his "
                                       "\nrisk attitude and actor j's actual risk attitude",
                                     Qt::ToolTipRole);
-    bigRAdjustComboBox->setItemData(3,"Actor i judges actor j's risk attitude correctly",
+    bigRAdjustComboBox->setItemData(4,"Actor i judges actor j's risk attitude correctly",
                                     Qt::ToolTipRole);
-    bigRAdjustComboBox->setItemData(4,"Actor i estimates actor j's risk attitude by interpolating between them, such that "
+    bigRAdjustComboBox->setItemData(3,"Actor i estimates actor j's risk attitude by interpolating between them, such that "
                                       "\nhis estimate is closer (1/3 anchored, 2/3 adjusted) to actor j's risk attitude",
                                     Qt::ToolTipRole);
 
