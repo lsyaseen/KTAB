@@ -22,7 +22,7 @@
 // --------------------------------------------
 
 #include <assert.h>
-
+#include <easylogging++.h>
 #include <time.h>
 #include "kmodel.h"
 
@@ -169,7 +169,7 @@ void Model::run() {
     assert(nullptr != s0);
     assert(nullptr != s0->step);
     iter++;
-    LOG(DEBUG) << "Starting Model::run iteration " << iter;
+    LOG(DEBUG) << "Starting Model::run iteration" << iter;
     auto s1 = s0->step();
     addState(s1);
     done = stop(iter, s1);

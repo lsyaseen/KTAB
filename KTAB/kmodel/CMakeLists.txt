@@ -175,6 +175,7 @@ INCLUDE_DIRECTORIES(
   ${EFENCE_INCLUDE_DIR}
   ${SQLITE_INCLUDE_DIR}
   ${TINYXML2_INCLUDE_DIR}
+  ${LOGGER_INCLUDE_DIR}
   )
 
 
@@ -189,6 +190,7 @@ TARGET_LINK_LIBRARIES(leonApp
   ${KUTILS_LIBRARY}
   ${EFENCE_LIBRARIES}
   ${SQLITE_LIBRARIES}
+  ${LOGGER_LIBRARY}
   )
 
 # -------------------------------------------------
@@ -202,6 +204,7 @@ TARGET_LINK_LIBRARIES(mtchApp
   ${KUTILS_LIBRARY}
   ${EFENCE_LIBRARIES}
   ${SQLITE_LIBRARIES}
+  ${LOGGER_LIBRARY}
   )
 
 # -------------------------------------------------
@@ -220,6 +223,7 @@ TARGET_LINK_LIBRARIES(demomodel
   ${EFENCE_LIBRARIES}
   ${SQLITE_LIBRARIES}
   ${TINYXML2_LIBRARIES}
+  ${LOGGER_LIBRARY}
   )
 # -------------------------------------------------
 # show some useful status/debugging information

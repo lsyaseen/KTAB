@@ -31,9 +31,6 @@
 
 namespace KBase {
 
-using std::cout;
-using std::endl;
-using std::flush;
 using std::get;
 using std::tuple;
 using std::thread;
