@@ -408,6 +408,9 @@ void MainWindow::getUtilChlgHorizontalVerticalAxisData(int turn)
                 affK=initI;
                 estH=vComboBox->currentIndex()-1; // -1, actors index starts from 1 not zero, only here.
 
+                if(estH<0)
+                    return;
+
                 VHAxisValues.append(turn);
                 VHAxisValues.append(estH);
                 VHAxisValues.append(affK);

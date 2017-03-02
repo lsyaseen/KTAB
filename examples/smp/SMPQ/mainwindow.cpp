@@ -388,7 +388,10 @@ void MainWindow::scenarioComboBoxValue(int scenario)
 void MainWindow::cellSelected(QStandardItem* in)
 {
     if(runButton->isEnabled())
+    {
         runButton->setEnabled(false);
+        runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: red;");
+    }
 
     if(0==in->column())
     {
@@ -400,7 +403,10 @@ void MainWindow::cellSelected(QStandardItem* in)
 void MainWindow::xmlCellSelected(QStandardItem* in)
 {
     if(runButton->isEnabled())
+    {
         runButton->setEnabled(false);
+        runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: red;");
+     }
 
     if(0==in->column())
     {
@@ -413,55 +419,39 @@ void MainWindow::insertNewRowCSV()
 {
     if(tableType=="NewSMPData" )
     {
-        while(csvTableWidget->rowCount()!=actorsLineEdit->text().toInt()
-              && actorsLineEdit->text().toInt()>csvTableWidget->rowCount()
-              && affinityMatrix->rowCount() != actorsLineEdit->text().toInt()
-              && actorsLineEdit->text().toInt()>affinityMatrix->rowCount())
-        {
-            csvTableWidget->insertRow(csvTableWidget->rowCount());
+        csvTableWidget->insertRow(csvTableWidget->rowCount());
 
-            QString actorHeader;
-            affinityMatrix->insertColumn(affinityMatrix->columnCount());
-            affinityMatrix->insertRow(affinityMatrix->rowCount());
-            actorHeader.append(" Actor ")/*.append(QString::number(affinityMatrix->columnCount()))*/;
-            affinityMatrix->setHorizontalHeaderItem(affinityMatrix->columnCount()-1,new QTableWidgetItem(actorHeader));
-            affinityMatrix->setVerticalHeaderItem(affinityMatrix->rowCount()-1,new QTableWidgetItem(actorHeader));
+        QString actorHeader;
+        affinityMatrix->insertColumn(affinityMatrix->columnCount());
+        affinityMatrix->insertRow(affinityMatrix->rowCount());
+        actorHeader.append(" Actor ")/*.append(QString::number(affinityMatrix->columnCount()))*/;
+        affinityMatrix->setHorizontalHeaderItem(affinityMatrix->columnCount()-1,new QTableWidgetItem(actorHeader));
+        affinityMatrix->setVerticalHeaderItem(affinityMatrix->rowCount()-1,new QTableWidgetItem(actorHeader));
 
-            initializeAffinityMatrixRowCol(affinityMatrix->rowCount()-1,"NewSMPData");
-        }
+        initializeAffinityMatrixRowCol(affinityMatrix->rowCount()-1,"NewSMPData");
     }
     else if(tableType=="DatabaseEdit")
     {
-        while(affinityMatrix->rowCount() != actorsLineEdit->text().toInt()
-              && actorsLineEdit->text().toInt()>affinityMatrix->rowCount())
-        {
-            csvTableWidget->insertRow(csvTableWidget->rowCount());
+        csvTableWidget->insertRow(csvTableWidget->rowCount());
 
-            QString actorHeader;
-            affinityMatrix->insertColumn(affinityMatrix->columnCount());
-            affinityMatrix->insertRow(affinityMatrix->rowCount());
-            actorHeader.append(" Actor ")/*.append(QString::number(affinityMatrix->columnCount()))*/;
-            affinityMatrix->setHorizontalHeaderItem(affinityMatrix->columnCount()-1,new QTableWidgetItem(actorHeader));
-            affinityMatrix->setVerticalHeaderItem(affinityMatrix->rowCount()-1,new QTableWidgetItem(actorHeader));
+        QString actorHeader;
+        affinityMatrix->insertColumn(affinityMatrix->columnCount());
+        affinityMatrix->insertRow(affinityMatrix->rowCount());
+        actorHeader.append(" Actor ")/*.append(QString::number(affinityMatrix->columnCount()))*/;
+        affinityMatrix->setHorizontalHeaderItem(affinityMatrix->columnCount()-1,new QTableWidgetItem(actorHeader));
+        affinityMatrix->setVerticalHeaderItem(affinityMatrix->rowCount()-1,new QTableWidgetItem(actorHeader));
 
-            initializeAffinityMatrixRowCol(affinityMatrix->rowCount()-1,"DatabaseEdit");
-        }
+        initializeAffinityMatrixRowCol(affinityMatrix->rowCount()-1,"DatabaseEdit");
+
     }
     else if(tableType=="CSV")
     {
-        if(modeltoCSV->rowCount() < actorsLineEdit->text().toInt())
-            modeltoCSV->insertRows(modeltoCSV->rowCount(),(actorsLineEdit->text().toInt() - modeltoCSV->rowCount()));
-
-        //        int rowCount = csvAffinityModel->rowCount();
+        modeltoCSV->insertRow(modeltoCSV->rowCount());
         int rowCount = csvAffinityModel->rowCount();
-        if(csvAffinityModel->rowCount() < actorsLineEdit->text().toInt() ||
-                csvAffinityModel->columnCount() < actorsLineEdit->text().toInt())
-        {
-            csvAffinityModel->insertRows(csvAffinityModel->rowCount(),(actorsLineEdit->text().toInt()
-                                                                       - csvAffinityModel->rowCount()));
-            csvAffinityModel->insertColumns(csvAffinityModel->columnCount(),(actorsLineEdit->text().toInt()
-                                                                             - csvAffinityModel->columnCount()));
-        }
+
+        csvAffinityModel->insertRow(csvAffinityModel->rowCount());
+        csvAffinityModel->insertColumn(csvAffinityModel->columnCount());
+
         QString actorHeader;
         //        qDebug()<<rowCount <<"rowcount" << csvAffinityModel->rowCount();
         for(int rows = rowCount; rows < csvAffinityModel->rowCount();++ rows)
@@ -476,19 +466,13 @@ void MainWindow::insertNewRowCSV()
     }
     else if(tableType=="XML")
     {
-        if(xmlSmpDataModel->rowCount() < actorsLineEdit->text().toInt())
-            xmlSmpDataModel->insertRows(xmlSmpDataModel->rowCount(),(actorsLineEdit->text().toInt()
-                                                                     - xmlSmpDataModel->rowCount()));
+        xmlSmpDataModel->insertRow(xmlSmpDataModel->rowCount());
 
         int rowCount = xmlAffinityMatrixModel->rowCount();
-        if(xmlAffinityMatrixModel->rowCount() < actorsLineEdit->text().toInt() ||
-                xmlAffinityMatrixModel->columnCount() < actorsLineEdit->text().toInt())
-        {
-            xmlAffinityMatrixModel->insertRows(xmlAffinityMatrixModel->rowCount(),(actorsLineEdit->text().toInt()
-                                                                                   - xmlAffinityMatrixModel->rowCount()));
-            xmlAffinityMatrixModel->insertColumns(xmlAffinityMatrixModel->columnCount(),(actorsLineEdit->text().toInt()
-                                                                                         - xmlAffinityMatrixModel->columnCount()));
-        }
+
+        xmlAffinityMatrixModel->insertRow(xmlAffinityMatrixModel->rowCount());
+        xmlAffinityMatrixModel->insertColumn(xmlAffinityMatrixModel->columnCount());
+
         QString actorHeader;
         //        qDebug()<<rowCount <<"rowcount" << xmlAffinityMatrixModel->rowCount();
         for(int rows = rowCount; rows < xmlAffinityMatrixModel->rowCount();++ rows)
@@ -496,50 +480,73 @@ void MainWindow::insertNewRowCSV()
             actorHeader.append(" Actor ").append(QString::number(rows+1));
             xmlAffinityMatrixModel->setHorizontalHeaderItem(rows, new QStandardItem(actorHeader));
             xmlAffinityMatrixModel->setVerticalHeaderItem(rows, new QStandardItem(actorHeader));
-            initializeAffinityMatrixRowCol(rows,"XML"); // NOTE : Still Working on this
+            initializeAffinityMatrixRowCol(rows,"XML");
             actorHeader.clear();
         }
     }
 }
 
+void MainWindow::deleteLastRow()
+{
+    if(tableType=="CSV")
+    {
+        csvAffinityModel->removeColumn(csvAffinityModel->columnCount()-1);
+        csvAffinityModel->removeRow(csvAffinityModel->rowCount()-1);
+        modeltoCSV->removeRow(modeltoCSV->rowCount()-1);
+    }
+    else if(tableType=="XML")
+    {
+        xmlAffinityMatrixModel->removeColumn(xmlAffinityMatrixModel->columnCount()-1);
+        xmlAffinityMatrixModel->removeRow(xmlAffinityMatrixModel->rowCount()-1);
+        xmlSmpDataModel->removeRow(xmlSmpDataModel->rowCount()-1);
+    }
+    else if(tableType=="NewSMPData" || tableType =="DatabaseEdit")
+    {
+        affinityMatrix->removeColumn(affinityMatrix->columnCount()-1);
+        affinityMatrix->removeRow(affinityMatrix->rowCount()-1);
+        csvTableWidget->removeRow(csvTableWidget->rowCount()-1);
+    }
+}
+
 void MainWindow::insertNewColumnCSV()
 {
-    if(tableType=="NewSMPData" || tableType=="DatabaseEdit")
-    {
-        while(((csvTableWidget->columnCount()-3)/2)!=dimensionsLineEdit->text().toInt()
-              && ((csvTableWidget->columnCount()-3)/2) <= dimensionsLineEdit->text().toInt())
-        {
-            if(csvTableWidget->columnCount()%2!=0)
-            {
-                QTableWidgetItem * pos = new QTableWidgetItem("Position");
-                createSeperateColumn(pos);
 
-                QTableWidgetItem * sal = new QTableWidgetItem("Saliance");
-                createSeperateColumn(sal);
-            }
-            else
-                return;
+    QString dimension = QInputDialog::getText(this,"Add Dimension", "Please name the new dimension");
+    if(!dimension.isEmpty())
+    {
+        if(tableType=="NewSMPData" || tableType=="DatabaseEdit")
+        {
+            QTableWidgetItem * pos = new QTableWidgetItem(dimension +" Position");
+            createSeperateColumn(pos);
+
+            QTableWidgetItem * sal = new QTableWidgetItem(dimension +" Saliance");
+            createSeperateColumn(sal);
+
         }
-    }
-    else if(tableType=="CSV")
-    {
-        while(((modeltoCSV->columnCount()-3)/2)!=dimensionsLineEdit->text().toInt()
-              && ((modeltoCSV->columnCount()-3)/2) <= dimensionsLineEdit->text().toInt())
+        else if(tableType=="CSV")
         {
-            if(modeltoCSV->columnCount()%2!=0)
-            {
-                modeltoCSV->insertColumns(modeltoCSV->columnCount(),1);
-                modeltoCSV->setHorizontalHeaderItem(modeltoCSV->columnCount()-1,new QStandardItem("Position"));
-                modeltoCSV->horizontalHeaderItem(modeltoCSV->columnCount()-1)->
-                        setToolTip("The policy position of an actor regarding the question (with or against)");
+            modeltoCSV->insertColumns(modeltoCSV->columnCount(),1);
+            modeltoCSV->setHorizontalHeaderItem(modeltoCSV->columnCount()-1,new QStandardItem(dimension +" Position"));
+            modeltoCSV->horizontalHeaderItem(modeltoCSV->columnCount()-1)->
+                    setToolTip("The policy position of an actor regarding the question (with or against)");
 
-                modeltoCSV->insertColumns(modeltoCSV->columnCount(),1);
-                modeltoCSV->setHorizontalHeaderItem(modeltoCSV->columnCount()-1,new QStandardItem("Salience"));
-                modeltoCSV->horizontalHeaderItem(modeltoCSV->columnCount()-1)->
-                        setToolTip("How much the actor cares about the question");
-            }
-            else
-                return;
+            modeltoCSV->insertColumns(modeltoCSV->columnCount(),1);
+            modeltoCSV->setHorizontalHeaderItem(modeltoCSV->columnCount()-1,new QStandardItem(dimension +" Salience"));
+            modeltoCSV->horizontalHeaderItem(modeltoCSV->columnCount()-1)->
+                    setToolTip("How much the actor cares about the question");
+
+        }
+        else if(tableType=="XML")
+        {
+            xmlSmpDataModel->insertColumns(xmlSmpDataModel->columnCount(),1);
+            xmlSmpDataModel->setHorizontalHeaderItem(xmlSmpDataModel->columnCount()-1,new QStandardItem(dimension +" Position"));
+            xmlSmpDataModel->horizontalHeaderItem(xmlSmpDataModel->columnCount()-1)->
+                    setToolTip("The policy position of an actor regarding the question (with or against)");
+
+            xmlSmpDataModel->insertColumns(xmlSmpDataModel->columnCount(),1);
+            xmlSmpDataModel->setHorizontalHeaderItem(xmlSmpDataModel->columnCount()-1,new QStandardItem(dimension +" Salience"));
+            xmlSmpDataModel->horizontalHeaderItem(xmlSmpDataModel->columnCount()-1)->
+                    setToolTip("How much the actor cares about the question");
         }
     }
 }
@@ -638,8 +645,10 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model, QStringList scenario
 
     actorsLineEdit->setEnabled(true);
     dimensionsLineEdit->setEnabled(true);
-    actorsPushButton->setEnabled(true);
+    addActorsPushButton->setEnabled(true);
+    deleteActorsPushButton->setEnabled(true);
     dimensionsPushButton->setEnabled(true);
+    donePushButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
     donePushButton->setEnabled(true);
 
     setDefaultParameters();//Default Model Parameters
@@ -663,6 +672,7 @@ void MainWindow::setCSVItemModel(QStandardItemModel *model, QStringList scenario
 
     //Enable run button, which is disabled by default
     runButton->setEnabled(true);
+    runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
 
     //update scenario name
     mScenarioDesc.clear();
@@ -776,8 +786,10 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
 
         actorsLineEdit->setEnabled(true);
         dimensionsLineEdit->setEnabled(true);
-        actorsPushButton->setEnabled(true);
+        addActorsPushButton->setEnabled(true);
+        deleteActorsPushButton->setEnabled(true);
         dimensionsPushButton->setEnabled(true);
+        donePushButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
         donePushButton->setEnabled(true);
 
         QString currentScenario = scenarioComboBox->currentText();
@@ -885,6 +897,8 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
             }
         }
         runButton->setEnabled(false);
+        runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: red;");
+
     }
     else
     {
@@ -957,8 +971,10 @@ void MainWindow::setDBItemModel(QStandardItemModel *model)
 
     actorsLineEdit->setEnabled(false);
     dimensionsLineEdit->setEnabled(false);
-    actorsPushButton->setEnabled(false);
+    addActorsPushButton->setEnabled(false);
+    deleteActorsPushButton->setEnabled(false);
     dimensionsPushButton->setEnabled(false);
+    donePushButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: red;");
     donePushButton->setEnabled(false);
 
     modeltoDB = model;
@@ -973,6 +989,7 @@ void MainWindow::setDBItemModel(QStandardItemModel *model)
 
     //Enable run button, which is disabled by default
     runButton->setEnabled(false);
+    runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: red;");
 
     actorsLineEdit->setText(QString::number(model->rowCount()));
     dimensionsLineEdit->setText(QString::number(dimensions+1));
@@ -1090,8 +1107,10 @@ void MainWindow::createNewSMPData(bool bl)
 
     actorsLineEdit->setEnabled(true);
     dimensionsLineEdit->setEnabled(true);
-    actorsPushButton->setEnabled(true);
+    addActorsPushButton->setEnabled(true);
+    deleteActorsPushButton->setEnabled(true);
     dimensionsPushButton->setEnabled(true);
+    donePushButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
     donePushButton->setEnabled(true);
 
     scenarioComboBox->setVisible(false);
@@ -1125,7 +1144,8 @@ void MainWindow::createNewSMPData(bool bl)
     actorsLineEdit->setText(QString::number(3));
     dimensionsLineEdit->setText(QString::number(1));
 
-    insertNewRowCSV();
+    for(int i=0;i<3;++i)
+        insertNewRowCSV();
 
     csvTableWidget->insertColumn(csvTableWidget->columnCount());
     csvTableWidget->setHorizontalHeaderItem(0,new QTableWidgetItem("Actor"));
@@ -1155,6 +1175,7 @@ void MainWindow::createNewSMPData(bool bl)
     affinityMatrix->setVerticalHeaderItem(2,new QTableWidgetItem("Actor 2"));*/
 
     runButton->setEnabled(false);
+    runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: red;");
 
 }
 
@@ -1180,8 +1201,8 @@ void MainWindow::initializeCentralViewFrame()
     stackWidget = new QStackedWidget(central);
 
     scenarioComboBox = new QComboBox(tableControlsFrame);
-    scenarioComboBox->setMaximumWidth(200);
-    scenarioComboBox->setFixedWidth(150);
+//    scenarioComboBox->setMaximumWidth(200);
+//    scenarioComboBox->setFixedWidth(150);
     gCLayout->addWidget(scenarioComboBox,0,2);
     scenarioComboBox->setEditable(true);
     scenarioComboBox->setToolTip("Enter the Scenario / Project Name");
@@ -1189,8 +1210,8 @@ void MainWindow::initializeCentralViewFrame()
 
     scenarioNameLineEdit = new QLineEdit(tableControlsFrame);
     scenarioNameLineEdit->setVisible(false);
-    scenarioNameLineEdit->setMaximumWidth(200);
-    scenarioNameLineEdit->setFixedWidth(150);
+//    scenarioNameLineEdit->setMaximumWidth(200);
+//    scenarioNameLineEdit->setFixedWidth(150);
     scenarioNameLineEdit->setToolTip("Enter the Scenario / Project Name");
     gCLayout->addWidget(scenarioNameLineEdit,0,2);
 
@@ -1202,23 +1223,30 @@ void MainWindow::initializeCentralViewFrame()
 
     connect(turnSlider,SIGNAL(valueChanged(int)),this,SLOT(sliderStateValueToQryDB(int)));
 
-    actorsPushButton = new QPushButton("Actors",tableControlsFrame);
-    actorsPushButton->setMaximumWidth(120);
-    actorsPushButton->setFixedWidth(90);
-    actorsPushButton->setToolTip("An individual, institution or group");
-    gCLayout->addWidget(actorsPushButton,0,0);
+    addActorsPushButton = new QPushButton(" + Actors",tableControlsFrame);
+    addActorsPushButton->setMaximumWidth(120);
+    addActorsPushButton->setFixedWidth(100);
+    addActorsPushButton->setToolTip("Add an individual, institution or group");
+    gCLayout->addWidget(addActorsPushButton,0,0);
+
+    deleteActorsPushButton = new QPushButton(" - Actors",tableControlsFrame);
+    deleteActorsPushButton->setMaximumWidth(120);
+    deleteActorsPushButton->setFixedWidth(100);
+    deleteActorsPushButton->setToolTip("Remove last individual, institution or group");
+    gCLayout->addWidget(deleteActorsPushButton,0,1);
 
     actorsLineEdit = new QLineEdit ("3",tableControlsFrame);
     actorsLineEdit->setMaximumWidth(70);
     actorsLineEdit->setFixedWidth(60);
     actorsLineEdit->setValidator( new QIntValidator(1,1000,this));
     actorsLineEdit->setToolTip("An individual, institution or group");
-    gCLayout->addWidget(actorsLineEdit,0,1);
+    //    gCLayout->addWidget(actorsLineEdit,0,1);
+    actorsLineEdit->hide();
 
-    dimensionsPushButton = new QPushButton("Dimensions",tableControlsFrame);
+    dimensionsPushButton = new QPushButton(" Add Dimension",tableControlsFrame);
     dimensionsPushButton->setMaximumWidth(120);
-    dimensionsPushButton->setFixedWidth(90);
-    dimensionsPushButton->setToolTip("Set number of dimensions");
+    dimensionsPushButton->setFixedWidth(100);
+    dimensionsPushButton->setToolTip("Add dimensions");
     gCLayout->addWidget(dimensionsPushButton,1,0);
 
     dimensionsLineEdit = new QLineEdit ("1",tableControlsFrame);
@@ -1226,19 +1254,23 @@ void MainWindow::initializeCentralViewFrame()
     dimensionsLineEdit->setFixedWidth(60);
     dimensionsLineEdit->setValidator( new QIntValidator(1,9,this));
     dimensionsLineEdit->setToolTip("Set number of dimensions");
-    gCLayout->addWidget(dimensionsLineEdit,1,1);
+    //    gCLayout->addWidget(dimensionsLineEdit,1,1);
+    dimensionsLineEdit->hide();
 
     scenarioDescriptionLineEdit = new QLineEdit(tableControlsFrame);
     scenarioDescriptionLineEdit->setToolTip("A description of the scenario or project");
     //    scenarioDescriptionLineEdit->setMaximumWidth(150);
     //    scenarioDescriptionLineEdit->setFixedWidth(130);
-    gCLayout->addWidget(scenarioDescriptionLineEdit,0,3);
+    gCLayout->addWidget(scenarioDescriptionLineEdit,1,2);
 
     donePushButton = new QPushButton("Done",tableControlsFrame);
-    donePushButton->setMaximumWidth(150);
-    donePushButton->setFixedWidth(130);
+    donePushButton->setMaximumWidth(120);
+    donePushButton->setFixedWidth(100);
+    donePushButton->setMaximumHeight(40);
+    donePushButton->setFixedHeight(22);
     donePushButton->setToolTip("Save to new CSV / XML file");
-    gCLayout->addWidget(donePushButton,1,2);
+    donePushButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
+    gCLayout->addWidget(donePushButton,1,1);
 
     setCentralWidget(centralBox);
 
@@ -1278,7 +1310,8 @@ void MainWindow::initializeCentralViewFrame()
     tableControlsFrame->hide();
     turnSlider->hide();
 
-    connect(actorsPushButton,SIGNAL(pressed()),this, SLOT(insertNewRowCSV()));
+    connect(addActorsPushButton,SIGNAL(pressed()),this, SLOT(insertNewRowCSV()));
+    connect(deleteActorsPushButton,SIGNAL(pressed()),this, SLOT(deleteLastRow()));
     connect(dimensionsPushButton,SIGNAL(pressed()),this, SLOT(insertNewColumnCSV()));
     connect(donePushButton,SIGNAL(clicked(bool)),this, SLOT(donePushButtonClicked(bool)));
 
@@ -1657,7 +1690,7 @@ void MainWindow::saveTableViewToCSV()
             QStringList strList;
 
             strList <<scenarioNameLineEdit->text();
-                      strList <<scenarioDescriptionLineEdit->text().trimmed();
+            strList <<scenarioDescriptionLineEdit->text().trimmed();
             strList <<QString::number(modeltoCSV->rowCount());
             strList <<QString::number((modeltoCSV->columnCount()-3)/2);
 
@@ -1685,6 +1718,8 @@ void MainWindow::saveTableViewToCSV()
             f.close();
 
             runButton->setEnabled(true);
+            runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
+
         }
     }
 }
@@ -1733,7 +1768,7 @@ void MainWindow::saveTableWidgetToCSV(bool bl)
             QStringList strList;
 
             strList <<scenarioNameLineEdit->text();
-                      strList <<scenarioDescriptionLineEdit->text();
+            strList <<scenarioDescriptionLineEdit->text();
             strList <<QString::number(csvTableWidget->rowCount());
             strList <<QString::number((csvTableWidget->columnCount()-3)/2);
 
@@ -1759,6 +1794,8 @@ void MainWindow::saveTableWidgetToCSV(bool bl)
             f.close();
 
             runButton->setEnabled(true);
+            runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
+
         }
 
     }
@@ -1803,6 +1840,8 @@ void MainWindow::saveTableWidgetToXML(bool bl)
         emit saveNewSMPDataToXMLFile(parameters,csvTableWidget,affinityMatrix);
 
         runButton->setEnabled(true);
+        runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
+
 
     }
 }
@@ -1811,7 +1850,7 @@ int MainWindow::validateControlButtons(QString viewName)
 {
     int ret=0;
 
-    if("csv_tableWidget"==viewName)
+    /*  if("csv_tableWidget"==viewName)
     {
         if(true==actorsLineEdit->text().isEmpty()
                 || csvTableWidget->rowCount()!=actorsLineEdit->text().toInt())
@@ -1865,7 +1904,7 @@ int MainWindow::validateControlButtons(QString viewName)
             displayMessage("Dimensions", "Enter a valid value");
         }
     }
-
+*/
     if(true==scenarioNameLineEdit->text().isEmpty())
     {
         ++ret;

@@ -99,6 +99,7 @@ private slots:
      void createNewSMPData(bool bl);
     void cellSelected(QStandardItem *in);
     void insertNewRowCSV();
+    void deleteLastRow();
     void insertNewColumnCSV();
     void donePushButtonClicked(bool bl);
     void saveTableWidgetToCSV(bool bl);
@@ -167,7 +168,8 @@ private:
     QStackedWidget * stackWidget;
 
     QComboBox * scenarioComboBox;
-    QPushButton * actorsPushButton;
+    QPushButton * addActorsPushButton;
+    QPushButton * deleteActorsPushButton;
     QLineEdit * actorsLineEdit;
     QPushButton * dimensionsPushButton;
     QLineEdit * dimensionsLineEdit;

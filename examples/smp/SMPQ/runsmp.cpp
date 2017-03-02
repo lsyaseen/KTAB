@@ -103,6 +103,8 @@ void MainWindow::runPushButtonClicked(bool bl)
     if(!dbFilePath.isEmpty())
     {
         runButton->setEnabled(false);
+        runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: red;");
+
 
         if(!dbFilePath.endsWith(".db"))
             dbFilePath.append(".db");
@@ -189,6 +191,8 @@ void MainWindow::runPushButtonClicked(bool bl)
         statusBar()->showMessage("SMP Model Run Cancelled !! ");
         QMessageBox::warning(this,"Warning", "SMP Model Run Cancelled !! ",QMessageBox::Ok);
         runButton->setEnabled(true);
+        runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
+
     }
 }
 
@@ -208,6 +212,8 @@ void MainWindow::disableRunButton(QTableWidgetItem *itm)
         affinityMatrix->setVerticalHeaderItem(itm->row(),new QTableWidgetItem(itm->text()));
         affinityMatrix->setHorizontalHeaderItem(itm->row(),new QTableWidgetItem(itm->text()));
         runButton->setEnabled(false);
+        runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: red;");
+
     }
 }
 
@@ -303,6 +309,8 @@ void MainWindow::initializeModelParametersDock()
     runButton = new QPushButton;
     runButton->setText("RUN");
     runButton->setEnabled(false);
+    runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: red;");
+
     runButton->setToolTip("Run the model");
     VLayout->addWidget(runButton,3,0);
 

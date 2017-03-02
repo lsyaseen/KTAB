@@ -80,9 +80,11 @@ void MainWindow::openStatusXml(bool status)
         emit readXMLFile();
 
         donePushButton->setEnabled(true);
+        donePushButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
         runButton->setEnabled(true);
         dimensionsLineEdit->setEnabled(true);
-        actorsPushButton->setEnabled(true);
+        addActorsPushButton->setEnabled(true);
+        deleteActorsPushButton->setEnabled(true);
         dimensionsPushButton->setEnabled(true);
 
         clearAllGraphs();
@@ -100,6 +102,8 @@ void MainWindow::xmlDataParsedFromFile(QStringList modelDesc, QStringList modpar
     dimensionsLineEdit->setText(QString::number(dims.length()));
     dimensionsLineEdit->setEnabled(true);
     runButton->setEnabled(true);
+    runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
+
     dimensionsXml=dims;
 
     updateControlsBar(modelDesc);
@@ -337,11 +341,19 @@ void MainWindow::saveTableViewToXML()
         parameters.append(interVecBrgnComboBox->currentText());
         parameters.append(bargnModelComboBox->currentText());
 
-        parameters.append(dimensionsXml);
+        QStringList dims;
+        for(int i=3; i <xmlSmpDataModel->columnCount();++i)
+        {
+            dims.append(xmlSmpDataModel->headerData(i,Qt::Horizontal).toString().remove("Position").remove("\n"));
+            ++i;
+        }
+        parameters.append(dims);
 
         emit saveXMLDataToFile(parameters,xmlSmpDataModel,xmlAffinityMatrixModel);
 
         runButton->setEnabled(true);
+        runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
+
     }
 }
 
