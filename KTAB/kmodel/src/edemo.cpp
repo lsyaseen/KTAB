@@ -27,13 +27,11 @@
 
 #include "edemo.h" 
 #include "emodel.cpp" 
+#include <easylogging++.h>
 
 
 
 namespace MDemo { // a namespace of which M, A, P, S know nothing
-using std::cout;
-using std::endl;
-using std::flush;
 using std::function;
 using std::get;
 using KBase::ReportingLevel;
@@ -157,7 +155,6 @@ function < vector<VBool>()> tbv(unsigned int nAct, unsigned int nBits, PRNG* rng
   auto uMat1 = KMatrix::uniform(rng, nAct, ic, 0.0, 1.0);
   auto uMat2 = smooth(smooth(uMat1));
   uMat2.mPrintf("%.4f ");
-  cout << endl;
   return rfn;
 }
 
@@ -192,27 +189,25 @@ function < vector<VBool>()> thetaBV(unsigned int n) {
 
 void demoEMod(uint64_t s) {
   using KBase::EModel;
-  cout << endl;
   printf("Using PRNG seed: %020llu \n", s);
 
   printf("Creating EModel objects ... \n");
 
   string n2D = "EModel-TwoDPoint";
   auto em2D = new EModel<TwoDPoint>(n2D, s);
-  cout << "Populating " << n2D << endl;
+  LOG(DEBUG) << "Populating" << n2D;
   em2D->enumOptions = theta2D;
   em2D->setOptions();
-  cout << "Now have " << em2D->numOptions() << " enumerated options" << endl;
+  LOG(DEBUG) << "Now have" << em2D->numOptions() << "enumerated options";
 
-  cout << endl;
   string nBV = "EModel-VBool";
   EModel<VBool>* emBV = new EModel<VBool>( nBV, s);
-  cout << "Populating " << nBV << endl;
+  LOG(DEBUG) << "Populating" << nBV;
   const unsigned int numActTBV = 17;
   const unsigned int numBitsTBV = 4;
   emBV->enumOptions = tbv(numActTBV, numBitsTBV, emBV->rng); //  thetaBV(4);
   emBV->setOptions();
-  cout << "Now have " << emBV->numOptions() << " enumerated options" << endl;
+  LOG(DEBUG) << "Now have" << emBV->numOptions() << "enumerated options";
 
   printf("Deleting EModel objects ... \n");
   delete em2D;

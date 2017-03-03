@@ -25,13 +25,14 @@
 // -------------------------------------------------
 
 #include "demomtch.h"
+#include <easylogging++.h>
+
+INITIALIZE_EASYLOGGINGPP
+
 
 using KBase::PRNG;
 
 namespace DemoMtch {
-using std::cout;
-using std::endl;
-using std::flush;
 using std::function;
 using std::get;
 using std::tuple;
@@ -61,11 +62,13 @@ bool equivMtchPstn(const MtchPstn & mp1, const MtchPstn & mp2) {
 }
 
 void showMtchPstn(const MtchPstn & mp) {
-  cout << "[MtchPstn ";
+  string log = "[MtchPstn";
   for (auto m : mp.match) {
-    cout << m << " ";
+    log += " " + std::to_string(m);
   }
-  cout << "]";
+  log += "]";
+
+  LOG(DEBUG) << log;
   return;
 }
 
@@ -85,7 +88,7 @@ bool stableMtchState(unsigned int iter, const State* s1) {
     }
   }
 
-  printf("Number of changed matchings: %u \n", numC);
+  LOG(DEBUG) << "Number of changed matchings:" << numC << "...";
 
   return (!earlyP && (0 == numC));
 }
@@ -214,8 +217,8 @@ tuple <KMatrix, VUI> MtchState::pDist(int persp) const {
     }
   }
   else {
-    cout << "SMPState::pDist: unrecognized perspective, " << persp << endl << flush;
-    assert(false);
+    LOG(DEBUG) << "SMPState::pDist: unrecognized perspective," << persp;
+    exit(-1);
   }
   auto pd = Model::scalarPCE(na, na, w, uij, vr, vpm, pcem, rl);
 
@@ -252,13 +255,13 @@ MtchModel* MtchModel::randomMS(unsigned int numA, unsigned int numI, VotingRule 
 
   switch (pMod) {
   case MtchActor::PropModel::ExpUtil:
-    cout << "Actors maximize expected utility, given positions of others" << endl;
+    LOG(DEBUG) << "Actors maximize expected utility, given positions of others";
     break;
   case MtchActor::PropModel::Probability:
-    cout << "Actors maximize probability of adoption, given positions of others" << endl;
+    LOG(DEBUG) << "Actors maximize probability of adoption, given positions of others";
     break;
   case MtchActor::PropModel::AgreeUtil:
-    cout << "Actors maximize expected utility of agreed-upon position, given positions of others" << endl;
+    LOG(DEBUG) << "Actors maximize expected utility of agreed-upon position, given positions of others";
     break;
   }
 
@@ -270,9 +273,9 @@ MtchModel* MtchModel::randomMS(unsigned int numA, unsigned int numI, VotingRule 
   // not look like an improvement to I under *his* beliefs.
   //
   // So I avoid this correct-but-confusing behavior by using the same VR for all.
-  cout << "Using voting rule " << vr << endl;
+  LOG(DEBUG) << "Using voting rule" << vr;
 
-  cout << "Randomly generated actors with random positions: " << endl;
+  LOG(DEBUG) << "Randomly generated actors with random positions:";
   auto md0 = new MtchModel("", seed);
   md0->numItm = numI;
   md0->numCat = numC;
@@ -284,18 +287,17 @@ MtchModel* MtchModel::randomMS(unsigned int numA, unsigned int numI, VotingRule 
     md0->addActor(ai);
     st0->addPstn(pi);
 
-    printf("%2u: %s,  %s \n", i, ai->name.c_str(), ai->desc.c_str());
-    printf("Scalar capability: %.2f \n", ai->sCap);
+    LOG(DEBUG) << i << ":" << ai->name << "," << ai->desc;
+    LOG(DEBUG) << KBase::getFormattedString("Scalar capability: %.2f", ai->sCap);
     string vrs = KBase::nameFromEnum<VotingRule>(ai->vr, KBase::VotingRuleNames);
-    printf("Voting rule: %s \n", vrs.c_str());
+    LOG(DEBUG) << "Voting rule:" << vrs;
     
-    printf("Values assigned to each sweet: \n");
+    string valOfSweet = "Values assigned to each sweet:";
     for (unsigned int j = 0; j < numI; j++) {
-      printf(" %.4f ", ai->vals[j]);
+      valOfSweet += KBase::getFormattedString(" %.4f ", ai->vals[j]);
     }
-    cout << endl;
+    LOG(DEBUG) << valOfSweet;
     showMtchPstn(*pi);
-    cout << endl << endl;
   }
 
   md0->addState(st0);
@@ -318,18 +320,18 @@ MtchModel::~MtchModel(){
 // -------------------------------------------------
 void demoDivideSweets(uint64_t s ) {
 
-  printf("Using PRNG seed: %020llu \n", s);
+  LOG(DEBUG) << KBase::getFormattedString("Using PRNG seed: %020llu", s);
   auto rng = new PRNG();
   rng->setSeed(s);
 
   const unsigned int numI = 25;
   const unsigned int numA = 7;
-  printf("Dividing %u sweets between %u actors \n", numI, numA);
+  LOG(DEBUG) << "Dividing" << numI << "sweets between" << numA << "actors";
 
   double minCap = 50;
   double maxCap = 100;
 
-  cout << "Generate actors with random voting rules, values-of-sweets and positions (matchings)" << endl;
+  LOG(DEBUG) << "Generate actors with random voting rules, values-of-sweets and positions (matchings)";
   auto as = vector<Actor*>();
   auto ps = vector<MtchPstn*>();
   for (unsigned int i = 0; i < numA; i++) {
@@ -338,19 +340,20 @@ void demoDivideSweets(uint64_t s ) {
     as.push_back(ai);
 
 
-    printf("%2u: %s , %s \n", i, ai->name.c_str(), ai->desc.c_str());
-    printf("Capability: %.2f \n", ai->sCap);
-    cout << "Voting rule: " << ai->vr << endl;
-    cout << "Valuation of each sweet: ";
+    LOG(DEBUG) << i << ":" << ai->name << "," << ai->desc;
+    LOG(DEBUG) << KBase::getFormattedString("Capability: %.2f", ai->sCap);
+    LOG(DEBUG) << "Voting rule:" << ai->vr;
+    string valOfSweet = "Valuation of each sweet:";
     for (auto v : ai->vals) {
-      printf("%5.3f  ", v);
+      valOfSweet += KBase::getFormattedString(" %5.3f", v);
     }
-    cout << endl;
-    cout << "Current position (who gets each sweet): ";
+    LOG(DEBUG) << valOfSweet;
+
+    string currPos = "Current position (who gets each sweet):";
     for (auto m : ps[i]->match) {
-      printf("%2i  ", m);
+      currPos += " " + std::to_string(m);
     }
-    cout << endl << endl;
+    LOG(DEBUG) << currPos;
   }
 
   auto uFn1 = [as, ps](unsigned int i, unsigned int j) {
@@ -360,9 +363,8 @@ void demoDivideSweets(uint64_t s ) {
   };
   auto u = KMatrix::map(uFn1, numA, numA);
 
-  cout << "Raw actor-pos util matrix" << endl;
+  LOG(DEBUG) << "Raw actor-pos util matrix";
   u.mPrintf(" %.4f ");
-  cout << endl << flush;
 
   auto vfn = [as, ps](unsigned int k, unsigned int i, unsigned int j) {
     auto ak = ((MtchActor*)(as[k]));
@@ -371,9 +373,8 @@ void demoDivideSweets(uint64_t s ) {
 
 
   auto c = Model::coalitions(vfn, as.size(), ps.size());
-  cout << "Coalition strength matrix" << endl;
+  LOG(DEBUG) << "Coalition strength matrix";
   c.mPrintf(" %+9.3f ");
-  cout << endl << flush;
 
   auto vpm = VPModel::Linear;
   auto pcem = PCEModel::ConditionalPCM;
@@ -382,14 +383,12 @@ void demoDivideSweets(uint64_t s ) {
   auto p = get<0>(ppv);
   auto pv = get<1>(ppv);
 
-  cout << "Probability Opt_i > Opt_j" << endl;
+  LOG(DEBUG) << "Probability Opt_i > Opt_j";
   pv.mPrintf(" %.4f ");
-  cout << endl;
-  cout << "Probability Opt_i" << endl;
+  LOG(DEBUG) << "Probability Opt_i";
   p.mPrintf(" %.4f ");
-  cout << "Expected utility to actors: " << endl;
+  LOG(DEBUG) << "Expected utility to actors:";
   (u*p).mPrintf(" %+8.3f ");
-  cout << endl << flush;
 
   for (auto a : as) { delete a; }
   for (auto p : ps) { delete p; }
@@ -398,7 +397,7 @@ void demoDivideSweets(uint64_t s ) {
 
 // -------------------------------------------------
 void demoMaxSupport(uint64_t s) {
-  printf("Using PRNG seed: %020llu \n", s);
+  LOG(DEBUG) << KBase::getFormattedString("Using PRNG seed: %020llu", s);
   auto rng = new PRNG();
   rng->setSeed(s);
 
@@ -411,8 +410,8 @@ void demoMaxSupport(uint64_t s) {
   mg1->numCat = numC;
   mg1->numItm = numI;
   mg1->randomize(rng);
-  cout << "Random matching of " << numI << " items to " << numA << " actors" << endl;
-  cout << (*mg1) << endl;
+  LOG(DEBUG) << "Random matching of" << numI << "items to" << numA << "actors";
+  LOG(DEBUG) << (*mg1);
   delete mg1;
   mg1 = nullptr;
 
@@ -441,12 +440,12 @@ void demoMaxSupport(uint64_t s) {
   assert(2 * maxCap <= 5 * minCap);
   assert(2 * maxCap + minCap >= 4 * minCap);
 
-  cout << "Generate actors with random voting rules, values-of-sweets and positions (matchings)" << endl;
-  cout << "Utilities are normalized to [0,1] scale" << endl;
-  cout << "minCap: " << minCap << endl;
-  cout << "maxCap: " << maxCap << endl;
-  cout << "Note: 2*maxCap          <= 5*minCap" << endl;
-  cout << "      2*maxCap + minCap >= 4*minCap" << endl << flush;
+  LOG(DEBUG) << "Generate actors with random voting rules, values-of-sweets and positions (matchings)";
+  LOG(DEBUG) << "Utilities are normalized to [0,1] scale";
+  LOG(DEBUG) << "minCap:" << minCap;
+  LOG(DEBUG) << "maxCap:" << maxCap;
+  LOG(DEBUG) << "Note: 2*maxCap          <= 5*minCap";
+  LOG(DEBUG) << "      2*maxCap + minCap >= 4*minCap";
   auto as = vector<Actor*>();
   auto ps = vector<MtchPstn*>();
   for (unsigned int i = 0; i < numA; i++){
@@ -470,17 +469,16 @@ void demoMaxSupport(uint64_t s) {
 
   for (unsigned int i = 0; i < numA; i++) {
     auto ai = (MtchActor*)as[i];
-    printf("%2u: %s , %s \n", i, ai->name.c_str(), ai->desc.c_str());
-    printf("Capability: %.2f \n", ai->sCap);
-    cout << "Voting rule: " << ai->vr << endl;
-    cout << "Valuation of each sweet: ";
+    LOG(DEBUG) << i << ":" << ai->name << "," << ai->desc;
+    LOG(DEBUG) << KBase::getFormattedString("Capability: %.2f", ai->sCap);
+    LOG(DEBUG) << "Voting rule:" << ai->vr;
+    string valOfSweet = "Valuation of each sweet:";
     for (unsigned int j = 0; j < numI; j++){
-      printf("%5.3f  ", ai->vals[j]);
+      valOfSweet += KBase::getFormattedString(" %5.3f", ai->vals[j]);
     }
-    cout << endl;
-    cout << "Current position: ";
+    LOG(DEBUG) << valOfSweet;
+    LOG(DEBUG) << "Current position:";
     showMtchPstn(*ps[i]);
-    cout << endl << endl;
   }
 
   auto uFn1 = [as, ps](unsigned int i, unsigned int j) {
@@ -491,9 +489,8 @@ void demoMaxSupport(uint64_t s) {
   };
 
   auto u = KMatrix::map(uFn1, numA, numA);
-  cout << "Raw actor-pos util matrix" << endl;
+  LOG(DEBUG) << "Raw actor-pos util matrix";
   u.mPrintf(" %.4f ");
-  cout << endl << flush;
   // end: cut-n-paste creation and display code from above
 
   auto zeta = [](const vector<Actor*> & as, const MtchPstn * p){
@@ -508,12 +505,12 @@ void demoMaxSupport(uint64_t s) {
 
 
   for (unsigned int i = 0; i < ps.size(); i++){
-    printf("zeta[%u] = %7.3f \n", i, zeta(as, ps[i]));
+    LOG(DEBUG) << KBase::getFormattedString("zeta[%u] = %7.3f", i, zeta(as, ps[i]));
   }
 
   // Now we setup a GAOpt to look for the position which maximizes zeta.
   unsigned int gps = 20;
-  printf("gpool: %u   \n", gps);
+  LOG(DEBUG) << "gpool:" << gps << "...";
   auto gOpt = new KBase::GAOpt<MtchGene>(gps);
 
   gOpt->cross = [](const MtchGene* g1, const MtchGene* g2, PRNG* rng) {
@@ -532,7 +529,7 @@ void demoMaxSupport(uint64_t s) {
   };
 
   gOpt->showGene = [](const MtchGene* mg){
-    cout << (*mg);
+    LOG(DEBUG) << (*mg);
     return;
   };
 
@@ -549,11 +546,10 @@ void demoMaxSupport(uint64_t s) {
     return m;
   };
 
-  cout << "Filling gpool ..." << endl;
+  LOG(DEBUG) << "Filling gpool ...";
   gOpt->fill(rng);
-  cout << "Initial fully random gpool: " << endl;
+  LOG(DEBUG) << "Initial fully random gpool:";
   gOpt->show();
-  cout << endl << endl << flush;
 
   // copy the best of a random lot
   // gOpt->sortPop();
@@ -566,13 +562,12 @@ void demoMaxSupport(uint64_t s) {
   unsigned int sIter = 0;
   double cf = 2.0;
   double mf = 2.0;
-  printf("crossFrac: %.2f  mutFrac: %.2f \n", cf, mf);
+  LOG(DEBUG) << KBase::getFormattedString("crossFrac: %.2f  mutFrac: %.2f", cf, mf);
   auto srl = KBase::ReportingLevel::Low;
   gOpt->run(rng, cf, mf, 1000, 0.2, 50, srl, iter, sIter);
 
-  cout << endl << endl << "Final gpool: " << endl;
+  LOG(DEBUG) << "Final gpool:";
   gOpt->show();
-  cout << endl << endl << flush;
   delete gOpt;
 
   // try the same thing via GHC over MtchPstn
@@ -605,7 +600,7 @@ void demoMaxSupport(uint64_t s) {
 
 void demoMtchSUSN(uint64_t s) {
 
-  printf("Using PRNG seed: %020llu \n", s);
+  LOG(DEBUG) << KBase::getFormattedString("Using PRNG seed: %020llu", s);
   auto rng = new PRNG();
   rng->setSeed(s);
 
@@ -647,27 +642,25 @@ void demoMtchSUSN(uint64_t s) {
   st0->step = [st0]() {return st0->stepSUSN(); };
 
 
-  cout << "Demonstrate SUSN bargaining over division of sweets with " << numA << " actors and " << numI << " sweets" << endl;
-  cout << "With non-Proportional voting, the actors generally do not stabilize their positions (within 10 turns, if ever)" << endl;
-  cout << "When it does stabilze, the positions of utility-maximizers stabilize but do not converge, while" << endl;
-  cout << "the positions of probability-maximizers do converge." << endl;
+  LOG(DEBUG) << "Demonstrate SUSN bargaining over division of sweets with" << numA << "actors and" << numI << "sweets";
+  LOG(DEBUG) << "With non-Proportional voting, the actors generally do not stabilize their positions (within 10 turns, if ever)";
+  LOG(DEBUG) << "When it does stabilze, the positions of utility-maximizers stabilize but do not converge, while";
+  LOG(DEBUG) << "the positions of probability-maximizers do converge.";
 
   st0->setAUtil(-1, ReportingLevel::Low);
   auto u = st0->aUtil[0]; // everyone got the same perspective, in this demo
 
-  cout << "Util matrix for U(actor_r, pstn_c) in random initial state: " << endl;
+  LOG(DEBUG) << "Util matrix for U(actor_r, pstn_c) in random initial state:";
   u.mPrintf(" %.4f ");
 
   auto pn = st0->pDist(-1);
   auto p = std::get<0>(pn);
 
-  cout << "Probability of outcomes in random initial state: " << endl;
+  LOG(DEBUG) << "Probability of outcomes in random initial state:";
   p.mPrintf(" %.4f ");
-  cout << endl << flush;
 
-  cout << "Expected utility to actors in random initial state: " << endl;
+  LOG(DEBUG) << "Expected utility to actors in random initial state:";
   (u*p).mPrintf(" %.4f "); //TODO: may need to modify this to use only unique positions
-  cout << endl << flush;
   //    st0->setAUtil();
 
   md0->run();
@@ -676,13 +669,13 @@ void demoMtchSUSN(uint64_t s) {
 }
 
 void multiMtchSUSN(uint64_t s) {
-  printf("Using PRNG seed: %020llu \n", s);
+  LOG(DEBUG) << KBase::getFormattedString("Using PRNG seed: %020llu", s);
   unsigned int numTrial = 3;
   unsigned int numStbl = 0;
   for (unsigned int i = 1; i <= numTrial; i++) {
     if (oneMtchSUSN(s))
       numStbl++;
-    printf("Stabilized: %u in %u / %u runs\n", numStbl, i, numTrial);
+    LOG(DEBUG) << "Stabilized:" << numStbl << "in" << i << "/" << numTrial << "runs";
   }
 
   return;
@@ -714,27 +707,25 @@ bool oneMtchSUSN(uint64_t s) {
   assert(numC == p00->numCat);
 
 
-  cout << "Demonstrate SUSN bargaining over division of sweets with " << numA << " actors and " << numI << " sweets" << endl;
-  cout << "With non-Proportional voting, the actors generally do not stabilize their positions (within 10 turns, if ever)" << endl;
-  cout << "When it does stabilze, the positions of utility-maximizers stabilize but do not converge, while" << endl;
-  cout << "the positions of probability-maximizers do converge." << endl;
+  LOG(DEBUG) << "Demonstrate SUSN bargaining over division of sweets with" << numA << "actors and" << numI << "sweets";
+  LOG(DEBUG) << "With non-Proportional voting, the actors generally do not stabilize their positions (within 10 turns, if ever)";
+  LOG(DEBUG) << "When it does stabilze, the positions of utility-maximizers stabilize but do not converge, while";
+  LOG(DEBUG) << "the positions of probability-maximizers do converge.";
 
   st0->setAUtil(-1, ReportingLevel::Low);
   auto u = st0->aUtil[0]; // everyone gets the same perspective, in this demo
 
-  cout << "Util matrix for U(actor_r, pstn_c) in random initial state: " << endl;
+  LOG(DEBUG) << "Util matrix for U(actor_r, pstn_c) in random initial state:";
   u.mPrintf(" %.4f ");
 
   auto pn = st0->pDist(-1);
   auto p = std::get<0>(pn);
 
-  cout << "Probability of outcomes in random initial state: " << endl;
+  LOG(DEBUG) << "Probability of outcomes in random initial state:";
   p.mPrintf(" %.4f ");
-  cout << endl << flush;
 
-  cout << "Expected utility to actors in random initial state: " << endl;
+  LOG(DEBUG) << "Expected utility to actors in random initial state:";
   (u*p).mPrintf(" %.4f "); // TODO: may need to modify this to use only unique positions
-  cout << endl << flush;
 
   auto newPstns = vector<Position*>();
   bool changed = true;
@@ -744,29 +735,27 @@ bool oneMtchSUSN(uint64_t s) {
   while (changed && (iter < iterMax)) { // rounds of the SUSN process
     newPstns = vector<Position*>();
     changed = false;
-    cout << "Starting iteration " << iter << endl;
+    LOG(DEBUG) << "Starting iteration" << iter;
     for (unsigned int ih = 0; ih < numA; ih++) {
       MtchActor* ah = (MtchActor*)(md0->actrs[ih]);
 
       switch (ah->pMod) {
       case MtchActor::PropModel::ExpUtil:
-        printf("maxEU search for actor %u ... \n", ih);
+        LOG(DEBUG) << "maxEU search for actor" << ih << "...";
         break;
       case MtchActor::PropModel::Probability:
-        printf("maxProb search for actor %u ... \n", ih);
+        LOG(DEBUG) << "maxProb search for actor" << ih << "...";
         break;
       case MtchActor::PropModel::AgreeUtil:
-        printf("maxAgU search for actor %u ... \n", ih);
+        LOG(DEBUG) << "maxAgU search for actor" << ih << "...";
         break;
       }
 
       auto evmp = ah->maxProbEUPstn(ah->pMod, st0);
-      printf("Found %.4f at this matching: \n", get<0>(evmp));
+      LOG(DEBUG) << KBase::getFormattedString("Found %.4f at this matching:", get<0>(evmp));
       showMtchPstn(get<1>(evmp));
-      cout << endl;
       double du = get<0>(evmp) -(u*p)(ih, 0);
-      printf("Actual change in value:  %+.4f \n", du);
-      cout << flush;
+      LOG(DEBUG) << KBase::getFormattedString("Actual change in value:  %+.4f", du);
 
       // Expected improvements do not always occur, because other actors also change their positions.
       // In state 0, actor i searches for a position which is better for him, assuming
@@ -782,23 +771,21 @@ bool oneMtchSUSN(uint64_t s) {
       MtchPstn* npi = new MtchPstn(get<1>(evmp));
       newPstns.push_back(npi);
 
-      printf("Old position %2u, %4u: ", ih, iter); showMtchPstn(*opi); cout << endl;
-      printf("New position %2u, %4u: ", ih, iter); showMtchPstn(*npi); cout << endl;
+      LOG(DEBUG) << "Old position" << ih << "," << iter << ":"; showMtchPstn(*opi);
+      LOG(DEBUG) << "New position" << ih << "," << iter << ":"; showMtchPstn(*npi);
 
       bool ei = equivMtchPstn(*npi, *opi);
       if (!ei) {
-        cout << "Actor " << ih << " expects a strategic improvement" << endl;
+        LOG(DEBUG) << "Actor" << ih << "expects a strategic improvement";
       }
-      cout << flush;
 
-      cout << endl;
       changed = changed || !ei;
     }
     if (!changed) {
-      cout << "No actor expects improvement" << endl;
+      LOG(DEBUG) << "No actor expects improvement";
     }
 
-    cout << "Update state ..." << flush;
+    LOG(DEBUG) << "Update state ...";
     for (unsigned int i = 0; i < numA; i++) {
       delete st0->pstns[i];
       st0->pstns[i] = newPstns[i];
@@ -808,25 +795,22 @@ bool oneMtchSUSN(uint64_t s) {
     st0->setAUtil(-1, ReportingLevel::Low);
     auto u2 = st0->aUtil[0]; // everyone got the same perspective
 
-    cout << " done" << endl;
+    LOG(DEBUG) << "...done";
 
-    cout << "Util matrix for U(actor_r, pstn_c): " << endl;
+    LOG(DEBUG) << "Util matrix for U(actor_r, pstn_c):";
     u2.mPrintf(" %.4f ");
 
     auto pn2 = st0->pDist(-1);
     auto p2 = std::get<0>(pn2);
 
-    cout << "Probability of outcomes: " << endl;
+    LOG(DEBUG) << "Probability of outcomes:";
     p2.mPrintf(" %.4f ");
-    cout << endl << flush;
 
-    cout << "Expected utility to actors: " << endl;
+    LOG(DEBUG) << "Expected utility to actors:";
     (u2*p2).mPrintf(" %.4f "); // TODO: may need to modify this to use only unique positions
-    cout << endl << flush;
 
 
     iter++;
-    cout << endl << flush;
   }
   return (iter < iterMax);
 }
@@ -945,22 +929,21 @@ MtchState * MtchState::doSUSN(ReportingLevel rl) const {
     if (ReportingLevel::Low < rl) {
       switch (ah->pMod) {
       case MtchActor::PropModel::ExpUtil:
-        printf("maxEU search for actor %u ... \n", ih);
+        LOG(DEBUG) << "maxEU search for actor" << ih << "...";
         break;
       case MtchActor::PropModel::Probability:
-        printf("maxProb search for actor %u ... \n", ih);
+        LOG(DEBUG) << "maxProb search for actor" << ih << "...";
         break;
       case MtchActor::PropModel::AgreeUtil:
-        printf("maxAgU search for actor %u ... \n", ih);
+        LOG(DEBUG) << "maxAgU search for actor" << ih << "...";
         break;
       }
     }
     auto evmp = ah->maxProbEUPstn(ah->pMod, this); // all the real action is in this function
 
     if (ReportingLevel::Low < rl) {
-      printf("Found %.4f at this matching: \n", get<0>(evmp));
+      LOG(DEBUG) << KBase::getFormattedString("Found %.4f at this matching:", get<0>(evmp));
       showMtchPstn(get<1>(evmp));
-      cout << endl;
     }
 
     // Expected improvements do not always occur, because other actors also change their positions.
@@ -978,8 +961,8 @@ MtchState * MtchState::doSUSN(ReportingLevel rl) const {
     s2->addPstn(newPi);
 
     if (ReportingLevel::Low < rl) {
-      printf("Old position %2u: ", ih); showMtchPstn(*oldPi); cout << endl;
-      printf("New position %2u: ", ih); showMtchPstn(*newPi); cout << endl;
+      LOG(DEBUG) << "Old position" << ih << ":"; showMtchPstn(*oldPi);
+      LOG(DEBUG) << "New position" << ih << ":"; showMtchPstn(*newPi);
     }
   } // end of loop over ih, actors
 
@@ -990,16 +973,14 @@ MtchState * MtchState::doSUSN(ReportingLevel rl) const {
 
     auto pn2 = pDist(-1); // objective perspective
     auto p2 = std::get<0>(pn2);
-    cout << "Util matrix for U(actor_r, pstn_c) in new state: " << endl;
+    LOG(DEBUG) << "Util matrix for U(actor_r, pstn_c) in new state:";
     u2.mPrintf(" %.4f ");
 
-    cout << "Probability of outcomes in new state: " << endl;
+    LOG(DEBUG) << "Probability of outcomes in new state:";
     p2.mPrintf(" %.4f ");
-    cout << endl << flush;
 
-    cout << "Expected utility to actors in new state: " << endl;
+    LOG(DEBUG) << "Expected utility to actors in new state:";
     (u2*p2).mPrintf(" %.4f "); // TODO: may need to modify this to use only unique positions
-    cout << endl << flush;
   }
 
   return s2;
@@ -1025,9 +1006,10 @@ MtchState * MtchState::doBCN(ReportingLevel rl) const  {
 
 
 int main(int ac, char **av) {
-  using std::cout;
-  using std::endl;
-  using std::flush;
+  // Set logging configuration from a file
+  el::Configurations confFromFile("./conf/logger.conf");
+  el::Loggers::reconfigureAllLoggers(confFromFile);
+
   using KBase::dSeed;
 
   auto sTime = KBase::displayProgramStart();
@@ -1085,25 +1067,25 @@ int main(int ac, char **av) {
 
   PRNG * rng = new PRNG();
   seed = rng->setSeed(seed); // 0 == get a random number
-  printf("Using PRNG seed:  %020llu \n", seed);
-  printf("Same seed in hex:   0x%016llX \n", seed);
+  LOG(DEBUG) << KBase::getFormattedString("Using PRNG seed:  %020llu", seed);
+  LOG(DEBUG) << KBase::getFormattedString("Same seed in hex:   0x%016llX", seed);
 
   // note that we reset the seed every time, so that in case something
   // goes wrong, we need not scroll back too far to find the
   // seed required to reproduce the bug.
   if (dosP) {
-    cout << "-----------------------------------" << endl;
+    LOG(DEBUG) << "-----------------------------------";
     DemoMtch::demoDivideSweets(seed);
   }
   if (maxSupP) {
-    cout << "-----------------------------------" << endl;
+    LOG(DEBUG) << "-----------------------------------";
     DemoMtch::demoMaxSupport(seed);
   }
   if (mtchSUSNP) {
-    cout << "-----------------------------------" << endl;
+    LOG(DEBUG) << "-----------------------------------";
     DemoMtch::demoMtchSUSN(seed);
   }
-  cout << "-----------------------------------" << endl;
+  LOG(DEBUG) << "-----------------------------------";
 
   delete rng;
   KBase::displayProgramEnd(sTime);
