@@ -24,10 +24,6 @@
 // --------------------------------------------
 #include "agenda.h"
 
-using std::cout;
-using std::endl;
-using std::flush;
-
 namespace AgendaControl {
 
 uint64_t fact(unsigned int n) {

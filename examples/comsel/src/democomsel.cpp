@@ -27,6 +27,7 @@
 
 #include <iostream>
 #include <cstdio>
+#include <string>
  
 #include "kutils.h"
 #include "kmatrix.h"
@@ -36,6 +37,10 @@
 #include "smp.h"
 #include "comsel.h"
 #include "democomsel.h"
+#include <easylogging++.h>
+
+INITIALIZE_EASYLOGGINGPP
+
 
 using namespace std;
 using KBase::VUI;
@@ -50,13 +55,9 @@ using KBase::VotingRule;
 
 namespace DemoComSel {
 
-  using std::cout;
-  using std::endl;
-  using std::flush;
   using std::function;
   using std::get;
   using std::string;
-  using std::printf;
 
   using KBase::ReportingLevel;
   using KBase::MtchPstn;
@@ -70,29 +71,29 @@ namespace DemoComSel {
 
   // -------------------------------------------------
   // like printVUI, but with range-checking and boolean output
-  void printCS(const VUI& v) {
+  string printCS(const VUI& v) {
     unsigned int n = v.size();
-    printf("[CS ");
+    string cs("[CS ");
     for (unsigned int i = 0; i < n; i++) {
       switch (v[i]) {
       case 0:
-        printf("-");
+        cs += "-";
         break;
       case 1:
-        printf("+");
+        cs += "+";
         break;
       default:
-        printf("printCS:: unrecognized case");
-        assert(false);
+        LOG(DEBUG) << "printCS:: unrecognized case";
+        exit(-1);
         break;
       }
     }
-    printf("]");
-    return;
+    cs += "]";
+    return cs;
   }
 
   void demoActorUtils(const uint64_t s, PRNG* rng) {
-    printf("Using PRNG seed: %020llu \n", s);
+    LOG(DEBUG) << KBase::getFormattedString("Using PRNG seed: %020llu", s);
     rng->setSeed(s);
     return;
   }
@@ -105,15 +106,15 @@ namespace DemoComSel {
     // utility to an actor of a position (committee)
     // getting actor's scalar capability
 
-    printf("Using PRNG seed: %020llu \n", s);
+    LOG(DEBUG) << KBase::getFormattedString("Using PRNG seed: %020llu", s);
     auto trng = new PRNG();
     trng->setSeed(s);
 
     if (0 == numA) { numA = 2 + (trng->uniform() % 4); } // i.e. [2,6] inclusive 
     if (0 == nDim) { nDim = 1 + (trng->uniform() % 7); } // i.e. [1,7] inclusive 
 
-    printf("Num parties: %u \n", numA);
-    printf("Num dimensions: %u \n", nDim);
+    LOG(DEBUG) << "Num parties:" << numA;
+    LOG(DEBUG) << "Num dimensions:" << nDim;
 
 
     unsigned int numItm = numA;
@@ -130,7 +131,7 @@ namespace DemoComSel {
     }
     assert(numPos == positions.size());
 
-    printf("Num positions: %u \n", numPos);
+    LOG(DEBUG) << "Num positions:" << numPos;
 
     auto ndfn = [](string ns, unsigned int i) {
       auto ali = KBase::newChars(10 + ((unsigned int)(ns.length())));
@@ -144,7 +145,7 @@ namespace DemoComSel {
     // create a model to hold some random actors
     auto csm = new CSModel(nDim, "csm0", s);
 
-    cout << "Configuring actors: randomizing" << endl;
+    LOG(DEBUG) << "Configuring actors: randomizing";
     for (unsigned int i = 0; i < numA; i++) {
       auto ai = new CSActor(ndfn("csa-", i), ndfn("csaDesc-", i), csm);
       ai->randomize(csm->rng, nDim);
@@ -167,18 +168,16 @@ namespace DemoComSel {
       }
     }
 
-    cout << "Scalar positions of actors (fixed) ..." << endl;
+    LOG(DEBUG) << "Scalar positions of actors (fixed) ...";
     for (auto a : csm->actrs) {
       auto csa = ((CSActor*)a);
-      printf("%s v-position: ", csa->name.c_str());
+      LOG(DEBUG) << csa->name << "v-position:";
       trans(csa->vPos).mPrintf(" %5.2f");
-      printf("%s v-salience: ", a->name.c_str());
+      LOG(DEBUG) << a->name << "v-salience:";
       trans(csa->vSal).mPrintf(" %5.2f");
-      cout << endl;
     }
-    cout << endl << flush;
 
-    cout << "Getting scalar strength of actors ..." << endl;
+    LOG(DEBUG) << "Getting scalar strength of actors ...";
     KMatrix aCap = KMatrix(1, csm->numAct);
     for (unsigned int i = 0; i < csm->numAct; i++) {
       auto ai = ((const CSActor *)(csm->actrs[i]));
@@ -186,14 +185,14 @@ namespace DemoComSel {
     }
 
     aCap = (100.0 / sum(aCap)) * aCap;
-    cout << "Scalar strengths: " << endl;
+    LOG(DEBUG) << "Scalar strengths:";
     for (unsigned int i = 0; i < csm->numAct; i++) {
       auto ai = ((CSActor *)(csm->actrs[i]));
       ai->sCap = aCap(0, i);
-      printf("%3i  %6.2f \n", i, ai->sCap);
+      LOG(DEBUG) << KBase::getFormattedString("%3i  %6.2f", i, ai->sCap);
     }
 
-    cout << "Computing utilities of positions ... " << endl;
+    LOG(DEBUG) << "Computing utilities of positions ... ";
     for (unsigned int i = 0; i < numA; i++) {
       // (0,0) causes computation of entire table
       double uii = csm->getActorCSPstnUtil(i, i); 
@@ -204,22 +203,23 @@ namespace DemoComSel {
 
     // rows are actors, columns are all possible position
     KMatrix uij = KMatrix(numA, numPos);  
-    cout << "Complete (normalized) utility matrix of all possible positions (rows)";
-    cout <<" versus actors (columns)" << endl << flush;
+    LOG(DEBUG) << "Complete (normalized) utility matrix of all possible positions (rows)"
+      <<" versus actors (columns)";
+    string utilMtx;
     for (unsigned int pj = 0; pj < numPos; pj++) {
-      printf("%3i  ", pj);
+      utilMtx += std::to_string(pj) + "  ";
       auto pstn = positions[pj];
-      printCS(pstn);
-      printf("  ");
+      utilMtx += printCS(pstn) + "  ";
       for (unsigned int ai = 0; ai < numA; ai++) {
         const double uap = csm->getActorCSPstnUtil(ai, pj);
         uij(ai, pj) = uap;
-        printf("%6.4f, ", uap);
+        utilMtx += KBase::getFormattedString("%6.4f, ", uap);
       }
-      cout << endl << flush;
     }
 
-    cout << endl << "Computing best position for each actor" << endl;
+    LOG(DEBUG) << utilMtx;
+
+    LOG(DEBUG) << "Computing best position for each actor";
     vector<VUI> bestAP = {}; // list of each actor's best position (followed by CP)
     for (unsigned int ai = 0; ai < numA; ai++) {
       unsigned int bestJ = 0;
@@ -230,23 +230,20 @@ namespace DemoComSel {
           bestV = uij(ai, pj);
         }
       }
-      printf("Best for %02u is %4u ", ai, bestJ);
-      printCS(positions[bestJ]);
-      cout << endl;
+      LOG(DEBUG) << "Best for" << ai << "is" << bestJ << " " << printCS(positions[bestJ]);
       bestAP.push_back(positions[bestJ]);
     }
 
     trans(aCap).mPrintf("%5.2f ");
-    cout << endl << flush;
 
     
     // which happens to indicate the PCW *if* proportional voting,
     // when we actually use PropBin
-    cout << "Computing zeta ... " << endl; 
+    LOG(DEBUG) << "Computing zeta ... "; 
     KMatrix zeta = aCap * uij;
     assert((1 == zeta.numR()) && (numPos == zeta.numC()));
 
-    cout << "Sorting positions from most to least net support ..." << endl << flush;
+    LOG(DEBUG) << "Sorting positions from most to least net support ...";
     auto betterPR = [](tuple<unsigned int, double, VUI> pr1,
       tuple<unsigned int, double, VUI> pr2) {
       double v1 = get<1>(pr1);
@@ -266,16 +263,15 @@ namespace DemoComSel {
     const unsigned int maxDisplayed = 256;
     unsigned int  numPr = (pairs.size() < maxDisplayed) ? pairs.size() : maxDisplayed;
 
-    cout << "Displaying highest " << numPr << endl << flush;
+    LOG(DEBUG) << "Displaying highest " << numPr;
     for (unsigned int i = 0; i < numPr; i++) {
       auto pri = pairs[i];
       unsigned int ni = get<0>(pri);
       double zi = get<1>(pri);
       VUI pi = get<2>(pri);
 
-      printf(" %3u: %4u  %7.2f  ", i, ni, zi);
-      printCS(pi);
-      cout << endl << flush;
+      LOG(DEBUG) << KBase::getFormattedString(" %3u: %4u  %7.2f  ", i, ni, zi)
+        << printCS(pi);
     }
 
     VUI bestCS = get<2>(pairs[0]);
@@ -310,14 +306,14 @@ namespace DemoComSel {
     csm->stop = [maxIter, csm](unsigned int iter, const KBase::State * s) {
       bool doneP = iter > maxIter;
       if (doneP) {
-        printf("Max iteration limit of %u exceeded \n", maxIter);
+        LOG(DEBUG) << "Max iteration limit of" << maxIter << "exceeded";
       }
       auto s2 = ((const CSState *)(csm->history[iter]));
       for (unsigned int i = 0; i < iter; i++) {
         auto s1 = ((const CSState *)(csm->history[i]));
         if (CSModel::equivStates(s1, s2)) {
           doneP = true;
-          printf("State number %u matched state number %u \n", iter, i);
+          LOG(DEBUG) << "State number" << iter << "matched state number" << i;
         }
       }
 
@@ -337,8 +333,9 @@ namespace DemoComSel {
 
 
 int main(int ac, char **av) {
-  using std::cout;
-  using std::endl;
+  el::Configurations confFromFile("./conf/logger.conf");
+  el::Loggers::reconfigureAllLoggers(confFromFile);
+
   using std::string;
   using KBase::dSeed;
   auto sTime = KBase::displayProgramStart(DemoComSel::appName, DemoComSel::appVersion);
@@ -398,19 +395,18 @@ int main(int ac, char **av) {
     delete rng;
     rng = nullptr;
   }
-  printf("Using PRNG seed: %020llu \n", seed);
-  printf("Same seed in hex: 0x%016llX \n", seed);
+  LOG(DEBUG) << KBase::getFormattedString("Using PRNG seed: %020llu", seed);
+  LOG(DEBUG) << KBase::getFormattedString("Same seed in hex: 0x%016llX", seed);
 
 
-  cout << "Creating objects from SMPLib ... " << endl << flush;
+  LOG(DEBUG) << "Creating objects from SMPLib ... ";
   auto sm = new SMPLib::SMPModel("", seed); // , "SMPScen-010101"
   auto sa = new SMPLib::SMPActor("Bob", "generic spatial actor");
   delete sm;
   sm = nullptr;
   delete sa;
   sa = nullptr;
-  cout << endl;
-  cout << "Done creating objects from SMPLib." << endl << flush;
+  LOG(DEBUG) << "Done creating objects from SMPLib.";
 
   
     // note that we reset the seed every time, so that in case something

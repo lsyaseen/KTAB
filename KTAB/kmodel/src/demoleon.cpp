@@ -2314,7 +2314,7 @@ void demoRealEcon(bool OSPonly, uint64_t s, PRNG* rng)
 
 
 int main(int ac, char **av) {
-  el::Configurations confFromFile("./conf/smpc-logger.conf");
+  el::Configurations confFromFile("./conf/logger.conf");
   el::Loggers::reconfigureAllLoggers(confFromFile);
   using KBase::dSeed;
 

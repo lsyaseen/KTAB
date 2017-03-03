@@ -42,6 +42,10 @@ if (NOT SQLITE_FOUND)
 endif (NOT SQLITE_FOUND)
 
 # --------------------------------------------------------
+
+find_package(easyloggingpp)
+
+# --------------------------------------------------------
 # See "Findkutils.cmake" in cmakemodules to figure
 # out where it looks and what variables it sets
 find_package(kutils)
@@ -66,6 +70,7 @@ INCLUDE_DIRECTORIES(
   ${SQLITE_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}/libsrc/
   ${PROJECT_SOURCE_DIR}/src/ 
+  ${LOGGER_INCLUDE_DIR}
   )
   
 set(AGENDALIB_SRCS
@@ -84,6 +89,7 @@ target_link_libraries (agdemo
   ${KUTILS_LIBRARY}
   ${SQLITE_LIBRARIES}
   ${EFENCE_LIBRARIES}
+  ${LOGGER_LIBRARY}
   )
 # -------------------------------------------------
 # show some useful status/debugging information
