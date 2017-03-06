@@ -116,19 +116,22 @@ void MainWindow::initializeBarGraphPlot()
 
     barCustomGraph->xAxis->setAutoTicks(true);
     barCustomGraph->xAxis->setAutoTickLabels(true);
-    barCustomGraph->xAxis->setRange(0, 110);
-    barCustomGraph->xAxis->setSubTickCount(0);
-    barCustomGraph->xAxis->setTickLength(0,5);
+    barCustomGraph->xAxis->setAutoTickStep(false);
+    barCustomGraph->xAxis->setTickStep(10.0);
+
+    barCustomGraph->xAxis->setRange(0, 100);
+    //barCustomGraph->xAxis->setSubTickCount(0);
+
+    //barCustomGraph->xAxis->setTickLength(0,10);
     barCustomGraph->xAxis->grid()->setVisible(true);
     barCustomGraph->setMinimumWidth(250);
     barCustomGraph->xAxis->setLabel("Position");
 
     barCustomGraph->yAxis->setAutoTicks(true);
     barCustomGraph->yAxis->setAutoTickLabels(true);
-
     barCustomGraph->yAxis->setRange(0, 100);
     barCustomGraph->yAxis->setPadding(5); // a bit more space to the left border
-    barCustomGraph->yAxis->setLabel("Strength");
+    barCustomGraph->yAxis->setLabel("Effective Power\nInfluence×Salience");
     barCustomGraph->yAxis->grid()->setSubGridVisible(false);
 
     connect( barCustomGraph->xAxis, SIGNAL(rangeChanged(QCPRange,QCPRange)), this, SLOT(xAxisRangeChanged(QCPRange,QCPRange)) );
@@ -271,7 +274,7 @@ void MainWindow::populateBarGraphStateRange(int states)
 void MainWindow::generateColors()
 {
     colorsList.clear();
-    colorsList << QColor(220,20,60)<< QColor(255,215,0)<< QColor(175,238,238)<<QColor(0,0,205)
+    colorsList << QColor(255,130,0)<< QColor(220,20,60)<< QColor(255,215,0)<< QColor(175,238,238)<<QColor(0,0,205)
                << QColor(165,42,42)<<QColor(34,139,34)<<QColor(218,165,32)<< QColor (95,158,160)
                << QColor(199,21,133)<<QColor(205,50,205)<<QColor(245,205,250)<<QColor(0,206,209)
                << QColor(173,255,47)<<QColor(127,255,212)<<QColor(65,105,225)<<QColor(255,20,147)
@@ -382,9 +385,9 @@ void MainWindow::barGraphDimensionChanged(int value)
 {
     dimension=value;
     lineGraphDimensionComboBox->setCurrentIndex(value);
-    barGraphTitle->setText(QString(barGraphDimensionComboBox->currentText() +", Turn " +QString::number(barGraphTurnSlider->value())));
+    barGraphTitle->setText(QString(barGraphDimensionComboBox->currentText() +"-Effective Power Landscape, Turn " +QString::number(barGraphTurnSlider->value())));
     getActorsInRange(dimension);
-    barCustomGraph->xAxis->setRange(0,110);
+    barCustomGraph->xAxis->setRange(0,100);
     barCustomGraph->yAxis->setRange(0,yAxisLen+20);
     yAxisLen=50;
     barCustomGraph->replot();
@@ -392,9 +395,9 @@ void MainWindow::barGraphDimensionChanged(int value)
 
 void MainWindow::barGraphTurnSliderChanged(int value)
 {
-    barGraphTitle->setText(QString(barGraphDimensionComboBox->currentText() +", Turn " +QString::number(value)));
+    barGraphTitle->setText(QString(barGraphDimensionComboBox->currentText() +"-Effective Power Landscape, Turn " +QString::number(value)));
     getActorsInRange(dimension);
-    barCustomGraph->xAxis->setRange(0,110);
+    barCustomGraph->xAxis->setRange(0,100);
     barCustomGraph->yAxis->setRange(0,yAxisLen+20);
     yAxisLen=50;
     barCustomGraph->replot();
