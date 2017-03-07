@@ -24,14 +24,12 @@
 
 #include "rplib2.h"
 #include <algorithm>
+#include <easylogging++.h>
 
 namespace RfrmPri2 {
 // namespace to hold everything related to the
 // "priority of reforms" CDMP, using EState<unsigned int>.
 // Note that KBase has no access.
-using std::cout;
-using std::endl;
-using std::flush;
 using std::get;
 using std::tuple;
 
@@ -59,7 +57,7 @@ string genName(const string & prefix, unsigned int i) {
 
 RP2Model* pmmCreation(uint64_t sd) {
   auto pmm = new RP2Model("Bob", sd);
-  cout << "Created pmm named " << pmm->getScenarioName() << endl << flush;
+  LOG(DEBUG) << "Created pmm named " << pmm->getScenarioName();
   pmm->pcem = KBase::PCEModel::MarkovIPCM;
   auto rng = new PRNG(sd);
   const unsigned int numAct = 17;
@@ -76,19 +74,19 @@ RP2Model* pmmCreation(uint64_t sd) {
     desc.push_back(genName("Description", i));
   }
   pmm->setActors(names, desc);
-  cout << "Added " << numAct << " actors " << endl << flush;
-  cout << "Configured " << pmm->getScenarioName() << endl << flush;
+  LOG(DEBUG) << "Added " << numAct << " actors ";
+  LOG(DEBUG) << "Configured " << pmm->getScenarioName();
   return pmm;
 }
 RP2Pos* pmpCreation(RP2Model* pmm) {
   auto pmp = new RP2Pos(pmm, 7);
-  cout << "Created pmp with index " << pmp->getIndex() << endl << flush;
+  LOG(DEBUG) << "Created pmp with index " << pmp->getIndex();
   return pmp;
 }
 RP2State* pmsCreation(RP2Model * pmm) {
   auto pms = new RP2State(pmm);
   pmm->addState(pms);
-  cout << "Added new state to RP2Model" << endl << flush;
+  LOG(DEBUG) << "Added new state to RP2Model";
   return pms;
 }
 
@@ -147,15 +145,15 @@ void initScen(uint64_t sd) {
 
   vector<double> prob = {};
   double pj = 1.0;
-  printf("pDecline factor: %.3f \n", pDecline);
-  printf("obFactor: %.3f \n", obFactor);
+  LOG(DEBUG) << KBase::getFormattedString("pDecline factor: %.3f", pDecline);
+  LOG(DEBUG) << KBase::getFormattedString("obFactor: %.3f", obFactor);
   // rate of decline has little effect on the results.
   for (unsigned int j = 0; j < numItm; j++) {
     prob.push_back(pj);
     pj = pj * pDecline;
   }
 
-  cout << "Computing positions ... " << endl;
+  LOG(DEBUG) << "Computing positions ... ";
   vector<VUI> positions; // list of all positions
   VUI pstn;
   // build the first permutation: 1,2,3,...
@@ -167,11 +165,11 @@ void initScen(uint64_t sd) {
     positions.push_back(pstn);
   }
   const unsigned int numPos = positions.size();
-  cout << "For " << numItm << " reform items there are ";
-  cout << numPos << " positions" << endl;
+  LOG(DEBUG) << "For" << numItm << "reform items there are"
+   << numPos << "positions";
 
 
-  cout << "Building position utility matrix ... " << flush;
+  LOG(DEBUG) << "Building position utility matrix ... ";
   auto rpValFn = [positions, riVal, aCap, govCost, govBudget, obFactor, prob](unsigned int ai, unsigned int pj) {
     VUI pstn = positions[pj];
     double rvp = rawValPos(ai, pstn, riVal, aCap, govCost, govBudget, obFactor, prob);
@@ -188,7 +186,7 @@ void initScen(uint64_t sd) {
   };
 
   const auto rpUtil = KMatrix::map(curve, rpNormVal);
-  cout << "done." << endl << flush;
+  LOG(DEBUG) << "done.";
 
   // This is an attempt to define a domain-independent measure of similarity,
   // by looking at the difference in outcomes to actors.
@@ -235,15 +233,14 @@ void initScen(uint64_t sd) {
   auto rslt1 = diffVUI(rand1, numClose);
   
   
-  cout << "Permutations with outcomes most similar to " << rand1 << endl;
+  LOG(DEBUG) << "Permutations with outcomes most similar to " << rand1;
   for (unsigned int i = 0; i < rslt1.size(); i++) {
     auto dp = rslt1[i];
     double d = get<0>(dp);
     unsigned int p = get<1>(dp);
     auto posP = positions[p];
-    printf("%2u: %4u  %.4f  ", i, p, d);
+    LOG(DEBUG) << KBase::getFormattedString("%2u: %4u  %.4f  ", i, p, d);
     KBase::printVUI(posP);
-    cout << endl;
   }
 
   delete rng;

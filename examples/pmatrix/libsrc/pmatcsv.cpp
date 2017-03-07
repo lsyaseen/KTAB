@@ -25,13 +25,11 @@
 // --------------------------------------------
 
 #include "pmatcsv.h"
+#include <easylogging++.h>
 
 // --------------------------------------------
 
 namespace PMatDemo {
-using std::cout;
-using std::endl;
-using std::flush;
 
 using KBase::KMatrix;
 using KBase::KException;
@@ -64,7 +62,7 @@ FittingParameters pccCSV(const string fs) {
   inStream >> dummy >> numCase;
   assert(1 <= numCase);
 
-  printf("Actors %u, Scenarios %u, Cases %u \n", numAct, numScen, numCase);
+  LOG(DEBUG) << "Actors" << numAct << ", Scenarios" << numScen << ", Cases" << numCase;
 
   // skip headers
   inStream.read_line();
@@ -105,19 +103,16 @@ FittingParameters pccCSV(const string fs) {
     } // loop over j, scenarios
   } // loop over i, actors
 
-  cout << "Actor names (min/max)" << endl;
+  LOG(DEBUG) << "Actor names (min/max)";
   for (unsigned int i = 0; i < numAct; i++) {
-    cout << (maxVect[i] ? "max" : "min") << "   " << aNames[i] << endl;
+    LOG(DEBUG) << (maxVect[i] ? "max" : "min") << "   " << aNames[i];
   }
-  cout << endl << flush;
 
-  cout << "Case Weights:" << endl;
+  LOG(DEBUG) << "Case Weights:";
   caseWeights.mPrintf("%7.3f ");
-  cout << endl;
 
-  cout << "Outcomes:" << endl;
+  LOG(DEBUG) << "Outcomes:";
   outcomes.mPrintf(" %+.4e  ");
-  cout << endl << flush;
 
 
   vector<double> threshVal = {};
@@ -156,19 +151,18 @@ FittingParameters pccCSV(const string fs) {
     }
   } // loop over j, cases
 
-  cout << "Prob threshholds" << endl;
+  LOG(DEBUG) << "Prob threshholds:";
   for (unsigned int k = 0; k < numCase; k++) {
     if (overThresh[k]) {
-      printf("Over  %.3f \n", threshVal[k]);
+      LOG(DEBUG) << KBase::getFormattedString("Over  %.3f", threshVal[k]);
     }
     else {
-      printf("Under %.3f \n", threshVal[k]);
+      LOG(DEBUG) << KBase::getFormattedString("Under %.3f", threshVal[k]);
     }
   }
 
-  cout << "ProbWeights:" << endl;
+  LOG(DEBUG) << "ProbWeights:";
   probWeight.mPrintf(" %5.3f ");
-  cout << endl << flush;
 
   auto rslt = FittingParameters(aNames, maxVect,
                                 outcomes, caseWeights,

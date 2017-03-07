@@ -115,6 +115,10 @@ if (NOT SQLITE_FOUND)
   message(FATAL_ERROR "Could not find SQLite")
 endif (NOT SQLITE_FOUND) 
 
+# --------------------------------------------------------
+
+find_package(easyloggingpp)
+
 # ------------------------------------------------- 
 # files to be built into a library go in libsrc/
 # any application or testing code goes in src
@@ -124,6 +128,7 @@ include_directories(
   ${KMODEL_INCLUDE_DIR} 
   ${PROJECT_SOURCE_DIR}/libsrc/
   ${MINICSV_DIR} 
+  ${LOGGER_INCLUDE_DIR}
   )
   
   
@@ -148,6 +153,7 @@ include_directories(
   ${EFENCE_INCLUDE_DIR}
   ${SQLITE_INCLUDE_DIR}
   ${TINYXML2_INCLUDE_DIR}
+  ${LOGGER_INCLUDE_DIR}
   )
    
 
@@ -164,6 +170,7 @@ TARGET_LINK_LIBRARIES(pmdemo
   ${KUTILS_LIBRARY}
   ${EFENCE_LIBRARIES}
   ${SQLITE_LIBRARIES}
+  ${LOGGER_LIBRARY}
   )
   
 # -------------------------------------------------

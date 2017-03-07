@@ -27,7 +27,6 @@
 
 #include <algorithm>
 #include <assert.h>
-#include <iostream>
 #include <set>
 #include <string>
 #include <tinyxml2.h>
@@ -39,9 +38,6 @@
 
 
 #include "kmodel.h"
-
-using namespace std;
-
 
 namespace RfrmPri {
 // namespace to hold everything related to the
