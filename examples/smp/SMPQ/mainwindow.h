@@ -57,6 +57,7 @@ class QAction;
 class QListWidget;
 class QMenu;
 class QTextEdit;
+#define MAX_DIMS 25
 
 namespace Ui {
 class MainWindow;
@@ -266,8 +267,8 @@ private:
     QList <QString> actorsName;
     QList <QString> actorsDescription;
     QList <QString> actorsInfl;
-    QList <QString> actorsPos[3];
-    QList <QString> actorsSal[3];
+    QList <QString> actorsPos[MAX_DIMS];
+    QList <QString> actorsSal[MAX_DIMS];
     QList <QString> actorAffinity;
     QList <int>     actI;
     QList <int>     actJ;

@@ -172,9 +172,11 @@ void MainWindow::runPushButtonClicked(bool bl)
         }
         else
         {
+            qDebug()<<"b4";
             currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
                                                       (sqlFlags, dbFilePath.toStdString(),
                                                        csvPath.toStdString(),seed,false,parameters));
+            qDebug()<<"a4";
         }
         cout << "-----------------------------------" << endl;
 

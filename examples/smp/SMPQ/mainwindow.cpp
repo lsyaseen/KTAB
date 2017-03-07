@@ -406,7 +406,7 @@ void MainWindow::xmlCellSelected(QStandardItem* in)
     {
         runButton->setEnabled(false);
         runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: red;");
-     }
+    }
 
     if(0==in->column())
     {
@@ -853,26 +853,13 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
             csvTableWidget->setItem(row,++col,new QTableWidgetItem(actorsDescription.at(row)));
             csvTableWidget->setItem(row,++col,new QTableWidgetItem(QString::number(actorsInfl.at(row).toDouble(),'f',1)));
 
-            if(dimensionsLineEdit->text().toInt()>=1)
+            for(int dim = 0 ; dim < dimensionsLineEdit->text().toInt();++ dim)
             {
                 csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsPos[0].at(row).toDouble()),'f',1)));
+                                        new QTableWidgetItem(QString::number((actorsPos[dim].at(row).toDouble()),'f',1)));
                 csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsSal[0].at(row).toDouble()*100),'f',1)));
-            }
-            if(dimensionsLineEdit->text().toInt()>=2)
-            {
-                csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsPos[1].at(row).toDouble()),'f',1)));
-                csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsSal[1].at(row).toDouble()*100),'f',1)));
-            }
-            if(dimensionsLineEdit->text().toInt()==3)
-            {
-                csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsPos[2].at(row).toDouble()),'f',1)));
-                csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsSal[2].at(row).toDouble()*100),'f',1)));
+                                        new QTableWidgetItem(QString::number((actorsSal[dim].at(row).toDouble()*100),'f',1)));
+
             }
         }
         //Affinity Matrix
@@ -1201,8 +1188,8 @@ void MainWindow::initializeCentralViewFrame()
     stackWidget = new QStackedWidget(central);
 
     scenarioComboBox = new QComboBox(tableControlsFrame);
-//    scenarioComboBox->setMaximumWidth(200);
-//    scenarioComboBox->setFixedWidth(150);
+    //    scenarioComboBox->setMaximumWidth(200);
+    //    scenarioComboBox->setFixedWidth(150);
     gCLayout->addWidget(scenarioComboBox,0,2);
     scenarioComboBox->setEditable(true);
     scenarioComboBox->setToolTip("Enter the Scenario / Project Name");
@@ -1210,8 +1197,8 @@ void MainWindow::initializeCentralViewFrame()
 
     scenarioNameLineEdit = new QLineEdit(tableControlsFrame);
     scenarioNameLineEdit->setVisible(false);
-//    scenarioNameLineEdit->setMaximumWidth(200);
-//    scenarioNameLineEdit->setFixedWidth(150);
+    //    scenarioNameLineEdit->setMaximumWidth(200);
+    //    scenarioNameLineEdit->setFixedWidth(150);
     scenarioNameLineEdit->setToolTip("Enter the Scenario / Project Name");
     gCLayout->addWidget(scenarioNameLineEdit,0,2);
 
@@ -2116,27 +2103,14 @@ void MainWindow::updateDBViewColumns()
             modeltoDB->setItem(row,++col,new QStandardItem(
                                    QString::number(actorsInfl.at(row).toDouble(),'f',1)));
 
-            if(dimensionsLineEdit->text().toInt()>=1)
+            for(int dim = 0 ; dim < dimensionsLineEdit->text().toInt();++ dim)
             {
                 modeltoDB->setItem(row,++col,new QStandardItem(
-                                       QString::number(actorsPos[0].at(row).toDouble(),'f',1)));
+                                       QString::number(actorsPos[dim].at(row).toDouble(),'f',1)));
                 modeltoDB->setItem(row,++col,new QStandardItem(
-                                       QString::number(actorsSal[0].at(row).toDouble()*100,'f',1)));
+                                       QString::number(actorsSal[dim].at(row).toDouble()*100,'f',1)));
             }
-            if(dimensionsLineEdit->text().toInt()>=2)
-            {
-                modeltoDB->setItem(row,++col,new QStandardItem(
-                                       QString::number(actorsPos[1].at(row).toDouble(),'f',1)));
-                modeltoDB->setItem(row,++col,new QStandardItem(
-                                       QString::number(actorsSal[1].at(row).toDouble()*100,'f',1)));
-            }
-            if(dimensionsLineEdit->text().toInt()==3)
-            {
-                modeltoDB->setItem(row,++col,new QStandardItem(
-                                       QString::number(actorsPos[2].at(row).toDouble(),'f',1)));
-                modeltoDB->setItem(row,++col,new QStandardItem(
-                                       QString::number(actorsSal[2].at(row).toDouble()*100,'f',1)));
-            }
+
         }
     }
 }

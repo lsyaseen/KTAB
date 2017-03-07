@@ -161,12 +161,10 @@ void Xmlparser::saveToXmlFile(QStringList parameters, QStandardItemModel *smpDat
 
     //Dimensions
     xmlWriter.writeStartElement("Dimensions");
-    if(dims>=1)
-        tagElements(&xmlWriter,"dName",parameters.at(12));
-    if(dims>=2)
-        tagElements(&xmlWriter,"dName",parameters.at(13));
-    if(dims>=3)
-        tagElements(&xmlWriter,"dName",parameters.at(14));
+    for(int i = 0 ; i < dims ; ++i)
+    {
+        tagElements(&xmlWriter,"dName",parameters.at(12+i));
+    }
     //end dimensions
     xmlWriter.writeEndElement();
 
@@ -181,21 +179,17 @@ void Xmlparser::saveToXmlFile(QStringList parameters, QStandardItemModel *smpDat
         tagElements(&xmlWriter,"capability",smpData->item(i,2)->text());
 
         xmlWriter.writeStartElement("Position");
-        if(dims>=1)
-            tagElements(&xmlWriter,"dCoord",smpData->item(i,3)->text());
-        if(dims>=2)
-            tagElements(&xmlWriter,"dCoord",smpData->item(i,5)->text());
-        if(dims>=3)
-            tagElements(&xmlWriter,"dCoord",smpData->item(i,7)->text());
+        for(int j=0; j< dims; ++j)
+        {
+            tagElements(&xmlWriter,"dCoord",smpData->item(i,3+(j*2))->text());   //3 5 7 9
+        }
         xmlWriter.writeEndElement();//end position
 
         xmlWriter.writeStartElement("Salience");
-        if(dims>=1)
-            tagElements(&xmlWriter,"dSal",smpData->item(i,4)->text());
-        if(dims>=2)
-            tagElements(&xmlWriter,"dSal",smpData->item(i,6)->text());
-        if(dims>=3)
-            tagElements(&xmlWriter,"dSal",smpData->item(i,8)->text());
+        for(int j=0; j< dims; ++j)
+        {
+            tagElements(&xmlWriter,"dSal",smpData->item(i,4+(j*2))->text()); //4 6 8 10
+        }
         xmlWriter.writeEndElement();//end Salience
 
         xmlWriter.writeEndElement();//end actor
@@ -269,12 +263,11 @@ void Xmlparser::saveNewDataToXmlFile(QStringList parameters, QTableWidget *smpDa
 
     //Dimensions
     xmlWriter.writeStartElement("Dimensions");
-    if(dims>=1)
-        tagElements(&xmlWriter,"dName",parameters.at(13));
-    if(dims>=2)
-        tagElements(&xmlWriter,"dName",parameters.at(14));
-    if(dims>=3)
-        tagElements(&xmlWriter,"dName",parameters.at(15));
+
+    for(int i = 0 ; i < dims ; ++i)
+    {
+        tagElements(&xmlWriter,"dName",parameters.at(13+i));
+    }
     //end dimensions
     xmlWriter.writeEndElement();
 
@@ -290,21 +283,18 @@ void Xmlparser::saveNewDataToXmlFile(QStringList parameters, QTableWidget *smpDa
         tagElements(&xmlWriter,"capability",smpDataWidget->item(i,2)->text());
 
         xmlWriter.writeStartElement("Position");
-        if(dims>=1)
-            tagElements(&xmlWriter,"dCoord",smpDataWidget->item(i,3)->text());
-        if(dims>=2)
-            tagElements(&xmlWriter,"dCoord",smpDataWidget->item(i,5)->text());
-        if(dims>=3)
-            tagElements(&xmlWriter,"dCoord",smpDataWidget->item(i,7)->text());
+
+        for(int j=0; j< dims; ++j)
+        {
+            tagElements(&xmlWriter,"dCoord",smpDataWidget->item(i,3+(j*2))->text()); // 3 5  7  9
+        }
         xmlWriter.writeEndElement();//end position
 
         xmlWriter.writeStartElement("Salience");
-        if(dims>=1)
-            tagElements(&xmlWriter,"dSal",smpDataWidget->item(i,4)->text());
-        if(dims>=2)
-            tagElements(&xmlWriter,"dSal",smpDataWidget->item(i,6)->text());
-        if(dims>=3)
-            tagElements(&xmlWriter,"dSal",smpDataWidget->item(i,8)->text());
+        for(int j=0; j< dims; ++j)
+        {
+            tagElements(&xmlWriter,"dSal",smpDataWidget->item(i,4+(j*2))->text()); //4 6 8 10
+        }
         xmlWriter.writeEndElement();//end Salience
 
         xmlWriter.writeEndElement();//end actor
@@ -492,51 +482,83 @@ void Xmlparser::organizeXmlData()
         {
             xmlModel->setItem(row,col, new QStandardItem(actorsList.at(row).at(col)));
         }
-        if(actorsList.at(0).length()==5)
+
+        int col =2;
+        int dim = (actorsList.at(0).length()-3)/2;
+        int base_a =2;
+        int base_s = base_a + dim;
+
+        for(int index =1; index <= dim; ++index)
         {
-            precision = actorsList.at(row).at(3);
+            int ndx_data_a = base_a + index;
+            int ndx_data_b = base_s + index;
+
+            precision = actorsList.at(row).at(ndx_data_a);
             precision = QString::number(precision.toDouble(),'f',1);
-            xmlModel->setItem(row,3, new QStandardItem(precision));
-            precision = actorsList.at(row).at(4);
+            xmlModel->setItem(row,++col, new QStandardItem(precision));
+
+            precision = actorsList.at(row).at(ndx_data_b);
             precision = QString::number(precision.toDouble(),'f',1);
-            xmlModel->setItem(row,4, new QStandardItem(precision));
+            xmlModel->setItem(row,++col, new QStandardItem(precision));
         }
-        else if(actorsList.at(0).length()==7)
-        {
-            precision = actorsList.at(row).at(3);
-            precision = QString::number(precision.toDouble(),'f',1);
-            xmlModel->setItem(row,3, new QStandardItem(precision));
-            precision = actorsList.at(row).at(5);
-            precision = QString::number(precision.toDouble(),'f',1);
-            xmlModel->setItem(row,4, new QStandardItem(precision));
-            precision = actorsList.at(row).at(4);
-            precision = QString::number(precision.toDouble(),'f',1);
-            xmlModel->setItem(row,5, new QStandardItem(precision));
-            precision = actorsList.at(row).at(6);
-            precision = QString::number(precision.toDouble(),'f',1);
-            xmlModel->setItem(row,6, new QStandardItem(precision));
-        }
-        else if(actorsList.at(0).length()==9)
-        {
-            precision = actorsList.at(row).at(3);
-            precision = QString::number(precision.toDouble(),'f',1);
-            xmlModel->setItem(row,3, new QStandardItem(precision));
-            precision = actorsList.at(row).at(6);
-            precision = QString::number(precision.toDouble(),'f',1);
-            xmlModel->setItem(row,4, new QStandardItem(precision));
-            precision = actorsList.at(row).at(4);
-            precision = QString::number(precision.toDouble(),'f',1);
-            xmlModel->setItem(row,5, new QStandardItem(precision));
-            precision = actorsList.at(row).at(7);
-            precision = QString::number(precision.toDouble(),'f',1);
-            xmlModel->setItem(row,6, new QStandardItem(precision));
-            precision = actorsList.at(row).at(5);
-            precision = QString::number(precision.toDouble(),'f',1);
-            xmlModel->setItem(row,7, new QStandardItem(precision));
-            precision = actorsList.at(row).at(8);
-            precision = QString::number(precision.toDouble(),'f',1);
-            xmlModel->setItem(row,8, new QStandardItem(precision));
-        }
+
+        //        for(int i = 5; i <= actorsList.at(0).length(); i=i+2)
+        //        {
+        //            precision = actorsList.at(row).at(base+1+count);
+        //            precision = QString::number(precision.toDouble(),'f',1);
+        //            xmlModel->setItem(row,++col, new QStandardItem(precision));
+
+        //            precision = actorsList.at(row).at(base+dim+count);
+        //            precision = QString::number(precision.toDouble(),'f',1);
+        //            xmlModel->setItem(row,++col, new QStandardItem(precision));
+        //            ++count;
+        //        }
+
+        //        if(actorsList.at(0).length()==5)
+        //        {
+        //            precision = actorsList.at(row).at(3);                   // len -2
+        //            precision = QString::number(precision.toDouble(),'f',1);
+        //            xmlModel->setItem(row,3, new QStandardItem(precision));
+        //            precision = actorsList.at(row).at(4);                   //len -1
+        //            precision = QString::number(precision.toDouble(),'f',1);
+        //            xmlModel->setItem(row,4, new QStandardItem(precision));
+        //        }
+        //        else if(actorsList.at(0).length()==7)
+        //        {
+        //            precision = actorsList.at(row).at(3);                   //len -4
+        //            precision = QString::number(precision.toDouble(),'f',1);
+        //            xmlModel->setItem(row,3, new QStandardItem(precision));
+        //            precision = actorsList.at(row).at(5);                   //len- 2
+        //            precision = QString::number(precision.toDouble(),'f',1);
+        //            xmlModel->setItem(row,4, new QStandardItem(precision));
+        //            precision = actorsList.at(row).at(4);                   //len -3
+        //            precision = QString::number(precision.toDouble(),'f',1);
+        //            xmlModel->setItem(row,5, new QStandardItem(precision));
+        //            precision = actorsList.at(row).at(6);                   //len -1
+        //            precision = QString::number(precision.toDouble(),'f',1);
+        //            xmlModel->setItem(row,6, new QStandardItem(precision));
+        //        }
+        //        else if(actorsList.at(0).length()==9)
+        //        {
+        //            precision = actorsList.at(row).at(3);                   //len -6
+        //            precision = QString::number(precision.toDouble(),'f',1);
+        //            xmlModel->setItem(row,3, new QStandardItem(precision));
+        //            precision = actorsList.at(row).at(6);                   //len -3
+        //            precision = QString::number(precision.toDouble(),'f',1);
+        //            xmlModel->setItem(row,4, new QStandardItem(precision));
+        //            precision = actorsList.at(row).at(4);                   //len -5
+        //            precision = QString::number(precision.toDouble(),'f',1);
+        //            xmlModel->setItem(row,5, new QStandardItem(precision));
+        //            precision = actorsList.at(row).at(7);                   //len -2
+        //            precision = QString::number(precision.toDouble(),'f',1);
+        //            xmlModel->setItem(row,6, new QStandardItem(precision));
+        //            precision = actorsList.at(row).at(5);                   //len -4
+        //            precision = QString::number(precision.toDouble(),'f',1);
+        //            xmlModel->setItem(row,7, new QStandardItem(precision));
+        //            precision = actorsList.at(row).at(8);                   //len -1
+        //            precision = QString::number(precision.toDouble(),'f',1);
+        //            xmlModel->setItem(row,8, new QStandardItem(precision));
+        //        }
     }
     emit xmlParsedData(modelDesc,modelParametes,dimensionNames,xmlModel,idealAdjustmentList);
 }
