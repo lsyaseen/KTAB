@@ -114,15 +114,12 @@ void MainWindow::initializeBarGraphPlot()
     barCustomGraph->plotLayout()->insertRow(0);
     barCustomGraph->plotLayout()->addElement(0, 0, barGraphTitle);
 
+    barCustomGraph->xAxis->setRange(0, 100);
     barCustomGraph->xAxis->setAutoTicks(true);
     barCustomGraph->xAxis->setAutoTickLabels(true);
     barCustomGraph->xAxis->setAutoTickStep(false);
     barCustomGraph->xAxis->setTickStep(10.0);
 
-    barCustomGraph->xAxis->setRange(0, 100);
-    //barCustomGraph->xAxis->setSubTickCount(0);
-
-    //barCustomGraph->xAxis->setTickLength(0,10);
     barCustomGraph->xAxis->grid()->setVisible(true);
     barCustomGraph->setMinimumWidth(250);
     barCustomGraph->xAxis->setLabel("Position");

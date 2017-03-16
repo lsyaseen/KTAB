@@ -110,7 +110,6 @@ void MainWindow::xmlDataParsedFromFile(QStringList modelDesc, QStringList modpar
     updateModelParameters(modpara);
     populateXmlTable(actModel);
 
-
     QVector<QString> actors;
     for(int i =0 ; i < actModel->rowCount() ; ++ i)
         actors.append(actModel->item(i,0)->text());

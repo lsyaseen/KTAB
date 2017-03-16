@@ -141,6 +141,10 @@ MainWindow::MainWindow()
     connect(this ,SIGNAL(importColors(QString,int)),csvObj,SLOT(importActorColors(QString,int)));
     connect(csvObj,SIGNAL(importedColors(QList<QColor>)),this,SLOT(updateColors(QList<QColor>)));
 
+    //actormoveddata
+    connect(this,SIGNAL(getActorMovedData(QString)),dbObj,SLOT(getActorMovedDataDB(QString)));
+    connect(dbObj,SIGNAL(actorMovedInfo(QStandardItemModel*)),this,SLOT(actorMovedInfoModel(QStandardItemModel*)));
+
     //editable headers of TableWidget and TableView
     headerEditor = 0;
     barsCount=0;
@@ -297,6 +301,13 @@ void MainWindow::updateScenarioListComboBox(QStringList * scenarios,QStringList*
     scenarioBox = mScenarioIds.at(indx);
     scenarioDescriptionLineEdit->setText(mScenarioDesc.at(indx));
 
+    QApplication::setOverrideCursor(QCursor(QPixmap("://images/hourglass.png")));
+    statusBar()->showMessage("Please wait !! Data is being fetched from Database, "
+                             "this may take some time !!");
+    emit getActorMovedData(scenarioBox);
+    QApplication::restoreOverrideCursor();
+
+
     //qDebug() <<scenarioBox;
     //    sliderStateValueToQryDB(0);//when new database is opened, start from zero
 }
@@ -321,10 +332,12 @@ void MainWindow::sliderStateValueToQryDB(int value)
     {
         scenarioBox = mScenarioIds.at(scenarioComboBox->currentIndex());
         lineCustomGraph->clearGraphs();
+
         if(turnSlider->value()!=numStates)
             lineCustomGraph->xAxis->setRange(-1,turnSlider->value()+1);
         else
             lineCustomGraph->xAxis->setRange(-1,turnSlider->value());
+
         emit getScenarioRunValues(value,scenarioBox,dimension);
 
         lineGraphTitle->setText(QString(lineGraphDimensionComboBox->currentText()
@@ -364,6 +377,13 @@ void MainWindow::scenarioComboBoxValue(int scenario)
         scenarioDescriptionLineEdit->setText(mScenarioDesc.at(scenario));
         if(tableType=="Database")
         {
+            QApplication::setOverrideCursor(QCursor(QPixmap("://images/hourglass.png")));
+            QApplication::processEvents();
+            statusBar()->showMessage("Please wait !! Data is being fetched from Database, "
+                                     "this may take some time !!");
+            emit getActorMovedData(scenarioBox);
+            statusBar()->showMessage("Database Loaded",2000);
+            QApplication::restoreOverrideCursor();
             emit getScenarioRunValues(turnSlider->value(),scenarioBox,0);
             lineCustomGraph->replot();
             emit getStateCountfromDB();
@@ -381,6 +401,7 @@ void MainWindow::scenarioComboBoxValue(int scenario)
             {
                 quadMapTurnSliderChanged(quadMapTurnSlider->value());
             }
+            statusBar()->showMessage("Database Loaded",2000);
         }
     }
 }
@@ -851,14 +872,14 @@ void MainWindow::setDBItemModelEdit(/*QSqlTableModel *modelEdit*/)
             int col=0;
             csvTableWidget->setItem(row,col,new QTableWidgetItem(actorsName.at(row)));
             csvTableWidget->setItem(row,++col,new QTableWidgetItem(actorsDescription.at(row)));
-            csvTableWidget->setItem(row,++col,new QTableWidgetItem(QString::number(actorsInfl.at(row).toDouble(),'f',1)));
+            csvTableWidget->setItem(row,++col,new QTableWidgetItem(QString::number(actorsInfl.at(row).toDouble(),'f',2)));
 
             for(int dim = 0 ; dim < dimensionsLineEdit->text().toInt();++ dim)
             {
                 csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsPos[dim].at(row).toDouble()),'f',1)));
+                                        new QTableWidgetItem(QString::number((actorsPos[dim].at(row).toDouble()),'f',2)));
                 csvTableWidget->setItem(row,++col,
-                                        new QTableWidgetItem(QString::number((actorsSal[dim].at(row).toDouble()*100),'f',1)));
+                                        new QTableWidgetItem(QString::number((actorsSal[dim].at(row).toDouble()*100),'f',2)));
 
             }
         }
@@ -2101,14 +2122,15 @@ void MainWindow::updateDBViewColumns()
             modeltoDB->setItem(row,col,new QStandardItem(actorsName.at(row)));
             modeltoDB->setItem(row,++col,new QStandardItem(actorsDescription.at(row)));
             modeltoDB->setItem(row,++col,new QStandardItem(
-                                   QString::number(actorsInfl.at(row).toDouble(),'f',1)));
+                                   QString::number(actorsInfl.at(row).toDouble(),'f',2)));
 
             for(int dim = 0 ; dim < dimensionsLineEdit->text().toInt();++ dim)
             {
                 modeltoDB->setItem(row,++col,new QStandardItem(
-                                       QString::number(actorsPos[dim].at(row).toDouble(),'f',1)));
+                                       QString::number(actorsPos[dim].at(row).toDouble(),'f',2)));
                 modeltoDB->setItem(row,++col,new QStandardItem(
-                                       QString::number(actorsSal[dim].at(row).toDouble()*100,'f',1)));
+                                       QString::number(actorsSal[dim].at(row).toDouble()*100,'f',2)));
+
             }
 
         }

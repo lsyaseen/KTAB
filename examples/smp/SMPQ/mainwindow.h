@@ -29,6 +29,7 @@
 #include "database.h"
 #include "xmlparser.h"
 #include "colorpickerdialog.h"
+#include "popupwidget.h"
 #include "../qcustomplot/qcustomplot.h"
 
 #include <QtSql>
@@ -57,7 +58,6 @@ class QAction;
 class QListWidget;
 class QMenu;
 class QTextEdit;
-#define MAX_DIMS 25
 
 namespace Ui {
 class MainWindow;
@@ -97,7 +97,7 @@ private slots:
     //Central-  Controls Frame
     void sliderStateValueToQryDB(int value);
     void scenarioComboBoxValue(int scenarioBox);
-     void createNewSMPData(bool bl);
+    void createNewSMPData(bool bl);
     void cellSelected(QStandardItem *in);
     void insertNewRowCSV();
     void deleteLastRow();
@@ -267,8 +267,8 @@ private:
     QList <QString> actorsName;
     QList <QString> actorsDescription;
     QList <QString> actorsInfl;
-    QList <QString> actorsPos[MAX_DIMS];
-    QList <QString> actorsSal[MAX_DIMS];
+    QList <QString> actorsPos[50];
+    QList <QString> actorsSal[50];
     QList <QString> actorAffinity;
     QList <int>     actI;
     QList <int>     actJ;
@@ -286,7 +286,8 @@ private slots:
     //    void removeSelectedGraph();
     void removeAllGraphs();
     void moveLegend();
-    void graphClicked(QCPAbstractPlottable *plottable);
+    void graphClicked(QCPAbstractPlottable *plottable, QMouseEvent* e);
+    void graphDoubleClicked(QCPAbstractPlottable *plottable, QMouseEvent* e);
     void updateBarDimension(QStringList* dims);
     void linePlotContextMenuRequest(QPoint pos);
     void saveLinePlotAsBMP();
@@ -566,6 +567,21 @@ signals:
                            QStandardItemModel * affModel);
     void saveNewSMPDataToXMLFile(QStringList parameters, QTableWidget
                                  * smpDataWidget, QTableWidget * affModelWidget);
+
+    //actormoved
+private:
+    QStandardItemModel * actorMovedDataModel;
+    QList <int> actorIDList;
+    QList <int> actorTurnList;
+    QList <int> actorDimensionList;
+signals:
+    void getActorMovedData(QString scenario);
+
+private slots :
+    void actorMovedInfoModel(QStandardItemModel * actorMovedData);
+
+private :
+    PopupWidget * popup;
 };
 
 

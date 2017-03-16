@@ -345,6 +345,48 @@ void Database::releaseDB()
     }
 }
 
+void Database::getActorMovedDataDB(QString scenario)
+{
+    actorMovedModel = new QStandardItemModel(this);
+
+    int colIndex =0;
+    int rowIndex =0;
+    QSqlQuery qry;
+    QString query;
+
+    query= QString("select M.Movd_Turn, M.Act_i as Movd_ActorID, M.Dim_k, M.PrevPos, M.CurrPos, M.Diff, "
+                   "M.Mover_BargnID, MI.Name as Initiator, MR.Name as Receiver, B.Init_Act_i, B.Recd_Act_j "
+                   "from (select L0.Act_i, L0.Dim_k, L0.Turn_t as Movd_Turn, L0.Mover_BargnId, L0.Pos_Coord "
+                   "as CurrPos, L1.Pos_Coord as PrevPos, L0.Pos_Coord - L1.Pos_Coord as Diff "
+                   "from (select * from VectorPosition where Turn_t <> 0 and ScenarioID = '%1') "
+                   "as L0 inner join (select * from VectorPosition where ScenarioID = '%1') "
+                   "as L1 on L0.Turn_t = (L1.Turn_t+1) and L0.Act_i = L1.Act_i and L0.Dim_k = L1.Dim_k "
+                   "where L0.Pos_Coord <> L1.Pos_Coord ) as M inner join (select * from Bargn where "
+                   "ScenarioID = '%1') as B on M.Mover_BargnId = B.BargnId inner join "
+                   "ActorDescription as MI on B.Init_Act_i = MI.Act_i and B.ScenarioID = MI.ScenarioID inner join "
+                   "ActorDescription as MR on B.Recd_Act_j = MR.Act_i and B.ScenarioID = MR.ScenarioID  ").arg(scenario);
+
+    qry.exec(query);
+    while(qry.next())
+    {
+        actorMovedModel->setItem(rowIndex,colIndex,new QStandardItem(qry.value(0).toString().trimmed()));
+        actorMovedModel->setItem(rowIndex,++colIndex,new QStandardItem(qry.value(1).toString().trimmed()));
+        actorMovedModel->setItem(rowIndex,++colIndex,new QStandardItem(qry.value(2).toString().trimmed()));
+        actorMovedModel->setItem(rowIndex,++colIndex,new QStandardItem(qry.value(3).toString().trimmed()));
+        actorMovedModel->setItem(rowIndex,++colIndex,new QStandardItem(qry.value(4).toString().trimmed()));
+        actorMovedModel->setItem(rowIndex,++colIndex,new QStandardItem(qry.value(5).toString().trimmed()));
+        actorMovedModel->setItem(rowIndex,++colIndex,new QStandardItem(qry.value(6).toString().trimmed()));
+        actorMovedModel->setItem(rowIndex,++colIndex,new QStandardItem(qry.value(7).toString().trimmed()));
+        actorMovedModel->setItem(rowIndex,++colIndex,new QStandardItem(qry.value(8).toString().trimmed()));
+        actorMovedModel->setItem(rowIndex,++colIndex,new QStandardItem(qry.value(9).toString().trimmed()));
+        actorMovedModel->setItem(rowIndex,++colIndex,new QStandardItem(qry.value(10).toString().trimmed()));
+
+        ++rowIndex;
+        colIndex=0;
+    }
+    emit actorMovedInfo(actorMovedModel);
+}
+
 void Database::getVectorPosition(int actor, int dim, int turn, QString scenario)
 {
     QSqlQuery qry;

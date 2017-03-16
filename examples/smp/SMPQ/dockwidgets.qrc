@@ -10,5 +10,6 @@
         <file>images/xml.png</file>
         <file>images/create.png</file>
         <file>images/colorpicker.png</file>
+        <file>images/close.png</file>
     </qresource>
 </RCC>

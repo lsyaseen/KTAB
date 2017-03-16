@@ -64,7 +64,7 @@ void CSV::readCSVFile(QString path)
                         if(j > 1)
                         {
                             QString value = lineToken.at(j);
-                            value = QString::number(value.toFloat(),'f',1);
+                            value = QString::number(value.toFloat(),'f',2);
                             QStandardItem *item = new QStandardItem(value.trimmed());
                             model->setItem(rowindex-2, j, item);
                         }
