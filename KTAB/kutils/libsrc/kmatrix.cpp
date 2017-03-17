@@ -624,6 +624,7 @@ KMatrix KMatrix::vecToKmat(vector<double> vec, unsigned int nr, unsigned int nc)
   return mat;
 }
 
+/*
 KMatrix KMatrix::getRow(unsigned int nr)
 {
   // be sure the requested row number is < numrows
@@ -634,6 +635,74 @@ KMatrix KMatrix::getRow(unsigned int nr)
     thisrow(0,c) = (*this)(nr,c);
   }
   return thisrow;
+}
+*/
+
+
+KMatrix firstEigenvector( const KMatrix& A, double tol) {
+  const unsigned int n = A.numR();
+  assert (A.numC() == n); // must be square
+  assert (1 < n);
+  assert (0.0 < tol);
+  
+  auto mDelta = [](const KMatrix& m1, const KMatrix& m2) {
+    auto diff = norm(m1-m2);
+    auto sum = norm(m1)+norm(m2);
+    auto d = (2.0 *diff)/sum;
+    return d;
+  };
+  
+  auto unitize = [] (const KMatrix & m1) {
+    double s = norm(m1);
+    auto m2 = m1 / s;
+    return m2;
+  };
+    
+  
+  double change = 2.0 * tol;
+  unsigned int iter = 0;
+  const unsigned int maxIter = 10000;
+  auto x = unitize(KMatrix(n, 1, 1.0));
+   
+  while (change > tol) {
+    auto y = unitize(A*x);
+    
+    // eigenvalue is dot(y,x)/dot(x,x), and x is unit-length
+    auto eVal = dot(y,x);
+    if (eVal < 0.0) { // avoid near-cancellation when the vector flips signs
+      y = y *(-1.0); // would be nice to have unitary -y operator
+    }
+    change = mDelta(x,y);
+    
+    if (false) {
+    cout << "X"<<endl;
+    x.mPrintf("%+.4f ");
+    cout << endl << flush;
+    cout << "Y"<<endl;
+    y.mPrintf("%+.4f ");
+    cout << endl << flush;
+    printf("At iteration %u, delta is %.4e \n", iter, change);
+    }
+    
+    x = unitize((x+y)/2.0); // reduces oscillations
+    iter++;
+    if (iter > maxIter) {
+      throw KException("firstEigenvector:: iteration limit exceeded");
+    }
+  } 
+  
+  if (true) {
+    printf("After iteration %u, delta is %.4e \n", iter, change);
+  }
+  
+  // The eigenvector is unique only up to the sign.
+  // So when the answer can be all negative or all positive,
+  // we prefer the all positive version.
+  auto xSum = sum(x);
+  if (xSum < 0.0) {
+    x = x * (-1.0);
+  }
+  return x;
 }
 
 } // end of namespace

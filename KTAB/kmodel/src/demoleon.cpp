@@ -2233,7 +2233,8 @@ void demoRealEcon(bool OSPonly, uint64_t s, PRNG* rng)
         break;
       default:
         // get a row from the scenario capabilities matrix and transpose to the column used by Actor
-        ai->vCap = KBase::trans(caps.getRow(i));
+        //ai->vCap = KBase::trans(caps.getRow(i));
+        ai->vCap = KBase::trans(KBase::hSlice(caps, i));
         break;
       }
       ai->vr = overallVR;
