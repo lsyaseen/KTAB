@@ -57,6 +57,8 @@ KMatrix vSlice(const KMatrix & m1, unsigned int j);
 
 KMatrix trans(const KMatrix & m);
 double  norm(const KMatrix & m);
+double  rms(const KMatrix & m);
+KMatrix unitize(const KMatrix & m);
 double  sum(const KMatrix & m);
 double  mean(const KMatrix & m);
 double  stdv(const KMatrix & m);
@@ -64,13 +66,13 @@ double  maxAbs(const KMatrix & m);
 tuple<unsigned int, unsigned int>  ndxMaxAbs(const KMatrix & m);
 double  dot(const KMatrix & m1, const KMatrix & m2);
 double  lCorr(const KMatrix & m1, const KMatrix & m2);
-KMatrix  inv(const KMatrix & m);
-KMatrix  clip(const KMatrix & m, double xMin, double xMax);
+KMatrix inv(const KMatrix & m);
+KMatrix clip(const KMatrix & m, double xMin, double xMax);
 KMatrix iMat(unsigned int n);
-bool iMatP(const KMatrix & m);
+bool    iMatP(const KMatrix & m);
 KMatrix makePerp(const KMatrix & x, const KMatrix & p);
-KMatrix  joinH(const KMatrix & mL, const KMatrix & mR);
-KMatrix  joinV(const KMatrix & mT, const KMatrix & mB);
+KMatrix joinH(const KMatrix & mL, const KMatrix & mR);
+KMatrix joinV(const KMatrix & mT, const KMatrix & mB);
 KMatrix operator+ (const KMatrix & m1, const KMatrix & m2);
 KMatrix operator+ (const KMatrix & m1, double x);
 KMatrix operator- (const KMatrix & m1, const KMatrix & m2);
@@ -78,7 +80,7 @@ KMatrix operator- (const KMatrix & m1, double x);
 KMatrix operator* (double x, const KMatrix & m1);
 KMatrix operator* (const KMatrix & m1, double x);
 KMatrix operator/ (const KMatrix & m1, double x);
-bool sameShape(const KMatrix & m1, const KMatrix & m2);
+bool    sameShape(const KMatrix & m1, const KMatrix & m2);
 KMatrix operator* (const KMatrix & m1, const KMatrix & m2);
 
 KMatrix rescaleRows(const KMatrix& m1, const double vMin, const double vMax);
@@ -131,9 +133,6 @@ public:
 
     // JAH 20160809 return a matrix of specified dimensions populated with the data in the vector
     static KMatrix vecToKmat(vector<double> vec, unsigned int nr, unsigned int nc);
-
-    // JAH 20160814 get a single row slice from a matrix
-    //KMatrix getRow(unsigned int nr);
 
     // For those rare cases when we do not need explicit indices inside the loop,
     // the standard C++11 iterators are provided to support range-for
