@@ -196,14 +196,20 @@ void MainWindow::saveBarPlotAsBMP()
 {
     QString fileName = getImageFileName("BMP File (*.bmp)","BarPlot",".bmp");
     if(!fileName.isEmpty())
+    {
         barCustomGraph->saveBmp(fileName);
+        //        setCurrentFile(fileName);
+    }
 }
 
 void MainWindow::saveBarPlotAsPDF()
 {
     QString fileName = getImageFileName("PDF File (*.pdf)","BarPlot",".pdf");
     if(!fileName.isEmpty())
+    {
         barCustomGraph->savePdf(fileName);
+        //        setCurrentFile(fileName);
+    }
 }
 
 void MainWindow::populateBarGraphActorsList()

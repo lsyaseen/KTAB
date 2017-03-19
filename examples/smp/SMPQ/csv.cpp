@@ -55,53 +55,60 @@ void CSV::readCSVFile(QString path)
                 if(lastField.contains(space))
                     lineToken.removeLast();
 
-
-                if(rowindex >= 2 )
+                if(lineToken.length()>2)//CHECK FOR COLORS CSV
                 {
-                    // load parsed data to model accordingly
-                    for (int j = 0; j < lineToken.size(); j++)
+                    if(rowindex >= 2 )
                     {
-                        if(j > 1)
+                        // load parsed data to model accordingly
+                        for (int j = 0; j < lineToken.size(); j++)
                         {
-                            QString value = lineToken.at(j);
-                            value = QString::number(value.toFloat(),'f',2);
-                            QStandardItem *item = new QStandardItem(value.trimmed());
-                            model->setItem(rowindex-2, j, item);
-                        }
-                        else
-                        {
-                            QString value = lineToken.at(j);
-                            QStandardItem *item = new QStandardItem(value.trimmed());
-                            model->setItem(rowindex-2, j, item);
+                            if(j > 1)
+                            {
+                                QString value = lineToken.at(j);
+                                value = QString::number(value.toFloat(),'f',2);
+                                QStandardItem *item = new QStandardItem(value.trimmed());
+                                model->setItem(rowindex-2, j, item);
+                            }
+                            else
+                            {
+                                QString value = lineToken.at(j);
+                                QStandardItem *item = new QStandardItem(value.trimmed());
+                                model->setItem(rowindex-2, j, item);
+                            }
                         }
                     }
-                }
-                else if(rowindex == 1)
-                {
-                    for(int i=3; i< lineToken.length(); ++i)
+                    else if(rowindex == 1)
                     {
-                        QString header = lineToken.at(i);
-                        QStringList headerList = header.split(" ");
-                        if(headerList.length()>1)
+                        for(int i=3; i< lineToken.length(); ++i)
                         {
-                            header = headerList.at(0);
-                            header.append(" \n").append(headerList.at(1));
-                            lineToken[i]=header;
+                            QString header = lineToken.at(i);
+                            QStringList headerList = header.split(" ");
+                            if(headerList.length()>1)
+                            {
+                                header = headerList.at(0);
+                                header.append(" \n").append(headerList.at(1));
+                                lineToken[i]=header;
+                            }
                         }
-                    }
 
-                    model->setHorizontalHeaderLabels(lineToken);
+                        model->setHorizontalHeaderLabels(lineToken);
+                    }
+                    else if(rowindex == 0)
+                    {
+                        scenarioName.append(lineToken.at(0));
+                        scenarioName.append(lineToken.at(1));
+                        lineToken.clear();
+                    }
+                    rowindex++;
                 }
-                else if(rowindex == 0)
+                else
                 {
-                    scenarioName.append(lineToken.at(0));
-                    scenarioName.append(lineToken.at(1));
-                    lineToken.clear();
+                    emit sendMessage("CSV","Unknown Data !");
+                    return;
                 }
-                rowindex++;
             }
-
             file.close();
+            emit csvModel(model,scenarioName);
         }
         else
         {
@@ -109,7 +116,6 @@ void CSV::readCSVFile(QString path)
             return;
         }
     }
-    emit csvModel(model,scenarioName);
 }
 
 
@@ -133,11 +139,7 @@ void CSV::exportActorColors(QString path, QList<int> actorIds, QList<QString> co
             qDebug() << strList;
         }
         f.close();
-
     }
-
-
-
 }
 
 void CSV::importActorColors(QString path, int actCount)

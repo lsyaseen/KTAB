@@ -118,111 +118,103 @@ void Xmlparser::readXmlFile()
     xmlFile->close();
 }
 
-void Xmlparser::saveToXmlFile(QStringList parameters, QStandardItemModel *smpData, QStandardItemModel *affMatrix)
+void Xmlparser::saveToXmlFile(QStringList parameters, QStandardItemModel *smpData, QStandardItemModel *affMatrix, QString filename)
 {
-    QString filename = QFileDialog::getSaveFileName(0,tr("Save Xml"), homeDirectory ,tr("Xml files (*.xml)"));
-
-    if(!filename.endsWith(".xml"))
-        filename.append(".xml");
-
     if(!filename.isEmpty())
     {
-        QDir dir =QFileInfo(filename).absoluteDir();
-        homeDirectory = dir.absolutePath();
-    }
+        QFile file(filename);
+        file.open(QIODevice::WriteOnly);
+        QXmlStreamWriter xmlWriter;
+        xmlWriter.setAutoFormatting(true);
+        xmlWriter.setDevice(&file);
 
-    QFile file(filename);
-    file.open(QIODevice::WriteOnly);
-    QXmlStreamWriter xmlWriter;
-    xmlWriter.setAutoFormatting(true);
-    xmlWriter.setDevice(&file);
+        /* Writes a document start with the XML version number. */
+        xmlWriter.writeStartDocument();
 
-    /* Writes a document start with the XML version number. */
-    xmlWriter.writeStartDocument();
+        xmlWriter.writeStartElement("Scenario");
+        xmlWriter.writeAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
+        xmlWriter.writeAttribute("xsi:noNamespaceSchemaLocation","smpSchema.xsd");
 
-    xmlWriter.writeStartElement("Scenario");
-    xmlWriter.writeAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
-    xmlWriter.writeAttribute("xsi:noNamespaceSchemaLocation","smpSchema.xsd");
+        tagElements(&xmlWriter,"name",parameters.at(0));
+        tagElements(&xmlWriter,"desc",parameters.at(1));
+        tagElements(&xmlWriter,"prngSeed",parameters.at(2));
 
-    tagElements(&xmlWriter,"name",parameters.at(0));
-    tagElements(&xmlWriter,"desc",parameters.at(1));
-    tagElements(&xmlWriter,"prngSeed",parameters.at(2));
+        //ModuleParameters
+        xmlWriter.writeStartElement("ModelParameters");
+        tagElements(&xmlWriter,"VictoryProbModel",parameters.at(3));
+        tagElements(&xmlWriter,"PCEModel",parameters.at(4));
+        tagElements(&xmlWriter,"StateTransitions",parameters.at(5));
+        tagElements(&xmlWriter,"VotingRule",parameters.at(6));
+        tagElements(&xmlWriter,"BigRAdjust",parameters.at(7));
+        tagElements(&xmlWriter,"BigRRange",parameters.at(8));
+        tagElements(&xmlWriter,"ThirdPartyCommit",parameters.at(9));
+        tagElements(&xmlWriter,"InterVecBrgn",parameters.at(10));
+        tagElements(&xmlWriter,"BargnModel",parameters.at(11));
+        //End Module Parameters
+        xmlWriter.writeEndElement();
 
-    //ModuleParameters
-    xmlWriter.writeStartElement("ModelParameters");
-    tagElements(&xmlWriter,"VictoryProbModel",parameters.at(3));
-    tagElements(&xmlWriter,"PCEModel",parameters.at(4));
-    tagElements(&xmlWriter,"StateTransitions",parameters.at(5));
-    tagElements(&xmlWriter,"VotingRule",parameters.at(6));
-    tagElements(&xmlWriter,"BigRAdjust",parameters.at(7));
-    tagElements(&xmlWriter,"BigRRange",parameters.at(8));
-    tagElements(&xmlWriter,"ThirdPartyCommit",parameters.at(9));
-    tagElements(&xmlWriter,"InterVecBrgn",parameters.at(10));
-    tagElements(&xmlWriter,"BargnModel",parameters.at(11));
-    //End Module Parameters
-    xmlWriter.writeEndElement();
+        int dims = parameters.length() - 12;
+        //    qDebug()<<dims;
 
-    int dims = parameters.length() - 12;
-    //    qDebug()<<dims;
-
-    //Dimensions
-    xmlWriter.writeStartElement("Dimensions");
-    for(int i = 0 ; i < dims ; ++i)
-    {
-        tagElements(&xmlWriter,"dName",parameters.at(12+i));
-    }
-    //end dimensions
-    xmlWriter.writeEndElement();
-
-    //Actors
-    xmlWriter.writeStartElement("Actors");
-
-    for(int i=0; i< smpData->rowCount();++i)
-    {
-        xmlWriter.writeStartElement("Actor");
-        tagElements(&xmlWriter,"name",smpData->item(i,0)->text());
-        tagElements(&xmlWriter,"description",smpData->item(i,1)->text());
-        tagElements(&xmlWriter,"capability",smpData->item(i,2)->text());
-
-        xmlWriter.writeStartElement("Position");
-        for(int j=0; j< dims; ++j)
+        //Dimensions
+        xmlWriter.writeStartElement("Dimensions");
+        for(int i = 0 ; i < dims ; ++i)
         {
-            tagElements(&xmlWriter,"dCoord",smpData->item(i,3+(j*2))->text());   //3 5 7 9
+            tagElements(&xmlWriter,"dName",parameters.at(12+i));
         }
-        xmlWriter.writeEndElement();//end position
+        //end dimensions
+        xmlWriter.writeEndElement();
 
-        xmlWriter.writeStartElement("Salience");
-        for(int j=0; j< dims; ++j)
+        //Actors
+        xmlWriter.writeStartElement("Actors");
+
+        for(int i=0; i< smpData->rowCount();++i)
         {
-            tagElements(&xmlWriter,"dSal",smpData->item(i,4+(j*2))->text()); //4 6 8 10
+            xmlWriter.writeStartElement("Actor");
+            tagElements(&xmlWriter,"name",smpData->item(i,0)->text());
+            tagElements(&xmlWriter,"description",smpData->item(i,1)->text());
+            tagElements(&xmlWriter,"capability",smpData->item(i,2)->text());
+
+            xmlWriter.writeStartElement("Position");
+            for(int j=0; j< dims; ++j)
+            {
+                tagElements(&xmlWriter,"dCoord",smpData->item(i,3+(j*2))->text());   //3 5 7 9
+            }
+            xmlWriter.writeEndElement();//end position
+
+            xmlWriter.writeStartElement("Salience");
+            for(int j=0; j< dims; ++j)
+            {
+                tagElements(&xmlWriter,"dSal",smpData->item(i,4+(j*2))->text()); //4 6 8 10
+            }
+            xmlWriter.writeEndElement();//end Salience
+
+            xmlWriter.writeEndElement();//end actor
         }
-        xmlWriter.writeEndElement();//end Salience
+        xmlWriter.writeEndElement();//end Actors
 
-        xmlWriter.writeEndElement();//end actor
-    }
-    xmlWriter.writeEndElement();//end Actors
+        //Ideal Adjustment
+        xmlWriter.writeStartElement("IdealAdjustment");
 
-    //Ideal Adjustment
-    xmlWriter.writeStartElement("IdealAdjustment");
-
-    for(int i=0; i< affMatrix->rowCount();++i)
-    {
-        for(int j=0; j<affMatrix->columnCount();++j)
+        for(int i=0; i< affMatrix->rowCount();++i)
         {
-            xmlWriter.writeStartElement("iaPair");
-            tagElements(&xmlWriter,"adjustingIdeal",affMatrix->headerData(i,Qt::Horizontal).toString());
-            tagElements(&xmlWriter,"referencePos",affMatrix->headerData(j,Qt::Vertical).toString());
-            tagElements(&xmlWriter,"adjust",affMatrix->item(i,j)->text());
-            xmlWriter.writeEndElement();//end iaPair
+            for(int j=0; j<affMatrix->columnCount();++j)
+            {
+                xmlWriter.writeStartElement("iaPair");
+                tagElements(&xmlWriter,"adjustingIdeal",affMatrix->headerData(i,Qt::Horizontal).toString());
+                tagElements(&xmlWriter,"referencePos",affMatrix->headerData(j,Qt::Vertical).toString());
+                tagElements(&xmlWriter,"adjust",affMatrix->item(i,j)->text());
+                xmlWriter.writeEndElement();//end iaPair
+            }
         }
+        xmlWriter.writeEndElement();//end IdealAdjustment
+
+        /*end scenario */
+        xmlWriter.writeEndDocument();
+
+        file.close();
+        emit newXmlFilePath(filename);
     }
-    xmlWriter.writeEndElement();//end IdealAdjustment
-
-    /*end scenario */
-    xmlWriter.writeEndDocument();
-
-    file.close();
-    emit newXmlFilePath(filename);
 }
 
 void Xmlparser::saveNewDataToXmlFile(QStringList parameters, QTableWidget *smpDataWidget,

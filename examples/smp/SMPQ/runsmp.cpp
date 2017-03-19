@@ -253,8 +253,8 @@ void MainWindow::logSMPDataOptionsAnalysis()
             if(!saveLogFilePath.endsWith(".txt"))
                 saveLogFilePath.append(".txt");
 
-                QDir dir =QFileInfo(saveLogFilePath).absoluteDir();
-                homeDirectory = dir.absolutePath();
+            QDir dir =QFileInfo(saveLogFilePath).absoluteDir();
+            homeDirectory = dir.absolutePath();
 
             logFileNewName=saveLogFilePath;
         }
@@ -622,9 +622,9 @@ void MainWindow::saveTurnHistoryToCSV()
 
     if(!csvFileNameLocation.isEmpty())
     {
-             QDir dir =QFileInfo(csvFileNameLocation).absoluteDir();
-            homeDirectory = dir.absolutePath();
-
+        QDir dir =QFileInfo(csvFileNameLocation).absoluteDir();
+        homeDirectory = dir.absolutePath();
+        //        setCurrentFile(csvFileNameLocation);
         qDebug()<<csvFileNameLocation.remove(".csv") << dbPath <<scenarioBox ;
         if(sankeyOutputHistory==true)
         {

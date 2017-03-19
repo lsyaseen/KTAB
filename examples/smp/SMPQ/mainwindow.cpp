@@ -131,8 +131,8 @@ MainWindow::MainWindow()
                                            QList<QStringList>)),this,
             SLOT(xmlDataParsedFromFile(QStringList,QStringList,QStringList,QStandardItemModel*,
                                        QList<QStringList>)));
-    connect(this,SIGNAL(saveXMLDataToFile(QStringList,QStandardItemModel*,QStandardItemModel*)),
-            xmlparser,SLOT(saveToXmlFile(QStringList,QStandardItemModel*,QStandardItemModel*)));
+    connect(this,SIGNAL(saveXMLDataToFile(QStringList,QStandardItemModel*,QStandardItemModel*,QString)),
+            xmlparser,SLOT(saveToXmlFile(QStringList,QStandardItemModel*,QStandardItemModel*,QString)));
     connect(xmlparser,SIGNAL(newXmlFilePath(QString)),this,SLOT(savedXmlName(QString)));
     connect(this,SIGNAL(saveNewSMPDataToXMLFile(QStringList,QTableWidget*,QTableWidget*)),
             xmlparser,SLOT(saveNewDataToXmlFile(QStringList,QTableWidget*,QTableWidget*)));
@@ -190,18 +190,10 @@ void MainWindow::csvGetFilePAth(bool bl, QString filepath )
     if(!csvFilePth.isEmpty())
     {
         setCurrentFile(csvFilePth);
-        emit releaseDatabase();
-        lineGraphDock->setVisible(false);
-        barGraphDock->setVisible(false);
-        quadMapDock->setVisible(false);
 
         modeltoCSV->clear();
         emit csvFilePath(csvFilePth);
-
-        // to pass csvfile path to smp
         csvPath = csvFilePth;
-        clearAllGraphs();
-        seedRand->clear();
     }
     statusBar()->showMessage(tr(" "));
 }
@@ -634,6 +626,15 @@ void MainWindow::dockWindowChanged()
 
 void MainWindow::setCSVItemModel(QStandardItemModel *model, QStringList scenarioName)
 {
+    emit releaseDatabase();
+    lineGraphDock->setVisible(false);
+    barGraphDock->setVisible(false);
+    quadMapDock->setVisible(false);
+
+    // to pass csvfile path to smp
+    clearAllGraphs();
+    seedRand->clear();
+
     savedAsXml=false;
 
     plotQuadMap->setEnabled(false);
@@ -1392,14 +1393,13 @@ void MainWindow::importActorColors()
     {
         QString colorCodeCsvFilePth;
         colorCodeCsvFilePth = QFileDialog::getOpenFileName(this,tr("Open CSV File"), homeDirectory , tr("CSV File (*.csv)"));
+
+        //emit path to csv class for processing
         if(!colorCodeCsvFilePth.isEmpty())
         {
             QDir dir =QFileInfo(colorCodeCsvFilePth).absoluteDir();
             homeDirectory = dir.absolutePath();
-        }
-        //emit path to csv class for processing
-        if(!colorCodeCsvFilePth.isEmpty())
-        {
+            setCurrentFile(colorCodeCsvFilePth);
             emit importColors(colorCodeCsvFilePth,actorsName.length());
         }
     }
@@ -1420,6 +1420,8 @@ void MainWindow::exportActorColors()
         }
         if(!colorPaletteCsvFileNameLocation.endsWith(".csv"))
             colorPaletteCsvFileNameLocation.append(".csv");
+
+        setCurrentFile(colorPaletteCsvFileNameLocation);
 
         QList<int> actorIdList;
         QList<QString> actorColorsList;
@@ -1932,61 +1934,6 @@ int MainWindow::validateControlButtons(QString viewName)
 {
     int ret=0;
 
-    /*  if("csv_tableWidget"==viewName)
-    {
-        if(true==actorsLineEdit->text().isEmpty()
-                || csvTableWidget->rowCount()!=actorsLineEdit->text().toInt())
-        {
-            ++ret;
-            displayMessage("Actors", "Enter a valid value");
-        }
-    }
-    else if("csv_tableView"==viewName)
-    {
-        if(true==actorsLineEdit->text().isEmpty()
-                || modeltoCSV->rowCount()!=actorsLineEdit->text().toInt())
-        {
-            ++ret;
-            displayMessage("Actors", "Enter a valid value");
-        }
-    }
-    else if("xml_tableView"==viewName)
-    {
-        if(true==actorsLineEdit->text().isEmpty()
-                || xmlSmpDataModel->rowCount()!=actorsLineEdit->text().toInt())
-        {
-            ++ret;
-            displayMessage("Actors", "Enter a valid value");
-        }
-    }
-    if("csv_tableWidget"==viewName)
-    {
-        if(true==dimensionsLineEdit->text().isEmpty()
-                || csvTableWidget->columnCount()!=(dimensionsLineEdit->text().toInt()*2)+3)
-        {
-            ++ret;
-            displayMessage("Dimensions", "Enter a valid value");
-        }
-    }
-    else if("csv_tableView"==viewName)
-    {
-        if(true==dimensionsLineEdit->text().isEmpty()
-                || modeltoCSV->columnCount()!=(dimensionsLineEdit->text().toInt()*2)+3)
-        {
-            ++ret;
-            displayMessage("Dimensions", "Enter a valid value");
-        }
-    }
-    else if("xml_tableView"==viewName)
-    {
-        if(true==dimensionsLineEdit->text().isEmpty()
-                || xmlSmpDataModel->columnCount()!=(dimensionsLineEdit->text().toInt()*2)+3)
-        {
-            ++ret;
-            displayMessage("Dimensions", "Enter a valid value");
-        }
-    }
-*/
     if(true==scenarioNameLineEdit->text().isEmpty())
     {
         ++ret;
@@ -2532,74 +2479,6 @@ void MainWindow::displayMenuTableView(QPoint pos)
     }
 }
 
-//void MainWindow::displayCsvAffinityMenuTableView(QPoint pos)
-//{
-//    QMenu menu(this);
-//    QAction *newactor = menu.addAction("Insert New Actor w.r.t row");
-//    QAction *delactor = menu.addAction("Delete Actor w.r.t row");
-//    menu.addSeparator();
-//    QAction *rename = menu.addAction("Rename Header w.r.t row");
-
-//    QAction *act = menu.exec(csvTableAffinityView->viewport()->mapToGlobal(pos));
-
-//    if (act == newactor)
-//    {
-//        bool ok;
-//        QString text = QInputDialog::getText(this, tr("Plesase Enter the Header Name"),
-//                                             tr("Header Name"), QLineEdit::Normal,"Actor ", &ok);
-//        csvAffinityModel->insertColumn(csvTableAffinityView->currentIndex().row());
-//        csvAffinityModel->insertRow(csvTableAffinityView->currentIndex().row());
-
-//        if(ok && !text.isEmpty())
-//        {
-//            csvAffinityModel->setVerticalHeaderItem(csvTableAffinityView->currentIndex().row()-1,
-//                                                    new QStandardItem(text));
-//            csvAffinityModel->setHorizontalHeaderItem(csvTableAffinityView->currentIndex().row()-1,
-//                                                      new QStandardItem(text));
-//        }
-//        for( int col = 0; col < csvAffinityModel->columnCount(); ++col)
-//        {
-//            if(csvTableAffinityView->currentIndex().row()-1==col)
-//                csvAffinityModel->setItem(csvTableAffinityView->currentIndex().row()-1,col,
-//                                          new QStandardItem("1"));
-//            else
-//                csvAffinityModel->setItem(csvTableAffinityView->currentIndex().row()-1,col,
-//                                          new QStandardItem("0"));
-//        }
-
-//        for(int row = 0; row < csvAffinityModel->rowCount() ; ++row)
-//        {
-//            if(csvTableAffinityView->currentIndex().row()-1==row)
-//                csvAffinityModel->setItem(row,csvTableAffinityView->currentIndex().row()-1,
-//                                          new QStandardItem("1"));
-//            else
-//                csvAffinityModel->setItem(row,csvTableAffinityView->currentIndex().row()-1,
-//                                          new QStandardItem("0"));
-//        }
-//    }
-//    if (act == delactor)
-//    {
-//        csvAffinityModel->removeColumn(csvTableAffinityView->currentIndex().row());
-//        csvAffinityModel->removeRow(csvTableAffinityView->currentIndex().row());
-//    }
-//    if (act == rename)
-//    {
-//        bool ok;
-//        QString text = QInputDialog::getText(this, tr("Plesase Enter the Header Name"),
-//                                             tr("Header Name"), QLineEdit::Normal,csvAffinityModel->headerData(
-//                                                 csvTableAffinityView->currentIndex().row(),Qt::Horizontal).toString(),
-//                                             &ok);
-//        if (ok && !text.isEmpty())
-//        {
-//            csvAffinityModel->setVerticalHeaderItem(csvTableAffinityView->currentIndex().row(),
-//                                                    new QStandardItem(text));
-//            csvAffinityModel->setHorizontalHeaderItem(csvTableAffinityView->currentIndex().row(),
-//                                                      new QStandardItem(text));
-//            statusBar()->showMessage("Header changed");
-//        }
-//    }
-//}
-
 void MainWindow::actorsNameDesc(QList <QString> actorName,QList <QString> actorDescription)
 {
     actorsName.clear();
@@ -2828,15 +2707,46 @@ void MainWindow::loadRecentFile(const QString &fileName)
         homeDirectory = dir.absolutePath();
 
         if(fileName.endsWith(".csv") || fileName.endsWith(".CSV"))
-            csvGetFilePAth(true,fileName);
+        {
+            checkCSVtype(fileName);
+        }
         else if(fileName.endsWith(".xml") || fileName.endsWith(".XML"))
+        {
             importXmlGetFilePath(true,fileName);
+        }
         else if(fileName.endsWith(".db") || fileName.endsWith(".DB"))
+        {
             dbGetFilePAth(true,fileName);
+        }
+
     }
     else
     {
-        displayMessage("Recent Files",QString(fileName+" not found !!"));
+
+        QMessageBox msgBox;
+        msgBox.setText(QString(fileName+" not found !\n"
+                               + "Do you want to remove from the recently accessed list ?"));
+        QPushButton *yesButton = msgBox.addButton(tr("Yes"), QMessageBox::ActionRole);
+        QPushButton *noButton = msgBox.addButton(QMessageBox::No);
+
+        msgBox.exec();
+
+        if (msgBox.clickedButton() == yesButton)
+        {
+            QStringList files = recentFileSettings.value("recentFileList").toStringList();
+            recentFileSettings.remove("recentFileList");
+
+            int index = files.indexOf(fileName);
+            files.removeAt(index);
+
+            recentFileSettings.setValue("recentFileList",files);
+
+            updateRecentFileActions();
+        }
+        else if (msgBox.clickedButton() == noButton)
+        {
+            msgBox.close();
+        }
     }
 
 }
@@ -2866,6 +2776,50 @@ void MainWindow::intializeHomeDirectory()
 
     defaultDirectory= homeDirectory;
     qDebug()<<homeDirectory;
+}
+
+void MainWindow::checkCSVtype(QString fileName)
+{
+    QFile file(fileName);
+    if (file.open(QIODevice::ReadOnly) && file.size() > 0)
+    {
+        QTextStream in(&file);                 // read to text stream
+
+        if (!in.atEnd())
+        {
+            // read one line from textstream(separated by "\n")
+            QString fileLine = in.readLine();
+
+            // parse the read line into separate pieces(tokens) with "," as the delimiter
+            QStringList lineToken = fileLine.split(",", QString::SkipEmptyParts);
+            if(lineToken.length()>2)
+            {
+                file.close();
+                csvGetFilePAth(true,fileName);
+            }
+            else if(lineToken.length()==2)
+            {
+                file.close();
+                if(tableType=="Database")
+                {
+                    setCurrentFile(fileName);
+                    emit importColors(fileName,actorsName.length());
+                }
+                else
+                {
+                    displayMessage("Actors color picker","Please Import DB or RUN SMP Model");
+                }
+            }
+            else
+            {
+                file.close();
+            }
+
+        }
+
+    }
+    updateRecentFileActions();
+
 }
 
 // --------------------------------------------

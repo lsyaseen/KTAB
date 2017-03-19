@@ -186,7 +186,7 @@ void MainWindow::initializeLineGraphPlot()
     // setup policy and connect slot for context menu popup:
     lineCustomGraph->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(lineCustomGraph, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(linePlotContextMenuRequest(QPoint)));
-//    connrct(lineCustomGraph, SIGNAL())
+    //    connrct(lineCustomGraph, SIGNAL())
 }
 
 void MainWindow::populateLineGraphActorsList()
@@ -593,14 +593,20 @@ void MainWindow::saveLinePlotAsBMP()
 {
     QString fileName = getImageFileName("BMP File (*.bmp)","LinePlot",".bmp");
     if(!fileName.isEmpty())
+    {
         lineCustomGraph->saveBmp(fileName);
+        //        setCurrentFile(fileName);
+    }
 }
 
 void MainWindow::saveLinePlotAsPDF()
 {
     QString fileName = getImageFileName("PDF File (*.pdf)","LinePlot",".pdf");
     if(!fileName.isEmpty())
+    {
         lineCustomGraph->savePdf(fileName);
+        //        setCurrentFile(fileName);
+    }
 }
 
 void MainWindow::moveLegend()
@@ -681,7 +687,7 @@ void MainWindow::graphDoubleClicked(QCPAbstractPlottable *plottable, QMouseEvent
 
         }
     }
- }
+}
 
 void MainWindow::actorMovedInfoModel(QStandardItemModel *actorMovedData)
 {
