@@ -52,14 +52,21 @@ void MainWindow::createXmlTable()
 
 }
 
-void MainWindow::importXmlGetFilePath(bool bl)
+void MainWindow::importXmlGetFilePath(bool bl,QString filepath)
 {
-
     QString filename;
-    filename = QFileDialog::getOpenFileName(this,tr("Xml File"), QDir::homePath() , tr("Xml File (*.xml)"));
-
+    if(filepath.isEmpty())
+    {
+        filename = QFileDialog::getOpenFileName(this,tr("Xml File"),homeDirectory, tr("Xml File (*.xml)"));
+    }
+    else
+        filename=filepath;
     if(!filename.isEmpty())
     {
+             QDir dir =QFileInfo(filename).absoluteDir();
+            homeDirectory = dir.absolutePath();
+
+        setCurrentFile(filename);
         emit releaseDatabase();
         lineGraphDock->setVisible(false);
         barGraphDock->setVisible(false);

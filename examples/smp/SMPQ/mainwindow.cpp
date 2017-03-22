@@ -36,6 +36,8 @@ MainWindow::MainWindow()
     createBarPlotsDockWindows();
     createQuadMapDockWindows();
 
+    intializeHomeDirectory();
+
     setWindowTitle(tr("KTAB: Spatial Model of Politics (SMP)"));
 
     //CSV class obj
@@ -121,7 +123,7 @@ MainWindow::MainWindow()
 
 
     //XML Class signal slots
-    xmlparser = new Xmlparser;
+    xmlparser = new Xmlparser(homeDirectory);
     connect(this,SIGNAL(openXMLFile(QString)),xmlparser,SLOT(openXmlFile(QString)));
     connect(this,SIGNAL(readXMLFile()),xmlparser,SLOT(readXmlFile()));
     connect(xmlparser,SIGNAL(openXMLStatus(bool)),this,SLOT(openStatusXml(bool)));
@@ -134,6 +136,7 @@ MainWindow::MainWindow()
     connect(xmlparser,SIGNAL(newXmlFilePath(QString)),this,SLOT(savedXmlName(QString)));
     connect(this,SIGNAL(saveNewSMPDataToXMLFile(QStringList,QTableWidget*,QTableWidget*)),
             xmlparser,SLOT(saveNewDataToXmlFile(QStringList,QTableWidget*,QTableWidget*)));
+    connect(this,SIGNAL(homeDirChanged(QString)),xmlparser,SLOT(updateHomeDir(QString)));
 
     //colorpalette
     connect(this,SIGNAL(exportColors(QString,QList<int>, QList<QString>)),
@@ -156,7 +159,6 @@ MainWindow::MainWindow()
     useHistory =true;
     currentScenarioId = "dummy";
     sankeyOutputHistory=true;
-
 }
 
 MainWindow::~MainWindow()
@@ -164,18 +166,30 @@ MainWindow::~MainWindow()
 
 }
 
-void MainWindow::csvGetFilePAth(bool bl)
+void MainWindow::csvGetFilePAth(bool bl, QString filepath )
 {
     Q_UNUSED(bl)
 
     statusBar()->showMessage(tr("Looking for CSV file"));
-    //Get  *.csv file path
+
     QString csvFilePth;
-    csvFilePth = QFileDialog::getOpenFileName(this,tr("Open CSV File"), QDir::homePath() , tr("CSV File (*.csv)"));
+    if(filepath.isEmpty())
+    {
+        //Get  *.csv file path
+        csvFilePth = QFileDialog::getOpenFileName(this,tr("Open CSV File"), homeDirectory , tr("CSV File (*.csv)"));
+        if(!csvFilePth.isEmpty())
+        {
+            QDir dir =QFileInfo(csvFilePth).absoluteDir();
+            homeDirectory = dir.absolutePath();
+        }
+    }
+    else
+        csvFilePth =filepath;
 
     //emit path to csv class for processing
     if(!csvFilePth.isEmpty())
     {
+        setCurrentFile(csvFilePth);
         emit releaseDatabase();
         lineGraphDock->setVisible(false);
         barGraphDock->setVisible(false);
@@ -198,13 +212,16 @@ void MainWindow::dbGetFilePAth(bool bl, QString smpDBPath, bool run)
     Q_UNUSED(bl)
     statusBar()->showMessage(tr("Looking for Database file ..."));
 
+    QString currentPath =dbPath;
     if(smpDBPath.isEmpty())
     {
-        QString currentPath =dbPath;
         //Get  *.db file path
-        dbPath = QFileDialog::getOpenFileName(this,tr("Database File"), QDir::homePath() , tr("Database File (*.db)"));
-        if(dbPath.isEmpty())
-            dbPath=currentPath;
+        dbPath = QFileDialog::getOpenFileName(this,tr("Database File"), homeDirectory , tr("Database File (*.db)"));
+        if(!dbPath.isEmpty())
+        {
+            QDir dir =QFileInfo(dbPath).absoluteDir();
+            homeDirectory = dir.absolutePath();
+        }
     }
     else
         dbPath = smpDBPath;
@@ -212,6 +229,7 @@ void MainWindow::dbGetFilePAth(bool bl, QString smpDBPath, bool run)
     //emit path to db class for processing
     if(!dbPath.isEmpty())
     {
+        setCurrentFile(dbPath);
         clearAllLabels();
         lineGraphDock->setVisible(true);
         barGraphDock->setVisible(true);
@@ -241,7 +259,7 @@ void MainWindow::dbGetFilePAth(bool bl, QString smpDBPath, bool run)
     }
     else
     {
-        dbPath = smpDBPath;
+        dbPath = currentPath;
     }
     statusBar()->showMessage(tr(" "));
 }
@@ -328,6 +346,8 @@ void MainWindow::updateActorCount(int actNum)
 
 void MainWindow::sliderStateValueToQryDB(int value)
 {
+    turnSlider->setToolTip(QString("Current Turn: "+QString::number(value)));
+    turnSlider->setToolTipDuration(3000);
     if(mScenarioIds.length()>0)
     {
         scenarioBox = mScenarioIds.at(scenarioComboBox->currentIndex());
@@ -1371,8 +1391,12 @@ void MainWindow::importActorColors()
     if(actorsName.length()>0 && tableType=="Database")
     {
         QString colorCodeCsvFilePth;
-        colorCodeCsvFilePth = QFileDialog::getOpenFileName(this,tr("Open CSV File"), QDir::homePath() , tr("CSV File (*.csv)"));
-
+        colorCodeCsvFilePth = QFileDialog::getOpenFileName(this,tr("Open CSV File"), homeDirectory , tr("CSV File (*.csv)"));
+        if(!colorCodeCsvFilePth.isEmpty())
+        {
+            QDir dir =QFileInfo(colorCodeCsvFilePth).absoluteDir();
+            homeDirectory = dir.absolutePath();
+        }
         //emit path to csv class for processing
         if(!colorCodeCsvFilePth.isEmpty())
         {
@@ -1388,8 +1412,12 @@ void MainWindow::exportActorColors()
     if(actorsName.length()>0 && tableType=="Database")
     {
         QString colorPaletteCsvFileNameLocation = QFileDialog::getSaveFileName(
-                    this, tr("Save Log File to "),"","CSV File (*.csv)");
-
+                    this, tr("Save Log File to "),homeDirectory,"CSV File (*.csv)");
+        if(!colorPaletteCsvFileNameLocation.isEmpty())
+        {
+            QDir dir =QFileInfo(colorPaletteCsvFileNameLocation).absoluteDir();
+            homeDirectory = dir.absolutePath();
+        }
         if(!colorPaletteCsvFileNameLocation.endsWith(".csv"))
             colorPaletteCsvFileNameLocation.append(".csv");
 
@@ -1450,7 +1478,7 @@ void MainWindow::changesActorsStyleSheet()
 
 void MainWindow::createActions()
 {
-    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu = menuBar()->addMenu(tr("&File"));
     QToolBar *fileToolBar = addToolBar(tr("File"));
     QList <QKeySequence> seq;
     fileMenu->setToolTipsVisible(true);
@@ -1515,7 +1543,38 @@ void MainWindow::createActions()
     fileMenu->addAction(modifyDBAct);
     fileToolBar->addAction(modifyDBAct);
 
+    for (int i = 0; i < maxRecentFilesCount; ++i)
+    {
+        recentFileActs[i] = new QAction(this);
+        recentFileActs[i]->setVisible(false);
+        connect(recentFileActs[i], SIGNAL(triggered()),this, SLOT(openRecentFile()));
+    }
+
     fileToolBar->addSeparator();
+    separatorAct = fileMenu->addSeparator();
+    for (int i = 0; i < maxRecentFilesCount; ++i)
+    {
+        fileMenu->addAction(recentFileActs[i]);
+    }
+    fileMenu->addSeparator();
+    updateRecentFileActions();
+
+    fileMenu->addSeparator();
+
+    QAction *clearFileHistoryAct = new QAction(tr("Clear Recent File History"), this);
+    clearFileHistoryAct->setToolTip("Clear Recently Open File History");
+    clearFileHistoryAct->setStatusTip(tr("Clear Recently Open File History"));
+    connect(clearFileHistoryAct, SIGNAL(triggered(bool)), this,SLOT(clearRecentFile(bool)));
+    fileMenu->addAction(clearFileHistoryAct);
+    fileMenu->addSeparator();
+
+    fileMenu->addSeparator();
+
+    QAction *changeHomeAct = new QAction(tr("Change Home Directory"), this);
+    changeHomeAct->setToolTip("Change Home Directory");
+    changeHomeAct->setStatusTip(tr("Change Home Directory"));
+    connect(changeHomeAct, SIGNAL(triggered(bool)), this,SLOT(changeHomeDirectory(bool)));
+    fileMenu->addAction(changeHomeAct);
     fileMenu->addSeparator();
 
     const QIcon exitIcon = QIcon::fromTheme("Quit ", QIcon("://images/exit.png"));
@@ -1683,51 +1742,57 @@ void MainWindow::saveTableViewToCSV()
     savedAsXml=false;
     if(0==validateControlButtons("csv_tableView"))
     {
-        QString saveFilePath = QFileDialog::getSaveFileName(this,tr("Save File to "), QDir::homePath(),tr("CSV File (*.csv)"));
-        if( !saveFilePath.endsWith(".csv") )
-            saveFilePath.append(".csv");
-
-        // to pass csvfile path to smp
-        csvPath = saveFilePath;
-
-        QFile f(saveFilePath);
-
-        if (f.open(QFile::WriteOnly | QFile::Truncate))
+        QString saveFilePath = QFileDialog::getSaveFileName(this,tr("Save File to "),homeDirectory,tr("CSV File (*.csv)"));
+        if(!saveFilePath.isEmpty())
         {
-            QTextStream data( &f );
-            QStringList strList;
+            if( !saveFilePath.endsWith(".csv") )
+                saveFilePath.append(".csv");
 
-            strList <<scenarioNameLineEdit->text();
-            strList <<scenarioDescriptionLineEdit->text().trimmed();
-            strList <<QString::number(modeltoCSV->rowCount());
-            strList <<QString::number((modeltoCSV->columnCount()-3)/2);
+            QDir dir =QFileInfo(saveFilePath).absoluteDir();
+            homeDirectory = dir.absolutePath();
 
-            data << strList.join(",") << ","<< "\n";
-            strList.clear();
+            // to pass csvfile path to smp
+            csvPath = saveFilePath;
 
-            //Appending a header
-            for( int col = 0; col < modeltoCSV->columnCount(); ++col )
+            QFile f(saveFilePath);
+
+            if (f.open(QFile::WriteOnly | QFile::Truncate))
             {
-                strList <<modeltoCSV->horizontalHeaderItem(col)->data(Qt::DisplayRole).toString().remove("\n");
-            }
-            data << strList.join(",") << "," <<"\n";
+                QTextStream data( &f );
+                QStringList strList;
 
-            //appending data
-            for (int row=0; row<modeltoCSV->rowCount(); row++)
-            {
+                strList <<scenarioNameLineEdit->text();
+                strList <<scenarioDescriptionLineEdit->text().trimmed();
+                strList <<QString::number(modeltoCSV->rowCount());
+                strList <<QString::number((modeltoCSV->columnCount()-3)/2);
+
+                data << strList.join(",") << ","<< "\n";
                 strList.clear();
 
-                for (int col=0; col<modeltoCSV->columnCount(); col++)
+                //Appending a header
+                for( int col = 0; col < modeltoCSV->columnCount(); ++col )
                 {
-                    strList << modeltoCSV->data(modeltoCSV->index(row,col)).toString();
+                    strList <<modeltoCSV->horizontalHeaderItem(col)->data(Qt::DisplayRole).toString().remove("\n");
                 }
-                data << strList.join(",") + "\n";
+                data << strList.join(",") << "," <<"\n";
+
+                //appending data
+                for (int row=0; row<modeltoCSV->rowCount(); row++)
+                {
+                    strList.clear();
+
+                    for (int col=0; col<modeltoCSV->columnCount(); col++)
+                    {
+                        strList << modeltoCSV->data(modeltoCSV->index(row,col)).toString();
+                    }
+                    data << strList.join(",") + "\n";
+                }
+                f.close();
+                setCurrentFile(saveFilePath);
+                runButton->setEnabled(true);
+                runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
+
             }
-            f.close();
-
-            runButton->setEnabled(true);
-            runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
-
         }
     }
 }
@@ -1760,52 +1825,57 @@ void MainWindow::saveTableWidgetToCSV(bool bl)
     savedAsXml=false;
     if(0==validateControlButtons("csv_tableWidget"))
     {
-        QString saveFilePath = QFileDialog::getSaveFileName(this,tr("Save File As"), QDir::homePath(),tr("CSV files (*.csv)"));
-
-        if( !saveFilePath.endsWith(".csv") )
-            saveFilePath.append(".csv");
-
-        // to pass csvfile path to smp
-        csvPath = saveFilePath;
-
-        QFile f(saveFilePath);
-
-        if (f.open(QFile::WriteOnly | QFile::Truncate))
+        QString saveFilePath = QFileDialog::getSaveFileName(this,tr("Save File As"),homeDirectory,tr("CSV files (*.csv)"));
+        if(!saveFilePath.isEmpty())
         {
-            QTextStream data( &f );
-            QStringList strList;
 
-            strList <<scenarioNameLineEdit->text();
-            strList <<scenarioDescriptionLineEdit->text();
-            strList <<QString::number(csvTableWidget->rowCount());
-            strList <<QString::number((csvTableWidget->columnCount()-3)/2);
+            QDir dir =QFileInfo(saveFilePath).absoluteDir();
+            homeDirectory = dir.absolutePath();
 
-            data << strList.join(",") << ","<< "\n";
-            strList.clear();
+            if( !saveFilePath.endsWith(".csv") )
+                saveFilePath.append(".csv");
 
-            //Appending a header
-            for( int col = 0; col < csvTableWidget->columnCount(); ++col )
+            // to pass csvfile path to smp
+            csvPath = saveFilePath;
+
+            QFile f(saveFilePath);
+
+            if (f.open(QFile::WriteOnly | QFile::Truncate))
             {
-                strList << csvTableWidget->horizontalHeaderItem(col)->data(Qt::DisplayRole).toString().remove("\n");
-            }
-            data << strList.join(",") << "," <<"\n";
+                QTextStream data( &f );
+                QStringList strList;
 
-            for( int row = 0; row < csvTableWidget->rowCount(); ++row )
-            {
+                strList <<scenarioNameLineEdit->text();
+                strList <<scenarioDescriptionLineEdit->text();
+                strList <<QString::number(csvTableWidget->rowCount());
+                strList <<QString::number((csvTableWidget->columnCount()-3)/2);
+
+                data << strList.join(",") << ","<< "\n";
                 strList.clear();
-                for( int column = 0; column < csvTableWidget->columnCount(); ++column )
+
+                //Appending a header
+                for( int col = 0; col < csvTableWidget->columnCount(); ++col )
                 {
-                    strList <<csvTableWidget->item(row,column)->text();
+                    strList << csvTableWidget->horizontalHeaderItem(col)->data(Qt::DisplayRole).toString().remove("\n");
                 }
-                data << strList.join( "," ) << ","  << "\n";
+                data << strList.join(",") << "," <<"\n";
+
+                for( int row = 0; row < csvTableWidget->rowCount(); ++row )
+                {
+                    strList.clear();
+                    for( int column = 0; column < csvTableWidget->columnCount(); ++column )
+                    {
+                        strList <<csvTableWidget->item(row,column)->text();
+                    }
+                    data << strList.join( "," ) << ","  << "\n";
+                }
+                f.close();
+                setCurrentFile(saveFilePath);
+                runButton->setEnabled(true);
+                runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
+
             }
-            f.close();
-
-            runButton->setEnabled(true);
-            runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
-
         }
-
     }
 }
 
@@ -1814,43 +1884,47 @@ void MainWindow::saveTableWidgetToXML(bool bl)
     savedAsXml=true;
     if(0==validateControlButtons("csv_tableWidget"))
     {
-        QString saveFilePath = QFileDialog::getSaveFileName(this,tr("Save File As"), QDir::homePath(),tr("XML files (*.xml)"));
-
-        if( !saveFilePath.endsWith(".xml"))
-            saveFilePath.append(".xml");
-
-        // to pass xml path to smp
-        xmlPath = saveFilePath;
-
-        QStringList parameters;
-        parameters.append(xmlPath);
-        parameters.append(scenarioNameLineEdit->text());
-        parameters.append(scenarioDescriptionLineEdit->text());
-        if(!seedRand->text().isEmpty())
-            parameters.append(seedRand->text());
-        else
-            parameters.append("0");
-        parameters.append(victProbModelComboBox->currentText());
-        parameters.append(pCEModelComboBox->currentText());
-        parameters.append(stateTransitionsComboBox->currentText());
-        parameters.append(votingRuleComboBox->currentText());
-        parameters.append(bigRAdjustComboBox->currentText());
-        parameters.append(bigRRangeComboBox->currentText());
-        parameters.append(thirdPartyCommitComboBox->currentText());
-        parameters.append(interVecBrgnComboBox->currentText());
-        parameters.append(bargnModelComboBox->currentText());
-
-        for(int i =3; i < csvTableWidget->columnCount(); i += 2)
+        QString saveFilePath = QFileDialog::getSaveFileName(this,tr("Save File As"),homeDirectory,tr("XML files (*.xml)"));
+        if(!saveFilePath.isEmpty())
         {
-            parameters.append(csvTableWidget->horizontalHeaderItem(i)
-                              ->data(Qt::DisplayRole).toString());
+            if( !saveFilePath.endsWith(".xml"))
+                saveFilePath.append(".xml");
+
+            QDir dir =QFileInfo(saveFilePath).absoluteDir();
+            homeDirectory = dir.absolutePath();
+
+            // to pass xml path to smp
+            xmlPath = saveFilePath;
+
+            QStringList parameters;
+            parameters.append(xmlPath);
+            parameters.append(scenarioNameLineEdit->text());
+            parameters.append(scenarioDescriptionLineEdit->text());
+            if(!seedRand->text().isEmpty())
+                parameters.append(seedRand->text());
+            else
+                parameters.append("0");
+            parameters.append(victProbModelComboBox->currentText());
+            parameters.append(pCEModelComboBox->currentText());
+            parameters.append(stateTransitionsComboBox->currentText());
+            parameters.append(votingRuleComboBox->currentText());
+            parameters.append(bigRAdjustComboBox->currentText());
+            parameters.append(bigRRangeComboBox->currentText());
+            parameters.append(thirdPartyCommitComboBox->currentText());
+            parameters.append(interVecBrgnComboBox->currentText());
+            parameters.append(bargnModelComboBox->currentText());
+
+            for(int i =3; i < csvTableWidget->columnCount(); i += 2)
+            {
+                parameters.append(csvTableWidget->horizontalHeaderItem(i)
+                                  ->data(Qt::DisplayRole).toString());
+            }
+            emit saveNewSMPDataToXMLFile(parameters,csvTableWidget,affinityMatrix);
+            setCurrentFile(saveFilePath);
+            runButton->setEnabled(true);
+            runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
+
         }
-        emit saveNewSMPDataToXMLFile(parameters,csvTableWidget,affinityMatrix);
-
-        runButton->setEnabled(true);
-        runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
-
-
     }
 }
 
@@ -2099,12 +2173,15 @@ int MainWindow::validateControlButtons(QString viewName)
 
 QString MainWindow::getImageFileName(QString imgType, QString imgFileName, QString imgExt)
 {
-    QString imgFilePath = QFileDialog::getSaveFileName(this, tr("Save Image File to "),imgFileName,
+    QString imgFilePath = QFileDialog::getSaveFileName(this, tr("Save Image File to "),QString(homeDirectory+QDir::separator()+imgFileName),
                                                        imgType);
     if(!imgFilePath.isEmpty())
     {
         if(!imgFilePath.endsWith(imgExt))
             imgFilePath.append(imgExt);
+
+        QDir dir =QFileInfo(imgFilePath).absoluteDir();
+        homeDirectory = dir.absolutePath();
 
     }
     return imgFilePath;
@@ -2659,6 +2736,136 @@ void MainWindow :: reconnectPlotWidgetSignals()
     connect(barGraphSelectAllCheckBox,SIGNAL(clicked(bool)),this,SLOT(barGraphSelectAllActorsCheckBoxClicked(bool)));
     connect(barGraphBinWidthButton,SIGNAL(clicked(bool)),this, SLOT(barGraphBinWidthButtonClicked(bool)));
 
+}
+
+void MainWindow::openRecentFile()
+{
+    QAction *action = qobject_cast<QAction *>(sender());
+    if (action)
+    {
+        loadRecentFile(action->data().toString());
+    }
+}
+
+void MainWindow::clearRecentFile(bool bl)
+{
+    recentFileSettings.remove("recentFileList");
+
+    updateRecentFileActions();
+}
+
+void MainWindow::changeHomeDirectory(bool bl)
+{
+    QString dir = QFileDialog::getExistingDirectory(this,"Change Home Dir", QDir::homePath());
+
+    if(!dir.isEmpty())
+    {
+        homeDirectory = dir;
+        recentFileSettings.setValue("HomeDirectory",homeDirectory);
+        emit homeDirChanged(homeDirectory);
+        defaultDirectory= homeDirectory;
+    }
+}
+
+void MainWindow::setCurrentFile(const QString &fileName)
+{
+    setWindowFilePath(fileName);
+
+    QSettings settings;
+    QStringList files = settings.value("recentFileList").toStringList();
+    files.removeAll(fileName);
+    files.prepend(fileName);
+    while (files.size() > maxRecentFilesCount)
+        files.removeLast();
+
+    settings.setValue("recentFileList", files);
+
+    foreach (QWidget *widget, QApplication::topLevelWidgets())
+    {
+        MainWindow *mainWin = qobject_cast<MainWindow *>(widget);
+        if (mainWin)
+        {
+            mainWin->updateRecentFileActions();
+        }
+    }
+}
+
+void MainWindow::updateRecentFileActions()
+{
+    QStringList files = recentFileSettings.value("recentFileList").toStringList();
+    recentFileSettings.value("recentFileList");
+
+    int numRecentFiles = qMin(files.size(), (int)maxRecentFilesCount);
+
+    for (int i = 0; i < numRecentFiles; ++i)
+    {
+        QString text = tr("&%1 %2").arg(i + 1).arg(strippedName(files[i]));
+        recentFileActs[i]->setText(text);
+        recentFileActs[i]->setData(files[i]);
+        recentFileActs[i]->setVisible(true);
+    }
+    for (int j = numRecentFiles; j < maxRecentFilesCount; ++j)
+    {
+        recentFileActs[j]->setVisible(false);
+    }
+
+    separatorAct->setVisible(numRecentFiles > 0);
+
+}
+
+QString MainWindow::strippedName(const QString &fullFileName)
+{
+    return QFileInfo(fullFileName).fileName();
+}
+
+void MainWindow::loadRecentFile(const QString &fileName)
+{
+    QFileInfo checkFileValid(fileName);
+
+    if (checkFileValid.exists() && checkFileValid.isFile())
+    {
+        QDir dir =QFileInfo(fileName).absoluteDir();
+        homeDirectory = dir.absolutePath();
+
+        if(fileName.endsWith(".csv") || fileName.endsWith(".CSV"))
+            csvGetFilePAth(true,fileName);
+        else if(fileName.endsWith(".xml") || fileName.endsWith(".XML"))
+            importXmlGetFilePath(true,fileName);
+        else if(fileName.endsWith(".db") || fileName.endsWith(".DB"))
+            dbGetFilePAth(true,fileName);
+    }
+    else
+    {
+        displayMessage("Recent Files",QString(fileName+" not found !!"));
+    }
+
+}
+
+void MainWindow::intializeHomeDirectory()
+{
+    QString homeDir = recentFileSettings.value( "HomeDirectory" ).toString();
+    qDebug()<<homeDir;
+    if(!QDir(homeDir).exists() || homeDir.isEmpty())
+    {
+        homeDirectory=QDir::homePath().append(QDir::separator()).append("KTAB_SMP");
+
+        if(!QDir(homeDirectory).exists())
+        {
+            if(!QDir(QDir::home()).mkdir("KTAB_SMP"))
+            {
+                displayMessage("Home Directory", "Unable to set Home directory as "+homeDirectory);
+            }
+        }
+    }
+    else if(!homeDir.isEmpty())
+    {
+        homeDirectory = homeDir;
+    }
+
+    recentFileSettings.setValue("HomeDirectory",homeDirectory);
+
+    defaultDirectory= homeDirectory;
+    qDebug()<<homeDirectory;
 }
 
 // --------------------------------------------

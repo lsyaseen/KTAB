@@ -93,21 +93,26 @@ void MainWindow::runPushButtonClicked(bool bl)
 
     name.replace(" ","_").replace(":","_");
 
+
     logSMPDataOptionsAnalysis();
 
     QString dbFilePath;
 
     QFileDialog fileDialog(this);
-    dbFilePath = fileDialog.getSaveFileName(this, tr("Save DB file as "),name,tr("DB File (*.db)"),0,QFileDialog::DontConfirmOverwrite);
+    dbFilePath = fileDialog.getSaveFileName(this, tr("Save DB file as "),
+                                            QString(homeDirectory+QDir::separator()+name),tr("DB File (*.db)"),
+                                            0,QFileDialog::DontConfirmOverwrite);
 
     if(!dbFilePath.isEmpty())
     {
         runButton->setEnabled(false);
         runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: red;");
 
-
         if(!dbFilePath.endsWith(".db"))
             dbFilePath.append(".db");
+
+        QDir dir =QFileInfo(dbFilePath).absoluteDir();
+        homeDirectory = dir.absolutePath();
 
         statusBar()->showMessage(" Please wait !! Executing SMP ....  This may take a while ....");
 
@@ -172,10 +177,10 @@ void MainWindow::runPushButtonClicked(bool bl)
         }
         else
         {
-             currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
+            currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
                                                       (sqlFlags, dbFilePath.toStdString(),
                                                        csvPath.toStdString(),seed,false,parameters));
-         }
+        }
         cout << "-----------------------------------" << endl;
 
         KBase::displayProgramEnd(sTime);
@@ -229,7 +234,7 @@ void MainWindow::logSMPDataOptionsAnalysis()
         {
             fclose(stdout);
             fp_old = *stdout;
-            QString logFileNewName = name;
+            QString logFileNewName = QString(homeDirectory+QDir::separator()+name);
             logFileNewName.append("DefaultLog.txt");
             logFileName = logFileNewName;
         }
@@ -239,7 +244,7 @@ void MainWindow::logSMPDataOptionsAnalysis()
     {
         fclose(stdout);
         fp_old = *stdout;
-        QString logFileNewName = name;
+        QString logFileNewName = QString(homeDirectory+QDir::separator()+name);
         logFileNewName.append("Log");
         QString saveLogFilePath = QFileDialog::getSaveFileName(this, tr("Save Log File to "),logFileNewName,
                                                                tr("Text File (*.txt)"),0,QFileDialog::DontConfirmOverwrite);
@@ -247,6 +252,9 @@ void MainWindow::logSMPDataOptionsAnalysis()
         {
             if(!saveLogFilePath.endsWith(".txt"))
                 saveLogFilePath.append(".txt");
+
+                QDir dir =QFileInfo(saveLogFilePath).absoluteDir();
+                homeDirectory = dir.absolutePath();
 
             logFileNewName=saveLogFilePath;
         }
@@ -443,9 +451,9 @@ void MainWindow::initializeModelParametersDock()
     stateTransitionsComboBox->addItems(stateList);
     stateTransitionsComboBox->setToolTip("Controls how the winning bargain in an actor's queue is chosen among all bargains");
     stateTransitionsComboBox->setItemData(0,"The bargain which has the strongest coalition, and hence the highest"
-                                    "\n probability of winning, wins (default)", Qt::ToolTipRole);
+                                            "\n probability of winning, wins (default)", Qt::ToolTipRole);
     stateTransitionsComboBox->setItemData(1,"The probability of winning for each bargain is proportional to its "
-                                    "\nrelative coalition strength",Qt::ToolTipRole);
+                                            "\nrelative coalition strength",Qt::ToolTipRole);
 
     v3->addWidget(stateTransitionsLabel,0,Qt::AlignBottom);
     v3->addWidget(stateTransitionsComboBox,0,Qt::AlignTop);
@@ -610,10 +618,13 @@ void MainWindow::setDefaultParameters()
 void MainWindow::saveTurnHistoryToCSV()
 {
     QString csvFileNameLocation = QFileDialog::getSaveFileName(
-                this, tr("Save Log File to "),"","CSV File (*.csv)");
+                this, tr("Save Log File to "),QString(homeDirectory+QDir::separator()+"Log"),"CSV File (*.csv)");
 
     if(!csvFileNameLocation.isEmpty())
     {
+             QDir dir =QFileInfo(csvFileNameLocation).absoluteDir();
+            homeDirectory = dir.absolutePath();
+
         qDebug()<<csvFileNameLocation.remove(".csv") << dbPath <<scenarioBox ;
         if(sankeyOutputHistory==true)
         {

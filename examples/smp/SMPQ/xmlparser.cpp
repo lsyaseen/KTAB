@@ -24,9 +24,9 @@
 #include "xmlparser.h"
 #include <QDebug>
 
-Xmlparser::Xmlparser()
+Xmlparser::Xmlparser(QString homeDir)
 {
-
+    homeDirectory=homeDir;
 }
 
 void Xmlparser::openXmlFile(QString xmlFilePath)
@@ -120,10 +120,16 @@ void Xmlparser::readXmlFile()
 
 void Xmlparser::saveToXmlFile(QStringList parameters, QStandardItemModel *smpData, QStandardItemModel *affMatrix)
 {
-    QString filename = QFileDialog::getSaveFileName(0,tr("Save Xml"), ".",tr("Xml files (*.xml)"));
+    QString filename = QFileDialog::getSaveFileName(0,tr("Save Xml"), homeDirectory ,tr("Xml files (*.xml)"));
 
     if(!filename.endsWith(".xml"))
         filename.append(".xml");
+
+    if(!filename.isEmpty())
+    {
+        QDir dir =QFileInfo(filename).absoluteDir();
+        homeDirectory = dir.absolutePath();
+    }
 
     QFile file(filename);
     file.open(QIODevice::WriteOnly);
@@ -323,6 +329,11 @@ void Xmlparser::saveNewDataToXmlFile(QStringList parameters, QTableWidget *smpDa
     qDebug()<<xmlWriter.hasError();
 
 
+}
+
+void Xmlparser::updateHomeDir(QString dir)
+{
+    homeDirectory =dir;
 }
 
 void Xmlparser::tagElements(QXmlStreamWriter *xmlWriter, QString tagName, QString tagValue)

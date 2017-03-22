@@ -53,6 +53,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QMenu>
+#include <QtGlobal>
 
 class QAction;
 class QListWidget;
@@ -82,7 +83,7 @@ private slots:
     void dockWindowChanged();
     //CSV
     void setCSVItemModel(QStandardItemModel * model, QStringList scenarioName);
-    void csvGetFilePAth(bool bl);
+    void csvGetFilePAth(bool bl, QString filepath=0);
     //Database
     void setDBItemModel(QStandardItemModel *model);
     void setDBItemModelEdit();
@@ -553,7 +554,7 @@ private :
 private slots:
     void displayMenuXmlTableView(QPoint pos);
     //    void displayMenuXmlAffTableView(QPoint pos);
-    void importXmlGetFilePath(bool bl);
+    void importXmlGetFilePath(bool bl, QString filepath=0);
     void openStatusXml(bool status);
     void xmlDataParsedFromFile(QStringList modelDesc, QStringList modpara, QStringList dims,
                                QStandardItemModel *actModel, QList <QStringList> idealAdj);
@@ -567,6 +568,7 @@ signals:
                            QStandardItemModel * affModel);
     void saveNewSMPDataToXMLFile(QStringList parameters, QTableWidget
                                  * smpDataWidget, QTableWidget * affModelWidget);
+    void homeDirChanged(QString dir);
 
     //actormoved
 private:
@@ -582,7 +584,28 @@ private slots :
 
 private :
     PopupWidget * popup;
-};
+    QMenu *fileMenu;
+    QString homeDirectory;
+    QString defaultDirectory;
+    QSettings recentFileSettings;
+
+    //recentfile history
+    QAction *separatorAct;
+
+    enum { maxRecentFilesCount = 5 };
+     QAction *recentFileActs[maxRecentFilesCount];
+
+    void setCurrentFile(const QString &fileName);
+    void updateRecentFileActions();
+    QString strippedName(const QString &fullFileName);
+    void loadRecentFile(const QString &fileName);
+    void intializeHomeDirectory();
+
+private slots:
+    void openRecentFile();
+    void clearRecentFile(bool bl);
+    void changeHomeDirectory(bool bl);
+ };
 
 
 
