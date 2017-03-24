@@ -63,8 +63,8 @@ void MainWindow::importXmlGetFilePath(bool bl,QString filepath)
         filename=filepath;
     if(!filename.isEmpty())
     {
-             QDir dir =QFileInfo(filename).absoluteDir();
-            homeDirectory = dir.absolutePath();
+        QDir dir =QFileInfo(filename).absoluteDir();
+        homeDirectory = dir.absolutePath();
 
         setCurrentFile(filename);
         emit releaseDatabase();
@@ -355,7 +355,19 @@ void MainWindow::saveTableViewToXML()
         }
         parameters.append(dims);
 
-        emit saveXMLDataToFile(parameters,xmlSmpDataModel,xmlAffinityMatrixModel);
+        QString filename = QFileDialog::getSaveFileName(this,tr("Save Xml"), homeDirectory ,tr("Xml files (*.xml)"));
+
+        if(!filename.endsWith(".xml"))
+            filename.append(".xml");
+
+        if(!filename.isEmpty())
+        {
+            QDir dir =QFileInfo(filename).absoluteDir();
+            homeDirectory = dir.absolutePath();
+            setCurrentFile(filename);
+        }
+
+        emit saveXMLDataToFile(parameters,xmlSmpDataModel,xmlAffinityMatrixModel,filename);
 
         runButton->setEnabled(true);
         runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");

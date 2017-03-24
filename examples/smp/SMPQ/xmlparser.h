@@ -40,7 +40,7 @@ public:
 public slots: // convert to signal slots
     void openXmlFile(QString xmlFilePath);
     void readXmlFile();
-    void saveToXmlFile(QStringList parameters, QStandardItemModel * smpData, QStandardItemModel *affMatrix);
+    void saveToXmlFile(QStringList parameters, QStandardItemModel * smpData, QStandardItemModel *affMatrix, QString path);
     void saveNewDataToXmlFile(QStringList parameters, QTableWidget * smpDataWidget, QTableWidget *affintyDataWidget);
     void updateHomeDir(QString dir);
 

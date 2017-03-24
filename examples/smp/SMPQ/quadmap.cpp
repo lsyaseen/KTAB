@@ -814,7 +814,10 @@ void MainWindow::saveQuadPlotAsBMP()
 {
     QString fileName = getImageFileName("BMP File (*.bmp)","QuadMap",".bmp");
     if(!fileName.isEmpty())
+    {
         quadMapCustomGraph->saveBmp(fileName);
+        //        setCurrentFile(fileName);
+    }
 }
 
 
@@ -822,6 +825,9 @@ void MainWindow::saveQuadPlotAsPDF()
 {
     QString fileName = getImageFileName("PDF File (*.pdf)","QuadMap",".pdf");
     if(!fileName.isEmpty())
+    {
         quadMapCustomGraph->savePdf(fileName);
+        //        setCurrentFile(fileName);
+    }
 }
 

@@ -565,7 +565,7 @@ signals:
     bool openXMLFile(QString file);
     void readXMLFile();
     void saveXMLDataToFile(QStringList parameters, QStandardItemModel * smpData,
-                           QStandardItemModel * affModel);
+                           QStandardItemModel * affModel, QString path);
     void saveNewSMPDataToXMLFile(QStringList parameters, QTableWidget
                                  * smpDataWidget, QTableWidget * affModelWidget);
     void homeDirChanged(QString dir);
@@ -600,6 +600,7 @@ private :
     QString strippedName(const QString &fullFileName);
     void loadRecentFile(const QString &fileName);
     void intializeHomeDirectory();
+    void checkCSVtype(QString fileName);
 
 private slots:
     void openRecentFile();
