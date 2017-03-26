@@ -28,6 +28,8 @@
 #include "csv.h"
 #include "database.h"
 #include "xmlparser.h"
+#include "colorpickerdialog.h"
+#include "popupwidget.h"
 #include "../qcustomplot/qcustomplot.h"
 
 #include <QtSql>
@@ -51,6 +53,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QMenu>
+#include <QtGlobal>
 
 class QAction;
 class QListWidget;
@@ -72,10 +75,15 @@ public:
 
 private slots:
     void about();
+    void chooseActorColors();
+    void importActorColors();
+    void exportActorColors();
+    void resetActorColors();
+    void updateColors(QList<QColor> updatedColors);
     void dockWindowChanged();
     //CSV
     void setCSVItemModel(QStandardItemModel * model, QStringList scenarioName);
-    void csvGetFilePAth(bool bl);
+    void csvGetFilePAth(bool bl, QString filepath=0);
     //Database
     void setDBItemModel(QStandardItemModel *model);
     void setDBItemModelEdit();
@@ -93,6 +101,7 @@ private slots:
     void createNewSMPData(bool bl);
     void cellSelected(QStandardItem *in);
     void insertNewRowCSV();
+    void deleteLastRow();
     void insertNewColumnCSV();
     void donePushButtonClicked(bool bl);
     void saveTableWidgetToCSV(bool bl);
@@ -133,6 +142,10 @@ signals:
     void getPosition(int dim,int turn);
     void getSalience(int dim,int turn);
 
+    //colors
+    void exportColors(QString path, QList<int> actorIds, QList<QString> colorCode);
+    void importColors(QString path, int actorCount);
+
 private:
     //MainWindow
     void createActions();
@@ -148,6 +161,7 @@ private:
 
     void updateDBViewColumns();
     QString checkForHeaderString(QString header);
+    void changesActorsStyleSheet();
 
     // Central Main Frame
     QFrame *central;
@@ -156,13 +170,15 @@ private:
     QStackedWidget * stackWidget;
 
     QComboBox * scenarioComboBox;
-    QPushButton * actorsPushButton;
+    QPushButton * addActorsPushButton;
+    QPushButton * deleteActorsPushButton;
     QLineEdit * actorsLineEdit;
     QPushButton * dimensionsPushButton;
     QLineEdit * dimensionsLineEdit;
     QPushButton * donePushButton;
     QLineEdit * scenarioDescriptionLineEdit;
     QSlider * turnSlider;
+    QLineEdit * scenarioNameLineEdit;
 
     //Model parameters
     QFrame * frames;
@@ -252,8 +268,8 @@ private:
     QList <QString> actorsName;
     QList <QString> actorsDescription;
     QList <QString> actorsInfl;
-    QList <QString> actorsPos[3];
-    QList <QString> actorsSal[3];
+    QList <QString> actorsPos[50];
+    QList <QString> actorsSal[50];
     QList <QString> actorAffinity;
     QList <int>     actI;
     QList <int>     actJ;
@@ -271,7 +287,8 @@ private slots:
     //    void removeSelectedGraph();
     void removeAllGraphs();
     void moveLegend();
-    void graphClicked(QCPAbstractPlottable *plottable);
+    void graphClicked(QCPAbstractPlottable *plottable, QMouseEvent* e);
+    void graphDoubleClicked(QCPAbstractPlottable *plottable, QMouseEvent* e);
     void updateBarDimension(QStringList* dims);
     void linePlotContextMenuRequest(QPoint pos);
     void saveLinePlotAsBMP();
@@ -462,6 +479,7 @@ private :
     int initiatorTip;
 
     bool useHistory;
+    bool sankeyOutputHistory;
     QString currentScenarioId;
 
     void initializeQuadMapDock();
@@ -531,11 +549,12 @@ private :
     void initializeAffinityMatrixRowCol(int count, QString table);
     void saveTableViewToXML();
     void setDefaultParameters();
+    void saveTurnHistoryToCSV();
 
 private slots:
     void displayMenuXmlTableView(QPoint pos);
     //    void displayMenuXmlAffTableView(QPoint pos);
-    void importXmlGetFilePath(bool bl);
+    void importXmlGetFilePath(bool bl, QString filepath=0);
     void openStatusXml(bool status);
     void xmlDataParsedFromFile(QStringList modelDesc, QStringList modpara, QStringList dims,
                                QStandardItemModel *actModel, QList <QStringList> idealAdj);
@@ -546,10 +565,48 @@ signals:
     bool openXMLFile(QString file);
     void readXMLFile();
     void saveXMLDataToFile(QStringList parameters, QStandardItemModel * smpData,
-                           QStandardItemModel * affModel);
+                           QStandardItemModel * affModel, QString path);
     void saveNewSMPDataToXMLFile(QStringList parameters, QTableWidget
                                  * smpDataWidget, QTableWidget * affModelWidget);
-};
+    void homeDirChanged(QString dir);
+
+    //actormoved
+private:
+    QStandardItemModel * actorMovedDataModel;
+    QList <int> actorIDList;
+    QList <int> actorTurnList;
+    QList <int> actorDimensionList;
+signals:
+    void getActorMovedData(QString scenario);
+
+private slots :
+    void actorMovedInfoModel(QStandardItemModel * actorMovedData);
+
+private :
+    PopupWidget * popup;
+    QMenu *fileMenu;
+    QString homeDirectory;
+    QString defaultDirectory;
+    QSettings recentFileSettings;
+
+    //recentfile history
+    QAction *separatorAct;
+
+    enum { maxRecentFilesCount = 5 };
+     QAction *recentFileActs[maxRecentFilesCount];
+
+    void setCurrentFile(const QString &fileName);
+    void updateRecentFileActions();
+    QString strippedName(const QString &fullFileName);
+    void loadRecentFile(const QString &fileName);
+    void intializeHomeDirectory();
+    void checkCSVtype(QString fileName);
+
+private slots:
+    void openRecentFile();
+    void clearRecentFile(bool bl);
+    void changeHomeDirectory(bool bl);
+ };
 
 
 

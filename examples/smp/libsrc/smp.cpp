@@ -57,6 +57,7 @@ using KBase::ReportingLevel;
 SMPModel * md0 = nullptr;
 
 std::vector<string> SMPModel::fieldVals;
+std::vector<string> SMPModel::dbFieldVals;
 
 // big enough buffer to build all desired SQLite statements
 const unsigned int sqlBuffSize = 250;
@@ -122,8 +123,8 @@ double SMPActor::posUtil(const Position * ap1, const SMPState* as) const {
     int ai = as->model->actrNdx(this);
     double ri = as->aNRA(ai); //as->nra(ai, 0);
     assert(0 <= ai);
-	const VctrPstn actorIdeal = as->getIdeal(ai);
-	const VctrPstn* p0 = &actorIdeal;
+    const VctrPstn actorIdeal = as->getIdeal(ai);
+    const VctrPstn* p0 = &actorIdeal;
     assert(nullptr != p0);
     auto p1 = ((const VctrPstn*)ap1);
     assert(nullptr != p1);
@@ -142,7 +143,7 @@ void SMPActor::randomize(PRNG* rng, unsigned int numD) {
     assert(fabs(s - sum(vSal)) < 1E-4);
 
     // Note that we randomly assign different voting rules
-  //vr = VotingRule::Proportional;
+    //vr = VotingRule::Proportional;
     const unsigned int numVR = KBase::VotingRuleNames.size();
     const unsigned int vrNum = ((unsigned int)(rng->uniform(0.0, numVR -0.01)));
     vr = VotingRule(vrNum);
@@ -701,13 +702,13 @@ double SMPState::posIdealDist(ReportingLevel rl) const {
 
         if (rl > ReportingLevel::Low) {
             printf("postn %2u, %2u ", i, t);
-            trans(pI).mPrintf(" %.4f ");
+            (trans(pI) * 100.0).mPrintf(" %.4f "); // print on the scale of [0,100]
             printf("ideal %2u, %2u ", i, t);
-            trans(iI).mPrintf(" %.4f ");
+            (trans(iI) * 100.0).mPrintf(" %.4f "); // print on the scale of [0,100]
         }
         double dI = KBase::norm(pI - iI);
         if (rl > ReportingLevel::Silent) {
-            printf("postn-ideal distance %2u, %2u: %.5f \n", i, t, dI);
+            printf("postn-ideal distance %2u, %2u: %.5f \n", i, t, dI * 100.0); // print on the scale of [0,100]
         }
         rmsDist = rmsDist + (dI*dI);
     }
@@ -742,7 +743,8 @@ tuple< KMatrix, VUI> SMPState::pDist(int persp) const {
     /// Calculate the probability distribution over states from this perspective
 
     // TODO: convert this to a single, commonly used setup function
-    const VotingRule vr = VotingRule::Proportional;
+    auto smod = (const SMPModel*)model;
+    const VotingRule vr = smod->vrCltn;
     const ReportingLevel rl = ReportingLevel::Silent;
 
     const unsigned int na = model->numAct;
@@ -881,57 +883,340 @@ double SMPModel::bvUtil(const  KMatrix & vd, const  KMatrix & vs, double R) {
     return u;
 };
 
-void SMPModel::sankeyOutput(string inputCSV) const {
+void SMPModel::sankeyOutput(string outputFile) const {
     assert(numAct == actrs.size());
     assert(numDim == dimName.size());
-    if (1 == numDim) {
-        unsigned int nameLen = inputCSV.length();
-        cout << endl;
-        const char* appendEffPwr = "_effPow.csv";
-        char* epName = newChars(nameLen + strlen(appendEffPwr) + 1);
-        sprintf(epName, "%s%s", inputCSV.c_str(), appendEffPwr);
-        cout << "Record effective power in " << epName << "  ...  " << flush;
-        FILE* f1 = fopen(epName, "w");
-        for (unsigned int i = 0; i < numAct; i++) {
-            auto ai = ((const SMPActor*)actrs[i]);
-            double ci = ai->sCap;
-            assert(0.0 < ci);
-            double si = KBase::sum(ai->vSal);
+
+    // first prepare the header line
+    char* headLine = newChars(300);
+    sprintf(headLine,"PRNG Seed:%20llu;VictoryProbModel:%s;VotingRule:%s;PCEModel:%s;StateTransitions:%s;BigRRange:%s;BigRAdjust:%s;ThirdPartyCommit:%s;InterVecBrgn:%s;BargnModel:%s",
+            getSeed(),KBase::nameFromEnum<VPModel>(vpm,KBase::VPModelNames).c_str(),
+            KBase::nameFromEnum<VotingRule>(vrCltn,KBase::VotingRuleNames).c_str(),
+            KBase::nameFromEnum<PCEModel>(pcem,KBase::PCEModelNames).c_str(),
+            KBase::nameFromEnum<StateTransMode>(stm,KBase::StateTransModeNames).c_str(),
+            KBase::nameFromEnum<BigRRange>(bigRRng,KBase::BigRRangeNames).c_str(),
+            KBase::nameFromEnum<BigRAdjust>(bigRAdj,KBase::BigRAdjustNames).c_str(),
+            KBase::nameFromEnum<ThirdPartyCommit>(tpCommit,KBase::ThirdPartyCommitNames).c_str(),
+            KBase::nameFromEnum<InterVecBrgn>(ivBrgn,InterVecBrgnNames).c_str(),
+            KBase::nameFromEnum<SMPBargnModel>(brgnMod,SMPBargnModelNames).c_str());
+
+    unsigned int nameLen = outputFile.length();
+    cout << endl;
+    const char* appendEffPwr = "_effPow.csv";
+    char* epName = newChars(nameLen + strlen(appendEffPwr) + 1);
+    sprintf(epName, "%s%s", outputFile.c_str(), appendEffPwr);
+    cout << "Record effective power in " << epName << "  ...  " << flush;
+    FILE* f1 = fopen(epName, "w");
+    fprintf(f1,"%s\n",headLine);
+    for (unsigned int i = 0; i < numAct; i++) {
+        auto ai = ((const SMPActor*)actrs[i]);
+        double ci = ai->sCap;
+        assert(0.0 < ci);
+        fprintf(f1, "%s", ai->name.c_str());
+        // loop through dimensions now
+        for (unsigned int k = 0; k < numDim; k++) {
+            double si = (ai->vSal)(k, 0);
             assert(0.0 < si);
             assert(si <= 1.0);
             double epi = ci * si;
-            fprintf(f1, "%s,%5.1f\n", ai->name.c_str(), epi);
+            // increased precision since we divided by 100 when the saliences were import
+            fprintf(f1, ",%5.2f", epi);
         }
-        fclose(f1);
-        f1 = nullptr;
-        cout << "done" << endl;
-        delete epName;
-        epName = nullptr;
+        fprintf(f1, "\n");
+    }
+    fclose(f1);
+    f1 = nullptr;
+    cout << "done" << endl;
+    delete epName;
+    epName = nullptr;
 
-        const char* appendPosLog = "_posLog.csv";
-        char* plName = newChars(nameLen + strlen(appendPosLog) + 1);
-        sprintf(plName, "%s%s", inputCSV.c_str(), appendPosLog);
-        cout << "Record 1D positions over time, without dimension-name in " << plName << "  ...  " << flush;
-        FILE* f2 = fopen(plName, "w");
-        for (unsigned int i = 0; i < numAct; i++) {
-            fprintf(f2, "%s", actrs[i]->name.c_str());
+    const char* appendPosLog = "_posLog.csv";
+    char* plName = newChars(nameLen + strlen(appendPosLog) + 1);
+    sprintf(plName, "%s%s", outputFile.c_str(), appendPosLog);
+    cout << "Record 1D positions over time, without dimension-name in " << plName << "  ...  " << flush;
+    FILE* f2 = fopen(plName, "w");
+    fprintf(f2,"%s\n",headLine);
+    for (unsigned int i = 0; i < numAct; i++) {
+        fprintf(f2, "%s", actrs[i]->name.c_str());
+        for (unsigned int k = 0; k<numDim; k++) {
             for (unsigned int t = 0; t < history.size(); t++) {
                 auto st = history[t];
                 auto pit = st->pstns[i];
                 auto vpit = (const VctrPstn*)pit;
-                assert(1 == vpit->numC());
                 assert(numDim == vpit->numR());
-                fprintf(f2, ",%5.1f", 100 * (*vpit)(0, 0)); // have to print "100.0" sometimes
+                fprintf(f2, ",%5.2f", 100 * (*vpit)(k, 0)); // have to print "100.0" sometimes
             }
-            fprintf(f2, "\n");
         }
-        fclose(f2);
-        f2 = nullptr;
-        cout << "done." << endl;
-        delete plName;
-        plName = nullptr;
+        fprintf(f2, "\n");
     }
+    fclose(f2);
+    f2 = nullptr;
+    cout << "done." << endl;
+    delete plName;
+    plName = nullptr;
+    delete headLine;
+    headLine = nullptr;
+
     return;
+}
+
+void SMPModel::sankeyOutput(string outputFile, string dbName, string scenarioId)
+{
+    cout<<dbName << endl << dbName.length() << endl;
+
+    sqlite3 *db = nullptr;
+    char* zErrMsg = nullptr;
+    if (sqlite3_open_v2(dbName.c_str(), &db, SQLITE_OPEN_READONLY, NULL)) {
+        std::cerr << __FILE__ << ", Line: " << __LINE__ << ", Tried to open db file: " << dbName << endl;
+        std::cerr << "Error: " << sqlite3_errmsg(db) << endl;
+        sqlite3_close(db);
+        exit(-1);
+    }
+
+    auto sqlExec = [&db, &zErrMsg](string sqlQry)
+    {
+        int rc = sqlite3_exec(db, sqlQry.c_str(), sankeyCallBack, nullptr, &zErrMsg);
+        if (rc != SQLITE_OK)
+        {
+            std::cerr <<  "SQL error: " <<  zErrMsg << endl;
+            sqlite3_free(zErrMsg);
+            sqlite3_close(db);
+        }
+        return rc;
+    };
+
+    auto clearDBFields = [](){
+        dbFieldVals.clear();
+        assert(dbFieldVals.empty() == true);
+    };
+
+    auto getActorNames = [](string scenarioID) {
+        string query = "SELECT Name FROM ActorDescription WHERE ScenarioId = \'" + scenarioID + "\'";
+        return query;
+    };
+
+    auto getDimensionsCount = [](string scenarioID) {
+        string query = "SELECT Desc from DimensionDescription WHERE ScenarioId = \'" + scenarioID + "\'";
+        return query;
+    };
+
+    auto getStateCount = [](string scenarioID) {
+        string query = "SELECT DISTINCT Turn_t from VectorPosition WHERE ScenarioId = \'" + scenarioID + "\'";
+        return query;
+    };
+
+    auto getSalienceVal = [](int turn, int dim, string scenarioID) {
+        string query = string("SELECT SpatialSalience.Sal from SpatialSalience, ActorDescription WHERE ") +
+                " ActorDescription.Act_i = SpatialSalience.Act_i " +
+                " and SpatialSalience.ScenarioId = \'" + scenarioID + "\'" +
+                " and ActorDescription.ScenarioId = \'" + scenarioID + "\'" +
+                " and SpatialSalience.Turn_t = " + std::to_string(turn) +
+                " and SpatialSalience.dim_k = " + std::to_string(dim)  ;
+
+        return query;
+    };
+
+    vector<vector<double>> salienceData;
+    auto saveSalienceValues = [&salienceData](int dim) {
+        salienceData.push_back(vector<double>());
+
+        for (int actIndx =0 ; actIndx < dbFieldVals.size(); ++actIndx)
+        {
+            salienceData[dim].push_back(std::stod(dbFieldVals.at(actIndx)));
+        }
+    };
+
+    auto getVectorPosition = [](int turn, int dim, string scenarioID) {
+        string query = string("SELECT Pos_Coord from VectorPosition WHERE ") +
+                " Dim_k = "+ std::to_string(dim) + " and Turn_t = " + std::to_string(turn)+
+                " and  ScenarioId = +\'" + scenarioID + "\'";
+
+        return query;
+    };
+
+    vector<vector<double>> vectorPositionDataDim0;
+    vector<vector<double>> vectorPositionDataDim1;
+    vector<vector<double>> vectorPositionDataDim2;
+
+    auto saveVectorPositionValues = [&vectorPositionDataDim0,
+            &vectorPositionDataDim1,&vectorPositionDataDim2](int turn, int dim) {
+
+        if(dim==0)
+            vectorPositionDataDim0.push_back(vector<double>());
+        else if(dim==1)
+            vectorPositionDataDim1.push_back(vector<double>());
+        else if (dim==2)
+            vectorPositionDataDim2.push_back(vector<double>());
+
+        for (int actIndx =0 ; actIndx < dbFieldVals.size(); ++actIndx)
+        {
+            if(dim==0)
+                vectorPositionDataDim0[turn].push_back(std::stod(dbFieldVals.at(actIndx)));
+            else if(dim==1)
+                vectorPositionDataDim1[turn].push_back(std::stod(dbFieldVals.at(actIndx)));
+            else if(dim==2)
+                vectorPositionDataDim2[turn].push_back(std::stod(dbFieldVals.at(actIndx)));
+        }
+    };
+
+    auto getScenarioData = [](string scenarioID) {
+        string query = string("SELECT * from ScenarioDesc WHERE ") +
+                " ScenarioId = +\'" + scenarioID + "\'";
+        return query;
+    };
+
+    vector<string > scenarioData; // 3D
+    auto saveScenarioColData = [&scenarioData]() {
+        for (int scenarioCol =0 ; scenarioCol < dbFieldVals.size(); ++scenarioCol)
+        {
+            scenarioData.push_back(dbFieldVals.at(scenarioCol));
+        }
+    };
+
+    auto getSpatialCapabilityData = [](string scenarioID) {
+        string query = string("SELECT Cap from SpatialCapability WHERE ") +
+                " ScenarioId = +\'" + scenarioID + "\'";
+        return query;
+    };
+
+    vector<double> capabilityData; // 3D
+    auto saveSpataialCapData = [&capabilityData]() {
+        for (int actor =0 ; actor < dbFieldVals.size(); ++actor)
+        {
+            capabilityData.push_back(std::stod(dbFieldVals.at(actor)));
+        }
+    };
+
+    clearDBFields();
+    int rc = sqlExec(getActorNames(scenarioId));
+    assert(SQLITE_OK == rc);
+    vector <string> actNames;
+    int numActors = dbFieldVals.size();
+    for(int actIndx=0; actIndx < dbFieldVals.size(); ++actIndx)
+    {
+        actNames.push_back(dbFieldVals.at(actIndx));
+    }
+
+    clearDBFields();
+    rc = sqlExec(getDimensionsCount(scenarioId));
+    assert(SQLITE_OK == rc);
+    int numDims = dbFieldVals.size();
+
+    clearDBFields();
+    rc = sqlExec(getStateCount(scenarioId));
+    assert(SQLITE_OK == rc);
+    int numTurns = dbFieldVals.size();
+
+    clearDBFields();
+    for(int dims =0 ; dims <numDims; ++dims)
+    {
+        rc = sqlExec(getSalienceVal(0,dims, scenarioId)); // 0 is turn, since values are identical, 0 is dimension
+        assert(SQLITE_OK == rc);
+
+        saveSalienceValues(dims);
+        clearDBFields();
+    }
+
+    clearDBFields();
+    for(int turns = 0 ; turns < numTurns ; ++turns)
+    {
+        for(int dims =0 ; dims <numDims; ++dims)
+        {
+            rc = sqlExec(getVectorPosition(turns,dims, scenarioId)); // turn, dimension, scenario
+            assert(SQLITE_OK == rc);
+
+            saveVectorPositionValues(turns,dims);
+            clearDBFields();
+        }
+    }
+
+    clearDBFields();
+    rc = sqlExec(getScenarioData(scenarioId));
+    assert(SQLITE_OK == rc);
+    saveScenarioColData();
+
+    clearDBFields();
+    rc = sqlExec(getSpatialCapabilityData(scenarioId));
+    assert(SQLITE_OK == rc);
+    saveSpataialCapData();
+
+    sqlite3_close_v2(db);
+
+    // first prepare the header line
+    char* headLine = newChars(300);
+    sprintf(headLine,
+            "PRNG Seed:%s;VictoryProbModel:%s;VotingRule:%s;PCEModel:%s;StateTransitions:%s;BigRRange:%s;BigRAdjust:%s;ThirdPartyCommit:%s;InterVecBrgn:%s;BargnModel:%s",
+            scenarioData.at(3).c_str(),
+            KBase::VPModelNames[std::stoi(scenarioData.at(4))].c_str(),
+            KBase::VotingRuleNames[std::stoi(scenarioData.at(7))].c_str(),
+            KBase::PCEModelNames[std::stoi(scenarioData.at(5))].c_str(),
+            KBase::StateTransModeNames[std::stoi(scenarioData.at(6))].c_str(),
+            KBase::BigRRangeNames[std::stoi(scenarioData.at(9))].c_str(),
+            KBase::BigRAdjustNames[std::stoi(scenarioData.at(8))].c_str(),
+            KBase::ThirdPartyCommitNames[std::stoi(scenarioData.at(10))].c_str(),
+            InterVecBrgnNames[std::stoi(scenarioData.at(11))].c_str(),
+            SMPBargnModelNames[std::stoi(scenarioData.at(12))].c_str());
+
+    unsigned int nameLen = outputFile.length();
+    cout << endl;
+    const char* appendEffPwr = "_effPow.csv";
+    char* epName = newChars(nameLen + strlen(appendEffPwr) + 1);
+    sprintf(epName, "%s%s", outputFile.c_str(), appendEffPwr);
+    cout << "Record effective power in " << epName << "  ...  " << flush;
+    FILE* f1 = fopen(epName, "w");
+    fprintf(f1,"%s\n",headLine);
+
+    for (unsigned int actor = 0; actor < numActors; actor++)
+    {
+        fprintf(f1, "%s", actNames[actor].c_str());
+        // loop through dimensions now
+        for (unsigned int dimension = 0; dimension < numDims; dimension++)
+        {
+            // increased precision since we divided by 100 when the saliences were import
+            fprintf(f1, ",%5.2f", salienceData[dimension].at(actor) * capabilityData.at(actor));
+        }
+        fprintf(f1, "\n");
+    }
+    fclose(f1);
+    f1 = nullptr;
+    cout << "done" << endl;
+    delete epName;
+    epName = nullptr;
+
+    const char* appendPosLog = "_posLog.csv";
+    char* plName = newChars(nameLen + strlen(appendPosLog) + 1);
+    sprintf(plName, "%s%s", outputFile.c_str(), appendPosLog);
+    cout << "Record 1D positions over time, without dimension-name in " << plName << "  ...  " << flush;
+    FILE* f2 = fopen(plName, "w");
+    fprintf(f2,"%s\n",headLine);
+
+    for (unsigned int actor = 0; actor < numActors; actor++)
+    {
+        fprintf(f2, "%s", actNames[actor].c_str());
+        for (unsigned int dimension = 0; dimension<numDims; dimension++)
+        {
+            for(unsigned int turn =0 ; turn < numTurns; ++turn)
+            {
+                if(dimension==0)
+                    fprintf(f2, ",%5.2f",vectorPositionDataDim0[turn].at(actor));
+                else if(dimension==1)
+                    fprintf(f2, ",%5.2f",vectorPositionDataDim1[turn].at(actor));
+                else if(dimension==2)
+                    fprintf(f2, ",%5.2f",vectorPositionDataDim2[turn].at(actor));
+            }
+        }
+        fprintf(f2, "\n");
+    }
+    fclose(f2);
+    f2 = nullptr;
+    cout << "done." << endl;
+    delete plName;
+    plName = nullptr;
+    delete headLine;
+    headLine = nullptr;
+
+    return;
+
 }
 
 // JAH 20160801 changed to refer to model sqlFlags vector to decide
@@ -965,8 +1250,9 @@ void SMPModel::showVPHistory() const {
         //createSQL(Model::NumTables + 0); // Make sure VectorPosition table is present
         auto sqlBuff = newChars(sqlBuffSize);
         sprintf(sqlBuff,
-            "INSERT INTO VectorPosition (ScenarioId, Turn_t, Act_i, Dim_k, Pos_Coord, Idl_Coord) VALUES ('%s', ?1, ?2, ?3, ?4, ?5)",
-            scenId.c_str());
+          "INSERT INTO VectorPosition "
+          "(ScenarioId, Turn_t, Act_i, Dim_k, Pos_Coord, Idl_Coord, Mover_BargnId)"
+          "VALUES ('%s', ?1, ?2, ?3, ?4, ?5, ?6)", scenId.c_str());
 
         assert(nullptr != smpDB);
         const char* insStr = sqlBuff;
@@ -993,7 +1279,8 @@ void SMPModel::showVPHistory() const {
                     auto vidl = sst->getIdeal(i);
                     assert(1 == vpit->numC());
                     assert(numDim == vpit->numR());
-                    printf("%5.1f , ", 100 * (*vpit)(k, 0)); // have to print "100.0" sometimes
+                    const double pCoord = (*vpit)(k, 0) * 100.0; // Use the scale of [0,100]
+                    printf("%5.1f , ", pCoord); // have to print "100.0" sometimes
                     int rslt = 0;
                     rslt = sqlite3_bind_int(insStmt, 1, t);
                     assert(SQLITE_OK == rslt);
@@ -1001,12 +1288,19 @@ void SMPModel::showVPHistory() const {
                     assert(SQLITE_OK == rslt);
                     rslt = sqlite3_bind_int(insStmt, 3, k);
                     assert(SQLITE_OK == rslt);
-                    const double pCoord = (*vpit)(k, 0);
-                    rslt = sqlite3_bind_double(insStmt, 4, pCoord);
+                    rslt = sqlite3_bind_double(insStmt, 4, pCoord); // Log at the scale of [0,100]
                     assert(SQLITE_OK == rslt);
-                    const double iCoord = vidl(k, 0);
+                    const double iCoord = vidl(k, 0) * 100.0; // Log at the scale of [0,100];
                     rslt = sqlite3_bind_double(insStmt, 5, iCoord);
                     assert(SQLITE_OK == rslt);
+
+                    try {
+                      rslt = sqlite3_bind_int(insStmt, 6, sst->getPosMoverBargain(i));
+                      assert(SQLITE_OK == rslt);
+                    }
+                    catch (const std::out_of_range& oor) { // exception thrown by std::map::at()
+                      // do nothing
+                    }
                     rslt = sqlite3_step(insStmt);
                     assert(SQLITE_DONE == rslt);
                     sqlite3_clear_bindings(insStmt);
@@ -1070,24 +1364,24 @@ SMPModel * SMPModel::initModel(vector<string> aName, vector<string> aDesc, vecto
                                uint64_t s, vector<bool> f, string scenDesc, string scenName)
 {
     
-  //  cout << "Num aName "<< aName.size() << endl;
-  //  cout << "Num aDesc "<< aDesc.size() << endl;
-  //  cout << "Num dName "<< dName.size() << endl;
-  //  auto sfn = [](const string str, const KMatrix & m) { 
-  //  cout << "Dim "<<str<<": "<<m.numR() << ", "<<m.numC() <<endl;
-  //  m.mPrintf(" %.4f ");
-  //  return;
-  //  };
-  //  sfn("cap", cap);
-  //  sfn("pos", pos);
-  //  sfn("sal", sal);
-  //  sfn("accM", accM);
-  //  cout << flush; 
+    //  cout << "Num aName "<< aName.size() << endl;
+    //  cout << "Num aDesc "<< aDesc.size() << endl;
+    //  cout << "Num dName "<< dName.size() << endl;
+    //  auto sfn = [](const string str, const KMatrix & m) {
+    //  cout << "Dim "<<str<<": "<<m.numR() << ", "<<m.numC() <<endl;
+    //  m.mPrintf(" %.4f ");
+    //  return;
+    //  };
+    //  sfn("cap", cap);
+    //  sfn("pos", pos);
+    //  sfn("sal", sal);
+    //  sfn("accM", accM);
+    //  cout << flush;
     
     assert(f.size() == Model::NumSQLLogGrps + NumSQLLogGrps);
     SMPModel * sm0 = new SMPModel(scenDesc, s, f, scenName); // JAH 20160711 added rng seed 20160730 JAH added sql flags
     SMPState * st0 = new SMPState(sm0);
-  sm0->addState(st0);
+    sm0->addState(st0);
 
     st0->step = [st0]() {
         return st0->stepBCN();
@@ -1100,7 +1394,7 @@ SMPModel * SMPModel::initModel(vector<string> aName, vector<string> aDesc, vecto
     for (auto dn : dName) {
         sm0->addDim(dn);
     }
-  
+
     for (unsigned int i = 0; i < na; i++) {
         auto ai = new SMPActor(aName[i], aDesc[i]);
         ai->sCap = cap(i, 0);
@@ -1140,7 +1434,7 @@ void SMPModel::displayModelParams(SMPModel *md0)
 }
 
 string SMPModel::runModel(vector<bool> sqlFlags, string dbFilePath,
-    string inputDataFile, uint64_t seed, vector<int> modelParams) {
+                          string inputDataFile, uint64_t seed, bool saveHist, vector<int> modelParams) {
     SMPModel::setDBPath(dbFilePath);
     if (md0 != nullptr) {
         delete md0;
@@ -1152,6 +1446,7 @@ string SMPModel::runModel(vector<bool> sqlFlags, string dbFilePath,
     assert(dotPos != string::npos); // A file name without extension
 
     string fileExt = inputDataFile.substr(dotPos+1);
+    string fileName= inputDataFile.substr(0,dotPos);
 
     // convert to all lower case for easy comparison
     std::transform(fileExt.begin(), fileExt.end(), fileExt.begin(), ::tolower);
@@ -1181,6 +1476,10 @@ string SMPModel::runModel(vector<bool> sqlFlags, string dbFilePath,
     displayModelParams(md0);
     configExec(md0);
     md0->releaseDB();
+    if (saveHist)
+    {
+        md0->sankeyOutput(fileName);
+    }
     return md0->getScenarioID();
 }
 
@@ -1394,8 +1693,21 @@ int SMPModel::callBack(void *data, int numCol, char **stringFields, char **colNa
     return (int)0;
 };
 
+
+int SMPModel::sankeyCallBack(void *data, int numCol, char **stringFields, char **colNames)
+{
+    for (int i = 0; i < numCol; i++)
+    {
+        dbFieldVals.push_back(stringFields[i] ? stringFields[i] : "NULL");
+    }
+
+    assert(dbFieldVals.size() > 0);
+    return (int)0;
+};
+
+
 double SMPModel::getQuadMapPoint(string dbname, string scenarioID, size_t turn, size_t est_h,
-    size_t aff_k, size_t init_i, size_t rcvr_j) {
+                                 size_t aff_k, size_t init_i, size_t rcvr_j) {
 
     sqlite3 *db = nullptr;
     char* zErrMsg = nullptr;
@@ -1418,21 +1730,21 @@ double SMPModel::getQuadMapPoint(string dbname, string scenarioID, size_t turn, 
 
     auto getUtilQuery = [scenarioID, turn, est_h](size_t initiator, size_t receiver) {
         string query = "SELECT Util FROM PosUtil WHERE ScenarioId = \'" + scenarioID
-            + "\' AND Turn_t = " + std::to_string(turn) + " AND Est_h = " + std::to_string(est_h)
-            + " AND Act_i = " + std::to_string(initiator) + " AND Pos_j =  " + std::to_string(receiver);
+                + "\' AND Turn_t = " + std::to_string(turn) + " AND Est_h = " + std::to_string(est_h)
+                + " AND Act_i = " + std::to_string(initiator) + " AND Pos_j =  " + std::to_string(receiver);
         return query;
     };
 
     auto getVSalQuery = [scenarioID, turn](size_t actor) {
         string query = "SELECT SUM(Sal) FROM SpatialSalience WHERE ScenarioId=\'" + scenarioID
-            + "\' AND Turn_t = " + std::to_string(turn) + " AND Act_i = " + std::to_string(actor);
+                + "\' AND Turn_t = " + std::to_string(turn) + " AND Act_i = " + std::to_string(actor);
 
         return query;
     };
 
     auto getSCapQuery = [scenarioID, turn](size_t actor) {
         string query = "SELECT Cap FROM SpatialCapability WHERE ScenarioId=\'" + scenarioID
-            + "\' AND Turn_t = " + std::to_string(turn) + " AND Act_i = " + std::to_string(actor);
+                + "\' AND Turn_t = " + std::to_string(turn) + " AND Act_i = " + std::to_string(actor);
 
         return query;
     };
@@ -1685,7 +1997,7 @@ void SMPModel::randomSMP(unsigned int numA, unsigned int sDim, bool accP, uint64
         cout << "voting rule: " << vrs << endl;
         cout << "Pos vector: ";
         VctrPstn * pi = ((VctrPstn*)(st0->pstns[i]));
-        trans(*pi).mPrintf(" %+7.4f ");
+        (trans(*pi) * 100.0).mPrintf(" %+7.4f "); // print on the scale of [0,100]
         cout << "Sal vector: ";
         trans(ai->vSal).mPrintf(" %+7.4f ");
         printf("Capability: %.3f \n", ai->sCap);
@@ -1713,9 +2025,9 @@ void SMPModel::randomSMP(unsigned int numA, unsigned int sDim, bool accP, uint64
     st0->setAUtil(-1, ReportingLevel::Silent);
     st0->setNRA(); // TODO: simple setting of NRA
 
-                   // with SMP actors, we can always read their ideal position.
-                   // with strategic voting, they might want to advocate positions
-                   // separate from their ideal, but this simple demo skips that.
+    // with SMP actors, we can always read their ideal position.
+    // with strategic voting, they might want to advocate positions
+    // separate from their ideal, but this simple demo skips that.
     auto uFn1 = [st0](unsigned int i, unsigned int j) {
         auto ai = ((SMPActor*)(st0->model->actrs[i]));
         auto pj = ((VctrPstn*)(st0->pstns[j])); // aj->iPos;
@@ -1730,7 +2042,7 @@ void SMPModel::randomSMP(unsigned int numA, unsigned int sDim, bool accP, uint64
 
     auto w = st0->actrCaps(); //  KMatrix::map(wFn, 1, numA);
 
-                              // no longer need external reference to the state
+    // no longer need external reference to the state
     st0 = nullptr;
 
     // arbitrary but illustrates that we can do an election with arbitrary
