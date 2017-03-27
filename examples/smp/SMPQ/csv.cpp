@@ -23,7 +23,6 @@
 // --------------------------------------------
 
 #include "csv.h"
-#include <QDebug>
 
 CSV::CSV()
 {
@@ -55,60 +54,31 @@ void CSV::readCSVFile(QString path)
                 if(lastField.contains(space))
                     lineToken.removeLast();
 
-                if(lineToken.length()>2)//CHECK FOR COLORS CSV
-                {
-                    if(rowindex >= 2 )
-                    {
-                        // load parsed data to model accordingly
-                        for (int j = 0; j < lineToken.size(); j++)
-                        {
-                            if(j > 1)
-                            {
-                                QString value = lineToken.at(j);
-                                value = QString::number(value.toFloat(),'f',2);
-                                QStandardItem *item = new QStandardItem(value.trimmed());
-                                model->setItem(rowindex-2, j, item);
-                            }
-                            else
-                            {
-                                QString value = lineToken.at(j);
-                                QStandardItem *item = new QStandardItem(value.trimmed());
-                                model->setItem(rowindex-2, j, item);
-                            }
-                        }
-                    }
-                    else if(rowindex == 1)
-                    {
-                        for(int i=3; i< lineToken.length(); ++i)
-                        {
-                            QString header = lineToken.at(i);
-                            QStringList headerList = header.split(" ");
-                            if(headerList.length()>1)
-                            {
-                                header = headerList.at(0);
-                                header.append(" \n").append(headerList.at(1));
-                                lineToken[i]=header;
-                            }
-                        }
 
-                        model->setHorizontalHeaderLabels(lineToken);
-                    }
-                    else if(rowindex == 0)
-                    {
-                        scenarioName.append(lineToken.at(0));
-                        scenarioName.append(lineToken.at(1));
-                        lineToken.clear();
-                    }
-                    rowindex++;
-                }
-                else
+                if(rowindex >= 2 )
                 {
-                    emit sendMessage("CSV","Unknown Data !");
-                    return;
+                    // load parsed data to model accordingly
+                    for (int j = 0; j < lineToken.size(); j++)
+                    {
+                        QString value = lineToken.at(j);
+                        QStandardItem *item = new QStandardItem(value.trimmed());
+                        model->setItem(rowindex-2, j, item);
+                    }
                 }
+                else if(rowindex == 1)
+                {
+                    model->setHorizontalHeaderLabels(lineToken);
+                }
+                else if(rowindex == 0)
+                {
+                    scenarioName.append(lineToken.at(0));
+                    scenarioName.append(lineToken.at(1));
+                    lineToken.clear();
+                }
+                rowindex++;
             }
+
             file.close();
-            emit csvModel(model,scenarioName);
         }
         else
         {
@@ -116,80 +86,7 @@ void CSV::readCSVFile(QString path)
             return;
         }
     }
-}
-
-
-void CSV::exportActorColors(QString path, QList<int> actorIds, QList<QString> colorCode)
-{
-    QFile f(path);
-
-    if (f.open(QFile::WriteOnly | QFile::Truncate))
-    {
-        QTextStream data( &f );
-        QStringList strList;
-
-        //appending data
-        for (int row=0; row < actorIds.length(); row++)
-        {
-            strList.clear();
-
-            strList << QString::number(actorIds.at(row));
-            strList << colorCode.at(row);
-            data << strList.join(",") + "\n";
-            qDebug() << strList;
-        }
-        f.close();
-    }
-}
-
-void CSV::importActorColors(QString path, int actCount)
-{
-    QRegExp space("^\\s*$");
-
-    //getting the csv file path
-    QList<QColor> colorCodeList;
-    if(!path.isEmpty())
-    {
-        QFile file(path);
-        if (file.open(QIODevice::ReadOnly) && file.size() > 0)
-        {
-            // file row counter
-            QTextStream in(&file);                 // read to text stream
-
-            while (!in.atEnd())
-            {
-                // read one line from textstream(separated by "\n")
-                QString fileLine = in.readLine();
-
-                // parse the read line into separate pieces(tokens) with "," as the delimiter
-                QStringList lineToken = fileLine.split(",", QString::SkipEmptyParts);
-                QString lastField = lineToken.at(lineToken.length()-1);
-                if(lastField.contains(space))
-                    lineToken.removeLast();
-
-
-                // load parsed data to model accordingly
-                for (int j = 0; j < lineToken.size(); j++)
-                {
-                    if(j == 1)
-                    {
-                        colorCodeList.append(lineToken.at(j));
-                    }
-                }
-            }
-            file.close();
-        }
-        qDebug()<<colorCodeList.length() << actCount;
-
-        emit(importedColors(colorCodeList));
-
-
-    }
-    else
-    {
-        emit sendMessage("CSV","File is Empty ! ");
-        return;
-    }
+    emit csvModel(model,scenarioName);
 }
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.

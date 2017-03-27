@@ -363,7 +363,7 @@ KTable * Model::createSQL(unsigned int n)
           "Recd_Seld	BOOLEAN NULL"\
           ");";
     name = "Bargn";
-    grpID = 4;
+    grpID = 3;
     break;
   case 9:  //
     // BargnCoords table
@@ -665,11 +665,11 @@ void Model::sqlBargainCoords(unsigned int t, int bargnID, const KBase::VctrPstn 
     assert(SQLITE_OK == rslt);
 
     //Init_Coord
-    rslt = sqlite3_bind_double(insStmt, 4, initPos(k,0) * 100.0); // Log at the scale of [0,100]
+    rslt = sqlite3_bind_double(insStmt, 4, initPos(k,0));
     assert(SQLITE_OK == rslt);
     //Recd_Coord
 
-    rslt = sqlite3_bind_double(insStmt, 5, rcvrPos(k, 0) * 100.0); // Log at the scale of [0,100]
+    rslt = sqlite3_bind_double(insStmt, 5, rcvrPos(k, 0));
     assert(SQLITE_OK == rslt);
     rslt = sqlite3_step(insStmt);
     assert(SQLITE_DONE == rslt);

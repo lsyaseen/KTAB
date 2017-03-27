@@ -40,8 +40,6 @@ void MainWindow::initializeQuadMapDock()
     connect(plotQuadMap,SIGNAL(clicked(bool)),this,SLOT(quadMapPlotPoints(bool)));
 
     autoScale = new QCheckBox("Auto Scale");
-    autoScale->setToolTip("The axes limits on the quad map default to [-1,1]; "
-                          " \ncheck this to zoom on the range of the plotted data ");
     hlay->addWidget(autoScale);
 
     connect(autoScale,SIGNAL(clicked(bool)),this,SLOT(quadMapAutoScale(bool)));
@@ -118,14 +116,13 @@ void MainWindow::initializeQuadMapPlot()
     quadMapCustomGraph->xAxis->setSubTickCount(0);
     quadMapCustomGraph->xAxis->setTickLength(0,0.1);
     quadMapCustomGraph->xAxis->grid()->setVisible(true);
-    quadMapCustomGraph->xAxis->setLabel("E[ΔU] to Receiver");
 
     quadMapCustomGraph->yAxis->setAutoTicks(true);
     quadMapCustomGraph->yAxis->setAutoTickLabels(true);
 
     quadMapCustomGraph->yAxis->setRange(-1, 1);
     quadMapCustomGraph->yAxis->setPadding(0); // a bit more space to the left border
-    quadMapCustomGraph->yAxis->setLabel("E[ΔU] to Initiator");
+    quadMapCustomGraph->yAxis->setLabel(" ");
     quadMapCustomGraph->yAxis->grid()->setSubGridVisible(false);
 
     connect(quadMapCustomGraph->xAxis, SIGNAL(rangeChanged(QCPRange,QCPRange)), this, SLOT(xAxisRangeChangedQuad(QCPRange,QCPRange)));
@@ -241,9 +238,6 @@ void MainWindow::populateInitiatorsAndReceiversRadioButtonsAndCheckBoxes()
 
     perspectiveComboBox->currentIndexChanged(perspectiveComboBox->currentIndex());
 
-    quadMapInitiatorsScrollArea->setToolTip("Plot expected utility changes for possible bargains initiated by this actor");
-    quadMapReceiversScrollArea->setToolTip("Plot expected utility changes for possible bargains received by these actors");
-
     widgetRB->adjustSize();
     widgetCB->adjustSize();
 }
@@ -251,25 +245,12 @@ void MainWindow::populateInitiatorsAndReceiversRadioButtonsAndCheckBoxes()
 void MainWindow::populatePerspectiveComboBox()
 {
     perspectiveComboBox = new QComboBox;
-    perspectiveComboBox->setToolTip("Actors from whose perspectives the expected utility "
-                                    "\nchanges are computed and plotted in each axis");
     QWidget* widget = new QWidget;
     QGridLayout *layout = new QGridLayout(widget);
 
     QStringList items;
     items << "Initiator" <<"Receiver(s)" <<"Objective" <<"Other";
     perspectiveComboBox->addItems(items);
-    perspectiveComboBox->setItemData(0,"Compute all utility changes from the perspective of the initiating actor"
-                                     ,Qt::ToolTipRole);
-    perspectiveComboBox->setItemData(1,"Compute all utility changes from the perspective of the receiving actor(s)"
-                                     ,Qt::ToolTipRole);
-    perspectiveComboBox->setItemData(2,"The vertical axis shows the utility changes from the perspective of the "
-                                       "\ninitiating actor, while the horizontal axis shows utility changes from "
-                                       "\nthe perspective of the receiving actor(s)"
-                                     ,Qt::ToolTipRole);
-    perspectiveComboBox->setItemData(3,"Allows the selection of any actor from whose perspective the utility changes"
-                                       "\n are computed and shown on both axes"
-                                     ,Qt::ToolTipRole);
 
     layout->addWidget(perspectiveComboBox,0,0,0,-1,Qt::AlignTop);
 
@@ -282,13 +263,11 @@ void MainWindow::populatePerspectiveComboBox()
     QLabel *vLabel = new QLabel("V");
     vLabel->setAlignment(Qt::AlignHCenter);
     vLabel->setFont(labelFont);
-    vLabel->setToolTip("Actor from whose perspective the utility changes \non the vertical axis are computed");
     vLabel->setFrameStyle(QFrame::Panel | QFrame::StyledPanel);
 
     QLabel *hLabel = new QLabel("H");
     hLabel->setAlignment(Qt::AlignHCenter);
     hLabel->setFont(labelFont);
-    hLabel->setToolTip("Actor from whose perspective the utility changes \non the horizontal axis are computed");
     hLabel->setFrameStyle(QFrame::Panel | QFrame::StyledPanel);
 
     vComboBox = new QComboBox;
@@ -313,9 +292,7 @@ void MainWindow::populatePerspectiveComboBox()
 
     perspectiveComboBox->setMinimumWidth(perspectiveComboBox->minimumSizeHint().width()-20);
     vComboBox->setMinimumWidth(vComboBox->minimumSizeHint().width()-20);
-    vComboBox->setToolTip("Actor from whose perspective the utility changes\n on the vertical axis are computed");
     hComboBox->setMinimumWidth(hComboBox->minimumSizeHint().width()-20);
-    hComboBox->setToolTip("Actor from whose perspective the utility changes\n on the horizontal axis are computed");
 
     widget->adjustSize();
 }
@@ -407,9 +384,6 @@ void MainWindow::getUtilChlgHorizontalVerticalAxisData(int turn)
 
                 affK=initI;
                 estH=vComboBox->currentIndex()-1; // -1, actors index starts from 1 not zero, only here.
-
-                if(estH<0)
-                    return;
 
                 VHAxisValues.append(turn);
                 VHAxisValues.append(estH);
@@ -778,7 +752,7 @@ void MainWindow::quadMapPlotPoints(bool status)
         plotQuadMap->setEnabled(false);
         removeAllScatterPoints();
         getUtilChlgHorizontalVerticalAxisData(turnSlider->value());
-        quadMapTitle->setText(QString(" E[ΔU] Quad Map for Actor %1, Turn "
+        quadMapTitle->setText(QString("Expected Utility Quad Map for Actor %1, Iteration "
                                       +QString::number(turnSlider->value())).arg(actorsName.at(initiatorTip)));
         quadMapCustomGraph->replot();
         if(true==autoScale->isChecked())
@@ -797,7 +771,6 @@ void MainWindow::quadMapPlotPoints(bool status)
 void MainWindow::dbImported(bool bl)
 {
     useHistory=false;
-    sankeyOutputHistory=true;
 }
 
 void MainWindow::quadPlotContextMenuRequest(QPoint pos)
@@ -814,10 +787,7 @@ void MainWindow::saveQuadPlotAsBMP()
 {
     QString fileName = getImageFileName("BMP File (*.bmp)","QuadMap",".bmp");
     if(!fileName.isEmpty())
-    {
         quadMapCustomGraph->saveBmp(fileName);
-        //        setCurrentFile(fileName);
-    }
 }
 
 
@@ -825,9 +795,6 @@ void MainWindow::saveQuadPlotAsPDF()
 {
     QString fileName = getImageFileName("PDF File (*.pdf)","QuadMap",".pdf");
     if(!fileName.isEmpty())
-    {
         quadMapCustomGraph->savePdf(fileName);
-        //        setCurrentFile(fileName);
-    }
 }
 

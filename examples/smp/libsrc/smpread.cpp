@@ -89,7 +89,6 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
     cout << "Scenario Description: " << scenDesc << endl;
 
     assert(scenName.length() <= Model::maxScenNameLen);
-    assert(scenDesc.length() <= Model::maxScenDescLen);
 
     printf("Number of actors: %u \n", numActor);
     printf("Number of dimensions: %u \n", numDim);

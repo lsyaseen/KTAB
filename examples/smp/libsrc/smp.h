@@ -219,10 +219,6 @@ public:
   void idealsFromPstns(const vector<VctrPstn> &  ps = {});
   VctrPstn getIdeal(unsigned int n) const;
 
-  uint64_t getPosMoverBargain(unsigned int actor) const;
-
-  void setPosMoverBargain(unsigned int actor, uint64_t bargainID);
-
   void calcUtils(unsigned int i) const;  // i == actor id 
 
 protected:
@@ -272,14 +268,7 @@ private:
    * Calculate all challenge utilities (i, i, i, j) which would be used to find the best challenge
    */
   void bestChallengeUtils(unsigned int i /* actor id */) const;
-
-  // Record the bargain id that caused an actor to move in each turn
-  using moverBargains = std::map<
-    unsigned int, // actor id
-    uint64_t // bargain id
-    >;
-  mutable moverBargains positionMovers;
-
+  
   using eduChlgsJ = std::map<unsigned int /*j*/, tuple<double, double> >;
   
   mutable std::map<unsigned int /*i*/, eduChlgsJ> eduChlgsIJ;
@@ -306,7 +295,7 @@ public:
   static double bvUtil(const KMatrix & vd, const  KMatrix & vs, double R);
 
   static std::string runModel(std::vector<bool> sqlFlags, std::string dbFilePath,
-      std::string inputDataFile, uint64_t seed, bool saveHist, std::vector<int> modelParams = std::vector<int>());
+      std::string inputDataFile, uint64_t seed, std::vector<int> modelParams = std::vector<int>());
 
   // this sets up a standard configuration and runs it
   static void configExec(SMPModel * md0);
@@ -337,10 +326,6 @@ public:
 
   // output the two files needed to draw Sankey diagrams
   void sankeyOutput(string inputCSV) const;
-
-  // output the two files needed to draw Sankey diagram for Database
-  static void sankeyOutput(string outputFile, string dbName, std::string scenarioId) ;
-
 
   // number of spatial dimensions in this SMP
   void addDim(string dn);
@@ -421,16 +406,10 @@ private:
 
   // fieldVals is used to store the result of select sql queries
   static std::vector<string> fieldVals;
-
-  // Method used in sqlite execution for callback functionality for sankeyOoutput
-  static int sankeyCallBack(void *data, int numCol, char **stringFields, char **colNames);
-
-  // fieldVals is used to store the result of select sql queries
-  static std::vector<string> dbFieldVals;
- };
+};
 
 
-extern SMPModel * md0 ;
+
 };// end of namespace
 
 // --------------------------------------------
