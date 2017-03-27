@@ -37,13 +37,10 @@ public:
     QStandardItemModel * model;
 public slots:
     void readCSVFile(QString path);
-    void exportActorColors(QString path, QList<int> actorIds, QList<QString> colorCode);
-    void importActorColors(QString path,int actCount);
 
 signals:
     void csvModel(QStandardItemModel * ,QStringList ScenarioName);
     void sendMessage(QString className, QString Message);
-    void importedColors(QList<QColor> colors);
 
 };
 

@@ -295,7 +295,6 @@ public:
   static const unsigned int maxNumActor = 250; //quite generous, as we expect 10-30.
 
   static const unsigned int maxScenNameLen = 512; // might be auto-generated in sensitivy analysis
-  static const unsigned int maxScenDescLen = 512; // see above
   static const unsigned int maxActNameLen = 25; // quite generous, as we expect 1-5
   static const unsigned int maxActDescLen = 256;
 
@@ -412,7 +411,7 @@ public:
 
   void setSeed(uint64_t seed);
 
-  uint64_t getSeed() const;
+  uint64_t getSeed();
 
   static KTable * createSQL(unsigned int n);
 protected:

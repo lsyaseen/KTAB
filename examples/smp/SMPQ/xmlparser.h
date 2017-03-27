@@ -29,20 +29,18 @@
 #include <QTableWidget>
 #include <QXmlStreamReader>
 #include <QStandardItemModel>
-#include <QDir>
 
 class Xmlparser  : public QObject
 {
     Q_OBJECT
 public:
-    explicit Xmlparser(QString homeDir);
+    explicit Xmlparser();
 
 public slots: // convert to signal slots
     void openXmlFile(QString xmlFilePath);
     void readXmlFile();
-    void saveToXmlFile(QStringList parameters, QStandardItemModel * smpData, QStandardItemModel *affMatrix, QString path);
+    void saveToXmlFile(QStringList parameters, QStandardItemModel * smpData, QStandardItemModel *affMatrix);
     void saveNewDataToXmlFile(QStringList parameters, QTableWidget * smpDataWidget, QTableWidget *affintyDataWidget);
-    void updateHomeDir(QString dir);
 
 private :
     void processModelParameters();
@@ -63,7 +61,6 @@ private :
     QList <QStringList> idealAdjustmentList;
 
     QStandardItemModel *xmlModel;
-    QString homeDirectory;
 
 
     void tagElements(QXmlStreamWriter *xmlWriter, QString tagName, QString tagValue);
@@ -73,6 +70,7 @@ signals:
                        QStandardItemModel * actModel, QList <QStringList> idealAdj);
     void newXmlFilePath(QString path);
 
+public slots:
 };
 
 #endif // XMLPARSER_H

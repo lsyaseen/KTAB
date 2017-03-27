@@ -42,36 +42,23 @@ void MainWindow::createXmlTable()
 
     xmlImportDataTableView = new QTableView;
     xmlAffinityMatrixTableView = new QTableView;
-    xmlAffinityMatrixTableView->setToolTip("The affinity matrix records, for all pairwise comparisons of actors, "
-                                           "\nthe affinity which actor i has for the position of actor j");
+
     xmlTabWidget->addTab(xmlImportDataTableView,"Xml SMP Data");
     xmlTabWidget->addTab(xmlAffinityMatrixTableView,"Affinity Matrix");
-    xmlTabWidget->setTabToolTip(1,"The affinity matrix records, for all pairwise comparisons of actors, "
-                                  "\nthe affinity which actor i has for the position of actor j");
+
     stackWidget->addWidget(xmlTabWidget);
 
 }
 
-void MainWindow::importXmlGetFilePath(bool bl,QString filepath)
+void MainWindow::importXmlGetFilePath(bool bl)
 {
+    emit releaseDatabase();
+
     QString filename;
-    if(filepath.isEmpty())
-    {
-        filename = QFileDialog::getOpenFileName(this,tr("Xml File"),homeDirectory, tr("Xml File (*.xml)"));
-    }
-    else
-        filename=filepath;
+    filename = QFileDialog::getOpenFileName(this,tr("Xml File"), QDir::homePath() , tr("Xml File (*.xml)"));
+
     if(!filename.isEmpty())
     {
-        QDir dir =QFileInfo(filename).absoluteDir();
-        homeDirectory = dir.absolutePath();
-
-        setCurrentFile(filename);
-        emit releaseDatabase();
-        lineGraphDock->setVisible(false);
-        barGraphDock->setVisible(false);
-        quadMapDock->setVisible(false);
-
         xmlPath=filename;
         emit openXMLFile(filename);
     }
@@ -87,11 +74,9 @@ void MainWindow::openStatusXml(bool status)
         emit readXMLFile();
 
         donePushButton->setEnabled(true);
-        donePushButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
         runButton->setEnabled(true);
         dimensionsLineEdit->setEnabled(true);
-        addActorsPushButton->setEnabled(true);
-        deleteActorsPushButton->setEnabled(true);
+        actorsPushButton->setEnabled(true);
         dimensionsPushButton->setEnabled(true);
 
         clearAllGraphs();
@@ -109,13 +94,12 @@ void MainWindow::xmlDataParsedFromFile(QStringList modelDesc, QStringList modpar
     dimensionsLineEdit->setText(QString::number(dims.length()));
     dimensionsLineEdit->setEnabled(true);
     runButton->setEnabled(true);
-    runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
-
     dimensionsXml=dims;
 
     updateControlsBar(modelDesc);
     updateModelParameters(modpara);
     populateXmlTable(actModel);
+
 
     QVector<QString> actors;
     for(int i =0 ; i < actModel->rowCount() ; ++ i)
@@ -146,36 +130,24 @@ void MainWindow::populateXmlTable(QStandardItemModel *actorsVal)
 
     xmlSmpDataModel = actorsVal;
     for(int col =0 ; col <3;++col)
-    {
         xmlSmpDataModel->setHeaderData(col,Qt::Horizontal,xmlTableHeaders.at(col));
-    }
-    xmlSmpDataModel->horizontalHeaderItem(0)->setToolTip("An individual, institution or group");
-    xmlSmpDataModel->horizontalHeaderItem(1)->setToolTip("A description of the actor");
-    xmlSmpDataModel->horizontalHeaderItem(2)->setToolTip("How much can the actor influence other actors");
 
     int dim=0;
     for(int col = 3 ; col <xmlSmpDataModel->columnCount(); col+=2)
     {
-        QString pos(" \n Position ");
-        QString sal(" \n Salience ");
+        QString pos(" Position ");
+        QString sal(" Salience ");
 
         pos.prepend(dimensionsXml.at(dim));
         sal.prepend(dimensionsXml.at(dim));
 
         xmlSmpDataModel->setHeaderData(col,Qt::Horizontal,pos);
-        xmlSmpDataModel->horizontalHeaderItem(col)->
-                setToolTip("The policy position of an actor regarding the question ( with or against)");
         xmlSmpDataModel->setHeaderData(col+1,Qt::Horizontal,sal);
-        xmlSmpDataModel->horizontalHeaderItem(col+1)->
-                setToolTip("How much the actor cares about the question");
-
         ++dim;
     }
 
     actorsLineEdit->setText(QString::number(xmlSmpDataModel->rowCount()));
     actorsLineEdit->setEnabled(true);
-    scenarioNameLineEdit->setPlaceholderText("Dataset/Scenario name");
-    scenarioDescriptionLineEdit->setPlaceholderText("Dataset/Scenario Description");
     xmlImportDataTableView->setModel(xmlSmpDataModel);
     xmlImportDataTableView->showMaximized();
     xmlImportDataTableView->resizeColumnsToContents();
@@ -226,9 +198,8 @@ void MainWindow::populateAffinityMatrix(QList<QStringList> idealAdj, QVector<QSt
 void MainWindow::updateControlsBar(QStringList modelDesc)
 {
     scenarioComboBox->clear();
-    scenarioComboBox->setVisible(false);
-    scenarioNameLineEdit->setVisible(true);
-    scenarioNameLineEdit->setText(modelDesc.at(0));
+    scenarioComboBox->addItem(modelDesc.at(0));//name
+    scenarioComboBox->setEditable(true);
 
     scenarioDescriptionLineEdit->setText(modelDesc.at(1));//desc
     scenarioDescriptionLineEdit->setEnabled(true);
@@ -331,7 +302,7 @@ void MainWindow::saveTableViewToXML()
     if(0==validateControlButtons("xml_tableView"))
     {
         QStringList parameters;
-        parameters.append(scenarioNameLineEdit->text());
+        parameters.append(scenarioComboBox->currentText());
         parameters.append(scenarioDescriptionLineEdit->text());
         if(!seedRand->text().isEmpty())
             parameters.append(seedRand->text());
@@ -347,31 +318,11 @@ void MainWindow::saveTableViewToXML()
         parameters.append(interVecBrgnComboBox->currentText());
         parameters.append(bargnModelComboBox->currentText());
 
-        QStringList dims;
-        for(int i=3; i <xmlSmpDataModel->columnCount();++i)
-        {
-            dims.append(xmlSmpDataModel->headerData(i,Qt::Horizontal).toString().remove("Position").remove("\n"));
-            ++i;
-        }
-        parameters.append(dims);
+        parameters.append(dimensionsXml);
 
-        QString filename = QFileDialog::getSaveFileName(this,tr("Save Xml"), homeDirectory ,tr("Xml files (*.xml)"));
-
-        if(!filename.endsWith(".xml"))
-            filename.append(".xml");
-
-        if(!filename.isEmpty())
-        {
-            QDir dir =QFileInfo(filename).absoluteDir();
-            homeDirectory = dir.absolutePath();
-            setCurrentFile(filename);
-        }
-
-        emit saveXMLDataToFile(parameters,xmlSmpDataModel,xmlAffinityMatrixModel,filename);
+        emit saveXMLDataToFile(parameters,xmlSmpDataModel,xmlAffinityMatrixModel);
 
         runButton->setEnabled(true);
-        runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: green;");
-
     }
 }
 
@@ -478,42 +429,12 @@ void MainWindow::displayMenuXmlTableView(QPoint pos)
                 if(xmlImportDataTableView->currentIndex().column()%2!=0)
                 {
                     if(!(text.contains("Position") || text.contains("position")))
-                    {
-                        if(!text.contains("\n"))
-                            text = text.append("\n Position");
-                        else
-                            text = text.append(" Position");
-                    }
-                    else
-                    {   QString header = text;
-                        header.remove("Position").remove("position");
-                        header.remove("\n");
-                        header.append("\n Position");
-                        text = header;
-                    }
-                    xmlSmpDataModel->horizontalHeaderItem(xmlImportDataTableView->currentIndex().column())->
-                            setToolTip("The policy position of an actor regarding the question ( with or against)");
+                        text = "Position";
                 }
                 else
                 {
                     if(!(text.contains("Salience")|| text.contains("salience")))
-                    {
-                        if(!text.contains("\n"))
-                            text = text.append("\n Salience");
-                        else
-                            text = text.append(" Salience");
-                    }
-                    else
-                    {
-                        QString header = text;
-                        header.remove("Salience").remove("salience");
-                        header.remove("\n");
-                        header.append("\n Salience");
-                        text = header;
-                    }
-
-                    xmlSmpDataModel->horizontalHeaderItem(xmlImportDataTableView->currentIndex().column())->
-                            setToolTip("How much the actor cares about the question");
+                        text = "Salience";
                 }
                 xmlSmpDataModel->setHeaderData(xmlImportDataTableView->currentIndex().column(),Qt::Horizontal,text);
                 statusBar()->showMessage("Header changed");
@@ -529,8 +450,6 @@ void MainWindow::displayMenuXmlTableView(QPoint pos)
         {
             xmlSmpDataModel->insertColumn(xmlImportDataTableView->currentIndex().column());
             xmlSmpDataModel->setHeaderData(xmlImportDataTableView->currentIndex().column()-1,Qt::Horizontal,"Position");
-            xmlSmpDataModel->horizontalHeaderItem(xmlImportDataTableView->currentIndex().column()-1)->
-                    setToolTip("The policy position of an actor regarding the question ( with or against)");
             statusBar()->showMessage("Column Inserted, Header changed");
         }
         else
@@ -543,7 +462,6 @@ void MainWindow::displayMenuXmlTableView(QPoint pos)
         {
             xmlSmpDataModel->insertColumn(xmlImportDataTableView->currentIndex().column());
             xmlSmpDataModel->setHeaderData(xmlImportDataTableView->currentIndex().column()-1,Qt::Horizontal,"Salience");
-            xmlSmpDataModel->horizontalHeaderItem(xmlImportDataTableView->currentIndex().column()-1)->setToolTip("How much the actor cares about the question");
             statusBar()->showMessage("Column Inserted, Header changed");
         }
         else

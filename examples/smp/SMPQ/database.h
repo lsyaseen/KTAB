@@ -64,9 +64,6 @@ public slots :
     //DB
     void releaseDB();
 
-    //GetActorMovedData
-    void getActorMovedDataDB(QString scenario);
-
 signals:
     void Message(QString , QString );
     void vectorPosition(QVector<double> x, QVector<double> y, QString actor,int turn);
@@ -92,15 +89,12 @@ signals:
     //QuadMap
     void utilChlngAndSQ(int turn, double hor, double ver , int actorID);
 
-    //ActorMoved
-    void actorMovedInfo(QStandardItemModel *);
 private:
     QSqlDatabase db;
     QString dbName;
     //    QSqlTableModel * sqlmodel;
     QSqlTableModel * sqlmodelEdit;
     QStandardItemModel * sqlmodel;
-    QStandardItemModel * actorMovedModel;
 
     int numActors =0;
     int numStates =0;
