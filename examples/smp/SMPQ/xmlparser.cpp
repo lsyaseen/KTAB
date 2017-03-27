@@ -24,9 +24,9 @@
 #include "xmlparser.h"
 #include <QDebug>
 
-Xmlparser::Xmlparser()
+Xmlparser::Xmlparser(QString homeDir)
 {
-
+    homeDirectory=homeDir;
 }
 
 void Xmlparser::openXmlFile(QString xmlFilePath)
@@ -70,17 +70,17 @@ void Xmlparser::readXmlFile()
             if (tokenName == "name")
             {
                 name = xmlReader.readElementText();
-//                qDebug() << name;
+                //                qDebug() << name;
             }
             else if(tokenName == "desc" )
             {
                 desc = xmlReader.readElementText();
-//                qDebug() << desc;
+                //                qDebug() << desc;
             }
             else if(tokenName == "prngSeed" )
             {
                 prngSeed = xmlReader.readElementText();
-//                qDebug() << prngSeed;
+                //                qDebug() << prngSeed;
             }
             else if(tokenName == "ModelParameters" )
             {
@@ -118,111 +118,103 @@ void Xmlparser::readXmlFile()
     xmlFile->close();
 }
 
-void Xmlparser::saveToXmlFile(QStringList parameters, QStandardItemModel *smpData, QStandardItemModel *affMatrix)
+void Xmlparser::saveToXmlFile(QStringList parameters, QStandardItemModel *smpData, QStandardItemModel *affMatrix, QString filename)
 {
-    QString filename = QFileDialog::getSaveFileName(0,tr("Save Xml"), ".",tr("Xml files (*.xml)"));
-
-    if(!filename.endsWith(".xml"))
-        filename.append(".xml");
-
-    QFile file(filename);
-    file.open(QIODevice::WriteOnly);
-    QXmlStreamWriter xmlWriter;
-    xmlWriter.setAutoFormatting(true);
-    xmlWriter.setDevice(&file);
-
-    /* Writes a document start with the XML version number. */
-    xmlWriter.writeStartDocument();
-
-    xmlWriter.writeStartElement("Scenario");
-    xmlWriter.writeAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
-    xmlWriter.writeAttribute("xsi:noNamespaceSchemaLocation","smpSchema.xsd");
-
-    tagElements(&xmlWriter,"name",parameters.at(0));
-    tagElements(&xmlWriter,"desc",parameters.at(1));
-    tagElements(&xmlWriter,"prngSeed",parameters.at(2));
-
-    //ModuleParameters
-    xmlWriter.writeStartElement("ModelParameters");
-    tagElements(&xmlWriter,"VictoryProbModel",parameters.at(3));
-    tagElements(&xmlWriter,"PCEModel",parameters.at(4));
-    tagElements(&xmlWriter,"StateTransitions",parameters.at(5));
-    tagElements(&xmlWriter,"VotingRule",parameters.at(6));
-    tagElements(&xmlWriter,"BigRAdjust",parameters.at(7));
-    tagElements(&xmlWriter,"BigRRange",parameters.at(8));
-    tagElements(&xmlWriter,"ThirdPartyCommit",parameters.at(9));
-    tagElements(&xmlWriter,"InterVecBrgn",parameters.at(10));
-    tagElements(&xmlWriter,"BargnModel",parameters.at(11));
-    //End Module Parameters
-    xmlWriter.writeEndElement();
-
-    int dims = parameters.length() - 12;
-//    qDebug()<<dims;
-
-    //Dimensions
-    xmlWriter.writeStartElement("Dimensions");
-    if(dims>=1)
-        tagElements(&xmlWriter,"dName",parameters.at(12));
-    if(dims>=2)
-        tagElements(&xmlWriter,"dName",parameters.at(13));
-    if(dims>=3)
-        tagElements(&xmlWriter,"dName",parameters.at(14));
-    //end dimensions
-    xmlWriter.writeEndElement();
-
-    //Actors
-    xmlWriter.writeStartElement("Actors");
-
-    for(int i=0; i< smpData->rowCount();++i)
+    if(!filename.isEmpty())
     {
-        xmlWriter.writeStartElement("Actor");
-        tagElements(&xmlWriter,"name",smpData->item(i,0)->text());
-        tagElements(&xmlWriter,"description",smpData->item(i,1)->text());
-        tagElements(&xmlWriter,"capability",smpData->item(i,2)->text());
+        QFile file(filename);
+        file.open(QIODevice::WriteOnly);
+        QXmlStreamWriter xmlWriter;
+        xmlWriter.setAutoFormatting(true);
+        xmlWriter.setDevice(&file);
 
-        xmlWriter.writeStartElement("Position");
-        if(dims>=1)
-            tagElements(&xmlWriter,"dCoord",smpData->item(i,3)->text());
-        if(dims>=2)
-            tagElements(&xmlWriter,"dCoord",smpData->item(i,5)->text());
-        if(dims>=3)
-            tagElements(&xmlWriter,"dCoord",smpData->item(i,7)->text());
-        xmlWriter.writeEndElement();//end position
+        /* Writes a document start with the XML version number. */
+        xmlWriter.writeStartDocument();
 
-        xmlWriter.writeStartElement("Salience");
-        if(dims>=1)
-            tagElements(&xmlWriter,"dSal",smpData->item(i,4)->text());
-        if(dims>=2)
-            tagElements(&xmlWriter,"dSal",smpData->item(i,6)->text());
-        if(dims>=3)
-            tagElements(&xmlWriter,"dSal",smpData->item(i,8)->text());
-        xmlWriter.writeEndElement();//end Salience
+        xmlWriter.writeStartElement("Scenario");
+        xmlWriter.writeAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
+        xmlWriter.writeAttribute("xsi:noNamespaceSchemaLocation","smpSchema.xsd");
 
-        xmlWriter.writeEndElement();//end actor
-    }
-    xmlWriter.writeEndElement();//end Actors
+        tagElements(&xmlWriter,"name",parameters.at(0));
+        tagElements(&xmlWriter,"desc",parameters.at(1));
+        tagElements(&xmlWriter,"prngSeed",parameters.at(2));
 
-    //Ideal Adjustment
-    xmlWriter.writeStartElement("IdealAdjustment");
+        //ModuleParameters
+        xmlWriter.writeStartElement("ModelParameters");
+        tagElements(&xmlWriter,"VictoryProbModel",parameters.at(3));
+        tagElements(&xmlWriter,"PCEModel",parameters.at(4));
+        tagElements(&xmlWriter,"StateTransitions",parameters.at(5));
+        tagElements(&xmlWriter,"VotingRule",parameters.at(6));
+        tagElements(&xmlWriter,"BigRAdjust",parameters.at(7));
+        tagElements(&xmlWriter,"BigRRange",parameters.at(8));
+        tagElements(&xmlWriter,"ThirdPartyCommit",parameters.at(9));
+        tagElements(&xmlWriter,"InterVecBrgn",parameters.at(10));
+        tagElements(&xmlWriter,"BargnModel",parameters.at(11));
+        //End Module Parameters
+        xmlWriter.writeEndElement();
 
-    for(int i=0; i< affMatrix->rowCount();++i)
-    {
-        for(int j=0; j<affMatrix->columnCount();++j)
+        int dims = parameters.length() - 12;
+        //    qDebug()<<dims;
+
+        //Dimensions
+        xmlWriter.writeStartElement("Dimensions");
+        for(int i = 0 ; i < dims ; ++i)
         {
-            xmlWriter.writeStartElement("iaPair");
-            tagElements(&xmlWriter,"adjustingIdeal",affMatrix->headerData(i,Qt::Horizontal).toString());
-            tagElements(&xmlWriter,"referencePos",affMatrix->headerData(j,Qt::Vertical).toString());
-            tagElements(&xmlWriter,"adjust",affMatrix->item(i,j)->text());
-            xmlWriter.writeEndElement();//end iaPair
+            tagElements(&xmlWriter,"dName",parameters.at(12+i));
         }
+        //end dimensions
+        xmlWriter.writeEndElement();
+
+        //Actors
+        xmlWriter.writeStartElement("Actors");
+
+        for(int i=0; i< smpData->rowCount();++i)
+        {
+            xmlWriter.writeStartElement("Actor");
+            tagElements(&xmlWriter,"name",smpData->item(i,0)->text());
+            tagElements(&xmlWriter,"description",smpData->item(i,1)->text());
+            tagElements(&xmlWriter,"capability",smpData->item(i,2)->text());
+
+            xmlWriter.writeStartElement("Position");
+            for(int j=0; j< dims; ++j)
+            {
+                tagElements(&xmlWriter,"dCoord",smpData->item(i,3+(j*2))->text());   //3 5 7 9
+            }
+            xmlWriter.writeEndElement();//end position
+
+            xmlWriter.writeStartElement("Salience");
+            for(int j=0; j< dims; ++j)
+            {
+                tagElements(&xmlWriter,"dSal",smpData->item(i,4+(j*2))->text()); //4 6 8 10
+            }
+            xmlWriter.writeEndElement();//end Salience
+
+            xmlWriter.writeEndElement();//end actor
+        }
+        xmlWriter.writeEndElement();//end Actors
+
+        //Ideal Adjustment
+        xmlWriter.writeStartElement("IdealAdjustment");
+
+        for(int i=0; i< affMatrix->rowCount();++i)
+        {
+            for(int j=0; j<affMatrix->columnCount();++j)
+            {
+                xmlWriter.writeStartElement("iaPair");
+                tagElements(&xmlWriter,"adjustingIdeal",affMatrix->headerData(i,Qt::Horizontal).toString());
+                tagElements(&xmlWriter,"referencePos",affMatrix->headerData(j,Qt::Vertical).toString());
+                tagElements(&xmlWriter,"adjust",affMatrix->item(i,j)->text());
+                xmlWriter.writeEndElement();//end iaPair
+            }
+        }
+        xmlWriter.writeEndElement();//end IdealAdjustment
+
+        /*end scenario */
+        xmlWriter.writeEndDocument();
+
+        file.close();
+        emit newXmlFilePath(filename);
     }
-    xmlWriter.writeEndElement();//end IdealAdjustment
-
-    /*end scenario */
-    xmlWriter.writeEndDocument();
-
-    file.close();
-    emit newXmlFilePath(filename);
 }
 
 void Xmlparser::saveNewDataToXmlFile(QStringList parameters, QTableWidget *smpDataWidget,
@@ -265,16 +257,15 @@ void Xmlparser::saveNewDataToXmlFile(QStringList parameters, QTableWidget *smpDa
     xmlWriter.writeEndElement();
 
     int dims = parameters.length() - 13;
-//    qDebug()<<dims;
+    //    qDebug()<<dims;
 
     //Dimensions
     xmlWriter.writeStartElement("Dimensions");
-    if(dims>=1)
-        tagElements(&xmlWriter,"dName",parameters.at(13));
-    if(dims>=2)
-        tagElements(&xmlWriter,"dName",parameters.at(14));
-    if(dims>=3)
-        tagElements(&xmlWriter,"dName",parameters.at(15));
+
+    for(int i = 0 ; i < dims ; ++i)
+    {
+        tagElements(&xmlWriter,"dName",parameters.at(13+i));
+    }
     //end dimensions
     xmlWriter.writeEndElement();
 
@@ -290,21 +281,18 @@ void Xmlparser::saveNewDataToXmlFile(QStringList parameters, QTableWidget *smpDa
         tagElements(&xmlWriter,"capability",smpDataWidget->item(i,2)->text());
 
         xmlWriter.writeStartElement("Position");
-        if(dims>=1)
-            tagElements(&xmlWriter,"dCoord",smpDataWidget->item(i,3)->text());
-        if(dims>=2)
-            tagElements(&xmlWriter,"dCoord",smpDataWidget->item(i,5)->text());
-        if(dims>=3)
-            tagElements(&xmlWriter,"dCoord",smpDataWidget->item(i,7)->text());
+
+        for(int j=0; j< dims; ++j)
+        {
+            tagElements(&xmlWriter,"dCoord",smpDataWidget->item(i,3+(j*2))->text()); // 3 5  7  9
+        }
         xmlWriter.writeEndElement();//end position
 
         xmlWriter.writeStartElement("Salience");
-        if(dims>=1)
-            tagElements(&xmlWriter,"dSal",smpDataWidget->item(i,4)->text());
-        if(dims>=2)
-            tagElements(&xmlWriter,"dSal",smpDataWidget->item(i,6)->text());
-        if(dims>=3)
-            tagElements(&xmlWriter,"dSal",smpDataWidget->item(i,8)->text());
+        for(int j=0; j< dims; ++j)
+        {
+            tagElements(&xmlWriter,"dSal",smpDataWidget->item(i,4+(j*2))->text()); //4 6 8 10
+        }
         xmlWriter.writeEndElement();//end Salience
 
         xmlWriter.writeEndElement();//end actor
@@ -333,6 +321,11 @@ void Xmlparser::saveNewDataToXmlFile(QStringList parameters, QTableWidget *smpDa
     qDebug()<<xmlWriter.hasError();
 
 
+}
+
+void Xmlparser::updateHomeDir(QString dir)
+{
+    homeDirectory =dir;
 }
 
 void Xmlparser::tagElements(QXmlStreamWriter *xmlWriter, QString tagName, QString tagValue)
@@ -449,7 +442,7 @@ void Xmlparser::ProcessActors()
     }
     actorsList.append(actors);
     actors.clear();
- }
+}
 
 void Xmlparser::ProcessIdealAdjustments()
 {
@@ -487,32 +480,30 @@ void Xmlparser::organizeXmlData()
     //smp actors data
     for(int row = 0; row < actorsList.length() ; ++row)
     {
+        QString precision;
         for(int col = 0; col < 3 ; ++ col)
         {
             xmlModel->setItem(row,col, new QStandardItem(actorsList.at(row).at(col)));
         }
-        if(actorsList.at(0).length()==5)
+
+        int col =2;
+        int dim = (actorsList.at(0).length()-3)/2;
+        int baseA =2;
+        int baseS = baseA + dim;
+
+        for(int index =1; index <= dim; ++index)
         {
-            xmlModel->setItem(row,3, new QStandardItem(actorsList.at(row).at(3)));
-            xmlModel->setItem(row,4, new QStandardItem(actorsList.at(row).at(4)));
-        }
-        else if(actorsList.at(0).length()==7)
-        {
-            xmlModel->setItem(row,3, new QStandardItem(actorsList.at(row).at(3)));
-            xmlModel->setItem(row,4, new QStandardItem(actorsList.at(row).at(5)));
-            xmlModel->setItem(row,5, new QStandardItem(actorsList.at(row).at(4)));
-            xmlModel->setItem(row,6, new QStandardItem(actorsList.at(row).at(6)));
-        }
-        else if(actorsList.at(0).length()==9)
-        {
-            xmlModel->setItem(row,3, new QStandardItem(actorsList.at(row).at(3)));
-            xmlModel->setItem(row,4, new QStandardItem(actorsList.at(row).at(6)));
-            xmlModel->setItem(row,5, new QStandardItem(actorsList.at(row).at(4)));
-            xmlModel->setItem(row,6, new QStandardItem(actorsList.at(row).at(7)));
-            xmlModel->setItem(row,7, new QStandardItem(actorsList.at(row).at(5)));
-            xmlModel->setItem(row,8, new QStandardItem(actorsList.at(row).at(8)));
+            int ndxDataA = baseA + index;
+            int ndxDataB = baseS + index;
+
+            precision = actorsList.at(row).at(ndxDataA);
+            precision = QString::number(precision.toDouble(),'f',2);
+            xmlModel->setItem(row,++col, new QStandardItem(precision));
+
+            precision = actorsList.at(row).at(ndxDataB);
+            precision = QString::number(precision.toDouble(),'f',2);
+            xmlModel->setItem(row,++col, new QStandardItem(precision));
         }
     }
-
     emit xmlParsedData(modelDesc,modelParametes,dimensionNames,xmlModel,idealAdjustmentList);
 }

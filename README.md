@@ -18,7 +18,7 @@ Examples are provided to illustrate the range of modeling which can be done in t
 - Negotiating the priority order to tasks to undertake (and which to drop)
 
 
-- A simple but highly parameterizable version of the [spatial model of politics](examples/smp/README.md). The command line version is `smpc`;  GUI versions will be called `smpg` and `smpq`. Dummy data is provided to illustrate the format for CSV input files.
+- A simple but highly parameterizable version of the [spatial model of politics](examples/smp/README.md). The command line version is `smpc`; the GUI version is `KTAB_SMP`. Dummy data is provided to illustrate the format for both CSV and XML input files.
 
 
 - A simple model of bargaining over the order in which projects should be addressed, taking into account budget limits. Dummy data is provided.
@@ -65,7 +65,7 @@ parallel assignment with pattern matching.
 
 ## User Interfaces ##
 
-A graphical front-end is under development. The current GUI version of the SMP, smpq, has been developed in [Qt](https://www.qt.io/). Qt is dual-licensed under both commercial and open-source terms; details can be found [here](https://www.qt.io/qt-licensing-terms/). The Qt licensing page states that dynamically linking an application to the open-source Qt libraries does not make the application open-source.
+A graphical front-end is under development. The current GUI version of the SMP, `KTAB_SMP`, has been developed in [Qt](https://www.qt.io/). Qt is dual-licensed under both commercial and open-source terms; details can be found [here](https://www.qt.io/qt-licensing-terms/). The Qt licensing page states that dynamically linking an application to the open-source Qt libraries does not make the application open-source.
 
 Previous work toward a graphical front-end was based on the FLTK project (http://www.fltk.org) [FLTK](http://www.fltk.org). FLTK is a cross-platform, C++ tookit provided under the terms of the GNU Library Public License, Version 2 with exceptions that allow for static linking; details can be found [here](http://www.fltk.org/COPYING.php).  The source code and build instructions for the most recent stable version can be obtained  [here](http://www.fltk.org/software.php). FLTK also uses CMake for configuration, then your favorite IDE to build.
 

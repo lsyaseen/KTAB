@@ -28,6 +28,9 @@ int main(int argc, char *argv[])
 {
   QCoreApplication::addLibraryPath("./plugins");
   QApplication a(argc, argv);
+  a.setOrganizationName("KAPSARC");
+  a.setApplicationName("KTAB_SMP");
+
   MainWindow w;
   w.showMaximized();
 

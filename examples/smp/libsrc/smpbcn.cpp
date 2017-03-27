@@ -222,7 +222,23 @@ SMPState* SMPState::doBCN() const {
     auto sqBrgnI = new BargainSMP(ai, ai, *posI, *posI);
     brgns[i].push_back(sqBrgnI);
 
-    if (model->sqlFlags[3])
+    // before we can log this bargain, we need to get the group ID for this table
+    // so then we can get the flag to populate the table or not
+    // note the implicit assumption that there will never be 43+ groups :-)
+    unsigned int grpID = 42;
+    for (unsigned int t = 0; t<model->KTables.size(); t++)
+    {
+        if (model->KTables[t]->tabName == "Bargn")
+        {
+            grpID = model->KTables[t]->tabGrpID;
+            break;
+        }
+    }
+    // be sure that it found this table
+    assert(grpID != 42);
+    assert(grpID < model->sqlFlags.size());
+
+    if (model->sqlFlags[grpID])
     {
       model->sqlBargainEntries(t, sqBrgnI->getID(), i, i, 0);
     }
@@ -308,20 +324,20 @@ SMPState* SMPState::doBCN() const {
       showOneBargain(brgnIIJ);
       printf(" from %2u's perspective (brgnIIJ) \n", i);
       printf("  %2u proposes %2u adopt: ", i, i);
-      KBase::trans(brgnIIJ->posInit).mPrintf(" %.3f ");
+      (KBase::trans(brgnIIJ->posInit) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
 
 
       printf("  %2u proposes %2u adopt: ", i, j);
-      KBase::trans(brgnIIJ->posRcvr).mPrintf(" %.3f ");
+      (KBase::trans(brgnIIJ->posRcvr) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
       printf("\n");
       printf("Bargain  ");
       showOneBargain(brgnJIJ);
       printf(" from %2u's perspective (brgnJIJ) \n", j);
       printf("  %2u proposes %2u adopt: ", j, i);
 
-      KBase::trans(brgnJIJ->posInit).mPrintf(" %.3f ");
+      (KBase::trans(brgnJIJ->posInit) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
       printf("  %2u proposes %2u adopt: ", j, j);
-      KBase::trans(brgnJIJ->posRcvr).mPrintf(" %.3f ");
+      (KBase::trans(brgnJIJ->posRcvr) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
       //Brgn table base entries
 
 
@@ -330,9 +346,9 @@ SMPState* SMPState::doBCN() const {
       showOneBargain(brgnIJ);
       printf(" bargain (brgnIJ) \n");
       printf("  compromise proposes %2u adopt: ", i);
-      KBase::trans(brgnIJ->posInit).mPrintf(" %.3f ");
+      (KBase::trans(brgnIJ->posInit) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
       printf("  compromise proposes %2u adopt: ", j);
-      KBase::trans(brgnIJ->posRcvr).mPrintf(" %.3f ");
+      (KBase::trans(brgnIJ->posRcvr) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
       printf("\n");
 
 
@@ -343,22 +359,16 @@ SMPState* SMPState::doBCN() const {
       //brgnIJ = tIIJ;
       //brgnIIJ = tIJ;
 
-      // TODO: what does this data represent?
-      //Brgn table base entries
-      // JAH 20160802 control logging added
-      if (model->sqlFlags[3])
-      {
-        //model->sqlBargainEntries(t, brgnJIJ->getID(), i, i, i, bestEU);
-        //model->sqlBargainEntries(t, brgnIIJ->getID(), i, i, j, bestEU);
-        model->sqlBargainEntries(t, brgnIJ->getID(), i, j, bestEU);
-      }
-
       cout << "Using "<<bMod<<" to form proposed bargains" << endl;
       switch (bMod) {
       case SMPBargnModel::InitOnlyInterpSMPBM:
         // record the only one used into SQLite JAH 20160802 use the flag
-        if(model->sqlFlags[3])
+        if(model->sqlFlags[grpID])
         {
+          model->sqlBargainEntries(t, brgnIIJ->getID(), i, j, bestEU);
+        }
+        if(model->sqlFlags[3])
+        {          
           model->sqlBargainCoords(t, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr);
         }
         // record this one onto BOTH the initiator and receiver queues
@@ -374,6 +384,11 @@ SMPState* SMPState::doBCN() const {
 
       case SMPBargnModel::InitRcvrInterpSMPBM:
         // record the pair used into SQLite JAH 20160802 use the flag
+        if(model->sqlFlags[grpID])
+        {
+          model->sqlBargainEntries(t, brgnIIJ->getID(), i, j, bestEU);
+          model->sqlBargainEntries(t, brgnJIJ->getID(), i, j, bestEU);
+        }
         if(model->sqlFlags[3])
         {
           model->sqlBargainCoords(t, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr);
@@ -392,6 +407,10 @@ SMPState* SMPState::doBCN() const {
 
       case SMPBargnModel::PWCompInterpSMPBM:
         // record the only one used into SQLite JAH 20160802 use the flag
+        if(model->sqlFlags[grpID])
+        {
+          model->sqlBargainEntries(t, brgnIJ->getID(), i, j, bestEU);
+        }
         if(model->sqlFlags[3])
         {
           model->sqlBargainCoords(t, brgnIJ->getID(), brgnIJ->posInit, brgnIJ->posRcvr);
@@ -505,10 +524,7 @@ SMPState* SMPState::doBCN() const {
     assert(nb == p.numR());
     assert(1 == p.numC());
     actorBargains.insert(map<unsigned int, KBase::KMatrix>::value_type(k, p));
-    cout << "done" << endl << flush;
 
-    //int maxArrcount = p.numR();
-    //int rslt = 0; // never used
     unsigned int mMax = nb; // indexing actors by i, bargains by m
     switch (stm) {
     case StateTransMode::DeterminsticSTM:
@@ -524,7 +540,6 @@ SMPState* SMPState::doBCN() const {
     // 0 <= mMax assured for uint
     assert(mMax < nb);
     actorMaxBrgNdx.insert(map<unsigned int, unsigned int>::value_type(k, mMax));
-    cout << "Chosen bargain (" << stm << "): " << mMax+1 << " out of " << nb << " bargains" << endl;
 
     //populate the Bargain Vote & Util tables
     // JAH added sql flag logging control
@@ -553,13 +568,13 @@ SMPState* SMPState::doBCN() const {
 		model->sqlBargainUtil(t, bargnIdsRows, u_im);
 	}
 
-
-
     // TODO: create a fresh position for k, from the selected bargain mMax.
     VctrPstn * pk = nullptr;
     auto bkm = brgns[k][mMax];
+    cout << "Chosen bargain (" << stm << "): " << bkm->getID()
+      << " " << mMax + 1 << " out of " << nb << " bargains" << endl;
+    auto oldPK = dynamic_cast<VctrPstn *>(pstns[k]);
     if (bkm->actInit == bkm->actRcvr) { // SQ
-      auto oldPK = (VctrPstn *)pstns[k];
       pk = new VctrPstn(*oldPK);
     }
     else {
@@ -575,6 +590,15 @@ SMPState* SMPState::doBCN() const {
         cout << "SMPState::doBCN: unrecognized actor in bargain" << endl;
         assert(false);
       }
+
+      // If the actor has changed its position, record the bargain id
+      for (int dimen = 0; dimen < pk->numR(); dimen++) {
+        auto pCoordOld = (*oldPK)(dimen, 0);
+        auto pCoord = (*pk)(dimen, 0);
+        if (pCoord != pCoordOld) {
+          s2->setPosMoverBargain(k, bkm->getID());
+        }
+      }
     }
     assert(nullptr != pk);
 
@@ -584,8 +608,11 @@ SMPState* SMPState::doBCN() const {
     cout << endl << flush;
   }
 
-  // record data so far
-  updateBargnTable(brgns, actorBargains, actorMaxBrgNdx);
+  if (model->sqlFlags[3])
+  {
+    // record data so far
+    updateBargnTable(brgns, actorBargains, actorMaxBrgNdx);
+  }
 
   // Some bargains are nullptr, and there are two copies of every non-nullptr randomly
   // arranged. If we delete them as we find them, then the second occurance will be corrupted,
@@ -885,8 +912,13 @@ tuple<int, double, double> SMPState::bestChallenge(unsigned int i) const {
   return rslt;
 }
 
+uint64_t SMPState::getPosMoverBargain(unsigned int actor) const {
+  return positionMovers.at(actor);
+}
 
-
+void SMPState::setPosMoverBargain(unsigned int actor, uint64_t bargainID) {
+  positionMovers.insert(moverBargains::value_type(actor, bargainID));
+}
 
 }; // end of namespace
 
