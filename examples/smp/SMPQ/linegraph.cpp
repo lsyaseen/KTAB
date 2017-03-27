@@ -119,7 +119,7 @@ void MainWindow::initializeLineGraphPlot()
     lineCustomGraph->plotLayout()->insertRow(0);
     lineCustomGraph->plotLayout()->addElement(0, 0,lineGraphTitle);
 
-    lineCustomGraph->xAxis->setLabel("Time");
+    lineCustomGraph->xAxis->setLabel("Turn");
     lineCustomGraph->yAxis->setLabel(" ");
     lineCustomGraph->legend->setVisible(false);
 
@@ -137,7 +137,7 @@ void MainWindow::initializeLineGraphPlot()
     }
     lineCustomGraph->xAxis->setTickVector(xAxisTicks);
     lineCustomGraph->xAxis->setTickVectorLabels(xAxisLabels);
-    lineCustomGraph->xAxis->setRange(-1,2);
+    lineCustomGraph->xAxis->setRange(-1,1);
 
     QVector<double> yAxisTicks;
     QVector<QString> yAxisLabels;
@@ -153,6 +153,7 @@ void MainWindow::initializeLineGraphPlot()
     lineCustomGraph->yAxis->setTickVector(yAxisTicks);
     lineCustomGraph->yAxis->setTickVectorLabels(yAxisLabels);
     lineCustomGraph->yAxis->setRange(0,100);
+    lineCustomGraph->setMinimumWidth(250);
 
     lineCustomGraph->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
 
@@ -179,11 +180,13 @@ void MainWindow::initializeLineGraphPlot()
     //    connect(lineCustomGraph, SIGNAL(legendDoubleClick(QCPLegend*,QCPAbstractLegendItem*,QMouseEvent*)), this, SLOT(legendDoubleClick(QCPLegend*,QCPAbstractLegendItem*)));
 
     // connect slot that shows a message in the status bar when a graph is clicked:
-    connect(lineCustomGraph, SIGNAL(plottableClick(QCPAbstractPlottable*,QMouseEvent*)), this, SLOT(graphClicked(QCPAbstractPlottable*)));
+    connect(lineCustomGraph, SIGNAL(plottableClick(QCPAbstractPlottable*,QMouseEvent*)), this, SLOT(graphClicked(QCPAbstractPlottable*,QMouseEvent*)));
+    connect(lineCustomGraph, SIGNAL(plottableDoubleClick(QCPAbstractPlottable*,QMouseEvent*)), this, SLOT(graphDoubleClicked(QCPAbstractPlottable*,QMouseEvent*)));
 
     // setup policy and connect slot for context menu popup:
     lineCustomGraph->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(lineCustomGraph, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(linePlotContextMenuRequest(QPoint)));
+    //    connrct(lineCustomGraph, SIGNAL())
 }
 
 void MainWindow::populateLineGraphActorsList()
@@ -224,6 +227,8 @@ void MainWindow::populateLineGraphActorsList()
     }
 
     lineGraphActorsScrollArea->setWidget(widget);
+    lineCustomGraph->setBackground(QBrush(QColor(255,255,255)));
+
 }
 
 void MainWindow::populateLineGraphDimensions(int dim)
@@ -235,7 +240,10 @@ void MainWindow::populateLineGraphDimensions(int dim)
     lineGraphDimensionComboBox->addItem(" ");
     for(int dims = 0; dims < dimensionList.length(); ++ dims )
     {
-        lineGraphDimensionComboBox->addItem(dimensionList.at(dims));
+        QString dim = dimensionList.at(dims);
+        lineGraphDimensionComboBox->addItem(dim.remove("\n"));
+        lineGraphDimensionComboBox->setItemData(dims+1,"Positions for Dimension "+ QString::number(dims+1),Qt::ToolTipRole);
+
     }
     connect(lineGraphDimensionComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(lineGraphDimensionChanged(int)));
     lineGraphDimensionComboBox->removeItem(0);
@@ -257,6 +265,8 @@ void MainWindow::updateLineDimension(QStringList *dims)
     for(int dims = 0; dims < dimenList.length(); ++ dims )
     {
         lineGraphDimensionComboBox->addItem(dimenList.at(dims));
+        lineGraphDimensionComboBox->setItemData(dims+1,"Positions for Dimension "+ QString::number(dims+1),Qt::ToolTipRole);
+
     }
     connect(lineGraphDimensionComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(lineGraphDimensionChanged(int)));
     lineGraphDimensionComboBox->removeItem(0);
@@ -363,19 +373,20 @@ void MainWindow::lineGraphDimensionChanged(int value)
     barGraphDimensionComboBox->setCurrentIndex(value);
 
     lineGraphTitle->setText(QString(lineGraphDimensionComboBox->currentText()
-                                    + " vs Time, Iteration " +
+                                    + ", Turn " +
                                     QString::number(lineGraphTurnSlider->value())));
     lineCustomGraph->yAxis->setLabel(lineGraphDimensionComboBox->currentText());
 
     lineCustomGraph->clearGraphs();
     emit getScenarioRunValues(lineGraphTurnSlider->value(),scenarioBox,dimension);
+    lineCustomGraph->yAxis->setRange(0,100);
     lineCustomGraph->replot();
 }
 
 void MainWindow::lineGraphTurnSliderChanged(int value)
 {
     //    lineGraphTitle->setText(QString(lineGraphDimensionComboBox->currentText()
-    //                                    + " vs Time, Iteration " +
+    //                                    + ", Turn " +
     //                                    QString::number(value)));
     //    lineCustomGraph->yAxis->setLabel(lineGraphDimensionComboBox->currentText());
 
@@ -528,9 +539,9 @@ void MainWindow::createSpline(const QVector<double> &x, const QVector<double> &y
     lineCustomGraph->graph()->setName(Actor);
 
     QString actorDetails;
-    actorDetails.append("Name: " +Actor + "\n");
-    actorDetails.append("Description: " +actorsDescription.at(actorsName.indexOf(Actor)) + "\n");
-    actorDetails.append("Influence: " +actorsInfl.at(actorsName.indexOf(Actor)));
+    actorDetails.append("Name: <b>" +Actor + "</b> <br>");
+    actorDetails.append("Description: <b>" +actorsDescription.at(actorsName.indexOf(Actor)) + "</b> <br>");
+    actorDetails.append("Influence: <b>" +QString::number(actorsInfl.at(actorsName.indexOf(Actor)).toDouble(),'f',2)+ "</b> <br>");
 
     lineCustomGraph->graph()->setTooltip(actorDetails);
 
@@ -582,14 +593,20 @@ void MainWindow::saveLinePlotAsBMP()
 {
     QString fileName = getImageFileName("BMP File (*.bmp)","LinePlot",".bmp");
     if(!fileName.isEmpty())
+    {
         lineCustomGraph->saveBmp(fileName);
+        //        setCurrentFile(fileName);
+    }
 }
 
 void MainWindow::saveLinePlotAsPDF()
 {
     QString fileName = getImageFileName("PDF File (*.pdf)","LinePlot",".pdf");
     if(!fileName.isEmpty())
+    {
         lineCustomGraph->savePdf(fileName);
+        //        setCurrentFile(fileName);
+    }
 }
 
 void MainWindow::moveLegend()
@@ -606,7 +623,7 @@ void MainWindow::moveLegend()
     }
 }
 
-void MainWindow::graphClicked(QCPAbstractPlottable *plottable)
+void MainWindow::graphClicked(QCPAbstractPlottable *plottable, QMouseEvent *e)
 {
     statusBar()->showMessage(QString("Clicked on Line '%1'.").arg(plottable->name()), 1000);
 
@@ -623,7 +640,68 @@ void MainWindow::graphClicked(QCPAbstractPlottable *plottable)
     lineCustomGraph->replot();
 }
 
+void MainWindow::graphDoubleClicked(QCPAbstractPlottable *plottable, QMouseEvent *e)
+{
 
+    int xPos = lineCustomGraph->xAxis->pixelToCoord(e->pos().x());
+    int yPos = lineCustomGraph->yAxis->pixelToCoord(e->pos().y());
+
+    lineLabelList.at(actorsName.indexOf(plottable->name()))->setVisible(true);
+    lineLabelToggleList[actorsName.indexOf(plottable->name())]=true;
+    lineCustomGraph->replot();
+
+    if(xPos>=0 && turnSlider->value()>0)
+    {
+        int index =-1;
+        for (int i =0; i < actorMovedDataModel->rowCount(); ++i)
+        {
+            if(actorTurnList.at(i)==xPos+1 &&
+                    actorIDList.at(i)==actorsName.indexOf(plottable->name()) &&
+                    actorDimensionList.at(i)==lineGraphDimensionComboBox->currentIndex())
+            {
+                index=i;
+                break;
+            }
+            else
+            {
+                index = -1;
+            }
+        }
+        QString actorDetails;
+        if(index>=0)
+        {
+            actorDetails.append(QString("\nFrom turn <b>%1</b> to turn <b>%2</b> ").arg(xPos).arg(xPos+1));
+            actorDetails.append(QString("<b>%1</b> moved <b>%2</b> from ").arg(plottable->name())
+                                .arg(QString::number(actorMovedDataModel->item(index,5)->text().toDouble(),'f',2)));
+            actorDetails.append(QString("<b>%1</b> to <b>%2</b> as a result ")
+                                .arg(QString::number(actorMovedDataModel->item(index,3)->text().toDouble(),'f',2))
+                                .arg(QString::number(actorMovedDataModel->item(index,4)->text().toDouble(),'f',2)));
+            actorDetails.append(QString("of bargain proposed by <b>%1</b> to <b>%2</b>")
+                                .arg(actorMovedDataModel->item(index,7)->text())
+                                .arg(actorMovedDataModel->item(index,8)->text()));
+
+            popup = new PopupWidget;
+            popup->showText(actorDetails);
+            popup->show();
+
+
+        }
+    }
+}
+
+void MainWindow::actorMovedInfoModel(QStandardItemModel *actorMovedData)
+{
+    actorTurnList.clear();
+    actorIDList.clear();
+    actorDimensionList.clear();
+    actorMovedDataModel=actorMovedData;
+    for(int row=0;row <actorMovedDataModel->rowCount(); ++row)
+    {
+        actorTurnList.append(actorMovedDataModel->item(row,0)->text().toInt());
+        actorIDList.append(actorMovedDataModel->item(row,1)->text().toInt());
+        actorDimensionList.append(actorMovedDataModel->item(row,2)->text().toInt());
+    }
+}
 
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.

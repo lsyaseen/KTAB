@@ -81,11 +81,13 @@ void MainWindow::initializeBarGraphDock()
 
     barGraphBinWidthButton = new QPushButton("No. of Bars");
     barGraphBinWidthButton->setFont(labelFont);
+    barGraphBinWidthButton->setToolTip("Number of bars displayed in the bar plot");
     barControlsVerticalLayout->addWidget(barGraphBinWidthButton);
     connect(barGraphBinWidthButton,SIGNAL(clicked(bool)),this, SLOT(barGraphBinWidthButtonClicked(bool)));
 
     barGraphGroupRangeLineEdit = new  QLineEdit;
     barGraphGroupRangeLineEdit->setText(QString::number(10));
+    barGraphGroupRangeLineEdit->setToolTip("Number of bars displayed in the bar plot");
     barControlsVerticalLayout->addWidget(barGraphGroupRangeLineEdit);
 
     barGraphTurnSlider = new QSlider(Qt::Horizontal);
@@ -112,19 +114,21 @@ void MainWindow::initializeBarGraphPlot()
     barCustomGraph->plotLayout()->insertRow(0);
     barCustomGraph->plotLayout()->addElement(0, 0, barGraphTitle);
 
+    barCustomGraph->xAxis->setRange(0, 100);
     barCustomGraph->xAxis->setAutoTicks(true);
     barCustomGraph->xAxis->setAutoTickLabels(true);
-    barCustomGraph->xAxis->setRange(0, 110);
-    barCustomGraph->xAxis->setSubTickCount(0);
-    barCustomGraph->xAxis->setTickLength(0,5);
+    barCustomGraph->xAxis->setAutoTickStep(false);
+    barCustomGraph->xAxis->setTickStep(10.0);
+
     barCustomGraph->xAxis->grid()->setVisible(true);
+    barCustomGraph->setMinimumWidth(250);
+    barCustomGraph->xAxis->setLabel("Position");
 
     barCustomGraph->yAxis->setAutoTicks(true);
     barCustomGraph->yAxis->setAutoTickLabels(true);
-
     barCustomGraph->yAxis->setRange(0, 100);
     barCustomGraph->yAxis->setPadding(5); // a bit more space to the left border
-    barCustomGraph->yAxis->setLabel(" ");
+    barCustomGraph->yAxis->setLabel("Effective Power\nInfluence×Salience");
     barCustomGraph->yAxis->grid()->setSubGridVisible(false);
 
     connect( barCustomGraph->xAxis, SIGNAL(rangeChanged(QCPRange,QCPRange)), this, SLOT(xAxisRangeChanged(QCPRange,QCPRange)) );
@@ -132,7 +136,8 @@ void MainWindow::initializeBarGraphPlot()
 
     // setup legend:
     barCustomGraph->legend->setVisible(false);
-    barCustomGraph->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    barCustomGraph->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes |
+                                    QCP::iSelectLegend | QCP::iSelectPlottables);
 
     // setup policy and connect slot for context menu popup:
     barCustomGraph->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -191,14 +196,20 @@ void MainWindow::saveBarPlotAsBMP()
 {
     QString fileName = getImageFileName("BMP File (*.bmp)","BarPlot",".bmp");
     if(!fileName.isEmpty())
+    {
         barCustomGraph->saveBmp(fileName);
+        //        setCurrentFile(fileName);
+    }
 }
 
 void MainWindow::saveBarPlotAsPDF()
 {
     QString fileName = getImageFileName("PDF File (*.pdf)","BarPlot",".pdf");
     if(!fileName.isEmpty())
+    {
         barCustomGraph->savePdf(fileName);
+        //        setCurrentFile(fileName);
+    }
 }
 
 void MainWindow::populateBarGraphActorsList()
@@ -249,7 +260,9 @@ void MainWindow::populateBarGraphDimensions(int dim)
     barGraphDimensionComboBox->addItem(" ");
     for(int dims = 0; dims < dimensionList.length(); ++ dims )
     {
-        barGraphDimensionComboBox->addItem(dimensionList.at(dims));
+        QString dim = dimensionList.at(dims);
+        barGraphDimensionComboBox->addItem(dim.remove("\n"));
+        barGraphDimensionComboBox->setItemData(dims+1,"Positions for Dimension "+ QString::number(dims+1),Qt::ToolTipRole);
     }
     connect(barGraphDimensionComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(barGraphDimensionChanged(int)));
     barGraphDimensionComboBox->removeItem(0);
@@ -263,7 +276,8 @@ void MainWindow::populateBarGraphStateRange(int states)
 
 void MainWindow::generateColors()
 {
-    colorsList << QColor(220,20,60)<< QColor(255,215,0)<< QColor(175,238,238)<<QColor(0,0,205)
+    colorsList.clear();
+    colorsList << QColor(255,130,0)<< QColor(220,20,60)<< QColor(255,215,0)<< QColor(175,238,238)<<QColor(0,0,205)
                << QColor(165,42,42)<<QColor(34,139,34)<<QColor(218,165,32)<< QColor (95,158,160)
                << QColor(199,21,133)<<QColor(205,50,205)<<QColor(245,205,250)<<QColor(0,206,209)
                << QColor(173,255,47)<<QColor(127,255,212)<<QColor(65,105,225)<<QColor(255,20,147)
@@ -374,9 +388,9 @@ void MainWindow::barGraphDimensionChanged(int value)
 {
     dimension=value;
     lineGraphDimensionComboBox->setCurrentIndex(value);
-    barGraphTitle->setText(QString(barGraphDimensionComboBox->currentText() +" Iteration " +QString::number(barGraphTurnSlider->value())));
+    barGraphTitle->setText(QString(barGraphDimensionComboBox->currentText() +"-Effective Power Landscape, Turn " +QString::number(barGraphTurnSlider->value())));
     getActorsInRange(dimension);
-    barCustomGraph->xAxis->setRange(0,110);
+    barCustomGraph->xAxis->setRange(0,100);
     barCustomGraph->yAxis->setRange(0,yAxisLen+20);
     yAxisLen=50;
     barCustomGraph->replot();
@@ -384,9 +398,9 @@ void MainWindow::barGraphDimensionChanged(int value)
 
 void MainWindow::barGraphTurnSliderChanged(int value)
 {
-    barGraphTitle->setText(QString(barGraphDimensionComboBox->currentText() +" Iteration " +QString::number(value)));
+    barGraphTitle->setText(QString(barGraphDimensionComboBox->currentText() +"-Effective Power Landscape, Turn " +QString::number(value)));
     getActorsInRange(dimension);
-    barCustomGraph->xAxis->setRange(0,110);
+    barCustomGraph->xAxis->setRange(0,100);
     barCustomGraph->yAxis->setRange(0,yAxisLen+20);
     yAxisLen=50;
     barCustomGraph->replot();
@@ -415,7 +429,7 @@ void MainWindow::barGraphActorsSalienceCapability(QList<int> aId, QList<double> 
             double barHeight = 0;
 
             QList <QVector <double> > values ;
-            range<< ((r1+r2)/2) *100 ;
+            range<< ((r1+r2)/2);
 
             for (int stackedActorsInOneBar = 0 ; stackedActorsInOneBar < aId.length(); ++ stackedActorsInOneBar)
             {
@@ -496,6 +510,8 @@ void MainWindow::updateBarDimension(QStringList *dims)
     for(int dims = 0; dims < dimenList.length(); ++ dims )
     {
         barGraphDimensionComboBox->addItem(dimenList.at(dims));
+        barGraphDimensionComboBox->setItemData(dims+1,"Positions for Dimension "+ QString::number(dims+1),Qt::ToolTipRole);
+
     }
     connect(barGraphDimensionComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(barGraphDimensionChanged(int)));
     barGraphDimensionComboBox->currentIndexChanged(barDimIndex);

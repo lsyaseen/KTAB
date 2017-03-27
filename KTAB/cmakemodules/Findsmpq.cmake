@@ -225,15 +225,19 @@ if(SMPQ_SOURCE_DIR)
     ${SMPQ_SOURCE_DIR}/runsmp.cpp
     ${SMPQ_SOURCE_DIR}/quadmap.cpp
     ${SMPQ_SOURCE_DIR}/xmlwidget.cpp
-    ${SMPQ_SOURCE_DIR}/xmlparser.cpp)
+    ${SMPQ_SOURCE_DIR}/xmlparser.cpp
+    ${SMPQ_SOURCE_DIR}/colorpickerdialog.cpp
+    ${SMPQ_SOURCE_DIR}/popupwidget.cpp)
 
   set (QtProjectLib_hdr
     ${SMPQ_SOURCE_DIR}/mainwindow.h
     ${SMPQ_SOURCE_DIR}/csv.h
     ${SMPQ_SOURCE_DIR}/database.h
-    ${SMPQ_SOURCE_DIR}/xmlparser.h)
+    ${SMPQ_SOURCE_DIR}/xmlparser.h
+    ${SMPQ_SOURCE_DIR}/colorpickerdialog.h
+    ${SMPQ_SOURCE_DIR}/popupwidget.h)
 
-  set (QtProjectLib_ui  ${SMPQ_SOURCE_DIR}/mainwindow.ui)
+  set (QtProjectLib_ui  ${SMPQ_SOURCE_DIR}/mainwindow.ui ${SMPQ_SOURCE_DIR}/popupwidget.ui)
   set (QtProjectRsc_qrc ${SMPQ_SOURCE_DIR}/dockwidgets.qrc)
   set (QtProjectBin_src ${SMPQ_SOURCE_DIR}/main.cpp)
 

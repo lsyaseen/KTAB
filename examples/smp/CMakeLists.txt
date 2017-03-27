@@ -5,8 +5,8 @@
 
 project(smp)
 
-cmake_minimum_required (VERSION 3.0)
-cmake_policy(VERSION 3.0)
+cmake_minimum_required (VERSION 2.8)
+cmake_policy(VERSION 2.8)
 cmake_policy(SET CMP0017 NEW) # prefer built-in modules
 cmake_policy(SET CMP0020 NEW) # Automatically link Qt executables to qtmain
 
@@ -196,9 +196,9 @@ if(ENABLE_QT_GUI)
     Qt5::PrintSupport)
 
   # WIN32 to suppress the console window under Windows
-  add_executable(smpq WIN32 ${QtProjectBin_src} ${QtProjectLib_qrc_rcc})
+  add_executable(KTAB_SMP WIN32 ${QtProjectBin_src} ${QtProjectLib_qrc_rcc})
 
-  target_link_libraries (smpq 
+  target_link_libraries (KTAB_SMP
     QtProjectLib 
     smp 
     ${KMODEL_LIBRARY} 

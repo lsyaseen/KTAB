@@ -51,15 +51,6 @@ This table stores the accommodation matrix, which records the affinities between
 Records the name of each dimension.
 
 # SQL Logging Group 1 - Position Tables
-## `PosUtil(ScenarioId*, Turn_t*, Est_h*, Act_i*, Pos_j*, Util)`
-    ScenarioId  Text(32)  Foreign Key into ScenarioDesc; id number for the scenario
-    Turn_t      Integer   iteration number, begins with 0 and increments by 1 each iteration; [0,infty)
-    Est_h       Integer   Foreign Key into ActorDescription; actor from whose view the utilities are recorded; [0,number actors-1]
-    Act_i       Integer   Foreign Key into ActorDescription; actor for whom the utility is recorded; [0,number actors-1]
-    Pos_j       Integer   Foreign Key into ActorDescription; actor for whose position the utility is recorded; [0,number actors-1]
-    Util        Real  Utility to actor Act_i of the position of actor Pos_j, as estimated by actor Est_h; [0,1]
-`PosUtil` records, for each iteration, the utility to *every* actor of *every* actors position, from the perspective of *every* actor. For each iteration, there are (number actor)^3 records.
-
 ## `PosEquiv(ScenarioId*, Turn_t*, Pos_i*, Eqv_j*)`
     ScenarioId  Text(32)  Foreign Key into ScenarioDesc; id number for the scenario
     Turn_t      Integer   iteration number, begins with 0 and increments by 1 each iteration; [0,infty)
@@ -122,19 +113,6 @@ The data stored in `TP_Prob_Vect_Loss` is from the same part of the model as  `U
 This table stores the culmination of all the calculations recorded in `UtilChlg` and `TP_Prob_Vict_Loss`. The resulting `Prob` is used in the model to guide bargain resolution.
 
 # SQL Logging Group 3 - Bargain Resolution Tables
-## `Bargn(ScenarioId*, Turn_t*, BargnId*, Init_Act_i, Recd_Act_j, Value, Init_Prob, Init_Seld, Recd_Prob, Recd_seld)`
-    ScenarioId  Text(32)  Foreign Key into ScenarioDesc; id number for the scenario
-    Turn_t      Integer   iteration number, begins with 0 and increments by 1 each iteration; [0,infty)
-    BargnId     Integer   bargain ID number from the BargainSMP.getID() method, this is automatically incremented each time a new bargain object is created; [1000,infty)
-    Init_Act_i  Integer   Foreign Key into ActorDescription; actor that initiated the bargain; [0,number actors-1]
-    Recd_Act_j  Integer   Foreign Key into ActorDescription; actor that received the bargain proposal; [0,number actors-1]
-    Value       Real      increase in utility the initiating actor expects from the bargain; [0,1]
-    Init_Prob   Real      probability that the bargain will be accepted when resolved inside the initiating actor's queue; [0,1]
-    Init_Seld   Boolean   indicates whether or not the bargain was accepted when resolved inside the initiating actor's queue; either 0 (False) or 1 (True)
-    Recd_Prob   Real      probability that the bargain will be accepted when resolved inside the receiving actor's queue; [0,1]
-    Recd_Seld   Boolean   indicates whether or not the bargain was accepted when resolved inside the receiving actor's queue; either 0 (False) or 1 (True)
-The `Bargn` table records bargains initiated by each actor during the bargain and resolution phase in each iteration of the model.  Each bargain consists of a new position for both the initiating actor and receiving actor, and every bargain is evaluated in both actors' queues.  Hence, this table also records the probability of being selected, as well as actual selection result, from both queues.
-
 ## `BargnCoord(ScenarioId*, Turn_t*, BargnId*, Dim_k*, Init_Coord, Recd_Coord)`
     ScenarioId  Text(32)  Foreign Key into ScenarioDesc; id number for the scenario
     Turn_t      Integer   iteration number, begins with 0 and increments by 1 each iteration; [0,infty)
@@ -161,15 +139,38 @@ Every proposed bargain is evaluated in at least two queues: the initiating actor
     Vote        Real      the vote of actor Act_k between bargains Bargn_i and Bargn_j; (-infty,infty)
 Every proposed bargain is evaluated in two queues: the initiating actor's queue, and the receiving actor's queue.  Status quo bargains are evaluated in every actor's queue. In each queue, all actors vote on **all pairs of all bargains**.  Hence, if there are three bargains in a queue, named *A*, *B*, *C*, all actors will compute the following votes: *A vs B*, *A vs C*, *B vs C*, *B vs A*, *C vs A*, and *C vs B*.  These votes are stored in this table, looping over all queues, all pairs of bargains (in each queue), and all actors.  Calculations with these votes are then used to compute the coalition strengths, which are then used to compute the select probabilities (and results) which are stored in `Bargn.Init_Prob`, `Bargn.Recd_Prob`, `Bargn.Init_Seld`, and `Bargn.Recd_Seld`.
 
-# SQL Logging Group 4 - Position History Table
-## `VectorPosition(ScenarioId*, Turn_t*, Act_i*, Dim_k*, Coord)`
-    ScenarioId  Text(32)  Foreign Key into ScenarioDesc; id number for the scenario
-    Turn_t      Integer   iteration number, begins with 0 and increments by 1 each iteration; [0,infty)
-    Act_i       Integer   Foreign Key into ActorDescription; actor whose position is recorded; [0,number actors-1]
-    Dim_k       Integer   dimension number for which the position is recorded; [0, number dimensions-1]
-    Pos_Coord       Real      position for actor Act_i in dimension Dim_k at the end of iteration Turn_t; [0,1]
-    Idl_Coord       Real      ideal position for actor Act_i in dimension Dim_k at the end of iteration Turn_t; [0,1]
+# SQL Logging Group 4 - Minimum Logging Table
+(if minimum logging is on, only tables in group 0 & 4 are logged)
+## `VectorPosition(ScenarioId*, Turn_t*, Act_i*, Dim_k*, Pos_Coord, Idl_Coord)`
+    ScenarioId     Text(32)  Foreign Key into ScenarioDesc; id number for the scenario
+    Turn_t         Integer   iteration number, begins with 0 and increments by 1 each iteration; [0,infty)
+    Act_i          Integer   Foreign Key into ActorDescription; actor whose position is recorded; [0,number actors-1]
+    Dim_k          Integer   dimension number for which the position is recorded; [0, number dimensions-1]
+    Pos_Coord      Real      position for actor Act_i in dimension Dim_k at the end of iteration Turn_t; [0,1]
+    Idl_Coord      Real      ideal position for actor Act_i in dimension Dim_k at the end of iteration Turn_t; [0,1]
+    Mover_BargnID  Integer   bargain ID from the previous iteration that caused actor Act_i to move in iteration Turn_t; [1000,infty)
 At the end of every iteration of the model, each actor has the potential to have shifted his actual position. This table records the history of these state changes.
 
+## `Bargn(ScenarioId*, Turn_t*, BargnId*, Init_Act_i, Recd_Act_j, Value, Init_Prob, Init_Seld, Recd_Prob, Recd_seld)`
+    ScenarioId  Text(32)  Foreign Key into ScenarioDesc; id number for the scenario
+    Turn_t      Integer   iteration number, begins with 0 and increments by 1 each iteration; [0,infty)
+    BargnId     Integer   bargain ID number from the BargainSMP.getID() method, this is automatically incremented each time a new bargain object is created; [1000,infty)
+    Init_Act_i  Integer   Foreign Key into ActorDescription; actor that initiated the bargain; [0,number actors-1]
+    Recd_Act_j  Integer   Foreign Key into ActorDescription; actor that received the bargain proposal; [0,number actors-1]
+    Value       Real      increase in utility the initiating actor expects from the bargain; [0,1]
+    Init_Prob   Real      probability that the bargain will be accepted when resolved inside the initiating actor's queue; [0,1]
+    Init_Seld   Boolean   indicates whether or not the bargain was accepted when resolved inside the initiating actor's queue; either 0 (False) or 1 (True)
+    Recd_Prob   Real      probability that the bargain will be accepted when resolved inside the receiving actor's queue; [0,1]
+    Recd_Seld   Boolean   indicates whether or not the bargain was accepted when resolved inside the receiving actor's queue; either 0 (False) or 1 (True)
+The `Bargn` table records bargains initiated by each actor during the bargain and resolution phase in each iteration of the model.  Each bargain consists of a new position for both the initiating actor and receiving actor, and every bargain is evaluated in both actors' queues.  Hence, this table also records the probability of being selected, as well as actual selection result, from both queues.  If minimal logging is on, this table is filled with basic bargain data, but is not updated to reflect the results of bargain resolution.  It is only updated if SQL Logging Group 3 is on.
+
+## `PosUtil(ScenarioId*, Turn_t*, Est_h*, Act_i*, Pos_j*, Util)`
+    ScenarioId  Text(32)  Foreign Key into ScenarioDesc; id number for the scenario
+    Turn_t      Integer   iteration number, begins with 0 and increments by 1 each iteration; [0,infty)
+    Est_h       Integer   Foreign Key into ActorDescription; actor from whose view the utilities are recorded; [0,number actors-1]
+    Act_i       Integer   Foreign Key into ActorDescription; actor for whom the utility is recorded; [0,number actors-1]
+    Pos_j       Integer   Foreign Key into ActorDescription; actor for whose position the utility is recorded; [0,number actors-1]
+    Util        Real  Utility to actor Act_i of the position of actor Pos_j, as estimated by actor Est_h; [0,1]
+`PosUtil` records, for each iteration, the utility to *every* actor of *every* actors position, from the perspective of *every* actor. For each iteration, there are (number actor)^3 records.
 
 * fields indicates the primary key for each table
