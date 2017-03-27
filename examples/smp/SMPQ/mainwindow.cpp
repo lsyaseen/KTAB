@@ -1351,8 +1351,9 @@ void MainWindow::initializeCentralViewFrame()
 
 void MainWindow::about()
 {
-    QMessageBox::about(this, tr("About SMP "),
-                       tr("KTAB is an open-source toolkit for assembling models that allow "
+    QMessageBox::about(this, tr("About KTAB SMP"),
+                       tr("KTAB SMP\n\nVersion 1.0\n\n"
+                           "KTAB is an open-source toolkit for assembling models that allow "
                           "systematic and rigorous analysis of Collective Decision-Making "
                           "Processes (CDMPs).  KTAB is intended to be a platform that contains "
                           "a number of models that can simulate CDMPs.  The initial model that "
