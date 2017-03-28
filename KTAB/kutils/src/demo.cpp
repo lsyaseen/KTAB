@@ -61,6 +61,11 @@ using KBase::nProd;
 
 
 void demoPCA(PRNG* rng);
+
+// return a tuple of updated weights and updated features (one per row)
+// xMat has one sample per row, one column per dimension
+// ftr has one component per row, one column per dimension
+// wght has one sample per row, one component per column.
 tuple<KMatrix, KMatrix> extendPCA (const KMatrix& xMat,
                                    const KMatrix& wght,
                                    const KMatrix& ftr);
@@ -380,15 +385,15 @@ void demoMatrix(PRNG* rng) {
     vector<double> dat = {1,2,3,4,5,6,7,8,9,10,11,12};
     // all in one row
     printf("1 x 12\n");
-    auto mat1 = KMatrix::vecToKmat(dat,1,12);
+    auto mat1 = KMatrix::vecInit(dat,1,12);
     mat1.mPrintf("%2.0f ");
     // 3 x 4
     printf("3 x 4\n");
-    auto mat2 = KMatrix::vecToKmat(dat,3,4);
+    auto mat2 = KMatrix::vecInit(dat,3,4);
     mat2.mPrintf("%2.0f ");
     // 2 x 6
     printf("2 x 6\n");
-    auto mat3 = KMatrix::vecToKmat(dat,2,6);
+    auto mat3 = KMatrix::vecInit(dat,2,6);
     mat3.mPrintf("%2.0f ");
 
     cout << "Row 0 of previous 2x6 matrix" << endl;
@@ -417,7 +422,7 @@ tuple<KMatrix, KMatrix> extendPCA (const KMatrix& xMat,
 
 
     auto checkColRMS = [] (const KMatrix& m) {
-        const double rmsTol = 1E-6;
+        const double rmsTol = 1E-10;
         double rmsM = rms(m);
         for (unsigned int j=0; j<m.numC(); j++) {
             auto mj = KBase::vSlice(m, j);
@@ -436,7 +441,7 @@ tuple<KMatrix, KMatrix> extendPCA (const KMatrix& xMat,
     assert (nDim == cvr.numR());
     assert (nDim == cvr.numC());
 
-    const double evTol = 1E-10;
+    const double evTol = 1E-15;
     auto v = KBase::firstEigenvector(cvr, evTol);  //column vector
     v = trans(v); // now a row-vector
 
@@ -479,14 +484,18 @@ void demoPCA(PRNG* rng) {
     };
 
 
+    const unsigned int nDim = 8;
+    const unsigned int nSample = 50;
+    const unsigned int nComp = 4;
+    const double evTol = 1E-15;
+    const double divFactor = 1.25;
 
-    const unsigned int nDim = 6;
     auto m1 = KMatrix::uniform(rng, nDim, nDim, 0.0, +1.0);
     cout << "Random matrix:"<<endl;
     m1.mPrintf("%.4f  ");
     cout << endl;
 
-    auto v1 = firstEigenvector(m1, 1E-10);
+    auto v1 = firstEigenvector(m1, evTol);
     auto s11 = dot(v1, v1);
 
     cout << "First eigenvector:"<<endl;
@@ -499,7 +508,6 @@ void demoPCA(PRNG* rng) {
     // Now we start a Principal Component Analysis
     cout << endl << endl;
     cout << "Setup PCA" << endl;
-    const unsigned int nSample = 12;
     const KMatrix pcv1 = posUnitize(KMatrix::uniform(rng, 1, nDim, -10.0, +10.0));
     printf("norm pcv1: %.4f \n", dot(pcv1, pcv1));
     cout << endl << flush;
@@ -520,29 +528,52 @@ void demoPCA(PRNG* rng) {
     printf("dot32: %+.2e \n", dot(pcv3, pcv2));
     cout << endl << flush;
 
-    cout<<"Actual principal components: "<<endl;
+    const KMatrix tv4 = KMatrix::uniform(rng, 1, nDim, -10.0, +10.0);
+    double a41 = dot(tv4, pcv1);
+    double a42 = dot(tv4, pcv2);
+    double a43 = dot(tv4, pcv3);
+    const KMatrix pcv4 = posUnitize(tv4 - (a41*pcv1 + a42*pcv2 + a43*pcv3));
+    printf("norm pcv4: %.4f \n", dot(pcv4, pcv4));
+    printf("dot41: %+.2e \n", dot(pcv4, pcv1));
+    printf("dot42: %+.2e \n", dot(pcv4, pcv2));
+    printf("dot43: %+.2e \n", dot(pcv4, pcv3));
+    cout << endl << flush;
+
+    cout<<"Actual " << nDim<<"-dim principal components: "<<endl;
     pcv1.mPrintf("%+7.4f  ");
     pcv2.mPrintf("%+7.4f  ");
     pcv3.mPrintf("%+7.4f  ");
+    pcv4.mPrintf("%+7.4f  ");
+    cout << endl << flush;
 
 
     auto xMat = KMatrix(nSample, nDim);
-    cout<<"Actual weights: "<<endl;
+    cout<<"Actual weights of "<< nSample<<" samples: "<<endl;
     for (unsigned int i=0; i<nSample; i++) {
-        auto w1 = rng->uniform(-45, +90);
-        auto w2 = rng->uniform(-15, +30);
-        auto w3 = rng->uniform( -5, +10) / 1000.0;
-        auto ns = KMatrix::uniform(rng, 1, nDim, -1.0, +1.0) / 1000.0;
-        auto xi = (w1*pcv1) + (w2*pcv2) + (w3*pcv3) + ns;
+        const double rMin = -45.0;
+        const double rMax = +90.0;
+        double div = 1.0;
+        auto w1 = rng->uniform(rMin, rMax) / div;
+        div = div * divFactor;
+        auto w2 = rng->uniform(rMin, rMax) / div;
+        div = div * divFactor;
+        auto w3 = rng->uniform(rMin, rMax) / div;
+        div = div * divFactor;
+        auto w4 = rng->uniform(rMin, rMax) / div;
+        div = div * divFactor;
+        auto ns = KMatrix::uniform(rng, 1, nDim, rMin, rMax) / div;
+        auto xi = (w1*pcv1) + (w2*pcv2) + (w3*pcv3) + (w4*pcv4) + ns;
         for (unsigned int j=0; j<nDim; j++) {
             xMat(i,j) = xi(0, j);
         }
         printf("%+8.4f  ", w1);
         printf("%+8.4f  ", w2);
         printf("%+8.4f  ", w3);
+        printf("%+8.4f  ", w4);
         cout << endl;
     }
-    printf("Random matrix: \n");
+    cout << endl << flush;
+    printf("Data (one sample per row): \n");
     xMat.mPrintf("%+8.3f  ");
     cout << endl << flush;
 
@@ -560,51 +591,42 @@ void demoPCA(PRNG* rng) {
     printf("Sample means: \n");
     sMean.mPrintf("%+8.3f  ");
 
-    const unsigned int nComp = 3;
     assert (nComp <= nDim);
-    auto yMat = xMat;
-    for (unsigned int n=0; n<nComp; n++) {
+    const KMatrix yMat = xMat;
+    auto cvrMat = (trans(yMat) * yMat) / nSample;
+    auto f1 = trans(firstEigenvector(cvrMat, evTol));
+    auto w1 = yMat * trans(f1); 
+
+    auto showErr = [yMat] (const KMatrix & w, const KMatrix & f) {
+        printf("Estimated principal components: \n");
+        f.mPrintf("%+7.4f  ");
+        printf("Estimated weights: \n");
+        w.mPrintf("%+8.3f  ");
+        cout << endl << flush;
+        auto zMat = w * f;
+        printf("RMS of estimated zMat: %.3e \n", rms(zMat));
+        auto eMat = yMat - zMat;
+        printf("RMS of error eMat: %.3e \n", rms(eMat));
+        double yzCorr = KBase::lCorr(yMat - mean(yMat), zMat - mean(zMat));
+        printf("Y-Z Affine correlation %+.4f \n", yzCorr);
+        return;
+    };
+    
+    showErr(w1, f1);
+
+
+    for (unsigned int n=1; n<nComp; n++) {
         cout << endl;
         printf("Extracting component %u \n", n);
-        // subtract sample means off each column
-        for (unsigned int j=0; j<nDim; j++) {
-            const KMatrix yj = vSlice(yMat, j);
-            const double mj = mean(yj);
-            for (unsigned int i=0; i<nSample; i++) {
-                yMat(i,j) = yMat(i,j) - mj;
-            }
-        }
-        printf("RMS of yMat: %.3e \n", rms(yMat));
 
-        auto cvrMat = (trans(yMat) * yMat) / nSample;
-        printf("Covriance matrix: \n");
-        cvrMat.mPrintf("%+10.1f  ");
-        cout << endl << flush;
-        assert (nDim == cvrMat.numR());
-        assert (nDim == cvrMat.numC());
-        for (unsigned int k=0; k<nDim; k++) {
-            assert(0.0 < cvrMat(k,k));
-        }
-        const double tol = 1E-10;
-        auto pcn = trans(firstEigenvector(cvrMat, tol));
-
-        printf("Est. principal component %u: \n", n);
-        pcn.mPrintf("%+7.4f  ");
-        cout << endl << flush;
-
-        auto wn = yMat * trans(pcn);
-        printf("Est. weights: \n");
-        wn.mPrintf("%+8.3f  ");
-
-        auto zMat = wn * pcn;
-        printf("RMS of zMat: %.3e \n", rms(zMat));
-        auto eMat = yMat - zMat;
-        printf("RMS of eMat: %.3e \n", rms(eMat));
-        double yzCorr = KBase::lCorr(yMat - mean(yMat), zMat - mean(zMat));
-        printf("Correlation %+.4f \n", yzCorr);
-        
         cout << "Try to extend" << endl << flush;
-        extendPCA(yMat, wn, pcn);
+        auto wf = extendPCA(yMat, w1, f1);
+        KMatrix w2 = get<0>(wf);
+        KMatrix f2 = get<1>(wf);
+
+        w1 = w2;
+        f1 = f2;
+        showErr(w1, f1);
     }
 
     return;

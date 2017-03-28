@@ -2053,13 +2053,13 @@ void demoRealEcon(bool OSPonly, uint64_t s, PRNG* rng)
   // this is from '[IO-USA-1981.xlsx]C+E'!F6:F14
   vector<double> xInput = {7.2451, 1.3015, 0.0228, 76.4894, 94.6275, 20.3296,
     23.5439, 27.6867, 19.9283};
-  auto xprt = KMatrix::vecToKmat(xInput, N, 1);
+  auto xprt = KMatrix::vecInit(xInput, N, 1);
 
   // base year domestic demand by sector
   // this is from '[IO-USA-1981.xlsx]C+E'!E6:E14
   vector<double> cInput = {15.5082, 9.5952, 303.6608, 295.1940, 365.1954, 122.5666,
     424.4459, 662.0114, 741.6478};
-  auto cons = KMatrix::vecToKmat(cInput, N, M);
+  auto cons = KMatrix::vecInit(cInput, N, M);
 
   // export demand price elasticities - different scenarios
   unsigned int epsscen = 2;
@@ -2075,13 +2075,13 @@ void demoRealEcon(bool OSPonly, uint64_t s, PRNG* rng)
     case 2: // negatively correlated with VA - most value-add linked with most elastic
     {
       vector<double> eInput = {3.000, 2.750, 2.625, 2.250, 2.500, 2.875, 2.375, 2.125, 2.000};
-      eps = KMatrix::vecToKmat(eInput,N,1);
+      eps = KMatrix::vecInit(eInput,N,1);
       break;
     }
     case 3: // positively correlated with VA - most value-add linked with least elastic
     {
       vector<double> eInput = {2.000, 2.250, 2.375, 2.750, 2.500, 2.125, 2.625, 2.875, 3.000};
-      eps = KMatrix::vecToKmat(eInput,N,1);
+      eps = KMatrix::vecInit(eInput,N,1);
       break;
     }
   }
@@ -2100,7 +2100,7 @@ void demoRealEcon(bool OSPonly, uint64_t s, PRNG* rng)
     13.0714, 4.0435, 36.6772, 11.5052, 12.8349, 5.7183, 14.9193, 13.3909, 11.3351,
     41.1748, 147.5870, 62.7062, 3.8941, 4.8131, 38.8027, 39.1631, 49.0999, 24.6415,
     87.5781, 57.6196, 115.9473};
-  auto trns = KMatrix::vecToKmat(tInput,N,N);
+  auto trns = KMatrix::vecInit(tInput,N,N);
 
   // base year factor value-added
   // this is from '[IO-USA-1981.xlsx]Trans-L'!C11:K13
@@ -2108,13 +2108,13 @@ void demoRealEcon(bool OSPonly, uint64_t s, PRNG* rng)
     254.0997, 401.0373, 391.3663, 16.0422, 44.2612, 19.9704, 56.0749, 43.1645,
     51.5711, 145.4282, 209.2748, 204.2281, 24.5049, 55.1145, 80.8226, 187.4229,
     144.2715, 78.7763, 33.1342, 119.5358, 116.6532};
-  auto rev = KMatrix::vecToKmat(vInput,L,N);
+  auto rev = KMatrix::vecInit(vInput,L,N);
 
 
   // vector of expenditures by factor into consumption group(s)
   // this is from '[IO-USA-1981.xlsx]JAH'!C11:K13
   vector<double> eInput = {0.951327802789937, 0.875269217592669, 0.886106910793789};
-  auto expnd = KMatrix::vecToKmat(eInput,M,L);
+  auto expnd = KMatrix::vecInit(eInput,M,L);
 
   // scaled (d+g)B matrix
   // this is from '[IO-USA-1981.xlsx]BCK'!C4:K12
@@ -2128,7 +2128,7 @@ void demoRealEcon(bool OSPonly, uint64_t s, PRNG* rng)
     0.0076, 0.0056, 0.0224, 0.0301, 0.0054, 0.0038, 0.0009, 0.0005, 0.0002, 0.0006,
     0.0004, 0.0014, 0.0003, 0.0003, 0.0002, 0.0000, 0.0000, 0.0000, 0.0005, 0.0002,
     0.0000, 0.0000, 0.0000, 0.0005};
-  auto Bmat = regul*KMatrix::vecToKmat(bInput,N,N);
+  auto Bmat = regul*KMatrix::vecInit(bInput,N,N);
 
   // set up for scenarios of capacities
   // 0 = random, 1 = equal, 2 = self-weighted, 3 = input-weighted
@@ -2178,7 +2178,7 @@ void demoRealEcon(bool OSPonly, uint64_t s, PRNG* rng)
     // from '[IO-USA-1981.xlsx]Trans-O'!C26:N26
     vector<double> compVA = { 1537.2745, 750.0555, 923.6700, 62.8064, 205.5044,
       249.9203, 458.6496, 275.9301, 199.5496, 458.0236, 571.5965, 729.0196 };
-    caps = KMatrix::vecToKmat(compVA, N + L, 1);
+    caps = KMatrix::vecInit(compVA, N + L, 1);
     cout << "Capabilities Matrix (Scen 3)" << endl;
     caps.mPrintf(" %0.3f ");
     cout << endl;

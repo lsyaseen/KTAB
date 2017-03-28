@@ -619,10 +619,15 @@ KMatrix rescaleRows(const KMatrix& m1, const double vMin, const double vMax) {
 }
 
 // JAH 20160809 create a matrix by reshaping from a vector
-KMatrix KMatrix::vecToKmat(vector<double> vec, unsigned int nr, unsigned int nc)
+    // BPW 20170403 more consistent name, without double-mention of KMatrix in KMatrix::vecToKmat
+KMatrix KMatrix::vecInit(const vector<double> & vec, const unsigned int nr, const unsigned int nc)
 {
     // be sure the size of the desired matrix is consistent with the data
     assert(vec.size() == nr*nc);
+    
+    // because we are subtracting from unsigned int, make sure the result does not underflow
+    assert (1 <= nc);
+    assert (1 <= nr);
 
     // init to the right size ...
     auto mat = KMatrix(nr,nc,0.0);

@@ -132,7 +132,8 @@ public:
 
 
     // JAH 20160809 return a matrix of specified dimensions populated with the data in the vector
-    static KMatrix vecToKmat(vector<double> vec, unsigned int nr, unsigned int nc);
+    // BPW 20170403 more consistent name, without double-mention of KMatrix in KMatrix::vecToKmat
+    static KMatrix vecInit(const vector<double> & vec, const unsigned int nr, const unsigned int nc);
 
     // For those rare cases when we do not need explicit indices inside the loop,
     // the standard C++11 iterators are provided to support range-for
