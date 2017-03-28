@@ -28,6 +28,8 @@ ColorPickerDialog::ColorPickerDialog(QWidget *parent) :
 {
     setWindowTitle("Actor Color Picker");
     setModal(true);
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    setWindowIcon(QIcon("://images/colorpicker.png"));
 
     int nWidth = 200;
     int nHeight = 500;
