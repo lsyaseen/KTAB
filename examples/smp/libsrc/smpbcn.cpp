@@ -26,6 +26,9 @@
 // --------------------------------------------
 
 #include "smp.h"
+#include <QSqlQuery>
+#include <QVariant>
+#include <QSqlError>
 
 namespace SMPLib {
 using std::function;
@@ -200,6 +203,10 @@ SMPState* SMPState::doBCN() {
 
   KBase::groupThreads(thrBCN, 0, na - 1);
 
+  if (model->sqlFlags[2]) {
+    recordProbEduChlg();
+  }
+
   LOG(INFO) << "Bargains to be resolved";
   showBargains(brgns);
 
@@ -322,9 +329,6 @@ void SMPState::doBCN(unsigned int i) {
         auto est = probEduChlg(h, k, i, j, recordTmpSQLP); // H's estimate of the effect on K of I->J
         double phij = get<0>(est);
         double edu_hk_ij = get<1>(est);
-        //LOG(INFO) << KBase::getFormattedString(
-        //  "Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f",
-        //  h, phij, i, j, k, edu_hk_ij);
         return est;
       };
 
@@ -850,8 +854,12 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
 
     sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 
+    string thij = std::to_string(t)
+      + "," + std::to_string(h)
+      + "," + std::to_string(i)
+      + "," + std::to_string(j);
+
     for (int tpk = 0; tpk < na; tpk++) {  // third party voter, tpk
-      auto an = ((const SMPActor*)(model->actrs[tpk]));
       int rslt = 0;
 
       rslt = sqlite3_bind_int(insStmt, 1, tpk);
@@ -882,6 +890,25 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
             "INSERT INTO ProbVict (ScenarioId, Turn_t, Est_h,Init_i,Rcvr_j,Prob) VALUES ('%s',%u,%u,%u,%u,%f)",
             model->getScenarioID().c_str(), turn, h, i, j, phij);
     sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
+
+    string thkij = std::to_string(t)
+      + "," + std::to_string(h)
+      + "," + std::to_string(k)
+      + "," + std::to_string(i)
+      + "," + std::to_string(j);
+
+    std::vector<double> eu;
+    eu.push_back(euSQ);
+    eu.push_back(euVict);
+    eu.push_back(euCntst);
+    eu.push_back(euChlg);
+
+    // Thread safety lock
+    utilDataLock.lock();
+    euData.emplace(thkij,eu);
+    tpvData.emplace(thij, tpvArray);
+    phijData.emplace(thij, phij);
+    utilDataLock.unlock();
 
     // the following four statements could be combined into one table
     memset(sqlBuff, '\0', sqlBuffSize);

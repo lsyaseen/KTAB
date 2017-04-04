@@ -88,6 +88,7 @@ int main(int ac, char **av) {
   string inputCSV = "";
   string inputDBname = "";
   string inputXML = "";
+  string connstr;
 
   auto showHelp = []() {
     printf("\n");
@@ -104,6 +105,8 @@ int main(int ac, char **av) {
     printf("--seed <n>              set a 64bit seed\n");
     printf("                        0 means truly random\n");
     printf("                        default: %020llu \n", dSeed);
+    printf("--connstr               a comma separated string for database server credentials\n");
+    printf("Driver=<QPSQL|QSQLITE>;Server=<IP>;[Port=<port>];Database=<DB_name>;Uid=<user_id>;Pwd=<password>");
   };
 
   bool isdbflagexist = false;
@@ -169,6 +172,10 @@ int main(int ac, char **av) {
       else if (strcmp(av[i], "--savehist") == 0) {
         saveHist = true;
       }
+      else if(strcmp(av[i], "--connstr") == 0) {
+        i++;
+        connstr = av[i];
+      }
       else {
         run = false;
         printf("Unrecognized argument %s\n", av[i]);
@@ -222,15 +229,18 @@ int main(int ac, char **av) {
     inputDBname = GenerateDBNameWithTimeStamp();
   }
   if (euSmpP) {
+    SMPLib::SMPModel::loginCredentials(connstr);
     SMPLib::SMPModel::randomSMP(0, 0, randAccP, seed, sqlFlags, inputDBname);
   }
   if (csvP) {
-    //SMPLib::SMPModel::csvReadExec(seed, inputCSV, sqlFlags, inputDBname);
+    SMPLib::SMPModel::loginCredentials(connstr);
+    // TODO Edit the runModel API to remove inputDBname parameter
     SMPLib::SMPModel::runModel(sqlFlags, inputDBname, inputCSV, seed, saveHist);
     SMPLib::SMPModel::destroyModel();
   }
   if (xmlP) {
-    //SMPLib::SMPModel::xmlReadExec(inputXML, sqlFlags, inputDBname);
+    //connstr = "Driver=QSQLITE;Database=testdb";
+    SMPLib::SMPModel::loginCredentials(connstr);
     SMPLib::SMPModel::runModel(sqlFlags, inputDBname, inputXML, seed, saveHist);
     SMPLib::SMPModel::destroyModel();
   }
