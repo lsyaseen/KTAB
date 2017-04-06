@@ -31,8 +31,9 @@ MainWindow::MainWindow()
 
     createActions();
     createStatusBar();
-    createConnections();
     intializeHomeDirectory();
+    intializeGUI();
+    createConnections();
 }
 
 MainWindow::~MainWindow()
@@ -42,7 +43,124 @@ MainWindow::~MainWindow()
 
 void MainWindow::createConnections()
 {
+    csvParserObj = new CSV;
+    xmlParserObj = new Xmlparser(homeDirectory);
 
+    //connect statement to pass the csv file path
+    connect(this,SIGNAL(csvFilePath(QString)), csvParserObj, SLOT(readCSVFile(QString)));
+    //connect statement to receive processed model
+    connect(csvParserObj,SIGNAL(csvModel(QStandardItemModel*,QStringList)),
+            this,SLOT(setCsvItemModel(QStandardItemModel*,QStringList)));
+    //To display any message to user
+    connect(csvParserObj,SIGNAL(sendMessage(QString,QString)),this,SLOT(displayMessage(QString,QString)));
+
+    //setActor Table with csv data
+    connect(this,SIGNAL(setActorModel(QStandardItemModel*,QStringList))
+            ,actorFrameObj,SLOT(setActorTableModel(QStandardItemModel*,QStringList)));
+
+}
+
+void MainWindow::intializeGUI()
+{
+    centralMainFrame = new QFrame;
+    setCentralWidget(centralMainFrame);
+    centralFrameGridLayout = new QGridLayout;
+
+    sasStackedWidget = new QStackedWidget; //holds model, actor & specs screens
+    modelFrame = new QFrame(sasStackedWidget);
+    actorFrame = new QFrame(sasStackedWidget);
+    specificationsFrame = new QFrame(sasStackedWidget);
+
+    modelFrameInitialization(); // 1st Window
+    actorFrameInitialization(); // 2nd Window
+
+    sasStackedWidget->addWidget(actorFrame);
+    sasStackedWidget->addWidget(specificationsFrame);
+
+    navigationFrame = new QFrame;
+
+    modelPushButton = new QPushButton("Model",navigationFrame);
+    actorPushButton = new QPushButton("Actor",navigationFrame);
+    specsPushButton = new QPushButton("Specification",navigationFrame);
+
+    modelPushButton->setFixedWidth(200);
+    modelPushButton->setFixedHeight(30);
+    actorPushButton->setFixedWidth(200);
+    actorPushButton->setFixedHeight(30);
+    specsPushButton->setFixedWidth(200);
+    specsPushButton->setFixedHeight(30);
+    modelPushButton->setStyleSheet( "QPushButton {background-color: rgb(50,205,50);}"
+                                    "QPushButton:hover{background-color:green;}");
+    actorPushButton->setStyleSheet("QPushButton:hover{background-color:green;}");
+    specsPushButton->setStyleSheet("QPushButton:hover{background-color:green;}");
+
+    connect(modelPushButton,SIGNAL(clicked(bool)),this,SLOT(modelNaviClicked()));
+    connect(actorPushButton,SIGNAL(clicked(bool)),this,SLOT(actorNaviClicked()));
+    connect(specsPushButton,SIGNAL(clicked(bool)),this,SLOT(specsNaviClicked()));
+
+    QHBoxLayout * navHBoxLayout = new QHBoxLayout;
+    navHBoxLayout->addWidget(modelPushButton,0,Qt::AlignRight);
+    navHBoxLayout->addWidget(actorPushButton,0,Qt::AlignCenter);
+    navHBoxLayout->addWidget(specsPushButton,0,Qt::AlignLeft);
+
+    navigationFrame->setLayout(navHBoxLayout);
+
+    centralFrameGridLayout->addWidget(sasStackedWidget,0,0);
+    centralFrameGridLayout->addWidget(navigationFrame,1,0,Qt::AlignBottom);
+
+    centralMainFrame->setLayout(centralFrameGridLayout);
+
+    sasStackedWidget->setCurrentIndex(0);
+}
+
+void MainWindow::modelFrameInitialization()
+{
+    modelFrameObj= new ModelFrame(sasStackedWidget);
+    sasStackedWidget->addWidget(modelFrameObj);
+}
+
+void MainWindow::actorFrameInitialization()
+{
+    actorFrameObj= new ActorFrame(sasStackedWidget);
+    sasStackedWidget->addWidget(actorFrameObj);
+}
+
+void MainWindow::modelNaviClicked()
+{
+    modelPushButton->setStyleSheet( "QPushButton {background-color: rgb(50,205,50);}"
+                                    "QPushButton:hover{background-color:green;}");
+    actorPushButton->setStyleSheet("QPushButton:hover{background-color:green;}");
+    specsPushButton->setStyleSheet("QPushButton:hover{background-color:green;}");
+
+    sasStackedWidget->setCurrentIndex(0);//model window
+
+}
+
+void MainWindow::actorNaviClicked()
+{
+    actorPushButton->setStyleSheet( "QPushButton {background-color: rgb(50,205,50);}"
+                                    "QPushButton:hover{background-color:green;}");
+    modelPushButton->setStyleSheet("QPushButton:hover{background-color:green;}");
+    specsPushButton->setStyleSheet("QPushButton:hover{background-color:green;}");
+
+    sasStackedWidget->setCurrentIndex(1);//actor window
+
+}
+
+void MainWindow::specsNaviClicked()
+{
+    specsPushButton->setStyleSheet( "QPushButton {background-color: rgb(50,205,50);}"
+                                    "QPushButton:hover{background-color:green;}");
+    actorPushButton->setStyleSheet("QPushButton:hover{background-color:green;}");
+    modelPushButton->setStyleSheet("QPushButton:hover{background-color:green;}");
+
+    sasStackedWidget->setCurrentIndex(2);//specifiaction window
+
+}
+
+void MainWindow::setCsvItemModel(QStandardItemModel * model, QStringList scenarioList)
+{
+    emit setActorModel(model,scenarioList);
 }
 
 void MainWindow::createActions()
@@ -67,7 +185,7 @@ void MainWindow::createActions()
     const QIcon clearIcon = QIcon::fromTheme("Clear Specifications", QIcon("://images/clear.png"));
     QAction *clearFileAct = new QAction(clearIcon, tr("Clear Specifications"), this);
     clearFileAct->setShortcuts(seq);
-    clearFileAct->setStatusTip(tr("Import Data from CSV/XML File"));
+    clearFileAct->setStatusTip(tr("Clear Specifications"));
     connect(clearFileAct, SIGNAL(triggered(bool)), this,SLOT(clearSpecifications(bool)));
     fileMenu->addAction(clearFileAct);
     fileToolBar->addAction(clearFileAct);
@@ -83,7 +201,7 @@ void MainWindow::createActions()
     fileToolBar->addAction(runFileAct);
 
     const QIcon saveIcon = QIcon::fromTheme("document-save", QIcon("://images/save.png"));
-    QAction *saveAct = new QAction(saveIcon, tr("&Save..."), this);
+    QAction *saveAct = new QAction(saveIcon, tr("Save"), this);
     connect(saveAct, SIGNAL(triggered(bool)), this, SLOT(saveClicked(bool)));
     saveAct->setShortcuts(QKeySequence::Save);
     saveAct->setStatusTip(tr("Save"));
@@ -270,7 +388,7 @@ void MainWindow::loadRecentFile(const QString &fileName)
 void MainWindow::intializeHomeDirectory()
 {
     QString homeDir = recentFileSettings.value( "HomeDirectory" ).toString();
-     if(!QDir(homeDir).exists() || homeDir.isEmpty())
+    if(!QDir(homeDir).exists() || homeDir.isEmpty())
     {
         homeDirectory=QDir::homePath().append(QDir::separator()).append("KTAB_SMP");
 
@@ -290,7 +408,7 @@ void MainWindow::intializeHomeDirectory()
     recentFileSettings.setValue("HomeDirectory",homeDirectory);
 
     defaultDirectory= homeDirectory;
- }
+}
 
 void MainWindow::displayMessage(QString cls, QString message)
 {
@@ -314,9 +432,31 @@ void MainWindow::about()
 
 void MainWindow::importDataFileCSVXML(bool bl)
 {
+    QString defaultFilter = tr("XML (*.xml *.XML)");
+    QFileDialog *fd = new QFileDialog;
+    QString fileName = fd->getOpenFileName(this,"Import File",homeDirectory,
+                                           tr("CSV (*.csv *.CSV);;XML (*.xml *.XML)" ),&defaultFilter);
 
+    qDebug()<<fileName;
+
+    if(!(fileName.endsWith(".csv")||fileName.endsWith(".CSV")
+         ||fileName.endsWith(".xml")||fileName.endsWith(".XML")))
+    {
+        displayMessage("Importing a File", "Please choose a File with extension as either .csv or .xml ");
+    }
+    else
+    {
+        if(fileName.endsWith(".csv")||fileName.endsWith(".CSV"))
+        {
+            emit csvFilePath(fileName);
+            actorNaviClicked();//Actor Attributes Window
+        }
+        else
+        {
+        }
+
+    }
 }
-
 void MainWindow::saveClicked(bool bl)
 {
 
@@ -326,9 +466,10 @@ void MainWindow::runModel(bool bl)
 {
 
 }
+
 void MainWindow::clearSpecifications(bool bl)
 {
-
+    modelNaviClicked();//Model Attributes Window
 }
 
 

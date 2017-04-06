@@ -22,25 +22,25 @@ if(SASQ_SOURCE_DIR)
   #manually adding files to the variables
   set (QtSASQProjectLib_src
     ${SASQ_SOURCE_DIR}/mainwindow.cpp
-#    ${SASQ_SOURCE_DIR}/csv.cpp
-#    ${SASQ_SOURCE_DIR}/database.cpp
-#    ${SASQ_SOURCE_DIR}/bargraph.cpp
-#    ${SASQ_SOURCE_DIR}/linegraph.cpp
+    ${SASQ_SOURCE_DIR}/actorwindow.cpp
+     ${SASQ_SOURCE_DIR}/modelwindow.cpp
+     ${SASQ_SOURCE_DIR}/specswindow.cpp
+     ${SASQ_SOURCE_DIR}/xmlparser.cpp
+    ${SASQ_SOURCE_DIR}/csv.cpp
 #    ${SASQ_SOURCE_DIR}/runsmp.cpp
 #    ${SASQ_SOURCE_DIR}/quadmap.cpp
 #    ${SASQ_SOURCE_DIR}/xmlwidget.cpp
-#    ${SASQ_SOURCE_DIR}/xmlparser.cpp
 #    ${SASQ_SOURCE_DIR}/colorpickerdialog.cpp
 #    ${SASQ_SOURCE_DIR}/popupwidget.cpp
 )
 
   set (QtSASQProjectLib_hdr
     ${SASQ_SOURCE_DIR}/mainwindow.h
-#    ${SASQ_SOURCE_DIR}/csv.h
-#    ${SASQ_SOURCE_DIR}/database.h
-#    ${SASQ_SOURCE_DIR}/xmlparser.h
-#    ${SASQ_SOURCE_DIR}/colorpickerdialog.h
-#    ${SASQ_SOURCE_DIR}/popupwidget.h
+    ${SASQ_SOURCE_DIR}/modelwindow.h
+    ${SASQ_SOURCE_DIR}/actorwindow.h
+    ${SASQ_SOURCE_DIR}/specswindow.h
+    ${SASQ_SOURCE_DIR}/xmlparser.h
+    ${SASQ_SOURCE_DIR}/csv.h
 )
 
   set (QtSASQProjectLib_ui  ${SASQ_SOURCE_DIR}/mainwindow.ui)

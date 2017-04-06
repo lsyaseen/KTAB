@@ -24,7 +24,15 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "modelwindow.h"
+#include "actorwindow.h"
+#include "specswindow.h"
+#include "csv.h"
+#include "xmlparser.h"
+
 #include <QMainWindow>
+#include <QtCore>
+#include <QObject>
 #include <QtGlobal>
 #include <QSettings>
 #include <QFileInfo>
@@ -32,6 +40,10 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDebug>
+#include <QFrame>
+#include <QStackedWidget>
+#include <QLayout>
+#include <QLabel>
 
 class QTextEdit;
 
@@ -50,7 +62,6 @@ public:
 private :
     void createActions();
     void createStatusBar();
-    void displayMessage(QString cls, QString message);
     void createConnections();
 
 private slots:
@@ -82,9 +93,43 @@ private slots:
     void about();
     void clearSpecifications(bool bl);
     void runModel(bool bl);
+    void displayMessage(QString cls, QString message);
 
-signals :
 
+    //GUI Initialization
+private :
+    QFrame * centralMainFrame;
+    QGridLayout * centralFrameGridLayout;
+    QStackedWidget * sasStackedWidget;
+    QFrame * modelFrame;
+    QFrame * actorFrame;
+    QFrame * specificationsFrame;
+    QFrame * navigationFrame;
+
+     void intializeGUI();
+     void modelFrameInitialization();
+     void actorFrameInitialization();
+     void specsFrameInitialization();
+
+     //navigation
+     QPushButton * modelPushButton;
+     QPushButton * actorPushButton;
+     QPushButton * specsPushButton;
+
+private slots :
+     void modelNaviClicked();
+     void actorNaviClicked();
+     void specsNaviClicked();
+     void setCsvItemModel(QStandardItemModel*, QStringList scenarioList);
+
+private :
+     ModelFrame * modelFrameObj;
+     ActorFrame * actorFrameObj;
+     CSV * csvParserObj;
+     Xmlparser * xmlParserObj;
+signals:
+     void csvFilePath(QString);
+     void setActorModel(QStandardItemModel *,QStringList);
 };
 
 
