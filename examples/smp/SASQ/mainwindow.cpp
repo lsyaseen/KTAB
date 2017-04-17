@@ -58,6 +58,26 @@ void MainWindow::createConnections()
     connect(this,SIGNAL(setActorModel(QStandardItemModel*,QStringList))
             ,actorFrameObj,SLOT(setActorTableModel(QStandardItemModel*,QStringList)));
 
+
+    connect(this,SIGNAL(openXMLFile(QString)),xmlParserObj,SLOT(openXmlFile(QString)));
+    connect(this,SIGNAL(readXMLFile()),xmlParserObj,SLOT(readXmlFile()));
+    connect(xmlParserObj,SIGNAL(openXMLStatus(bool)),this,SLOT(openStatusXml(bool)));
+    connect(xmlParserObj,SIGNAL(xmlParsedData(QStringList,QStringList,QStringList,QStandardItemModel*,
+                                              QList<QStringList>)),this,
+            SLOT(xmlDataParsedFromFile(QStringList,QStringList,QStringList,QStandardItemModel*,
+                                       QList<QStringList>)));
+
+    connect(this,SIGNAL(setAccomodationTableModel(QStandardItemModel*,QList<QStringList>,QStringList)),actorFrameObj,
+            SLOT(setAccTableModel(QStandardItemModel*,QList<QStringList>,QStringList)));
+
+    connect(this,SIGNAL(saveXMLDataToFile(QStringList,QStandardItemModel*,QStandardItemModel*,QString)),
+            xmlParserObj,SLOT(saveToXmlFile(QStringList,QStandardItemModel*,QStandardItemModel*,QString)));
+    connect(xmlParserObj,SIGNAL(newXmlFilePath(QString)),this,SLOT(savedXmlName(QString)));
+    connect(this,SIGNAL(saveNewSMPDataToXMLFile(QStringList,QTableWidget*,QTableWidget*)),
+            xmlParserObj,SLOT(saveNewDataToXmlFile(QStringList,QTableWidget*,QTableWidget*)));
+    connect(this,SIGNAL(homeDirChanged(QString)),xmlParserObj,SLOT(updateHomeDir(QString)));
+
+
 }
 
 void MainWindow::intializeGUI()
@@ -432,12 +452,13 @@ void MainWindow::about()
 
 void MainWindow::importDataFileCSVXML(bool bl)
 {
-    QString defaultFilter = tr("XML (*.xml *.XML)");
+    QString defaultFilter = tr("CSV (*.csv *.CSV)");
     QFileDialog *fd = new QFileDialog;
     QString fileName = fd->getOpenFileName(this,"Import File",homeDirectory,
                                            tr("CSV (*.csv *.CSV);;XML (*.xml *.XML)" ),&defaultFilter);
 
-    qDebug()<<fileName;
+    QString ext = fd->selectedNameFilter();
+    qDebug()<<fileName << ext;
 
     if(!(fileName.endsWith(".csv")||fileName.endsWith(".CSV")
          ||fileName.endsWith(".xml")||fileName.endsWith(".XML")))
@@ -453,8 +474,9 @@ void MainWindow::importDataFileCSVXML(bool bl)
         }
         else
         {
+            emit openXMLFile(fileName);
+            actorNaviClicked();//Actor Attributes Window
         }
-
     }
 }
 void MainWindow::saveClicked(bool bl)
@@ -472,7 +494,24 @@ void MainWindow::clearSpecifications(bool bl)
     modelNaviClicked();//Model Attributes Window
 }
 
+void MainWindow::openStatusXml(bool status)
+{
+    if(status)
+    {
+        emit readXMLFile();
+    }
+    else
+        displayMessage("Xml Parser", "Unable to open File");
 
+}
+
+void MainWindow::xmlDataParsedFromFile(QStringList modelDesc, QStringList modpara,
+                                       QStringList dims, QStandardItemModel * actModel,
+                                       QList<QStringList> idealAdjustmentList)
+{
+    emit setAccomodationTableModel(actModel,idealAdjustmentList,dims);
+
+}
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------

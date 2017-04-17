@@ -45,7 +45,8 @@ void Xmlparser::openXmlFile(QString xmlFilePath)
 void Xmlparser::readXmlFile()
 {
     xmlModel = new QStandardItemModel;
-
+    xmlModel->setRowCount(0);
+    xmlModel->setColumnCount(0);
     dimensionNames.clear();
     modelParametes.clear();
     actorsList.clear();

@@ -106,30 +106,38 @@ private :
     QFrame * specificationsFrame;
     QFrame * navigationFrame;
 
-     void intializeGUI();
-     void modelFrameInitialization();
-     void actorFrameInitialization();
-     void specsFrameInitialization();
+    void intializeGUI();
+    void modelFrameInitialization();
+    void actorFrameInitialization();
+    void specsFrameInitialization();
 
-     //navigation
-     QPushButton * modelPushButton;
-     QPushButton * actorPushButton;
-     QPushButton * specsPushButton;
+    //navigation
+    QPushButton * modelPushButton;
+    QPushButton * actorPushButton;
+    QPushButton * specsPushButton;
 
 private slots :
-     void modelNaviClicked();
-     void actorNaviClicked();
-     void specsNaviClicked();
-     void setCsvItemModel(QStandardItemModel*, QStringList scenarioList);
+    void modelNaviClicked();
+    void actorNaviClicked();
+    void specsNaviClicked();
+    void setCsvItemModel(QStandardItemModel*, QStringList scenarioList);
+    void openStatusXml(bool status);
+    void xmlDataParsedFromFile(QStringList modelDesc,QStringList modelParametes,
+                               QStringList dimensionNames,QStandardItemModel* xmlModel,
+                               QList<QStringList>idealAdjustmentList);
 
 private :
-     ModelFrame * modelFrameObj;
-     ActorFrame * actorFrameObj;
-     CSV * csvParserObj;
-     Xmlparser * xmlParserObj;
+    ModelFrame * modelFrameObj;
+    ActorFrame * actorFrameObj;
+    CSV * csvParserObj;
+    Xmlparser * xmlParserObj;
 signals:
-     void csvFilePath(QString);
-     void setActorModel(QStandardItemModel *,QStringList);
+    void csvFilePath(QString);
+    void setActorModel(QStandardItemModel *,QStringList);
+    void readXMLFile();
+    void openXMLFile(QString file);
+    void setAccomodationTableModel(QStandardItemModel *actModel,
+                                   QList<QStringList> idealAdjustmentList,QStringList dims);
 };
 
 

@@ -447,9 +447,12 @@ void ModelFrame::listViewClicked()
 
 void ModelFrame::modelListViewContextMenu(QPoint pos)
 {
-    QMenu *menu = new QMenu(this);
-    menu->addAction("Remove Selected Items", this, SLOT(listViewClicked()));
-    menu->popup(specsListView->mapToGlobal(pos));
+    if(specsListView->model()->rowCount()>0)
+    {
+        QMenu *menu = new QMenu(this);
+        menu->addAction("Remove Selected Items", this, SLOT(listViewClicked()));
+        menu->popup(specsListView->mapToGlobal(pos));
+    }
 }
 
 

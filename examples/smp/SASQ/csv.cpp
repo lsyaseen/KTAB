@@ -31,6 +31,7 @@ CSV::CSV()
 }
 void CSV::readCSVFile(QString path)
 {
+    model->clear();
     QRegExp space("^\\s*$");
     //getting the csv file path
     QStringList scenarioName;
