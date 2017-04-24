@@ -408,8 +408,18 @@ void ActorFrame::initializeSpecificationsList()
 
 void ActorFrame::actorComboBoxChanged(QString  index)
 {
-    int row = actorDataTableView->model()->columnCount()-2;
 
+    int row=0;
+    for( int col =2; col < actorDataTableView->model()->columnCount(); ++col)
+    {
+        QTableWidgetItem * item = new QTableWidgetItem(
+                    actorDataTableView->model()->headerData(col,Qt::Horizontal)
+                    .toString().remove("\n"));
+        sasDataGridTableWidget->setVerticalHeaderItem(row,item);
+        ++row;
+    }
+
+    row = actorDataTableView->model()->columnCount()-2;
     for(int r =0 ; r < row ; ++r )
     {
         for(int c =0 ; c < sasDataGridTableWidget->columnCount() ; ++c)
