@@ -19,6 +19,9 @@
 #include <QHeaderView>
 #include <QGroupBox>
 #include <QRadioButton>
+#include <QLineEdit>
+#include <QInputDialog>
+#include <QStandardItemModel>
 
 class ActorFrame: public QFrame
 {
@@ -45,7 +48,7 @@ private :
     QTableView * actorDataTableView;
     QTableView * accomodationMatrixTableView;
 
-    QStandardItemModel * accModel;
+    QStandardItemModel * csvAccModel;
     QStandardItemModel * csvActorDataModel;
 
     QStandardItemModel * xmlAccModel;
@@ -59,6 +62,14 @@ private :
 
     QRadioButton * valueRadioButton;
     QRadioButton * minDeltaMaxRadioButton;
+    QRadioButton * basePMRadioButton;
+    QRadioButton * basePMPRadioButton;
+
+    QComboBox * actorComboBox ;
+    QLineEdit * scenarioName;
+    QLineEdit * scenarioDescription;
+
+    bool importedData;
 
     void intializeFrameLayout();
     void initializeInputDataTable();
@@ -70,11 +81,13 @@ private :
     void intitalizeSasGridColumn();
     void initializeSpecificationsTypeButtons();
     void initializeSpecificationsList();
+    void initializeAffinityMatrixRowCol(int count, QString table);
 
 private slots:
     void actorComboBoxChanged(QString index);
     void actorListViewContextMenu(QPoint pos);
     void listViewClicked();
+    void clearSpecsList();
 
     void minDeltaMaxRadioButtonClicked(bool bl);
     void basePMRadioButtonClicked(bool bl);
@@ -85,13 +98,14 @@ private slots:
     void addSpecClicked(bool bl);
     void sasDataGridContextMenuRequested(QPoint pos);
     void addValueColumn();
+    void displayMenuTableView(QPoint pos);
+    void cellSelected(QStandardItem *in);
 
 public slots :
     void setActorTableModel(QStandardItemModel *model, QStringList scenarioList);
-    void setAccTableModel(QStandardItemModel *model, QList<QStringList> idealAdjustmentList, QStringList dimensionsXml);
+    void setAccTableModel(QStandardItemModel *model, QList<QStringList> idealAdjustmentList, QStringList dimensionsXml, QStringList desc);
 
 
 };
-
 
 #endif // ACTORWINDOW_H

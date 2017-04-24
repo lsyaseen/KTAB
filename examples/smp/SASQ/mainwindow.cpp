@@ -67,8 +67,9 @@ void MainWindow::createConnections()
             SLOT(xmlDataParsedFromFile(QStringList,QStringList,QStringList,QStandardItemModel*,
                                        QList<QStringList>)));
 
-    connect(this,SIGNAL(setAccomodationTableModel(QStandardItemModel*,QList<QStringList>,QStringList)),actorFrameObj,
-            SLOT(setAccTableModel(QStandardItemModel*,QList<QStringList>,QStringList)));
+    connect(this,SIGNAL(setAccomodationTableModel(QStandardItemModel*,QList<QStringList>,
+                                                  QStringList,QStringList)),actorFrameObj,
+            SLOT(setAccTableModel(QStandardItemModel*,QList<QStringList>,QStringList,QStringList)));
 
     connect(this,SIGNAL(saveXMLDataToFile(QStringList,QStandardItemModel*,QStandardItemModel*,QString)),
             xmlParserObj,SLOT(saveToXmlFile(QStringList,QStandardItemModel*,QStandardItemModel*,QString)));
@@ -456,26 +457,28 @@ void MainWindow::importDataFileCSVXML(bool bl)
     QFileDialog *fd = new QFileDialog;
     QString fileName = fd->getOpenFileName(this,"Import File",homeDirectory,
                                            tr("CSV (*.csv *.CSV);;XML (*.xml *.XML)" ),&defaultFilter);
-
-    QString ext = fd->selectedNameFilter();
-    qDebug()<<fileName << ext;
-
-    if(!(fileName.endsWith(".csv")||fileName.endsWith(".CSV")
-         ||fileName.endsWith(".xml")||fileName.endsWith(".XML")))
+    if(!fileName.isEmpty())
     {
-        displayMessage("Importing a File", "Please choose a File with extension as either .csv or .xml ");
-    }
-    else
-    {
-        if(fileName.endsWith(".csv")||fileName.endsWith(".CSV"))
+        QString ext = fd->selectedNameFilter();
+        qDebug()<<fileName << ext;
+
+        if(!(fileName.endsWith(".csv")||fileName.endsWith(".CSV")
+             ||fileName.endsWith(".xml")||fileName.endsWith(".XML")))
         {
-            emit csvFilePath(fileName);
-            actorNaviClicked();//Actor Attributes Window
+            displayMessage("Importing a File", "Please choose a File with extension as either .csv or .xml ");
         }
         else
         {
-            emit openXMLFile(fileName);
-            actorNaviClicked();//Actor Attributes Window
+            if(fileName.endsWith(".csv")||fileName.endsWith(".CSV"))
+            {
+                emit csvFilePath(fileName);
+                actorNaviClicked();//Actor Attributes Window
+            }
+            else
+            {
+                emit openXMLFile(fileName);
+                actorNaviClicked();//Actor Attributes Window
+            }
         }
     }
 }
@@ -509,7 +512,7 @@ void MainWindow::xmlDataParsedFromFile(QStringList modelDesc, QStringList modpar
                                        QStringList dims, QStandardItemModel * actModel,
                                        QList<QStringList> idealAdjustmentList)
 {
-    emit setAccomodationTableModel(actModel,idealAdjustmentList,dims);
+    emit setAccomodationTableModel(actModel,idealAdjustmentList,dims,modelDesc);
 
 }
 // --------------------------------------------

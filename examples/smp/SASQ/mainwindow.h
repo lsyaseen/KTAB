@@ -137,7 +137,8 @@ signals:
     void readXMLFile();
     void openXMLFile(QString file);
     void setAccomodationTableModel(QStandardItemModel *actModel,
-                                   QList<QStringList> idealAdjustmentList,QStringList dims);
+                                   QList<QStringList> idealAdjustmentList,
+                                   QStringList dims,QStringList desc);
 };
 
 
