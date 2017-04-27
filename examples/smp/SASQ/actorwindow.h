@@ -22,6 +22,7 @@
 #include <QLineEdit>
 #include <QInputDialog>
 #include <QStandardItemModel>
+#include <QStringList>
 
 class ActorFrame: public QFrame
 {
@@ -81,12 +82,18 @@ private :
     void intitalizeSasGridColumn();
     void initializeSpecificationsTypeButtons();
     void initializeSpecificationsList();
-    void initializeAffinityMatrixRowCol(int count, QString table);
+    void initializeAccMatrixRowCol(int count, QString table);
+    void initializeBaseDataGrid();
+    QString processMinDeltaMax(QList<double> values);
+    QString processBasePM( QList<double> values);
+    QString processBasePMP(QList<double> values);
+    QString processValuesN( QList<double> values);
 
 private slots:
     void actorComboBoxChanged(QString index);
     void actorListViewContextMenu(QPoint pos);
-    void listViewClicked();
+    void listViewRemoveSelectedClicked();
+    void listViewRemoveAllClicked();
     void clearSpecsList();
 
     void minDeltaMaxRadioButtonClicked(bool bl);

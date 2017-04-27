@@ -101,7 +101,7 @@ void ActorFrame::initializeInputDataTable()
 {
     inputDataTabWidget = new QTabWidget;
     actorDataTableView = new QTableView;
-     accomodationMatrixTableView = new QTableView;
+    accomodationMatrixTableView = new QTableView;
     csvActorDataModel = new QStandardItemModel;
     connect(csvActorDataModel,SIGNAL(itemChanged(QStandardItem*)),
             this,SLOT(cellSelected(QStandardItem*)));
@@ -314,7 +314,9 @@ void ActorFrame::initializeSASDataGrid()
     inputFrame->setLayout(hLay);
 
     actorSensGridLayout->addWidget(inputFrame,0,0,Qt::AlignTop);
-    actorSensGridLayout->addWidget(sasDataGridTableWidget,1,0,Qt::AlignTop);
+    actorSensGridLayout->addWidget(sasDataGridTableWidget,1,0);
+    hLay->setContentsMargins(1,1,1,1);
+    sasDataGridTableWidget->setContentsMargins(1,1,1,1);
 }
 
 void ActorFrame::intitalizeSasGridColumn()
@@ -408,7 +410,7 @@ void ActorFrame::initializeSpecificationsList()
 
 void ActorFrame::actorComboBoxChanged(QString  index)
 {
-
+    sasDataGridTableWidget->clearContents();
     int row=0;
     for( int col =2; col < actorDataTableView->model()->columnCount(); ++col)
     {
@@ -420,13 +422,14 @@ void ActorFrame::actorComboBoxChanged(QString  index)
     }
 
     row = actorDataTableView->model()->columnCount()-2;
-    for(int r =0 ; r < row ; ++r )
-    {
-        for(int c =0 ; c < sasDataGridTableWidget->columnCount() ; ++c)
-        {
-            sasDataGridTableWidget->setItem(r,c,new QTableWidgetItem(""));
-        }
-    }
+    //    for(int r =0 ; r < row ; ++r )
+    //    {
+    //        for(int c =0 ; c < sasDataGridTableWidget->columnCount() ; ++c)
+    //        {
+    ////                        sasDataGridTableWidget->setItem(r,c,new QTableWidgetItem(""));
+    ////             sasDataGridTableWidget->clearContents();
+    //        }
+    //    }
     while(sasDataGridTableWidget->rowCount()!=row)
     {
         sasDataGridTableWidget->removeRow(sasDataGridTableWidget->rowCount()-1);
@@ -442,6 +445,11 @@ void ActorFrame::actorComboBoxChanged(QString  index)
         sasDataGridTableWidget->setVerticalHeaderItem(row,item);
         row++;
     }
+
+    if(true == basePMPRadioButton->isChecked() || true == basePMRadioButton->isChecked())
+    {
+        initializeBaseDataGrid();
+    }
 }
 
 void ActorFrame::actorListViewContextMenu(QPoint pos)
@@ -449,12 +457,13 @@ void ActorFrame::actorListViewContextMenu(QPoint pos)
     if(specsListView->model()->rowCount()>0)
     {
         QMenu *menu = new QMenu(this);
-        menu->addAction("Remove Selected Items", this, SLOT(listViewClicked()));
+        menu->addAction("Remove Selected Items", this, SLOT(listViewRemoveSelectedClicked()));
+        menu->addAction("Remove All Items", this, SLOT(listViewRemoveAllClicked()));
         menu->popup(specsListView->mapToGlobal(pos));
     }
 }
 
-void ActorFrame::listViewClicked()
+void ActorFrame::listViewRemoveSelectedClicked()
 {
     for(int index=0; index < specsListModel->rowCount();++index)
     {
@@ -464,6 +473,15 @@ void ActorFrame::listViewClicked()
             specsListModel->removeRow(index);
             index = index -1; // index changed to current row, deletion of item changes list index
         }
+    }
+}
+
+void ActorFrame::listViewRemoveAllClicked()
+{
+    for(int index=0; index < specsListModel->rowCount();++index)
+    {
+        specsListModel->removeRow(index);
+        index = index -1; // index changed to current row, deletion of item changes list index
     }
 }
 
@@ -492,40 +510,83 @@ void ActorFrame::addSpecClicked(bool bl)
             specification.remove("\n");
 
             QString str;
+            QList<double> values;
             for(int col = 0 ; col < sasDataGridTableWidget->columnCount() ; ++col)
             {
                 auto ret = sasDataGridTableWidget->item(row,col);
 
                 if(ret != 0)
                 {
-                    str.append(sasDataGridTableWidget->item(row,col)->text()).append(",");
+                    if(col>0)
+                    {
+                        double v = sasDataGridTableWidget->item(row,col)->text().toDouble();
+                        if(v>0.0)
+                            values.append(v);
+                    }
+                    else
+                    {
+                        values.append(sasDataGridTableWidget->item(row,col)->text().toDouble());
+                    }
                 }
                 else
                 {
                     specification.clear();
+                    values.clear();
                     str.clear();
                     break;
                 }
-            }
-            specification.append(str);
-            specification.append(")");
-            specification.remove(",)").append(")");
 
-            if(specification.contains("()") || specification.contains("))")
-                    || specification.contains(",)"))
+            }
+            if(true==minDeltaMaxRadioButton->isChecked() && 3==values.count())
             {
-                specification.clear();
+                str.append(processMinDeltaMax(values));
+            }
+            else if (true == basePMRadioButton->isChecked()&& 2==values.count())
+            {
+                str.append(processBasePM(values));
+            }
+            else if (true == basePMPRadioButton->isChecked()&& 2==values.count())
+            {
+                str.append(processBasePMP(values));
+            }
+            else if (true == valueRadioButton->isChecked() &&
+                     sasDataGridTableWidget->columnCount()==values.count())
+            {
+                str.append(processValuesN(values));
             }
             else
             {
-                QStandardItem *item = new QStandardItem(specification);
-                item->setCheckable(true);
-                item->setCheckState(Qt::Unchecked);
-                item->setEditable(false);
-                specsListModel->setItem(specsListModel->rowCount(),item);
-                specsListView->scrollToBottom();
-                qDebug()<<specification;
                 specification.clear();
+                values.clear();
+                str.clear();
+            }
+            specification.append(str);
+            if(!specification.isEmpty())
+            {
+                specification.append(")");
+
+                if(specification.contains("()") || specification.contains("))")
+                        || specification.contains(",)"))
+                {
+                    specification.clear();
+                }
+                else
+                {
+                    QStandardItem *item = new QStandardItem(specification);
+                    item->setCheckable(true);
+                    item->setCheckState(Qt::Unchecked);
+                    item->setEditable(false);
+                    specsListModel->setItem(specsListModel->rowCount(),item);
+                    specsListView->scrollToBottom();
+                    qDebug()<<specification;
+                    specification.clear();
+                }
+            }
+            else
+            {
+                specification.clear();
+                values.clear();
+                str.clear();
             }
         }
     }
@@ -547,10 +608,6 @@ void ActorFrame::addValueColumn()
     sasDataGridTableWidget->setHorizontalHeaderItem(sasDataGridTableWidget->columnCount()-1
                                                     ,new QTableWidgetItem(
                                                         QString("Val "+QString::number(sasDataGridTableWidget->columnCount()))));
-    //    sasDataGridTableWidget->item(0,sasDataGridTableWidget->columnCount()-1)
-    //            ->setBackgroundColor(QColor::fromRgb(192,192,192,135));
-    //    sasDataGridTableWidget->item(0,sasDataGridTableWidget->columnCount()-1)
-    //            ->setTextAlignment(Qt::AlignCenter);
 }
 
 void ActorFrame::minDeltaMaxRadioButtonClicked(bool bl)
@@ -566,16 +623,10 @@ void ActorFrame::minDeltaMaxRadioButtonClicked(bool bl)
 
             sasDataGridTableWidget->insertColumn(0);
             sasDataGridTableWidget->setHorizontalHeaderItem(0,new QTableWidgetItem("Min"));
-            //            sasDataGridTableWidget->item(0,1)->setBackgroundColor(QColor::fromRgb(192,192,192,135));
-            //            sasDataGridTableWidget->item(0,1)->setTextAlignment(Qt::AlignCenter);
             sasDataGridTableWidget->insertColumn(1);
             sasDataGridTableWidget->setHorizontalHeaderItem(1,new QTableWidgetItem("Delta"));
-            //            sasDataGridTableWidget->item(0,2)->setTextAlignment(Qt::AlignCenter);
-            //            sasDataGridTableWidget->item(0,2)->setBackgroundColor(QColor::fromRgb(192,192,192,135));
             sasDataGridTableWidget->insertColumn(2);
             sasDataGridTableWidget->setHorizontalHeaderItem(2,new QTableWidgetItem("Max"));
-            //            sasDataGridTableWidget->item(0,3)->setBackgroundColor(QColor::fromRgb(192,192,192,135));
-            //            sasDataGridTableWidget->item(0,3)->setTextAlignment(Qt::AlignCenter);
         }
     }
 }
@@ -593,12 +644,11 @@ void ActorFrame::basePMRadioButtonClicked(bool bl)
 
             sasDataGridTableWidget->insertColumn(0);
             sasDataGridTableWidget->setHorizontalHeaderItem(0,new QTableWidgetItem("Base"));
-            //            sasDataGridTableWidget->item(0,1)->setBackgroundColor(QColor::fromRgb(192,192,192,135));
-            //            sasDataGridTableWidget->item(0,1)->setTextAlignment(Qt::AlignCenter);
+
+            initializeBaseDataGrid();
+
             sasDataGridTableWidget->insertColumn(1);
             sasDataGridTableWidget->setHorizontalHeaderItem(1,new QTableWidgetItem("±"));
-            //            sasDataGridTableWidget->item(0,2)->setTextAlignment(Qt::AlignCenter);
-            //            sasDataGridTableWidget->item(0,2)->setBackgroundColor(QColor::fromRgb(192,192,192,135));
         }
     }
 }
@@ -616,12 +666,11 @@ void ActorFrame::basePMPRadioButtonClicked(bool bl)
 
             sasDataGridTableWidget->insertColumn(0);
             sasDataGridTableWidget->setHorizontalHeaderItem(0,new QTableWidgetItem("Base"));
-            //            sasDataGridTableWidget->item(0,1)->setBackgroundColor(QColor::fromRgb(192,192,192,135));
-            //            sasDataGridTableWidget->item(0,1)->setTextAlignment(Qt::AlignCenter);
+
+            initializeBaseDataGrid();
+
             sasDataGridTableWidget->insertColumn(1);
             sasDataGridTableWidget->setHorizontalHeaderItem(1,new QTableWidgetItem("±%"));
-            //            sasDataGridTableWidget->item(0,2)->setTextAlignment(Qt::AlignCenter);
-            //            sasDataGridTableWidget->item(0,2)->setBackgroundColor(QColor::fromRgb(192,192,192,135));
         }
     }
 }
@@ -660,7 +709,7 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
             {
                 QString specification;
 
-                for(int row =0; row < sasDataGridTableWidget->rowCount()-1;++ row)
+                for(int row =0; row < sasDataGridTableWidget->rowCount()-1; ++row)
                 {
                     specification.append(actorComboBox->itemText(act));
                     specification.append(".");
@@ -668,47 +717,101 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
                     specification.remove("\n");
 
                     QString str;
-                    for(int col = 0 ; col <  sasDataGridTableWidget->columnCount() ; ++ col)
+                    QList<double> values;
+                    if(row <= actorDataTableView->model()->columnCount()-2)
                     {
-                        auto ret = sasDataGridTableWidget->item(row,col);
+                        auto ret = sasDataGridTableWidget->item(row,1); // col 1
 
-                        if(ret != 0)
+                        if(ret != 0 && (!ret->text().isEmpty()))
                         {
-                            str.append(sasDataGridTableWidget->item(row,col)->text()).append(",");
+                            double v = sasDataGridTableWidget->item(row,1)->text().toDouble();
+                            if(v>0.0)
+                            {
+                                int c = row+2; // 2 is offset
+                                values.append(actorDataTableView->model()->data(
+                                                  actorDataTableView->model()->index(act,c)).toDouble());
+                                values.append(v);// +- / +-% , 2nd value
+                            }
                         }
                         else
                         {
                             specification.clear();
+                            values.clear();
                             str.clear();
-                            break;
                         }
                     }
-                    specification.append(str);
-                    specification.append(")");
-                    specification.remove(",)").append(")");
-
-                    if(specification.contains("()") || specification.contains("))")
-                            || specification.contains(",)"))
+                    else if (row > actorDataTableView->model()->columnCount()-2)
                     {
-                        specification.clear();
+
+                        auto ret = sasDataGridTableWidget->item(row,1); // col 1
+
+                        if(ret != 0 && (!ret->text().isEmpty()))
+                        {
+                            double v = sasDataGridTableWidget->item(row,1)->text().toDouble();
+                            if(v>0.0)
+                            {
+                                int c = row-actorDataTableView->model()->rowCount()-2;
+                                values.append(accomodationMatrixTableView->model()->data(
+                                                  accomodationMatrixTableView->model()->index(act,c)).toDouble());
+                                values.append(v);// +- / +-% , 2nd value
+                            }
+                        }
+                        else
+                        {
+                            specification.clear();
+                            values.clear();
+                            str.clear();
+                        }
+                    }
+
+                    if (true == basePMRadioButton->isChecked()&& 2==values.count())
+                    {
+                        str.append(processBasePM(values));
+                    }
+                    else if (true == basePMPRadioButton->isChecked()&& 2==values.count())
+                    {
+                        str.append(processBasePMP(values));
                     }
                     else
                     {
-                        specification.replace(QString(currentAct+" <"),QString(actorComboBox->itemText(act)+" <"));
-                        QStandardItem *item = new QStandardItem(specification);
-                        item->setCheckable(true);
-                        item->setCheckState(Qt::Unchecked);
-                        item->setEditable(false);
-                        specsListModel->setItem(specsListModel->rowCount(),item);
-                        specsListView->scrollToBottom();
                         specification.clear();
+                        values.clear();
+                        str.clear();
+                    }
+                    specification.append(str);
+                    if(!specification.isEmpty())
+                    {
+                        specification.append(")");
+
+
+                        if(specification.contains("()") || specification.contains("))")
+                                || specification.contains(",)"))
+                        {
+                            specification.clear();
+                        }
+                        else
+                        {
+                            specification.replace(QString(currentAct+" <"),QString(actorComboBox->itemText(act)+" <"));
+                            QStandardItem *item = new QStandardItem(specification);
+                            item->setCheckable(true);
+                            item->setCheckState(Qt::Unchecked);
+                            item->setEditable(false);
+                            specsListModel->setItem(specsListModel->rowCount(),item);
+                            specsListView->scrollToBottom();
+                            specification.clear();
+                        }
+                    }
+                    else
+                    {
+                        specification.clear();
+                        values.clear();
+                        str.clear();
                     }
                 }
             }
         }
     }
 }
-
 
 void ActorFrame::displayMenuTableView(QPoint pos)
 {
@@ -951,11 +1054,11 @@ void ActorFrame::displayMenuTableView(QPoint pos)
 
         if(importedData==true)//csv
         {
-            initializeAffinityMatrixRowCol(actorDataTableView->currentIndex().row(),"CSV");
+            initializeAccMatrixRowCol(actorDataTableView->currentIndex().row(),"CSV");
         }
         else // xml
         {
-            initializeAffinityMatrixRowCol(actorDataTableView->currentIndex().row(),"XML");
+            initializeAccMatrixRowCol(actorDataTableView->currentIndex().row(),"XML");
         }
         actorHeader.clear();
 
@@ -968,10 +1071,9 @@ void ActorFrame::displayMenuTableView(QPoint pos)
             xmlActorDataModel->insertRow(actorDataTableView->currentIndex().row());
         }
     }
-
 }
 
-void ActorFrame::initializeAffinityMatrixRowCol(int count, QString table)
+void ActorFrame::initializeAccMatrixRowCol(int count, QString table)
 {
     if ("XML"==table)
     {
@@ -1019,7 +1121,6 @@ void ActorFrame::cellSelected(QStandardItem* in)
         {
             csvAccModel->setHorizontalHeaderItem(in->row(),new QStandardItem(in->text()));
             csvAccModel->setVerticalHeaderItem(in->row(),new QStandardItem(in->text()));
-            qDebug()<<"here";
         }
         else
         {
@@ -1027,6 +1128,88 @@ void ActorFrame::cellSelected(QStandardItem* in)
             xmlAccModel->setVerticalHeaderItem(in->row(),new QStandardItem(in->text()));
         }
     }
-    qDebug()<<"here11" ;
+}
 
+void ActorFrame::initializeBaseDataGrid()
+{
+    int row =0;
+    for(int actCol = 2 ; actCol < actorDataTableView->model()->columnCount(); ++actCol)
+    {
+        sasDataGridTableWidget->setItem(row,0,new QTableWidgetItem(
+                                            actorDataTableView->model()->data
+                                            (actorDataTableView->model()->index(
+                                                 actorComboBox->currentIndex(),actCol)).toString()));
+        row++;
+    }
+
+    for(int accIndex = 0 ; accIndex < accomodationMatrixTableView->model()->columnCount(); ++accIndex)
+    {
+        sasDataGridTableWidget->setItem(row,0,new QTableWidgetItem(
+                                            accomodationMatrixTableView->model()->data
+                                            (accomodationMatrixTableView->model()->index(
+                                                 actorComboBox->currentIndex(),accIndex)).toString()));
+
+        row++;
+    }
+}
+
+QString ActorFrame::processMinDeltaMax( QList<double> values)
+{
+    QString processedString;
+    if(values.at(0)<values.at(2)) // min < max
+    {
+        for(double min = values.at(0) ; min <= values.at(2) ; min +=  values.at(1))
+        {
+            processedString.append(QString::number(min)).append(",");
+            qDebug()<<processedString;
+        }
+        processedString.remove(processedString.length()-1,1);
+        qDebug()<<processedString;
+        return processedString;
+    }
+    else // min > max
+    {
+        processedString.append(QString::number(values.at(0)));
+    }
+    return processedString;
+}
+
+QString ActorFrame::processBasePM(QList<double> values)
+{
+    QString processedString;
+    qDebug()<<values;
+    double base = values.at(0) - values.at(1);
+    processedString.append(QString::number(base)).append(",");
+    processedString.append(QString::number(values.at(0))).append(",");
+    base = values.at(0)+values.at(1);
+    processedString.append(QString::number(base));
+
+    return processedString;
+
+}
+
+QString ActorFrame::processBasePMP(QList<double> values)
+{
+    QString processedString;
+    qDebug()<<values;
+    double base = values.at(0)-(values.at(0)*values.at(1))/100;
+    processedString.append(QString::number(base)).append(",");
+    processedString.append(QString::number(values.at(0))).append(",");
+    base = values.at(0)+(values.at(0)*values.at(1))/100;
+    processedString.append(QString::number(base));
+
+    return processedString;
+}
+
+QString ActorFrame::processValuesN(QList<double> values)
+{
+    QString processedString;
+    qDebug()<<values;
+    for(int val = 0 ; val < values.count();++val)
+    {
+        processedString.append(QString::number(values.at(val))).append(",");
+    }
+    processedString.remove(processedString.length()-1,1);
+
+    return processedString;
 }

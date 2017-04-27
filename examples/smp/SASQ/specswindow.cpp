@@ -23,3 +23,13 @@
 
 #include "specswindow.h"
 
+
+SpecificationFrame::SpecificationFrame(QObject *parent)
+{
+
+}
+
+SpecificationFrame::~SpecificationFrame()
+{
+
+}

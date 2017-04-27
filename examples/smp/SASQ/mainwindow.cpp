@@ -123,7 +123,7 @@ void MainWindow::intializeGUI()
     navHBoxLayout->addWidget(modelPushButton,0,Qt::AlignRight);
     navHBoxLayout->addWidget(actorPushButton,0,Qt::AlignCenter);
     navHBoxLayout->addWidget(specsPushButton,0,Qt::AlignLeft);
-
+    navHBoxLayout->setContentsMargins(1,1,1,1);
     navigationFrame->setLayout(navHBoxLayout);
 
     centralFrameGridLayout->addWidget(sasStackedWidget,0,0);
