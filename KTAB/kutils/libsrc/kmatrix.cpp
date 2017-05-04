@@ -673,13 +673,11 @@ KMatrix firstEigenvector( const KMatrix& A, double tol) {
         change = mDelta(x,y);
 
         if (false) {
-            cout << "X"<<endl;
+            LOG(DEBUG) << "X";
             x.mPrintf("%+.4f ");
-            cout << endl << flush;
-            cout << "Y"<<endl;
+            LOG(DEBUG) << "Y";
             y.mPrintf("%+.4f ");
-            cout << endl << flush;
-            printf("At iteration %u, delta is %.4e \n", iter, change);
+            LOG(DEBUG) << KBase::getFormattedString("At iteration %u, delta is %.4e", iter, change);
         }
 
         x = unitize((x+y)/2.0); // reduces oscillations
@@ -690,7 +688,7 @@ KMatrix firstEigenvector( const KMatrix& A, double tol) {
     }
 
     if (true) {
-        printf("After iteration %u, delta is %.4e \n", iter, change);
+        LOG(DEBUG) << KBase::getFormattedString("After iteration %u, delta is %.4e", iter, change);
     }
 
     // The eigenvector is unique only up to the sign.

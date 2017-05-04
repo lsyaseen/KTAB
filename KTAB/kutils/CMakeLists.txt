@@ -147,7 +147,8 @@ add_executable(demoutils
 target_link_libraries(demoutils
   kutils 
   ${EFENCE_LIBRARIES}
-  )
+  ${LOGGER_LIBRARY}
+ )
 # -------------------------------------------------
 # show some useful status/debugging information
 

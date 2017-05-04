@@ -359,7 +359,6 @@ void demoMatrix(PRNG* rng) {
         assert(diff < errTol);
         LOG(DEBUG) << "ok";
         diff = norm(iMat(n) - (b*a));
-        printf("Norm of diff I-inv(a)*a is %.3E ... ", diff);
         LOG(DEBUG) << getFormattedString("Norm of diff I-inv(a)*a is %.3E ... ", diff);
         assert(diff < errTol);
         LOG(DEBUG) << "ok";
@@ -476,64 +475,57 @@ void demoPCA(PRNG* rng) {
     const double divFactor = 1.25;
 
     auto m1 = KMatrix::uniform(rng, nDim, nDim, 0.0, +1.0);
-    cout << "Random matrix:"<<endl;
+    LOG(DEBUG) << "Random matrix:";
     m1.mPrintf("%.4f  ");
-    cout << endl;
 
     auto v1 = firstEigenvector(m1, evTol);
     auto s11 = dot(v1, v1);
 
-    cout << "First eigenvector:"<<endl;
+    LOG(DEBUG) << "First eigenvector:";
     v1.mPrintf("%+.5f ");
 
     auto v2 = m1 * v1;
     auto s12 = dot(v2, v1);
-    printf("Eigenvalue: %+.4f \n", s12/s11);
+    LOG(DEBUG) << KBase::getFormattedString("Eigenvalue: %+.4f", s12/s11);
 
     // Now we start a Principal Component Analysis
-    cout << endl << endl;
-    cout << "Setup PCA" << endl;
+    LOG(DEBUG) << "Setup PCA";
     const KMatrix pcv1 = posUnitize(KMatrix::uniform(rng, 1, nDim, -10.0, +10.0));
-    printf("norm pcv1: %.4f \n", dot(pcv1, pcv1));
-    cout << endl << flush;
+    LOG(DEBUG) << KBase::getFormattedString("norm pcv1: %.4f", dot(pcv1, pcv1));
 
     const KMatrix tv2 = KMatrix::uniform(rng, 1, nDim, -10.0, +10.0);
     double a21 = dot(tv2, pcv1) ;
     const KMatrix pcv2 = posUnitize(tv2 - a21*pcv1);
-    printf("norm pcv2: %.4f \n", dot(pcv2, pcv2));
-    printf("dot21: %+.2e \n", dot(pcv2, pcv1));
-    cout << endl << flush;
+    LOG(DEBUG) << KBase::getFormattedString("norm pcv2: %.4f", dot(pcv2, pcv2));
+    LOG(DEBUG) << KBase::getFormattedString("dot21: %+.2e", dot(pcv2, pcv1));
 
     const KMatrix tv3 = KMatrix::uniform(rng, 1, nDim, -10.0, +10.0);
     double a31 = dot(tv3, pcv1);
     double a32 = dot(tv3, pcv2);
     const KMatrix pcv3 = posUnitize(tv3 - (a31*pcv1 + a32*pcv2));
-    printf("norm pcv3: %.4f \n", dot(pcv3, pcv3));
-    printf("dot31: %+.2e \n", dot(pcv3, pcv1));
-    printf("dot32: %+.2e \n", dot(pcv3, pcv2));
-    cout << endl << flush;
+    LOG(DEBUG) << KBase::getFormattedString("norm pcv3: %.4f", dot(pcv3, pcv3));
+    LOG(DEBUG) << KBase::getFormattedString("dot31: %+.2e", dot(pcv3, pcv1));
+    LOG(DEBUG) << KBase::getFormattedString("dot32: %+.2e", dot(pcv3, pcv2));
 
     const KMatrix tv4 = KMatrix::uniform(rng, 1, nDim, -10.0, +10.0);
     double a41 = dot(tv4, pcv1);
     double a42 = dot(tv4, pcv2);
     double a43 = dot(tv4, pcv3);
     const KMatrix pcv4 = posUnitize(tv4 - (a41*pcv1 + a42*pcv2 + a43*pcv3));
-    printf("norm pcv4: %.4f \n", dot(pcv4, pcv4));
-    printf("dot41: %+.2e \n", dot(pcv4, pcv1));
-    printf("dot42: %+.2e \n", dot(pcv4, pcv2));
-    printf("dot43: %+.2e \n", dot(pcv4, pcv3));
-    cout << endl << flush;
+    LOG(DEBUG) << KBase::getFormattedString("norm pcv4: %.4f", dot(pcv4, pcv4));
+    LOG(DEBUG) << KBase::getFormattedString("dot41: %+.2e", dot(pcv4, pcv1));
+    LOG(DEBUG) << KBase::getFormattedString("dot42: %+.2e", dot(pcv4, pcv2));
+    LOG(DEBUG) << KBase::getFormattedString("dot43: %+.2e", dot(pcv4, pcv3));
 
-    cout<<"Actual " << nDim<<"-dim principal components: "<<endl;
+    LOG(DEBUG) << "Actual " << nDim << "-dim principal components: ";
     pcv1.mPrintf("%+7.4f  ");
     pcv2.mPrintf("%+7.4f  ");
     pcv3.mPrintf("%+7.4f  ");
     pcv4.mPrintf("%+7.4f  ");
-    cout << endl << flush;
 
 
     auto xMat = KMatrix(nSample, nDim);
-    cout<<"Actual weights of "<< nSample<<" samples: "<<endl;
+    LOG(DEBUG) << "Actual weights of" << nSample << "samples:";
     for (unsigned int i=0; i<nSample; i++) {
         const double rMin = -45.0;
         const double rMax = +90.0;
@@ -551,16 +543,10 @@ void demoPCA(PRNG* rng) {
         for (unsigned int j=0; j<nDim; j++) {
             xMat(i,j) = xi(0, j);
         }
-        printf("%+8.4f  ", w1);
-        printf("%+8.4f  ", w2);
-        printf("%+8.4f  ", w3);
-        printf("%+8.4f  ", w4);
-        cout << endl;
+        LOG(DEBUG) << KBase::getFormattedString("%+8.4f  %+8.4f  %+8.4f  %+8.4f", w1, w2, w3, w4);
     }
-    cout << endl << flush;
-    printf("Data (one sample per row): \n");
+    LOG(DEBUG) << "Data (one sample per row): ";
     xMat.mPrintf("%+8.3f  ");
-    cout << endl << flush;
 
     auto sMean = KMatrix(1, nDim);
     // subtract sample means off each column
@@ -573,7 +559,7 @@ void demoPCA(PRNG* rng) {
         }
     }
 
-    printf("Sample means: \n");
+    LOG(DEBUG) <<"Sample means:";
     sMean.mPrintf("%+8.3f  ");
 
     assert (nComp <= nDim);
@@ -583,17 +569,16 @@ void demoPCA(PRNG* rng) {
     auto w1 = yMat * trans(f1); 
 
     auto showErr = [yMat] (const KMatrix & w, const KMatrix & f) {
-        printf("Estimated principal components: \n");
+        LOG(DEBUG) << "Estimated principal components:";
         f.mPrintf("%+7.4f  ");
-        printf("Estimated weights: \n");
+        LOG(DEBUG) << "Estimated weights:";
         w.mPrintf("%+8.3f  ");
-        cout << endl << flush;
         auto zMat = w * f;
-        printf("RMS of estimated zMat: %.3e \n", rms(zMat));
+        LOG(DEBUG) << KBase::getFormattedString("RMS of estimated zMat: %.3e", rms(zMat));
         auto eMat = yMat - zMat;
-        printf("RMS of error eMat: %.3e \n", rms(eMat));
+        LOG(DEBUG) << KBase::getFormattedString("RMS of error eMat: %.3e", rms(eMat));
         double yzCorr = KBase::lCorr(yMat - mean(yMat), zMat - mean(zMat));
-        printf("Y-Z Affine correlation %+.4f \n", yzCorr);
+        LOG(DEBUG) << KBase::getFormattedString("Y-Z Affine correlation %+.4f", yzCorr);
         return;
     };
     
@@ -601,10 +586,9 @@ void demoPCA(PRNG* rng) {
 
 
     for (unsigned int n=1; n<nComp; n++) {
-        cout << endl;
-        printf("Extracting component %u \n", n);
+        LOG(DEBUG) << "Extracting component" << n;
 
-        cout << "Try to extend" << endl << flush;
+        LOG(DEBUG) << "Try to extend";
         auto wf = extendPCA(yMat, w1, f1);
         KMatrix w2 = get<0>(wf);
         KMatrix f2 = get<1>(wf);
@@ -1144,14 +1128,16 @@ void demoGHC(PRNG* rng) {
     };
 
     auto sfn = [](VBool bv) {
+        string bvBits;
         for (auto b : bv) {
             if (b) {
-                printf("+");
+                bvBits += "+";
             }
             else {
-                printf("o");
+                bvBits += "o";
             }
         }
+        LOG(DEBUG) << bvBits;
         return;
     };
 
@@ -2086,6 +2072,7 @@ int main(int ac, char **av) {
     // Set logging configuration from a file
     el::Configurations confFromFile("./conf/logger.conf");
     el::Loggers::reconfigureAllLoggers(confFromFile);
+
     using KBase::dSeed;
     using UDemo::TargetedBV;
     auto sTime = KBase::displayProgramStart();
