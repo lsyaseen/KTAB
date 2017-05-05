@@ -56,7 +56,7 @@ endif (NOT SQLITE_FOUND)
 
 # --------------------------------------------------------
 
-find_package(easyloggingpp)
+find_package(Easyloggingpp)
 
 # --------------------------------------------------------
 

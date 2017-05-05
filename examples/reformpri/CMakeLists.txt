@@ -65,7 +65,7 @@ endif (NOT SQLITE_FOUND)
 
 # --------------------------------------------------------
 
-find_package(easyloggingpp)
+find_package(Easyloggingpp)
 
 # -------------------------------------------------
 # See "Findkutils.cmake" in cmakemodules to figure

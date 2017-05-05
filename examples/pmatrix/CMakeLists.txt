@@ -117,7 +117,7 @@ endif (NOT SQLITE_FOUND)
 
 # --------------------------------------------------------
 
-find_package(easyloggingpp)
+find_package(Easyloggingpp)
 
 # ------------------------------------------------- 
 # files to be built into a library go in libsrc/

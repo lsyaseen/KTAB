@@ -83,7 +83,6 @@ ET enumFromName (const string& ets, const vector<string>& etNames) {
     }
   }
   if (!found) {
-    std::cout << "unrecognized enum-type name:  " << ets << std::endl<< std::flush;
     throw(KException("enumFromName: unrecognized enum-type name"));
   }
   return et;
