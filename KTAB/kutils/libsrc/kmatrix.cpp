@@ -213,10 +213,10 @@ KMatrix KMatrix::arrayInit(const double mv[], const unsigned int & nr, const uns
 }
 
 
-void KMatrix::mPrintf(string fs) const {
+void KMatrix::mPrintf(string fs, string msg) const {
     const char * fc = fs.c_str();
-    string rowVals;
-    auto pf = [fc, this, &rowVals](unsigned int i, unsigned int j) {
+    string rowVals = msg;
+    auto pf = [fc, this, &rowVals, msg](unsigned int i, unsigned int j) {
         rowVals += KBase::getFormattedString(fc, (*this)(i, j));
         if (j == (this->numC() - 1)) {
             LOG(DEBUG) << rowVals;

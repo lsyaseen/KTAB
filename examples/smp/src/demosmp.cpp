@@ -65,7 +65,7 @@ std::string GenerateDBNameWithTimeStamp()
 }
 int main(int ac, char **av) {
   // Set logging configuration from a file
-  el::Configurations confFromFile("./conf/smpc-logger.conf");
+  el::Configurations confFromFile("./smpc-logger.conf");
   el::Loggers::reconfigureAllLoggers(confFromFile);
 
   using std::string;

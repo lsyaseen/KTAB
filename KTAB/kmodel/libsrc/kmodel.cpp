@@ -189,7 +189,6 @@ unsigned int Model::addActor(Actor* a) {
 unsigned int Model::addState(State* s) {
   assert(nullptr != s);
   assert(this == s->model);
-  s->model = this;
   history.push_back(s);
   auto hs = ((const unsigned int)(history.size()));
   return hs;

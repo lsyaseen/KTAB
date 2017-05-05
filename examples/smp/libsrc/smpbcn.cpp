@@ -96,11 +96,6 @@ uint64_t BargainSMP::getID() const {
 }
 
 // --------------------------------------------
-void recordUtility(unsigned int i /* actor id */, const SMPState* obj) {
-  obj->calcUtils(i);
-}
-  
-// --------------------------------------------
 /*
  * Calculate all the utilities and record in database. utitlity for (i,i,i,j)
  * combination is getting calculated and recorded in a separate method
@@ -191,30 +186,92 @@ vector<double> SMPState::calcVotes(KMatrix w, KMatrix u, int k) const
 	return votes;
 }
 
-SMPState* SMPState::doBCN() const {
-  const bool recordBargainingP = true;
-  auto brgns = vector< vector < BargainSMP* > >();
+SMPState* SMPState::doBCN() {
   const unsigned int na = model->numAct;
   brgns.resize(na);
   for (unsigned int i = 0; i < na; i++) {
     brgns[i] = vector<BargainSMP*>();
   }
 
-  const unsigned int t = myTurn();
+  auto thrBCN = [this](unsigned int i) {
+    this->doBCN(i);
+  };
 
-  const VPModel vpmBargains = model->vpm;
-  const PCEModel pcemBargains = model->pcem;
-  const StateTransMode stm = model->stm;
+  KBase::groupThreads(thrBCN, 0, na - 1);
 
-  auto smod = (const SMPModel*)model;
-  const VotingRule vrBargains = smod->vrCltn;
-  const InterVecBrgn ivb = smod->ivBrgn;
-  const SMPBargnModel bMod = smod->brgnMod;
+  LOG(DEBUG) << "Bargains to be resolved";
+  showBargains(brgns);
 
-  // TODO: use groupThreads on *this* loop for high-level parallelism
-  for (unsigned int i = 0; i < na; i++) {
+  w = actrCaps();
+  LOG(DEBUG) << "w:";
+  w.mPrintf(" %6.2f ");
+
+  s2 = new SMPState(model);
+
+  auto thrCalcPosts = [this](unsigned int k) {
+    this->updateBestBrgnPositions(k);
+  };
+
+  KBase::groupThreads(thrCalcPosts, 0, na - 1);
+
+  // record data so far
+  updateBargnTable(brgns, actorBargains, actorMaxBrgNdx);
+
+  // Some bargains are nullptr, and there are two copies of every non-nullptr randomly
+  // arranged. If we delete them as we find them, then the second occurance will be corrupted,
+  // so the code crashes when it tries to access the memory to see if it matches something
+  // already deleted. Hence, we scan them all, building a list of unique bargains,
+  // then delete those in order.
+  auto uBrgns = vector<BargainSMP*>();
+
+  for (unsigned int i = 0; i < brgns.size(); i++) {
+    auto ai = ((const SMPActor*)(model->actrs[i]));
+    for (unsigned int j = 0; j < brgns[i].size(); j++) {
+      BargainSMP* bij = brgns[i][j];
+      if (nullptr != bij) {
+        if (ai == bij->actInit) {
+          uBrgns.push_back(bij); // this is the initiator's copy, so save it for deletion
+        }
+      }
+      brgns[i][j] = nullptr; // either way, null it out.
+    }
+  }
+
+  for (auto b : uBrgns) {
+    //int aI = model->actrNdx(b->actInit);
+    //int aR = model->actrNdx(b->actRcvr);
+    //printf("Delete bargain [%2i:%2i] \n", aI, aR);
+    delete b;
+  }
+
+  // TODO: this really should do all the assessment: ueIndices, rnProb, all U^h_{ij}, raProb
+  s2->setUENdx();
+
+  if (0 == accomodate.numC()) { // nothing to copy
+    s2->setAccomodate(1.0); // set to identity matrix
+  }
+  else {
+    s2->setAccomodate(accomodate);
+  }
+
+  if (0 == ideals.size()) { // nothing to copy
+    s2->idealsFromPstns(); // set s2's current ideals to s2's current positions
+  }
+  else {
+    s2->ideals = ideals; // copy s1's old ideals
+  }
+  s2->newIdeals(); // adjust s2 ideals toward new ones
+  double ipDist = s2->posIdealDist(ReportingLevel::Medium);
+  LOG(DEBUG) << KBase::getFormattedString("rms (pstn, ideal) = %.5f", ipDist);
+  return s2;
+}
+
+void SMPState::doBCN(unsigned int i) {
     auto ai = ((const SMPActor*)(model->actrs[i]));
     auto posI = ((const VctrPstn*)pstns[i]);
+    auto smod = dynamic_cast<SMPModel *>(model);
+    const InterVecBrgn ivb = smod->ivBrgn;
+    const SMPBargnModel bMod = smod->brgnMod;
 
     auto sqBrgnI = new BargainSMP(ai, ai, *posI, *posI);
     brgns[i].push_back(sqBrgnI);
@@ -237,7 +294,7 @@ SMPState* SMPState::doBCN() const {
 
     if (model->sqlFlags[grpID])
     {
-      model->sqlBargainEntries(t, sqBrgnI->getID(), i, i, 0);
+      model->sqlBargainEntries(turn, sqBrgnI->getID(), i, i, 0);
     }
 
     bestChallengeUtils(i);
@@ -250,24 +307,10 @@ SMPState* SMPState::doBCN() const {
       assert(0 <= bestJ);
       const unsigned int j = bestJ; // for consistency in code below
 
-      const unsigned int t = myTurn(); // need to be on model's history list
-      LOG(INFO) << KBase::getFormattedString(
-        "In turn %i actor %u has most advantageous target %u worth %.3f",
-        t, i, j, bestEU);
-
       auto aj = ((const SMPActor*)(model->actrs[j]));
       auto posJ = ((const VctrPstn*)pstns[j]);
 
-      // Look for counter-intuitive cases
-      if (piiJ < 0.5) {
-        LOG(DEBUG) << "turn" << t << ","
-            << "i" << i << ","
-            << "j" << j << ","
-            << "bestEU worth" << bestEU << ","
-            << "piiJ " << piiJ;
-      }
-
-      std::thread thr(recordUtility, i, this);
+      std::thread thr(&SMPState::calcUtils, this, i);
 
       // make the variables local to lexical scope of this block.
       // for testing, calculate and print out a block of data showing each's perspective
@@ -276,22 +319,17 @@ SMPState* SMPState::doBCN() const {
         auto est = probEduChlg(h, k, i, j, recordTmpSQLP); // H's estimate of the effect on K of I->J
         double phij = get<0>(est);
         double edu_hk_ij = get<1>(est);
-        LOG(DEBUG) << KBase::getFormattedString(
-          "Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f",
-          h, phij, i, j, k, edu_hk_ij);
+        //LOG(DEBUG) << KBase::getFormattedString(
+        //  "Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f",
+        //  h, phij, i, j, k, edu_hk_ij);
         return est;
       };
 
-      // I's estimate of the effect on I of I->J
-      LOG(DEBUG) << KBase::getFormattedString(
-        "Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f",
-        i, piiJ, i, j, i, get<2>(chlgI));
-
-      pFn(i, j, i, j); // I's estimate of the effect on J of I->J
+      auto est_ijij = pFn(i, j, i, j); // I's estimate of the effect on J of I->J
 
       auto Vjij = pFn(j, i, i, j); // J's estimate of the effect on I of I->J
 
-      pFn(j, j, i, j); // J's estimate of the effect on J of I->J
+      auto est_jjij = pFn(j, j, i, j); // J's estimate of the effect on J of I->J
 
       // interpolate a bargain from I's perspective
       BargainSMP* brgnIIJ = SMPActor::interpolateBrgn(ai, aj, posI, posJ, piiJ, 1 - piiJ, ivb);
@@ -318,29 +356,73 @@ SMPState* SMPState::doBCN() const {
       auto bpj = VctrPstn((wi*brgnIIJ->posRcvr + wj*brgnJIJ->posRcvr) / (wi + wj));
       BargainSMP *brgnIJ = new  BargainSMP(brgnIIJ->actInit, brgnIIJ->actRcvr, bpi, bpj);
 
+      mtxLock.lock();
+      LOG(INFO) << KBase::getFormattedString(
+        "In turn %i actor %u has most advantageous target %u worth %.3f",
+        turn, i, j, bestEU);
+
+      // Look for counter-intuitive cases
+      if (piiJ < 0.5) {
+        LOG(DEBUG) << "turn" << turn << ","
+            << "i" << i << ","
+            << "j" << j << ","
+            << "bestEU worth" << bestEU << ","
+            << "piiJ " << piiJ;
+      }
+
+      // I's estimate of the effect on I of I->J
+      LOG(DEBUG) << KBase::getFormattedString(
+        "Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f",
+        i, piiJ, i, j, i, get<2>(chlgI));
+
+      // I's estimate of the effect on J of I->J
+      LOG(DEBUG) << KBase::getFormattedString(
+          "Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f",
+          i, get<0>(est_ijij), i, j, j, get<1>(est_ijij));
+
+      // J's estimate of the effect on I of I->J
+      LOG(DEBUG) << KBase::getFormattedString(
+          "Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f",
+          j, get<0>(Vjij), i, j, i, get<1>(Vjij));
+
+      // J's estimate of the effect on J of I->J
+      LOG(DEBUG) << KBase::getFormattedString(
+          "Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f",
+          j, get<0>(est_jjij), i, j, j, get<1>(est_jjij));
+      LOG(DEBUG) << "";
+
       // Bargain positions from i's perspective
-      LOG(INFO) << "Bargain (brgnIIJ)" << showOneBargain(brgnIIJ)
-        << "from the perspective of" << i;
-      LOG(INFO) << i << "proposes" << i << "adopt:";
-      (KBase::trans(brgnIIJ->posInit) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
-      LOG(INFO) << i << "proposes" << j << "adopt:";
-      (KBase::trans(brgnIIJ->posRcvr) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
+      LOG(INFO) << "Bargain" << showOneBargain(brgnIIJ)
+        << "from" << std::to_string(i) + "'s perspective (brgnIIJ)";
+      //LOG(INFO) << i << "proposes" << i << "adopt:";
+      string proposal = string("   ") + std::to_string(i) + " proposes " + std::to_string(i) + " adopt: ";
+      (KBase::trans(brgnIIJ->posInit) * 100.0).mPrintf(" %.3f ", proposal); // print on the scale of [0,100]
+      //LOG(INFO) << i << "proposes" << j << "adopt:";
+      proposal = string("   ") + std::to_string(i) + " proposes " + std::to_string(j) + " adopt: ";
+      (KBase::trans(brgnIIJ->posRcvr) * 100.0).mPrintf(" %.3f ", proposal); // print on the scale of [0,100]
+      LOG(DEBUG) << "";
 
       // Bargain positions from j's perspective
-      LOG(INFO) << "Bargain (brgnJIJ)" << showOneBargain(brgnJIJ)
-        << "from the perpective of" << j;
-      LOG(INFO) << j << "proposes" << i << "adopt:";
-      (KBase::trans(brgnJIJ->posInit) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
-      LOG(INFO) << j << "proposes" << j << "adopt:";
-      (KBase::trans(brgnJIJ->posRcvr) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
+      LOG(INFO) << "Bargain" << showOneBargain(brgnJIJ)
+        << "from" << std::to_string(j) + "'s perspective (brgnIIJ)";
+      //LOG(INFO) << j << "proposes" << i << "adopt:";
+      proposal = string("   ") + std::to_string(j) + " proposes " + std::to_string(i) + " adopt: ";
+      (KBase::trans(brgnJIJ->posInit) * 100.0).mPrintf(" %.3f ", proposal); // print on the scale of [0,100]
+      //LOG(INFO) << j << "proposes" << j << "adopt:";
+      proposal = string("   ") + std::to_string(j) + " proposes " + std::to_string(j) + " adopt: ";
+      (KBase::trans(brgnJIJ->posRcvr) * 100.0).mPrintf(" %.3f ", proposal); // print on the scale of [0,100]
+      LOG(DEBUG) << "";
 
       // Power-weighted compromise
       LOG(INFO) << "Power-weighted compromise" << showOneBargain(brgnIJ) << "bargain (brgnIJ)";
-      LOG(INFO) << "  Compromise proposes" << i << "adopt: ";
-      (KBase::trans(brgnIJ->posInit) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
+      //LOG(INFO) << "  Compromise proposes" << i << "adopt: ";
+      proposal = string("   ") + string("  compromise proposes ") + std::to_string(i) + " adopt: ";
+      (KBase::trans(brgnIJ->posInit) * 100.0).mPrintf(" %.3f ", proposal); // print on the scale of [0,100]
 
-      LOG(INFO) << "  Compromise proposes" << j << "adopt: ";
-      (KBase::trans(brgnIJ->posRcvr) * 100.0).mPrintf(" %.3f "); // print on the scale of [0,100]
+      //LOG(INFO) << "  Compromise proposes" << j << "adopt: ";
+      proposal = string("   ") + string("  compromise proposes ") + std::to_string(j) + " adopt: ";
+      (KBase::trans(brgnIJ->posRcvr) * 100.0).mPrintf(" %.3f ", proposal); // print on the scale of [0,100]
+      LOG(DEBUG) << "";
 
 
       // TODO: make one-perspective an option.
@@ -351,16 +433,17 @@ SMPState* SMPState::doBCN() const {
       //brgnIIJ = tIJ;
 
       LOG(INFO) << "Using" << bMod << "to form proposed bargains";
+      mtxLock.unlock();
       switch (bMod) {
       case SMPBargnModel::InitOnlyInterpSMPBM:
         // record the only one used into SQLite JAH 20160802 use the flag
         if(model->sqlFlags[grpID])
         {
-          model->sqlBargainEntries(t, brgnIIJ->getID(), i, j, bestEU);
+          model->sqlBargainEntries(turn, brgnIIJ->getID(), i, j, bestEU);
         }
         if(model->sqlFlags[3])
         {          
-          model->sqlBargainCoords(t, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr);
+          model->sqlBargainCoords(turn, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr);
         }
         // record this one onto BOTH the initiator and receiver queues
         brgns[i].push_back(brgnIIJ); // initiator's copy, delete only it later
@@ -377,13 +460,13 @@ SMPState* SMPState::doBCN() const {
         // record the pair used into SQLite JAH 20160802 use the flag
         if(model->sqlFlags[grpID])
         {
-          model->sqlBargainEntries(t, brgnIIJ->getID(), i, j, bestEU);
-          model->sqlBargainEntries(t, brgnJIJ->getID(), i, j, bestEU);
+          model->sqlBargainEntries(turn, brgnIIJ->getID(), i, j, bestEU);
+          model->sqlBargainEntries(turn, brgnJIJ->getID(), i, j, bestEU);
         }
         if(model->sqlFlags[3])
         {
-          model->sqlBargainCoords(t, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr);
-          model->sqlBargainCoords(t, brgnJIJ->getID(), brgnJIJ->posInit, brgnJIJ->posRcvr);
+          model->sqlBargainCoords(turn, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr);
+          model->sqlBargainCoords(turn, brgnJIJ->getID(), brgnJIJ->posInit, brgnJIJ->posRcvr);
         }
         // record these both onto BOTH the initiator and receiver queues
         brgns[i].push_back(brgnIIJ); // initiator's copy, delete only it later
@@ -400,11 +483,11 @@ SMPState* SMPState::doBCN() const {
         // record the only one used into SQLite JAH 20160802 use the flag
         if(model->sqlFlags[grpID])
         {
-          model->sqlBargainEntries(t, brgnIJ->getID(), i, j, bestEU);
+          model->sqlBargainEntries(turn, brgnIJ->getID(), i, j, bestEU);
         }
         if(model->sqlFlags[3])
         {
-          model->sqlBargainCoords(t, brgnIJ->getID(), brgnIJ->posInit, brgnIJ->posRcvr);
+          model->sqlBargainCoords(turn, brgnIJ->getID(), brgnIJ->posInit, brgnIJ->posRcvr);
         }
         // record this one onto BOTH the initiator and receiver queues
         brgns[i].push_back(brgnIJ); // initiator's copy, delete only it later
@@ -426,15 +509,9 @@ SMPState* SMPState::doBCN() const {
     else {
       LOG(INFO) << "Actor" << i << "has no advantageous targets";
     }
-  }
+}
 
-  LOG(DEBUG) << "Bargains to be resolved";
-  showBargains(brgns);
-
-  auto w = actrCaps();
-  LOG(DEBUG) << "w:";
-  w.mPrintf(" %6.2f ");
-
+void SMPState::updateBestBrgnPositions(int k) {
   auto ndxMaxProb = [](const KMatrix & cv) {
     const double pTol = 1E-8;
     assert(fabs(KBase::sum(cv) - 1.0) < pTol);
@@ -447,7 +524,7 @@ SMPState* SMPState::doBCN() const {
 
   // what is the utility to actor nai of the state resulting after
   // the nbj-th bargain of the k-th actor is implemented?
-  auto brgnUtil = [this, brgns](unsigned int nk, unsigned int nai, unsigned int nbj) {
+  auto brgnUtil = [this](unsigned int nk, unsigned int nai, unsigned int nbj) {
     const unsigned int na = model->numAct;
     BargainSMP * b = brgns[nk][nbj];
     assert(nullptr != b);
@@ -494,30 +571,27 @@ SMPState* SMPState::doBCN() const {
   // making sure to divide the sum of the utilities of positions by 1/N
   // so 0 <= Util(state after Brgn_m) <= 1, then do the standard scalarPCE for bargains involving k.
 
-  SMPState* s2 = new SMPState(model);
-
-  map<unsigned int, KBase::KMatrix> actorBargains;
-  map<unsigned int, unsigned int> actorMaxBrgNdx;
-
-  // This loop would be another good place for high-level parallelism
-  for (unsigned int k = 0; k < na; k++) {
-    unsigned int nb = brgns[k].size();
     auto buk = [brgnUtil, k](unsigned int nai, unsigned int nbj) {
       return brgnUtil(k, nai, nbj);
     };
+    auto smod = dynamic_cast<SMPModel *>(model);
+    unsigned int na = smod->numAct;
+    unsigned int nb = brgns[k].size();
+
+    mtxLock.lock();
     auto u_im = KMatrix::map(buk, na, nb);
 
     LOG(DEBUG) << "u_im:";
     u_im.mPrintf(" %.5f ");
 
     LOG(INFO) << "Doing scalarPCE for the" << nb << "bargains of actor" << k << "...";
-    auto p = Model::scalarPCE(na, nb, w, u_im, vrBargains, vpmBargains, pcemBargains, ReportingLevel::Medium);
+    auto p = Model::scalarPCE(na, nb, w, u_im, smod->vrCltn, smod->vpm, smod->pcem, ReportingLevel::Medium);
     assert(nb == p.numR());
     assert(1 == p.numC());
     actorBargains.insert(map<unsigned int, KBase::KMatrix>::value_type(k, p));
 
     unsigned int mMax = nb; // indexing actors by i, bargains by m
-    switch (stm) {
+    switch (smod->stm) {
     case StateTransMode::DeterminsticSTM:
       mMax = ndxMaxProb(p);
       break;
@@ -531,6 +605,10 @@ SMPState* SMPState::doBCN() const {
     // 0 <= mMax assured for uint
     assert(mMax < nb);
     actorMaxBrgNdx.insert(map<unsigned int, unsigned int>::value_type(k, mMax));
+    auto bkm = brgns[k][mMax];
+    LOG(DEBUG) << "Chosen bargain (" << smod->stm << "):" << bkm->getID()
+      << mMax + 1 << "out of" << nb << "bargains";
+    mtxLock.unlock();
 
     //populate the Bargain Vote & Util tables
     // JAH added sql flag logging control
@@ -554,16 +632,13 @@ SMPState* SMPState::doBCN() const {
 		for (unsigned int actor = 0; actor < na; ++actor) {
 			auto pv_ij = calcVotes(w, u_im, actor);
 
-			model->sqlBargainVote(t, barginIDsPair_i_j, pv_ij, actor);
+			model->sqlBargainVote(turn, barginIDsPair_i_j, pv_ij, actor);
 		}
-		model->sqlBargainUtil(t, bargnIdsRows, u_im);
+		model->sqlBargainUtil(turn, bargnIdsRows, u_im);
 	}
 
     // TODO: create a fresh position for k, from the selected bargain mMax.
     VctrPstn * pk = nullptr;
-    auto bkm = brgns[k][mMax];
-    LOG(DEBUG) << "Chosen bargain (" << stm << "): " << bkm->getID()
-      << " " << mMax + 1 << " out of " << nb << " bargains";
     auto oldPK = dynamic_cast<VctrPstn *>(pstns[k]);
     if (bkm->actInit == bkm->actRcvr) { // SQ
       pk = new VctrPstn(*oldPK);
@@ -579,6 +654,7 @@ SMPState* SMPState::doBCN() const {
       }
       else {
         LOG(ERROR) << "SMPState::doBCN: unrecognized actor in bargain";
+        assert(false);
         exit(-1);
       }
 
@@ -593,64 +669,8 @@ SMPState* SMPState::doBCN() const {
     }
     assert(nullptr != pk);
 
-    assert(k == s2->pstns.size());
-    s2->pstns.push_back(pk);
-  }
-
-  if (model->sqlFlags[3])
-  {
-    // record data so far
-    updateBargnTable(brgns, actorBargains, actorMaxBrgNdx);
-  }
-
-  // Some bargains are nullptr, and there are two copies of every non-nullptr randomly
-  // arranged. If we delete them as we find them, then the second occurance will be corrupted,
-  // so the code crashes when it tries to access the memory to see if it matches something
-  // already deleted. Hence, we scan them all, building a list of unique bargains,
-  // then delete those in order.
-  auto uBrgns = vector<BargainSMP*>();
-
-  for (unsigned int i = 0; i < brgns.size(); i++) {
-    auto ai = ((const SMPActor*)(model->actrs[i]));
-    for (unsigned int j = 0; j < brgns[i].size(); j++) {
-      BargainSMP* bij = brgns[i][j];
-      if (nullptr != bij) {
-        if (ai == bij->actInit) {
-          uBrgns.push_back(bij); // this is the initiator's copy, so save it for deletion
-        }
-      }
-      brgns[i][j] = nullptr; // either way, null it out.
-    }
-  }
-
-  for (auto b : uBrgns) {
-    //int aI = model->actrNdx(b->actInit);
-    //int aR = model->actrNdx(b->actRcvr);
-    //printf("Delete bargain [%2i:%2i] \n", aI, aR);
-    delete b;
-  }
-
-  // TODO: this really should do all the assessment: ueIndices, rnProb, all U^h_{ij}, raProb
-  s2->setUENdx();
-
-
-  if (0 == accomodate.numC()) { // nothing to copy
-    s2->setAccomodate(1.0); // set to identity matrix
-  }
-  else {
-    s2->setAccomodate(accomodate);
-  }
-
-  if (0 == ideals.size()) { // nothing to copy
-    s2->idealsFromPstns(); // set s2's current ideals to s2's current positions
-  }
-  else {
-    s2->ideals = ideals; // copy s1's old ideals
-  }
-  s2->newIdeals(); // adjust s2 ideals toward new ones
-  double ipDist = s2->posIdealDist(ReportingLevel::Medium);
-  LOG(DEBUG) << KBase::getFormattedString("rms (pstn, ideal) = %.5f", ipDist);
-  return s2;
+    // Make sure that the pk is stored at right position in s2.
+    s2->pstns[k] = pk;
 }
 
 
@@ -800,8 +820,6 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
     // record tpvArray into SQLite turn, est (h), init (i), third party (n), receiver (j), and tpvArray[n]
     // printf ("SMPState::probEduChlg(%2i, %2i, %2i, %i2) = %+6.4f - %+6.4f = %+6.4f\n", h, k, i, j, euCh, euSQ, euChlg);
 
-    unsigned int t = myTurn();
-
     sqlite3 * db = model->smpDB;
     char* zErrMsg = nullptr; // Error message in case
 
@@ -810,7 +828,7 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
 
     sprintf(sqlBuff,
             "INSERT INTO TP_Prob_Vict_Loss (ScenarioId, Turn_t, Est_h,Init_i,ThrdP_k,Rcvr_j,Prob,Util_V,Util_L) VALUES ('%s', %u, %u, %u, ?1, %u, ?2, ?3, ?4)",
-            model->getScenarioID().c_str(), t, h, i, j);
+            model->getScenarioID().c_str(), turn, h, i, j);
 
     // The whole point of a prepared statement is to reuse it.
     // Therefore, we prepare it before the loop, and reuse it inside the loop:
@@ -853,14 +871,14 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
     memset(sqlBuff, '\0', sqlBuffSize);
     sprintf(sqlBuff,
             "INSERT INTO ProbVict (ScenarioId, Turn_t, Est_h,Init_i,Rcvr_j,Prob) VALUES ('%s',%u,%u,%u,%u,%f)",
-            model->getScenarioID().c_str(), t, h, i, j, phij);
+            model->getScenarioID().c_str(), turn, h, i, j, phij);
     sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
 
     // the following four statements could be combined into one table
     memset(sqlBuff, '\0', sqlBuffSize);
     sprintf(sqlBuff,
             "INSERT INTO UtilChlg (ScenarioId, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util_SQ,Util_Vict,Util_Cntst,Util_Chlg) VALUES ('%s',%u,%u,%u,%u,%u,%f,%f,%f,%f)",
-            model->getScenarioID().c_str(), t, h, k, i, j, euSQ, euVict, euCntst, euChlg);
+            model->getScenarioID().c_str(), turn, h, k, i, j, euSQ, euVict, euCntst, euChlg);
     sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
 
     sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);

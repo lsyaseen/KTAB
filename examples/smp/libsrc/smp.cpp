@@ -246,11 +246,7 @@ BargainSMP* SMPActor::interpolateBrgn(const SMPActor* ai, const SMPActor* aj,
 
 
 
-SMPState::SMPState(Model * m) : State(m) {
-    nra = KMatrix();
-
-    // cannot  setup AccomdateMatrix yet, because we have no actors
-    accomodate = KMatrix();
+SMPState::SMPState(Model * m) : State(m), turn(m->history.size()) {
 }
 
 
@@ -399,7 +395,7 @@ void SMPState::setAllAUtil(ReportingLevel rl) {
     auto rnUtil_ij = KMatrix::map(uFn1, na, na);
 
     if (ReportingLevel::Silent < rl) {
-        LOG(DEBUG) << "Raw actor-pos value matrix (risk neutral):";
+        LOG(DEBUG) << "Raw actor-pos value matrix (risk neutral)";
         rnUtil_ij.mPrintf(" %+.3f ");
     }
 
@@ -591,16 +587,15 @@ SMPState* SMPState::stepBCN() {
         return;
     };
     gSetup(this);
-    int myT = myTurn();
 
     // JAH 20160802 toggle population of PosUtil, PosEquiv, PosVote, and PosBrob
     // en masse based on value at index 1 of the sqlFlags vector
     // VectorPosition, which is in this same group, is handled separately
     if (model->sqlFlags[1])
     {
-        model->sqlPosEquiv(myT);
-        model->sqlPosProb(myT);
-        model->sqlPosVote(myT);
+        model->sqlPosEquiv(turn);
+        model->sqlPosProb(turn);
+        model->sqlPosVote(turn);
     }
     // That gets recorded upon the next state - but it
     // therefore misses the very last state.

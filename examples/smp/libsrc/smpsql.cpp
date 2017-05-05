@@ -469,8 +469,6 @@ void SMPState::updateBargnTable(const vector<vector<BargainSMP*>> & brgns,
                                 map<unsigned int, KBase::KMatrix>  actorBargains,
                                 map<unsigned int, unsigned int>   actorMaxBrgNdx) const {
 
-  const unsigned int t = myTurn();
-
   sqlite3 *db = model->smpDB;
   auto sqlBuff = newChars(300);
 
@@ -513,7 +511,7 @@ void SMPState::updateBargnTable(const vector<vector<BargainSMP*>> & brgns,
         initProb = (actorBargains[initActr])(initBgnNdx, 0);
         initSelected = initBgnNdx == actorMaxBrgNdx[initActr] ? 1 : 0;
 
-        bindExecuteBargnTableUpdate(updateStmt, t, bg->getID(),
+        bindExecuteBargnTableUpdate(updateStmt, turn, bg->getID(),
                                     initActr, initProb, initSelected,
                                     rcvrActr, -1.0, 0);
 
@@ -543,7 +541,7 @@ void SMPState::updateBargnTable(const vector<vector<BargainSMP*>> & brgns,
               rcvrSelected = actorMaxBrgNdx[rcvrActr] == rcvrBgNdx ? 1 : 0;
 
               --countDown;
-              bindExecuteBargnTableUpdate(updateStmt, t, bg->getID(),
+              bindExecuteBargnTableUpdate(updateStmt, turn, bg->getID(),
                                           initActr, initProb, initSelected,
                                           rcvrActr, rcvrProb, rcvrSelected);
               break;

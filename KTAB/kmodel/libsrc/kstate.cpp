@@ -31,9 +31,9 @@ using KBase::KMatrix;
 
 
 State::State(Model * m) {
-  clear();
   assert(nullptr != m);
   model = m;
+  pstns.resize(model->numAct);
 }
 
 State::~State() {
