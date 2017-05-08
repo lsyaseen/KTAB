@@ -24,17 +24,13 @@
 // --------------------------------------------
 
 #include <assert.h>
-#include <iostream>
 #include <tuple>
+#include <easylogging++.h>
 
 #include "kutils.h"
 #include "prng.h"
 
 namespace KBase {
-
-using std::cout;
-using std::endl;
-using std::flush;
 
 // -------------------------------------------------
 
@@ -117,12 +113,19 @@ VUI uiSeq(const unsigned int n1, const unsigned int n2, const unsigned int ns) {
   return uis;
 }
 
-void printVUI(const VUI& p) {
-  cout << "[VUI ";
+string stringVUI(const VUI& p) {
+  string vui("[VUI");
   for (auto i : p) {
-    printf("%2u ", i);
+    const string is = std::to_string(i);
+    vui += " " + is; // pythonic " + i" gives random memory contents
   }
-  cout << "]";
+  vui += "]";
+  return vui;
+}
+
+void printVUI(const VUI& p) {
+  const string vui = stringVUI(p);
+  LOG(DEBUG) << vui;
   return;
 }
 
@@ -134,7 +137,7 @@ void groupThreads(function<void(unsigned int)> tfn,
   using std::thread;
   const unsigned int threadsPerHWC = 4;
   unsigned int numHWC = 0;
-  unsigned int dfltNumThreads = 10;
+  const unsigned int dfltNumThreads = 10;
   if (0 == numPar) { // no specific number requested, so guess
 
     // As of OCt. 2016, this function might or might not have one or two
@@ -154,12 +157,12 @@ void groupThreads(function<void(unsigned int)> tfn,
   }
   if (ReportingLevel::Silent < rl) {
     if (0 == numHWC) {
-      cout << "Could not detect hardware concurrency" << endl;
+      LOG(WARNING) << "Could not detect hardware concurrency";
     }
     else {
-      cout << "Detected hardware concurrency: " << numHWC << endl;
+      LOG(DEBUG) << "Detected hardware concurrency:" << numHWC;
     }
-    cout << "Using groups of " << numPar << endl;
+    LOG(DEBUG) << "Using groups of" << numPar;
   }
 
   unsigned int cntr = numLow;
@@ -167,14 +170,14 @@ void groupThreads(function<void(unsigned int)> tfn,
     vector<thread> myThreads = {};
     for (unsigned int i = 0; ((i < numPar) && (cntr <= numHigh)); i++) {
       if (ReportingLevel::Medium < rl) {
-        printf("Launching thread %3u / %3u / [%3u,%3u]", i, cntr, numLow, numHigh);
-        cout << endl << flush;
+        LOG(DEBUG) << KBase::getFormattedString(
+          "Launching thread %3u / %3u / [%3u,%3u]", i, cntr, numLow, numHigh);
       }
       myThreads.push_back(thread(tfn, cntr));
       cntr++;
     }
     if (ReportingLevel::Low < rl) {
-      cout << "Joining ..." << endl;
+      LOG(DEBUG) << "Joining ...";
     }
     for (auto& ti : myThreads) {
       ti.join();
@@ -189,8 +192,8 @@ std::chrono::time_point<std::chrono::system_clock>  displayProgramStart(string a
   std::chrono::time_point<std::chrono::system_clock> st;
   st = std::chrono::system_clock::now();
   std::time_t start_time = std::chrono::system_clock::to_time_t(st);
-  cout << "  Software version: " << appName << " " << appVersion <<endl;
-  cout << "  Start time: " << std::ctime(&start_time) << endl;
+  LOG(DEBUG) << "Software version: " << appName << appVersion;
+  LOG(DEBUG) << "Start time:" << std::ctime(&start_time);
   return st;
 }
 
@@ -199,8 +202,8 @@ void displayProgramEnd(std::chrono::time_point<std::chrono::system_clock> st) {
   ft = std::chrono::system_clock::now();
   std::chrono::duration<double> eTime = ft - st;
   std::time_t fTime = std::chrono::system_clock::to_time_t(ft);
-  cout << "  Finish time: " << std::ctime(&fTime) << endl << flush;
-  printf("  Elapsed time: %.4f seconds \n", eTime.count());
+  LOG(DEBUG) << "Finish time:" << std::ctime(&fTime);
+  LOG(DEBUG) << KBase::getFormattedString("Elapsed time: %.4f seconds", eTime.count());
   return;
 }
 

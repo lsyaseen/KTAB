@@ -25,20 +25,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <iostream>
 #include <string.h>
 #include <vector>
 
 #include "prng.h"
 #include "kmatrix.h"
+#include <easylogging++.h>
 
 
 namespace KBase {
-
-using std::printf;
-using std::cout;
-using std::endl;
-using std::flush;
 
 KMatrix subMatrix(const KMatrix & m1,
                   unsigned int i1, unsigned int i2,
@@ -218,12 +213,15 @@ KMatrix KMatrix::arrayInit(const double mv[], const unsigned int & nr, const uns
 }
 
 
-void KMatrix::mPrintf(string fs) const {
+void KMatrix::mPrintf(string fs, string msg) const {
     const char * fc = fs.c_str();
-    auto pf = [fc, this](unsigned int i, unsigned int j) {
-        std::printf(fc, (*this)(i, j));
+    string rowVals = msg;
+    auto pf = [fc, this, &rowVals, msg](unsigned int i, unsigned int j) {
+        rowVals += KBase::getFormattedString(fc, (*this)(i, j));
         if (j == (this->numC() - 1)) {
-            std::printf("\n");
+            LOG(DEBUG) << rowVals;
+            // Reset the string object before processing next row in the matrix
+            rowVals.clear();
         }
         return;
     };
@@ -675,13 +673,11 @@ KMatrix firstEigenvector( const KMatrix& A, double tol) {
         change = mDelta(x,y);
 
         if (false) {
-            cout << "X"<<endl;
+            LOG(DEBUG) << "X";
             x.mPrintf("%+.4f ");
-            cout << endl << flush;
-            cout << "Y"<<endl;
+            LOG(DEBUG) << "Y";
             y.mPrintf("%+.4f ");
-            cout << endl << flush;
-            printf("At iteration %u, delta is %.4e \n", iter, change);
+            LOG(DEBUG) << KBase::getFormattedString("At iteration %u, delta is %.4e", iter, change);
         }
 
         x = unitize((x+y)/2.0); // reduces oscillations
@@ -692,7 +688,7 @@ KMatrix firstEigenvector( const KMatrix& A, double tol) {
     }
 
     if (true) {
-        printf("After iteration %u, delta is %.4e \n", iter, change);
+        LOG(DEBUG) << KBase::getFormattedString("After iteration %u, delta is %.4e", iter, change);
     }
 
     // The eigenvector is unique only up to the sign.
