@@ -26,6 +26,9 @@
 
 
 #include "demoleon.h"
+#include <easylogging++.h>
+
+INITIALIZE_EASYLOGGINGPP
 
 using std::cout;
 using std::endl;
@@ -569,9 +572,9 @@ void LeonModel::printEstGDP() {
       return ls->estGDP(i, j);
     };
     auto gdp = KMatrix::map(fn, numAct, numAct);
-    printf("For turn %u, estimated GDP by actor (row) of positions (policy): \n", t);
+    LOG(DEBUG) << "For turn" << t << ", estimated GDP by actor (row) of positions (policy):";
     gdp.mPrintf("%8.2f ");
-    cout << endl << flush;
+    LOG(DEBUG) << " ";
   }
 
   return;
@@ -1684,7 +1687,7 @@ LeonModel* demoSetup(unsigned int numFctr, unsigned int numCGrp, unsigned int nu
   using std::flush;
   using std::get;
 
-  printf("Setting up with PRNG seed:  %020llu \n", s);
+  LOG(DEBUG) << KBase::getFormattedString("Setting up with PRNG seed:  %020llu", s);
   rng->setSeed(s);
 
   // because votes, and hence coalition strengths, cannot be computed simply as a function
@@ -2438,6 +2441,8 @@ void demoRealEcon(bool OSPonly, uint64_t s, PRNG* rng)
 
 
 int main(int ac, char **av) {
+  el::Configurations confFromFile("./leon-logger.conf");
+  el::Loggers::reconfigureAllLoggers(confFromFile);
   using std::cout;
   using std::endl;
   using std::flush;

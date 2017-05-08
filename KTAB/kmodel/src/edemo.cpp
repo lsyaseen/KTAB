@@ -193,7 +193,7 @@ function < vector<VBool>()> thetaBV(unsigned int n) {
 void demoEMod(uint64_t s) {
   using KBase::EModel;
   cout << endl;
-  printf("Using PRNG seed: %020llu \n", s);
+  LOG(DEBUG) << KBase::getFormattedString("demoEMod using PRNG seed:  %020llu", s);
 
   printf("Creating EModel objects ... \n");
 

@@ -25,6 +25,10 @@
 // -------------------------------------------------
 
 #include "demomtch.h"
+#include <easylogging++.h>
+
+INITIALIZE_EASYLOGGINGPP
+
 
 using KBase::PRNG;
 
@@ -61,11 +65,13 @@ bool equivMtchPstn(const MtchPstn & mp1, const MtchPstn & mp2) {
 }
 
 void showMtchPstn(const MtchPstn & mp) {
-  cout << "[MtchPstn ";
+  string log = "[MtchPstn";
   for (auto m : mp.match) {
-    cout << m << " ";
+    log += " " + std::to_string(m);
   }
-  cout << "]";
+  log += "]";
+
+  LOG(DEBUG) << log;
   return;
 }
 
@@ -371,9 +377,9 @@ void demoDivideSweets(uint64_t s ) {
 
 
   auto c = Model::coalitions(vfn, as.size(), ps.size());
-  cout << "Coalition strength matrix" << endl;
+  LOG(DEBUG) << "Coalition strength matrix";
   c.mPrintf(" %+9.3f ");
-  cout << endl << flush;
+  LOG(DEBUG) << " "; // force newline, for legibility
 
   auto vpm = VPModel::Linear;
   auto pcem = PCEModel::ConditionalPCM;
@@ -382,14 +388,14 @@ void demoDivideSweets(uint64_t s ) {
   auto p = get<0>(ppv);
   auto pv = get<1>(ppv);
 
-  cout << "Probability Opt_i > Opt_j" << endl;
+  LOG(DEBUG) << "Probability Opt_i > Opt_j" ;
   pv.mPrintf(" %.4f ");
-  cout << endl;
-  cout << "Probability Opt_i" << endl;
+  LOG(DEBUG) ;
+  LOG(DEBUG) << "Probability Opt_i" ;
   p.mPrintf(" %.4f ");
-  cout << "Expected utility to actors: " << endl;
+  LOG(DEBUG) << "Expected utility to actors: ";
   (u*p).mPrintf(" %+8.3f ");
-  cout << endl << flush;
+  LOG(DEBUG) << " "; // force newline, for legibility
 
   for (auto a : as) { delete a; }
   for (auto p : ps) { delete p; }
@@ -411,8 +417,9 @@ void demoMaxSupport(uint64_t s) {
   mg1->numCat = numC;
   mg1->numItm = numI;
   mg1->randomize(rng);
-  cout << "Random matching of " << numI << " items to " << numA << " actors" << endl;
-  cout << (*mg1) << endl;
+  LOG(DEBUG) << "Random matching of " << numI << " items to " << numA << " actors" << endl;
+  LOG(DEBUG) << (*mg1);
+  LOG(DEBUG) << " ";// force newline
   delete mg1;
   mg1 = nullptr;
 
@@ -436,17 +443,17 @@ void demoMaxSupport(uint64_t s) {
   // S0 can give W2,W3,W4 what he does not want, and they give him what they do not want,
   // and everyone in the deal gets everything they do want. Log-rolling in action.
 
-  double minCap = 100;
-  double maxCap = 225;
+  const double minCap = 100;
+  const double maxCap = 225;
   assert(2 * maxCap <= 5 * minCap);
   assert(2 * maxCap + minCap >= 4 * minCap);
 
-  cout << "Generate actors with random voting rules, values-of-sweets and positions (matchings)" << endl;
-  cout << "Utilities are normalized to [0,1] scale" << endl;
-  cout << "minCap: " << minCap << endl;
-  cout << "maxCap: " << maxCap << endl;
-  cout << "Note: 2*maxCap          <= 5*minCap" << endl;
-  cout << "      2*maxCap + minCap >= 4*minCap" << endl << flush;
+  LOG(DEBUG) << "Generate actors with random voting rules, values-of-sweets and positions (matchings)" ;
+  LOG(DEBUG) << "Utilities are normalized to [0,1] scale" ;
+  LOG(DEBUG) << "minCap: " << minCap ;
+  LOG(DEBUG) << "maxCap: " << maxCap ;
+  LOG(DEBUG) << "Note: 2*maxCap          <= 5*minCap" ;
+  LOG(DEBUG) << "      2*maxCap + minCap >= 4*minCap"  ;
   auto as = vector<Actor*>();
   auto ps = vector<MtchPstn*>();
   for (unsigned int i = 0; i < numA; i++){
@@ -1025,6 +1032,9 @@ MtchState * MtchState::doBCN(ReportingLevel rl) const  {
 
 
 int main(int ac, char **av) {
+  // Set logging configuration from a file
+  el::Configurations confFromFile("./mtch-logger.conf");
+  el::Loggers::reconfigureAllLoggers(confFromFile);
   using std::cout;
   using std::endl;
   using std::flush;
@@ -1035,7 +1045,7 @@ int main(int ac, char **av) {
   bool run = true;
   bool dosP = false;
   bool maxSupP = false;
-  bool mtchSUSNP = true; // debugging with Visual Studio
+  bool mtchSUSNP = false;
 
   auto showHelp = []() {
     printf("\n");
