@@ -40,7 +40,7 @@
 #define KTAB_MODEL_H
 
 #include <sqlite3.h>
-
+#include <iostream>
 #include "kutils.h"
 #include "kmatrix.h"
 #include "prng.h"
