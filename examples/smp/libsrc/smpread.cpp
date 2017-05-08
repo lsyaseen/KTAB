@@ -467,12 +467,12 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
     catch (const KException& ke)
     {
         cout << "Caught KException in SMPModel::readXML: " << ke.msg << endl << flush;
-        exit(-1);
+        assert(false); // exit(-1); // easy to catch exception than inspect return value
     }
     catch (...)
     {
         cout << "Caught unidentified exception in SMPModel::readXML" << endl << flush;
-        exit(-1);
+        assert(false); // exit(-1); // easy to catch exception than inspect return value
     }
 
     posM = posM / 100.0;
