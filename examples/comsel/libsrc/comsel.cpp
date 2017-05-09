@@ -32,6 +32,7 @@
 #include "smp.h"
 #include "comsel.h"
 #include "hcsearch.h"
+#include <easylogging++.h>
 
 namespace ComSelLib {
   using std::printf;

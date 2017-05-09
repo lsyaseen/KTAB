@@ -24,6 +24,9 @@
 
 
 #include "pmdemo.h"
+#include <easylogging++.h>
+
+INITIALIZE_EASYLOGGINGPP
 
 using std::cout;
 using std::endl;
@@ -286,6 +289,8 @@ void genPMM(uint64_t sd) {
 int main(int ac, char **av) {
   using KBase::dSeed;
   using KBase::PRNG;
+  el::Configurations confFromFile("./pmatrix-logger.conf");
+  el::Loggers::reconfigureAllLoggers(confFromFile);
 
   auto sTime = KBase::displayProgramStart();
   uint64_t seed = dSeed;
@@ -345,6 +350,13 @@ int main(int ac, char **av) {
   printf("Using PRNG seed:  %020llu \n", seed);
   printf("Same seed in hex:   0x%016llX \n", seed);
 
+  const bool parP = KBase::testMultiThreadSQLite(false, KBase::ReportingLevel::Medium);
+  if (parP) {
+    LOG(DEBUG) << "Can continue with multi-threaded execution";
+  }
+  else {
+    LOG(DEBUG) << "Must continue with single-threaded execution";
+  }
   if (pmm) {
     auto pmm = PMatDemo::pmmCreation(seed);
     assert(nullptr != pmm);

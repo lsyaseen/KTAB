@@ -27,6 +27,10 @@
 //#include "kmodel.h"
 #include "agenda.h"
 #include "demo.h"
+#include <easylogging++.h>
+
+INITIALIZE_EASYLOGGINGPP
+
 using std::cout;
 using std::endl;
 using std::flush;
@@ -129,19 +133,19 @@ void demoCounting(unsigned int numI, unsigned int maxU, unsigned int maxS, unsig
 
   for (unsigned int i = 1; i <= numI + 2; i++) {
     auto n = AgendaControl::numAgenda(i);
-    printf(" %2i -> %llu \n", i, n);
+    printf(" %2u -> %llu \n", i, n);
   }
   cout << endl << flush;
 
-  printf("Using %i items: ", numI);
+  printf("Using %u items: ", numI);
   for (unsigned int i : testI) {
-    printf("%i ", i);
+    printf("%u ", i);
   }
   cout << endl << flush;
 
   auto enumAg = [numI](Agenda::PartitionRule pr, std::string s) {
     vector<Agenda*> testA = Agenda::enumerateAgendas(numI, pr);
-    printf("For %i items, found %i distinct %s agendas \n", numI, testA.size(), s.c_str());
+    printf("For %u items, found %i distinct %s agendas \n", numI, testA.size(), s.c_str());
     for (auto a : testA) {
       cout << *a << endl;
     }
@@ -178,6 +182,8 @@ int main(int ac, char **av) {
   using AgendaControl::Choice;
   using AgendaControl::Terminal;
 
+  el::Configurations confFromFile("./pmatrix-logger.conf");
+  el::Loggers::reconfigureAllLoggers(confFromFile);
   auto sTime = KBase::displayProgramStart();
   uint64_t seed = dSeed;
   bool enumP = false;

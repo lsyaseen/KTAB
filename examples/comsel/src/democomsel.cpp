@@ -27,7 +27,9 @@
 
 #include <iostream>
 #include <cstdio>
- 
+#include <string>
+#include <vector>
+
 #include "kutils.h"
 #include "kmatrix.h"
 #include "prng.h"
@@ -36,6 +38,9 @@
 #include "smp.h"
 #include "comsel.h"
 #include "democomsel.h"
+#include <easylogging++.h>
+
+INITIALIZE_EASYLOGGINGPP
 
 using namespace std;
 using KBase::VUI;
@@ -341,6 +346,10 @@ int main(int ac, char **av) {
   using std::endl;
   using std::string;
   using KBase::dSeed;
+  
+  el::Configurations confFromFile("./comsel-logger.conf");
+  el::Loggers::reconfigureAllLoggers(confFromFile);
+  
   auto sTime = KBase::displayProgramStart(DemoComSel::appName, DemoComSel::appVersion);
   uint64_t seed = dSeed; // arbitrary
   bool run = true;

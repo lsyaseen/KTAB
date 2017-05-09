@@ -378,10 +378,10 @@ int main(int ac, char **av) {
 
   const bool parP = KBase::testMultiThreadSQLite(false, KBase::ReportingLevel::Medium);  
     if (parP) {
-      LOG(DEBUG) << "Will continue with multi-threaded execution";
+      LOG(DEBUG) << "Can continue with multi-threaded execution";
     }
     else {
-      LOG(DEBUG) << "Will continue with single-threaded execution";
+      LOG(DEBUG) << "Must continue with single-threaded execution";
     }
 
   if (rp2P) {
