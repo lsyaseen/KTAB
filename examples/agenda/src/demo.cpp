@@ -182,7 +182,7 @@ int main(int ac, char **av) {
   using AgendaControl::Choice;
   using AgendaControl::Terminal;
 
-  el::Configurations confFromFile("./pmatrix-logger.conf");
+  el::Configurations confFromFile("./agenda-logger.conf");
   el::Loggers::reconfigureAllLoggers(confFromFile);
   auto sTime = KBase::displayProgramStart();
   uint64_t seed = dSeed;
@@ -235,9 +235,9 @@ int main(int ac, char **av) {
   seed = rng->setSeed(seed); // 0 == get a random number
   printf("Using PRNG seed:  %020llu \n", seed);
   printf("Same seed in hex:   0x%016llX \n", seed);
-  unsigned int maxU = 8;
-  unsigned int maxS = 10;
-  unsigned int maxB = 10;
+  const unsigned int maxU = 8;
+  const unsigned int maxS = 10;
+  const unsigned int maxB = 10;
   if (enumP) {
     AgendaControl::demoCounting(enumN, maxU, maxS, maxB);
   }
