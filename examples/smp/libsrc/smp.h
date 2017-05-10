@@ -24,10 +24,10 @@
 #ifndef SMP_LIB_H
 #define SMP_LIB_H
 
-#include <iostream>
 #include <string>
 #include <map>
 
+#include <easylogging++.h>
 #include "sqlite3.h"
 #include "kutils.h"
 #include "prng.h"
@@ -197,7 +197,7 @@ public:
   // use the parameters of your state to compute the relative probability of each actor's position
   virtual tuple< KMatrix, VUI> pDist(int persp) const;
   void showBargains(const vector < vector < BargainSMP* > > & brgns) const;
-  void showOneBargain(const BargainSMP* b) const;
+  string showOneBargain(const BargainSMP* b) const;
 
   virtual bool equivNdx(unsigned int i, unsigned int j) const;
 
@@ -223,11 +223,11 @@ public:
 
   void setPosMoverBargain(unsigned int actor, uint64_t bargainID);
 
-  void calcUtils(unsigned int i) const;  // i == actor id 
-
 protected:
 
 private:
+
+  void calcUtils(unsigned int i) const;  // i == actor id 
 
   // this sets the values in all the AUtil matrices
   virtual void setAllAUtil(ReportingLevel rl);
@@ -241,7 +241,9 @@ private:
 
   KMatrix nra = KMatrix();
 
-  SMPState* doBCN() const;
+  SMPState* doBCN();
+
+  void doBCN(unsigned int i);
 
   // returns estimated probability k wins (given likely coaltiions), and expected delta-util of that challenge.
   // If desired, record in SQLite.
@@ -286,8 +288,23 @@ private:
   
   mutable int bestJ;
 
-	private:
-		vector<double> calcVotes(KMatrix w, KMatrix u, int actor) const;
+  unsigned int turn;
+
+  vector< vector < BargainSMP* > > brgns;
+
+  KBase::KMatrix w;
+
+  SMPState* s2 = nullptr;
+
+  std::map<unsigned int, KBase::KMatrix> actorBargains;
+
+  std::map<unsigned int, unsigned int> actorMaxBrgNdx;
+
+  std::mutex mtxLock;
+
+  void updateBestBrgnPositions(int k);
+
+  vector<double> calcVotes(KMatrix w, KMatrix u, int actor) const;
 };
 
 class SMPModel : public Model {
