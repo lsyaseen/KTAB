@@ -46,7 +46,9 @@ void demoTX2(string fileName) {
     auto eid = d1.ErrorID();
     if (0 != eid) {
       cout << "ErrorID: " << eid  << endl;
-      throw KException(d1.GetErrorStr1());
+      string errMsg = string("Tinyxml2 ErrorID: ") + std::to_string(eid)
+                + ", Error Name: " + d1.ErrorName(); //  this fails to link: d1.GetErrorStr1();
+            throw KException(errMsg);
     }
     else {
       // missing data causes the missing XMLElement* to come back as nullptr,
