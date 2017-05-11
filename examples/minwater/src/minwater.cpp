@@ -31,7 +31,6 @@
 #include "2015-10-24-merged-port.h"
 #include "2015-10-24-merged-prod.h"
 #include "2015-10-24-merged-scen.h"
-
 #include <easylogging++.h>
 
 INITIALIZE_EASYLOGGINGPP
@@ -607,6 +606,8 @@ int main(int ac, char **av) {
 
     using KBase::PRNG;
     using KBase::dSeed;
+    el::Configurations confFromFile("./minwater-logger.conf");
+    el::Loggers::reconfigureAllLoggers(confFromFile);
 
     auto sTime = KBase::displayProgramStart();
 

@@ -339,29 +339,26 @@ void demoMatrix(PRNG* rng) {
         auto lhs = trans((a - b)*trans(c));
         auto rhs = c * (trans(a) - trans(b));
         double err = norm(lhs - rhs);
-        LOG(DEBUG) << getFormattedString("Norm of diff T((a-b)*T(c)) - c*(T(a)-T(b)) is %.3E ... ", err);
+        LOG(DEBUG) << getFormattedString("Norm of diff T((a-b)*T(c)) - c*(T(a)-T(b)) is %.3E ", err);
         assert(err < errTol);
-        LOG(DEBUG) << "ok";
     }
 
     LOG(DEBUG) << "Test matrix inversion";
     for (unsigned int iter = 0; iter < 10; iter++) {
-        double errTol = 1E-10;
-        unsigned int n = 5;
+        const double errTol = 1E-10;
+        const unsigned int n = 5;
         auto a = KMatrix::uniform(rng, n, n, -10, 20);
         if (0 == iter % 3) {
             a = a / 1000; // test inversion with smaller elements
         }
-        LOG(DEBUG) << getFormattedString("RMS(a)=%.4f", norm(a) / n);
+        LOG(DEBUG) << getFormattedString("\nRMS(a)=%.4f", norm(a) / n);
         auto b = inv(a);
         double diff = norm(iMat(n) - (a*b));
-        LOG(DEBUG) << getFormattedString("Norm of diff I-a*inv(a) is %.3E ... ", diff);
+        LOG(DEBUG) << getFormattedString("Norm of diff I-a*inv(a) is %.3E  ", diff);
         assert(diff < errTol);
-        LOG(DEBUG) << "ok";
         diff = norm(iMat(n) - (b*a));
-        LOG(DEBUG) << getFormattedString("Norm of diff I-inv(a)*a is %.3E ... ", diff);
+        LOG(DEBUG) << getFormattedString("Norm of diff I-inv(a)*a is %.3E  ", diff);
         assert(diff < errTol);
-        LOG(DEBUG) << "ok";
     }
 
     // JAH 20160809 added test for the new vector init
@@ -2070,7 +2067,7 @@ void parallelMatrixMult(PRNG * rng) {
 
 int main(int ac, char **av) {
     // Set logging configuration from a file
-    el::Configurations confFromFile("./conf/logger.conf");
+    el::Configurations confFromFile("./kutils-logger.conf");
     el::Loggers::reconfigureAllLoggers(confFromFile);
 
     using KBase::dSeed;

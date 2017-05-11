@@ -23,6 +23,7 @@
 
 #include <assert.h>
 #include <easylogging++.h>
+
 #include "kmodel.h"
 
 
@@ -102,12 +103,15 @@ void Model::demoSQLite()
   // application abruptly terminates mid-operation.
   sql = "PRAGMA synchronous = off;";
   rc = sExec(sql, "Set synchronous to off \n");
+  assert(SQLITE_OK == rc);
   
   sql = "PRAGMA journal_mode = off;";
   rc = sExec(sql, "Set journal_mode to off \n");
+  assert(SQLITE_OK == rc);
   
   sql = "PRAGMA locking_mode = exclusive;";
   rc = sExec(sql, "Set locking_mode to exclusive \n");
+  assert(SQLITE_OK == rc);
 
   // Create SQL statement
   sql = "create table if not exists PETS("  \
@@ -119,7 +123,9 @@ void Model::demoSQLite()
 
   // Execute SQL statement
   rc = sExec(sql, "Created table successfully \n");
-  sqlite3_close(db);
+  assert(SQLITE_OK == rc);
+  rc = sqlite3_close(db);
+  assert(SQLITE_OK == rc);
 
 
   sOpen(2);
@@ -134,26 +140,34 @@ void Model::demoSQLite()
         "VALUES (3, 'Carol', 7, 'Chihuahua', 'Tan' );"      \
         "INSERT INTO PETS (ID, NAME, AGE, SPECIES, COLOR) " \
         "VALUES (4, 'David', 5, 'Alsation', 'Mixed' );";
-  \
+  /*
   "INSERT INTO PETS (ID, NAME, AGE, SPECIES, COLOR) " \
   "VALUES (5, 'Ellie', 8, 'Rhodesian', 'Red' );";
+  */
 
-  LOG(DEBUG) << "NB: This should get one planned SQL error at ID=4";
+
+  LOG(DEBUG) << "NB: This should get one planned SQL error at ID=4"; // SPECIES should be BREED
   rc = sExec(sql, "Records inserted successfully \n");
-  sqlite3_close(db);
+  assert(SQLITE_OK != rc); // check for planned SQL error
+  rc = sqlite3_close(db);
+  assert(SQLITE_OK == rc); // avoid EFFCPP warning
 
 
   sOpen(3);
   sql = "SELECT * from PETS where AGE>5;";
   rc = sExec(sql, "Records selected successfully\n");
+  assert(SQLITE_OK == rc);
   LOG(DEBUG) << "NB: ID=5 was never inserted due to planned SQL error at ID=4";
   sqlite3_close(db);
+  assert(SQLITE_OK == rc);
 
 
   sOpen(4);
   sql = "DROP TABLE PETS;";
   rc = sExec(sql, "Dropped table successfully \n");
-  sqlite3_close(db);
+  assert(SQLITE_OK == rc);
+  rc = sqlite3_close(db);
+  assert(SQLITE_OK == rc);
 
   return;
 }

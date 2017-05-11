@@ -56,7 +56,7 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
 // --------------------------------------------
 
 void demoPCE(uint64_t s, PRNG* rng) {
-  printf("Using PRNG seed: %020llu \n", s);
+  LOG(DEBUG) << KBase::getFormattedString("demoPCE using PRNG seed:  %020llu", s);
   rng->setSeed(s);
 
   LOG(DEBUG) << "Demonstrate minimal PCE";
@@ -155,7 +155,7 @@ void demoSpVSR(uint64_t s, PRNG* rng) {
   using std::shared_ptr;
   using std::tuple;
 
-  printf("Using PRNG seed: %020llu \n", s);
+  LOG(DEBUG) << KBase::getFormattedString("demoSpVSR using PRNG seed:  %020llu", s);
   rng->setSeed(s);
 
   LOG(DEBUG) << "Demonstrate shared_ptr<void> for returns";
@@ -206,7 +206,7 @@ void demoSpVSR(uint64_t s, PRNG* rng) {
 
 int main(int ac, char **av) {
   // Set logging configuration from a file
-  el::Configurations confFromFile("./conf/logger.conf");
+  el::Configurations confFromFile("./kmodel-logger.conf");
   el::Loggers::reconfigureAllLoggers(confFromFile);
   
   using KBase::dSeed;
@@ -235,7 +235,7 @@ int main(int ac, char **av) {
     printf("--pce             simple PCE\n");
     printf("--mi              markov incentives PCE\n");
     printf("--emod  (si|cp)   simple enumerated model, starting at self-interested or central position \n");
-    printf("--fit             fit weights \n");
+    //printf("--fit             fit weights \n"); // now in pmatrix demo
     printf("--spvsr           demonstrated shared_ptr<void> return\n");
     printf("--sql             demo SQLite \n");
     printf("--tx2  <file>     demo TinyXML2 library \n"); // e.g. dummyData_3Dim.xml

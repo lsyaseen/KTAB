@@ -113,12 +113,18 @@ VUI uiSeq(const unsigned int n1, const unsigned int n2, const unsigned int ns) {
   return uis;
 }
 
-void printVUI(const VUI& p) {
-  string vui("[VUI ");
+string stringVUI(const VUI& p) {
+  string vui("[VUI");
   for (auto i : p) {
-    vui += " " + i;
+    const string is = std::to_string(i);
+    vui += " " + is; // pythonic " + i" gives random memory contents
   }
   vui += "]";
+  return vui;
+}
+
+void printVUI(const VUI& p) {
+  const string vui = stringVUI(p);
   LOG(DEBUG) << vui;
   return;
 }
@@ -131,7 +137,7 @@ void groupThreads(function<void(unsigned int)> tfn,
   using std::thread;
   const unsigned int threadsPerHWC = 4;
   unsigned int numHWC = 0;
-  unsigned int dfltNumThreads = 10;
+  const unsigned int dfltNumThreads = 10;
   if (0 == numPar) { // no specific number requested, so guess
 
     // As of OCt. 2016, this function might or might not have one or two

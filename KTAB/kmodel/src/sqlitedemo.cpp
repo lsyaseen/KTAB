@@ -95,7 +95,7 @@ tuple<unsigned int, vector<vector<string>>> SQLDB::query(const char* query)
   string error = sqlite3_errmsg(database);
   if (error != "not an error")
   {
-    LOG(DEBUG) << query << " " << error ;
+    LOG(DEBUG) << query << " " << error;
   }
   return tuple<unsigned int, vector<vector<string>>>(rowC, results);
 }
@@ -133,7 +133,7 @@ void demoDBObject()
   LOG(DEBUG) << "Selecting three records ..." ;
   auto rslt = db->query("SELECT * FROM tbl WHERE c>50;");
   unsigned int rowC = get<0>(rslt);
-  LOG(DEBUG) << "Retrieved" << rowC << "rows";
+  LOG(DEBUG) << "Retrieved "<< rowC <<" rows \n";
   vector<vector<string> > rStr = get<1>(rslt);
   for (vector<vector<string> >::iterator it = rStr.begin(); it < rStr.end(); ++it)
   {

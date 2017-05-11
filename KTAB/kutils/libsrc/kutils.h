@@ -60,7 +60,8 @@ typedef vector<unsigned int> VUI;
 typedef tuple<double, unsigned int> TDI;
 typedef vector<bool> VBool;
 
-void printVUI(const VUI& p);
+string stringVUI(const VUI& p);
+void printVUI(const VUI& p); // must have Logger intitialized
 
 enum class ReportingLevel : uint8_t { Silent = 0, Low, Medium, High, Debugging };
 

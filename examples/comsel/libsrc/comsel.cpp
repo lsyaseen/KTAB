@@ -34,7 +34,6 @@
 #include "hcsearch.h"
 #include <easylogging++.h>
 
-
 namespace ComSelLib {
   using std::get;
   using std::string;
@@ -395,6 +394,7 @@ namespace ComSelLib {
 
     auto numP = ((const unsigned int)(pstns.size()));
 
+    std::cout << "numP: " << numP << std::endl << std::flush;
 
     // Given the utility matrix, uMat, calculate the expected utility to each actor,
     // as a column-vector. Again, this is from the perspective of whoever developed uMat.
@@ -429,12 +429,7 @@ namespace ComSelLib {
     const KMatrix eu0 = euMat(uUnique); // 'u' with duplicates, 'uUnique' without duplicates
 
     CSState * s2 = new CSState((CSModel*)model);
-
-    //s2->pstns = vector<KBase::Position*>();
-    for (unsigned int h = 0; h < numA; h++) {
-      s2->pstns.push_back(nullptr);
-    }
-
+    assert(numP == s2->pstns.size());  // pre-allocated by constructor, all nullptr's
 
     // TODO: clean up the nesting of lambda-functions.
     // need to create a hypothetical state and run setOneAUtil(h,Silent) on it
@@ -629,6 +624,10 @@ namespace ComSelLib {
     }
 
     assert(nullptr != s2);
+
+    std::cout << "numP: " << numP << std::endl << std::flush;
+    std::cout << "s2->pstns.size(): " << s2->pstns.size() << std::endl << std::flush;
+
     assert(numP == s2->pstns.size());
     assert(numA == s2->model->numAct);
     for (auto p : s2->pstns) {

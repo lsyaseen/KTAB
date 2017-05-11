@@ -28,6 +28,9 @@
 // ------------------------------------------------------------------------------------
 
 namespace TXDemo {
+using std::cout;
+using std::endl;
+using std::flush;
 using std::string;
 using std::vector;
 using std::tuple;
@@ -43,8 +46,10 @@ void demoTX2(string fileName) {
     d1.LoadFile(fileName.c_str());
     auto eid = d1.ErrorID();
     if (0 != eid) {
-      LOG(DEBUG) << "ErrorID:" << eid;
-      throw KException(d1.GetErrorStr1());
+      cout << "ErrorID: " << eid  << endl;
+      string errMsg = string("Tinyxml2 ErrorID: ") + std::to_string(eid)
+                + ", Error Name: " + d1.ErrorName(); //  this fails to link: d1.GetErrorStr1();
+            throw KException(errMsg);
     }
     else {
       // missing data causes the missing XMLElement* to come back as nullptr,

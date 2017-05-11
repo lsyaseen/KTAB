@@ -33,7 +33,16 @@ using KBase::KMatrix;
 State::State(Model * m) {
   assert(nullptr != m);
   model = m;
-  pstns.resize(model->numAct);
+
+  // As we pre-size the pstns array, we must make certain the pointers do not point at junk.
+  // If the Model has been populated, then this allocates a non-zero vector.
+  // But if it is a brand-new Model, it might not have any actors, so you still
+  // have to allocate/push later.
+  const unsigned int na = model->numAct;
+  pstns.resize(na);
+  for (unsigned int i = 0; i < na; i++) {
+    pstns[i] = nullptr;
+  }
 }
 
 State::~State() {
@@ -52,7 +61,7 @@ void State::clear() {
   step = nullptr;
 }
 
-void State::addPstn(Position* p) {
+void State::pushPstn(Position* p) {
   assert(nullptr != p);
   pstns.push_back(p);
   return;

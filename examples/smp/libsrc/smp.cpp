@@ -551,13 +551,13 @@ VctrPstn SMPState::getIdeal(unsigned int n) const
 {
     return ideals[n];
 }
-void SMPState::addPstn(Position* ap) {
+void SMPState::pushPstn(Position* ap) {
     auto sp = (VctrPstn*)ap;
     auto sm = (SMPModel*)model;
     assert(1 == sp->numC());
     assert(sm->numDim == sp->numR());
 
-    State::addPstn(ap);
+    State::pushPstn(ap);
     return;
 }
 
@@ -1404,7 +1404,7 @@ SMPModel * SMPModel::initModel(vector<string> aName, vector<string> aDesc, vecto
             (*vpi)(j, 0) = pos(i, j);
         }
         sm0->addActor(ai);
-        st0->addPstn(vpi);
+        st0->pushPstn(vpi);
     }
 
     st0->setAccomodate(accM);
@@ -1985,7 +1985,7 @@ void SMPModel::randomSMP(unsigned int numA, unsigned int sDim, bool accP, uint64
         ai->randomize(md0->rng, sDim);
         auto iPos = new VctrPstn(KMatrix::uniform(md0->rng, sDim, 1, 0.0, 1.0)); // SMP is always on [0,1] scale
         md0->addActor(ai);
-        st0->addPstn(iPos);
+        st0->pushPstn(iPos);
     }
 
     for (unsigned int i = 0; i < numA; i++) {

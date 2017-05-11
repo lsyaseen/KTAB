@@ -28,7 +28,8 @@
 #include <iostream>
 #include <cstdio>
 #include <string>
- 
+#include <vector>
+
 #include "kutils.h"
 #include "kmatrix.h"
 #include "prng.h"
@@ -40,7 +41,6 @@
 #include <easylogging++.h>
 
 INITIALIZE_EASYLOGGINGPP
-
 
 using namespace std;
 using KBase::VUI;
@@ -281,7 +281,7 @@ namespace DemoComSel {
 
     auto css0 = new CSState(csm);
     csm->addState(css0);
-
+    assert(numA == css0->pstns.size()); // pre-allocated by constructor, all nullptr's
     // Either start them all at the CP or have each choose an initial position which
     // maximizes their direct utility, regardless of expected utility.
     for (unsigned int i = 0; i < numA; i++) {
@@ -294,9 +294,11 @@ namespace DemoComSel {
       if (siP) {
         pi->match = bestAP[i];
       }
-      css0->addPstn(pi);
+      css0->pstns[i] = pi;
+
+      assert(numA == css0->pstns.size()); // must be invariant
     }
-    assert(numA == css0->pstns.size());
+    
 
     css0->step = [css0]() {
       return css0->stepSUSN();
@@ -338,6 +340,10 @@ int main(int ac, char **av) {
 
   using std::string;
   using KBase::dSeed;
+  
+  el::Configurations confFromFile("./comsel-logger.conf");
+  el::Loggers::reconfigureAllLoggers(confFromFile);
+  
   auto sTime = KBase::displayProgramStart(DemoComSel::appName, DemoComSel::appVersion);
   uint64_t seed = dSeed; // arbitrary
   bool run = true;

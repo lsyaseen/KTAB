@@ -368,7 +368,7 @@ LeonState* LeonState::doSUSN(ReportingLevel rl) const {
 
 
   s2 = new LeonState((LeonModel *)model);
-
+  assert(model->numAct == s2->pstns.size());
   for (unsigned int h = 0; h < numA; h++) {
     auto vhc = new KBase::VHCSearch();
     vhc->eval = [this, h, assessEU](const KMatrix & m1) {
@@ -409,9 +409,11 @@ LeonState* LeonState::doSUSN(ReportingLevel rl) const {
     trans(rBest).mPrintf(" %+.6f ");
 
     VctrPstn * posBest = new VctrPstn(rBest);
-    s2->pstns.push_back(posBest);
+    //s2->pstns.push_back(posBest);
+    assert(nullptr == s2->pstns[h]); // make sure it was empty
+    s2->pstns[h] = posBest;
 
-    double du = vBest - eu0(h, 0);
+    const double du = vBest - eu0(h, 0);
     LOG(DEBUG) << KBase::getFormattedString("EU improvement for %2u of %+.4E", h, du);
     //printf("  vBest = %+.6f \n", vBest);
     //printf("  eu0(%i, 0) for %i = %+.6f \n", h, h, eu0(h,0));
@@ -575,7 +577,7 @@ tuple<KMatrix, KMatrix, KMatrix, KMatrix> LeonModel::makeBaseYear(unsigned int n
   LOG(DEBUG) << " T T T T C X";
   LOG(DEBUG) << " V V V V";
   LOG(DEBUG) << " V V V V";
-
+  LOG(DEBUG) << "    "; // force blank line
   LOG(DEBUG) << "Synthetic data has"
     << L << "factors," << M << "consumption groups," << N << "industrial sectors"
     << "and one export sector (with constant elasticity demand)";
@@ -698,6 +700,7 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
   using KBase::iMat;
   using KBase::norm;
 
+  LOG(DEBUG) << " "; // force blank line
   LOG(DEBUG) << "Build I/O model from base-year data";
 
   x0 = xprt;
@@ -765,7 +768,7 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
     sumVAClms(0, j) = svc;
   }
 
-  LOG(DEBUG) << " check (export + cons = value added) ... ";
+  LOG(DEBUG) << " check (export + cons = value added)";
   assert(fabs(sxc + sCons - sVA) < 0.001);
   LOG(DEBUG) << "ok";
 
@@ -1725,7 +1728,7 @@ LeonModel* demoSetup(unsigned int numFctr, unsigned int numCGrp, unsigned int nu
 
     for (unsigned int i = 0; i < numA; i++) {
       eMod0->addActor(es[i]);
-      eSt0->addPstn(ps[i]);
+      eSt0->pushPstn(ps[i]);
     }
   }
   // end of local-var block
@@ -1920,6 +1923,7 @@ void demoRealEcon(bool OSPonly, uint64_t s, PRNG* rng)
         LOG(DEBUG) << "Quiet";
       else
         LOG(DEBUG) << "Not Quiet";
+
     }
     return (tooLong || quiet);
   };
@@ -2151,7 +2155,7 @@ void demoRealEcon(bool OSPonly, uint64_t s, PRNG* rng)
 
     for (unsigned int i = 0; i < numA; i++) {
       eMod0->addActor(es[i]);
-      eSt0->addPstn(ps[i]);
+      eSt0->pushPstn(ps[i]);
     }
   }
   // end of local-var block
@@ -2314,7 +2318,7 @@ void demoRealEcon(bool OSPonly, uint64_t s, PRNG* rng)
 
 
 int main(int ac, char **av) {
-  el::Configurations confFromFile("./conf/logger.conf");
+  el::Configurations confFromFile("./leon-logger.conf");
   el::Loggers::reconfigureAllLoggers(confFromFile);
   using KBase::dSeed;
 

@@ -33,6 +33,9 @@ INITIALIZE_EASYLOGGINGPP
 using KBase::PRNG;
 
 namespace DemoMtch {
+using std::cout;
+using std::endl;
+using std::flush;
 using std::function;
 using std::get;
 using std::tuple;
@@ -188,7 +191,7 @@ MtchActor* MtchActor::rAct(unsigned int numI, double minCap, double maxCap, PRNG
 }
 
 // -------------------------------------------------
-MtchState::MtchState(Model* mod) : State(mod){
+MtchState::MtchState(Model* mod) : State(mod) {
   //
 }
 
@@ -280,12 +283,15 @@ MtchModel* MtchModel::randomMS(unsigned int numA, unsigned int numI, VotingRule 
   md0->numItm = numI;
   md0->numCat = numC;
   auto st0 = new MtchState(md0);
-  for (unsigned int i = 0; i < numA; i++){
+  // pre-allocated by constructor, all nullptr's
+  // However, there are no actors yet, so it is pre-allocated to zero items.
+  assert(0 == st0->pstns.size()); 
+  for (unsigned int i = 0; i < numA; i++) {
     auto ai = MtchActor::rAct(numI, minCap, maxCap, md0->rng, i);
     ai->vr = vr;
     MtchPstn* pi = MtchActor::rPos(numI, numA, md0->rng);
     md0->addActor(ai);
-    st0->addPstn(pi);
+    st0->pushPstn(pi);
 
     LOG(DEBUG) << i << ":" << ai->name << "," << ai->desc;
     LOG(DEBUG) << KBase::getFormattedString("Scalar capability: %.2f", ai->sCap);
@@ -299,7 +305,7 @@ MtchModel* MtchModel::randomMS(unsigned int numA, unsigned int numI, VotingRule 
     LOG(DEBUG) << valOfSweet;
     showMtchPstn(*pi);
   }
-
+  assert(numA == st0->pstns.size()); // now they shouuld match
   md0->addState(st0);
   return md0;
 }
@@ -375,6 +381,7 @@ void demoDivideSweets(uint64_t s ) {
   auto c = Model::coalitions(vfn, as.size(), ps.size());
   LOG(DEBUG) << "Coalition strength matrix";
   c.mPrintf(" %+9.3f ");
+  LOG(DEBUG) << " "; // force newline, for legibility
 
   auto vpm = VPModel::Linear;
   auto pcem = PCEModel::ConditionalPCM;
@@ -383,12 +390,14 @@ void demoDivideSweets(uint64_t s ) {
   auto p = get<0>(ppv);
   auto pv = get<1>(ppv);
 
-  LOG(DEBUG) << "Probability Opt_i > Opt_j";
+  LOG(DEBUG) << "Probability Opt_i > Opt_j" ;
   pv.mPrintf(" %.4f ");
-  LOG(DEBUG) << "Probability Opt_i";
+  LOG(DEBUG) ;
+  LOG(DEBUG) << "Probability Opt_i" ;
   p.mPrintf(" %.4f ");
-  LOG(DEBUG) << "Expected utility to actors:";
+  LOG(DEBUG) << "Expected utility to actors: ";
   (u*p).mPrintf(" %+8.3f ");
+  LOG(DEBUG) << " "; // force newline, for legibility
 
   for (auto a : as) { delete a; }
   for (auto p : ps) { delete p; }
@@ -410,8 +419,9 @@ void demoMaxSupport(uint64_t s) {
   mg1->numCat = numC;
   mg1->numItm = numI;
   mg1->randomize(rng);
-  LOG(DEBUG) << "Random matching of" << numI << "items to" << numA << "actors";
+  LOG(DEBUG) << "Random matching of " << numI << " items to " << numA << " actors" << endl;
   LOG(DEBUG) << (*mg1);
+  LOG(DEBUG) << " ";// force newline
   delete mg1;
   mg1 = nullptr;
 
@@ -435,17 +445,17 @@ void demoMaxSupport(uint64_t s) {
   // S0 can give W2,W3,W4 what he does not want, and they give him what they do not want,
   // and everyone in the deal gets everything they do want. Log-rolling in action.
 
-  double minCap = 100;
-  double maxCap = 225;
+  const double minCap = 100;
+  const double maxCap = 225;
   assert(2 * maxCap <= 5 * minCap);
   assert(2 * maxCap + minCap >= 4 * minCap);
 
-  LOG(DEBUG) << "Generate actors with random voting rules, values-of-sweets and positions (matchings)";
-  LOG(DEBUG) << "Utilities are normalized to [0,1] scale";
-  LOG(DEBUG) << "minCap:" << minCap;
-  LOG(DEBUG) << "maxCap:" << maxCap;
-  LOG(DEBUG) << "Note: 2*maxCap          <= 5*minCap";
-  LOG(DEBUG) << "      2*maxCap + minCap >= 4*minCap";
+  LOG(DEBUG) << "Generate actors with random voting rules, values-of-sweets and positions (matchings)" ;
+  LOG(DEBUG) << "Utilities are normalized to [0,1] scale" ;
+  LOG(DEBUG) << "minCap: " << minCap ;
+  LOG(DEBUG) << "maxCap: " << maxCap ;
+  LOG(DEBUG) << "Note: 2*maxCap          <= 5*minCap" ;
+  LOG(DEBUG) << "      2*maxCap + minCap >= 4*minCap"  ;
   auto as = vector<Actor*>();
   auto ps = vector<MtchPstn*>();
   for (unsigned int i = 0; i < numA; i++){
@@ -920,10 +930,11 @@ void MtchState::setAllAUtil(ReportingLevel rl) {
 }
 
 MtchState * MtchState::doSUSN(ReportingLevel rl) const {
+  const unsigned int numA = model->numAct;
 
   MtchState * s2 = new MtchState(model);
+  assert(numA == s2->pstns.size()); // pre-allocated by constructor, all nullptr's
 
-  const unsigned int numA = model->numAct;
   for (unsigned int ih = 0; ih < numA; ih++) {
     MtchActor* ah = (MtchActor*)(model->actrs[ih]);
     if (ReportingLevel::Low < rl) {
@@ -958,8 +969,8 @@ MtchState * MtchState::doSUSN(ReportingLevel rl) const {
 
     MtchPstn* oldPi = (MtchPstn*)(pstns[ih]);
     MtchPstn* newPi = new MtchPstn(get<1>(evmp));
-    s2->addPstn(newPi);
-
+    s2->pstns[ih] = newPi;
+    assert(numA == s2->pstns.size());
     if (ReportingLevel::Low < rl) {
       LOG(DEBUG) << "Old position" << ih << ":"; showMtchPstn(*oldPi);
       LOG(DEBUG) << "New position" << ih << ":"; showMtchPstn(*newPi);
@@ -1007,9 +1018,8 @@ MtchState * MtchState::doBCN(ReportingLevel rl) const  {
 
 int main(int ac, char **av) {
   // Set logging configuration from a file
-  el::Configurations confFromFile("./conf/logger.conf");
+  el::Configurations confFromFile("./mtch-logger.conf");
   el::Loggers::reconfigureAllLoggers(confFromFile);
-
   using KBase::dSeed;
 
   auto sTime = KBase::displayProgramStart();
@@ -1017,7 +1027,7 @@ int main(int ac, char **av) {
   bool run = true;
   bool dosP = false;
   bool maxSupP = false;
-  bool mtchSUSNP = true; // debugging with Visual Studio
+  bool mtchSUSNP = false;
 
   auto showHelp = []() {
     printf("\n");

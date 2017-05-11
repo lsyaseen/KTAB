@@ -148,7 +148,7 @@ void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, cons
     }
     unsigned int ki = cpP ? ndxMaxZ : bestJ;
     auto pi = new PMatrixPos(eKEM, ki);
-    es1->addPstn(pi);
+    es1->pushPstn(pi);
   }
 
   es1->setUENdx();
@@ -279,6 +279,8 @@ int main(int ac, char **av) {
 
   using KBase::dSeed;
   using KBase::PRNG;
+  el::Configurations confFromFile("./pmatrix-logger.conf");
+  el::Loggers::reconfigureAllLoggers(confFromFile);
 
   auto sTime = KBase::displayProgramStart();
   uint64_t seed = dSeed;
@@ -338,6 +340,13 @@ int main(int ac, char **av) {
   LOG(DEBUG) << KBase::getFormattedString("Using PRNG seed:  %020llu", seed);
   LOG(DEBUG) << KBase::getFormattedString("Same seed in hex:   0x%016llX", seed);
 
+  const bool parP = KBase::testMultiThreadSQLite(false, KBase::ReportingLevel::Medium);
+  if (parP) {
+    LOG(DEBUG) << "Can continue with multi-threaded execution";
+  }
+  else {
+    LOG(DEBUG) << "Must continue with single-threaded execution";
+  }
   if (pmm) {
     auto pmm = PMatDemo::pmmCreation(seed);
     assert(nullptr != pmm);

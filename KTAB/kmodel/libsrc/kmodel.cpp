@@ -23,6 +23,7 @@
 
 #include <assert.h>
 #include <easylogging++.h>
+
 #include <time.h>
 #include "kmodel.h"
 
@@ -32,6 +33,11 @@ using std::get;
 using std::tuple;
 
 using KBase::nameFromEnum;
+
+// --------------------------------------------
+// Global Variables
+
+static std::mutex mtx_spce_log; // control access to log inside Model::scalarPCE
 
 // --------------------------------------------
 
@@ -47,10 +53,10 @@ Model::Model(string desc, uint64_t sd, vector<bool> f, string Name) {
   rng = nullptr;
 
   sqlFlags = f; // JAH 20160730 save the vec of SQL flags
-  LOG(DEBUG) << "SQL Logging Flags";
+  LOG(DEBUG) << "SQL Logging Flags ";
   for (unsigned int i = 0; i < sqlFlags.size(); i++)
   {
-    LOG(DEBUG) << "Grp" << i << "=" << sqlFlags[i] ? 1 : 0;
+    LOG(DEBUG) << "Grp" << i << "=" << (sqlFlags[i] ? 1 : 0); // "a<<b?c:d" was "suspicious code"
   }
 
   // Record the UTC time so it can be used as the default scenario name
@@ -81,7 +87,7 @@ Model::Model(string desc, uint64_t sd, vector<bool> f, string Name) {
 
   if (0 == Name.length()) {
     LOG(WARNING) << "No scenario description provided to Model::Model";
-    LOG(DEBUG) << "Using default description generated from UTC start time.";
+    LOG(DEBUG) << "Using default description generated from UTC start time." ;
 
     scenName = utcBuff;
   }
@@ -735,7 +741,6 @@ KMatrix Model::condPCE(const KMatrix & pv) {
   return p;
 }
 
-std::mutex mtxLock_spce;
 
 // calculate the [option,1] column vector of option-probabilities.
 // w is a [1,actor] row-vector of actor strengths, u is [act,option] utilities.
@@ -757,7 +762,7 @@ KMatrix Model::scalarPCE(unsigned int numAct, unsigned int numOpt, const KMatrix
   const auto p = get<0>(pv2); //column
   const auto pv = get<1>(pv2); // square
 
-  mtxLock_spce.lock();
+  mtx_spce_log.lock();
   if (ReportingLevel::Low < rl) {
     LOG(DEBUG) << "Num actors:" << numAct;
     LOG(DEBUG) << "Num options:" << numOpt;
@@ -780,7 +785,7 @@ KMatrix Model::scalarPCE(unsigned int numAct, unsigned int numOpt, const KMatrix
     }
     LOG(DEBUG) << "Found stable PCE distribution";
   }
-  mtxLock_spce.unlock();
+  mtx_spce_log.unlock();
   return p;
 }
 

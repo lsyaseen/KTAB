@@ -320,8 +320,10 @@ void RPModel::readXML(string fileName)
     auto eid = d1.ErrorID();
     if (0 != eid)
     {
-      LOG(DEBUG) << "ErrorID: " << eid;
-      throw KException(d1.GetErrorStr1());
+      cout << "ErrorID: " << eid << endl;
+      string errMsg = string("Tinyxml2 ErrorID: ") + std::to_string(eid)
+                + ", Error Name: " + d1.ErrorName(); //  this fails to link: d1.GetErrorStr1();
+            throw KException(errMsg);
     }
     else
     {
@@ -825,12 +827,7 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
   const KMatrix eu0 = euMat(uUnique); // 'u' with duplicates, 'uUnique' without duplicates
 
   RPState* s2 = new RPState(model);
-
-  //s2->pstns = vector<KBase::Position*>();
-  for (unsigned int h = 0; h < numA; h++)
-  {
-    s2->pstns.push_back(nullptr);
-  }
+  assert(numA == s2->pstns.size()); // pre-allocated by constructor, all nullptr's
 
   // TODO: clean up the nesting of lambda-functions.
   // need to create a hypothetical state and run setOneAUtil(h,Silent) on it

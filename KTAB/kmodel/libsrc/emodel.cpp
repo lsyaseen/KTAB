@@ -284,19 +284,19 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
   const auto eu0 = expUtilMat(rl, numA, numP, vpm, uUnique); //  without duplicates
 
   if (ReportingLevel::Low < rl) {
-    printf("--------------------------------------- \n");
-    printf("Actor expected utilities in actual state: \n");
+    LOG(DEBUG) << "--------------------------------------- ";
+    LOG(DEBUG) << "Actor expected utilities in actual state: ";
     for (unsigned int h = 0; h < numA; h++)
     {
-      printf("%3u , %.5f \n", h, eu0(h, 0));
+      LOG(DEBUG) << KBase::getFormattedString("%3u , %.5f \n", h, eu0(h, 0));
     }
     LOG(DEBUG) << "Positions in this state: ";
     show();
 
-    printf("Out of %u positions, %u were unique, with these indices: ", numA, numU);
+    LOG(DEBUG) << KBase::getFormattedString("Out of %u positions, %u were unique, with these indices: ", numA, numU);
     for (auto i : uIndices)
     {
-      printf("%2i ", i);
+      LOG(DEBUG) << KBase::getFormattedString("%2i ", i);
     }
   }
 
@@ -381,10 +381,10 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
 
 
     if (ReportingLevel::Low < rl) {
-      printf("--------------------------------------- \n");
-      printf("Assessing utility to %2i of hypo-pos: ", h);
+      LOG(DEBUG) << "--------------------------------------- ";
+      LOG(DEBUG) << KBase::getFormattedString("Assessing utility to %2i of hypo-pos: ", h);
       LOG(DEBUG) << eph;
-      printf("Hypo-util minus base util: \n");
+      LOG(DEBUG) << "Hypo-util minus base util: ";
       (uh - uh0).mPrintf(" %+.4E ");
     }
 
@@ -442,8 +442,8 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
     };
 
     if (ReportingLevel::Low < rl) {
-      printf("---------------------------------------- \n");
-      printf("Search for best next-position of actor %2i \n", h);
+      LOG(DEBUG) << "---------------------------------------- ";
+      LOG(DEBUG) << KBase::getFormattedString("Search for best next-position of actor %2i ", h);
     }
     auto rslt = ghc->run(*ph, // start from h's current positions
                          ReportingLevel::Silent,
@@ -457,8 +457,8 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
     ghc = nullptr;
 
     if (ReportingLevel::Medium < rl) {
-      printf("Iter: %u  Stable: %u \n", iterN, stblN);
-      printf("Best value for %2i: %+.6f \n", h, vBest);
+      LOG(DEBUG) << KBase::getFormattedString("Iter: %u  Stable: %u \n", iterN, stblN);
+      LOG(DEBUG) << KBase::getFormattedString("Best value for %2i: %+.6f \n", h, vBest);
       LOG(DEBUG) << "Best position:    " << pBest;
     }
 
@@ -471,11 +471,11 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
 
     double du = vBest - eu0(h, 0); // (hypothetical, future) - (actual, current)
     if (ReportingLevel::Low < rl) {
-      printf("Expected EU improvement for %2i of %+.4E \n", h, du);
+      LOG(DEBUG) << KBase::getFormattedString("Expected EU improvement for %2i of %+.4E \n", h, du);
       if (ReportingLevel::Medium < rl) {
-        printf("  vBest = %+.6f \n", vBest);
-        printf("  eu0(%i, 0) for %i = %+.6f \n", h, h, eu0(h,0));
-        printf("  du = %+.6f \n", du);
+        LOG(DEBUG) << KBase::getFormattedString("  vBest = %+.6f \n", vBest);
+        LOG(DEBUG) << KBase::getFormattedString("  eu0(%i, 0) for %i = %+.6f \n", h, h, eu0(h,0));
+        LOG(DEBUG) << KBase::getFormattedString("  du = %+.6f \n", du);
       }
     }
     // Logically, du should always be non-negative, as GHC never returns a worse value than the starting point.
@@ -594,19 +594,19 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
   const auto eu0 = expUtilMat(rl, numA, numP, vpm, uUnique);
 
   if (ReportingLevel::Low < rl) {
-    printf("--------------------------------------- \n");
-    printf("Assessing utility of actual state to all actors \n");
+    LOG(DEBUG) << "--------------------------------------- ";
+    LOG(DEBUG) << "Assessing utility of actual state to all actors ";
     for (unsigned int h = 0; h < numA; h++)
     {
-      printf("%3u , %.5f \n", h, eu0(h, 0));
+      LOG(DEBUG) << KBase::getFormattedString("%3u , %.5f \n", h, eu0(h, 0));
     }
     LOG(DEBUG) << "Positions in this state: ";
     show();
 
-    printf("Out of %u positions, %u were unique, with these indices: ", numA, numU);
+    LOG(DEBUG) << KBase::getFormattedString("Out of %u positions, %u were unique, with these indices: ", numA, numU);
     for (auto i : uIndices)
     {
-      printf("%2i ", i);
+      LOG(DEBUG) << KBase::getFormattedString("%2i ", i);
     }
   }
 
@@ -734,7 +734,7 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
       bestZeta = zi;
       bestNghbr = i;
       if (ReportingLevel::Low < rl) {
-        printf("New best neighbor is %u with z=%.4f (delta=%.2E)\n",
+        LOG(DEBUG) << KBase::getFormattedString("New best neighbor is %u with z=%.4f (delta=%.2E)\n",
                i, zi, delta);
         KBase::printVUI(ni);
       }
@@ -770,7 +770,7 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
 
   VUI nghbr = neighbors[bestNghbr];
   if (ReportingLevel::Silent < rl) {
-    printf("Highest zeta is %.5f for state %u: \n", bestZeta, bestNghbr);
+    LOG(DEBUG) << KBase::getFormattedString("Highest zeta is %.5f for state %u: \n", bestZeta, bestNghbr);
     printVUI(nghbr);
   }
 
@@ -810,7 +810,7 @@ VUI EState<PT>::powerWeightedSimilarity(const KMatrix& uMat, unsigned int ti, un
       const double duj = uMat(j,ti) - uMat(j, k);
       dk = dk + (sj*duj*duj);
     }
-    //printf("%2u PW %.4f \n", k, dk);
+    //LOG(DEBUG) << KBase::getFormattedString("%2u PW %.4f \n", k, dk);
     vdk[k] = TDI(dk, k);
   }
 
@@ -910,7 +910,7 @@ KMatrix EState<PT>::expUtilMat  (KBase::ReportingLevel rl,
     const bool okLower = (0.0 <= mij + tol);
     const bool okUpper = (mij <= 1.0 + tol);
     if (!okLower || !okUpper) {
-      printf("%f  %i  %i  \n", mij, i, j);
+      LOG(DEBUG) << KBase::getFormattedString("%f  %i  %i  \n", mij, i, j);
     }
     assert(okLower);
     assert(okUpper);
@@ -947,7 +947,7 @@ KMatrix EState<PT>::expUtilMat  (KBase::ReportingLevel rl,
   KMatrix::mapV(euRng, eu.numR(), eu.numC());
 
   if (ReportingLevel::Low < rl) {
-    printf("Util matrix is %u x %u \n", uMat.numR(), uMat.numC());
+    LOG(DEBUG) << KBase::getFormattedString("Util matrix is %u x %u \n", uMat.numR(), uMat.numC());
     LOG(DEBUG) << "Assessing EU from util matrix: ";
     uMat.mPrintf(" %.6f ");
 

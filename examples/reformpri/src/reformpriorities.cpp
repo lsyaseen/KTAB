@@ -23,6 +23,7 @@
 // Define the functions and methods unique to the Priority case.
 // -------------------------------------------------
 
+#include "kutils.h"
 #include "reformpriorities.h"
 #include "rplib2.h"
 #include <tuple>
@@ -47,7 +48,7 @@ using std::get;
 // with the CP last.
 // As a side-affect, set each actor's min/max permutation values so as to
 // compute normalized utilities later.
-vector<VUI> scanPositions(const RPModel * rpm) {
+vector<VUI> scanAllPossiblePositions(const RPModel * rpm) {
   unsigned int numA = rpm->numAct;
   unsigned int numRefItem = rpm->numItm;
   assert(numRefItem == rpm->numCat);
@@ -82,17 +83,17 @@ vector<VUI> scanPositions(const RPModel * rpm) {
   LOG(DEBUG) << log;
 
   LOG(DEBUG) << "Computing positions ... ";
-  vector<VUI> positions; // list of all positions
+  vector<VUI> allPositions; // list of all possiblepositions
   VUI pstn;
-  // build the first permutation: 1,2,3,...
+  // build the first permutation: 0,1,2,3,...
   for (unsigned int i = 0; i < numRefItem; i++) {
     pstn.push_back(i);
   }
-  positions.push_back(pstn);
+  allPositions.push_back(pstn);
   while (next_permutation(pstn.begin(), pstn.end())) {
-    positions.push_back(pstn);
+    allPositions.push_back(pstn);
   }
-  const unsigned int numPos = positions.size();
+  const unsigned int numPos = allPositions.size();
   LOG(DEBUG) << "For" << numRefItem << "reform items there are"
    << numPos << "positions";
 
@@ -104,14 +105,17 @@ vector<VUI> scanPositions(const RPModel * rpm) {
   // Then we scan across rows to find that actor's pvMin/pvMax, and record that
   // so utilActorPos can use it in the future. Finally, we normalize the rows and
   // display the normalized utility matrix.
-  LOG(DEBUG) << "Computing utilities of positions ... ";
-  auto ruFn = [positions, rpm](unsigned int ai, unsigned int pj) {
-    auto pstn = positions[pj];
+  auto ruFn = [allPositions, rpm](unsigned int ai, unsigned int pj) {
+    auto pstn = allPositions[pj];
     double uip = rpm->utilActorPos(ai, pstn);
     return uip;
   };
+
+  LOG(DEBUG) << "Computing utilities of positions ... ";
   // rows are actors, columns are all possible positions
   auto rawUij = KMatrix::map(ruFn, numA, numPos);
+
+  // set the min/max for each actor
   for (unsigned int i = 0; i < numA; i++) {
     double pvMin = rawUij(i, 0);
     double pvMax = rawUij(i, 0);
@@ -130,28 +134,21 @@ vector<VUI> scanPositions(const RPModel * rpm) {
     ai->posValMin = pvMin;
     ai->posValMax = pvMax;
   }
+  LOG(DEBUG) << "Normalizing utilities of positions ... ";
   KMatrix uij = KBase::rescaleRows(rawUij, 0.0, 1.0); // von Neumann utility scale
 
-  auto printPstn = [](const VUI& p) {
-    string vui("[VUI ");
-    for (auto i : p) {
-      vui += " " + i;
-    }
-    vui += "]";
-    return vui;
-  };
-
-  string utilMtx("Complete (normalized) utility matrix of all possible positions (rows) versus actors (columns)");
+  string utilMtx("Complete (normalized) utility matrix of all possible positions (rows) versus actors (columns) \n");
   for (unsigned int pj = 0; pj < numPos; pj++) {
     utilMtx += KBase::getFormattedString("%3u  ", pj);
-    auto pstn = positions[pj];
-    printVUI(pstn);
-    utilMtx += printPstn(pstn);
+    auto pstn = allPositions[pj];
+    //printVUI(pstn);
+    utilMtx += KBase::stringVUI(pstn);
     utilMtx += "  ";
     for (unsigned int ai = 0; ai < numA; ai++) {
       double uap = uij(ai, pj);
       utilMtx += KBase::getFormattedString("%6.4f, ", uap);
     }
+    utilMtx += KBase::getFormattedString("\n");
   }
   LOG(DEBUG) << utilMtx;
 
@@ -170,9 +167,15 @@ vector<VUI> scanPositions(const RPModel * rpm) {
         bestV = uij(ai, pj);
       }
     }
-    LOG(DEBUG) << "Best for" << ai << "is ";
-    printVUI(positions[bestJ]);
-    bestAP.push_back(positions[bestJ]);
+    string bestMtx("Best position for ");
+    string ais = std::to_string(ai);
+    //string bjs = std::to_string(bestJ);
+    string ps = KBase::stringVUI(allPositions[bestJ]);
+    bestMtx += ais + " is " + ps;
+    LOG(DEBUG) << bestMtx; 
+    //LOG(DEBUG) << "Best for" << ai << "is ";
+    //printVUI(positions[bestJ]);
+    bestAP.push_back(allPositions[bestJ]);
   }
 
 
@@ -193,7 +196,7 @@ vector<VUI> scanPositions(const RPModel * rpm) {
 
   auto pairs = vector<tuple<unsigned int, double, VUI>>();
   for (unsigned int i = 0; i < numPos; i++) {
-    auto pri = tuple<unsigned int, double, VUI>(i, zeta(0, i), positions[i]);
+    auto pri = tuple<unsigned int, double, VUI>(i, zeta(0, i), allPositions[i]);
     pairs.push_back(pri);
   }
 
@@ -208,9 +211,9 @@ vector<VUI> scanPositions(const RPModel * rpm) {
     unsigned int ni = get<0>(pri);
     double zi = get<1>(pri);
     VUI pi = get<2>(pri);
-
-    LOG(DEBUG) << KBase::getFormattedString(" %3u: %4u  %.2f  ", i, ni, zi);
-    printVUI(pi);
+    string ps = KBase::stringVUI(pi);
+    LOG(DEBUG) << KBase::getFormattedString(" %3u: %4u  %.2f  %s", i, ni, zi, ps.c_str());
+    //printVUI(pi);
   }
 
   VUI bestPerm = get<2>(pairs[0]);
@@ -263,7 +266,7 @@ void rp2Creation(uint64_t sd) {
 // -------------------------------------------------
 
 int main(int ac, char **av) {
-  el::Configurations confFromFile("./conf/logger.conf");
+  el::Configurations confFromFile("./rpdemo-logger.conf");
   el::Loggers::reconfigureAllLoggers(confFromFile);
 
   using KBase::ReportingLevel;
@@ -273,7 +276,7 @@ int main(int ac, char **av) {
   using RfrmPri::RPModel;
   using RfrmPri::RPState;
   using RfrmPri::RPActor;
-  using RfrmPri::printPerm;
+  //using RfrmPri::printPerm;
 
   auto sTime = KBase::displayProgramStart(RfrmPri::appName, RfrmPri::appVersion);
   uint64_t seed = dSeed; // arbitrary;
@@ -300,6 +303,8 @@ int main(int ac, char **av) {
     printf("                  default: %020llu \n", dSeed);
     printf("--sNum <n>        choose a scenario number \n");
     printf("                  default: %u \n", sNum);
+    printf("                  0: random example, potentially VERY large \n");
+    printf("                  1: hard-coded example, moderate size \n");
     printf("--xml <f>         read XML scenario from a given file \n");
     printf("\n");
     printf("For example, rpdemo --si  --xml rpdata.xml, would read the file rpdata.xml \n");
@@ -370,6 +375,15 @@ int main(int ac, char **av) {
   // Unix correctly prints all digits with lu, lX, llu, and llX.
   // Windows only prints part, with lu, lX, llu, and llX.
 
+
+  const bool parP = KBase::testMultiThreadSQLite(false, KBase::ReportingLevel::Medium);  
+    if (parP) {
+      LOG(DEBUG) << "Can continue with multi-threaded execution";
+    }
+    else {
+      LOG(DEBUG) << "Must continue with single-threaded execution";
+    }
+
   if (rp2P) {
     RfrmPri2::rp2Creation(seed);
     return 0;
@@ -383,8 +397,6 @@ int main(int ac, char **av) {
   else {
     switch (sNum) {
     case 0:
-      rpm->initScen(sNum);
-      break;
     case 1:
       rpm->initScen(sNum);
       break;
@@ -403,12 +415,16 @@ int main(int ac, char **av) {
   auto rps0 = new RPState(rpm);
   rpm->addState(rps0);
 
-  auto pstns = RfrmPri::scanPositions(rpm);
-  KBase::VUI bestPerm = pstns[numA];
+  // NOTE WELL: Records each actor's most self-interested position, but does not set them.
+  // Further, it appends Central Position after the last actor position
+  auto siPstns = RfrmPri::scanAllPossiblePositions(rpm);
+  assert(numA + 1 == siPstns.size());
+  const KBase::VUI bestPerm = siPstns[numA];
   assert(numR == bestPerm.size());
+  assert(numA == rps0->pstns.size()); // pre-allocated by constructor, all nullptr's
 
-  // Either start them all at the CP or have each to choose an initial position which
-  // maximizes their direct utility, regardless of expected utility.
+  // Move them all to either the CP or to SI positions which
+  // maximize their direct utility, regardless of expected utility.
   for (unsigned int i = 0; i < numA; i++) {
     auto pi = new  MtchPstn();
     pi->numCat = numR;
@@ -416,10 +432,10 @@ int main(int ac, char **av) {
     if (cpP) {
       pi->match = bestPerm;
     }
-    if (siP) {
-      pi->match = pstns[i];
+    else {
+      pi->match = siPstns[i];
     }
-    rps0->addPstn(pi);
+    rps0->pstns[i] = pi;
   }
   assert(numA == rps0->pstns.size());
 

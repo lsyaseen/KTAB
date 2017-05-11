@@ -249,9 +249,9 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
         d1.LoadFile(fName.c_str());
         auto eid = d1.ErrorID();
         if (0 != eid) {
-            string errMsg = string("Tinyxml2 ErrorID: ") + std::to_string(eid)
-                + ", Error Name: " + d1.ErrorName() 
-                + " " + d1.GetErrorStr1();
+      string errMsg = string("Tinyxml2 ErrorID: ") + std::to_string(eid)
+                + ", Error Name: " + d1.ErrorName(); //  this fails to link: d1.GetErrorStr1();
+            throw KException(errMsg);
             throw KException(errMsg);
         }
         // missing data causes the missing XMLElement* to come back as nullptr
