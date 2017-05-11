@@ -100,7 +100,7 @@ uint64_t BargainSMP::getID() const {
  * Calculate all the utilities and record in database. utitlity for (i,i,i,j)
  * combination is getting calculated and recorded in a separate method
  */
-void SMPState::calcUtils(unsigned int i ) const { // i == actor id 
+void SMPState::calcUtils(unsigned int i, unsigned int bestJ ) const { // i == actor id
   const unsigned int na = model->numAct;
   const bool recordTmpSQLP = true;  // Record this in SQLite
   auto pFn = [this, recordTmpSQLP](unsigned int h, unsigned int k, unsigned int i, unsigned int j) {
@@ -160,7 +160,10 @@ void SMPState::bestChallengeUtils(unsigned int i /* actor id */) const {
         eduJ[j] = probEduChlg(i, i, i, j, recordTmpSQLP);
     }
   }
+
+  lockEduChlgsIJ.lock();
   eduChlgsIJ[i] = eduJ;
+  lockEduChlgsIJ.unlock();
 }
 
 // --------------------------------------------
@@ -302,7 +305,7 @@ void SMPState::doBCN(unsigned int i) {
     auto chlgI = bestChallenge(i);
     const double bestEU = get<2>(chlgI);
     if (0 < bestEU) {
-      bestJ = get<0>(chlgI); //
+      unsigned int bestJ = get<0>(chlgI); //
       const double piiJ = get<1>(chlgI); // i's estimate of probability i defeats j
       assert(0 <= bestJ);
       const unsigned int j = bestJ; // for consistency in code below
@@ -310,7 +313,7 @@ void SMPState::doBCN(unsigned int i) {
       auto aj = ((const SMPActor*)(model->actrs[j]));
       auto posJ = ((const VctrPstn*)pstns[j]);
 
-      std::thread thr(&SMPState::calcUtils, this, i);
+      std::thread thr(&SMPState::calcUtils, this, i, bestJ);
 
       // make the variables local to lexical scope of this block.
       // for testing, calculate and print out a block of data showing each's perspective
@@ -507,7 +510,7 @@ void SMPState::doBCN(unsigned int i) {
       thr.join();
     }
     else {
-      LOG(INFO) << "Actor" << i << "has no advantageous targets";
+      LOG(INFO) << "In turn" << turn << "Actor" << i << "has no advantageous targets";
     }
 }
 

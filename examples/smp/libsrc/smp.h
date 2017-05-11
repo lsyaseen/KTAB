@@ -229,7 +229,7 @@ protected:
 
 private:
 
-  void calcUtils(unsigned int i) const;  // i == actor id 
+  void calcUtils(unsigned int i, unsigned int bestJ) const;  // i == actor id
 
   // this sets the values in all the AUtil matrices
   virtual void setAllAUtil(ReportingLevel rl);
@@ -288,7 +288,7 @@ private:
   
   mutable std::map<unsigned int /*i*/, eduChlgsJ> eduChlgsIJ;
   
-  mutable int bestJ;
+  mutable std::mutex lockEduChlgsIJ;
 
   unsigned int turn;
 
