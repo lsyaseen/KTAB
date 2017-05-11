@@ -191,7 +191,7 @@ MtchActor* MtchActor::rAct(unsigned int numI, double minCap, double maxCap, PRNG
 }
 
 // -------------------------------------------------
-MtchState::MtchState(Model* mod) : State(mod){
+MtchState::MtchState(Model* mod) : State(mod) {
   //
 }
 
@@ -283,12 +283,15 @@ MtchModel* MtchModel::randomMS(unsigned int numA, unsigned int numI, VotingRule 
   md0->numItm = numI;
   md0->numCat = numC;
   auto st0 = new MtchState(md0);
-  for (unsigned int i = 0; i < numA; i++){
+  // pre-allocated by constructor, all nullptr's
+  // However, there are no actors yet, so it is pre-allocated to zero items.
+  assert(0 == st0->pstns.size()); 
+  for (unsigned int i = 0; i < numA; i++) {
     auto ai = MtchActor::rAct(numI, minCap, maxCap, md0->rng, i);
     ai->vr = vr;
     MtchPstn* pi = MtchActor::rPos(numI, numA, md0->rng);
     md0->addActor(ai);
-    st0->addPstn(pi);
+    st0->pushPstn(pi);
 
     printf("%2u: %s,  %s \n", i, ai->name.c_str(), ai->desc.c_str());
     printf("Scalar capability: %.2f \n", ai->sCap);
@@ -303,7 +306,7 @@ MtchModel* MtchModel::randomMS(unsigned int numA, unsigned int numI, VotingRule 
     showMtchPstn(*pi);
     cout << endl << endl;
   }
-
+  assert(numA == st0->pstns.size()); // now they shouuld match
   md0->addState(st0);
   return md0;
 }
@@ -943,10 +946,11 @@ void MtchState::setAllAUtil(ReportingLevel rl) {
 }
 
 MtchState * MtchState::doSUSN(ReportingLevel rl) const {
+  const unsigned int numA = model->numAct;
 
   MtchState * s2 = new MtchState(model);
+  assert(numA == s2->pstns.size()); // pre-allocated by constructor, all nullptr's
 
-  const unsigned int numA = model->numAct;
   for (unsigned int ih = 0; ih < numA; ih++) {
     MtchActor* ah = (MtchActor*)(model->actrs[ih]);
     if (ReportingLevel::Low < rl) {
@@ -982,8 +986,8 @@ MtchState * MtchState::doSUSN(ReportingLevel rl) const {
 
     MtchPstn* oldPi = (MtchPstn*)(pstns[ih]);
     MtchPstn* newPi = new MtchPstn(get<1>(evmp));
-    s2->addPstn(newPi);
-
+    s2->pstns[ih] = newPi;
+    assert(numA == s2->pstns.size());
     if (ReportingLevel::Low < rl) {
       printf("Old position %2u: ", ih); showMtchPstn(*oldPi); cout << endl;
       printf("New position %2u: ", ih); showMtchPstn(*newPi); cout << endl;

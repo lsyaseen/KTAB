@@ -153,7 +153,7 @@ void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, cons
     }
     unsigned int ki = cpP ? ndxMaxZ : bestJ;
     auto pi = new PMatrixPos(eKEM, ki);
-    es1->addPstn(pi);
+    es1->pushPstn(pi);
   }
 
   es1->setUENdx();

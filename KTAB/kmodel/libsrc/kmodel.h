@@ -40,7 +40,7 @@
 #define KTAB_MODEL_H
 
 #include <sqlite3.h>
-#include <iostream>
+
 #include "kutils.h"
 #include "kmatrix.h"
 #include "prng.h"
@@ -291,6 +291,9 @@ public:
   explicit Model(string d, uint64_t s, vector<bool> f, string Name = "");
   virtual ~Model();
 
+  // forbid copying of entire model objects
+  Model(const Model& that) = delete;
+
   static const unsigned int minNumActor = 3;
   static const unsigned int maxNumActor = 250; //quite generous, as we expect 10-30.
 
@@ -423,6 +426,7 @@ protected:
   // synchronized with the result of createSQL(k) !
 
 
+
   // TODO: rename this from 'smpDB' to 'scenarioDB'
   // Note that, with composite models, there many be dozens interacting.
   string scenName = "Scen"; // default is set from UTC time
@@ -452,7 +456,19 @@ public:
   void randomizeUtils(double minU, double maxU, double uNoise); //testing only
 
   void clear();
-  virtual void addPstn(Position* p);
+
+  // Notice that there are two different ways to add positions.
+  // Because the state constructor pre-allocates the pstns array to match
+  // the number of actors, it sometimes makes an array of non-trivial size,
+  // and sometimes it makes an array of size zero.
+  // If you are in the former case, like when a model is doing bargaining from 
+  // the current state to the next, then you add positions by putting them
+  // in the right, pre-allocated space.
+  // However, if you are in the latter case, like when a new model is having
+  // its first round of actors created and their positions recorded, then
+  // you need to push actors into the Model and push their positions into the
+  // State. This function is for the latter case.
+  virtual void pushPstn(Position* p);
 
   // use the parameters of your state to compute the relative probability of each unique position.
   // persp = -1 means use everyone's separate perspectives (i.e. get actual probabilities, not one actor's beliefs).

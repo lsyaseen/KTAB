@@ -23,10 +23,8 @@
 
 #include "sqlitedemo.h"
 #include "kmodel.h"
+#include <easylogging++.h>
 
-using std::cout;
-using std::endl;
-using std::flush;
 using std::string;
 using std::vector;
 
@@ -97,7 +95,7 @@ tuple<unsigned int, vector<vector<string>>> SQLDB::query(const char* query)
   string error = sqlite3_errmsg(database);
   if (error != "not an error")
   {
-    cout << query << " " << error << endl;
+    LOG(DEBUG) << query << " " << error;
   }
   return tuple<unsigned int, vector<vector<string>>>(rowC, results);
 }
@@ -114,16 +112,16 @@ void SQLDB::close()
 
 void demoDBObject()
 {
-  cout << endl << endl << "Demo SQLDB"<<endl;
+  LOG(DEBUG) << "Demo SQLDB";
   using std::get;
 
   const bool parP = KBase::testMultiThreadSQLite(false, KBase::ReportingLevel::Medium);
 
-  cout << "Initializing sqlite3 ..."<<endl << flush;
+  LOG(DEBUG) << "Initializing sqlite3 ...";
   sqlite3_initialize();
-  cout << "Creating database ..."<<endl << flush;
+  LOG(DEBUG) << "Creating database ...";
   auto db = new SQLDB("myDB.db");
-  cout << "Inserting six records ..."<<endl << flush;
+  LOG(DEBUG) << "Inserting six records ...";
   db->query("CREATE TABLE tbl (a INTEGER, b INTEGER, c INTEGER);");
   db->query("INSERT INTO tbl VALUES(22, 50, 90);");
   db->query("INSERT INTO tbl VALUES(30, 29, 28);");
@@ -132,22 +130,22 @@ void demoDBObject()
   db->query("INSERT INTO tbl VALUES(45, 61, 66);");
   db->query("INSERT INTO tbl VALUES(48, 38, 46);");
 
-  cout << "Selecting three records ..." << endl << flush;
+  LOG(DEBUG) << "Selecting three records ..." ;
   auto rslt = db->query("SELECT * FROM tbl WHERE c>50;");
   unsigned int rowC = get<0>(rslt);
-  printf("Retrieved %u rows \n", rowC);
+  LOG(DEBUG) << "Retrieved "<< rowC <<" rows \n";
   vector<vector<string> > rStr = get<1>(rslt);
   for (vector<vector<string> >::iterator it = rStr.begin(); it < rStr.end(); ++it)
   {
     vector<string> row = *it;
-    cout << "Values: (a=" << row.at(0) << ", b=" << row.at(1) << ", c=" << row.at(2) << ")" << endl;
+    LOG(DEBUG) << "Values: (a=" << row.at(0) << ", b=" << row.at(1) << ", c=" << row.at(2) << ")" ;
   }
 
-  cout << "Deleting database ..."<<endl << flush;
+  LOG(DEBUG) << "Deleting database ...";
   delete db;
   db = nullptr;
 
-  cout << "Shutting down SQlite3."<< endl << flush;
+  LOG(DEBUG) << "Shutting down SQlite3.";
   sqlite3_shutdown();
   return;
 }

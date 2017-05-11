@@ -21,13 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // --------------------------------------------
 
-#include<iostream>
 #include "kmodel.h"
 
 namespace KBase {
-using std::cout;
-using std::endl;
-using std::flush;
 using std::get;
 using std::tuple;
 using KBase::PRNG;
@@ -38,6 +34,16 @@ State::State(Model * m) {
   clear();
   assert(nullptr != m);
   model = m;
+
+  // As we pre-size the pstns array, we must make certain the pointers do not point at junk.
+  // If the Model has been populated, then this allocates a non-zero vector.
+  // But if it is a brand-new Model, it might not have any actors, so you still
+  // have to allocate/push later.
+  const unsigned int na = model->numAct;
+  pstns.resize(na);
+  for (unsigned int i = 0; i < na; i++) {
+    pstns[i] = nullptr;
+  }
 }
 
 State::~State() {
@@ -56,7 +62,7 @@ void State::clear() {
   step = nullptr;
 }
 
-void State::addPstn(Position* p) {
+void State::pushPstn(Position* p) {
   assert(nullptr != p);
   pstns.push_back(p);
   return;

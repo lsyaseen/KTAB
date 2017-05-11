@@ -290,7 +290,7 @@ namespace DemoComSel {
 
     auto css0 = new CSState(csm);
     csm->addState(css0);
-
+    assert(numA == css0->pstns.size()); // pre-allocated by constructor, all nullptr's
     // Either start them all at the CP or have each choose an initial position which
     // maximizes their direct utility, regardless of expected utility.
     for (unsigned int i = 0; i < numA; i++) {
@@ -303,9 +303,11 @@ namespace DemoComSel {
       if (siP) {
         pi->match = bestAP[i];
       }
-      css0->addPstn(pi);
+      css0->pstns[i] = pi;
+
+      assert(numA == css0->pstns.size()); // must be invariant
     }
-    assert(numA == css0->pstns.size());
+    
 
     css0->step = [css0]() {
       return css0->stepSUSN();

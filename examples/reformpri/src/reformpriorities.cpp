@@ -421,11 +421,10 @@ int main(int ac, char **av) {
   assert(numA + 1 == siPstns.size());
   const KBase::VUI bestPerm = siPstns[numA];
   assert(numR == bestPerm.size());
-  assert(0 == rps0->pstns.size()); // not yet set
+  assert(numA == rps0->pstns.size()); // pre-allocated by constructor, all nullptr's
 
   // Move them all to either the CP or to SI positions which
   // maximize their direct utility, regardless of expected utility.
-  rps0->pstns.resize(numA);
   for (unsigned int i = 0; i < numA; i++) {
     auto pi = new  MtchPstn();
     pi->numCat = numR;

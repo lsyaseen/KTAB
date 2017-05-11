@@ -192,7 +192,9 @@ public:
   function<shared_ptr<void>(const Actor* ai, const State* s)> bestTarget = nullptr;
   function<shared_ptr<void>(const Actor* aInit, const Actor* aRcvr, shared_ptr<void> btData, const State* s)> bargain = nullptr;
 
-  virtual void addPstn(Position* p);
+
+  // See State::pushPstn for explanation of the two different ways to add positions to a State.
+  virtual void pushPstn(Position* p);
 
   // use the parameters of your state to compute the relative probability of each actor's position
   virtual tuple< KMatrix, VUI> pDist(int persp) const;

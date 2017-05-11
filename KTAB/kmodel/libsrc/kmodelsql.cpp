@@ -22,7 +22,7 @@
 // --------------------------------------------
 
 #include <assert.h>
-#include <iostream>
+#include <easylogging++.h>
 
 #include "kmodel.h"
 
@@ -30,9 +30,6 @@
 namespace KBase
 {
 
-using std::cout;
-using std::endl;
-using std::flush;
 using std::get;
 using std::tuple;
 
@@ -51,15 +48,14 @@ KTable::~KTable() {};
 
 void Model::demoSQLite()
 {
-  cout << endl << "Starting basic demo of SQLite in Model class" << endl;
+  LOG(DEBUG) << "Starting basic demo of SQLite in Model class";
 
   auto callBack = [](void *data, int numCol, char **stringFields, char **colNames)
   {
     for (int i = 0; i < numCol; i++)
     {
-      printf("%s = %s\n", colNames[i], stringFields[i] ? stringFields[i] : "NULL");
+      LOG(DEBUG) << colNames[i] << "=" << (stringFields[i] ? stringFields[i] : "NULL");
     }
-    printf("\n");
     return ((int)0);
   };
 
@@ -73,12 +69,12 @@ void Model::demoSQLite()
     int rc = sqlite3_open("test.db", &db);
     if (rc != SQLITE_OK)
     {
-      fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+      LOG(ERROR) << "Can't open database:" << sqlite3_errmsg(db);
       exit(0);
     }
     else
     {
-      fprintf(stderr, "Opened database successfully (%i)\n", n);
+      LOG(DEBUG) << "Opened database successfully" << n;
     }
     return;
   };
@@ -88,19 +84,18 @@ void Model::demoSQLite()
     int rc = sqlite3_exec(db, sql.c_str(), callBack, nullptr, &zErrMsg); // nullptr is the 'data' argument
     if (rc != SQLITE_OK)
     {
-      fprintf(stderr, "SQL error: %s\n", zErrMsg);
+      LOG(ERROR) << "SQL error:" << zErrMsg;
       sqlite3_free(zErrMsg);
     }
     else
     {
-      fprintf(stdout, msg.c_str());
+      LOG(DEBUG) << msg;
     }
     return rc;
   };
 
 
   // Open database
-  cout << endl << flush;
   sOpen(1);
   
   // try some pragmas. these should speed up operations on larger tables,
@@ -108,12 +103,15 @@ void Model::demoSQLite()
   // application abruptly terminates mid-operation.
   sql = "PRAGMA synchronous = off;";
   rc = sExec(sql, "Set synchronous to off \n");
+  assert(SQLITE_OK == rc);
   
   sql = "PRAGMA journal_mode = off;";
   rc = sExec(sql, "Set journal_mode to off \n");
+  assert(SQLITE_OK == rc);
   
   sql = "PRAGMA locking_mode = exclusive;";
   rc = sExec(sql, "Set locking_mode to exclusive \n");
+  assert(SQLITE_OK == rc);
 
   // Create SQL statement
   sql = "create table if not exists PETS("  \
@@ -125,10 +123,11 @@ void Model::demoSQLite()
 
   // Execute SQL statement
   rc = sExec(sql, "Created table successfully \n");
-  sqlite3_close(db);
+  assert(SQLITE_OK == rc);
+  rc = sqlite3_close(db);
+  assert(SQLITE_OK == rc);
 
 
-  cout << endl << flush;
   sOpen(2);
   
 
@@ -141,28 +140,34 @@ void Model::demoSQLite()
         "VALUES (3, 'Carol', 7, 'Chihuahua', 'Tan' );"      \
         "INSERT INTO PETS (ID, NAME, AGE, SPECIES, COLOR) " \
         "VALUES (4, 'David', 5, 'Alsation', 'Mixed' );";
-  \
+  /*
   "INSERT INTO PETS (ID, NAME, AGE, SPECIES, COLOR) " \
   "VALUES (5, 'Ellie', 8, 'Rhodesian', 'Red' );";
+  */
 
-  cout << "NB: This should get one planned SQL error at ID=4" << endl << flush;
+
+  LOG(DEBUG) << "NB: This should get one planned SQL error at ID=4"; // SPECIES should be BREED
   rc = sExec(sql, "Records inserted successfully \n");
-  sqlite3_close(db);
+  assert(SQLITE_OK != rc); // check for planned SQL error
+  rc = sqlite3_close(db);
+  assert(SQLITE_OK == rc); // avoid EFFCPP warning
 
 
-  cout << endl << flush;
   sOpen(3);
   sql = "SELECT * from PETS where AGE>5;";
   rc = sExec(sql, "Records selected successfully\n");
-  cout << "NB: ID=5 was never inserted due to planned SQL error at ID=4" << endl;
+  assert(SQLITE_OK == rc);
+  LOG(DEBUG) << "NB: ID=5 was never inserted due to planned SQL error at ID=4";
   sqlite3_close(db);
+  assert(SQLITE_OK == rc);
 
 
-  cout << endl << flush;
   sOpen(4);
   sql = "DROP TABLE PETS;";
   rc = sExec(sql, "Dropped table successfully \n");
-  sqlite3_close(db);
+  assert(SQLITE_OK == rc);
+  rc = sqlite3_close(db);
+  assert(SQLITE_OK == rc);
 
   return;
 }
@@ -172,9 +177,9 @@ bool testMultiThreadSQLite (bool tryReset, KBase::ReportingLevel rl) {
   bool parP = (0 != mutexP);
   if (ReportingLevel::Silent < rl) {
     if (parP) {
-      cout << "This SQLite3 library WAS compiled to be threadsafe."<<endl << flush;
+      LOG(DEBUG) << "This SQLite3 library WAS compiled to be threadsafe.";
     } else {
-      cout << "This SQLite3 library was NOT compiled to be threadsafe."<<endl << flush;
+      LOG(DEBUG) << "This SQLite3 library was NOT compiled to be threadsafe.";
     }
   }
   if (tryReset && (!parP)) {
@@ -186,22 +191,22 @@ bool testMultiThreadSQLite (bool tryReset, KBase::ReportingLevel rl) {
       parP = false;
     }
     if (ReportingLevel::Low < rl){
-      cout << "  Note that multi-threading might have been disabled via sqlite3_config."<<endl<<flush;
-      cout << "  Tried to reconfigure to SQLITE_CONFIG_SERIALIZED ... " << flush;
+      LOG(DEBUG) << "  Note that multi-threading might have been disabled via sqlite3_config.";
+      LOG(DEBUG) << "  Tried to reconfigure to SQLITE_CONFIG_SERIALIZED ... ";
       if (configRslt == SQLITE_OK) {
-        cout << "SUCCESS"<< endl;
+        LOG(DEBUG) << "SUCCESS";
       }
       else  {
-        cout << "FAILED"<< endl;
+        LOG(ERROR) << "FAILED";
       }
     }
   }
   if (ReportingLevel::Silent < rl) {
     if (parP)  {
-      cout << "Possible to continue multi-threaded"<< endl << flush;
+      LOG(DEBUG) << "Possible to continue multi-threaded";
     }
     else {
-      cout << "Necessary to continue single-threaded"<< endl << flush;
+      LOG(DEBUG) << "Necessary to continue single-threaded";
     }
   }
   return parP;
