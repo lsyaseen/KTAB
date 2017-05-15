@@ -274,9 +274,6 @@ void genPMM(uint64_t sd) {
 
 
 int main(int ac, char **av) {
-  el::Configurations confFromFile("./conf/logger.conf");
-  el::Loggers::reconfigureAllLoggers(confFromFile);
-
   using KBase::dSeed;
   using KBase::PRNG;
   el::Configurations confFromFile("./pmatrix-logger.conf");

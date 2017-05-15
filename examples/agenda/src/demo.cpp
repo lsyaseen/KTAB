@@ -30,6 +30,7 @@
 
 INITIALIZE_EASYLOGGINGPP
 
+using std::string;
 using std::vector;
 using KBase::KMatrix;
 using KBase::PRNG;
@@ -169,9 +170,6 @@ void demoCounting(unsigned int numI, unsigned int maxU, unsigned int maxS, unsig
 }; // end of namespace
 
 int main(int ac, char **av) {
-  el::Configurations confFromFile("./conf/logger.conf");
-  el::Loggers::reconfigureAllLoggers(confFromFile);
-
   using std::function;
   using KBase::dSeed;
   using AgendaControl::Agenda;

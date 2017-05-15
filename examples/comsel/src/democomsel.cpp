@@ -335,9 +335,6 @@ namespace DemoComSel {
 
 
 int main(int ac, char **av) {
-  el::Configurations confFromFile("./conf/logger.conf");
-  el::Loggers::reconfigureAllLoggers(confFromFile);
-
   using std::string;
   using KBase::dSeed;
   
