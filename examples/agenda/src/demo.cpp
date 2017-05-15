@@ -130,34 +130,19 @@ void demoCounting(unsigned int numI, unsigned int maxU, unsigned int maxS, unsig
 
   for (unsigned int i = 1; i <= numI + 2; i++) {
     auto n = AgendaControl::numAgenda(i);
-<<<<<<< HEAD
     LOG(DEBUG) << KBase::getFormattedString(" %2i -> %llu", i, n);
-=======
-    printf(" %2u -> %llu \n", i, n);
->>>>>>> upstream/rpdLog02
   }
 
-<<<<<<< HEAD
   log.clear();
   log += "Using " + std::to_string(numI) + " items:";
   for (unsigned int i : testI) {
     log += " " + std::to_string(i);
-=======
-  printf("Using %u items: ", numI);
-  for (unsigned int i : testI) {
-    printf("%u ", i);
->>>>>>> upstream/rpdLog02
   }
   LOG(DEBUG) << log;
 
   auto enumAg = [numI](Agenda::PartitionRule pr, std::string s) {
     vector<Agenda*> testA = Agenda::enumerateAgendas(numI, pr);
-<<<<<<< HEAD
-    LOG(DEBUG) << "For" << numI << "items, found"
-      << testA.size() << "distinct" << s << "agendas";
-=======
     printf("For %u items, found %i distinct %s agendas \n", numI, testA.size(), s.c_str());
->>>>>>> upstream/rpdLog02
     for (auto a : testA) {
       LOG(DEBUG) << *a;
     }
@@ -244,19 +229,11 @@ int main(int ac, char **av) {
 
   PRNG * rng = new PRNG();
   seed = rng->setSeed(seed); // 0 == get a random number
-<<<<<<< HEAD
   LOG(DEBUG) << KBase::getFormattedString("Using PRNG seed:  %020llu", seed);
   LOG(DEBUG) << KBase::getFormattedString("Same seed in hex:   0x%016llX", seed);
-  unsigned int maxU = 8;
-  unsigned int maxS = 10;
-  unsigned int maxB = 10;
-=======
-  printf("Using PRNG seed:  %020llu \n", seed);
-  printf("Same seed in hex:   0x%016llX \n", seed);
   const unsigned int maxU = 8;
   const unsigned int maxS = 10;
   const unsigned int maxB = 10;
->>>>>>> upstream/rpdLog02
   if (enumP) {
     AgendaControl::demoCounting(enumN, maxU, maxS, maxB);
   }
