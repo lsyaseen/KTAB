@@ -59,8 +59,8 @@ private :
     QString prngSeed;
     QStringList modelParametes;
     QStringList dimensionNames;
-    QList <QStringList> actorsList;
-    QList <QStringList> idealAdjustmentList;
+    QVector <QStringList> actorsList;
+    QVector <QStringList> idealAdjustmentList;
 
     QStandardItemModel *xmlModel;
     QString homeDirectory;
@@ -70,7 +70,7 @@ private :
 signals:
     void openXMLStatus(bool bl);
     void xmlParsedData(QStringList modelDesc, QStringList modpara, QStringList dims,
-                       QStandardItemModel * actModel, QList <QStringList> idealAdj);
+                       QStandardItemModel * actModel, QVector <QStringList> idealAdj);
     void newXmlFilePath(QString path);
 
 };

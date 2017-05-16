@@ -87,23 +87,23 @@ MainWindow::MainWindow()
 
     //DB to Tables
     connect(this, SIGNAL(getActorsDesc()),dbObj,SLOT(getActorsDescriptionDB()));
-    connect(dbObj,SIGNAL(actorsNameDesc(QList <QString> ,QList <QString>)),this,SLOT(actorsNameDesc(QList  <QString> ,QList  <QString>)));
+    connect(dbObj,SIGNAL(actorsNameDesc(QVector <QString> ,QVector <QString>)),this,SLOT(actorsNameDesc(QVector  <QString> ,QVector  <QString>)));
     connect(this, SIGNAL(getInfluence(int)),dbObj,SLOT(getInfluenceDB(int)));
-    connect(dbObj,SIGNAL(actorsInflu(QList<QString>)),this,SLOT(actorsInfluence(QList  <QString>)));
+    connect(dbObj,SIGNAL(actorsInflu(QVector<QString>)),this,SLOT(actorsInfluence(QVector  <QString>)));
     connect(this, SIGNAL(getPosition(int,int)),dbObj,SLOT(getPositionDB(int,int)));
-    connect(dbObj,SIGNAL(actorsPostn(QList<QString>,int)),this,SLOT(actorsPosition(QList<QString>,int)));
+    connect(dbObj,SIGNAL(actorsPostn(QVector<QString>,int)),this,SLOT(actorsPosition(QVector<QString>,int)));
     connect(this, SIGNAL(getSalience(int,int)),dbObj,SLOT(getSalienceDB(int,int)));
-    connect(dbObj,SIGNAL(actorsSalnce(QList<QString>,int)),this,SLOT(actorsSalience(QList<QString>,int)));
-    connect(dbObj,SIGNAL(actorsAffinity(QList<QString>,QList<int>,QList<int>)),
-            this,SLOT(actAffinity(QList<QString>,QList<int>,QList<int>)));
-    connect(dbObj,SIGNAL(scenModelParameters(QList<int>,QString)),
-            this,SLOT(scenarioModelParameters(QList<int>,QString)));
+    connect(dbObj,SIGNAL(actorsSalnce(QVector<QString>,int)),this,SLOT(actorsSalience(QVector<QString>,int)));
+    connect(dbObj,SIGNAL(actorsAffinity(QVector<QString>,QVector<int>,QVector<int>)),
+            this,SLOT(actAffinity(QVector<QString>,QVector<int>,QVector<int>)));
+    connect(dbObj,SIGNAL(scenModelParameters(QVector<int>,QString)),
+            this,SLOT(scenarioModelParameters(QVector<int>,QString)));
     connect(this,SIGNAL(releaseDatabase()),dbObj,SLOT(releaseDB()));
 
     //BAR Charts
     connect(this,SIGNAL(getActorIdsInRange(double,double,int,int)),dbObj,SLOT(getActorsInRangeFromDB(double,double,int,int)));
-    connect(dbObj,SIGNAL(listActorsSalienceCapability(QList<int>,QList<double>,QList<double>,double,double)),this,
-            SLOT(barGraphActorsSalienceCapability(QList<int>,QList<double>,QList<double>,double,double)));
+    connect(dbObj,SIGNAL(listActorsSalienceCapability(QVector<int>,QVector<double>,QVector<double>,double,double)),this,
+            SLOT(barGraphActorsSalienceCapability(QVector<int>,QVector<double>,QVector<double>,double,double)));
 
     //LINE GRAPHS
     //To get dimensions count
@@ -114,8 +114,8 @@ MainWindow::MainWindow()
 
     //QUAD MAPS
     //to get Util_Chlg and Util_SQ values
-    connect(this,SIGNAL(getUtilChlgAndUtilSQfromDB(QList<int>)),
-            dbObj,SLOT(getUtilChlgAndSQvalues(QList<int>)));
+    connect(this,SIGNAL(getUtilChlgAndUtilSQfromDB(QVector<int>)),
+            dbObj,SLOT(getUtilChlgAndSQvalues(QVector<int>)));
 
     //received Chlg and sq values
     connect(dbObj,SIGNAL(utilChlngAndSQ(int , double , double  , int )),
@@ -128,9 +128,9 @@ MainWindow::MainWindow()
     connect(this,SIGNAL(readXMLFile()),xmlparser,SLOT(readXmlFile()));
     connect(xmlparser,SIGNAL(openXMLStatus(bool)),this,SLOT(openStatusXml(bool)));
     connect(xmlparser,SIGNAL(xmlParsedData(QStringList,QStringList,QStringList,QStandardItemModel*,
-                                           QList<QStringList>)),this,
+                                           QVector<QStringList>)),this,
             SLOT(xmlDataParsedFromFile(QStringList,QStringList,QStringList,QStandardItemModel*,
-                                       QList<QStringList>)));
+                                       QVector<QStringList>)));
     connect(this,SIGNAL(saveXMLDataToFile(QStringList,QStandardItemModel*,QStandardItemModel*,QString)),
             xmlparser,SLOT(saveToXmlFile(QStringList,QStandardItemModel*,QStandardItemModel*,QString)));
     connect(xmlparser,SIGNAL(newXmlFilePath(QString)),this,SLOT(savedXmlName(QString)));
@@ -139,10 +139,10 @@ MainWindow::MainWindow()
     connect(this,SIGNAL(homeDirChanged(QString)),xmlparser,SLOT(updateHomeDir(QString)));
 
     //colorpalette
-    connect(this,SIGNAL(exportColors(QString,QList<int>, QList<QString>)),
-            csvObj,SLOT(exportActorColors(QString,QList<int>,QList<QString>)));
+    connect(this,SIGNAL(exportColors(QString,QVector<int>, QVector<QString>)),
+            csvObj,SLOT(exportActorColors(QString,QVector<int>,QVector<QString>)));
     connect(this ,SIGNAL(importColors(QString,int)),csvObj,SLOT(importActorColors(QString,int)));
-    connect(csvObj,SIGNAL(importedColors(QList<QColor>)),this,SLOT(updateColors(QList<QColor>)));
+    connect(csvObj,SIGNAL(importedColors(QVector<QColor>)),this,SLOT(updateColors(QVector<QColor>)));
 
     //actormoveddata
     connect(this,SIGNAL(getActorMovedData(QString)),dbObj,SLOT(getActorMovedDataDB(QString)));
@@ -1373,13 +1373,13 @@ void MainWindow::chooseActorColors()
 {
     if(actorsName.length()>0 && tableType=="Database")
     {
-        QList<QColor> colors;
+        QVector<QColor> colors;
 
         for(int i=0; i < actorsName.length(); ++i)
             colors.append(colorsList.at(i));
 
         ColorPickerDialog *colorPicker = new ColorPickerDialog;
-        connect(colorPicker,SIGNAL(changedColors(QList<QColor>)),this,SLOT(updateColors(QList<QColor>)));
+        connect(colorPicker,SIGNAL(changedColors(QVector<QColor>)),this,SLOT(updateColors(QVector<QColor>)));
         colorPicker->intializeActors(actorsName,colors);
         colorPicker->show();
     }
@@ -1424,8 +1424,8 @@ void MainWindow::exportActorColors()
 
         setCurrentFile(colorPaletteCsvFileNameLocation);
 
-        QList<int> actorIdList;
-        QList<QString> actorColorsList;
+        QVector<int> actorIdList;
+        QVector<QString> actorColorsList;
         for(int act=0; act < actorsName.length(); ++act)
         {
             actorIdList.append(act);
@@ -1449,7 +1449,7 @@ void MainWindow::resetActorColors()
         displayMessage("Actors color picker","Please Import DB or RUN SMP Model");
 }
 
-void MainWindow::updateColors(QList<QColor> updatedColors)
+void MainWindow::updateColors(QVector<QColor> updatedColors)
 {
     for(int i=0; i < updatedColors.length(); ++i)
         colorsList[i]=updatedColors.at(i);
@@ -2480,7 +2480,7 @@ void MainWindow::displayMenuTableView(QPoint pos)
     }
 }
 
-void MainWindow::actorsNameDesc(QList <QString> actorName,QList <QString> actorDescription)
+void MainWindow::actorsNameDesc(QVector <QString> actorName,QVector <QString> actorDescription)
 {
     actorsName.clear();
     actorsDescription.clear();
@@ -2542,29 +2542,29 @@ void MainWindow::actorsNameDesc(QList <QString> actorName,QList <QString> actorD
         populateInitiatorsAndReceiversRadioButtonsAndCheckBoxes();
 }
 
-void MainWindow::actorsInfluence(QList<QString> actorInfluence)
+void MainWindow::actorsInfluence(QVector<QString> actorInfluence)
 {
     actorsInfl=actorInfluence;
 }
 
-void MainWindow::actorsPosition(QList<QString> actorPosition, int dim)
+void MainWindow::actorsPosition(QVector<QString> actorPosition, int dim)
 {
     actorsPos[dim]=actorPosition;
 }
 
-void MainWindow::actorsSalience(QList<QString> actorSalience,int dim)
+void MainWindow::actorsSalience(QVector<QString> actorSalience,int dim)
 {
     actorsSal[dim]=actorSalience;
 }
 
-void MainWindow::actAffinity(QList<QString> actorAff, QList<int> actorI, QList<int> actorJ)
+void MainWindow::actAffinity(QVector<QString> actorAff, QVector<int> actorI, QVector<int> actorJ)
 {
     actorAffinity=actorAff;
     actI = actorI;
     actJ = actorJ;
 }
 
-void MainWindow::scenarioModelParameters(QList<int> modParaDB, QString seedDB)
+void MainWindow::scenarioModelParameters(QVector<int> modParaDB, QString seedDB)
 {
     victProbModelComboBox->setCurrentIndex(modParaDB.at(0));
     pCEModelComboBox->setCurrentIndex(modParaDB.at(1));
