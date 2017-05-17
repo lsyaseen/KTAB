@@ -85,7 +85,7 @@ void ColorPickerDialog::initializeDialogWindow()
     actorsSA->setWidgetResizable(true);
 }
 
-void ColorPickerDialog::intializeActors(QList<QString> actorsNames, QList<QColor> colors)
+void ColorPickerDialog::intializeActors(QVector<QString> actorsNames, QVector<QColor> colors)
 {
     pickerColors = colors;
     actorNamesList = actorsNames;
@@ -97,7 +97,7 @@ void ColorPickerDialog::intializeActors(QList<QString> actorsNames, QList<QColor
     }
 }
 
-QFrame * ColorPickerDialog::initializeActorFrame(QString actName, QList<QColor> colors,int index)
+QFrame * ColorPickerDialog::initializeActorFrame(QString actName, QVector<QColor> colors,int index)
 {
     QFrame * actorFrame= new QFrame;
 
