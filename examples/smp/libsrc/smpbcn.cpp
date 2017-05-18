@@ -151,19 +151,17 @@ void SMPState::calcUtils(unsigned int i, unsigned int bestJ ) const { // i == ac
 }
 
 // --------------------------------------------
-void SMPState::bestChallengeUtils(unsigned int i /* actor id */) const {
+eduChlgsI SMPState::bestChallengeUtils(unsigned int i) const {
   const unsigned int na = model->numAct;
   const bool recordTmpSQLP = true;  // Record this in SQLite
-  eduChlgsJ eduJ;
+  eduChlgsI eduI;
   for (unsigned int j = 0; j < na; j++) {
     if( i != j ) {
-        eduJ[j] = probEduChlg(i, i, i, j, recordTmpSQLP);
+        eduI[j] = probEduChlg(i, i, i, j, recordTmpSQLP);
     }
   }
 
-  lockEduChlgsIJ.lock();
-  eduChlgsIJ[i] = eduJ;
-  lockEduChlgsIJ.unlock();
+  return eduI;
 }
 
 // --------------------------------------------
@@ -277,7 +275,9 @@ void SMPState::doBCN(unsigned int i) {
     const SMPBargnModel bMod = smod->brgnMod;
 
     auto sqBrgnI = new BargainSMP(ai, ai, *posI, *posI);
+    brgnsLock.lock();
     brgns[i].push_back(sqBrgnI);
+    brgnsLock.unlock();
 
     // before we can log this bargain, we need to get the group ID for this table
     // so then we can get the flag to populate the table or not
@@ -300,9 +300,9 @@ void SMPState::doBCN(unsigned int i) {
       model->sqlBargainEntries(turn, sqBrgnI->getID(), i, i, 0);
     }
 
-    bestChallengeUtils(i);
+    eduChlgsI eduI = bestChallengeUtils(i);
 
-    auto chlgI = bestChallenge(i);
+    auto chlgI = bestChallenge(eduI);
     const double bestEU = get<2>(chlgI);
     if (0 < bestEU) {
       unsigned int bestJ = get<0>(chlgI); //
@@ -449,8 +449,10 @@ void SMPState::doBCN(unsigned int i) {
           model->sqlBargainCoords(turn, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr);
         }
         // record this one onto BOTH the initiator and receiver queues
+        brgnsLock.lock();
         brgns[i].push_back(brgnIIJ); // initiator's copy, delete only it later
         brgns[j].push_back(brgnIIJ); // receiver's copy, just null it out later
+        brgnsLock.unlock();
         // clean up unused
         delete brgnIJ;
         brgnIJ = nullptr;
@@ -472,10 +474,12 @@ void SMPState::doBCN(unsigned int i) {
           model->sqlBargainCoords(turn, brgnJIJ->getID(), brgnJIJ->posInit, brgnJIJ->posRcvr);
         }
         // record these both onto BOTH the initiator and receiver queues
+        brgnsLock.lock();
         brgns[i].push_back(brgnIIJ); // initiator's copy, delete only it later
         brgns[i].push_back(brgnJIJ); // initiator's copy, delete only it later
         brgns[j].push_back(brgnIIJ); // receiver's copy, just null it out later
         brgns[j].push_back(brgnJIJ); // receiver's copy, just null it out later
+        brgnsLock.unlock();
         // clean up unused
         delete brgnIJ;
         brgnIJ = nullptr;
@@ -493,8 +497,10 @@ void SMPState::doBCN(unsigned int i) {
           model->sqlBargainCoords(turn, brgnIJ->getID(), brgnIJ->posInit, brgnIJ->posRcvr);
         }
         // record this one onto BOTH the initiator and receiver queues
+        brgnsLock.lock();
         brgns[i].push_back(brgnIJ); // initiator's copy, delete only it later
         brgns[j].push_back(brgnIJ); // receiver's copy, just null it out later
+        brgnsLock.unlock();
         // clean up unused
         delete brgnIIJ;
         brgnIIJ = nullptr;
@@ -894,7 +900,7 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
 }
 
 
-tuple<int, double, double> SMPState::bestChallenge(unsigned int i) const {
+tuple<int, double, double> SMPState::bestChallenge(eduChlgsI &eduI) const {
   int bestJ = -1;
   double pIJ = 0;
   double bestEU = -1.00;
@@ -903,11 +909,11 @@ tuple<int, double, double> SMPState::bestChallenge(unsigned int i) const {
   // I take a fraction of the minimum.
   const double minSigEDU = 1e-5; // TODO: 1/20 of the minimum, or 0.0005
 
-  for(const auto& eduJ : eduChlgsIJ[i]) {
-    double pij = get<0>(eduJ.second);
-    double edu = get<1>(eduJ.second);
+  for(const auto& eduIJ : eduI) {
+    double pij = get<0>(eduIJ.second);
+    double edu = get<1>(eduIJ.second);
     if ((minSigEDU < edu) && (bestEU < edu)) {
-      bestJ = eduJ.first;
+      bestJ = eduIJ.first;
       pIJ = pij;
       bestEU = edu;
     }

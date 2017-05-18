@@ -59,6 +59,7 @@ using KBase::VUI;
 using KBase::BigRAdjust;
 using KBase::BigRRange;
 using KBase::KTable; // JAH 20160728
+using eduChlgsI = std::map<unsigned int /*j*/, tuple<double, double> >;
 
 class SMPActor;
 class SMPState;
@@ -252,7 +253,7 @@ private:
   tuple<double, double> probEduChlg(unsigned int h, unsigned int k, unsigned int i, unsigned int j, bool sqlP) const;
 
   // return best j, p[i>j], edu[i->j]
-  tuple<int, double, double> bestChallenge(unsigned int i) const;
+  tuple<int, double, double> bestChallenge(eduChlgsI &eduI) const;
 
   // the actor's ideal, against which they judge others' positions
   vector<VctrPstn> ideals = {};
@@ -275,7 +276,7 @@ private:
   /**
    * Calculate all challenge utilities (i, i, i, j) which would be used to find the best challenge
    */
-  void bestChallengeUtils(unsigned int i /* actor id */) const;
+  eduChlgsI bestChallengeUtils(unsigned int i /* initiator actor */) const;
 
   // Record the bargain id that caused an actor to move in each turn
   using moverBargains = std::map<
@@ -284,15 +285,11 @@ private:
     >;
   mutable moverBargains positionMovers;
 
-  using eduChlgsJ = std::map<unsigned int /*j*/, tuple<double, double> >;
-  
-  mutable std::map<unsigned int /*i*/, eduChlgsJ> eduChlgsIJ;
-  
-  mutable std::mutex lockEduChlgsIJ;
-
   unsigned int turn;
 
   vector< vector < BargainSMP* > > brgns;
+
+  std::mutex brgnsLock;
 
   KBase::KMatrix w;
 
