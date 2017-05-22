@@ -128,7 +128,8 @@ void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, cons
   LOG(DEBUG) << "Central position is number " << ndxMaxZ;
 
 
-  auto es1 = new PMatrixState(eKEM);
+  auto es1 = new PMatrixState(eKEM); // pre-allocates the pstns array
+  assert(eKEM->numAct == es1->pstns.size());
 
   if (cpP) {
     LOG(DEBUG) << "Assigning actors to the central position";
@@ -148,9 +149,10 @@ void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, cons
     }
     unsigned int ki = cpP ? ndxMaxZ : bestJ;
     auto pi = new PMatrixPos(eKEM, ki);
-    es1->pushPstn(pi);
+    es1->pstns[i] = pi;
   }
 
+  assert(eKEM->numAct == es1->pstns.size());
   es1->setUENdx();
 
   // test instantiation of templates

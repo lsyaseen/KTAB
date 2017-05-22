@@ -188,7 +188,9 @@ bool EState<PT>::equivNdx(unsigned int i, unsigned int j) const {
   assert (i < pstns.size());
   assert (j < pstns.size());
   auto pi = (const EPosition<PT>*) (pstns[i]);
+  assert(nullptr != pi);
   auto pj = (const EPosition<PT>*) (pstns[j]);
+  assert(nullptr != pj);
   bool eqv = (pi->getIndex() == pj->getIndex());
   return eqv;
 }
@@ -611,14 +613,23 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
   }
 
   auto clearPstns = [numA] (EState<PT>* est) {
-    assert (0 == est->pstns.size());
-    est->pstns.resize(numA);
-    for (unsigned int i = 0; i < numA; i++) {
-      est->pstns[i] = nullptr;
+    // Amit changed the constructor of ALL Models to (sometimes) pre-allocate data.
+    // Sometimes it pre-allocates to the right size, filled with nullptr.
+    // Sometimes it pre-allocates to size zero.
+    assert((0 == est->pstns.size()) || (numA == est->pstns.size()));
+    if (0 == est->pstns.size()) {
+      est->pstns.resize(numA);
+      for (unsigned int i = 0; i < numA; i++) {
+        est->pstns[i] = nullptr;
+      }
     }
-    assert (numA == est->pstns.size());
-    for (unsigned int i=0; i<numA; i++) {
-      assert (nullptr == est->pstns[i]);
+    if (numA == est->pstns.size()) {
+      for (unsigned int i=0; i<numA; i++) {
+        if (nullptr != est->pstns[i]) {
+          delete est->pstns[i];
+          est->pstns[i] = nullptr;
+        }
+      }
     }
     return;
   };
