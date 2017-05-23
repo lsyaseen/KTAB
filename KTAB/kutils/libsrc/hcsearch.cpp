@@ -97,9 +97,9 @@ VHCSearch::run(KMatrix p0,
   const bool parP = true;
 
   auto showFn = [this](string preface, const KMatrix & p, double v) {
-    LOG(DEBUG) << preface << "point:";
+    LOG(INFO) << preface << "point:";
     trans(p).mPrintf(" %+0.4f ");
-    LOG(DEBUG) << getFormattedString("%s value: %+.6f", preface.c_str(), v);
+    LOG(INFO) << getFormattedString("%s value: %+.6f", preface.c_str(), v);
     if (nullptr != report) {
       report(p);
     }
@@ -176,10 +176,10 @@ VHCSearch::run(KMatrix p0,
 
     if (ReportingLevel::Medium <= rl) {
       if (parP) {
-        LOG(DEBUG) << "After multi-threaded VHC iteration" << iter;
+        LOG(INFO) << "After multi-threaded VHC iteration" << iter;
       }
       else {
-        LOG(DEBUG) << "After single-threaded VHC iteration" << iter;
+        LOG(INFO) << "After single-threaded VHC iteration" << iter;
       }
       showFn("Best current", p0, v0);
       if (nullptr != report) {

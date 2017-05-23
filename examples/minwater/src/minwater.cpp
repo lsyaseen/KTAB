@@ -98,7 +98,7 @@ void setLikelyScenarios(const KMatrix & scen) {
     for (auto i : likelyScenarios) {
         log += " " + std::to_string(i);
     }
-    LOG(DEBUG) << log;
+    LOG(INFO) << log;
 
     return;
 }
@@ -207,39 +207,39 @@ double waterMinProb(ReportingLevel rl, const KMatrix & p0) {
     double err = sqrt(((err0*err0) + (err1*err1)) / 2.0);
 
     if (ReportingLevel::Silent < rl) {
-        LOG(DEBUG) << "Actor-cap matrix";
+        LOG(INFO) << "Actor-cap matrix";
         w.mPrintf(" %8.1f ");
 
         if (ReportingLevel::Low < rl) {
-            LOG(DEBUG) << "Raw actor-pos util matrix:";
+            LOG(INFO) << "Raw actor-pos util matrix:";
             uInit.mPrintf(" %.4f ");
 
-            LOG(DEBUG) << "Coalition strength matrix:";
+            LOG(INFO) << "Coalition strength matrix:";
             c1.mPrintf(" %+9.3f ");
 
-            LOG(DEBUG) << "Probability Opt_i > Opt_j:";
+            LOG(INFO) << "Probability Opt_i > Opt_j:";
             pv1.mPrintf(" %.4f ");
         }
 
-        LOG(DEBUG) << "Estimated prior probability Opt_i:";
+        LOG(INFO) << "Estimated prior probability Opt_i:";
         for (unsigned int i = 0; i < pr0.numR(); i++) {
-          LOG(DEBUG) << KBase::getFormattedString("%2u , %6.4f", i, pr0(i, 0));
+          LOG(INFO) << KBase::getFormattedString("%2u , %6.4f", i, pr0(i, 0));
         }
         //pr0.printf(" %.4f ");
 
-        LOG(DEBUG) << "Estimated posterior probability Opt_i:";
+        LOG(INFO) << "Estimated posterior probability Opt_i:";
         for (unsigned int i = 0; i < pr1.numR(); i++) {
-            LOG(DEBUG) << KBase::getFormattedString("%2u , %6.4f", i, pr1(i, 0));
+            LOG(INFO) << KBase::getFormattedString("%2u , %6.4f", i, pr1(i, 0));
         }
         //pr1.printf(" %.4f ");
 
-        LOG(DEBUG) << KBase::getFormattedString("Probability of base case %.3f ( %.3f )", priorBase, trgtP0);
+        LOG(INFO) << KBase::getFormattedString("Probability of base case %.3f ( %.3f )", priorBase, trgtP0);
 
-        LOG(DEBUG) << KBase::getFormattedString("Probability of nominal case(s) %.3f ( %.3f )", postNom, trgtP1);
+        LOG(INFO) << KBase::getFormattedString("Probability of nominal case(s) %.3f ( %.3f )", postNom, trgtP1);
 
-        LOG(DEBUG) << KBase::getFormattedString("RMSE of probabilities: %.4f", err);
+        LOG(INFO) << KBase::getFormattedString("RMSE of probabilities: %.4f", err);
 
-        LOG(DEBUG) << KBase::getFormattedString("RMS of weight factors: %.4f", pRMS);
+        LOG(INFO) << KBase::getFormattedString("RMS of weight factors: %.4f", pRMS);
     }
 
     return (err + (pRMS * prmsW));
@@ -260,7 +260,7 @@ void minProbErr() {
 
     vhc->nghbrs = VHCSearch::vn1;
     auto p0 = KMatrix(numA, 1); // all zeros
-    LOG(DEBUG) << "Initial point:";
+    LOG(INFO) << "Initial point:";
     trans(p0).mPrintf(" %+.4f ");
     auto rslt = vhc->run(p0,
                          100, 10, 1E-5, // iMax, sMax, sTol
@@ -272,9 +272,9 @@ void minProbErr() {
     unsigned int sn = get<3>(rslt);
     delete vhc;
     vhc = nullptr;
-    LOG(DEBUG) << "Iter:" << in << "Stable:" << sn;
-    LOG(DEBUG) << KBase::getFormattedString("Best value: %+.4f", vBest);
-    LOG(DEBUG) << "Best point:";
+    LOG(INFO) << "Iter:" << in << "Stable:" << sn;
+    LOG(INFO) << KBase::getFormattedString("Best value: %+.4f", vBest);
+    LOG(INFO) << "Best point:";
     trans(pBest).mPrintf(" %+.4f ");
     return;
 }
@@ -365,7 +365,7 @@ void waterMin() {
 
     setUInit(scenQuant);
 
-    LOG(DEBUG) << "uInit: ";
+    LOG(INFO) << "uInit: ";
     uInit.mPrintf(" %.3f ");
 
     setLikelyScenarios(scenQuant);
@@ -373,7 +373,7 @@ void waterMin() {
     auto p = DemoWaterMin::waterMinProb(KBase::ReportingLevel::Medium,
                                         KBase::KMatrix(numA, 1));
 
-    LOG(DEBUG) << "Error-minimizing search ...";
+    LOG(INFO) << "Error-minimizing search ...";
     DemoWaterMin::minProbErr();
     return;
 }
@@ -382,7 +382,7 @@ void demoRMLP(PRNG* rng) {
 
 
     auto pfn = [](string lbl, string f, KMatrix m) {
-        LOG(DEBUG) << lbl;
+        LOG(INFO) << lbl;
         m.mPrintf(f);
         return;
     };
@@ -393,11 +393,11 @@ void demoRMLP(PRNG* rng) {
     const unsigned int iterLim = 100 * 1000;
 
     auto rmlp = RsrcMinLP::makeRMLP(rng, numP, numC, numS);
-    LOG(DEBUG) << "Number of products:" << rmlp->numProd;
+    LOG(INFO) << "Number of products:" << rmlp->numProd;
     pfn("Initial X: ", "%.2f ", rmlp->xInit);
     pfn("Resource costs: ", "%.2f ", rmlp->rCosts);
     const double rsrc0 = dot(rmlp->xInit, rmlp->rCosts);
-    LOG(DEBUG) << KBase::getFormattedString("Initial cost: %.2f", rsrc0);
+    LOG(INFO) << KBase::getFormattedString("Initial cost: %.2f", rsrc0);
 
     pfn("Fractional reduction / growth bounds: ", "%8.4f ", rmlp->bounds);
 
@@ -419,7 +419,7 @@ void demoRMLP(PRNG* rng) {
     pfn("Reduction bounds: ", "%7.2f ", rBounds);
     pfn("Growth bounds: ", "%7.2f ", gBounds);
 
-    LOG(DEBUG) << "Number of portfolios:" << rmlp->numPortC;
+    LOG(INFO) << "Number of portfolios:" << rmlp->numPortC;
     pfn("Portfolio weights: ", "%.3f ", rmlp->portWghts);
     pfn("Portfolio reductions: ", "%.3f ", rmlp->portRed);
 
@@ -432,7 +432,7 @@ void demoRMLP(PRNG* rng) {
     auto minPV = KMatrix::map(portFn, initPV.numR(), initPV.numC());
     pfn("Minimum portfolio values: ", "%8.2f", minPV);
 
-    LOG(DEBUG) << "Number of supply/demand ratio constraints:" << rmlp->numSpplyC;
+    LOG(INFO) << "Number of supply/demand ratio constraints:" << rmlp->numSpplyC;
 
     auto initS = rmlp->spplyWghts * rmlp->xInit;
     assert(1 == initS.numC());
@@ -517,17 +517,17 @@ void demoRMLP(PRNG* rng) {
         KMatrix u = get<0>(r);
         unsigned int iter = get<1>(r);
         KMatrix res = get<2>(r);
-        LOG(DEBUG) << "After" << iter << "iterations";
-        LOG(DEBUG) << "  LCP solution u:  ";
+        LOG(INFO) << "After" << iter << "iterations";
+        LOG(INFO) << "  LCP solution u:  ";
         trans(u).mPrintf(" %+.3f ");
-        LOG(DEBUG) << "  LCP residual r:  ";
+        LOG(INFO) << "  LCP residual r:  ";
         trans(res).mPrintf(" %+.3f ");
-        LOG(DEBUG) << "Dimensions: " << res.numR();
+        LOG(INFO) << "Dimensions: " << res.numR();
         KMatrix v = matM*u + matQ;
         double tol = 100 * eps;
         double e1 = sfe(u, u);
         double e2 = sfe(v, matM*u + matQ);
-        LOG(DEBUG) << KBase::getFormattedString("SFE of u is %.3E,  SFE of v is %.3E", e1, e2);
+        LOG(INFO) << KBase::getFormattedString("SFE of u is %.3E,  SFE of v is %.3E", e1, e2);
         assert(e1 < tol); // inaccurate U
         assert(e2 < tol); // inaccurate V
         auto sFn = [u](unsigned int i, unsigned int j) {
@@ -535,7 +535,7 @@ void demoRMLP(PRNG* rng) {
             return u(i, 0);
         };
         auto x = KMatrix::map(sFn, N, 1);
-        LOG(DEBUG) << "  LP solution x:  ";
+        LOG(INFO) << "  LP solution x:  ";
         trans(x).mPrintf(" %+.3f ");
         return x;
     };
@@ -547,47 +547,47 @@ void demoRMLP(PRNG* rng) {
 
     if (true) {
         try {
-            LOG(DEBUG) << "Solve via BSHe96";
+            LOG(INFO) << "Solve via BSHe96";
             auto r1 = viBSHe96(matM, matQ, KBase::projPos, start, eps, iterLim);
             auto x1 = processRslt(r1);
 
-            LOG(DEBUG) << KBase::getFormattedString("Initial resource usage: %10.2f", rsrc0);
+            LOG(INFO) << KBase::getFormattedString("Initial resource usage: %10.2f", rsrc0);
             const double rsrc1 = dot(x1, rmlp->rCosts);
-            LOG(DEBUG) << KBase::getFormattedString("Minimized resource usage: %10.2f", rsrc1);
-            LOG(DEBUG) << KBase::getFormattedString("Percentage change %+.3f", (100.0*(rsrc1 - rsrc0) / rsrc0));
+            LOG(INFO) << KBase::getFormattedString("Minimized resource usage: %10.2f", rsrc1);
+            LOG(INFO) << KBase::getFormattedString("Percentage change %+.3f", (100.0*(rsrc1 - rsrc0) / rsrc0));
         }
         catch (...) {
-            LOG(DEBUG) << "Caught exception";
+            LOG(INFO) << "Caught exception";
         }
     }
 
     if (true) {
         try {
-            LOG(DEBUG) << "Solve via AEG";
+            LOG(INFO) << "Solve via AEG";
             auto r2 = viABG(start, F, KBase::projPos, 0.5, eps, iterLim, true);
             auto x2 = processRslt(r2);
-            LOG(DEBUG) << KBase::getFormattedString("Initial resource usage:   %10.2f", rsrc0);
+            LOG(INFO) << KBase::getFormattedString("Initial resource usage:   %10.2f", rsrc0);
             const double rsrc2 = dot(x2, rmlp->rCosts);
-            LOG(DEBUG) << KBase::getFormattedString("Minimized resource usage: %10.2f", rsrc2);
-            LOG(DEBUG) << KBase::getFormattedString("Percentage change %+.3f", (100.0*(rsrc2 - rsrc0) / rsrc0));
+            LOG(INFO) << KBase::getFormattedString("Minimized resource usage: %10.2f", rsrc2);
+            LOG(INFO) << KBase::getFormattedString("Percentage change %+.3f", (100.0*(rsrc2 - rsrc0) / rsrc0));
         }
         catch (...) {
-            LOG(DEBUG) << "Caught exception";
+            LOG(INFO) << "Caught exception";
         }
     }
 
     if (true) { //  exceeds the iteration limit much more often than BSHe96
         try {
-            LOG(DEBUG) << "Solve via ABG";
+            LOG(INFO) << "Solve via ABG";
             auto r2 = viABG(start, F, KBase::projPos, 0.5, eps, iterLim, false);
             auto x2 = processRslt(r2);
-            LOG(DEBUG) << KBase::getFormattedString("Initial resource usage:   %10.2f", rsrc0);
+            LOG(INFO) << KBase::getFormattedString("Initial resource usage:   %10.2f", rsrc0);
             const double rsrc2 = dot(x2, rmlp->rCosts);
-            LOG(DEBUG) << KBase::getFormattedString("Minimized resource usage: %10.2f", rsrc2);
-            LOG(DEBUG) << KBase::getFormattedString("Percentage change %+.3f", (100.0*(rsrc2 - rsrc0) / rsrc0));
+            LOG(INFO) << KBase::getFormattedString("Minimized resource usage: %10.2f", rsrc2);
+            LOG(INFO) << KBase::getFormattedString("Percentage change %+.3f", (100.0*(rsrc2 - rsrc0) / rsrc0));
         }
         catch (...) {
-            LOG(DEBUG) << "Caught exception";
+            LOG(INFO) << "Caught exception";
         }
     }
 
@@ -656,8 +656,8 @@ int main(int ac, char **av) {
 
     PRNG * rng = new PRNG();
     seed = rng->setSeed(seed); // 0 == get a random number
-    LOG(DEBUG) << KBase::getFormattedString("Using PRNG seed:  %020llu", seed);
-    LOG(DEBUG) << KBase::getFormattedString("Same seed in hex:   0x%016llX", seed);
+    LOG(INFO) << KBase::getFormattedString("Using PRNG seed:  %020llu", seed);
+    LOG(INFO) << KBase::getFormattedString("Same seed in hex:   0x%016llX", seed);
 
     if (waterMinP) {
         DemoWaterMin::waterMin();

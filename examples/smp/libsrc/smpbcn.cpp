@@ -200,11 +200,11 @@ SMPState* SMPState::doBCN() {
 
   KBase::groupThreads(thrBCN, 0, na - 1);
 
-  LOG(DEBUG) << "Bargains to be resolved";
+  LOG(INFO) << "Bargains to be resolved";
   showBargains(brgns);
 
   w = actrCaps();
-  LOG(DEBUG) << "w:";
+  LOG(INFO) << "w:";
   w.mPrintf(" %6.2f ");
 
   s2 = new SMPState(model);
@@ -263,7 +263,7 @@ SMPState* SMPState::doBCN() {
   }
   s2->newIdeals(); // adjust s2 ideals toward new ones
   double ipDist = s2->posIdealDist(ReportingLevel::Medium);
-  LOG(DEBUG) << KBase::getFormattedString("rms (pstn, ideal) = %.5f", ipDist);
+  LOG(INFO) << KBase::getFormattedString("rms (pstn, ideal) = %.5f", ipDist);
   return s2;
 }
 
@@ -322,7 +322,7 @@ void SMPState::doBCN(unsigned int i) {
         auto est = probEduChlg(h, k, i, j, recordTmpSQLP); // H's estimate of the effect on K of I->J
         double phij = get<0>(est);
         double edu_hk_ij = get<1>(est);
-        //LOG(DEBUG) << KBase::getFormattedString(
+        //LOG(INFO) << KBase::getFormattedString(
         //  "Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f",
         //  h, phij, i, j, k, edu_hk_ij);
         return est;
@@ -366,7 +366,7 @@ void SMPState::doBCN(unsigned int i) {
 
       // Look for counter-intuitive cases
       if (piiJ < 0.5) {
-        LOG(DEBUG) << "turn" << turn << ","
+        LOG(INFO) << "turn" << turn << ","
             << "i" << i << ","
             << "j" << j << ","
             << "bestEU worth" << bestEU << ","
@@ -374,25 +374,25 @@ void SMPState::doBCN(unsigned int i) {
       }
 
       // I's estimate of the effect on I of I->J
-      LOG(DEBUG) << KBase::getFormattedString(
+      LOG(INFO) << KBase::getFormattedString(
         "Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f",
         i, piiJ, i, j, i, get<2>(chlgI));
 
       // I's estimate of the effect on J of I->J
-      LOG(DEBUG) << KBase::getFormattedString(
+      LOG(INFO) << KBase::getFormattedString(
           "Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f",
           i, get<0>(est_ijij), i, j, j, get<1>(est_ijij));
 
       // J's estimate of the effect on I of I->J
-      LOG(DEBUG) << KBase::getFormattedString(
+      LOG(INFO) << KBase::getFormattedString(
           "Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f",
           j, get<0>(Vjij), i, j, i, get<1>(Vjij));
 
       // J's estimate of the effect on J of I->J
-      LOG(DEBUG) << KBase::getFormattedString(
+      LOG(INFO) << KBase::getFormattedString(
           "Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f",
           j, get<0>(est_jjij), i, j, j, get<1>(est_jjij));
-      LOG(DEBUG) << "";
+      LOG(INFO) << "";
 
       // Bargain positions from i's perspective
       LOG(INFO) << "Bargain" << showOneBargain(brgnIIJ)
@@ -403,7 +403,7 @@ void SMPState::doBCN(unsigned int i) {
       //LOG(INFO) << i << "proposes" << j << "adopt:";
       proposal = string("   ") + std::to_string(i) + " proposes " + std::to_string(j) + " adopt: ";
       (KBase::trans(brgnIIJ->posRcvr) * 100.0).mPrintf(" %.3f ", proposal); // print on the scale of [0,100]
-      LOG(DEBUG) << "";
+      LOG(INFO) << "";
 
       // Bargain positions from j's perspective
       LOG(INFO) << "Bargain" << showOneBargain(brgnJIJ)
@@ -414,7 +414,7 @@ void SMPState::doBCN(unsigned int i) {
       //LOG(INFO) << j << "proposes" << j << "adopt:";
       proposal = string("   ") + std::to_string(j) + " proposes " + std::to_string(j) + " adopt: ";
       (KBase::trans(brgnJIJ->posRcvr) * 100.0).mPrintf(" %.3f ", proposal); // print on the scale of [0,100]
-      LOG(DEBUG) << "";
+      LOG(INFO) << "";
 
       // Power-weighted compromise
       LOG(INFO) << "Power-weighted compromise" << showOneBargain(brgnIJ) << "bargain (brgnIJ)";
@@ -425,7 +425,7 @@ void SMPState::doBCN(unsigned int i) {
       //LOG(INFO) << "  Compromise proposes" << j << "adopt: ";
       proposal = string("   ") + string("  compromise proposes ") + std::to_string(j) + " adopt: ";
       (KBase::trans(brgnIJ->posRcvr) * 100.0).mPrintf(" %.3f ", proposal); // print on the scale of [0,100]
-      LOG(DEBUG) << "";
+      LOG(INFO) << "";
 
 
       // TODO: make one-perspective an option.
@@ -509,7 +509,7 @@ void SMPState::doBCN(unsigned int i) {
         break;
 
       default:
-        LOG(ERROR) << "SMPState::doBCN unrecognized SMPBargnModel";
+        LOG(INFO) << "SMPState::doBCN unrecognized SMPBargnModel";
         exit(-1);
       }
 
@@ -590,7 +590,7 @@ void SMPState::updateBestBrgnPositions(int k) {
     mtxLock.lock();
     auto u_im = KMatrix::map(buk, na, nb);
 
-    LOG(DEBUG) << "u_im:";
+    LOG(INFO) << "u_im:";
     u_im.mPrintf(" %.5f ");
 
     LOG(INFO) << "Doing scalarPCE for the" << nb << "bargains of actor" << k << "...";
@@ -615,7 +615,7 @@ void SMPState::updateBestBrgnPositions(int k) {
     assert(mMax < nb);
     actorMaxBrgNdx.insert(map<unsigned int, unsigned int>::value_type(k, mMax));
     auto bkm = brgns[k][mMax];
-    LOG(DEBUG) << "Chosen bargain (" << smod->stm << "):" << bkm->getID()
+    LOG(INFO) << "Chosen bargain (" << smod->stm << "):" << bkm->getID()
       << mMax + 1 << "out of" << nb << "bargains";
     mtxLock.unlock();
 
@@ -662,7 +662,7 @@ void SMPState::updateBestBrgnPositions(int k) {
         pk = new VctrPstn(bkm->posRcvr);
       }
       else {
-        LOG(ERROR) << "SMPState::doBCN: unrecognized actor in bargain";
+        LOG(INFO) << "SMPState::doBCN: unrecognized actor in bargain";
         assert(false);
         exit(-1);
       }

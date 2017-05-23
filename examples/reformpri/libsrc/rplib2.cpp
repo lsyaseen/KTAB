@@ -57,7 +57,7 @@ string genName(const string & prefix, unsigned int i) {
 
 RP2Model* pmmCreation(uint64_t sd) {
   auto pmm = new RP2Model("Bob", sd);
-  LOG(DEBUG) << "Created pmm named " << pmm->getScenarioName();
+  LOG(INFO) << "Created pmm named " << pmm->getScenarioName();
   pmm->pcem = KBase::PCEModel::MarkovIPCM;
   auto rng = new PRNG(sd);
   const unsigned int numAct = 17;
@@ -74,19 +74,19 @@ RP2Model* pmmCreation(uint64_t sd) {
     desc.push_back(genName("Description", i));
   }
   pmm->setActors(names, desc);
-  LOG(DEBUG) << "Added " << numAct << " actors ";
-  LOG(DEBUG) << "Configured " << pmm->getScenarioName();
+  LOG(INFO) << "Added " << numAct << " actors ";
+  LOG(INFO) << "Configured " << pmm->getScenarioName();
   return pmm;
 }
 RP2Pos* pmpCreation(RP2Model* pmm) {
   auto pmp = new RP2Pos(pmm, 7);
-  LOG(DEBUG) << "Created pmp with index " << pmp->getIndex();
+  LOG(INFO) << "Created pmp with index " << pmp->getIndex();
   return pmp;
 }
 RP2State* pmsCreation(RP2Model * pmm) {
   auto pms = new RP2State(pmm);
   pmm->addState(pms);
-  LOG(DEBUG) << "Added new state to RP2Model";
+  LOG(INFO) << "Added new state to RP2Model";
   return pms;
 }
 
@@ -145,15 +145,15 @@ void initScen(uint64_t sd) {
 
   vector<double> prob = {};
   double pj = 1.0;
-  LOG(DEBUG) << KBase::getFormattedString("pDecline factor: %.3f", pDecline);
-  LOG(DEBUG) << KBase::getFormattedString("obFactor: %.3f", obFactor);
+  LOG(INFO) << KBase::getFormattedString("pDecline factor: %.3f", pDecline);
+  LOG(INFO) << KBase::getFormattedString("obFactor: %.3f", obFactor);
   // rate of decline has little effect on the results.
   for (unsigned int j = 0; j < numItm; j++) {
     prob.push_back(pj);
     pj = pj * pDecline;
   }
 
-  LOG(DEBUG) << "Computing positions ... ";
+  LOG(INFO) << "Computing positions ... ";
   vector<VUI> positions; // list of all positions
   VUI pstn;
   // build the first permutation: 1,2,3,...
@@ -165,11 +165,11 @@ void initScen(uint64_t sd) {
     positions.push_back(pstn);
   }
   const unsigned int numPos = positions.size();
-  LOG(DEBUG) << "For" << numItm << "reform items there are"
+  LOG(INFO) << "For" << numItm << "reform items there are"
    << numPos << "positions";
 
 
-  LOG(DEBUG) << "Building position utility matrix ... ";
+  LOG(INFO) << "Building position utility matrix ... ";
   auto rpValFn = [positions, riVal, aCap, govCost, govBudget, obFactor, prob](unsigned int ai, unsigned int pj) {
     VUI pstn = positions[pj];
     double rvp = rawValPos(ai, pstn, riVal, aCap, govCost, govBudget, obFactor, prob);
@@ -186,7 +186,7 @@ void initScen(uint64_t sd) {
   };
 
   const auto rpUtil = KMatrix::map(curve, rpNormVal);
-  LOG(DEBUG) << "done.";
+  LOG(INFO) << "done.";
 
   // This is an attempt to define a domain-independent measure of similarity,
   // by looking at the difference in outcomes to actors.
@@ -233,13 +233,13 @@ void initScen(uint64_t sd) {
   auto rslt1 = diffVUI(rand1, numClose);
   
   
-  LOG(DEBUG) << "Permutations with outcomes most similar to " << rand1;
+  LOG(INFO) << "Permutations with outcomes most similar to " << rand1;
   for (unsigned int i = 0; i < rslt1.size(); i++) {
     auto dp = rslt1[i];
     double d = get<0>(dp);
     unsigned int p = get<1>(dp);
     auto posP = positions[p];
-    LOG(DEBUG) << KBase::getFormattedString("%2u: %4u  %.4f  ", i, p, d);
+    LOG(INFO) << KBase::getFormattedString("%2u: %4u  %.4f  ", i, p, d);
     KBase::printVUI(posP);
   }
 

@@ -189,29 +189,29 @@ function < vector<VBool>()> thetaBV(unsigned int n) {
 
 void demoEMod(uint64_t s) {
   using KBase::EModel;
-  LOG(DEBUG) << " ";
-  LOG(DEBUG) << KBase::getFormattedString("demoEMod using PRNG seed:  %020llu", s);
+  LOG(INFO) << " ";
+  LOG(INFO) << KBase::getFormattedString("demoEMod using PRNG seed:  %020llu", s);
 
-  LOG(DEBUG) << "Creating EModel objects ... ";
+  LOG(INFO) << "Creating EModel objects ... ";
 
   string n2D = "EModel-TwoDPoint";
   auto em2D = new EModel<TwoDPoint>(n2D, s);
-  LOG(DEBUG) << KBase::getFormattedString("Populating %s ", n2D.c_str());
+  LOG(INFO) << KBase::getFormattedString("Populating %s ", n2D.c_str());
   em2D->enumOptions = theta2D;
   em2D->setOptions();
-  LOG(DEBUG) << KBase::getFormattedString("Now have %u enumerated options", em2D->numOptions());
+  LOG(INFO) << KBase::getFormattedString("Now have %u enumerated options", em2D->numOptions());
    
   string nBV = "EModel-VBool";
   EModel<VBool>* emBV = new EModel<VBool>( nBV, s); 
-  LOG(DEBUG) << KBase::getFormattedString("Populating %s ", nBV.c_str());
+  LOG(INFO) << KBase::getFormattedString("Populating %s ", nBV.c_str());
   const unsigned int numActTBV = 17;
   const unsigned int numBitsTBV = 4;
   emBV->enumOptions = tbv(numActTBV, numBitsTBV, emBV->rng); //  thetaBV(4);
   emBV->setOptions(); 
-  LOG(DEBUG) << KBase::getFormattedString("Now have %u enumerated options", emBV->numOptions());
+  LOG(INFO) << KBase::getFormattedString("Now have %u enumerated options", emBV->numOptions());
 
 
-  LOG(DEBUG) << "Deleting EModel objects ... ";
+  LOG(INFO) << "Deleting EModel objects ... ";
   delete em2D;
   delete emBV;
   return;

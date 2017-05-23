@@ -176,10 +176,10 @@ void GAOpt<GAP>::run(PRNG* rng, double c, double m,
     runP = (iter < maxI) && (sIter < maxS);
 
     if (ReportingLevel::Low < srl) {
-      LOG(DEBUG) << iter << "/" << maxI << " iterations and "
+      LOG(INFO) << iter << "/" << maxI << " iterations and "
         << sIter << "/" << maxS << " stable";
-      LOG(DEBUG) << getFormattedString("newBest value: %+.4f up %+.4f", newBest, dv);
-      LOG(DEBUG) << "newBest gene:";
+      LOG(INFO) << getFormattedString("newBest value: %+.4f up %+.4f", newBest, dv);
+      LOG(INFO) << "newBest gene:";
       showGene(get<1>(pri));
       if (ReportingLevel::Medium < srl) {
         show();
@@ -188,11 +188,11 @@ void GAOpt<GAP>::run(PRNG* rng, double c, double m,
   }
   if (ReportingLevel::Silent < srl) {
     auto pri = getNth(0);
-    LOG(DEBUG) << "Search completed after "
+    LOG(INFO) << "Search completed after "
       << iter << "/" << maxI << " iterations and "
       << sIter << "/" << maxS << " stable";
-    LOG(DEBUG) << getFormattedString("best value: %+.4f", get<0>(pri));
-    LOG(DEBUG) << "best gene: ";
+    LOG(INFO) << getFormattedString("best value: %+.4f", get<0>(pri));
+    LOG(INFO) << "best gene: ";
     showGene(get<1>(pri));
   }
   el::Loggers::addFlag(el::LoggingFlag::AutoSpacing);
@@ -380,7 +380,7 @@ void GAOpt<GAP>::show() {
     auto pri = gpool[i];
     auto vi = get<0>(pri);
     auto gi = get<1>(pri);
-    LOG(DEBUG) << getFormattedString("%4u  %8.3f", i, vi);
+    LOG(INFO) << getFormattedString("%4u  %8.3f", i, vi);
     assert(nullptr != gi);
     showGene(gi);
   }

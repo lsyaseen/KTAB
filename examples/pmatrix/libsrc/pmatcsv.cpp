@@ -62,7 +62,7 @@ FittingParameters pccCSV(const string fs) {
   inStream >> dummy >> numCase;
   assert(1 <= numCase);
 
-  LOG(DEBUG) << "Actors" << numAct << ", Scenarios" << numScen << ", Cases" << numCase;
+  LOG(INFO) << "Actors" << numAct << ", Scenarios" << numScen << ", Cases" << numCase;
 
   // skip headers
   inStream.read_line();
@@ -103,15 +103,15 @@ FittingParameters pccCSV(const string fs) {
     } // loop over j, scenarios
   } // loop over i, actors
 
-  LOG(DEBUG) << "Actor names (min/max)";
+  LOG(INFO) << "Actor names (min/max)";
   for (unsigned int i = 0; i < numAct; i++) {
-    LOG(DEBUG) << (maxVect[i] ? "max" : "min") << "   " << aNames[i];
+    LOG(INFO) << (maxVect[i] ? "max" : "min") << "   " << aNames[i];
   }
 
-  LOG(DEBUG) << "Case Weights:";
+  LOG(INFO) << "Case Weights:";
   caseWeights.mPrintf("%7.3f ");
 
-  LOG(DEBUG) << "Outcomes:";
+  LOG(INFO) << "Outcomes:";
   outcomes.mPrintf(" %+.4e  ");
 
 
@@ -151,17 +151,17 @@ FittingParameters pccCSV(const string fs) {
     }
   } // loop over j, cases
 
-  LOG(DEBUG) << "Prob threshholds:";
+  LOG(INFO) << "Prob threshholds:";
   for (unsigned int k = 0; k < numCase; k++) {
     if (overThresh[k]) {
-      LOG(DEBUG) << KBase::getFormattedString("Over  %.3f", threshVal[k]);
+      LOG(INFO) << KBase::getFormattedString("Over  %.3f", threshVal[k]);
     }
     else {
-      LOG(DEBUG) << KBase::getFormattedString("Under %.3f", threshVal[k]);
+      LOG(INFO) << KBase::getFormattedString("Under %.3f", threshVal[k]);
     }
   }
 
-  LOG(DEBUG) << "ProbWeights:";
+  LOG(INFO) << "ProbWeights:";
   probWeight.mPrintf(" %5.3f ");
 
   auto rslt = FittingParameters(aNames, maxVect,

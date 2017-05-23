@@ -175,18 +175,18 @@ GHCSearch<HCP>::run(HCP p0, ReportingLevel srl,
     iter++;
 
     if (ReportingLevel::Low < srl) {
-      LOG(DEBUG) << KBase::getFormattedString("%u/%u iterations    %u/%u stable", iter, iMax, sIter, sMax);
-      LOG(DEBUG) << KBase::getFormattedString("newBest value: %+.4f up %+.4f", vBest, dv);
-      LOG(DEBUG) << "newBest point:";
+      LOG(INFO) << KBase::getFormattedString("%u/%u iterations    %u/%u stable", iter, iMax, sIter, sMax);
+      LOG(INFO) << KBase::getFormattedString("newBest value: %+.4f up %+.4f", vBest, dv);
+      LOG(INFO) << "newBest point:";
       show(p0);
     }
   }
   if (ReportingLevel::Silent < srl) {
-    LOG(DEBUG) << KBase::getFormattedString(
+    LOG(INFO) << KBase::getFormattedString(
       "GHCSearch::run ended with %u/%u iterations    %u/%u stable", iter,
       iMax, sIter, sMax);
-    LOG(DEBUG) << KBase::getFormattedString("newBest value: %+.4f", v0);
-    LOG(DEBUG) << "newBest point:";
+    LOG(INFO) << KBase::getFormattedString("newBest value: %+.4f", v0);
+    LOG(INFO) << "newBest point:";
     show(p0);
   }
 

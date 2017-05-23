@@ -178,7 +178,7 @@ void EState<PT>::show() const {
     log += " " + std::to_string(posNdx(i));
   }
   log += "]";
-  LOG(DEBUG) << log;
+  LOG(INFO) << log;
   return;
 }
 
@@ -209,12 +209,12 @@ unsigned int EState<PT>::posNdx(const unsigned int i) const {
 
 template <class PT>
 EState<PT>* EState<PT>::stepSUSN() {
-  LOG(DEBUG) << "State number " << model->history.size() - 1;
+  LOG(INFO) << "State number " << model->history.size() - 1;
   show();
   if ((0 == uIndices.size()) || (0 == eIndices.size())) {
     setUENdx();
   }
-  LOG(DEBUG) << "Setting all utilities from objective perspective";
+  LOG(INFO) << "Setting all utilities from objective perspective";
   setAUtil(-1, ReportingLevel::Low);
   auto s2 = doSUSN(ReportingLevel::Low);
   assert(nullptr != s2);
@@ -286,19 +286,19 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
   const auto eu0 = expUtilMat(rl, numA, numP, vpm, uUnique); //  without duplicates
 
   if (ReportingLevel::Low < rl) {
-    LOG(DEBUG) << "--------------------------------------- ";
-    LOG(DEBUG) << "Actor expected utilities in actual state: ";
+    LOG(INFO) << "--------------------------------------- ";
+    LOG(INFO) << "Actor expected utilities in actual state: ";
     for (unsigned int h = 0; h < numA; h++)
     {
-      LOG(DEBUG) << KBase::getFormattedString("%3u , %.5f \n", h, eu0(h, 0));
+      LOG(INFO) << KBase::getFormattedString("%3u , %.5f \n", h, eu0(h, 0));
     }
-    LOG(DEBUG) << "Positions in this state: ";
+    LOG(INFO) << "Positions in this state: ";
     show();
 
-    LOG(DEBUG) << KBase::getFormattedString("Out of %u positions, %u were unique, with these indices: ", numA, numU);
+    LOG(INFO) << KBase::getFormattedString("Out of %u positions, %u were unique, with these indices: ", numA, numU);
     for (auto i : uIndices)
     {
-      LOG(DEBUG) << KBase::getFormattedString("%2i ", i);
+      LOG(INFO) << KBase::getFormattedString("%2i ", i);
     }
   }
 
@@ -377,16 +377,16 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
     }
 
     if (false) {
-      LOG(DEBUG) << "constructed hypUtil matrix:";
+      LOG(INFO) << "constructed hypUtil matrix:";
       hypUtil.mPrintf(" %8.2f ");
     }
 
 
     if (ReportingLevel::Low < rl) {
-      LOG(DEBUG) << "--------------------------------------- ";
-      LOG(DEBUG) << KBase::getFormattedString("Assessing utility to %2i of hypo-pos: ", h);
-      LOG(DEBUG) << eph;
-      LOG(DEBUG) << "Hypo-util minus base util: ";
+      LOG(INFO) << "--------------------------------------- ";
+      LOG(INFO) << KBase::getFormattedString("Assessing utility to %2i of hypo-pos: ", h);
+      LOG(INFO) << eph;
+      LOG(INFO) << "Hypo-util minus base util: ";
       (uh - uh0).mPrintf(" %+.4E ");
     }
 
@@ -408,7 +408,7 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
   // efn, nghbrPerms, and sfn.
   auto newPosFn = [this, ehFN, rl,  u, eu0, s2](const unsigned int h)  {
     if (ReportingLevel::Low < rl) {
-      LOG(DEBUG) << "Started newPosFn for "<<h;
+      LOG(INFO) << "Started newPosFn for "<<h;
     }
     s2->pstns[h] = nullptr;
     auto ph = ((const EPosition<PT>*)(pstns[h]));
@@ -429,7 +429,7 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
         ns.push_back(ep);
       }
       if (ReportingLevel::Low < rl) {
-        LOG(DEBUG) << "Found "<<ns.size()<<" neighbors";
+        LOG(INFO) << "Found "<<ns.size()<<" neighbors";
       }
       assert (0 < ns.size());
       return ns;
@@ -439,13 +439,13 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
 
     // show some representation of this position on cout
     ghc->show = [](const EPosition<PT> & ep) {
-      LOG(DEBUG) << ep ;
+      LOG(INFO) << ep ;
       return;
     };
 
     if (ReportingLevel::Low < rl) {
-      LOG(DEBUG) << "---------------------------------------- ";
-      LOG(DEBUG) << KBase::getFormattedString("Search for best next-position of actor %2i ", h);
+      LOG(INFO) << "---------------------------------------- ";
+      LOG(INFO) << KBase::getFormattedString("Search for best next-position of actor %2i ", h);
     }
     auto rslt = ghc->run(*ph, // start from h's current positions
                          ReportingLevel::Silent,
@@ -459,9 +459,9 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
     ghc = nullptr;
 
     if (ReportingLevel::Medium < rl) {
-      LOG(DEBUG) << KBase::getFormattedString("Iter: %u  Stable: %u \n", iterN, stblN);
-      LOG(DEBUG) << KBase::getFormattedString("Best value for %2i: %+.6f \n", h, vBest);
-      LOG(DEBUG) << "Best position:    " << pBest;
+      LOG(INFO) << KBase::getFormattedString("Iter: %u  Stable: %u \n", iterN, stblN);
+      LOG(INFO) << KBase::getFormattedString("Best value for %2i: %+.6f \n", h, vBest);
+      LOG(INFO) << "Best position:    " << pBest;
     }
 
     auto posBest = new EPosition<PT>(pBest);
@@ -473,11 +473,11 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
 
     double du = vBest - eu0(h, 0); // (hypothetical, future) - (actual, current)
     if (ReportingLevel::Low < rl) {
-      LOG(DEBUG) << KBase::getFormattedString("Expected EU improvement for %2i of %+.4E \n", h, du);
+      LOG(INFO) << KBase::getFormattedString("Expected EU improvement for %2i of %+.4E \n", h, du);
       if (ReportingLevel::Medium < rl) {
-        LOG(DEBUG) << KBase::getFormattedString("  vBest = %+.6f \n", vBest);
-        LOG(DEBUG) << KBase::getFormattedString("  eu0(%i, 0) for %i = %+.6f \n", h, h, eu0(h,0));
-        LOG(DEBUG) << KBase::getFormattedString("  du = %+.6f \n", du);
+        LOG(INFO) << KBase::getFormattedString("  vBest = %+.6f \n", vBest);
+        LOG(INFO) << KBase::getFormattedString("  eu0(%i, 0) for %i = %+.6f \n", h, h, eu0(h,0));
+        LOG(INFO) << KBase::getFormattedString("  du = %+.6f \n", du);
       }
     }
     // Logically, du should always be non-negative, as GHC never returns a worse value than the starting point.
@@ -495,10 +495,10 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
   parP = parP && (rl <= ReportingLevel::Low);
   if (ReportingLevel::Silent < rl) {
     if (parP) {
-      LOG(DEBUG) << "Will continue with multi-threaded execution";
+      LOG(INFO) << "Will continue with multi-threaded execution";
     }
     else {
-      LOG(DEBUG) << "Will continue with single-threaded execution";
+      LOG(INFO) << "Will continue with single-threaded execution";
     }
   }
 
@@ -529,7 +529,7 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
 
 template <class PT>
 EState<PT>* EState<PT>::stepBCN() {
-  LOG(DEBUG) << "State number " << model->history.size() - 1;
+  LOG(INFO) << "State number " << model->history.size() - 1;
   if ((0 == uIndices.size()) || (0 == eIndices.size())) {
     setUENdx();
   }
@@ -548,7 +548,7 @@ template <class PT>
 EState<PT>* EState<PT>::doBCN(ReportingLevel rl) const {
   EState<PT>* s2 = nullptr;
 
-  LOG(DEBUG) << "EState<PT>::doBCN not yet implemented";
+  LOG(INFO) << "EState<PT>::doBCN not yet implemented";
   // do something
 
   assert (s2 != nullptr);
@@ -561,7 +561,7 @@ EState<PT>* EState<PT>::doBCN(ReportingLevel rl) const {
 
 template <class PT>
 EState<PT>* EState<PT>::stepMCN() {
-  LOG(DEBUG) << "State number " << model->history.size() - 1;
+  LOG(INFO) << "State number " << model->history.size() - 1;
   if ((0 == uIndices.size()) || (0 == eIndices.size())) {
     setUENdx();
   }
@@ -596,19 +596,19 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
   const auto eu0 = expUtilMat(rl, numA, numP, vpm, uUnique);
 
   if (ReportingLevel::Low < rl) {
-    LOG(DEBUG) << "--------------------------------------- ";
-    LOG(DEBUG) << "Assessing utility of actual state to all actors ";
+    LOG(INFO) << "--------------------------------------- ";
+    LOG(INFO) << "Assessing utility of actual state to all actors ";
     for (unsigned int h = 0; h < numA; h++)
     {
-      LOG(DEBUG) << KBase::getFormattedString("%3u , %.5f \n", h, eu0(h, 0));
+      LOG(INFO) << KBase::getFormattedString("%3u , %.5f \n", h, eu0(h, 0));
     }
-    LOG(DEBUG) << "Positions in this state: ";
+    LOG(INFO) << "Positions in this state: ";
     show();
 
-    LOG(DEBUG) << KBase::getFormattedString("Out of %u positions, %u were unique, with these indices: ", numA, numU);
+    LOG(INFO) << KBase::getFormattedString("Out of %u positions, %u were unique, with these indices: ", numA, numU);
     for (auto i : uIndices)
     {
-      LOG(DEBUG) << KBase::getFormattedString("%2i ", i);
+      LOG(INFO) << KBase::getFormattedString("%2i ", i);
     }
   }
 
@@ -686,7 +686,7 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
   // three-neighbors are possible, but prohibitively expensive and not very helpful.
 
   if (ReportingLevel::Silent < rl) {
-    LOG(DEBUG) << "Creating and ranking "<<neighbors.size() << " neighboring states";
+    LOG(INFO) << "Creating and ranking "<<neighbors.size() << " neighboring states";
   }
   // create and rank all (!) the neighboring states
   const auto w = eMod->actorWeights(); // a row vector
@@ -745,7 +745,7 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
       bestZeta = zi;
       bestNghbr = i;
       if (ReportingLevel::Low < rl) {
-        LOG(DEBUG) << KBase::getFormattedString("New best neighbor is %u with z=%.4f (delta=%.2E)\n",
+        LOG(INFO) << KBase::getFormattedString("New best neighbor is %u with z=%.4f (delta=%.2E)\n",
                i, zi, delta);
         KBase::printVUI(ni);
       }
@@ -763,10 +763,10 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
 
   if (ReportingLevel::Silent < rl) {
     if (parP) {
-      LOG(DEBUG) << "Will continue with multi-threaded execution";
+      LOG(INFO) << "Will continue with multi-threaded execution";
     }
     else {
-      LOG(DEBUG) << "Will continue with single-threaded execution";
+      LOG(INFO) << "Will continue with single-threaded execution";
     }
   }
 
@@ -781,7 +781,7 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
 
   VUI nghbr = neighbors[bestNghbr];
   if (ReportingLevel::Silent < rl) {
-    LOG(DEBUG) << KBase::getFormattedString("Highest zeta is %.5f for state %u: \n", bestZeta, bestNghbr);
+    LOG(INFO) << KBase::getFormattedString("Highest zeta is %.5f for state %u: \n", bestZeta, bestNghbr);
     printVUI(nghbr);
   }
 
@@ -821,7 +821,7 @@ VUI EState<PT>::powerWeightedSimilarity(const KMatrix& uMat, unsigned int ti, un
       const double duj = uMat(j,ti) - uMat(j, k);
       dk = dk + (sj*duj*duj);
     }
-    //LOG(DEBUG) << KBase::getFormattedString("%2u PW %.4f \n", k, dk);
+    //LOG(INFO) << KBase::getFormattedString("%2u PW %.4f \n", k, dk);
     vdk[k] = TDI(dk, k);
   }
 
@@ -858,7 +858,7 @@ tuple <KMatrix, VUI> EState<PT>::pDist(int persp) const {
   const unsigned int numU = uIndices.size();
   assert(numU <= numP); // might have dropped some duplicates
 
-  LOG(DEBUG) << "Number of aUtils: " << aUtil.size();
+  LOG(INFO) << "Number of aUtils: " << aUtil.size();
 
   /*
     const auto u = aUtil[0]; // all have same beliefs in this demo
@@ -921,7 +921,7 @@ KMatrix EState<PT>::expUtilMat  (KBase::ReportingLevel rl,
     const bool okLower = (0.0 <= mij + tol);
     const bool okUpper = (mij <= 1.0 + tol);
     if (!okLower || !okUpper) {
-      LOG(DEBUG) << KBase::getFormattedString("%f  %i  %i  \n", mij, i, j);
+      LOG(INFO) << KBase::getFormattedString("%f  %i  %i  \n", mij, i, j);
     }
     assert(okLower);
     assert(okUpper);
@@ -958,20 +958,20 @@ KMatrix EState<PT>::expUtilMat  (KBase::ReportingLevel rl,
   KMatrix::mapV(euRng, eu.numR(), eu.numC());
 
   if (ReportingLevel::Low < rl) {
-    LOG(DEBUG) << KBase::getFormattedString("Util matrix is %u x %u \n", uMat.numR(), uMat.numC());
-    LOG(DEBUG) << "Assessing EU from util matrix: ";
+    LOG(INFO) << KBase::getFormattedString("Util matrix is %u x %u \n", uMat.numR(), uMat.numC());
+    LOG(INFO) << "Assessing EU from util matrix: ";
     uMat.mPrintf(" %.6f ");
 
-    LOG(DEBUG) << "Coalition strength matrix";
+    LOG(INFO) << "Coalition strength matrix";
     c.mPrintf(" %12.6f ");
 
-    LOG(DEBUG) << "Probability Opt_i > Opt_j";
+    LOG(INFO) << "Probability Opt_i > Opt_j";
     pv.mPrintf(" %.6f ");
 
-    LOG(DEBUG) << "Probability Opt_i";
+    LOG(INFO) << "Probability Opt_i";
     p.mPrintf(" %.6f ");
 
-    LOG(DEBUG) << "Expected utility to actors: ";
+    LOG(INFO) << "Expected utility to actors: ";
     eu.mPrintf(" %.6f ");
   }
 

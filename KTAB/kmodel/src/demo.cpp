@@ -56,10 +56,10 @@ namespace MDemo { // a namespace of which M, A, P, S know nothing
 // --------------------------------------------
 
 void demoPCE(uint64_t s, PRNG* rng) {
-  LOG(DEBUG) << KBase::getFormattedString("demoPCE using PRNG seed:  %020llu", s);
+  LOG(INFO) << KBase::getFormattedString("demoPCE using PRNG seed:  %020llu", s);
   rng->setSeed(s);
 
-  LOG(DEBUG) << "Demonstrate minimal PCE";
+  LOG(INFO) << "Demonstrate minimal PCE";
 
   VPModel vpm = VPModel::Linear;
   switch (rng->uniform() % 6) {
@@ -80,14 +80,14 @@ void demoPCE(uint64_t s, PRNG* rng) {
     vpm = VPModel::Binary;
     break;
   default:
-    LOG(DEBUG) << "Unrecognized VPModel option";
+    LOG(INFO) << "Unrecognized VPModel option";
     assert(false);
     break;
   }
 
-  LOG(DEBUG) << "Using VPModel " << vpm;
+  LOG(INFO) << "Using VPModel " << vpm;
 
-  LOG(DEBUG) << "First, stable distrib is exactly as expected in bilateral conflict";
+  LOG(INFO) << "First, stable distrib is exactly as expected in bilateral conflict";
 
   auto cFn = [rng](unsigned int i, unsigned int j) {
     if (i == j) {
@@ -100,48 +100,48 @@ void demoPCE(uint64_t s, PRNG* rng) {
   };
 
   auto show = [](const KMatrix & cMat, const KMatrix & pvMat, const KMatrix & pVec) {
-    LOG(DEBUG) << "Coalitions matrix:";
+    LOG(INFO) << "Coalitions matrix:";
     cMat.mPrintf(" %6.3f ");
-    LOG(DEBUG) << "prob[i>j] Markov transitions matrix:";
+    LOG(INFO) << "prob[i>j] Markov transitions matrix:";
     pvMat.mPrintf(" %.4f ");
-    LOG(DEBUG) << "limiting stable prob[i] vector:";
+    LOG(INFO) << "limiting stable prob[i] vector:";
     pVec.mPrintf(" %.4f ");
     return;
   };
-  LOG(DEBUG) << "Compare simple " << vpm << " ratios to2-by-2  Markov-uniform ...";
+  LOG(INFO) << "Compare simple " << vpm << " ratios to2-by-2  Markov-uniform ...";
   auto c = KMatrix::map(cFn, 2, 2);
   auto p3 = Model::markovIncentivePCE(c, vpm);
   auto ppv = Model::probCE2(PCEModel::MarkovUPCM, vpm, c);
   auto p2 = get<0>(ppv); // column
   auto pv = get<1>(ppv); //square
-  LOG(DEBUG) << "2-Option Markov Uniform ";
+  LOG(INFO) << "2-Option Markov Uniform ";
   show(c, pv, p2);
-  LOG(DEBUG) << "Markov Incentive";
+  LOG(INFO) << "Markov Incentive";
   show(c, pv, p3);
 
   p3 = get<0>(Model::probCE2(PCEModel::MarkovIPCM, vpm, c));
-  LOG(DEBUG) << "2-Option Markov Incentive";
+  LOG(INFO) << "2-Option Markov Incentive";
   show(c, pv, p3);
-  LOG(DEBUG) << "But not so clear with three options ...";
+  LOG(INFO) << "But not so clear with three options ...";
   c = KMatrix::map(cFn, 3, 3);
   ppv = Model::probCE2(PCEModel::MarkovUPCM, vpm, c);
   p2 = get<0>(ppv); // column
   pv = get<1>(ppv); //square
-  LOG(DEBUG) << "3-Option Markov Uniform ";
+  LOG(INFO) << "3-Option Markov Uniform ";
   p3 = Model::markovIncentivePCE(c, vpm);
 
-  LOG(DEBUG) << "Markov Uniform  ";
+  LOG(INFO) << "Markov Uniform  ";
   show(c, pv, p2);
-  LOG(DEBUG) << "Markov Incentive";
+  LOG(INFO) << "Markov Incentive";
   show(c, pv, p3);
 
-  LOG(DEBUG) << "3-Option Markov Incentive";
-  LOG(DEBUG) << "probCE2 ... ";
+  LOG(INFO) << "3-Option Markov Incentive";
+  LOG(INFO) << "probCE2 ... ";
   p3 = get<0>(Model::probCE2(PCEModel::MarkovIPCM, vpm, c));
-  LOG(DEBUG) << "tmpMarkovIncentivePCE ... ";
+  LOG(INFO) << "tmpMarkovIncentivePCE ... ";
   show(c, pv, p3);
   // ---------------------------
-  LOG(DEBUG) << "Conditional PCE model: ";
+  LOG(INFO) << "Conditional PCE model: ";
   p2 = get<0>(Model::probCE2(PCEModel::ConditionalPCM, vpm, c));
   show(c, pv, p2);
   return;
@@ -155,12 +155,12 @@ void demoSpVSR(uint64_t s, PRNG* rng) {
   using std::shared_ptr;
   using std::tuple;
 
-  LOG(DEBUG) << KBase::getFormattedString("demoSpVSR using PRNG seed:  %020llu", s);
+  LOG(INFO) << KBase::getFormattedString("demoSpVSR using PRNG seed:  %020llu", s);
   rng->setSeed(s);
 
-  LOG(DEBUG) << "Demonstrate shared_ptr<void> for returns";
-  LOG(DEBUG) << "This will be necessary to return arbitrary structures ";
-  LOG(DEBUG) << "from bestTarget without using a bare void* pointer.";
+  LOG(INFO) << "Demonstrate shared_ptr<void> for returns";
+  LOG(INFO) << "This will be necessary to return arbitrary structures ";
+  LOG(INFO) << "from bestTarget without using a bare void* pointer.";
 
   // if x is of type shared_ptr(T), then x.get() is of type T*,
   // so we dereference a shared pointer as *(x.get()), aka *x.get()
@@ -168,7 +168,7 @@ void demoSpVSR(uint64_t s, PRNG* rng) {
   auto sp1 = make_shared<int>(42); // shared pointer to an integer
   printf("Use count sp1: %li \n", sp1.use_count());
   //int* p1 = sp1.get(); // gets the  pointer
-  LOG(DEBUG) << "The shared integer is " << *sp1.get();
+  LOG(INFO) << "The shared integer is " << *sp1.get();
   {   // create another reference
     auto sp2 = sp1;
     printf("Use count sp1: %li \n", sp1.use_count());
@@ -180,7 +180,7 @@ void demoSpVSR(uint64_t s, PRNG* rng) {
   auto fn = [rng, &fs](unsigned int nr, unsigned int nc) {
     auto m1 = KMatrix::uniform(rng, nr, nc, -10, +50);
     auto d = KBase::norm(m1);
-    LOG(DEBUG) << "Inside lambda:";
+    LOG(INFO) << "Inside lambda:";
     m1.mPrintf(fs);
     shared_ptr<void> rslt = make_shared<tuple<double, KMatrix>>(d, m1); // shared_ptr version of (void*)
     return rslt;
@@ -194,7 +194,7 @@ void demoSpVSR(uint64_t s, PRNG* rng) {
   // we get() the bare pointer, a void*,
   // cast it to tuple<...>*,
   // then dereference that pointer.
-  LOG(DEBUG) << "As retrieved:";
+  LOG(INFO) << "As retrieved:";
   get<1>(r53).mPrintf(fs);
 
   return;
@@ -248,7 +248,7 @@ int main(int ac, char **av) {
 
   if (ac > 1) {
     for (int i = 1; i < ac; i++) {
-      LOG(DEBUG) << "Argument" << i << "is -|" << av[i] << "|-";
+      LOG(INFO) << "Argument" << i << "is -|" << av[i] << "|-";
       if (strcmp(av[i], "--seed") == 0) {
         i++;
         seed = std::stoull(av[i]);
@@ -302,23 +302,23 @@ int main(int ac, char **av) {
 
   PRNG * rng = new PRNG();
   seed = rng->setSeed(seed); // 0 == get a random number
-  LOG(DEBUG) << KBase::getFormattedString("Using PRNG seed:  %020llu", seed);
-  LOG(DEBUG) << KBase::getFormattedString("Same seed in hex:   0x%016llX", seed);
+  LOG(INFO) << KBase::getFormattedString("Using PRNG seed:  %020llu", seed);
+  LOG(INFO) << KBase::getFormattedString("Same seed in hex:   0x%016llX", seed);
 
 
   // note that we reset the seed every time, so that in case something
   // goes wrong, we need not scroll back too far to find the
   // seed required to reproduce the bug.
   if (pceP) {
-    LOG(DEBUG) << "-----------------------------------";
+    LOG(INFO) << "-----------------------------------";
     MDemo::demoPCE(seed, rng);
   }
   if (spvsrP) {
-    LOG(DEBUG) << "-----------------------------------";
+    LOG(INFO) << "-----------------------------------";
     MDemo::demoSpVSR(seed, rng);
   }
   if (csvSMP) {
-    LOG(DEBUG) << "-----------------------------------";
+    LOG(INFO) << "-----------------------------------";
     MDemo::demoMiniCSV(inputCSVSMP);
   }
 
@@ -345,28 +345,28 @@ int main(int ac, char **av) {
       }
     }
     auto pDist = Model::markovIncentivePCE(coalitions, vpm);
-    LOG(DEBUG) << "Markov Incentive probabiities with " << vpm;
+    LOG(INFO) << "Markov Incentive probabiities with " << vpm;
     trans(pDist).mPrintf(" %.4f");
   }
 
 
   if (emodP) {
-    LOG(DEBUG) << "-----------------------------------";
+    LOG(INFO) << "-----------------------------------";
     MDemo::demoEMod(seed);
   }
 
   if (sqlP) {
-    LOG(DEBUG) << "-----------------------------------";
+    LOG(INFO) << "-----------------------------------";
     Model::demoSQLite();
     MDemo::demoDBObject();
   }
 
   if (tx2P) {
-    LOG(DEBUG) << "-----------------------------------";
+    LOG(INFO) << "-----------------------------------";
     TXDemo::demoTX2(inputXML);
   }
 
-  LOG(DEBUG) << "-----------------------------------";
+  LOG(INFO) << "-----------------------------------";
 
   delete rng;
   KBase::displayProgramEnd(sTime);

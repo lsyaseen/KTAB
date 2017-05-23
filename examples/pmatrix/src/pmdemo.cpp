@@ -41,16 +41,16 @@ using KBase::trans;
 
 void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, const vector<string> & aNames) {
   assert(0 != s);
-  LOG(DEBUG) << "Creating PMatrixModel objects ...";
+  LOG(INFO) << "Creating PMatrixModel objects ...";
 
   auto eKEM = new PMatrixModel("PMatrixModel", s);
 
   eKEM->pcem = KBase::PCEModel::MarkovIPCM;
 
-  LOG(DEBUG) << "Actor weight vector: ";
+  LOG(INFO) << "Actor weight vector: ";
   wMat.mPrintf("%6.2f  ");
 
-  LOG(DEBUG) << "Utility(actor, option) matrix:";
+  LOG(INFO) << "Utility(actor, option) matrix:";
   uMat.mPrintf("%5.3f  ");
 
   eKEM->setWeights(wMat);
@@ -69,14 +69,14 @@ void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, cons
   eKEM->stop = [maxIter, eKEM](unsigned int iter, const KBase::State * s) {
     bool doneP = iter > maxIter;
     if (doneP) {
-      LOG(DEBUG) << "Max iteration limit of" << maxIter << "exceeded";
+      LOG(INFO) << "Max iteration limit of" << maxIter << "exceeded";
     }
     auto s2 = ((const PMatrixState *)(eKEM->history[iter]));
     for (unsigned int i = 0; i < iter; i++) {
       auto s1 = ((const PMatrixState *)(eKEM->history[i]));
       if (eKEM->equivStates(s1, s2)) {
         doneP = true;
-        LOG(DEBUG) << "State number" << iter << "matched state number" << i;
+        LOG(INFO) << "State number" << iter << "matched state number" << i;
       }
     }
     return doneP;
@@ -84,8 +84,8 @@ void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, cons
 
 
   const unsigned int nOpt = eKEM->numOptions();
-  LOG(DEBUG) << "Number of options:" << nOpt;
-  LOG(DEBUG) << "Number of actors:" << eKEM->numAct;
+  LOG(INFO) << "Number of options:" << nOpt;
+  LOG(INFO) << "Number of actors:" << eKEM->numAct;
 
 
   const auto probTheta = Model::scalarPCE(eKEM->numAct, nOpt,
@@ -95,26 +95,26 @@ void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, cons
                                           ReportingLevel::Silent);
 
   const auto p2 = trans(probTheta);
-  LOG(DEBUG) << "PCE over entire option-space:";
+  LOG(INFO) << "PCE over entire option-space:";
   p2.mPrintf(" %5.3f ");
 
   auto zeta = wMat * uMat;
-  LOG(DEBUG) << "Zeta over entire option-space:";
+  LOG(INFO) << "Zeta over entire option-space:";
   zeta.mPrintf(" %5.1f ");
 
   auto aCorr = [](const KMatrix & x, const KMatrix &y) {
     return lCorr(x - mean(x), y - mean(y));
   };
 
-  LOG(DEBUG) << KBase::getFormattedString("af-corr(p2,zeta): %.3f", aCorr(p2, zeta));
+  LOG(INFO) << KBase::getFormattedString("af-corr(p2,zeta): %.3f", aCorr(p2, zeta));
 
   auto logP = KMatrix::map([](double x) {
     return log(x);
   }, p2);
-  LOG(DEBUG) << KBase::getFormattedString("af-corr(logp2,zeta): %.3f", aCorr(logP, zeta));
+  LOG(INFO) << KBase::getFormattedString("af-corr(logp2,zeta): %.3f", aCorr(logP, zeta));
 
   for (unsigned int i = 0; i < nOpt; i++) {
-    LOG(DEBUG) << KBase::getFormattedString("%2u  %6.4f  %+8.3f  %5.1f ", i, p2(0, i), logP(0, i), zeta(0, i));
+    LOG(INFO) << KBase::getFormattedString("%2u  %6.4f  %+8.3f  %5.1f ", i, p2(0, i), logP(0, i), zeta(0, i));
   }
 
   double maxZ = -1.0;
@@ -125,17 +125,17 @@ void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, cons
       ndxMaxZ = i;
     }
   }
-  LOG(DEBUG) << "Central position is number " << ndxMaxZ;
+  LOG(INFO) << "Central position is number " << ndxMaxZ;
 
 
   auto es1 = new PMatrixState(eKEM); // pre-allocates the pstns array
   assert(eKEM->numAct == es1->pstns.size());
 
   if (cpP) {
-    LOG(DEBUG) << "Assigning actors to the central position";
+    LOG(INFO) << "Assigning actors to the central position";
   }
   else {
-    LOG(DEBUG) << "Assigning actors to their self-interested initial positions";
+    LOG(INFO) << "Assigning actors to their self-interested initial positions";
   }
   for (unsigned int i = 0; i < eKEM->numAct; i++) {
     double maxU = -1.0;
@@ -163,15 +163,15 @@ void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, cons
   es1->step = sFn2;
   eKEM->addState(es1);
 
-  LOG(DEBUG) << "--------------";
-  LOG(DEBUG) << "First state:";
+  LOG(INFO) << "--------------";
+  LOG(INFO) << "First state:";
   es1->show();
 
   eKEM->run();
 
   const unsigned int histLen = eKEM->history.size();
   PMatrixState* esA = (PMatrixState*)(eKEM->history[histLen - 1]);
-  LOG(DEBUG) << "Last State" << histLen - 1;
+  LOG(INFO) << "Last State" << histLen - 1;
   esA->show();
   esA->setAUtil(-1, ReportingLevel::Medium);
   auto lastPDU = esA->pDist(-1);
@@ -180,9 +180,9 @@ void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, cons
   KMatrix umh = esA->uMatH(-1);
   auto eu = umh*pd;
 
-  LOG(DEBUG) << "Unique indices:";
+  LOG(INFO) << "Unique indices:";
   for (unsigned int i : un) {
-    LOG(DEBUG) << KBase::getFormattedString(" %2u ", i);
+    LOG(INFO) << KBase::getFormattedString(" %2u ", i);
   }
 
   string policiesList("Corresponding policies:");
@@ -191,29 +191,29 @@ void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, cons
     auto ni = posI->getIndex();
     policiesList += "  " + std::to_string(ni);
   }
-  LOG(DEBUG) << policiesList;
+  LOG(INFO) << policiesList;
 
-  LOG(DEBUG) << "Policy probabilities:";
+  LOG(INFO) << "Policy probabilities:";
   for (unsigned int j=0; j<un.size(); j++) {
     unsigned int i = un[j];
     auto posI = (EPosition<unsigned int>*)(esA->pstns[i]);
     auto ni = posI->getIndex();
     double probI = pd(j, 0);
-    LOG(DEBUG) << KBase::getFormattedString("%2u:  %.4f", ni, probI);
+    LOG(INFO) << KBase::getFormattedString("%2u:  %.4f", ni, probI);
   }
-  LOG(DEBUG) << "Actor expected utilities:";
+  LOG(INFO) << "Actor expected utilities:";
   trans(eu).mPrintf(" %.4f ");
   return;
 }
 
 void fitFile(string fName, uint64_t seed) {
   const double bigR = +0.5;
-  LOG(DEBUG) << "Fitting file "<<fName;
+  LOG(INFO) << "Fitting file "<<fName;
   auto fParams = pccCSV(fName);
   vector<string> aNames = get<0>(fParams);
   auto uMat = PMatrixModel::utilFromFP(fParams, bigR);
 
-  LOG(DEBUG) << "RA-Util from outcomes: ";
+  LOG(INFO) << "RA-Util from outcomes: ";
   uMat.mPrintf(" %.4f  ");
   auto c12 = PMatrixModel::minProbError(fParams, bigR, 1100.0);
   // 250 for 2016-08-27 results
@@ -224,11 +224,11 @@ void fitFile(string fName, uint64_t seed) {
   const KMatrix w1 = get<1>(c12);
   const KMatrix w2 = get<2>(c12);
 
-  LOG(DEBUG) << "=====================================";
-  LOG(DEBUG) << "EMod with BAU-case weights";
+  LOG(INFO) << "=====================================";
+  LOG(INFO) << "EMod with BAU-case weights";
   runPMM(seed, false, w1, uMat, aNames);
-  LOG(DEBUG) << "=====================================";
-  LOG(DEBUG) << "EMod with change-case weights";
+  LOG(INFO) << "=====================================";
+  LOG(INFO) << "EMod with change-case weights";
   runPMM(seed, false, w2, uMat, aNames);
 
   return;
@@ -336,15 +336,15 @@ int main(int ac, char **av) {
 
   PRNG * rng = new PRNG();
   seed = rng->setSeed(seed); // 0 == get a random number
-  LOG(DEBUG) << KBase::getFormattedString("Using PRNG seed:  %020llu", seed);
-  LOG(DEBUG) << KBase::getFormattedString("Same seed in hex:   0x%016llX", seed);
+  LOG(INFO) << KBase::getFormattedString("Using PRNG seed:  %020llu", seed);
+  LOG(INFO) << KBase::getFormattedString("Same seed in hex:   0x%016llX", seed);
 
   const bool parP = KBase::testMultiThreadSQLite(false, KBase::ReportingLevel::Medium);
   if (parP) {
-    LOG(DEBUG) << "Can continue with multi-threaded execution";
+    LOG(INFO) << "Can continue with multi-threaded execution";
   }
   else {
-    LOG(DEBUG) << "Must continue with single-threaded execution";
+    LOG(INFO) << "Must continue with single-threaded execution";
   }
   if (pmm) {
     auto pmm = PMatDemo::pmmCreation(seed);

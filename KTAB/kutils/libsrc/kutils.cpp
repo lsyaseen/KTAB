@@ -125,7 +125,7 @@ string stringVUI(const VUI& p) {
 
 void printVUI(const VUI& p) {
   const string vui = stringVUI(p);
-  LOG(DEBUG) << vui;
+  LOG(INFO) << vui;
   return;
 }
 
@@ -157,12 +157,12 @@ void groupThreads(function<void(unsigned int)> tfn,
   }
   if (ReportingLevel::Silent < rl) {
     if (0 == numHWC) {
-      LOG(WARNING) << "Could not detect hardware concurrency";
+      LOG(INFO) << "Could not detect hardware concurrency";
     }
     else {
-      LOG(DEBUG) << "Detected hardware concurrency:" << numHWC;
+      LOG(INFO) << "Detected hardware concurrency:" << numHWC;
     }
-    LOG(DEBUG) << "Using groups of" << numPar;
+    LOG(INFO) << "Using groups of" << numPar;
   }
 
   unsigned int cntr = numLow;
@@ -170,14 +170,14 @@ void groupThreads(function<void(unsigned int)> tfn,
     vector<thread> myThreads = {};
     for (unsigned int i = 0; ((i < numPar) && (cntr <= numHigh)); i++) {
       if (ReportingLevel::Medium < rl) {
-        LOG(DEBUG) << KBase::getFormattedString(
+        LOG(INFO) << KBase::getFormattedString(
           "Launching thread %3u / %3u / [%3u,%3u]", i, cntr, numLow, numHigh);
       }
       myThreads.push_back(thread(tfn, cntr));
       cntr++;
     }
     if (ReportingLevel::Low < rl) {
-      LOG(DEBUG) << "Joining ...";
+      LOG(INFO) << "Joining ...";
     }
     for (auto& ti : myThreads) {
       ti.join();
@@ -192,8 +192,8 @@ std::chrono::time_point<std::chrono::system_clock>  displayProgramStart(string a
   std::chrono::time_point<std::chrono::system_clock> st;
   st = std::chrono::system_clock::now();
   std::time_t start_time = std::chrono::system_clock::to_time_t(st);
-  LOG(DEBUG) << "Software version: " << appName << appVersion;
-  LOG(DEBUG) << "Start time:" << std::ctime(&start_time);
+  LOG(INFO) << "Software version: " << appName << appVersion;
+  LOG(INFO) << "Start time:" << std::ctime(&start_time);
   return st;
 }
 
@@ -202,8 +202,8 @@ void displayProgramEnd(std::chrono::time_point<std::chrono::system_clock> st) {
   ft = std::chrono::system_clock::now();
   std::chrono::duration<double> eTime = ft - st;
   std::time_t fTime = std::chrono::system_clock::to_time_t(ft);
-  LOG(DEBUG) << "Finish time:" << std::ctime(&fTime);
-  LOG(DEBUG) << KBase::getFormattedString("Elapsed time: %.4f seconds", eTime.count());
+  LOG(INFO) << "Finish time:" << std::ctime(&fTime);
+  LOG(INFO) << KBase::getFormattedString("Elapsed time: %.4f seconds", eTime.count());
   return;
 }
 

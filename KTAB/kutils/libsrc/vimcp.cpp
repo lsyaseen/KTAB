@@ -113,9 +113,9 @@ tuple<KMatrix, unsigned int, KMatrix> viBSHe96(const KMatrix & M, const KMatrix 
                                                function<KMatrix(const KMatrix &)> pK,
                                                KMatrix u0, const double eps, const unsigned int iMax) {
   if (false) {
-    LOG(DEBUG) << "Received M:";
+    LOG(INFO) << "Received M:";
     M.mPrintf("%+.4f  ");
-    LOG(DEBUG) << "Received q:";
+    LOG(INFO) << "Received q:";
     trans(q).mPrintf("%+.4f  ");
   }
 

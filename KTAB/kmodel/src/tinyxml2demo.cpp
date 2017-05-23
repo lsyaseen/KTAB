@@ -79,10 +79,10 @@ void demoTX2(string fileName) {
 
         XMLElement* numDimEl = numActEl->NextSiblingElement("Cell");
         numDim = atoi(numDimEl->FirstChildElement("Data")->GetText());
-        LOG(DEBUG) << "Name of scenario:" << sName;
-        LOG(DEBUG) << "Desc of scenario:" << sDescEl->FirstChildElement("Data")->GetText();
-        LOG(DEBUG) << "Number of actors:" << numAct;
-        LOG(DEBUG) << "Number of dims:" << numDim;
+        LOG(INFO) << "Name of scenario:" << sName;
+        LOG(INFO) << "Desc of scenario:" << sDescEl->FirstChildElement("Data")->GetText();
+        LOG(INFO) << "Number of actors:" << numAct;
+        LOG(INFO) << "Number of dims:" << numDim;
       }
       catch (...) {
         throw (KException("Error reading file header"));
@@ -104,17 +104,17 @@ void demoTX2(string fileName) {
           const char * aDesc = aDescEl->FirstChildElement("Data")->GetText();
           const double aCap = atof(aCapEl->FirstChildElement("Data")->GetText());
 
-          LOG(DEBUG) <<"Actor name:" << aName;
-          LOG(DEBUG) <<"Actor desc:" << aDesc;
-          LOG(DEBUG) << KBase::getFormattedString("Actor cap: %+.3f", aCap);
+          LOG(INFO) <<"Actor name:" << aName;
+          LOG(INFO) <<"Actor desc:" << aDesc;
+          LOG(INFO) << KBase::getFormattedString("Actor cap: %+.3f", aCap);
           XMLElement* psEl = aCapEl->NextSiblingElement("Cell");
           for (unsigned int i=0; i<numDim; i++) {
             const double posI = atof(psEl->FirstChildElement("Data")->GetText());
-            LOG(DEBUG) << KBase::getFormattedString("  Pos %i: %.3f", i, posI);
+            LOG(INFO) << KBase::getFormattedString("  Pos %i: %.3f", i, posI);
             psEl = psEl->NextSiblingElement("Cell");
             const double salI = atof(psEl->FirstChildElement("Data")->GetText());
-            LOG(DEBUG) << KBase::getFormattedString("  Sal %i: %.3f", i, salI);
-            LOG(DEBUG) << "-------------";
+            LOG(INFO) << KBase::getFormattedString("  Sal %i: %.3f", i, salI);
+            LOG(INFO) << "-------------";
 
             psEl = psEl->NextSiblingElement("Cell");
           }
@@ -122,7 +122,7 @@ void demoTX2(string fileName) {
           rowEl = rowEl->NextSiblingElement("Row");
         }
         assert(numAct == numRetAct);
-        LOG(DEBUG) << "Retrieved" << numRetAct << "actors as expected";
+        LOG(INFO) << "Retrieved" << numRetAct << "actors as expected";
       }
       catch (...) {
         throw (KException("Error reading actor data"));
@@ -130,7 +130,7 @@ void demoTX2(string fileName) {
     }
   }
   catch (const KException& ke) {
-    LOG(DEBUG) << "Caught KException in demoTX2:"<< ke.msg;
+    LOG(INFO) << "Caught KException in demoTX2:"<< ke.msg;
   }
   /*
     catch(const std::exception& e) {
@@ -138,7 +138,7 @@ void demoTX2(string fileName) {
     }
     */
   catch(...) {
-    LOG(DEBUG) << "Caught unidentified exception in demoTX2";
+    LOG(INFO) << "Caught unidentified exception in demoTX2";
   }
 
   return;

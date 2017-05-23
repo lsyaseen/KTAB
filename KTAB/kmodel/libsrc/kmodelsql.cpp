@@ -48,13 +48,13 @@ KTable::~KTable() {};
 
 void Model::demoSQLite()
 {
-  LOG(DEBUG) << "Starting basic demo of SQLite in Model class";
+  LOG(INFO) << "Starting basic demo of SQLite in Model class";
 
   auto callBack = [](void *data, int numCol, char **stringFields, char **colNames)
   {
     for (int i = 0; i < numCol; i++)
     {
-      LOG(DEBUG) << colNames[i] << "=" << (stringFields[i] ? stringFields[i] : "NULL");
+      LOG(INFO) << colNames[i] << "=" << (stringFields[i] ? stringFields[i] : "NULL");
     }
     return ((int)0);
   };
@@ -69,12 +69,12 @@ void Model::demoSQLite()
     int rc = sqlite3_open("test.db", &db);
     if (rc != SQLITE_OK)
     {
-      LOG(ERROR) << "Can't open database:" << sqlite3_errmsg(db);
+      LOG(INFO) << "Can't open database:" << sqlite3_errmsg(db);
       exit(0);
     }
     else
     {
-      LOG(DEBUG) << "Opened database successfully" << n;
+      LOG(INFO) << "Opened database successfully" << n;
     }
     return;
   };
@@ -84,12 +84,12 @@ void Model::demoSQLite()
     int rc = sqlite3_exec(db, sql.c_str(), callBack, nullptr, &zErrMsg); // nullptr is the 'data' argument
     if (rc != SQLITE_OK)
     {
-      LOG(ERROR) << "SQL error:" << zErrMsg;
+      LOG(INFO) << "SQL error:" << zErrMsg;
       sqlite3_free(zErrMsg);
     }
     else
     {
-      LOG(DEBUG) << msg;
+      LOG(INFO) << msg;
     }
     return rc;
   };
@@ -146,7 +146,7 @@ void Model::demoSQLite()
   */
 
 
-  LOG(DEBUG) << "NB: This should get one planned SQL error at ID=4"; // SPECIES should be BREED
+  LOG(INFO) << "NB: This should get one planned SQL error at ID=4"; // SPECIES should be BREED
   rc = sExec(sql, "Records inserted successfully \n");
   assert(SQLITE_OK != rc); // check for planned SQL error
   rc = sqlite3_close(db);
@@ -157,7 +157,7 @@ void Model::demoSQLite()
   sql = "SELECT * from PETS where AGE>5;";
   rc = sExec(sql, "Records selected successfully\n");
   assert(SQLITE_OK == rc);
-  LOG(DEBUG) << "NB: ID=5 was never inserted due to planned SQL error at ID=4";
+  LOG(INFO) << "NB: ID=5 was never inserted due to planned SQL error at ID=4";
   sqlite3_close(db);
   assert(SQLITE_OK == rc);
 
@@ -177,9 +177,9 @@ bool testMultiThreadSQLite (bool tryReset, KBase::ReportingLevel rl) {
   bool parP = (0 != mutexP);
   if (ReportingLevel::Silent < rl) {
     if (parP) {
-      LOG(DEBUG) << "This SQLite3 library WAS compiled to be threadsafe.";
+      LOG(INFO) << "This SQLite3 library WAS compiled to be threadsafe.";
     } else {
-      LOG(DEBUG) << "This SQLite3 library was NOT compiled to be threadsafe.";
+      LOG(INFO) << "This SQLite3 library was NOT compiled to be threadsafe.";
     }
   }
   if (tryReset && (!parP)) {
@@ -191,22 +191,22 @@ bool testMultiThreadSQLite (bool tryReset, KBase::ReportingLevel rl) {
       parP = false;
     }
     if (ReportingLevel::Low < rl){
-      LOG(DEBUG) << "  Note that multi-threading might have been disabled via sqlite3_config.";
-      LOG(DEBUG) << "  Tried to reconfigure to SQLITE_CONFIG_SERIALIZED ... ";
+      LOG(INFO) << "  Note that multi-threading might have been disabled via sqlite3_config.";
+      LOG(INFO) << "  Tried to reconfigure to SQLITE_CONFIG_SERIALIZED ... ";
       if (configRslt == SQLITE_OK) {
-        LOG(DEBUG) << "SUCCESS";
+        LOG(INFO) << "SUCCESS";
       }
       else  {
-        LOG(ERROR) << "FAILED";
+        LOG(INFO) << "FAILED";
       }
     }
   }
   if (ReportingLevel::Silent < rl) {
     if (parP)  {
-      LOG(DEBUG) << "Possible to continue multi-threaded";
+      LOG(INFO) << "Possible to continue multi-threaded";
     }
     else {
-      LOG(DEBUG) << "Necessary to continue single-threaded";
+      LOG(INFO) << "Necessary to continue single-threaded";
     }
   }
   return parP;

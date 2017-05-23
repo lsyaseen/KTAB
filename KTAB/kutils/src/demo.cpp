@@ -70,15 +70,15 @@ tuple<KMatrix, KMatrix> extendPCA (const KMatrix& xMat,
 void demoUIndices() {
     auto showIS = [](KBase::VUI is) {
         for (unsigned int i = 0; i < is.size(); i++) {
-            LOG(DEBUG) << KBase::getFormattedString("%2u: %2i", i, is[i]);
+            LOG(INFO) << KBase::getFormattedString("%2u: %2i", i, is[i]);
         }
         return;
     };
     auto is1 = KBase::uiSeq(10, 19);
-    LOG(DEBUG) << "Space by 1:";
+    LOG(INFO) << "Space by 1:";
     showIS(is1);
     auto is2 = KBase::uiSeq(10, 19, 2);
-    LOG(DEBUG) << "Space by 2:";
+    LOG(INFO) << "Space by 2:";
     showIS(is2);
 
     VUI xs = { 10, 11, 20, 12, 30,  9, 23, 29, 40, 22, 43 };
@@ -90,17 +90,17 @@ void demoUIndices() {
     VUI uns = get<0>(uePair);
     VUI ens = get<1>(uePair);
 
-    LOG(DEBUG) << "Items:"; // should be [0,2,4,8]
+    LOG(INFO) << "Items:"; // should be [0,2,4,8]
     showIS(xs);
-    LOG(DEBUG) << "Indices of unique items:"; // should be [0,2,4,8]
+    LOG(INFO) << "Indices of unique items:"; // should be [0,2,4,8]
     showIS(uns);
-    LOG(DEBUG) << "Indices of equivalent items:"; // should be [0,2,4,8]
+    LOG(INFO) << "Indices of equivalent items:"; // should be [0,2,4,8]
     showIS(ens);
     return;
 }
 
 void show(string str, const KMatrix & m, string fs) {
-    LOG(DEBUG) << str;
+    LOG(INFO) << str;
     m.mPrintf(fs.c_str());
     return;
 }
@@ -159,7 +159,7 @@ void demoThreadLambda(unsigned int n) {
             assert(0 < ifn(i, 500000000));
             hello += "thread";
             assert(0 < ifn(i, 500000000));
-            LOG(DEBUG) << hello << i;
+            LOG(INFO) << hello << i;
             assert(0 < ifn(i, 500000000));
             return;
         }));
@@ -236,7 +236,7 @@ void demoThreadSynch(unsigned int n) {
         t.join();
     }
 
-    LOG(DEBUG) << counter->value;
+    LOG(INFO) << counter->value;
 
     delete counter;
     counter = nullptr;
@@ -255,7 +255,7 @@ void demoMatrix(PRNG* rng) {
 
     KMatrix m0;
     auto m1 = KMatrix(2, 3);
-    LOG(DEBUG) << "Small zero-filled matrix";
+    LOG(INFO) << "Small zero-filled matrix";
     m1.mPrintf(" %+5.2f ");
     m1(0, 0) = 4.03;
     m1(0, 1) = 2.19;
@@ -263,56 +263,56 @@ void demoMatrix(PRNG* rng) {
     m1(1, 0) = 8.40;
     m1(1, 1) = 6.65;
     m1(1, 2) = 2.36;
-    LOG(DEBUG) << getFormattedString("Set (0,1) element to %+5.2f", m1(0, 1));
-    LOG(DEBUG) << getFormattedString("Set (1,2) element to %+5.2f", m1(1, 2));
+    LOG(INFO) << getFormattedString("Set (0,1) element to %+5.2f", m1(0, 1));
+    LOG(INFO) << getFormattedString("Set (1,2) element to %+5.2f", m1(1, 2));
     m1.mPrintf(" %5.2f ");
 
-    LOG(DEBUG) << "Computing norm ...";
+    LOG(INFO) << "Computing norm ...";
     double nm = norm(m1);
-    LOG(DEBUG) << "norm is" << nm;
+    LOG(INFO) << "norm is" << nm;
 
     double c1 = 2.3;
-    LOG(DEBUG) << getFormattedString("Pre- and post-multiply c1 and m1, where c1=%5.2f and m1=", c1);
+    LOG(INFO) << getFormattedString("Pre- and post-multiply c1 and m1, where c1=%5.2f and m1=", c1);
     m1.mPrintf(" %5.2f");
 
-    LOG(DEBUG) << "Pre-multiply c1 * m1 =";
+    LOG(INFO) << "Pre-multiply c1 * m1 =";
     auto c1m1 = c1 * m1;
     c1m1.mPrintf(" %5.2f");
 
-    LOG(DEBUG) << "Post-multiply m1*c1 =";
+    LOG(INFO) << "Post-multiply m1*c1 =";
     auto m1c1 = m1 * c1;
     m1c1.mPrintf(" %5.2f");
 
 
 
-    LOG(DEBUG) << "Transposition then copy";
+    LOG(INFO) << "Transposition then copy";
     m0 = trans(m1); // test transpose and default constructors
     m0.mPrintf(" %5.2f ");
 
-    LOG(DEBUG) << "Demo strictly-linear correlation";
+    LOG(INFO) << "Demo strictly-linear correlation";
     auto X = KMatrix::uniform(rng, 5, 8, -10, +10);
     auto ns = KMatrix::uniform(rng, 5, 8, -5, +5);
     double aAct = -2.7;
     auto Y = aAct*X + ns;
-    LOG(DEBUG) << "Independent vars in X:";
+    LOG(INFO) << "Independent vars in X:";
     X.mPrintf(" %+6.2f ");
 
-    LOG(DEBUG) << "Dependent vars in Y:";
+    LOG(INFO) << "Dependent vars in Y:";
     Y.mPrintf(" %+6.2f ");
     double aEst = KBase::dot(Y, X) / KBase::dot(X, X);
-    LOG(DEBUG) << getFormattedString("aAct: %+.4f", aAct);
-    LOG(DEBUG) << getFormattedString("aEst: %+.4f", aEst);
+    LOG(INFO) << getFormattedString("aAct: %+.4f", aAct);
+    LOG(INFO) << getFormattedString("aEst: %+.4f", aEst);
     double lcorr = KBase::lCorr(Y, X);
-    LOG(DEBUG) << getFormattedString("Measured correlation is %+.5f", lcorr);
+    LOG(INFO) << getFormattedString("Measured correlation is %+.5f", lcorr);
 
     auto qtDemo = [](uint64_t s0) {
         uint64_t s1 = KBase::qTrans(s0);
-        LOG(DEBUG) << getFormattedString("s0: 0x%016llX", s0);
-        LOG(DEBUG) << getFormattedString("s1: 0x%016llX", s1);
+        LOG(INFO) << getFormattedString("s0: 0x%016llX", s0);
+        LOG(INFO) << getFormattedString("s1: 0x%016llX", s1);
         return;
     };
 
-    LOG(DEBUG) << "qTrans:";
+    LOG(INFO) << "qTrans:";
     qtDemo(0);
     qtDemo(1);
     qtDemo(2);
@@ -321,13 +321,13 @@ void demoMatrix(PRNG* rng) {
     // if X ~ U[-sqrt(3),+sqrt3()] then mean(X)=0, stdv(X)=1
     unsigned int nr = 1500;
     unsigned int nc = 750;
-    LOG(DEBUG) << getFormattedString("Testing PRNG for m~0, s~1 over [%u,%u] matrix", nr, nc);
+    LOG(INFO) << getFormattedString("Testing PRNG for m~0, s~1 over [%u,%u] matrix", nr, nc);
     double s3 = sqrt(3.0);
     auto x = KMatrix::uniform(rng, nr, nc, -s3, +s3);
-    LOG(DEBUG) << getFormattedString("Observed mean: %+.5E", mean(x));
-    LOG(DEBUG) << getFormattedString("Observed stdv: %+.5E", stdv(x));
+    LOG(INFO) << getFormattedString("Observed mean: %+.5E", mean(x));
+    LOG(INFO) << getFormattedString("Observed stdv: %+.5E", stdv(x));
 
-    LOG(DEBUG) << "Test matrix transpose, subtract, multiply";
+    LOG(INFO) << "Test matrix transpose, subtract, multiply";
     for (unsigned int iter = 0; iter < 10; iter++) {
         double errTol = 1E-10;
         unsigned int n1 = 5 + (rng->uniform() % 21);
@@ -339,11 +339,11 @@ void demoMatrix(PRNG* rng) {
         auto lhs = trans((a - b)*trans(c));
         auto rhs = c * (trans(a) - trans(b));
         double err = norm(lhs - rhs);
-        LOG(DEBUG) << getFormattedString("Norm of diff T((a-b)*T(c)) - c*(T(a)-T(b)) is %.3E ", err);
+        LOG(INFO) << getFormattedString("Norm of diff T((a-b)*T(c)) - c*(T(a)-T(b)) is %.3E ", err);
         assert(err < errTol);
     }
 
-    LOG(DEBUG) << "Test matrix inversion";
+    LOG(INFO) << "Test matrix inversion";
     for (unsigned int iter = 0; iter < 10; iter++) {
         const double errTol = 1E-10;
         const unsigned int n = 5;
@@ -351,36 +351,36 @@ void demoMatrix(PRNG* rng) {
         if (0 == iter % 3) {
             a = a / 1000; // test inversion with smaller elements
         }
-        LOG(DEBUG) << getFormattedString("\nRMS(a)=%.4f", norm(a) / n);
+        LOG(INFO) << getFormattedString("\nRMS(a)=%.4f", norm(a) / n);
         auto b = inv(a);
         double diff = norm(iMat(n) - (a*b));
-        LOG(DEBUG) << getFormattedString("Norm of diff I-a*inv(a) is %.3E  ", diff);
+        LOG(INFO) << getFormattedString("Norm of diff I-a*inv(a) is %.3E  ", diff);
         assert(diff < errTol);
         diff = norm(iMat(n) - (b*a));
-        LOG(DEBUG) << getFormattedString("Norm of diff I-inv(a)*a is %.3E  ", diff);
+        LOG(INFO) << getFormattedString("Norm of diff I-inv(a)*a is %.3E  ", diff);
         assert(diff < errTol);
     }
 
     // JAH 20160809 added test for the new vector init
-    LOG(DEBUG) << "Test matrix reshaped from vector";
+    LOG(INFO) << "Test matrix reshaped from vector";
     vector<double> dat = {1,2,3,4,5,6,7,8,9,10,11,12};
     // all in one row
-    LOG(DEBUG) << "1 x 12";
+    LOG(INFO) << "1 x 12";
     auto mat1 = KMatrix::vecInit(dat,1,12);
     mat1.mPrintf("%2.0f ");
     // 3 x 4
-    LOG(DEBUG) << "3 x 4";
+    LOG(INFO) << "3 x 4";
     auto mat2 = KMatrix::vecInit(dat,3,4);
     mat2.mPrintf("%2.0f ");
     // 2 x 6
-    LOG(DEBUG) << "2 x 6";
+    LOG(INFO) << "2 x 6";
     auto mat3 = KMatrix::vecInit(dat,2,6);
     mat3.mPrintf("%2.0f ");
 
-    LOG(DEBUG) << "Row 0 of previous 2x6 matrix";
+    LOG(INFO) << "Row 0 of previous 2x6 matrix";
     auto row1 = KBase::hSlice(mat3, 0);
     row1.mPrintf(" %2.0f ");
-    LOG(DEBUG) << "Row 1 of previous 3x4 matrix";
+    LOG(INFO) << "Row 1 of previous 3x4 matrix";
     auto row2 = KBase::hSlice(mat2, 1);
     row2.mPrintf(" %2.0f ");
 
@@ -472,49 +472,49 @@ void demoPCA(PRNG* rng) {
     const double divFactor = 1.25;
 
     auto m1 = KMatrix::uniform(rng, nDim, nDim, 0.0, +1.0);
-    LOG(DEBUG) << "Random matrix:";
+    LOG(INFO) << "Random matrix:";
     m1.mPrintf("%.4f  ");
 
     auto v1 = firstEigenvector(m1, evTol);
     auto s11 = dot(v1, v1);
 
-    LOG(DEBUG) << "First eigenvector:";
+    LOG(INFO) << "First eigenvector:";
     v1.mPrintf("%+.5f ");
 
     auto v2 = m1 * v1;
     auto s12 = dot(v2, v1);
-    LOG(DEBUG) << KBase::getFormattedString("Eigenvalue: %+.4f", s12/s11);
+    LOG(INFO) << KBase::getFormattedString("Eigenvalue: %+.4f", s12/s11);
 
     // Now we start a Principal Component Analysis
-    LOG(DEBUG) << "Setup PCA";
+    LOG(INFO) << "Setup PCA";
     const KMatrix pcv1 = posUnitize(KMatrix::uniform(rng, 1, nDim, -10.0, +10.0));
-    LOG(DEBUG) << KBase::getFormattedString("norm pcv1: %.4f", dot(pcv1, pcv1));
+    LOG(INFO) << KBase::getFormattedString("norm pcv1: %.4f", dot(pcv1, pcv1));
 
     const KMatrix tv2 = KMatrix::uniform(rng, 1, nDim, -10.0, +10.0);
     double a21 = dot(tv2, pcv1) ;
     const KMatrix pcv2 = posUnitize(tv2 - a21*pcv1);
-    LOG(DEBUG) << KBase::getFormattedString("norm pcv2: %.4f", dot(pcv2, pcv2));
-    LOG(DEBUG) << KBase::getFormattedString("dot21: %+.2e", dot(pcv2, pcv1));
+    LOG(INFO) << KBase::getFormattedString("norm pcv2: %.4f", dot(pcv2, pcv2));
+    LOG(INFO) << KBase::getFormattedString("dot21: %+.2e", dot(pcv2, pcv1));
 
     const KMatrix tv3 = KMatrix::uniform(rng, 1, nDim, -10.0, +10.0);
     double a31 = dot(tv3, pcv1);
     double a32 = dot(tv3, pcv2);
     const KMatrix pcv3 = posUnitize(tv3 - (a31*pcv1 + a32*pcv2));
-    LOG(DEBUG) << KBase::getFormattedString("norm pcv3: %.4f", dot(pcv3, pcv3));
-    LOG(DEBUG) << KBase::getFormattedString("dot31: %+.2e", dot(pcv3, pcv1));
-    LOG(DEBUG) << KBase::getFormattedString("dot32: %+.2e", dot(pcv3, pcv2));
+    LOG(INFO) << KBase::getFormattedString("norm pcv3: %.4f", dot(pcv3, pcv3));
+    LOG(INFO) << KBase::getFormattedString("dot31: %+.2e", dot(pcv3, pcv1));
+    LOG(INFO) << KBase::getFormattedString("dot32: %+.2e", dot(pcv3, pcv2));
 
     const KMatrix tv4 = KMatrix::uniform(rng, 1, nDim, -10.0, +10.0);
     double a41 = dot(tv4, pcv1);
     double a42 = dot(tv4, pcv2);
     double a43 = dot(tv4, pcv3);
     const KMatrix pcv4 = posUnitize(tv4 - (a41*pcv1 + a42*pcv2 + a43*pcv3));
-    LOG(DEBUG) << KBase::getFormattedString("norm pcv4: %.4f", dot(pcv4, pcv4));
-    LOG(DEBUG) << KBase::getFormattedString("dot41: %+.2e", dot(pcv4, pcv1));
-    LOG(DEBUG) << KBase::getFormattedString("dot42: %+.2e", dot(pcv4, pcv2));
-    LOG(DEBUG) << KBase::getFormattedString("dot43: %+.2e", dot(pcv4, pcv3));
+    LOG(INFO) << KBase::getFormattedString("norm pcv4: %.4f", dot(pcv4, pcv4));
+    LOG(INFO) << KBase::getFormattedString("dot41: %+.2e", dot(pcv4, pcv1));
+    LOG(INFO) << KBase::getFormattedString("dot42: %+.2e", dot(pcv4, pcv2));
+    LOG(INFO) << KBase::getFormattedString("dot43: %+.2e", dot(pcv4, pcv3));
 
-    LOG(DEBUG) << "Actual " << nDim << "-dim principal components: ";
+    LOG(INFO) << "Actual " << nDim << "-dim principal components: ";
     pcv1.mPrintf("%+7.4f  ");
     pcv2.mPrintf("%+7.4f  ");
     pcv3.mPrintf("%+7.4f  ");
@@ -522,7 +522,7 @@ void demoPCA(PRNG* rng) {
 
 
     auto xMat = KMatrix(nSample, nDim);
-    LOG(DEBUG) << "Actual weights of" << nSample << "samples:";
+    LOG(INFO) << "Actual weights of" << nSample << "samples:";
     for (unsigned int i=0; i<nSample; i++) {
         const double rMin = -45.0;
         const double rMax = +90.0;
@@ -540,9 +540,9 @@ void demoPCA(PRNG* rng) {
         for (unsigned int j=0; j<nDim; j++) {
             xMat(i,j) = xi(0, j);
         }
-        LOG(DEBUG) << KBase::getFormattedString("%+8.4f  %+8.4f  %+8.4f  %+8.4f", w1, w2, w3, w4);
+        LOG(INFO) << KBase::getFormattedString("%+8.4f  %+8.4f  %+8.4f  %+8.4f", w1, w2, w3, w4);
     }
-    LOG(DEBUG) << "Data (one sample per row): ";
+    LOG(INFO) << "Data (one sample per row): ";
     xMat.mPrintf("%+8.3f  ");
 
     auto sMean = KMatrix(1, nDim);
@@ -556,7 +556,7 @@ void demoPCA(PRNG* rng) {
         }
     }
 
-    LOG(DEBUG) <<"Sample means:";
+    LOG(INFO) <<"Sample means:";
     sMean.mPrintf("%+8.3f  ");
 
     assert (nComp <= nDim);
@@ -566,16 +566,16 @@ void demoPCA(PRNG* rng) {
     auto w1 = yMat * trans(f1); 
 
     auto showErr = [yMat] (const KMatrix & w, const KMatrix & f) {
-        LOG(DEBUG) << "Estimated principal components:";
+        LOG(INFO) << "Estimated principal components:";
         f.mPrintf("%+7.4f  ");
-        LOG(DEBUG) << "Estimated weights:";
+        LOG(INFO) << "Estimated weights:";
         w.mPrintf("%+8.3f  ");
         auto zMat = w * f;
-        LOG(DEBUG) << KBase::getFormattedString("RMS of estimated zMat: %.3e", rms(zMat));
+        LOG(INFO) << KBase::getFormattedString("RMS of estimated zMat: %.3e", rms(zMat));
         auto eMat = yMat - zMat;
-        LOG(DEBUG) << KBase::getFormattedString("RMS of error eMat: %.3e", rms(eMat));
+        LOG(INFO) << KBase::getFormattedString("RMS of error eMat: %.3e", rms(eMat));
         double yzCorr = KBase::lCorr(yMat - mean(yMat), zMat - mean(zMat));
-        LOG(DEBUG) << KBase::getFormattedString("Y-Z Affine correlation %+.4f", yzCorr);
+        LOG(INFO) << KBase::getFormattedString("Y-Z Affine correlation %+.4f", yzCorr);
         return;
     };
     
@@ -583,9 +583,9 @@ void demoPCA(PRNG* rng) {
 
 
     for (unsigned int n=1; n<nComp; n++) {
-        LOG(DEBUG) << "Extracting component" << n;
+        LOG(INFO) << "Extracting component" << n;
 
-        LOG(DEBUG) << "Try to extend";
+        LOG(INFO) << "Try to extend";
         auto wf = extendPCA(yMat, w1, f1);
         KMatrix w2 = get<0>(wf);
         KMatrix f2 = get<1>(wf);
@@ -610,11 +610,11 @@ void demoABG00(PRNG* rng) {
     KMatrix l = x - 1;
     KMatrix u = x + 1;
 
-    LOG(DEBUG) << "Feasible point, x, with 0=|Ax-b|, l<=x<=u:";
+    LOG(INFO) << "Feasible point, x, with 0=|Ax-b|, l<=x<=u:";
     x.mPrintf(" %8.2f ");
-    LOG(DEBUG) << "Lower bound = x-1, upper bound = x+1";
-    LOG(DEBUG) << "Dim of x:" << dx;
-    LOG(DEBUG) << "Dim of b:" << db;
+    LOG(INFO) << "Lower bound = x-1, upper bound = x+1";
+    LOG(INFO) << "Dim of x:" << dx;
+    LOG(INFO) << "Dim of b:" << db;
 
     // box constrained VI, aka MCP
     auto P = [l, u](const KMatrix & x1) {
@@ -640,15 +640,15 @@ void demoABG00(PRNG* rng) {
     unsigned int iter = get<1>(xie);
     KMatrix e = get<2>(xie);
 
-    LOG(DEBUG) << "Initial search point, x0:";
+    LOG(INFO) << "Initial search point, x0:";
     x0.mPrintf(" %8.2f ");
 
-    LOG(DEBUG) << "After" << iter << "iterations, found xf:";
+    LOG(INFO) << "After" << iter << "iterations, found xf:";
     xf.mPrintf(" %8.2f ");
-    LOG(DEBUG) << "xf-x:";
+    LOG(INFO) << "xf-x:";
     (xf - x).mPrintf(" %8.2f ");
-    LOG(DEBUG) << getFormattedString("Norm of AX-b: %.3E", norm(A*xf - b));
-    LOG(DEBUG) << "Final projection error:";
+    LOG(INFO) << getFormattedString("Norm of AX-b: %.3E", norm(A*xf - b));
+    LOG(INFO) << "Final projection error:";
     e.mPrintf(" %+.2E ");
 
     return;
@@ -747,8 +747,8 @@ KMatrix projEllipse(const KMatrix & a, const KMatrix & w) {
     while (err > eps) {
         if (ReportingLevel::Silent < rl) {
             if ((ReportingLevel::Low < rl) || (0 == iter)) {
-                LOG(DEBUG) << "iter" << iter;
-                LOG(DEBUG) << getFormattedString("%.4f  %.4e/%.4e  [%.8e, %.8e]", en, err, eps, f0, f1);
+                LOG(INFO) << "iter" << iter;
+                LOG(INFO) << getFormattedString("%.4f  %.4e/%.4e  [%.8e, %.8e]", en, err, eps, f0, f1);
                 show("x", trans(x), "%+.6f  ");
             }
         }
@@ -770,8 +770,8 @@ KMatrix projEllipse(const KMatrix & a, const KMatrix & w) {
         iter++;
     }
     if (ReportingLevel::Silent < rl) {
-        LOG(DEBUG) << "iter" << iter;
-        LOG(DEBUG) << getFormattedString("%.4e/%.4e  [%.8e, %.8e]", err, eps, f0, f1);
+        LOG(INFO) << "iter" << iter;
+        LOG(INFO) << getFormattedString("%.4e/%.4e  [%.8e, %.8e]", err, eps, f0, f1);
         show("x", trans(x), "%+.6f  ");
     }
     return x;
@@ -788,7 +788,7 @@ KMatrix projEllipse(const KMatrix & a, const KMatrix & w) {
 //
 // Generally, ABG performs much better on this problem than does BSHe96.
 void demoEllipseLVI(PRNG* rng, unsigned int n) {
-    LOG(DEBUG) << "Construct and solve LVI with ellipsoidal K in" << n << "dimensions";
+    LOG(INFO) << "Construct and solve LVI with ellipsoidal K in" << n << "dimensions";
     KMatrix a = KMatrix::uniform(rng, n, 1, +5.0, +15.0);
     KMatrix A = KMatrix::uniform(rng, n, n, -1.0, +2.0);
     KMatrix M = trans(A) * A;
@@ -807,12 +807,12 @@ void demoEllipseLVI(PRNG* rng, unsigned int n) {
     M = (c2*M) / c1;
     KMatrix q = -1.0 * (M*xStar + beta);
 
-    LOG(DEBUG) << "Constructed solution";
+    LOG(INFO) << "Constructed solution";
     show("Ellipsoid:", trans(a), "%+8.4f  ");
     show("xStar:", trans(xStar), "%+8.4f  ");
     show("M*xStar+q:", trans(M*xStar + q), "%+8.4f  ");
 
-    LOG(DEBUG) << "Constructed problem for that solution";
+    LOG(INFO) << "Constructed problem for that solution";
     show("M:", M, "%+8.4f  ");
     show("q:", trans(q), "%+8.4f  ");
 
@@ -836,29 +836,29 @@ void demoEllipseLVI(PRNG* rng, unsigned int n) {
         KMatrix u = get<0>(r);
         unsigned int iter = get<1>(r);
         KMatrix res = get<2>(r);
-        LOG(DEBUG) << "After" << iter << "iterations";
-        LOG(DEBUG) << "  solution u:";
+        LOG(INFO) << "After" << iter << "iterations";
+        LOG(INFO) << "  solution u:";
         trans(u).mPrintf(" %+.3f ");
-        LOG(DEBUG) << "  residual r:";
+        LOG(INFO) << "  residual r:";
         trans(res).mPrintf(" %+.3f ");
         KMatrix v = M*u + q;
         double e1 = sfe(u, xStar);
         double e2 = sfe(v, M*xStar + q);
-        LOG(DEBUG) << getFormattedString("SFE of u is %.3E,  SFE of v is %.3E", e1, e2);
+        LOG(INFO) << getFormattedString("SFE of u is %.3E,  SFE of v is %.3E", e1, e2);
         assert(e1 < tol); // inaccurate U
         assert(e2 < tol); // inaccurate V
         return;
     };
 
-    LOG(DEBUG) << "Solve via ABG";
+    LOG(INFO) << "Solve via ABG";
     auto r2 = viABG(x0, F, projE, 0.5, eps, iterLim, false);
     processRslt(r2);
 
-    LOG(DEBUG) << "Solve via AEG";
+    LOG(INFO) << "Solve via AEG";
     auto r2e = viABG(x0, F, projE, 0.5, eps, iterLim, true);
     processRslt(r2e);
 
-    LOG(DEBUG) << "Solve via BSHe96";
+    LOG(INFO) << "Solve via BSHe96";
     auto r1 = viBSHe96(M, q, projE, x0, eps, iterLim);
     processRslt(r1);
 
@@ -902,7 +902,7 @@ tuple<KMatrix, KMatrix, KMatrix, KMatrix> antiLemke(unsigned int n) {
 
 // Generally, BSHe96 performs much better on this problem than does ABG.
 void demoAntiLemke(PRNG* rng, unsigned int n) {
-    LOG(DEBUG) << "Construct and solve AntiLemke LVI in" << n << "dimensions";
+    LOG(INFO) << "Construct and solve AntiLemke LVI in" << n << "dimensions";
     auto al = antiLemke(n);
     KMatrix M = get<0>(al);
     KMatrix q = get<1>(al);
@@ -917,37 +917,37 @@ void demoAntiLemke(PRNG* rng, unsigned int n) {
     auto xInit = KMatrix::uniform(rng, n, 1, -20.0, 20.0);
     double eps = 1E-6;
     unsigned int iterLim = 10000;
-    LOG(DEBUG) << "Initial point:";
+    LOG(INFO) << "Initial point:";
     trans(xInit).mPrintf(" %+7.3f ");
 
     auto processRslt = [sfe, M, q, u, eps](tuple<KMatrix, unsigned int, KMatrix> r) {
         KMatrix u = get<0>(r);
         unsigned int iter = get<1>(r);
         KMatrix res = get<2>(r);
-        LOG(DEBUG) << "After" << iter << "iterations";
-        LOG(DEBUG) << "  solution u:";
+        LOG(INFO) << "After" << iter << "iterations";
+        LOG(INFO) << "  solution u:";
         trans(u).mPrintf(" %+.3f ");
-        LOG(DEBUG) << "  residual r:";
+        LOG(INFO) << "  residual r:";
         trans(res).mPrintf(" %+.3f ");
         KMatrix v = M*u + q;
         double tol = 100 * eps;
         double e1 = sfe(u, u);
         double e2 = sfe(v, M*u + q);
-        LOG(DEBUG) << getFormattedString("SFE of u is %.3E,  SFE of v is %.3E", e1, e2);
+        LOG(INFO) << getFormattedString("SFE of u is %.3E,  SFE of v is %.3E", e1, e2);
         assert(e1 < tol); // inaccurate U
         assert(e2 < tol); // inaccurate V
         return;
     };
 
-    LOG(DEBUG) << "Solve via BSHe96";
+    LOG(INFO) << "Solve via BSHe96";
     auto r1 = viBSHe96(M, q, KBase::projPos, xInit, eps, iterLim);
     processRslt(r1);
 
-    LOG(DEBUG) << "Solve via ABG";
+    LOG(INFO) << "Solve via ABG";
     auto r2 = viABG(xInit, F, KBase::projPos, 0.5, eps, iterLim, false);
     processRslt(r2);
 
-    LOG(DEBUG) << "Solve via AEG";
+    LOG(INFO) << "Solve via AEG";
     auto r2b = viABG(xInit, F, KBase::projPos, 0.5, eps, iterLim, true);
     processRslt(r2b);
 
@@ -958,18 +958,18 @@ void demoAntiLemke(PRNG* rng, unsigned int n) {
 void demoEllipse(PRNG* rng) {
     unsigned int numD = 9;
     auto a = KMatrix::uniform(rng, numD, 1, 1.0, 10.0);
-    LOG(DEBUG) << "Demo projection onto ellipsoid in" << numD << "dimensions";
-    LOG(DEBUG) << "Ellipse parameters:";
+    LOG(INFO) << "Demo projection onto ellipsoid in" << numD << "dimensions";
+    LOG(INFO) << "Ellipse parameters:";
     trans(a).mPrintf(" %+8.4f ");
     auto w = KMatrix::uniform(rng, numD, 1, -20.0, 20.0);
-    LOG(DEBUG) << "Point to be projected:";
+    LOG(INFO) << "Point to be projected:";
     trans(w).mPrintf(" %+8.4f ");
     auto pe = UDemo::projEllipse(a, w);
 
-    LOG(DEBUG) << "Projected point:";
+    LOG(INFO) << "Projected point:";
     trans(pe).mPrintf(" %+8.4f ");
 
-    LOG(DEBUG) << getFormattedString("eNorm(projected) = %.f", UDemo::eNorm(a, pe));
+    LOG(INFO) << getFormattedString("eNorm(projected) = %.f", UDemo::eNorm(a, pe));
 
     UDemo::demoEllipseLVI(rng, 10);
     return;
@@ -987,8 +987,8 @@ void demoGA(PRNG* rng) {
     // This is also an example of how to use λ-fn
     // to redefine the eval fn w/o touching the class
 
-    LOG(DEBUG) << "Target length = " << nb ;
-    LOG(DEBUG) << "Set target: ";
+    LOG(INFO) << "Target length = " << nb ;
+    LOG(INFO) << "Set target: ";
     const KBase::VBool trgt = TargetedBV::randomBV(rng, nb);
     TargetedBV::setTarget(trgt);
     TargetedBV::showBits(TargetedBV::getTarget());
@@ -1008,9 +1008,9 @@ void demoGA(PRNG* rng) {
     gs[tblSize - 1] = TargetedBV(trgt);
     tbl[tblSize - 1] = trgt;
 
-    LOG(DEBUG) << "Table eval with minD = " << minD;
+    LOG(INFO) << "Table eval with minD = " << minD;
     for (unsigned int i = 0; i < tblSize; i++) {
-        LOG(DEBUG) << getFormattedString("%2u  %8.3f  ", i, gs[i].tblEval(minD, wghts, tbl));
+        LOG(INFO) << getFormattedString("%2u  %8.3f  ", i, gs[i].tblEval(minD, wghts, tbl));
         TargetedBV::showBits(gs[i].bits);
     }
 
@@ -1019,7 +1019,7 @@ void demoGA(PRNG* rng) {
         double vi = gsi.tblEval(minD, wghts, tbl);
         TargetedBV gsj = gs[j];
         double vj = gsj.tblEval(minD, wghts, tbl);
-        LOG(DEBUG) << getFormattedString("v[%2i]/v[%2i]:  %.3f", i, j, (vi / vj));
+        LOG(INFO) << getFormattedString("v[%2i]/v[%2i]:  %.3f", i, j, (vi / vj));
         return;
     };
     compFn(tblSize - 1, 0);
@@ -1067,7 +1067,7 @@ void demoGA(PRNG* rng) {
     double cf = 2.2; // 2.2 == everything crosses over twice, plus random 20%
     double mf = 1.5; // 1.5 == everything mutates once, plus random 50%
 
-    LOG(DEBUG) << "Population size:" << pS;
+    LOG(INFO) << "Population size:" << pS;
 
     auto gOpt = new GAOpt<TargetedBV>(pS);
     gOpt->cross = crFn;
@@ -1082,22 +1082,22 @@ void demoGA(PRNG* rng) {
     //   gOpt->init(ip);
 
     gOpt->fill(rng);
-    LOG(DEBUG) << "Random basic population:";
+    LOG(INFO) << "Random basic population:";
     gOpt->show();
 
     auto srl = KBase::ReportingLevel::Low;
     unsigned int iter = 0;
     unsigned int sIter = 0;
-    LOG(DEBUG) << getFormattedString("Crossover fraction: %.3f", cf);
-    LOG(DEBUG) << getFormattedString("Mutation fraction: %.3f", mf);
+    LOG(INFO) << getFormattedString("Crossover fraction: %.3f", cf);
+    LOG(INFO) << getFormattedString("Mutation fraction: %.3f", mf);
     gOpt->run(rng, cf, mf, 1000, 0.2, 50, srl, iter, sIter);
 
-    LOG(DEBUG) << "Completed run after" << iter << "iterations," << sIter << "stable";
+    LOG(INFO) << "Completed run after" << iter << "iterations," << sIter << "stable";
     auto vgBest = gOpt->getNth(0);
-    LOG(DEBUG) << getFormattedString("Best value found: %.3f", get<0>(vgBest));
-    LOG(DEBUG) << "Best gene found:";
+    LOG(INFO) << getFormattedString("Best value found: %.3f", get<0>(vgBest));
+    LOG(INFO) << "Best gene found:";
     get<1>(vgBest)->show();
-    LOG(DEBUG) << "Final gpool: ";
+    LOG(INFO) << "Final gpool: ";
     gOpt->show();
 
     delete gOpt;
@@ -1134,7 +1134,7 @@ void demoGHC(PRNG* rng) {
                 bvBits += "o";
             }
         }
-        LOG(DEBUG) << bvBits;
+        LOG(INFO) << bvBits;
         return;
     };
 
@@ -1150,17 +1150,17 @@ void demoGHC(PRNG* rng) {
     };
 
     el::Loggers::removeFlag(el::LoggingFlag::AutoSpacing);
-    LOG(DEBUG) << "Generic hill-climbing search over " << numBits << "-bit strings";
+    LOG(INFO) << "Generic hill-climbing search over " << numBits << "-bit strings";
     el::Loggers::addFlag(el::LoggingFlag::AutoSpacing);
-    LOG(DEBUG) << "Target string: ";
+    LOG(INFO) << "Target string: ";
     sfn(bv0);
-    LOG(DEBUG) << getFormattedString("Target value : %+.3f", efn(bv0));
+    LOG(INFO) << getFormattedString("Target value : %+.3f", efn(bv0));
 
-    LOG(DEBUG) << "Starting general hill-climbing search";
+    LOG(INFO) << "Starting general hill-climbing search";
     VBool p0 = rng->bits(numBits);
-    LOG(DEBUG) << "Initial string: ";
+    LOG(INFO) << "Initial string: ";
     sfn(p0);
-    LOG(DEBUG) << getFormattedString("Initial value: %+.3f", efn(p0));
+    LOG(INFO) << getFormattedString("Initial value: %+.3f", efn(p0));
 
     auto ghc = GHCSearch<VBool>();
     ghc.eval = efn;
@@ -1181,10 +1181,10 @@ void demoVHC00(uint64_t sd) {
     for (unsigned int i=0; i<n; i++) {
         tm(i,i)=rng->uniform(1.0, 5.0);
     }
-    LOG(DEBUG) << "Dimension:"<<n;
-    LOG(DEBUG) << "Target point:";
+    LOG(INFO) << "Dimension:"<<n;
+    LOG(INFO) << "Target point:";
     trans(trgt).mPrintf(" %+.4f ");
-    LOG(DEBUG) << "Transformation matrix:";
+    LOG(INFO) << "Transformation matrix:";
     tm.mPrintf(" %+.4f ");
 
     auto vhc = new VHCSearch();
@@ -1201,7 +1201,7 @@ void demoVHC00(uint64_t sd) {
         vhc->nghbrs = VHCSearch::vn2;
     }
     auto p0 = KMatrix::uniform(rng, n, 1, -100, +100);
-    LOG(DEBUG) << "Initial point:";
+    LOG(INFO) << "Initial point:";
     trans(p0).mPrintf(" %+.4f ");
     auto rslt = vhc->run(p0,
                          500000, 10, 1E-10,
@@ -1213,14 +1213,14 @@ void demoVHC00(uint64_t sd) {
     unsigned int sn = get<3>(rslt);
     delete vhc;
     vhc = nullptr;
-    LOG(DEBUG) << "Iter:" << in << "Stable:" << sn;
-    LOG(DEBUG) << getFormattedString("Best value: %+.4f", vBest);
-    LOG(DEBUG) << "Best point:";
+    LOG(INFO) << "Iter:" << in << "Stable:" << sn;
+    LOG(INFO) << getFormattedString("Best value: %+.4f", vBest);
+    LOG(INFO) << "Best point:";
     trans(pBest).mPrintf(" %+.4f ");
 
     // JAH 20161103 changed back to llu
-    LOG(DEBUG) << getFormattedString("Used PRNG seed:  %020llu", sd);
-    LOG(DEBUG) << "Target point was originally:";
+    LOG(INFO) << getFormattedString("Used PRNG seed:  %020llu", sd);
+    LOG(INFO) << "Target point was originally:";
     trans(trgt).mPrintf(" %+.4f ");
 
     return;
@@ -1230,10 +1230,10 @@ void demoVHC01(uint64_t sd) {
     auto rng = new PRNG(sd);
     using KBase::KMatrix;
     using KBase::VHCSearch;
-    LOG(DEBUG) << "Nash bargaining problem, with 1D positions and 2D bargains";
-    LOG(DEBUG) << "NBS seems always to be that t2i == t2j (i.e. di+dj=1)";
-    LOG(DEBUG) << "But di is not quite pj (and dj is not quite pi)";
-    LOG(DEBUG) << "And di-dj == pj-pi only in mutually risk-neutral cases.";
+    LOG(INFO) << "Nash bargaining problem, with 1D positions and 2D bargains";
+    LOG(INFO) << "NBS seems always to be that t2i == t2j (i.e. di+dj=1)";
+    LOG(INFO) << "But di is not quite pj (and dj is not quite pi)";
+    LOG(INFO) << "And di-dj == pj-pi only in mutually risk-neutral cases.";
 
     double minR = -0.95;
     double maxR = +0.95;
@@ -1245,23 +1245,23 @@ void demoVHC01(uint64_t sd) {
     double rj = rng->uniform(minR, maxR);  // risk-attitude of j
     double pj = 1 - pi;
 
-    LOG(DEBUG) << getFormattedString("Ti: %.5f   Tj: %.5f", ti, tj);
-    LOG(DEBUG) << getFormattedString("Ri: %+.5f  Rj: %+.5f", ri, rj);
-    LOG(DEBUG) << getFormattedString("Pi: %.5f   Pj: %.5f", pi, pj);
+    LOG(INFO) << getFormattedString("Ti: %.5f   Tj: %.5f", ti, tj);
+    LOG(INFO) << getFormattedString("Ri: %+.5f  Rj: %+.5f", ri, rj);
+    LOG(INFO) << getFormattedString("Pi: %.5f   Pj: %.5f", pi, pj);
 
     double uii = bsu(fabs(ti - ti), ri) + bsu(fabs(ti - ti), ri);
     double uij = bsu(fabs(ti - tj), ri) + bsu(fabs(ti - tj), ri);
     double uci = pi*uii + pj*uij;  // exp. utility of conflict's outcome to i
-    LOG(DEBUG) << getFormattedString("uii:  %.5f", uii);
-    LOG(DEBUG) << getFormattedString("uij:  %.5f", uij);
-    LOG(DEBUG) << getFormattedString("uci:  %.5f", uci);
+    LOG(INFO) << getFormattedString("uii:  %.5f", uii);
+    LOG(INFO) << getFormattedString("uij:  %.5f", uij);
+    LOG(INFO) << getFormattedString("uci:  %.5f", uci);
 
     double uji = bsu(fabs(tj - ti), rj) + bsu(fabs(tj - ti), rj);
     double ujj = bsu(fabs(tj - tj), rj) + bsu(fabs(tj - tj), rj);
     double ucj = pi*uji + pj*ujj;  // exp. utility of conflict's outcome to j
-    LOG(DEBUG) << getFormattedString("uji:  %.5f", uji);
-    LOG(DEBUG) << getFormattedString("ujj:  %.5f", ujj);
-    LOG(DEBUG) << getFormattedString("ucj:  %.5f", ucj);
+    LOG(INFO) << getFormattedString("uji:  %.5f", uji);
+    LOG(INFO) << getFormattedString("ujj:  %.5f", ujj);
+    LOG(INFO) << getFormattedString("ucj:  %.5f", ucj);
 
     auto vc = new VHCSearch();
     vc->nghbrs = VHCSearch::vn2;
@@ -1286,10 +1286,10 @@ void demoVHC01(uint64_t sd) {
     vc->eval = eFn;
 
     auto d0ij = KMatrix::uniform(rng, 2, 1, -0.05, +0.05);
-    LOG(DEBUG) << "Point 1:";
+    LOG(INFO) << "Point 1:";
     trans(d0ij).mPrintf(" %+.4f ");
 
-    LOG(DEBUG) << "NP 1: " << eFn(d0ij);
+    LOG(INFO) << "NP 1: " << eFn(d0ij);
 
     auto rslt = vc->run(d0ij,
                         1000, 20, 1e-16,
@@ -1300,11 +1300,11 @@ void demoVHC01(uint64_t sd) {
     unsigned int in = get<2>(rslt);
     unsigned int sn = get<3>(rslt);
 
-    LOG(DEBUG) << "Point 2:";
+    LOG(INFO) << "Point 2:";
     trans(pBest).mPrintf(" %+.5f ");
 
-    LOG(DEBUG) << "NP 2:" << vBest;
-    LOG(DEBUG) << "Iter: " << in << " Stable:" << sn;
+    LOG(INFO) << "NP 2:" << vBest;
+    LOG(INFO) << "Iter: " << in << " Stable:" << sn;
 
     double d2i = pBest(0, 0);
     double d2j = pBest(1, 0);
@@ -1319,18 +1319,18 @@ void demoVHC01(uint64_t sd) {
     // If ri,rj are mixed, then either outcome may occur.
     //
     if (vBest < 0.0) {
-        LOG(DEBUG) << "Found no bargain which both prefer to conflict";
+        LOG(INFO) << "Found no bargain which both prefer to conflict";
     }
     else {
-        LOG(DEBUG) << "Found a bargain which both prefer to conflict" 
+        LOG(INFO) << "Found a bargain which both prefer to conflict" 
             << getFormattedString("T2i: %.5f   T2j: %.5f   diff: %.5f", t2i, t2j, fabs(t2i - t2j));
-        LOG(DEBUG) << "Not quite zero:";
-        LOG(DEBUG) << getFormattedString("Pi - D2j:   %+.5f", pi - d2j);
-        LOG(DEBUG) << getFormattedString("Pj - D2i:   %+.5f", pj - d2i);
+        LOG(INFO) << "Not quite zero:";
+        LOG(INFO) << getFormattedString("Pi - D2j:   %+.5f", pi - d2j);
+        LOG(INFO) << getFormattedString("Pj - D2i:   %+.5f", pj - d2i);
 
-        LOG(DEBUG) << "Not quite equal:";
-        LOG(DEBUG) << getFormattedString("D2i - D2j: %+.5f", d2i - d2j);
-        LOG(DEBUG) << getFormattedString(" Pj -  Pi: %+.5f", pj - pi);
+        LOG(INFO) << "Not quite equal:";
+        LOG(INFO) << getFormattedString("D2i - D2j: %+.5f", d2i - d2j);
+        LOG(INFO) << getFormattedString(" Pj -  Pi: %+.5f", pj - pi);
     }
     return;
 }
@@ -1341,12 +1341,12 @@ void demoVHC02(uint64_t sd) {
     using KBase::dot;
     using KBase::maxAbs;
 
-    LOG(DEBUG) << "Nash bargaining problem, with 4D points and 8D bargains";
-    LOG(DEBUG) << "When both are risk-averse, the NBS seems always to be that t2i == tb == t2j";
-    LOG(DEBUG) << "even though tb is not a weighted mix of ti and tj.";
-    LOG(DEBUG) << "When one or both are risk-seeking, then there may not";
-    LOG(DEBUG) << "be a bargain they both prefer to conflict. When there is one,";
-    LOG(DEBUG) << "they might or might not take the same position.";
+    LOG(INFO) << "Nash bargaining problem, with 4D points and 8D bargains";
+    LOG(INFO) << "When both are risk-averse, the NBS seems always to be that t2i == tb == t2j";
+    LOG(INFO) << "even though tb is not a weighted mix of ti and tj.";
+    LOG(INFO) << "When one or both are risk-seeking, then there may not";
+    LOG(INFO) << "be a bargain they both prefer to conflict. When there is one,";
+    LOG(INFO) << "they might or might not take the same position.";
 
     auto vc = new KBase::VHCSearch();
 
@@ -1371,16 +1371,16 @@ void demoVHC02(uint64_t sd) {
     double pj = 1 - pi;
 
     auto sfn = [](string s, KMatrix m) {
-        LOG(DEBUG) << s << ":  ";
+        LOG(INFO) << s << ":  ";
         trans(m).mPrintf(" %.4f ");
     };
 
     sfn("ti:", ti);
     sfn("si:", si);
-    LOG(DEBUG) << getFormattedString("pi: %.4f  ri: %+.5f", pi, ri);
+    LOG(INFO) << getFormattedString("pi: %.4f  ri: %+.5f", pi, ri);
     sfn("tj:", tj);
     sfn("sj:", sj);
-    LOG(DEBUG) << getFormattedString("pj: %.4f  rj: %+.5f", pj, rj);
+    LOG(INFO) << getFormattedString("pj: %.4f  rj: %+.5f", pj, rj);
 
     auto tiProp = ti + pj*(tj - ti);
     auto tjProp = tj + pi*(ti - tj);
@@ -1393,16 +1393,16 @@ void demoVHC02(uint64_t sd) {
     double uii = bvu(ti - ti, si, ri) + bvu(ti - ti, si, ri);
     double uij = bvu(ti - tj, si, ri) + bvu(ti - tj, si, ri);
     double uci = pi*uii + pj*uij;
-    LOG(DEBUG) << getFormattedString("uii:  %.5f", uii);
-    LOG(DEBUG) << getFormattedString("uij:  %.5f", uij);
-    LOG(DEBUG) << getFormattedString("uci:  %.5f", uci);
+    LOG(INFO) << getFormattedString("uii:  %.5f", uii);
+    LOG(INFO) << getFormattedString("uij:  %.5f", uij);
+    LOG(INFO) << getFormattedString("uci:  %.5f", uci);
 
     double uji = bvu(tj - ti, sj, rj) + bvu(tj - ti, sj, rj);
     double ujj = bvu(tj - tj, sj, rj) + bvu(tj - tj, sj, rj);
     double ucj = pi*uji + pj*ujj;
-    LOG(DEBUG) << getFormattedString("uji:  %.5f", uji);
-    LOG(DEBUG) << getFormattedString("ujj:  %.5f", ujj);
-    LOG(DEBUG) << getFormattedString("ucj:  %.5f", ucj);
+    LOG(INFO) << getFormattedString("uji:  %.5f", uji);
+    LOG(INFO) << getFormattedString("ujj:  %.5f", ujj);
+    LOG(INFO) << getFormattedString("ucj:  %.5f", ucj);
 
     auto efn2 = [ti, uci, si, ri, tj, ucj, sj, rj](KMatrix t2i, KMatrix t2j) {
         double ubi = bvu(ti - t2i, si, ri) + bvu(ti - t2j, si, ri);
@@ -1571,7 +1571,7 @@ void demoVHC02(uint64_t sd) {
     vc->nghbrs = KBase::VHCSearch::vn2;
 
     auto p0 = KMatrix::uniform(rng, 8, 1, -0.05, +0.05);
-    LOG(DEBUG) << getFormattedString("Initial NP: %+.4f", vc->eval(p0));
+    LOG(INFO) << getFormattedString("Initial NP: %+.4f", vc->eval(p0));
     sfn("Initial point: ", p0);
 
     auto rslt = vc->run(p0,
@@ -1615,18 +1615,18 @@ void demoVHC02(uint64_t sd) {
     // At least to me, eS2P2 does appear a little simpler, so I will use it as the
     // closed form estimator.
 
-    LOG(DEBUG) << "Iter:" << in <<  "Stable:" << sn;
-    LOG(DEBUG) << getFormattedString("Best NP:  %+.4f", vBest);
+    LOG(INFO) << "Iter:" << in <<  "Stable:" << sn;
+    LOG(INFO) << getFormattedString("Best NP:  %+.4f", vBest);
     sfn("Best point: ", pBest);
     if (vBest < 0) {
-        LOG(DEBUG) << "Found no bargain which both sides prefer to conflict";
+        LOG(INFO) << "Found no bargain which both sides prefer to conflict";
     }
     else {
-        LOG(DEBUG) << "Found a bargain which both sides prefer to conflict";
-        LOG(DEBUG) << getFormattedString("0:4  %.4f", fabs(pBest(0, 0) - pBest(4, 0)));
-        LOG(DEBUG) << getFormattedString("1:5  %.4f", fabs(pBest(1, 0) - pBest(5, 0)));
-        LOG(DEBUG) << getFormattedString("2:6  %.4f", fabs(pBest(2, 0) - pBest(6, 0)));
-        LOG(DEBUG) << getFormattedString("3:7  %.4f", fabs(pBest(3, 0) - pBest(7, 0)));
+        LOG(INFO) << "Found a bargain which both sides prefer to conflict";
+        LOG(INFO) << getFormattedString("0:4  %.4f", fabs(pBest(0, 0) - pBest(4, 0)));
+        LOG(INFO) << getFormattedString("1:5  %.4f", fabs(pBest(1, 0) - pBest(5, 0)));
+        LOG(INFO) << getFormattedString("2:6  %.4f", fabs(pBest(2, 0) - pBest(6, 0)));
+        LOG(INFO) << getFormattedString("3:7  %.4f", fabs(pBest(3, 0) - pBest(7, 0)));
 
         double mb[] = {
             (pBest(0, 0) + pBest(4, 0)) / 2,
@@ -1649,11 +1649,11 @@ void demoVHC02(uint64_t sd) {
         //
         double estDI = dot(b - ti, tj - ti) / dot(ti - tj, ti - tj);
         double estDJ = 1 - estDI;
-        LOG(DEBUG) << getFormattedString("Effective fractional shifts:  %+.5f  %+.5f", estDI, estDJ);
+        LOG(INFO) << getFormattedString("Effective fractional shifts:  %+.5f  %+.5f", estDI, estDJ);
         KMatrix estB = ti + estDI*(tj - ti);
         sfn("Interpolated bargain:", estB);
         double estErr = rms(estB - b);
-        LOG(DEBUG) << getFormattedString("Resulting RMS estimation error: %.4f", estErr);
+        LOG(INFO) << getFormattedString("Resulting RMS estimation error: %.4f", estErr);
         // note that dBS1P1 and dBS1P1 are identical to other estimators
 
         auto fS1P0 = estMat(1, 0);
@@ -1675,8 +1675,8 @@ void demoVHC02(uint64_t sd) {
         sfn("Prob-Sal-weighted dBS1P2:", dBS1P2);
         sfn("Prob-Sal-weighted dBS2P2:", dBS2P2);
 
-        LOG(DEBUG) << "Resulting RMS estimation error:";
-        LOG(DEBUG) << "RMS of eS1P1  eS1P2  eS2P1  eS2P2  dS1P2  dS2P2  "
+        LOG(INFO) << "Resulting RMS estimation error:";
+        LOG(INFO) << "RMS of eS1P1  eS1P2  eS2P1  eS2P2  dS1P2  dS2P2  "
             << "fS1P0 fS1P1 fS1P2 S2P0 fS2P1 fS2P2 "
             << getFormattedString("%7.4f  %7.4f  %7.4f  %7.4f ",
                 joinedRMS(eBS1P1), joinedRMS(eBS1P2), joinedRMS(eBS2P1), joinedRMS(eBS2P2))
@@ -1685,8 +1685,8 @@ void demoVHC02(uint64_t sd) {
                 rms(fS1P0 - pBest), rms(fS1P1 - pBest), rms(fS1P2 - pBest),
                 rms(fS2P0 - pBest), rms(fS2P1 - pBest), rms(fS2P2 - pBest));
 
-        LOG(DEBUG) << "Resulting MaxAbs estimation error:";
-        LOG(DEBUG) << "MaxAbs of eS1P1  eS1P2  eS2P1  eS2P2  dS1P2  dS2P2  "
+        LOG(INFO) << "Resulting MaxAbs estimation error:";
+        LOG(INFO) << "MaxAbs of eS1P1  eS1P2  eS2P1  eS2P2  dS1P2  dS2P2  "
             << getFormattedString("%7.4f  %7.4f  %7.4f  %7.4f ",
                 maxAbs(eBS1P1 - b), maxAbs(eBS1P2 - b), maxAbs(eBS2P1 - b), maxAbs(eBS2P2 - b))
             << getFormattedString("%7.4f  %7.4f", maxAbs(dBS1P2 - b), maxAbs(dBS2P2 - b));
@@ -1700,8 +1700,8 @@ void demoVHC03(uint64_t sd) {
     using KBase::dot;
     using KBase::maxAbs;
 
-    LOG(DEBUG) << "Nash bargaining problem, with 4D points and 8D bargains, vector salience and vector capabilities";
-    LOG(DEBUG) << "Note the log-rolling on dimensions 0 and 1";
+    LOG(INFO) << "Nash bargaining problem, with 4D points and 8D bargains, vector salience and vector capabilities";
+    LOG(INFO) << "Note the log-rolling on dimensions 0 and 1";
 
     auto vc = new KBase::VHCSearch();
 
@@ -1746,7 +1746,7 @@ void demoVHC03(uint64_t sd) {
     KMatrix pj = (-1.0)*pi + 1;
 
     auto sfn = [](string s, KMatrix m) {
-        LOG(DEBUG) << s << ":";
+        LOG(INFO) << s << ":";
         trans(m).mPrintf(" %7.4f ");
     };
 
@@ -1755,11 +1755,11 @@ void demoVHC03(uint64_t sd) {
     ri = -0.1;
     rj = 0.9;
 
-    LOG(DEBUG) << getFormattedString("ri: %+.3f", ri);
+    LOG(INFO) << getFormattedString("ri: %+.3f", ri);
     sfn("ti:", ti);
     sfn("si:", si);
     sfn("ci:", ci);
-    LOG(DEBUG) << getFormattedString("rj: %+.3f", rj);
+    LOG(INFO) << getFormattedString("rj: %+.3f", rj);
     sfn("tj:", tj);
     sfn("sj:", sj);
     sfn("cj:", cj);
@@ -1781,7 +1781,7 @@ void demoVHC03(uint64_t sd) {
 
     auto batna = KMatrix::map(oneDimBargain, 4, 1);
 
-    LOG(DEBUG) << "BATNA determined by bargaining along each dimension separately, using eS2P2.";
+    LOG(INFO) << "BATNA determined by bargaining along each dimension separately, using eS2P2.";
     sfn("BATNA: ", batna);
 
     // util to each actor of SQ
@@ -1792,13 +1792,13 @@ void demoVHC03(uint64_t sd) {
     double uiB = bvu(ti - batna, si, ri) + bvu(ti - batna, si, ri);
     double ujB = bvu(tj - batna, sj, rj) + bvu(tj - batna, sj, rj);
 
-    LOG(DEBUG) << getFormattedString("uiSQ: %.4f", uiSQ);
-    LOG(DEBUG) << getFormattedString("uiB:  %.4f", uiB);
-    LOG(DEBUG) << getFormattedString("delta: %+.4f", uiB - uiSQ);
+    LOG(INFO) << getFormattedString("uiSQ: %.4f", uiSQ);
+    LOG(INFO) << getFormattedString("uiB:  %.4f", uiB);
+    LOG(INFO) << getFormattedString("delta: %+.4f", uiB - uiSQ);
 
-    LOG(DEBUG) << getFormattedString("ujSQ: %.4f", ujSQ);
-    LOG(DEBUG) << getFormattedString("ujB:  %.4f", ujB);
-    LOG(DEBUG) << getFormattedString("delta: %+.4f", ujB - ujSQ);
+    LOG(INFO) << getFormattedString("ujSQ: %.4f", ujSQ);
+    LOG(INFO) << getFormattedString("ujB:  %.4f", ujB);
+    LOG(INFO) << getFormattedString("delta: %+.4f", ujB - ujSQ);
 
     // Nash-product, compared to BATNA
     auto efn0 = [ti, uiB, si, ri, tj, ujB, sj, rj](const KMatrix & t2i, const KMatrix & t2j) {
@@ -1809,7 +1809,7 @@ void demoVHC03(uint64_t sd) {
     };
 
     double npv = efn0(batna, batna);
-    LOG(DEBUG) << "NP of the BATNA: " << npv; // just a double-check
+    LOG(INFO) << "NP of the BATNA: " << npv; // just a double-check
 
     auto getT2I = [](const KMatrix & v) {
         double m2i[] = { v(0, 0), v(1, 0), v(2, 0), v(3, 0) }; // position
@@ -1834,7 +1834,7 @@ void demoVHC03(uint64_t sd) {
     vc->nghbrs = KBase::VHCSearch::vn2;
 
     auto p0 = KMatrix::uniform(rng, 8, 1, -0.5, +1.5); // deliberately outside the allowed [0,1] range
-    LOG(DEBUG) << getFormattedString("Initial NP: %+.4f", vc->eval(p0));
+    LOG(INFO) << getFormattedString("Initial NP: %+.4f", vc->eval(p0));
     sfn("Initial point: ", p0);
 
     auto rslt = vc->run(p0,
@@ -1847,24 +1847,24 @@ void demoVHC03(uint64_t sd) {
     unsigned int in = get<2>(rslt);
     unsigned int sn = get<3>(rslt);
 
-    LOG(DEBUG) << "Iter:" << in << "  Stable:" << sn;
-    LOG(DEBUG) << getFormattedString("Best NP:  %+.4f", vBest);
+    LOG(INFO) << "Iter:" << in << "  Stable:" << sn;
+    LOG(INFO) << getFormattedString("Best NP:  %+.4f", vBest);
     sfn("Best point: ", pBest);
     if (vBest < 0) {
-        LOG(DEBUG) << "Found no bargain which both sides prefer to BATNA";
+        LOG(INFO) << "Found no bargain which both sides prefer to BATNA";
     }
     else {
         // it turns out to have exactly the log-rolling which was expected
         // from the initial setup. Interestingly, it turns out to be symmetric
         // in that both actors adopt the same position at the Nash Bargain,
         // even though they use different metrics and risk attitudes.
-        LOG(DEBUG) << "Found a bargain which both sides prefer to BATNA";
+        LOG(INFO) << "Found a bargain which both sides prefer to BATNA";
         auto t2I = getT2I(pBest);
         auto t2J = getT2J(pBest);
         sfn("t2I:", t2I);
         sfn("t2J:", t2J);
-        LOG(DEBUG) << getFormattedString("Norm of t2I shift from BATNA: %.3f", norm(t2I - batna));
-        LOG(DEBUG) << getFormattedString("Norm of t2J shift from BATNA: %.3f", norm(t2J - batna));
+        LOG(INFO) << getFormattedString("Norm of t2I shift from BATNA: %.3f", norm(t2I - batna));
+        LOG(INFO) << getFormattedString("Norm of t2J shift from BATNA: %.3f", norm(t2J - batna));
     }
     return;
 }
@@ -1957,7 +1957,7 @@ void TargetedBV::showBits(VBool bv) {
             bitVals += "o";
         }
     }
-    LOG(DEBUG) << bitVals;
+    LOG(INFO) << bitVals;
     return;
 }
 bool TargetedBV::equiv(const TargetedBV * g2) const {
@@ -2014,9 +2014,9 @@ void parallelMatrixMult(PRNG * rng) {
     const unsigned int r1 = 100;
     const unsigned int c2 = r1;
     const unsigned int cr = crc / (r1*c2);
-    LOG(DEBUG) << getFormattedString(
+    LOG(INFO) << getFormattedString(
         "Starting concurrent matrix multiply of [%u,%u] by [%u, %u]", r1, cr, cr, c2);
-    LOG(DEBUG) << "This will launch" << r1*c2 << "threads";
+    LOG(INFO) << "This will launch" << r1*c2 << "threads";
 
     auto m1 = KMatrix::uniform(rng, r1, cr, -10, 50);
     auto m2 = KMatrix::uniform(rng, cr, c2, -10, 50);
@@ -2038,7 +2038,7 @@ void parallelMatrixMult(PRNG * rng) {
             s = s + m1(i, j)*m2(j, k);
         }
         m3B(i, k) = s;
-        LOG(DEBUG) << "Thread (" << i << "," << k << ") completed";
+        LOG(INFO) << "Thread (" << i << "," << k << ") completed";
         return;
     };
 
@@ -2056,7 +2056,7 @@ void parallelMatrixMult(PRNG * rng) {
         t.join();
     }
 
-    LOG(DEBUG) << getFormattedString("Diff in matrix mults: %.3E", norm(m3A - m3B));
+    LOG(INFO) << getFormattedString("Diff in matrix mults: %.3E", norm(m3A - m3B));
 
     return;
 }
@@ -2192,15 +2192,15 @@ int main(int ac, char **av) {
     // Unix correctly prints all digits with lu, lX, llu, and llX.
     // Windows only prints part, with lu, lX, llu, and llX.
     // JAH 20161103 changed back to llu/llx
-    LOG(DEBUG) << getFormattedString("Using PRNG seed:  %020llu", seed);
-    LOG(DEBUG) << getFormattedString("Same seed in hex:   0x%016llx", seed);
+    LOG(INFO) << getFormattedString("Using PRNG seed:  %020llu", seed);
+    LOG(INFO) << getFormattedString("Same seed in hex:   0x%016llx", seed);
 
 
     //    UDemo::demoCoords(rng);
 
     if (threadP) {
         UDemo::demoThreadLambda(10);
-        LOG(DEBUG) << "Demo using mutex to protect counter ...";
+        LOG(INFO) << "Demo using mutex to protect counter ...";
         UDemo::demoThreadSynch(10);
         UDemo::demoThreadSynch(10);
         UDemo::demoThreadSynch(10);
@@ -2244,7 +2244,7 @@ int main(int ac, char **av) {
             UDemo::demoVHC03(seed);
             break;
         default:
-            LOG(DEBUG) << "Unrecognized vhcN: " << vhcN;
+            LOG(INFO) << "Unrecognized vhcN: " << vhcN;
         }
     }
 
@@ -2261,7 +2261,7 @@ int main(int ac, char **av) {
             UDemo::demoAntiLemke(rng, 25);
             break;
         default:
-            LOG(DEBUG) << "Unrecognized vimcpN: " << vimcpN;
+            LOG(INFO) << "Unrecognized vimcpN: " << vimcpN;
         }
     }
 

@@ -95,7 +95,7 @@ tuple<unsigned int, vector<vector<string>>> SQLDB::query(const char* query)
   string error = sqlite3_errmsg(database);
   if (error != "not an error")
   {
-    LOG(DEBUG) << query << " " << error;
+    LOG(INFO) << query << " " << error;
   }
   return tuple<unsigned int, vector<vector<string>>>(rowC, results);
 }
@@ -112,16 +112,16 @@ void SQLDB::close()
 
 void demoDBObject()
 {
-  LOG(DEBUG) << "Demo SQLDB";
+  LOG(INFO) << "Demo SQLDB";
   using std::get;
 
   const bool parP = KBase::testMultiThreadSQLite(false, KBase::ReportingLevel::Medium);
 
-  LOG(DEBUG) << "Initializing sqlite3 ...";
+  LOG(INFO) << "Initializing sqlite3 ...";
   sqlite3_initialize();
-  LOG(DEBUG) << "Creating database ...";
+  LOG(INFO) << "Creating database ...";
   auto db = new SQLDB("myDB.db");
-  LOG(DEBUG) << "Inserting six records ...";
+  LOG(INFO) << "Inserting six records ...";
   db->query("CREATE TABLE tbl (a INTEGER, b INTEGER, c INTEGER);");
   db->query("INSERT INTO tbl VALUES(22, 50, 90);");
   db->query("INSERT INTO tbl VALUES(30, 29, 28);");
@@ -130,22 +130,22 @@ void demoDBObject()
   db->query("INSERT INTO tbl VALUES(45, 61, 66);");
   db->query("INSERT INTO tbl VALUES(48, 38, 46);");
 
-  LOG(DEBUG) << "Selecting three records ..." ;
+  LOG(INFO) << "Selecting three records ..." ;
   auto rslt = db->query("SELECT * FROM tbl WHERE c>50;");
   unsigned int rowC = get<0>(rslt);
-  LOG(DEBUG) << "Retrieved "<< rowC <<" rows \n";
+  LOG(INFO) << "Retrieved "<< rowC <<" rows \n";
   vector<vector<string> > rStr = get<1>(rslt);
   for (vector<vector<string> >::iterator it = rStr.begin(); it < rStr.end(); ++it)
   {
     vector<string> row = *it;
-    LOG(DEBUG) << "Values: (a=" << row.at(0) << ", b=" << row.at(1) << ", c=" << row.at(2) << ")" ;
+    LOG(INFO) << "Values: (a=" << row.at(0) << ", b=" << row.at(1) << ", c=" << row.at(2) << ")" ;
   }
 
-  LOG(DEBUG) << "Deleting database ...";
+  LOG(INFO) << "Deleting database ...";
   delete db;
   db = nullptr;
 
-  LOG(DEBUG) << "Shutting down SQlite3.";
+  LOG(INFO) << "Shutting down SQlite3.";
   sqlite3_shutdown();
   return;
 }

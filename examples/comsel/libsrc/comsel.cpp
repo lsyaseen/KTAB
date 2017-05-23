@@ -133,7 +133,7 @@ namespace ComSelLib {
     };
     KMatrix::mapV(setuij, na, na);
 
-    LOG(DEBUG) << "Actor spatial position utility matrix: ";
+    LOG(INFO) << "Actor spatial position utility matrix: ";
     actorSpPstnUtil->mPrintf(" %5.3f");
 
     return;
@@ -175,7 +175,7 @@ namespace ComSelLib {
       case 1: // on committee, use full strength
         break;
       default:
-        LOG(DEBUG) << "CSModel::oneCSPstnUtil - unrecognized match value: " << vb[k];
+        LOG(INFO) << "CSModel::oneCSPstnUtil - unrecognized match value: " << vb[k];
         assert(false); // no way to recover from this programming error
         break;
       }
@@ -228,16 +228,16 @@ namespace ComSelLib {
     const unsigned int numA = model->numAct;
     for (unsigned int i = 0; i < numA; i++) {
       auto pi = ((MtchPstn*)(pstns[i]));
-      LOG(DEBUG) << "Position:" << i;
+      LOG(INFO) << "Position:" << i;
       printVUI(pi->match);
     }
     auto pu = pDist(-1);
     KMatrix p = get<0>(pu);
     auto uNdx = get<1>(pu);
-    LOG(DEBUG) << "There are" << uNdx.size() << "unique positions";
+    LOG(INFO) << "There are" << uNdx.size() << "unique positions";
     for (unsigned int i1 = 0; i1 < uNdx.size(); i1++) {
       unsigned int i2 = uNdx[i1];
-      LOG(DEBUG) << KBase::getFormattedString("  %2u:  %.4f", i2, p(i1, 0));
+      LOG(INFO) << KBase::getFormattedString("  %2u:  %.4f", i2, p(i1, 0));
     }
     return;
   }
@@ -261,7 +261,7 @@ namespace ComSelLib {
     auto numU = ((const unsigned int)(uIndices.size()));
     assert(numU <= numP); // might have dropped some duplicates
 
-    LOG(DEBUG) << "Number of aUtils: " << aUtil.size();
+    LOG(INFO) << "Number of aUtils: " << aUtil.size();
 
     const KMatrix u = aUtil[0]; // all have same beliefs in this demo
 
@@ -306,7 +306,7 @@ namespace ComSelLib {
       const double tol = 1E-10;
       const double mij = m(i, j);
       if ((mij + tol < 0.0) || (1.0 + tol < mij)) {
-        LOG(DEBUG) << KBase::getFormattedString("%f  %i  %i", mij, i, j);
+        LOG(INFO) << KBase::getFormattedString("%f  %i  %i", mij, i, j);
       }
       assert(0.0 <= mij + tol);
       assert(mij <= 1.0 + tol);
@@ -342,20 +342,20 @@ namespace ComSelLib {
     KMatrix::mapV(euRng, eu.numR(), eu.numC());
 
     if (ReportingLevel::Low < rl) {
-      LOG(DEBUG) << "Util matrix is" << uMat.numR() << "x" << uMat.numC();
-      LOG(DEBUG) << "Assessing EU from util matrix: ";
+      LOG(INFO) << "Util matrix is" << uMat.numR() << "x" << uMat.numC();
+      LOG(INFO) << "Assessing EU from util matrix: ";
       uMat.mPrintf(" %.6f ");
 
-      LOG(DEBUG) << "Coalition strength matrix:";
+      LOG(INFO) << "Coalition strength matrix:";
       c.mPrintf(" %12.6f ");
 
-      LOG(DEBUG) << "Probability Opt_i > Opt_j:";
+      LOG(INFO) << "Probability Opt_i > Opt_j:";
       pv.mPrintf(" %.6f ");
 
-      LOG(DEBUG) << "Probability Opt_i:";
+      LOG(INFO) << "Probability Opt_i:";
       p.mPrintf(" %.6f ");
 
-      LOG(DEBUG) << "Expected utility to actors: ";
+      LOG(INFO) << "Expected utility to actors: ";
       eu.mPrintf(" %.6f ");
     }
 
@@ -364,7 +364,7 @@ namespace ComSelLib {
 
 
   CSState* CSState::stepSUSN() {
-    LOG(DEBUG) << "State number " << model->history.size() - 1;
+    LOG(INFO) << "State number " << model->history.size() - 1;
     if ((0 == uIndices.size()) || (0 == eIndices.size())) {
       setUENdx();
     }
@@ -401,14 +401,14 @@ namespace ComSelLib {
     auto euMat = [rl, numA, numP, this](const KMatrix & uMat) { 
       return expUtilMat(rl, numA, numP, uMat); };
     auto euState = euMat(u);
-    LOG(DEBUG) << "Actor expected utilities: ";
+    LOG(INFO) << "Actor expected utilities: ";
     KBase::trans(euState).mPrintf("%6.4f, ");
 
     if (ReportingLevel::Low < rl) {
-      LOG(DEBUG) << "---------------------------------------";
-      LOG(DEBUG) << "Assessing utility of actual state to all actors";
+      LOG(INFO) << "---------------------------------------";
+      LOG(INFO) << "Assessing utility of actual state to all actors";
       for (unsigned int h = 0; h < numA; h++) {
-        LOG(DEBUG) << "not available";
+        LOG(INFO) << "not available";
       }
       string log = "Out of " + std::to_string(numA)
         + " positions, " + std::to_string(numU) + " were unique";
@@ -416,7 +416,7 @@ namespace ComSelLib {
         log += std::to_string(i);
       }
 
-      LOG(DEBUG) << log;
+      LOG(INFO) << log;
     }
 
 
@@ -459,8 +459,8 @@ namespace ComSelLib {
         assert(KBase::maxAbs(u - uh0) < 1E-10); // all have same beliefs in this demo
         const unsigned int nI = ((CSModel*)model)->numItm;
         if (mph.match.size() != nI) {
-          LOG(DEBUG) << "Size of match object " << mph.match.size();
-          LOG(DEBUG) << " does not match number of items " << nI;
+          LOG(INFO) << "Size of match object " << mph.match.size();
+          LOG(INFO) << " does not match number of items " << nI;
         }
         assert(mph.match.size() == nI);
         auto uh = uh0;
@@ -513,16 +513,16 @@ namespace ComSelLib {
         }
 
         if (false) {
-          LOG(DEBUG) << "constructed hypUtil matrix:";
+          LOG(INFO) << "constructed hypUtil matrix:";
           hypUtil.mPrintf(" %8.2f ");
         }
 
 
         if (ReportingLevel::Low < rl) {
-          LOG(DEBUG) << "---------------------------------------";
-          LOG(DEBUG) << "Assessing utility to" << h << "of hypo-pos: ";
+          LOG(INFO) << "---------------------------------------";
+          LOG(INFO) << "Assessing utility to" << h << "of hypo-pos: ";
           printVUI(mph.match);
-          LOG(DEBUG) << "Hypo-util minus base util:";
+          LOG(INFO) << "Hypo-util minus base util:";
           (uh - uh0).mPrintf(" %+.4E ");
         }
         const KMatrix eu = euMat(hypUtil); // uh or hypUtil
@@ -557,8 +557,8 @@ namespace ComSelLib {
         3, 0.001); // stable-max, stable-tol
 
       if (ReportingLevel::Low < rl) {
-        LOG(DEBUG) << "----------------------------------------";
-        LOG(DEBUG) << "Search for best next-position of actor" << h;
+        LOG(INFO) << "----------------------------------------";
+        LOG(INFO) << "Search for best next-position of actor" << h;
         //printf("Search for best next-position of actor %2i starting from ", h);
         //trans(*aPos).printf(" %+.6f ");
       }
@@ -571,12 +571,12 @@ namespace ComSelLib {
       delete ghc;
       ghc = nullptr;
       if (ReportingLevel::Medium < rl) {
-        LOG(DEBUG) << "Iter:" << iterN << "Stable:" << stblN;
-        LOG(DEBUG) << KBase::getFormattedString("Best value for %2i: %+.6f", h, vBest);
-        LOG(DEBUG) << "Best position:    ";
-        LOG(DEBUG) << "numCat: " << pBest.numCat;
-        LOG(DEBUG) << "numItm: " << pBest.numItm;
-        LOG(DEBUG) << "perm: ";
+        LOG(INFO) << "Iter:" << iterN << "Stable:" << stblN;
+        LOG(INFO) << KBase::getFormattedString("Best value for %2i: %+.6f", h, vBest);
+        LOG(INFO) << "Best position:    ";
+        LOG(INFO) << "numCat: " << pBest.numCat;
+        LOG(INFO) << "numItm: " << pBest.numItm;
+        LOG(INFO) << "perm: ";
         printVUI(pBest.match);
       }
       MtchPstn * posBest = new MtchPstn(pBest);
@@ -586,7 +586,7 @@ namespace ComSelLib {
 
       double du = vBest - eu0(h, 0); // (hypothetical, future) - (actual, current)
       if (ReportingLevel::Low < rl) {
-        LOG(DEBUG) << KBase::getFormattedString("EU improvement for %2i of %+.4E", h, du);
+        LOG(INFO) << KBase::getFormattedString("EU improvement for %2i of %+.4E", h, du);
       }
       //printf("  vBest = %+.6f \n", vBest);
       //printf("  eu0(%i, 0) for %i = %+.6f \n", h, h, eu0(h,0));
@@ -642,7 +642,7 @@ namespace ComSelLib {
 
   CSState * CSState::doBCN(ReportingLevel rl) const {
     CSState * cs2 = nullptr;
-    LOG(DEBUG) << "CSState::doBCN not yet implemented"; // TODO: finish this
+    LOG(INFO) << "CSState::doBCN not yet implemented"; // TODO: finish this
     assert(false);
     return cs2;
   }

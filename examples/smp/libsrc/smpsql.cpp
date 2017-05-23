@@ -147,7 +147,7 @@ void SMPModel::sqlTest() {
 
   auto callBack = [](void *NotUsed, int argc, char **argv, char **azColName) {
     for (int i = 0; i < argc; i++) {
-      LOG(DEBUG) << KBase::getFormattedString(
+      LOG(INFO) << KBase::getFormattedString(
         "%s = %s", azColName[i], (argv[i] ? argv[i] : "NULL"));
     }
     return ((int)0);
@@ -161,11 +161,11 @@ void SMPModel::sqlTest() {
   auto sOpen = [&db](unsigned int n, string dbPath) {
     int rc = sqlite3_open(dbPath.c_str(), &db);
     if (rc != SQLITE_OK) {
-      LOG(ERROR) << "Can't open database:" << sqlite3_errmsg(db);
+      LOG(INFO) << "Can't open database:" << sqlite3_errmsg(db);
       exit(0);
     }
     else {
-      LOG(DEBUG) << "Successfully opened database #" << n;
+      LOG(INFO) << "Successfully opened database #" << n;
     }
     return;
   };
@@ -173,11 +173,11 @@ void SMPModel::sqlTest() {
   auto sExec = [&db, callBack, &zErrMsg](string sql, string msg) {
     int rc = sqlite3_exec(db, sql.c_str(), callBack, nullptr, &zErrMsg);
     if (rc != SQLITE_OK) {
-      LOG(ERROR) << "SQL error:" << zErrMsg;
+      LOG(INFO) << "SQL error:" << zErrMsg;
       sqlite3_free(zErrMsg);
     }
     else {
-      LOG(DEBUG) << msg;
+      LOG(INFO) << msg;
     }
     return rc;
   };

@@ -154,7 +154,7 @@ KMatrix RPState::expUtilMat(KBase::ReportingLevel rl,
     const double mij = m(i, j);
     if ((mij + tol < 0.0) || (1.0 + tol < mij))
     {
-      LOG(DEBUG) << KBase::getFormattedString("%f  %i  %i ", mij, i, j);
+      LOG(INFO) << KBase::getFormattedString("%f  %i  %i ", mij, i, j);
     }
     assert(0.0 <= mij + tol);
     assert(mij <= 1.0 + tol);
@@ -192,20 +192,20 @@ KMatrix RPState::expUtilMat(KBase::ReportingLevel rl,
 
   if (ReportingLevel::Low < rl)
   {
-    LOG(DEBUG) << "Util matrix is" << uMat.numR() << "x" << uMat.numC();
-    LOG(DEBUG) << "Assessing EU from util matrix: ";
+    LOG(INFO) << "Util matrix is" << uMat.numR() << "x" << uMat.numC();
+    LOG(INFO) << "Assessing EU from util matrix: ";
     uMat.mPrintf(" %.6f ");
 
-    LOG(DEBUG) << "Coalition strength matrix";
+    LOG(INFO) << "Coalition strength matrix";
     c.mPrintf(" %12.6f ");
 
-    LOG(DEBUG) << "Probability Opt_i > Opt_j";
+    LOG(INFO) << "Probability Opt_i > Opt_j";
     pv.mPrintf(" %.6f ");
 
-    LOG(DEBUG) << "Probability Opt_i";
+    LOG(INFO) << "Probability Opt_i";
     p.mPrintf(" %.6f ");
 
-    LOG(DEBUG) << "Expected utility to actors: ";
+    LOG(INFO) << "Expected utility to actors: ";
     eu.mPrintf(" %.6f ");
   }
 
@@ -271,7 +271,7 @@ void RPModel::initScen(unsigned int ns)
       break;
       */
   default:
-    LOG(DEBUG) << "Unrecognized scenario number" << ns;
+    LOG(INFO) << "Unrecognized scenario number" << ns;
     break;
   }
 
@@ -335,7 +335,7 @@ void RPModel::readXML(string fileName)
       try
       {
         const char * sName = scenNameEl->GetText();
-        LOG(DEBUG) << "Name of scenario:" << sName;
+        LOG(INFO) << "Name of scenario:" << sName;
       }
       catch (...)
       {
@@ -391,7 +391,7 @@ void RPModel::readXML(string fileName)
           nc++;
           cEl = cEl->NextSiblingElement("category");
         }
-        LOG(DEBUG) << "Found" << nc << "categories";
+        LOG(INFO) << "Found" << nc << "categories";
         numCat = nc;
       }
       catch (...)
@@ -420,7 +420,7 @@ void RPModel::readXML(string fileName)
           ni++;
           iEl = iEl->NextSiblingElement("Item");
         }
-        LOG(DEBUG) << "Found" << ni << "items" ;
+        LOG(INFO) << "Found" << ni << "items" ;
         assert(ni == nc); // for this problem, number of items and categories are equal
         numItm = ni;
       }
@@ -432,8 +432,8 @@ void RPModel::readXML(string fileName)
       // We now know numItm and obFactor, so we can fill in prob vector.
       prob = vector<double>();
       double pj = 1.0;
-      LOG(DEBUG) << KBase::getFormattedString("pDecline factor: %.3f", pDecline);
-      LOG(DEBUG) << KBase::getFormattedString("obFactor: %.3f", obFactor);
+      LOG(INFO) << KBase::getFormattedString("pDecline factor: %.3f", pDecline);
+      LOG(INFO) << KBase::getFormattedString("obFactor: %.3f", obFactor);
       // rate of decline has little effect on the results.
       for (unsigned int j = 0; j < numItm; j++)
       {
@@ -483,7 +483,7 @@ void RPModel::readXML(string fileName)
           na++;
           aEl = aEl->NextSiblingElement("Actor");
         }
-        LOG(DEBUG) << "Found" << na << "actors";
+        LOG(INFO) << "Found" << na << "actors";
         assert(minNumActor <= na);
         assert(na <= maxNumActor);
       }
@@ -495,11 +495,11 @@ void RPModel::readXML(string fileName)
   }
   catch (const KException& ke)
   {
-    LOG(DEBUG) << "Caught KException in RPModel::readXML: " << ke.msg;
+    LOG(INFO) << "Caught KException in RPModel::readXML: " << ke.msg;
   }
   catch (...)
   {
-    LOG(DEBUG) << "Caught unidentified exception in RPModel::readXML";
+    LOG(INFO) << "Caught unidentified exception in RPModel::readXML";
   }
 
   return;
@@ -622,8 +622,8 @@ void RPModel::configScen(unsigned int numA, const double aCap[], const KMatrix &
 
   prob = vector<double>();
   double pj = 1.0;
-  LOG(DEBUG) << KBase::getFormattedString("pDecline factor: %.3f", pDecline);
-  LOG(DEBUG) << KBase::getFormattedString("obFactor: %.3f", obFactor);
+  LOG(INFO) << KBase::getFormattedString("pDecline factor: %.3f", pDecline);
+  LOG(INFO) << KBase::getFormattedString("obFactor: %.3f", obFactor);
   // rate of decline has little effect on the results.
   for (unsigned int j = 0; j < numItm; j++) {
     prob.push_back(pj);
@@ -677,7 +677,7 @@ void RPModel::showHist() const
   for (unsigned int i = 0; i < history.size(); i++)
   {
     auto si = ((const RPState *)(history[i]));
-    LOG(DEBUG) << "State" << i;
+    LOG(INFO) << "State" << i;
     si->show();
 
   }
@@ -726,7 +726,7 @@ tuple <KMatrix, VUI> RPState::pDist(int persp) const
   const unsigned int numU = uIndices.size();
   assert(numU <= numP); // might have dropped some duplicates
 
-  LOG(DEBUG) << "Number of aUtils: " << aUtil.size();
+  LOG(INFO) << "Number of aUtils: " << aUtil.size();
 
   const KMatrix u = aUtil[0]; // all have same beliefs in this demo
 
@@ -763,7 +763,7 @@ tuple <KMatrix, VUI> RPState::pDist(int persp) const
 
 RPState* RPState::stepSUSN()
 {
-  LOG(DEBUG) << "State number " << model->history.size() - 1;
+  LOG(INFO) << "State number " << model->history.size() - 1;
   if ((0 == uIndices.size()) || (0 == eIndices.size()))
   {
     setUENdx();
@@ -794,16 +794,16 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
     return expUtilMat(rl, numA, numP, vpm, uMat);
   };
   auto euState = euMat(u);
-  LOG(DEBUG) << "Actor expected utilities: ";
+  LOG(INFO) << "Actor expected utilities: ";
   KBase::trans(euState).mPrintf("%6.4f, ");
 
   if (ReportingLevel::Low < rl)
   {
-    LOG(DEBUG) << "---------------------------------------";
-    LOG(DEBUG) << "Assessing utility of actual state to all actors";
+    LOG(INFO) << "---------------------------------------";
+    LOG(INFO) << "Assessing utility of actual state to all actors";
     for (unsigned int h = 0; h < numA; h++)
     {
-      LOG(DEBUG) << "  actual utilities not available";
+      LOG(INFO) << "  actual utilities not available";
     }
     string log = "Out of " + std::to_string(numA) + " positions, "
       + std::to_string(numU) + " were unique, with these indices: ";
@@ -811,7 +811,7 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
     {
       log += " " + std::to_string(i);
     }
-    LOG(DEBUG) << log;
+    LOG(INFO) << log;
   }
 
 
@@ -858,8 +858,8 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
       assert(KBase::maxAbs(u - uh0) < 1E-10); // all have same beliefs in this demo
       if (mph.match.size() != rpMod->numItm)
       {
-        LOG(DEBUG) << mph.match.size();
-        LOG(DEBUG) << rpMod->numItm;
+        LOG(INFO) << mph.match.size();
+        LOG(INFO) << rpMod->numItm;
       }
       assert(mph.match.size() == rpMod->numItm);
       auto uh = uh0;
@@ -918,17 +918,17 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
       }
 
       if (false) {
-        LOG(DEBUG) << "constructed hypUtil matrix:";
+        LOG(INFO) << "constructed hypUtil matrix:";
         hypUtil.mPrintf(" %8.2f ");
       }
 
 
       if (ReportingLevel::Low < rl)
       {
-        LOG(DEBUG) << "---------------------------------------";
-        LOG(DEBUG) << "Assessing utility to" << h << "of hypo-pos:";
+        LOG(INFO) << "---------------------------------------";
+        LOG(INFO) << "Assessing utility to" << h << "of hypo-pos:";
         printVUI(mph.match);
-        LOG(DEBUG) << "Hypo-util minus base util:";
+        LOG(INFO) << "Hypo-util minus base util:";
         (uh - uh0).mPrintf(" %+.4E ");
       }
       const KMatrix eu = euMat(hypUtil); // uh or hypUtil
@@ -965,8 +965,8 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
 
     if (ReportingLevel::Low < rl)
     {
-      LOG(DEBUG) << "----------------------------------------";
-      LOG(DEBUG) << "Search for best next-position of actor" << h;;
+      LOG(INFO) << "----------------------------------------";
+      LOG(INFO) << "Search for best next-position of actor" << h;;
       //printf("Search for best next-position of actor %2i starting from ", h);
       //trans(*aPos).printf(" %+.6f ");
     }
@@ -980,12 +980,12 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
     ghc = nullptr;
     if (ReportingLevel::Medium < rl)
     {
-      LOG(DEBUG) << "Iter:" << iterN << "Stable:" << stblN;
-      LOG(DEBUG) << KBase::getFormattedString("Best value for %2i: %+.6f", h, vBest);
-      LOG(DEBUG) << "Best position:    ";
-      LOG(DEBUG) << "numCat: " << pBest.numCat;
-      LOG(DEBUG) << "numItm: " << pBest.numItm;
-      LOG(DEBUG) << "perm: ";
+      LOG(INFO) << "Iter:" << iterN << "Stable:" << stblN;
+      LOG(INFO) << KBase::getFormattedString("Best value for %2i: %+.6f", h, vBest);
+      LOG(INFO) << "Best position:    ";
+      LOG(INFO) << "numCat: " << pBest.numCat;
+      LOG(INFO) << "numItm: " << pBest.numItm;
+      LOG(INFO) << "perm: ";
       printVUI(pBest.match);
     }
     MtchPstn * posBest = new MtchPstn(pBest);
@@ -996,7 +996,7 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
     double du = vBest - eu0(h, 0); // (hypothetical, future) - (actual, current)
     if (ReportingLevel::Low < rl)
     {
-      LOG(DEBUG) << KBase::getFormattedString("EU improvement for %2i of %+.4E", h, du);
+      LOG(INFO) << KBase::getFormattedString("EU improvement for %2i of %+.4E", h, du);
     }
     //printf("  vBest = %+.6f \n", vBest);
     //printf("  eu0(%i, 0) for %i = %+.6f \n", h, h, eu0(h,0));
@@ -1069,7 +1069,7 @@ void RPState::setAllAUtil(ReportingLevel rl)
     double uij = ai->posUtil(pstns[j]);
     if (!(0.0 <= uij))
     {
-      LOG(DEBUG) << i << " " << j << "  " << uij;
+      LOG(INFO) << i << " " << j << "  " << uij;
       printVUI(rp->match);
     }
     assert(0.0 <= uij);
@@ -1082,14 +1082,14 @@ void RPState::setAllAUtil(ReportingLevel rl)
   auto normU = KMatrix::map(uFn1, numA, numA);
   if (KBase::ReportingLevel::Low < rl)
   {
-    LOG(DEBUG) << "Normalized actor-pos util matrix";
+    LOG(INFO) << "Normalized actor-pos util matrix";
     normU.mPrintf(" %.4f ");
 
     /// For the purposes of this demo, I consider each actor to know exactly what
     /// the others value. They know what consequences the others expect,
     /// and how they will value those consequences,
     /// even if they disagree on both facts and values.
-    LOG(DEBUG) << "aUtil size: " << aUtil.size();
+    LOG(INFO) << "aUtil size: " << aUtil.size();
   }
 
   assert(0 == aUtil.size());
@@ -1127,17 +1127,17 @@ void RPState::show() const
   for (unsigned int i = 0; i < numA; i++)
   {
     auto pi = ((MtchPstn*)(pstns[i]));
-    LOG(DEBUG) << "Position:" << i;
+    LOG(INFO) << "Position:" << i;
     printVUI(pi->match);
   }
   auto pu = pDist(-1);
   KMatrix p = get<0>(pu);
   auto uNdx = get<1>(pu);
-  LOG(DEBUG) << "There are" << uNdx.size() << "unique positions";
+  LOG(INFO) << "There are" << uNdx.size() << "unique positions";
   for (unsigned int i1 = 0; i1 < uNdx.size(); i1++)
   {
     unsigned int i2 = uNdx[i1];
-    LOG(DEBUG) << KBase::getFormattedString("  %2u:  %.4f", i2, p(i1, 0));
+    LOG(INFO) << KBase::getFormattedString("  %2u:  %.4f", i2, p(i1, 0));
   }
   return;
 } // end of RPState::show()

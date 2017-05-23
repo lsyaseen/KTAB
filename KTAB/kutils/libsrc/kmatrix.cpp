@@ -219,7 +219,7 @@ void KMatrix::mPrintf(string fs, string msg) const {
     auto pf = [fc, this, &rowVals, msg](unsigned int i, unsigned int j) {
         rowVals += KBase::getFormattedString(fc, (*this)(i, j));
         if (j == (this->numC() - 1)) {
-            LOG(DEBUG) << rowVals;
+            LOG(INFO) << rowVals;
             // Reset the string object before processing next row in the matrix
             rowVals.clear();
         }
@@ -673,11 +673,11 @@ KMatrix firstEigenvector( const KMatrix& A, double tol) {
         change = mDelta(x,y);
 
         if (false) {
-            LOG(DEBUG) << "X";
+            LOG(INFO) << "X";
             x.mPrintf("%+.4f ");
-            LOG(DEBUG) << "Y";
+            LOG(INFO) << "Y";
             y.mPrintf("%+.4f ");
-            LOG(DEBUG) << KBase::getFormattedString("At iteration %u, delta is %.4e", iter, change);
+            LOG(INFO) << KBase::getFormattedString("At iteration %u, delta is %.4e", iter, change);
         }
 
         x = unitize((x+y)/2.0); // reduces oscillations
@@ -688,7 +688,7 @@ KMatrix firstEigenvector( const KMatrix& A, double tol) {
     }
 
     if (true) {
-        LOG(DEBUG) << KBase::getFormattedString("After iteration %u, delta is %.4e", iter, change);
+        LOG(INFO) << KBase::getFormattedString("After iteration %u, delta is %.4e", iter, change);
     }
 
     // The eigenvector is unique only up to the sign.

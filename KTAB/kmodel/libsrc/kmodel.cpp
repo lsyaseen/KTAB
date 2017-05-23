@@ -53,10 +53,10 @@ Model::Model(string desc, uint64_t sd, vector<bool> f, string Name) {
   rng = nullptr;
 
   sqlFlags = f; // JAH 20160730 save the vec of SQL flags
-  LOG(DEBUG) << "SQL Logging Flags ";
+  LOG(INFO) << "SQL Logging Flags ";
   for (unsigned int i = 0; i < sqlFlags.size(); i++)
   {
-    LOG(DEBUG) << "Grp" << i << "=" << (sqlFlags[i] ? 1 : 0); // "a<<b?c:d" was "suspicious code"
+    LOG(INFO) << "Grp" << i << "=" << (sqlFlags[i] ? 1 : 0); // "a<<b?c:d" was "suspicious code"
   }
 
   // Record the UTC time so it can be used as the default scenario name
@@ -76,8 +76,8 @@ Model::Model(string desc, uint64_t sd, vector<bool> f, string Name) {
   }
 
   if (0 == desc.length()) {
-    LOG(WARNING) << "No scenario description provided to Model::Model";
-    LOG(DEBUG) << "Using default description generated from UTC start time.";
+    LOG(INFO) << "No scenario description provided to Model::Model";
+    LOG(INFO) << "Using default description generated from UTC start time.";
 
     scenDesc = utcBuff;
   }
@@ -86,8 +86,8 @@ Model::Model(string desc, uint64_t sd, vector<bool> f, string Name) {
   }
 
   if (0 == Name.length()) {
-    LOG(WARNING) << "No scenario description provided to Model::Model";
-    LOG(DEBUG) << "Using default description generated from UTC start time." ;
+    LOG(INFO) << "No scenario description provided to Model::Model";
+    LOG(INFO) << "Using default description generated from UTC start time." ;
 
     scenName = utcBuff;
   }
@@ -126,9 +126,9 @@ Model::Model(string desc, uint64_t sd, vector<bool> f, string Name) {
   setSeed(sd);
 
   // BPW 20160928 print out the seed actually used (non-zero) instead of the one given (e.g. 0)
-  LOG(DEBUG) << KBase::getFormattedString("Using PRNG seed: %020llu", rngSeed);
-  LOG(DEBUG) << "Scenario Name: -|" << scenName << "|-";
-  LOG(DEBUG) << "Scenario Description: " << scenDesc;
+  LOG(INFO) << KBase::getFormattedString("Using PRNG seed: %020llu", rngSeed);
+  LOG(INFO) << "Scenario Name: -|" << scenName << "|-";
+  LOG(INFO) << "Scenario Description: " << scenDesc;
 }
 
 void Model::setSeed(uint64_t seed) {
@@ -175,7 +175,7 @@ void Model::run() {
     assert(nullptr != s0);
     assert(nullptr != s0->step);
     iter++;
-    LOG(DEBUG) << "Starting Model::run iteration" << iter;
+    LOG(INFO) << "Starting Model::run iteration" << iter;
     auto s1 = s0->step();
     addState(s1);
     done = stop(iter, s1);
@@ -630,10 +630,10 @@ KMatrix Model::markovIncentivePCE(const KMatrix & coalitions, VPModel vpm) {
   // do the markov calculation
   while (pTol < change)  { // && (iter < iMax)
     if (printP) {
-      LOG(DEBUG) << "Iteration" << iter << "/" << iMax;
-      LOG(DEBUG) << "pDist:";
+      LOG(INFO) << "Iteration" << iter << "/" << iMax;
+      LOG(INFO) << "pDist:";
       trans(p).mPrintf(" %.4f");
-      LOG(DEBUG) << KBase::getFormattedString("change: %.4e", change);
+      LOG(INFO) << KBase::getFormattedString("change: %.4e", change);
     }
     auto ct = KMatrix(numOpt, numOpt);
     for (unsigned int i = 0; i < numOpt; i++) {
@@ -643,7 +643,7 @@ KMatrix Model::markovIncentivePCE(const KMatrix & coalitions, VPModel vpm) {
       }
     }
     if (printP) {
-      LOG(DEBUG) << "Ct:";
+      LOG(INFO) << "Ct:";
       ct.mPrintf("  %.3f");
     }
     change = 0.0;
@@ -764,26 +764,26 @@ KMatrix Model::scalarPCE(unsigned int numAct, unsigned int numOpt, const KMatrix
 
   mtx_spce_log.lock();
   if (ReportingLevel::Low < rl) {
-    LOG(DEBUG) << "Num actors:" << numAct;
-    LOG(DEBUG) << "Num options:" << numOpt;
+    LOG(INFO) << "Num actors:" << numAct;
+    LOG(INFO) << "Num options:" << numOpt;
 
     if ((numAct <= 20) && (numOpt <= 20)) {
-      LOG(DEBUG) << "Actor strengths:";
+      LOG(INFO) << "Actor strengths:";
       w.mPrintf(" %6.2f ");
-      LOG(DEBUG) << "Voting rule:" << vr;
+      LOG(INFO) << "Voting rule:" << vr;
       // printf("         aka %s \n", KBase::vrName(vr).c_str());
-      LOG(DEBUG) << "Utility to actors of options:";
+      LOG(INFO) << "Utility to actors of options:";
       u.mPrintf(" %+8.3f ");
 
-      LOG(DEBUG) << "Coalition strengths of (i:j):";
+      LOG(INFO) << "Coalition strengths of (i:j):";
       c.mPrintf(" %8.3f ");
 
-      LOG(DEBUG) << "Probability Opt_i > Opt_j";
+      LOG(INFO) << "Probability Opt_i > Opt_j";
       pv.mPrintf(" %.4f ");
-      LOG(DEBUG) << "Probability Opt_i";
+      LOG(INFO) << "Probability Opt_i";
       p.mPrintf(" %.4f ");
     }
-    LOG(DEBUG) << "Found stable PCE distribution";
+    LOG(INFO) << "Found stable PCE distribution";
   }
   mtx_spce_log.unlock();
   return p;
