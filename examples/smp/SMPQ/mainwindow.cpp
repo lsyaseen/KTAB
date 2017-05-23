@@ -23,9 +23,15 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+INITIALIZE_EASYLOGGINGPP
 
 MainWindow::MainWindow()
 {
+    loggerConf.parseFromFile("./ktab-smp-logger.conf");
+    // Disable all the logging to begin with
+    loggerConf.set(el::Level::Global, el::ConfigurationType::Enabled, "false");
+    el::Loggers::reconfigureAllLoggers(loggerConf);
+
     initializeCentralViewFrame();
 
     createActions();

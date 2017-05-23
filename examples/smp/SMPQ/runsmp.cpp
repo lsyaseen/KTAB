@@ -89,10 +89,13 @@ void MainWindow::runPushButtonClicked(bool bl)
     Q_UNUSED(bl)
 
     QDateTime UTC = QDateTime::currentDateTime().toTimeSpec(Qt::UTC);
-    QString name (UTC.toString());
-
-    name.replace(" ","_").replace(":","_");
-
+    QString name;
+    name.append(QString::number(UTC.date().year())).append("-");
+    name.append(QString("%1").arg(UTC.date().month(), 2, 10, QLatin1Char('0'))).append("-");
+    name.append(QString("%1").arg(UTC.date().day(), 2, 10, QLatin1Char('0'))).append("__");
+    name.append(QString("%1").arg(UTC.time().hour(), 2, 10, QLatin1Char('0'))).append("-");
+    name.append(QString("%1").arg(UTC.time().minute(), 2, 10, QLatin1Char('0'))).append("-");
+    name.append(QString("%1").arg(UTC.time().second(), 2, 10, QLatin1Char('0')));
 
     logSMPDataOptionsAnalysis();
 
@@ -225,61 +228,59 @@ void MainWindow::disableRunButton(QTableWidgetItem *itm)
 void MainWindow::logSMPDataOptionsAnalysis()
 {
     QDateTime UTC = QDateTime::currentDateTime().toTimeSpec(Qt::UTC);
-    QString name (UTC.toString());
-    name.replace(" ","_").replace(":","_");
+    QString name;
+    name.append(QString::number(UTC.date().year())).append("-");
+    name.append(QString("%1").arg(UTC.date().month(), 2, 10, QLatin1Char('0'))).append("-");
+    name.append(QString("%1").arg(UTC.date().day(), 2, 10, QLatin1Char('0'))).append("__");
+    name.append(QString("%1").arg(UTC.time().hour(), 2, 10, QLatin1Char('0'))).append("-");
+    name.append(QString("%1").arg(UTC.time().minute(), 2, 10, QLatin1Char('0'))).append("-");
+    name.append(QString("%1").arg(UTC.time().second(), 2, 10, QLatin1Char('0')));
 
     if(logDefaultAct->isChecked()==true)
     {
         if(logFileName.isEmpty())
         {
-            fclose(stdout);
-            fp_old = *stdout;
-            QString logFileNewName = QString(homeDirectory+QDir::separator()+name);
-            logFileNewName.append("DefaultLog.txt");
-            logFileName = logFileNewName;
+            logFileName = name.append("default_log.txt");
         }
-        stream = freopen(logFileName.toStdString().c_str(),"a+",stdout);
+
+        loggerConf.setGlobally(el::ConfigurationType::Filename, logFileName.toStdString());
+        // Enable all the logging
+        loggerConf.set(el::Level::Global, el::ConfigurationType::Enabled, "true");
+        el::Loggers::reconfigureAllLoggers(loggerConf);
     }
     else if(logNewAct->isChecked()==true)
     {
         fclose(stdout);
         fp_old = *stdout;
         QString logFileNewName = QString(homeDirectory+QDir::separator()+name);
-        logFileNewName.append("Log");
         QString saveLogFilePath = QFileDialog::getSaveFileName(this, tr("Save Log File to "),logFileNewName,
                                                                tr("Text File (*.txt)"),0,QFileDialog::DontConfirmOverwrite);
         if(!saveLogFilePath.isEmpty())
         {
-            if(!saveLogFilePath.endsWith(".txt"))
-                saveLogFilePath.append(".txt");
-
+            if(saveLogFilePath.endsWith(".txt"))
+            {
+                saveLogFilePath.remove(".txt");
+            }
             QDir dir =QFileInfo(saveLogFilePath).absoluteDir();
             homeDirectory = dir.absolutePath();
 
             logFileNewName=saveLogFilePath;
+
+            std::string logFileName = logFileNewName.append("_log.txt").toStdString();
+            loggerConf.setGlobally(el::ConfigurationType::Filename, logFileName);
+            // Enable all the logging
+            loggerConf.set(el::Level::Global, el::ConfigurationType::Enabled, "true");
+            el::Loggers::reconfigureAllLoggers(loggerConf);
         }
-        stream = freopen(logFileNewName.toStdString().c_str(),"a+",stdout);
     }
     else
     {
         if(logNoneAct->isChecked()==true)
         {
-            fclose(stdout);
-            FILE* outfile = fopen ("/dev/null", "w");
-            if (outfile != NULL)
-            {
-                *stdout = *outfile;
-                stream=freopen("/dev/null", "w" ,stdout);
-            }
-            else
-            {
-                outfile = fopen ("NUL", "w");
-                if (outfile != NULL)
-                {
-                    *stdout = *outfile;
-                    stream=freopen("nul", "w" ,stdout);
-                }
-            }
+            // Disable all the logging
+            loggerConf.set(el::Level::Global, el::ConfigurationType::Enabled, "false");
+
+            el::Loggers::reconfigureAllLoggers(loggerConf);
         }
     }
 

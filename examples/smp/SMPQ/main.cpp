@@ -23,14 +23,9 @@
 
 #include "mainwindow.h"
 #include <QApplication>
-#include <easylogging++.h>
-INITIALIZE_EASYLOGGINGPP
 
 int main(int argc, char *argv[])
 {
-  // Set logging configuration from a file
-  el::Configurations confFromFile("./conf/smpc-logger.conf");
-  el::Loggers::reconfigureAllLoggers(confFromFile);
   QCoreApplication::addLibraryPath("./plugins");
   QApplication a(argc, argv);
   a.setOrganizationName("KAPSARC");

@@ -54,6 +54,7 @@
 #include <QMessageBox>
 #include <QMenu>
 #include <QtGlobal>
+#include <easylogging++.h>
 
 class QAction;
 class QListWidget;
@@ -606,6 +607,9 @@ private slots:
     void openRecentFile();
     void clearRecentFile(bool bl);
     void changeHomeDirectory(bool bl);
+
+private :
+    el::Configurations loggerConf;
  };
 
 
