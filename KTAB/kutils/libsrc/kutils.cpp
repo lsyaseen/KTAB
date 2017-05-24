@@ -193,7 +193,7 @@ std::chrono::time_point<std::chrono::system_clock>  displayProgramStart(string a
   st = std::chrono::system_clock::now();
   std::time_t start_time = std::chrono::system_clock::to_time_t(st);
   LOG(INFO) << "Software version: " << appName << appVersion;
-  LOG(INFO) << "Start time:" << std::ctime(&start_time);
+  LOG(INFO) << "Start time:" << std::asctime(std::gmtime(&start_time));
   return st;
 }
 
@@ -202,7 +202,7 @@ void displayProgramEnd(std::chrono::time_point<std::chrono::system_clock> st) {
   ft = std::chrono::system_clock::now();
   std::chrono::duration<double> eTime = ft - st;
   std::time_t fTime = std::chrono::system_clock::to_time_t(ft);
-  LOG(INFO) << "Finish time:" << std::ctime(&fTime);
+  LOG(INFO) << "Finish time:" << std::asctime(std::gmtime(&fTime));
   LOG(INFO) << KBase::getFormattedString("Elapsed time: %.4f seconds", eTime.count());
   return;
 }

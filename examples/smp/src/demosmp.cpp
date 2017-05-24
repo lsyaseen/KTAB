@@ -51,18 +51,24 @@ void ReplaceStringInPlace(std::string& subject, const std::string& search,
 }
 std::string GenerateDBNameWithTimeStamp()
 {
-	using namespace std::chrono;
-	system_clock::time_point today = system_clock::now();
-	time_t tt;
-	tt = system_clock::to_time_t(today);
-	std::string s = ctime(&tt);
-	ReplaceStringInPlace(s, " ", "_");
-	ReplaceStringInPlace(s, ":", "_");
-	ReplaceStringInPlace(s, "\n", "");
-	s += "_GMT.db";
-	return s;
-
+  // Generate a name with following format:
+  // smpc-YYYY-MM-DD-HH-MM-SS
+  // Ex: smpc-2017-05-24__14-46-29.db
+  using namespace std::chrono;
+  system_clock::time_point today = system_clock::now();
+  time_t tt;
+  tt = system_clock::to_time_t(today);
+  struct tm * ptm = gmtime(&tt);
+  size_t nameLength = 33;
+  char *dbname= new char [nameLength];
+  sprintf_s(dbname, nameLength, "smpc-%d-%02d-%02d__%02d-%02d-%02d_GMT.db",
+    ptm->tm_year+1900, ptm->tm_mon+1, ptm->tm_mday,
+    ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
+  std::string name = std::string(dbname);
+  delete[] dbname;
+  return name;
 }
+
 int main(int ac, char **av) {
   // Set logging configuration from a file
   el::Configurations confFromFile("./smpc-logger.conf");

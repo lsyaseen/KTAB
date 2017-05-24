@@ -89,13 +89,14 @@ void MainWindow::runPushButtonClicked(bool bl)
     Q_UNUSED(bl)
 
     QDateTime UTC = QDateTime::currentDateTime().toTimeSpec(Qt::UTC);
-    QString name;
+    QString name("ktab-smp-");
     name.append(QString::number(UTC.date().year())).append("-");
     name.append(QString("%1").arg(UTC.date().month(), 2, 10, QLatin1Char('0'))).append("-");
     name.append(QString("%1").arg(UTC.date().day(), 2, 10, QLatin1Char('0'))).append("__");
     name.append(QString("%1").arg(UTC.time().hour(), 2, 10, QLatin1Char('0'))).append("-");
     name.append(QString("%1").arg(UTC.time().minute(), 2, 10, QLatin1Char('0'))).append("-");
     name.append(QString("%1").arg(UTC.time().second(), 2, 10, QLatin1Char('0')));
+    name.append("_GMT");
 
     logSMPDataOptionsAnalysis();
 
@@ -228,19 +229,20 @@ void MainWindow::disableRunButton(QTableWidgetItem *itm)
 void MainWindow::logSMPDataOptionsAnalysis()
 {
     QDateTime UTC = QDateTime::currentDateTime().toTimeSpec(Qt::UTC);
-    QString name;
+    QString name("ktab-smp-");
     name.append(QString::number(UTC.date().year())).append("-");
     name.append(QString("%1").arg(UTC.date().month(), 2, 10, QLatin1Char('0'))).append("-");
     name.append(QString("%1").arg(UTC.date().day(), 2, 10, QLatin1Char('0'))).append("__");
     name.append(QString("%1").arg(UTC.time().hour(), 2, 10, QLatin1Char('0'))).append("-");
     name.append(QString("%1").arg(UTC.time().minute(), 2, 10, QLatin1Char('0'))).append("-");
     name.append(QString("%1").arg(UTC.time().second(), 2, 10, QLatin1Char('0')));
+    name.append("_GMT");
 
     if(logDefaultAct->isChecked()==true)
     {
         if(logFileName.isEmpty())
         {
-            logFileName = name.append("default_log.txt");
+            logFileName = name.append("_log.txt");
         }
 
         loggerConf.setGlobally(el::ConfigurationType::Filename, logFileName.toStdString());
