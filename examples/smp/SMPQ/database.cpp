@@ -308,7 +308,7 @@ void Database::getDims()
     emit dimensList(dimList);
 }
 
-void Database::getUtilChlgAndSQvalues(QList<int> VHAxisValues)
+void Database::getUtilChlgAndSQvalues(QVector<int> VHAxisValues)
 {
     if(10==VHAxisValues.length())
     {

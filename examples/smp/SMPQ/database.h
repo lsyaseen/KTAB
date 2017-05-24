@@ -59,7 +59,7 @@ public slots :
     void getDims();
 
     //QuadMap
-    void getUtilChlgAndSQvalues(QList<int> VHAxisValues);
+    void getUtilChlgAndSQvalues(QVector<int> VHAxisValues);
 
     //DB
     void releaseDB();
@@ -77,17 +77,17 @@ signals:
     void dimensionsCount(int value,QStringList *dimensions);
     void dimensList(QStringList *dimensions);
     void scenarios(QStringList *scenariosList,QStringList *scenariosIdList, QStringList *scenarioDesc, int indx);
-    void scenModelParameters(QList<int> scenModelparam, QString seedDB);
+    void scenModelParameters(QVector<int> scenModelparam, QString seedDB);
 
     //DB to CSV
-    void actorsNameDesc(QList <QString>, QList <QString>);
-    void actorsInflu(QList <QString>);
-    void actorsPostn(QList<QString>,int);
-    void actorsSalnce(QList<QString>,int);
-    void actorsAffinity(QList<QString>,QList<int>,QList<int>);
+    void actorsNameDesc(QVector <QString>, QVector <QString>);
+    void actorsInflu(QVector <QString>);
+    void actorsPostn(QVector<QString>,int);
+    void actorsSalnce(QVector<QString>,int);
+    void actorsAffinity(QVector<QString>,QVector<int>,QVector<int>);
 
     //BarCharts
-    void listActorsSalienceCapability(QList<int>,QList<double>,QList<double>,double r1,double r2);
+    void listActorsSalienceCapability(QVector<int>,QVector<double>,QVector<double>,double r1,double r2);
 
     //QuadMap
     void utilChlngAndSQ(int turn, double hor, double ver , int actorID);
@@ -110,30 +110,30 @@ private:
     QStringList * scenarioList;
     QStringList * scenarioIdList;
     QStringList * scenarioDescList;
-    QList<int> scenarioModelParam;
+    QVector<int> scenarioModelParam;
     QString seedDB;
     QString scenarioM;
 
     //DB to CSV
-    QList <QString> actorNameList;
-    QList <QString> actorDescList;
-    QList <QString> actorInfluence;
-    QList <QString> actorPosition;
-    QList <QString> actorSalience;
-    QList <QString> actorAffinity;
-    QList <int>     actorI;
-    QList <int>     actorJ;
+    QVector <QString> actorNameList;
+    QVector <QString> actorDescList;
+    QVector <QString> actorInfluence;
+    QVector <QString> actorPosition;
+    QVector <QString> actorSalience;
+    QVector <QString> actorAffinity;
+    QVector <int>     actorI;
+    QVector <int>     actorJ;
 
     //BarChart
-    QList <int> actorIdsList;
-    QList <double> actorSalienceList;
-    QList <double> actorCapabilityList;
+    QVector <int> actorIdsList;
+    QVector <double> actorSalienceList;
+    QVector <double> actorCapabilityList;
 
     //quadMap
-    QList <double> utilChlgV;
-    QList <double> utilSQV;
-    QList <double> utilChlgH;
-    QList <double> utilSQH;
+    QVector <double> utilChlgV;
+    QVector <double> utilSQV;
+    QVector <double> utilChlgH;
+    QVector <double> utilSQH;
 
     double hCord;
     double vCord;

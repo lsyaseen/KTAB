@@ -295,8 +295,9 @@ void MainWindow::generateColors()
                << QColor(124,252,0)<<QColor(155,255,127)<<QColor(176,224,230)<<QColor(238,232,170)
                << QColor(240,230,140)<<QColor(128,128,0)<< QColor(255,255,0);
 
-    for(int g = 67; g<=255; g++)
+    for(int g = 67; g<=2550; g++) {
         colorsList.append(QColor(rand()%255,rand()%255,rand()%255));
+    }
 }
 
 void MainWindow::getActorsInRange(int dim)
@@ -323,16 +324,8 @@ void MainWindow::getActorsInRange(int dim)
 
 void MainWindow::deleteBars()
 {
-    for(int i= 0; i < 100; ++i)
-    {
-        if(!bars[i].isEmpty())
-        {
-            qDeleteAll(bars[i].begin(),bars[i].end());
-            bars[i].clear();
-        }
-    }
-
-    barsCount=0;
+    qDeleteAll(bars.begin(),bars.end());
+    bars.clear();
 }
 
 QCPBars *MainWindow::createBar(int actorId)
@@ -413,79 +406,60 @@ void MainWindow::barGraphBinWidthButtonClicked(bool bl)
     barGraphTurnSliderChanged(barGraphTurnSlider->value());
 }
 
-void MainWindow::barGraphActorsSalienceCapability(QList<int> aId, QList<double> sal, QList<double> cap,double r1,double r2)
+void MainWindow::barGraphActorsSalienceCapability(QVector<int> aId, QVector<double> sal, QVector<double> cap,double r1,double r2)
 {
 
     if( barActorCBList.length() == lineActorCBList.length())
     {
         if(!aId.isEmpty() && !barGraphCheckedActorsIdList.isEmpty())
         {
-            actorsIdsClr.clear();
             QVector <double> range;
-            QVector <double> stackedActorsSelected[100];
-            QVector <double> stackedActorsUnselected[100];
 
-            QCPBars * bar;
+            QCPBars * bar = nullptr;
             double barHeight = 0;
 
-            QList <QVector <double> > values ;
             range<< ((r1+r2)/2);
 
-            for (int stackedActorsInOneBar = 0 ; stackedActorsInOneBar < aId.length(); ++ stackedActorsInOneBar)
+            prevBar = bar;
+            for( int stackedActorsInOneBar = 0; stackedActorsInOneBar < aId.length(); ++ stackedActorsInOneBar)
             {
-                if(barGraphCheckedActorsIdList.at(aId.at(stackedActorsInOneBar))==true)
+                bar = createBar(aId.at(stackedActorsInOneBar));
+                double barData = sal.at(stackedActorsInOneBar) * cap.at(stackedActorsInOneBar);
+                QVector<double> displayData;
+                displayData.append(barData);
+                bar->setData(range,displayData);
+                barHeight += barData;
+                if(barGraphCheckedActorsIdList.at(aId.at(stackedActorsInOneBar)) == true)
                 {
-                    stackedActorsSelected[stackedActorsInOneBar] << (sal.at(stackedActorsInOneBar) * cap.at(stackedActorsInOneBar));
-                    values.append(stackedActorsSelected[stackedActorsInOneBar]);
-                    actorsIdsClr.append(aId.at(stackedActorsInOneBar));
-                    barHeight += (sal.at(stackedActorsInOneBar) * cap.at(stackedActorsInOneBar));
-                }
-            }
+                    if(stackedActorsInOneBar>0)
+                    {
+                        bar->moveBelow(prevBar);
+                    }
+                    else
+                    {
+                        // If the first selected actor starts the stacked bar
+                        prevBar = bar;
+                    }
 
-            int sel = values.length();
+                    bars.append(bar);
 
-            for (int stackedActorsInOneBar = 0 ; stackedActorsInOneBar < aId.length(); ++ stackedActorsInOneBar)
-            {
-                if(barGraphCheckedActorsIdList.at(aId.at(stackedActorsInOneBar))==false)
-                {
-                    stackedActorsUnselected[stackedActorsInOneBar] << (sal.at(stackedActorsInOneBar) * cap.at(stackedActorsInOneBar));
-                    values.append(stackedActorsUnselected[stackedActorsInOneBar]);
-                    barHeight += (sal.at(stackedActorsInOneBar) * cap.at(stackedActorsInOneBar));
-                }
-            }
-
-            for (int i =0; i < values.length(); ++i)
-            {
-                if(i < sel)
-                {
-                    prevBar= bar;
-                    bar = createBar(actorsIdsClr.at(i));
-                    bar->setData(range,values.at(i));
-
-                    if(i>0)
-                        bar->moveAbove(prevBar);
-
-                    bars[barsCount].append(bar);
                 }
                 else
-                {
-                    prevBar= bar;
-                    bar = createBar(aId.at(i));
+                { // for not-selected actor
                     bar->setBrush(QColor(211,211,211,70));
-
-                    bar->setData(range,values.at(i));
-
-                    if(i>=sel && i >0)
+                    if(stackedActorsInOneBar>0)
+                    {
                         bar->moveAbove(prevBar);
+                    }
+                    else
+                    {
+                        // If the first non-selected actor starts the stacked bar
+                        prevBar = bar;
+                    }
 
-                    bars[barsCount].append(bar);
+                    bars.append(bar);
                 }
             }
-
-            if(barsCount < 100)
-                ++barsCount;
-            else
-                barsCount=0;
 
             if(barHeight>yAxisLen)
             {

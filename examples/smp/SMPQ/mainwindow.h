@@ -80,7 +80,7 @@ private slots:
     void importActorColors();
     void exportActorColors();
     void resetActorColors();
-    void updateColors(QList<QColor> updatedColors);
+    void updateColors(QVector<QColor> updatedColors);
     void dockWindowChanged();
     //CSV
     void setCSVItemModel(QStandardItemModel * model, QStringList scenarioName);
@@ -114,12 +114,12 @@ private slots:
     //    void displayCsvAffinityMenuTableView(QPoint pos);
 
     //DB to CSV
-    void actorsNameDesc(QList<QString> actorName, QList<QString> actorDescription);
-    void actorsInfluence(QList<QString> ActorInfluence);
-    void actorsPosition(QList<QString> actorPosition, int dim);
-    void actorsSalience(QList<QString> actorSalience, int dim);
-    void actAffinity(QList<QString> actorAff, QList<int> actorI, QList<int> actorJ);
-    void scenarioModelParameters(QList<int> modParaDB, QString seedDB);
+    void actorsNameDesc(QVector<QString> actorName, QVector<QString> actorDescription);
+    void actorsInfluence(QVector<QString> ActorInfluence);
+    void actorsPosition(QVector<QString> actorPosition, int dim);
+    void actorsSalience(QVector<QString> actorSalience, int dim);
+    void actAffinity(QVector<QString> actorAff, QVector<int> actorI, QVector<int> actorJ);
+    void scenarioModelParameters(QVector<int> modParaDB, QString seedDB);
 
 signals:
     //CSV
@@ -144,7 +144,7 @@ signals:
     void getSalience(int dim,int turn);
 
     //colors
-    void exportColors(QString path, QList<int> actorIds, QList<QString> colorCode);
+    void exportColors(QString path, QVector<int> actorIds, QVector<QString> colorCode);
     void importColors(QString path, int actorCount);
 
 private:
@@ -266,14 +266,14 @@ private:
 
     //DB to CSV
     int dimension;
-    QList <QString> actorsName;
-    QList <QString> actorsDescription;
-    QList <QString> actorsInfl;
-    QList <QString> actorsPos[50];
-    QList <QString> actorsSal[50];
-    QList <QString> actorAffinity;
-    QList <int>     actI;
-    QList <int>     actJ;
+    QVector <QString> actorsName;
+    QVector <QString> actorsDescription;
+    QVector <QString> actorsInfl;
+    QMap <int, QVector <QString>> actorsPos;
+    QMap <int, QVector <QString>> actorsSal;
+    QVector <QString> actorAffinity;
+    QVector <int>     actI;
+    QVector <int>     actJ;
 
     QStringList dimensionList;
 
@@ -322,25 +322,23 @@ private :
     QLineEdit * barGraphGroupRangeLineEdit;
 
     QSlider * barGraphTurnSlider;
-    QList <QCheckBox *> barGraphActorsCheckBoxList;
-    QList <bool> barGraphCheckedActorsIdList;
+    QVector <QCheckBox *> barGraphActorsCheckBoxList;
+    QVector <bool> barGraphCheckedActorsIdList;
     QPushButton * barGraphBinWidthButton;
 
 
-    QList<QCPBars *> bars[100];
-    QCPBars * prevBar;
+    QVector<QCPBars *> bars;
+    QCPBars * prevBar = nullptr;
     QCPBars * prevBarU;
-    QList<QColor> colorsList;
+    QVector<QColor> colorsList;
 
-    QList <QCheckBox * > barActorCBList;
-    QList <int> actorsIdsClr;
+    QVector <QCheckBox * > barActorCBList;
 
     double yAxisLen;
 
     int in;
     int barsCount;
 
-    double currentStackHeight[100];
     double binWidth;
 
     QCPPlotTitle * barGraphTitle;
@@ -354,7 +352,7 @@ private slots:
     void barGraphDimensionChanged(int value);
     void barGraphTurnSliderChanged(int value);
     void barGraphBinWidthButtonClicked(bool bl);
-    void barGraphActorsSalienceCapability(QList<int> aId, QList<double> sal, QList<double>cap, double r1, double r2);
+    void barGraphActorsSalienceCapability(QVector<int> aId, QVector<double> sal, QVector<double>cap, double r1, double r2);
     void xAxisRangeChanged( const QCPRange &newRange, const QCPRange &oldRange );
     void yAxisRangeChanged( const QCPRange &newRange, const QCPRange &oldRange );
     void barPlotContextMenuRequest(QPoint pos);
@@ -382,17 +380,17 @@ private :
     QStackedWidget *graphTypeStackedWidget;
     QSlider *lineGraphTurnSlider;
 
-    QList <QCheckBox *> lineGraphActorsCheckBoxList;
-    QList <bool> lineGraphCheckedActorsIdList;
+    QVector <QCheckBox *> lineGraphActorsCheckBoxList;
+    QVector <bool> lineGraphCheckedActorsIdList;
 
-    QList <QCheckBox * > lineActorCBList;
+    QVector <QCheckBox * > lineActorCBList;
 
     QCPPlotTitle * lineGraphTitle;
 
     int numStates;
 
-    QList <bool> lineLabelToggleList;
-    QList <QCPItemText * > lineLabelList;
+    QVector <bool> lineLabelToggleList;
+    QVector <QCPItemText * > lineLabelList;
     QCPItemText *textLabel ;
     int tnty;
 
@@ -447,9 +445,9 @@ private :
     QScrollArea * quadMapReceiversScrollArea;
     QFrame * quadMapPerspectiveFrame;
 
-    QList <QRadioButton *> quadMapInitiatorsRadioButtonList;
-    QList <QCheckBox *> quadMapReceiversCheckBoxList;
-    QList <bool> quadMapReceiversCBCheckedList;
+    QVector <QRadioButton *> quadMapInitiatorsRadioButtonList;
+    QVector <QCheckBox *> quadMapReceiversCheckBoxList;
+    QVector <bool> quadMapReceiversCBCheckedList;
 
     QComboBox * vComboBox;
     QComboBox * hComboBox;
@@ -462,7 +460,7 @@ private :
     QVector <double> deltaUtilV;
     QVector <double> deltaUtilH;
     int actorIdIndexV;
-    QList <int> actorIdIndexH;
+    QVector <int> actorIdIndexH;
 
     int actorsQueriedCount;
 
@@ -474,7 +472,7 @@ private :
     QCheckBox * autoScale;
     QString prevScenario;
 
-    QList <int> VHAxisValues;
+    QVector <int> VHAxisValues;
 
     QPushButton * plotQuadMap;
     int initiatorTip;
@@ -519,7 +517,7 @@ private slots :
     void saveQuadPlotAsPDF();
 
 signals :
-    void getUtilChlgAndUtilSQfromDB(QList <int > VHAxisList);
+    void getUtilChlgAndUtilSQfromDB(QVector <int > VHAxisList);
 
 
     //Xmlparser
@@ -544,7 +542,7 @@ private :
 
     void createXmlTable();
     void populateXmlTable(QStandardItemModel *actorsVal);
-    void populateAffinityMatrix(QList<QStringList> idealAdj, QVector<QString> actors);
+    void populateAffinityMatrix(QVector<QStringList> idealAdj, QVector<QString> actors);
     void updateControlsBar(QStringList modelDesc);
     void updateModelParameters(QStringList modPara);
     void initializeAffinityMatrixRowCol(int count, QString table);
@@ -558,7 +556,7 @@ private slots:
     void importXmlGetFilePath(bool bl, QString filepath=0);
     void openStatusXml(bool status);
     void xmlDataParsedFromFile(QStringList modelDesc, QStringList modpara, QStringList dims,
-                               QStandardItemModel *actModel, QList <QStringList> idealAdj);
+                               QStandardItemModel *actModel, QVector <QStringList> idealAdj);
     void savedXmlName(QString fileName);
     void saveTableWidgetToXML(bool bl);
     void xmlCellSelected(QStandardItem *in);
@@ -574,9 +572,9 @@ signals:
     //actormoved
 private:
     QStandardItemModel * actorMovedDataModel;
-    QList <int> actorIDList;
-    QList <int> actorTurnList;
-    QList <int> actorDimensionList;
+    QVector <int> actorIDList;
+    QVector <int> actorTurnList;
+    QVector <int> actorDimensionList;
 signals:
     void getActorMovedData(QString scenario);
 
