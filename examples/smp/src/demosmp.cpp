@@ -61,7 +61,7 @@ std::string GenerateDBNameWithTimeStamp()
   struct tm * ptm = gmtime(&tt);
   size_t nameLength = 33;
   char *dbname= new char [nameLength];
-  sprintf_s(dbname, nameLength, "smpc-%d-%02d-%02d__%02d-%02d-%02d_GMT.db",
+  sprintf(dbname, "smpc-%d-%02d-%02d__%02d-%02d-%02d_GMT.db",
     ptm->tm_year+1900, ptm->tm_mon+1, ptm->tm_mday,
     ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
   std::string name = std::string(dbname);
