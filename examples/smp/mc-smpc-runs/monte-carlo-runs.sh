@@ -10,27 +10,27 @@
 START=1
 END=20
 
-rm -f run-smpc*txt  run-smpc*db  test.db
+rm -f smpc*_GMT_log.txt  smpc*_GMT.db  test.db
 for i in $(eval echo "{$START..$END}")
 do
   # Zulu (UTC) time, with nanoseconds
   timestamp="$(date --utc +%Y-%m-%d_%H-%M-%S-%NZ)"
-  name="run-smpc-$timestamp"
-  echo "$i: $name" 
-  nice ../smpc --seed 0 --logmin --dbname $name.db --euSMP > $name.txt 
+  name="smpc-${timestamp}_GMT"
+  echo "${i}: ${name}" 
+  ../smpc --seed 0 --logmin --dbname ${name}.db --euSMP
 done
 
 
 echo "Problem sizes"
-grep "Number of actors" run-smpc*.txt
-grep "Number of SMP dimensions" run-smpc*.txt
+grep "Number of actors" smpc*_GMT_log.txt
+grep "Number of SMP dimensions" smpc*_GMT_log.txt
 
 
-sNum=$(grep "Start time" run-smpc*.txt | wc -l)
-cNum=$(grep "Elapsed time" run-smpc*.txt | wc -l)
+sNum=$(grep "Start time" smpc*_GMT_log.txt | wc -l)
+cNum=$(grep "Elapsed time" smpc*_GMT_log.txt | wc -l)
 
-echo "Number of runs started   $sNum"
-echo "Number of runs completed $cNum"
+echo "Number of runs started   ${sNum}"
+echo "Number of runs completed ${cNum}"
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 # Copyright KAPSARC. MIT Open Source License.
