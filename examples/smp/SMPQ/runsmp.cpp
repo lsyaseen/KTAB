@@ -39,9 +39,6 @@ using KBase::VPModel;
 
 namespace DemoSMP {
 
-using std::cout;
-using std::endl;
-using std::flush;
 using std::function;
 using std::get;
 using std::string;
@@ -62,20 +59,23 @@ smpStopFn(unsigned int minIter, unsigned int maxIter, double minDeltaRatio, doub
         bool longEnough = (minIter <= iter);
         bool quiet = false;
         auto sf = [](unsigned int i1, unsigned int i2, double d12) {
-            printf("sDist [%2i,%2i] = %.2E   ", i1, i2, d12);
-            return;
+            return KBase::getFormattedString("sDist [%2i,%2i] = %.2E   ", i1, i2, d12);;
         };
         auto s0 = ((const SMPState*)(s->model->history[0]));
         auto s1 = ((const SMPState*)(s->model->history[1]));
         auto d01 = SMPModel::stateDist(s0, s1) + minSigDelta;
-        sf(0, 1, d01);
+        string logMsg;
+        logMsg += sf(0, 1, d01);
         auto sx = ((const SMPState*)(s->model->history[iter - 0]));
         auto sy = ((const SMPState*)(s->model->history[iter - 1]));
         auto dxy = SMPModel::stateDist(sx, sy);
-        sf(iter - 1, iter - 0, dxy);
+        logMsg += sf(iter - 1, iter - 0, dxy);
+        LOG(INFO) << logMsg;
         const double aRatio = dxy / d01;
         quiet = (aRatio < minDeltaRatio);
-        printf("\nFractional change compared to first step: %.4f  (target=%.4f) \n\n", aRatio, minDeltaRatio);
+        LOG(INFO) << KBase::getFormattedString(
+          "Fractional change compared to first step: %.4f  (target=%.4f)\n",
+          aRatio, minDeltaRatio);
         return tooLong || (longEnough && quiet);
     };
     return sfn;
@@ -169,10 +169,6 @@ void MainWindow::runPushButtonClicked(bool bl)
         //        printf("Using PRNG seed:  %020llu \n", seed);
         //        printf("Same seed in hex:   0x%016llX \n", seed);
 
-        using std::cout;
-        using std::endl;
-        using std::flush;
-        cout << "-----------------------------------" << endl << flush;
         if(savedAsXml==true)
         {
             currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
@@ -185,10 +181,8 @@ void MainWindow::runPushButtonClicked(bool bl)
                                                       (sqlFlags, dbFilePath.toStdString(),
                                                        csvPath.toStdString(),seed,false,parameters));
         }
-        cout << "-----------------------------------" << endl;
 
         KBase::displayProgramEnd(sTime);
-        cout << flush;
 
         QApplication::restoreOverrideCursor();
 

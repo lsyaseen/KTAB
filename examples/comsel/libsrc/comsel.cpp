@@ -380,8 +380,6 @@ namespace ComSelLib {
 
 
   CSState * CSState::doSUSN(ReportingLevel rl) const {
-    // cout << "CSState::doSUSN not yet implemented" << endl; // TODO: finish this
-    // assert(false);
 
     const unsigned int numA = model->numAct;
     assert(numA == model->actrs.size());
@@ -394,7 +392,7 @@ namespace ComSelLib {
 
     auto numP = ((const unsigned int)(pstns.size()));
 
-    std::cout << "numP: " << numP << std::endl << std::flush;
+    LOG(INFO) << "numP: " << numP;
 
     // Given the utility matrix, uMat, calculate the expected utility to each actor,
     // as a column-vector. Again, this is from the perspective of whoever developed uMat.
@@ -625,8 +623,8 @@ namespace ComSelLib {
 
     assert(nullptr != s2);
 
-    std::cout << "numP: " << numP << std::endl << std::flush;
-    std::cout << "s2->pstns.size(): " << s2->pstns.size() << std::endl << std::flush;
+    LOG(INFO) << "numP: " << numP;
+    LOG(INFO) << "s2->pstns.size(): " << s2->pstns.size();
 
     assert(numP == s2->pstns.size());
     assert(numA == s2->model->numAct);

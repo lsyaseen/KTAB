@@ -29,14 +29,12 @@
 #include "kmatrix.h"
 #include "kmodel.h"
 #include "csvdemo.h"
+#include <easylogging++.h>
 
 // --------------------------------------------
 
 namespace MDemo { // a namespace of which M, A, P, S know nothing
 
-using std::cout;
-using std::endl;
-using std::flush;
 using std::string;
 using std::vector;
 using KBase::KMatrix;
@@ -68,7 +66,7 @@ void pccCSV(const string) {
   inStream >> dummy >> numCase;
   assert(1 <= numCase);
 
-  printf("Actors %u, Scenarios %u, Cases %u \n", numAct, numScen, numCase);
+  LOG(INFO) << KBase::getFormattedString("Actors %u, Scenarios %u, Cases %u", numAct, numScen, numCase);
 
   // skip headers
   inStream.read_line();
@@ -109,19 +107,16 @@ void pccCSV(const string) {
     } // loop over j, scenarios
   } // loop over i, actors
 
-  cout << "Actor names (min/max)" << endl;
+  LOG(INFO) << "Actor names (min/max)";
   for (unsigned int i = 0; i < numAct; i++) {
-    cout << aNames[i] << "   " << (maxVect[i] ? "max" : "min") << endl;
+    LOG(INFO) << aNames[i] << "   " << (maxVect[i] ? "max" : "min");
   }
-  cout << endl << flush;
 
-  cout << "Case Weights:" << endl;
+  LOG(INFO) << "Case Weights:";
   caseWeights.mPrintf(" %5.2f ");
-  cout << endl;
 
-  cout << "Outcomes:" << endl;
+  LOG(INFO) << "Outcomes:";
   outcomes.mPrintf(" %+.4e  ");
-  cout << endl << flush;
 
 
   vector<double> threshVal = {};
@@ -160,19 +155,18 @@ void pccCSV(const string) {
     }
   } // loop over j, cases
 
-  cout << "Prob threshholds" << endl;
+  LOG(INFO) << "Prob threshholds";
   for (unsigned int k = 0; k < numCase; k++) {
     if (overThresh[k]) {
-      printf("Over  %.3f \n", threshVal[k]);
+      LOG(INFO) << KBase::getFormattedString("Over  %.3f", threshVal[k]);
     }
     else {
-      printf("Under %.3f \n", threshVal[k]);
+      LOG(INFO) << KBase::getFormattedString("Under %.3f", threshVal[k]);
     }
   }
 
-  cout << "ProbWeights:" << endl;
+  LOG(INFO) << "ProbWeights:";
   probWeight.mPrintf(" %5.3f ");
-  cout << endl << flush;
 
 
 
@@ -191,8 +185,8 @@ void demoMiniCSV(const string fs) {
     unsigned int numDim = 0;
     inStream.read_line();
     inStream >> scenName >> scenDesc >> numAct >> numDim;
-    printf("SName: %s, SDesc: %s \n", scenName.c_str(), scenDesc.c_str());
-    printf("Num actors: %i, num dim: %i \n", numAct, numDim);
+    LOG(INFO) << KBase::getFormattedString("SName: %s, SDesc: %s", scenName.c_str(), scenDesc.c_str());
+    LOG(INFO) << KBase::getFormattedString("Num actors: %i, num dim: %i", numAct, numDim);
 
     // skip row of headers
     inStream.read_line();
@@ -203,14 +197,15 @@ void demoMiniCSV(const string fs) {
       double aCap = 0.0;
       inStream.read_line();
       inStream >> aName >> aDesc >> aCap;
-      printf("Read %2i: %s   %s   %7.3f  ", i, aName.c_str(), aDesc.c_str(), aCap);
+      string logMsg;
+      logMsg += KBase::getFormattedString("Read %2i: %s   %s   %7.3f", i, aName.c_str(), aDesc.c_str(), aCap);
       for (unsigned int d = 0; d < numDim; d++) {
         double dPos = 0.0; // on [0, 100] scale
         double dSal = 0.0; // on [0, 100] scale
         inStream >> dPos >> dSal;
-        printf("%5.2f  %5.2f  ", dPos, dSal);
+        logMsg += KBase::getFormattedString("  %5.2f  %5.2f", dPos, dSal);
       }
-      cout << endl << flush;
+      LOG(INFO) << logMsg;
     }
   }
 

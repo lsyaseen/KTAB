@@ -166,15 +166,15 @@ void demoSpVSR(uint64_t s, PRNG* rng) {
   // so we dereference a shared pointer as *(x.get()), aka *x.get()
 
   auto sp1 = make_shared<int>(42); // shared pointer to an integer
-  printf("Use count sp1: %li \n", sp1.use_count());
+  LOG(INFO) << KBase::getFormattedString("Use count sp1: %li", sp1.use_count());
   //int* p1 = sp1.get(); // gets the  pointer
   LOG(INFO) << "The shared integer is " << *sp1.get();
   {   // create another reference
     auto sp2 = sp1;
-    printf("Use count sp1: %li \n", sp1.use_count());
+    LOG(INFO) << KBase::getFormattedString("Use count sp1: %li", sp1.use_count());
     // let it go out-of-scope
   }
-  printf("Use count sp1: %li \n", sp1.use_count());
+  LOG(INFO) << KBase::getFormattedString("Use count sp1: %li", sp1.use_count());
   const string fs = " %+6.2f ";
   // function<shared_ptr<void>(unsigned int, unsigned int)> fn
   auto fn = [rng, &fs](unsigned int nr, unsigned int nc) {
@@ -188,7 +188,7 @@ void demoSpVSR(uint64_t s, PRNG* rng) {
 
 
   shared_ptr<void> r1 = fn(5, 3); // DO NOT try "void* r = fn(5,3).get()" - it will segv
-  printf("Reference count: %li \n", r1.use_count());
+  LOG(INFO) << KBase::getFormattedString("Reference count: %li", r1.use_count());
 
   auto r53 = *((tuple<double, KMatrix>*) r1.get());
   // we get() the bare pointer, a void*,

@@ -143,7 +143,8 @@ void demoCounting(unsigned int numI, unsigned int maxU, unsigned int maxS, unsig
 
   auto enumAg = [numI](Agenda::PartitionRule pr, std::string s) {
     vector<Agenda*> testA = Agenda::enumerateAgendas(numI, pr);
-    printf("For %u items, found %i distinct %s agendas \n", numI, testA.size(), s.c_str());
+    LOG(INFO) << KBase::getFormattedString(
+      "For %u items, found %i distinct %s agendas", numI, testA.size(), s.c_str());
     for (auto a : testA) {
       LOG(INFO) << *a;
     }
