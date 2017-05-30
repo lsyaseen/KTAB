@@ -22,14 +22,12 @@
 // --------------------------------------------
 
 #include "tinyxml2demo.h"
+#include <easylogging++.h>
 
 
 // ------------------------------------------------------------------------------------
 
 namespace TXDemo {
-using std::cout;
-using std::endl;
-using std::flush;
 using std::string;
 using std::vector;
 using std::tuple;
@@ -45,8 +43,9 @@ void demoTX2(string fileName) {
     d1.LoadFile(fileName.c_str());
     auto eid = d1.ErrorID();
     if (0 != eid) {
-      cout << "ErrorID: " << eid  << endl;
-      throw KException(d1.GetErrorStr1());
+      string errMsg = string("Tinyxml2 ErrorID: ") + std::to_string(eid)
+                + ", Error Name: " + d1.ErrorName(); //  this fails to link: d1.GetErrorStr1();
+            throw KException(errMsg);
     }
     else {
       // missing data causes the missing XMLElement* to come back as nullptr,
@@ -76,10 +75,10 @@ void demoTX2(string fileName) {
 
         XMLElement* numDimEl = numActEl->NextSiblingElement("Cell");
         numDim = atoi(numDimEl->FirstChildElement("Data")->GetText());
-        printf( "Name of scenario: %s\n", sName );
-        printf( "Desc of scenario: %s\n", sDescEl->FirstChildElement("Data")->GetText() );
-        printf( "Number of actors: %i\n", numAct);
-        printf( "Number of dims:   %i\n", numDim);
+        LOG(INFO) << "Name of scenario:" << sName;
+        LOG(INFO) << "Desc of scenario:" << sDescEl->FirstChildElement("Data")->GetText();
+        LOG(INFO) << "Number of actors:" << numAct;
+        LOG(INFO) << "Number of dims:" << numDim;
       }
       catch (...) {
         throw (KException("Error reading file header"));
@@ -101,27 +100,25 @@ void demoTX2(string fileName) {
           const char * aDesc = aDescEl->FirstChildElement("Data")->GetText();
           const double aCap = atof(aCapEl->FirstChildElement("Data")->GetText());
 
-          printf("Actor name: %s \n", aName);
-          printf("Actor desc: %s \n", aDesc);
-          printf("Actor cap: %+.3f \n", aCap);
+          LOG(INFO) <<"Actor name:" << aName;
+          LOG(INFO) <<"Actor desc:" << aDesc;
+          LOG(INFO) << KBase::getFormattedString("Actor cap: %+.3f", aCap);
           XMLElement* psEl = aCapEl->NextSiblingElement("Cell");
           for (unsigned int i=0; i<numDim; i++) {
             const double posI = atof(psEl->FirstChildElement("Data")->GetText());
-            printf("  Pos %i: %.3f \n", i, posI);
+            LOG(INFO) << KBase::getFormattedString("  Pos %i: %.3f", i, posI);
             psEl = psEl->NextSiblingElement("Cell");
             const double salI = atof(psEl->FirstChildElement("Data")->GetText());
-            printf("  Sal %i: %.3f \n", i, salI);
-            cout << "  -------------" << endl << flush;
+            LOG(INFO) << KBase::getFormattedString("  Sal %i: %.3f", i, salI);
+            LOG(INFO) << "-------------";
 
             psEl = psEl->NextSiblingElement("Cell");
           }
-          cout << endl << flush;
           numRetAct++;
           rowEl = rowEl->NextSiblingElement("Row");
         }
-        cout << "Retrieved " << numRetAct << " actors" << flush;
-        assert (numAct == numRetAct);
-        cout << " as expected" << endl;
+        assert(numAct == numRetAct);
+        LOG(INFO) << "Retrieved" << numRetAct << "actors as expected";
       }
       catch (...) {
         throw (KException("Error reading actor data"));
@@ -129,7 +126,7 @@ void demoTX2(string fileName) {
     }
   }
   catch (const KException& ke) {
-    cout << "Caught KException in demoTX2: "<< ke.msg <<endl<<flush;
+    LOG(INFO) << "Caught KException in demoTX2:"<< ke.msg;
   }
   /*
     catch(const std::exception& e) {
@@ -137,7 +134,7 @@ void demoTX2(string fileName) {
     }
     */
   catch(...) {
-    cout << "Caught unidentified exception in demoTX2"<<endl<<flush;
+    LOG(INFO) << "Caught unidentified exception in demoTX2";
   }
 
   return;

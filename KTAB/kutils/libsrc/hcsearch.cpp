@@ -24,6 +24,7 @@
 
 #include "kutils.h"
 #include "hcsearch.h"
+#include <easylogging++.h>
 
 namespace KBase {
 using std::tuple;
@@ -96,13 +97,12 @@ VHCSearch::run(KMatrix p0,
   const bool parP = true;
 
   auto showFn = [this](string preface, const KMatrix & p, double v) {
-    printf("%s point: \n", preface.c_str());
+    LOG(INFO) << preface << "point:";
     trans(p).mPrintf(" %+0.4f ");
-    printf("%s value: %+.6f \n", preface.c_str(), v);
+    LOG(INFO) << getFormattedString("%s value: %+.6f", preface.c_str(), v);
     if (nullptr != report) {
       report(p);
     }
-    cout << endl << flush;
     return;
   };
 
@@ -176,10 +176,10 @@ VHCSearch::run(KMatrix p0,
 
     if (ReportingLevel::Medium <= rl) {
       if (parP) {
-        printf("After multi-threaded VHC iteration %u \n", iter);
+        LOG(INFO) << "After multi-threaded VHC iteration" << iter;
       }
       else {
-        printf("After single-threaded VHC iteration %u \n", iter);
+        LOG(INFO) << "After single-threaded VHC iteration" << iter;
       }
       showFn("Best current", p0, v0);
       if (nullptr != report) {
@@ -192,7 +192,6 @@ VHCSearch::run(KMatrix p0,
   tuple<double, KMatrix, unsigned int, unsigned int> rslt { v0, p0, iter, sIter };
 
   if (ReportingLevel::Low <= rl) {
-    cout << endl << flush;
     showFn("Final", p0, v0);
   }
   return rslt;

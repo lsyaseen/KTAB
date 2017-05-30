@@ -23,10 +23,7 @@
 // Implement a simple agenda-object, independent of kmodel.h
 // --------------------------------------------
 #include "agenda.h"
-
-using std::cout;
-using std::endl;
-using std::flush;
+#include <easylogging++.h>
 
 namespace AgendaControl {
 
@@ -155,11 +152,12 @@ vector<Agenda*> Agenda::agendaSet(PartitionRule pr, const VUI xs) {
   auto n = ((const unsigned int)(xs.size()));
   assert(0 < n);
   auto showA = [](const VUI &as) {
-    printf("[");
+    std::string vui("[");
     for (auto a : as) {
-      printf(" %u ", a);
+      vui += " " + std::to_string(a);
     }
-    printf("]");
+    vui += "]";
+    LOG(INFO) << vui;
     return;
   };
 

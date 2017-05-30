@@ -63,6 +63,10 @@ if (NOT SQLITE_FOUND)
   message(FATAL_ERROR "Could not find SQLite")
 endif (NOT SQLITE_FOUND) 
 
+# --------------------------------------------------------
+
+find_package(Easyloggingpp)
+
 # -------------------------------------------------
 # See "Findkutils.cmake" in cmakemodules to figure
 # out where it looks and what variables it sets
@@ -92,6 +96,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/libsrc/
   ${SQLITE_INCLUDE_DIR}
   ${TINYXML2_INCLUDE_DIR}
+  ${LOGGER_INCLUDE_DIR}
 )
 
 set(RPLIB_SRCS 
@@ -109,6 +114,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/libsrc/
   ${PROJECT_SOURCE_DIR}/src/
   ${SQLITE_INCLUDE_DIR}
+  ${LOGGER_INCLUDE_DIR}
 )
 
 set(RPDEMO_SRCS
@@ -126,6 +132,7 @@ target_link_libraries(rpdemo
   ${EFENCE_LIBRARIES}
   ${SQLITE_LIBRARIES}
   ${TINYXML2_LIBRARIES}
+  ${LOGGER_LIBRARY}
   )
 
 # -------------------------------------------------

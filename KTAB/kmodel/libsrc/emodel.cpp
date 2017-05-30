@@ -23,18 +23,15 @@
 
 
 #include <assert.h>
-#include <iostream>
 
 #include "hcsearch.h"
 #include "emodel.h"
 #include <thread>
+#include <easylogging++.h>
 
 
 namespace KBase {
 
-using std::cout;
-using std::endl;
-using std::flush;
 using std::get;
 using std::tuple;
 using std::thread;
@@ -176,11 +173,12 @@ template <class PT>
 void EState<PT>::show() const {
   //cout << "EState<PT>::show()  not yet implemented" << endl << flush;
   unsigned int na = pstns.size();
-  cout << "[EState";
+  string log = "[EState";
   for (unsigned int i=0; i<na; i++) {
-    cout << " "<< posNdx(i);
+    log += " " + std::to_string(posNdx(i));
   }
-  cout << "]"<<endl<<flush;
+  log += "]";
+  LOG(INFO) << log;
   return;
 }
 
@@ -190,7 +188,9 @@ bool EState<PT>::equivNdx(unsigned int i, unsigned int j) const {
   assert (i < pstns.size());
   assert (j < pstns.size());
   auto pi = (const EPosition<PT>*) (pstns[i]);
+  assert(nullptr != pi);
   auto pj = (const EPosition<PT>*) (pstns[j]);
+  assert(nullptr != pj);
   bool eqv = (pi->getIndex() == pj->getIndex());
   return eqv;
 }
@@ -209,20 +209,18 @@ unsigned int EState<PT>::posNdx(const unsigned int i) const {
 
 template <class PT>
 EState<PT>* EState<PT>::stepSUSN() {
-  cout << endl << flush;
-  cout << "State number " << model->history.size() - 1 << endl << flush;
+  LOG(INFO) << "State number " << model->history.size() - 1;
   show();
   if ((0 == uIndices.size()) || (0 == eIndices.size())) {
     setUENdx();
   }
-  cout << "Setting all utilities from objective perspective"<<endl<<flush;
+  LOG(INFO) << "Setting all utilities from objective perspective";
   setAUtil(-1, ReportingLevel::Low);
   auto s2 = doSUSN(ReportingLevel::Low);
   assert(nullptr != s2);
   s2->step = [s2]() {
     return s2->stepSUSN();
   };
-  cout << flush;
   return s2;
 }
 
@@ -288,22 +286,20 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
   const auto eu0 = expUtilMat(rl, numA, numP, vpm, uUnique); //  without duplicates
 
   if (ReportingLevel::Low < rl) {
-    printf("--------------------------------------- \n");
-    printf("Actor expected utilities in actual state: \n");
+    LOG(INFO) << "--------------------------------------- ";
+    LOG(INFO) << "Actor expected utilities in actual state: ";
     for (unsigned int h = 0; h < numA; h++)
     {
-      printf("%3u , %.5f \n", h, eu0(h, 0));
+      LOG(INFO) << KBase::getFormattedString("%3u , %.5f \n", h, eu0(h, 0));
     }
-    cout << endl << "Positions in this state: ";
+    LOG(INFO) << "Positions in this state: ";
     show();
-    cout << endl;
-    printf("Out of %u positions, %u were unique, with these indices: ", numA, numU);
-    cout << flush;
+
+    LOG(INFO) << KBase::getFormattedString("Out of %u positions, %u were unique, with these indices: ", numA, numU);
     for (auto i : uIndices)
     {
-      printf("%2i ", i);
+      LOG(INFO) << KBase::getFormattedString("%2i ", i);
     }
-    cout << endl << flush;
   }
 
   // Note that EState::makeNewEState is a pure virtual method,
@@ -381,19 +377,17 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
     }
 
     if (false) {
-      cout << "constructed hypUtil matrix:" << endl << flush;
+      LOG(INFO) << "constructed hypUtil matrix:";
       hypUtil.mPrintf(" %8.2f ");
-      cout << endl << flush;
     }
 
 
     if (ReportingLevel::Low < rl) {
-      printf("--------------------------------------- \n");
-      printf("Assessing utility to %2i of hypo-pos: ", h);
-      cout << eph << endl << flush;
-      printf("Hypo-util minus base util: \n");
+      LOG(INFO) << "--------------------------------------- ";
+      LOG(INFO) << KBase::getFormattedString("Assessing utility to %2i of hypo-pos: ", h);
+      LOG(INFO) << eph;
+      LOG(INFO) << "Hypo-util minus base util: ";
       (uh - uh0).mPrintf(" %+.4E ");
-      cout << endl << flush;
     }
 
     const KMatrix eu = expUtilMat(rl,
@@ -414,7 +408,7 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
   // efn, nghbrPerms, and sfn.
   auto newPosFn = [this, ehFN, rl,  u, eu0, s2](const unsigned int h)  {
     if (ReportingLevel::Low < rl) {
-      cout << "Started newPosFn for "<<h<<endl<<flush;
+      LOG(INFO) << "Started newPosFn for "<<h;
     }
     s2->pstns[h] = nullptr;
     auto ph = ((const EPosition<PT>*)(pstns[h]));
@@ -435,7 +429,7 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
         ns.push_back(ep);
       }
       if (ReportingLevel::Low < rl) {
-        cout << "Found "<<ns.size()<<" neighbors"<<endl<<flush;
+        LOG(INFO) << "Found "<<ns.size()<<" neighbors";
       }
       assert (0 < ns.size());
       return ns;
@@ -445,14 +439,13 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
 
     // show some representation of this position on cout
     ghc->show = [](const EPosition<PT> & ep) {
-      cout << ep ;
+      LOG(INFO) << ep ;
       return;
     };
 
     if (ReportingLevel::Low < rl) {
-      printf("---------------------------------------- \n");
-      printf("Search for best next-position of actor %2i \n", h);
-      cout << flush;
+      LOG(INFO) << "---------------------------------------- ";
+      LOG(INFO) << KBase::getFormattedString("Search for best next-position of actor %2i ", h);
     }
     auto rslt = ghc->run(*ph, // start from h's current positions
                          ReportingLevel::Silent,
@@ -466,9 +459,9 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
     ghc = nullptr;
 
     if (ReportingLevel::Medium < rl) {
-      printf("Iter: %u  Stable: %u \n", iterN, stblN);
-      printf("Best value for %2i: %+.6f \n", h, vBest);
-      cout << "Best position:    " << pBest << endl;
+      LOG(INFO) << KBase::getFormattedString("Iter: %u  Stable: %u \n", iterN, stblN);
+      LOG(INFO) << KBase::getFormattedString("Best value for %2i: %+.6f \n", h, vBest);
+      LOG(INFO) << "Best position:    " << pBest;
     }
 
     auto posBest = new EPosition<PT>(pBest);
@@ -480,13 +473,12 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
 
     double du = vBest - eu0(h, 0); // (hypothetical, future) - (actual, current)
     if (ReportingLevel::Low < rl) {
-      printf("Expected EU improvement for %2i of %+.4E \n", h, du);
+      LOG(INFO) << KBase::getFormattedString("Expected EU improvement for %2i of %+.4E \n", h, du);
       if (ReportingLevel::Medium < rl) {
-        printf("  vBest = %+.6f \n", vBest);
-        printf("  eu0(%i, 0) for %i = %+.6f \n", h, h, eu0(h,0));
-        printf("  du = %+.6f \n", du);
+        LOG(INFO) << KBase::getFormattedString("  vBest = %+.6f \n", vBest);
+        LOG(INFO) << KBase::getFormattedString("  eu0(%i, 0) for %i = %+.6f \n", h, h, eu0(h,0));
+        LOG(INFO) << KBase::getFormattedString("  du = %+.6f \n", du);
       }
-      cout << endl << flush;
     }
     // Logically, du should always be non-negative, as GHC never returns a worse value than the starting point.
     // However, actors plan on the assumption that all others do not change - yet they do.
@@ -503,10 +495,10 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
   parP = parP && (rl <= ReportingLevel::Low);
   if (ReportingLevel::Silent < rl) {
     if (parP) {
-      cout << "Will continue with multi-threaded execution"<<endl<<flush;
+      LOG(INFO) << "Will continue with multi-threaded execution";
     }
     else {
-      cout << "Will continue with single-threaded execution"<<endl<<flush;
+      LOG(INFO) << "Will continue with single-threaded execution";
     }
   }
 
@@ -537,8 +529,7 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
 
 template <class PT>
 EState<PT>* EState<PT>::stepBCN() {
-  cout << endl << flush;
-  cout << "State number " << model->history.size() - 1 << endl << flush;
+  LOG(INFO) << "State number " << model->history.size() - 1;
   if ((0 == uIndices.size()) || (0 == eIndices.size())) {
     setUENdx();
   }
@@ -550,7 +541,6 @@ EState<PT>* EState<PT>::stepBCN() {
   s2->step = [s2]() {
     return s2->stepBCN();
   };
-  cout << endl << flush;
   return s2;
 }
 
@@ -558,7 +548,7 @@ template <class PT>
 EState<PT>* EState<PT>::doBCN(ReportingLevel rl) const {
   EState<PT>* s2 = nullptr;
 
-  cout << "EState<PT>::doBCN not yet implemented"<<endl<<flush;
+  LOG(INFO) << "EState<PT>::doBCN not yet implemented";
   // do something
 
   assert (s2 != nullptr);
@@ -571,8 +561,7 @@ EState<PT>* EState<PT>::doBCN(ReportingLevel rl) const {
 
 template <class PT>
 EState<PT>* EState<PT>::stepMCN() {
-  cout << endl << flush;
-  cout << "State number " << model->history.size() - 1 << endl << flush;
+  LOG(INFO) << "State number " << model->history.size() - 1;
   if ((0 == uIndices.size()) || (0 == eIndices.size())) {
     setUENdx();
   }
@@ -584,7 +573,6 @@ EState<PT>* EState<PT>::stepMCN() {
   s2->step = [s2]() {
     return s2->stepMCN();
   };
-  cout << endl << flush;
   return s2;
 }
 
@@ -608,33 +596,40 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
   const auto eu0 = expUtilMat(rl, numA, numP, vpm, uUnique);
 
   if (ReportingLevel::Low < rl) {
-    printf("--------------------------------------- \n");
-    printf("Assessing utility of actual state to all actors \n");
+    LOG(INFO) << "--------------------------------------- ";
+    LOG(INFO) << "Assessing utility of actual state to all actors ";
     for (unsigned int h = 0; h < numA; h++)
     {
-      printf("%3u , %.5f \n", h, eu0(h, 0));
+      LOG(INFO) << KBase::getFormattedString("%3u , %.5f \n", h, eu0(h, 0));
     }
-    cout << endl << "Positions in this state: ";
+    LOG(INFO) << "Positions in this state: ";
     show();
-    cout << endl;
-    printf("Out of %u positions, %u were unique, with these indices: ", numA, numU);
-    cout << flush;
+
+    LOG(INFO) << KBase::getFormattedString("Out of %u positions, %u were unique, with these indices: ", numA, numU);
     for (auto i : uIndices)
     {
-      printf("%2i ", i);
+      LOG(INFO) << KBase::getFormattedString("%2i ", i);
     }
-    cout << endl << flush;
   }
 
   auto clearPstns = [numA] (EState<PT>* est) {
-    assert (0 == est->pstns.size());
-    est->pstns.resize(numA);
-    for (unsigned int i = 0; i < numA; i++) {
-      est->pstns[i] = nullptr;
+    // Amit changed the constructor of ALL Models to (sometimes) pre-allocate data.
+    // Sometimes it pre-allocates to the right size, filled with nullptr.
+    // Sometimes it pre-allocates to size zero.
+    assert((0 == est->pstns.size()) || (numA == est->pstns.size()));
+    if (0 == est->pstns.size()) {
+      est->pstns.resize(numA);
+      for (unsigned int i = 0; i < numA; i++) {
+        est->pstns[i] = nullptr;
+      }
     }
-    assert (numA == est->pstns.size());
-    for (unsigned int i=0; i<numA; i++) {
-      assert (nullptr == est->pstns[i]);
+    if (numA == est->pstns.size()) {
+      for (unsigned int i=0; i<numA; i++) {
+        if (nullptr != est->pstns[i]) {
+          delete est->pstns[i];
+          est->pstns[i] = nullptr;
+        }
+      }
     }
     return;
   };
@@ -691,8 +686,7 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
   // three-neighbors are possible, but prohibitively expensive and not very helpful.
 
   if (ReportingLevel::Silent < rl) {
-    cout << "Creating and ranking "<<neighbors.size();
-    cout << " neighboring states"<<endl<<flush;
+    LOG(INFO) << "Creating and ranking "<<neighbors.size() << " neighboring states";
   }
   // create and rank all (!) the neighboring states
   const auto w = eMod->actorWeights(); // a row vector
@@ -751,11 +745,9 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
       bestZeta = zi;
       bestNghbr = i;
       if (ReportingLevel::Low < rl) {
-        printf("New best neighbor is %u with z=%.4f (delta=%.2E)\n",
+        LOG(INFO) << KBase::getFormattedString("New best neighbor is %u with z=%.4f (delta=%.2E)\n",
                i, zi, delta);
         KBase::printVUI(ni);
-        cout <<endl<<flush;
-        cout <<flush;
       }
     }
     nsEvalMutex.unlock();
@@ -771,10 +763,10 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
 
   if (ReportingLevel::Silent < rl) {
     if (parP) {
-      cout << "Will continue with multi-threaded execution"<<endl<<flush;
+      LOG(INFO) << "Will continue with multi-threaded execution";
     }
     else {
-      cout << "Will continue with single-threaded execution"<<endl<<flush;
+      LOG(INFO) << "Will continue with single-threaded execution";
     }
   }
 
@@ -789,7 +781,7 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
 
   VUI nghbr = neighbors[bestNghbr];
   if (ReportingLevel::Silent < rl) {
-    printf("Highest zeta is %.5f for state %u: \n", bestZeta, bestNghbr);
+    LOG(INFO) << KBase::getFormattedString("Highest zeta is %.5f for state %u: \n", bestZeta, bestNghbr);
     printVUI(nghbr);
   }
 
@@ -829,7 +821,7 @@ VUI EState<PT>::powerWeightedSimilarity(const KMatrix& uMat, unsigned int ti, un
       const double duj = uMat(j,ti) - uMat(j, k);
       dk = dk + (sj*duj*duj);
     }
-    //printf("%2u PW %.4f \n", k, dk);
+    //LOG(INFO) << KBase::getFormattedString("%2u PW %.4f \n", k, dk);
     vdk[k] = TDI(dk, k);
   }
 
@@ -866,7 +858,7 @@ tuple <KMatrix, VUI> EState<PT>::pDist(int persp) const {
   const unsigned int numU = uIndices.size();
   assert(numU <= numP); // might have dropped some duplicates
 
-  cout << "Number of aUtils: " << aUtil.size() << endl << flush;
+  LOG(INFO) << "Number of aUtils: " << aUtil.size();
 
   /*
     const auto u = aUtil[0]; // all have same beliefs in this demo
@@ -929,8 +921,7 @@ KMatrix EState<PT>::expUtilMat  (KBase::ReportingLevel rl,
     const bool okLower = (0.0 <= mij + tol);
     const bool okUpper = (mij <= 1.0 + tol);
     if (!okLower || !okUpper) {
-      printf("%f  %i  %i  \n", mij, i, j);
-      cout << flush;
+      LOG(INFO) << KBase::getFormattedString("%f  %i  %i  \n", mij, i, j);
     }
     assert(okLower);
     assert(okUpper);
@@ -967,26 +958,21 @@ KMatrix EState<PT>::expUtilMat  (KBase::ReportingLevel rl,
   KMatrix::mapV(euRng, eu.numR(), eu.numC());
 
   if (ReportingLevel::Low < rl) {
-    printf("Util matrix is %u x %u \n", uMat.numR(), uMat.numC());
-    cout << "Assessing EU from util matrix: " << endl;
+    LOG(INFO) << KBase::getFormattedString("Util matrix is %u x %u \n", uMat.numR(), uMat.numC());
+    LOG(INFO) << "Assessing EU from util matrix: ";
     uMat.mPrintf(" %.6f ");
-    cout << endl << flush;
 
-    cout << "Coalition strength matrix" << endl;
+    LOG(INFO) << "Coalition strength matrix";
     c.mPrintf(" %12.6f ");
-    cout << endl << flush;
 
-    cout << "Probability Opt_i > Opt_j" << endl;
+    LOG(INFO) << "Probability Opt_i > Opt_j";
     pv.mPrintf(" %.6f ");
-    cout << endl << flush;
 
-    cout << "Probability Opt_i" << endl;
+    LOG(INFO) << "Probability Opt_i";
     p.mPrintf(" %.6f ");
-    cout << endl << flush;
 
-    cout << "Expected utility to actors: " << endl;
+    LOG(INFO) << "Expected utility to actors: ";
     eu.mPrintf(" %.6f ");
-    cout << endl << flush;
   }
 
   return eu;

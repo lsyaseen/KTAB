@@ -50,6 +50,10 @@ endif (NOT SQLITE_FOUND)
 
 # --------------------------------------------------------
 
+find_package(Easyloggingpp)
+
+# --------------------------------------------------------
+
 set (COMSEL_XLIBS  )
 
 if(UNIX)
@@ -107,6 +111,7 @@ include_directories (
   ${PROJECT_SOURCE_DIR}/src/
   ${SQLITE_INCLUDE_DIR}
   ${TINYXML2_INCLUDE_DIR}
+  ${LOGGER_INCLUDE_DIR}
   )
 
 
@@ -138,6 +143,7 @@ target_link_libraries(csg
   ${SQLITE_LIBRARIES}
   ${EFENCE_LIBRARIES}
   ${TINYXML2_LIBRARIES}
+  ${LOGGER_LIBRARY}
   )
   
 if (WIN32)  

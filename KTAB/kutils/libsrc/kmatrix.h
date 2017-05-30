@@ -102,7 +102,7 @@ public:
     // default copy constructor, copy assigment, etc. are sufficient
     double operator() (unsigned int i, unsigned int j) const;  // readable rvalue
     double& operator() (unsigned int i, unsigned int j);       // assignable lvalue
-    void mPrintf(string) const;
+    void mPrintf(string, string msg=string()) const;
     unsigned int numR() const;
     unsigned int numC() const;
     static KMatrix uniform(PRNG* rng, unsigned int nr, unsigned int nc, double a, double b);

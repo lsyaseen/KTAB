@@ -101,6 +101,10 @@ if (NOT SQLITE_FOUND)
 endif (NOT SQLITE_FOUND) 
 
 # -------------------------------------------------
+
+find_package(Easyloggingpp)
+
+# -------------------------------------------------
 # See "Findkutils.cmake" in cmakemodules to figure
 # out where it looks and what variables it sets
 
@@ -117,6 +121,7 @@ include_directories(
   ${KUTILS_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}/libsrc/
   ${SQLITE_INCLUDE_DIR}
+  ${LOGGER_INCLUDE_DIR}
   )
 set(KTABMODEL_SRCS
   libsrc/kmodel.cpp
@@ -170,6 +175,7 @@ INCLUDE_DIRECTORIES(
   ${EFENCE_INCLUDE_DIR}
   ${SQLITE_INCLUDE_DIR}
   ${TINYXML2_INCLUDE_DIR}
+  ${LOGGER_INCLUDE_DIR}
   )
 
 
@@ -184,6 +190,7 @@ TARGET_LINK_LIBRARIES(leonApp
   ${KUTILS_LIBRARY}
   ${EFENCE_LIBRARIES}
   ${SQLITE_LIBRARIES}
+  ${LOGGER_LIBRARY}
   )
 
 # -------------------------------------------------
@@ -197,6 +204,7 @@ TARGET_LINK_LIBRARIES(mtchApp
   ${KUTILS_LIBRARY}
   ${EFENCE_LIBRARIES}
   ${SQLITE_LIBRARIES}
+  ${LOGGER_LIBRARY}
   )
 
 # -------------------------------------------------
@@ -215,6 +223,7 @@ TARGET_LINK_LIBRARIES(demomodel
   ${EFENCE_LIBRARIES}
   ${SQLITE_LIBRARIES}
   ${TINYXML2_LIBRARIES}
+  ${LOGGER_LIBRARY}
   )
 # -------------------------------------------------
 # show some useful status/debugging information

@@ -68,12 +68,17 @@ if (ENABLE_EFENCE)
 endif (ENABLE_EFENCE) 
 
 # -------------------------------------------------
+
+find_package(Easyloggingpp)
+
+# -------------------------------------------------
 # files to be built into a library go in libsrc/
 # any application or testing code goes in src
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/libsrc/
   ${EFENCE_INCLUDE_DIR} 
+  ${LOGGER_INCLUDE_DIR}
 )
 
 set(KTABBASIC_SRCS
@@ -142,7 +147,8 @@ add_executable(demoutils
 target_link_libraries(demoutils
   kutils 
   ${EFENCE_LIBRARIES}
-  )
+  ${LOGGER_LIBRARY}
+ )
 # -------------------------------------------------
 # show some useful status/debugging information
 

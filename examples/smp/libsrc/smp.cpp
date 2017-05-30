@@ -28,9 +28,6 @@
 #include "smp.h"
 
 namespace SMPLib {
-using std::cout;
-using std::endl;
-using std::flush;
 using std::function;
 using std::get;
 using std::string;
@@ -72,7 +69,8 @@ smpStopFn(unsigned int minIter, unsigned int maxIter, double minDeltaRatio, doub
         bool longEnough = (minIter <= iter);
         bool quiet = false;
         auto sf = [](unsigned int i1, unsigned int i2, double d12) {
-            printf("sDist [%2i,%2i] = %.2E   ", i1, i2, d12);
+            LOG(INFO) << KBase::getFormattedString(
+              "sDist [%2i,%2i] = %.2E   ", i1, i2, d12);
             return;
         };
         auto s0 = ((const SMPState*)(s->model->history[0]));
@@ -85,7 +83,9 @@ smpStopFn(unsigned int minIter, unsigned int maxIter, double minDeltaRatio, doub
         sf(iter - 1, iter - 0, dxy);
         const double aRatio = dxy / d01;
         quiet = (aRatio < minDeltaRatio);
-        printf("\nFractional change compared to first step: %.4f  (target=%.4f) \n\n", aRatio, minDeltaRatio);
+        LOG(INFO) << KBase::getFormattedString(
+          "Fractional change compared to first step: %.4f  (target=%.4f)",
+          aRatio, minDeltaRatio);
         return tooLong || (longEnough && quiet);
     };
     return sfn;
@@ -147,8 +147,7 @@ void SMPActor::randomize(PRNG* rng, unsigned int numD) {
     const unsigned int numVR = KBase::VotingRuleNames.size();
     const unsigned int vrNum = ((unsigned int)(rng->uniform(0.0, numVR -0.01)));
     vr = VotingRule(vrNum);
-    //cout << "Voting rule " << vrNum << "  " << vr << endl;
-    return;
+        return;
 }
 
 
@@ -247,11 +246,7 @@ BargainSMP* SMPActor::interpolateBrgn(const SMPActor* ai, const SMPActor* aj,
 
 
 
-SMPState::SMPState(Model * m) : State(m) {
-    nra = KMatrix();
-
-    // cannot  setup AccomdateMatrix yet, because we have no actors
-    accomodate = KMatrix();
+SMPState::SMPState(Model * m) : State(m), turn(m->history.size()) {
 }
 
 
@@ -400,9 +395,8 @@ void SMPState::setAllAUtil(ReportingLevel rl) {
     auto rnUtil_ij = KMatrix::map(uFn1, na, na);
 
     if (ReportingLevel::Silent < rl) {
-        cout << "Raw actor-pos value matrix (risk neutral)" << endl;
+        LOG(INFO) << "Raw actor-pos value matrix (risk neutral)";
         rnUtil_ij.mPrintf(" %+.3f ");
-        cout << endl << flush;
     }
 
 
@@ -417,18 +411,16 @@ void SMPState::setAllAUtil(ReportingLevel rl) {
     nra = Model::bigRfromProb(p_i, rr);
 
     if (ReportingLevel::Silent < rl) {
-        cout << "Inferred risk attitudes: " << endl;
+        LOG(INFO) << "Inferred risk attitudes:";
         nra.mPrintf(" %+.3f ");
-        cout << endl << flush;
     }
 
     auto raUtil_ij = KMatrix::map(uFn1, na, na);
 
     if (ReportingLevel::Silent < rl) {
-        cout << "Risk-aware actor-pos utility matrix (objective):" << endl;
+        LOG(INFO) << "Risk-aware actor-pos utility matrix (objective):";
         raUtil_ij.mPrintf(" %+.4f ");
-        cout << endl;
-        cout << "RMS change in value vs utility: " << norm(rnUtil_ij - raUtil_ij) / na << endl << flush;
+        LOG(INFO) << "RMS change in value vs utility: " << norm(rnUtil_ij - raUtil_ij) / na;
     }
 
     const double duTol = 1E-6;
@@ -438,23 +430,23 @@ void SMPState::setAllAUtil(ReportingLevel rl) {
     if (ReportingLevel::Silent < rl) {
         switch (ra) {
         case BigRAdjust::FullRA:
-            cout << "Using " << ra << ": r^h_i = ri" << endl;
+            LOG(INFO) << "Using" << ra << ": r^h_i = ri";
             break;
         case BigRAdjust::TwoThirdsRA:
-            cout << "Using " << ra << ": r^h_i = (rh + 2*ri)/3" << endl;
+            LOG(INFO) << "Using" << ra << ": r^h_i = (rh + 2*ri)/3";
             break;
         case BigRAdjust::HalfRA:
-            cout << "Using " << ra << ": r^h_i = (rh + ri)/2" << endl;
+            LOG(INFO) << "Using" << ra << ": r^h_i = (rh + ri)/2";
             break;
         case BigRAdjust::OneThirdRA:
-            cout << "Using " << ra << ": r^h_i = (2*rh + ri)/3" << endl;
+            LOG(INFO) << "Using" << ra << ": r^h_i = (2*rh + ri)/3";
             break;
         case BigRAdjust::NoRA:
-            cout << "Using " << ra << ": r^h_i = rh " << endl;
+            LOG(INFO) << "Using" << ra << ": r^h_i = rh ";
             break;
         default:
-            cout << "Unrecognized BigRAdjust" << endl;
-            assert(false);
+            LOG(INFO) << "Unrecognized BigRAdjust";
+            exit(-1);
             break;
         }
     }
@@ -473,12 +465,10 @@ void SMPState::setAllAUtil(ReportingLevel rl) {
 
 
         if (ReportingLevel::Silent < rl) {
-            cout << "Estimate by " << h << " of risk-aware utility matrix:" << endl;
+            LOG(INFO) << "Estimate by" << h << "of risk-aware utility matrix:";
             u_h_ij.mPrintf(" %+.4f ");
-            cout << endl;
 
-            cout << "RMS change in util^h vs utility: " << norm(u_h_ij - raUtil_ij) / na << endl;
-            cout << endl;
+            LOG(INFO) << "RMS change in util^h vs utility:" << norm(u_h_ij - raUtil_ij) / na;
         }
 
         assert(duTol < norm(u_h_ij - raUtil_ij)); // I've never seen it below 0.03
@@ -488,32 +478,48 @@ void SMPState::setAllAUtil(ReportingLevel rl) {
 
 
 void SMPState::setOneAUtil(unsigned int perspH, ReportingLevel rl) {
-    cout << "SMPState::setOneAUtil - not yet implemented" << endl << flush;
+    LOG(INFO) << "SMPState::setOneAUtil - not yet implemented";
 
 
     return;
 }
 
 void SMPState::showBargains(const vector < vector < BargainSMP* > > & brgns) const {
+    string msg = "Bargains involving actor %2u: ";
+    string brgnFormat = "[%llu, %u:%u]"; // [bargainID, initAct:recvAct]
+    string actorBargains;
+
+    auto printOneBargain = [this, &brgns, &actorBargains, &brgnFormat](unsigned int i, unsigned int j) {
+      BargainSMP* bij = brgns[i][j];
+      assert(nullptr != bij);
+      actorBargains += 
+        KBase::getFormattedString
+        (
+          brgnFormat.c_str(),
+          bij->getID(),
+          model->actrNdx(bij->actInit),
+          model->actrNdx(bij->actRcvr)
+        );
+    };
+
     for (unsigned int i = 0; i < brgns.size(); i++) {
-        printf("Bargains involving actor %2u: ", i);
+        actorBargains += KBase::getFormattedString(msg.c_str(), i);
         for (unsigned int j = 0; j < brgns[i].size(); j++) {
-            BargainSMP* bij = brgns[i][j];
-            assert(nullptr != bij);
-            showOneBargain(bij);
+            printOneBargain(i, j);
         }
-        cout << endl << flush;
+        LOG(INFO) << actorBargains;
+        actorBargains.clear();
     }
     return;
 }
 
-void SMPState::showOneBargain(const BargainSMP* b) const {
+string SMPState::showOneBargain(const BargainSMP* b) const {
     assert(nullptr != b);
     unsigned int ai = model->actrNdx(b->actInit);
     unsigned int aj = model->actrNdx(b->actRcvr);
     uint64_t bid = b->getID();
-    printf("[%llu, %u:%u]", bid, ai, aj);
-    return;
+    string bargain = KBase::getFormattedString("[%llu, %u:%u]", bid, ai, aj);
+    return bargain;
 }
 
 void SMPState::setNRA() {
@@ -545,13 +551,13 @@ VctrPstn SMPState::getIdeal(unsigned int n) const
 {
     return ideals[n];
 }
-void SMPState::addPstn(Position* ap) {
+void SMPState::pushPstn(Position* ap) {
     auto sp = (VctrPstn*)ap;
     auto sm = (SMPModel*)model;
     assert(1 == sp->numC());
     assert(sm->numDim == sp->numR());
 
-    State::addPstn(ap);
+    State::pushPstn(ap);
     return;
 }
 
@@ -581,16 +587,15 @@ SMPState* SMPState::stepBCN() {
         return;
     };
     gSetup(this);
-    int myT = myTurn();
 
     // JAH 20160802 toggle population of PosUtil, PosEquiv, PosVote, and PosBrob
     // en masse based on value at index 1 of the sqlFlags vector
     // VectorPosition, which is in this same group, is handled separately
     if (model->sqlFlags[1])
     {
-        model->sqlPosEquiv(myT);
-        model->sqlPosProb(myT);
-        model->sqlPosVote(myT);
+        model->sqlPosEquiv(turn);
+        model->sqlPosProb(turn);
+        model->sqlPosVote(turn);
     }
     // That gets recorded upon the next state - but it
     // therefore misses the very last state.
@@ -701,22 +706,24 @@ double SMPState::posIdealDist(ReportingLevel rl) const {
         auto iI = ideals[i];
 
         if (rl > ReportingLevel::Low) {
-            printf("postn %2u, %2u ", i, t);
+            LOG(INFO) << "postn" << i << "," << t << ":";
             (trans(pI) * 100.0).mPrintf(" %.4f "); // print on the scale of [0,100]
-            printf("ideal %2u, %2u ", i, t);
+            LOG(INFO) << "ideal" << i << "," << t << ":";
             (trans(iI) * 100.0).mPrintf(" %.4f "); // print on the scale of [0,100]
         }
         double dI = KBase::norm(pI - iI);
         if (rl > ReportingLevel::Silent) {
-            printf("postn-ideal distance %2u, %2u: %.5f \n", i, t, dI * 100.0); // print on the scale of [0,100]
+            // print on the scale of [0,100]
+            LOG(INFO) << KBase::getFormattedString(
+              "postn-ideal distance %2u, %2u: %.5f", i, t, dI * 100.0);
         }
         rmsDist = rmsDist + (dI*dI);
     }
     rmsDist = rmsDist / ((double)na);
     rmsDist = sqrt(rmsDist);
     if (rl > ReportingLevel::Silent) {
-        printf("postn-ideal distance RMS %2u: %.5f \n", t, rmsDist);
-        cout << flush;
+        LOG(INFO) << KBase::getFormattedString(
+          "postn-ideal distance RMS %2u: %.5f", t, rmsDist);
     }
     return rmsDist;
 }
@@ -729,7 +736,8 @@ void SMPState::setAccomodate(double adjRate) {
     assert(adjRate <= 1.0);
     const unsigned int na = model->numAct;
 
-    printf("Setting SMPState::accomodate to %.3f * identity matrix \n", adjRate);
+    LOG(INFO) << KBase::getFormattedString(
+      "Setting SMPState::accomodate to %.3f * identity matrix", adjRate);
 
     // A standard Identity matrix is helpful here because it
     // should keep the behavior same as the original "cynical" model:
@@ -764,19 +772,20 @@ tuple< KMatrix, VUI> SMPState::pDist(int persp) const {
         }
     }
     else {
-        cout << "SMPState::pDist: unrecognized perspective, " << persp << endl << flush;
-        assert(false);
+        LOG(INFO) << "SMPState::pDist: unrecognized perspective," << persp;
+        exit(-1);
     }
 
     assert(0 < uIndices.size()); // should have been set with setUENdx();
-    //auto uNdx2 = uniqueNdx(); // get the indices to unique positions
     if (ReportingLevel::Silent < rl) {
-        printf("Unique positions %i/%u ", uIndices.size(), na);
-        cout << "[ ";
+        string logMsg = "Unique positions ";
+        logMsg += std::to_string(uIndices.size()) + "/" + std::to_string(na);
+        logMsg += " [";
         for (auto i : uIndices) {
-            printf(" %i ", i);
+            logMsg += string(" ") + std::to_string(i);
         }
-        cout << " ] " << endl << flush;
+        logMsg += " ]";
+        LOG(INFO) << logMsg;
     }
     auto uufn = [uij, this](unsigned int i, unsigned int j) {
         return uij(i, uIndices[j]);
@@ -812,13 +821,14 @@ SMPModel::~SMPModel() {
 
 void SMPModel::releaseDB() {
     if (nullptr != smpDB) {
-        cout << "SMPModel: Closing database" << endl << flush;
+        LOG(INFO) << "SMPModel: Closing database";
         int close_result = sqlite3_close(smpDB);
         if (close_result != SQLITE_OK) {
-            cout << "SMPModel: Closing database failed!" << endl << flush;
+            LOG(INFO) << "SMPModel: Closing database failed!";
+            exit(-1);
         }
         else {
-            cout << "SMPModel: Closing database succeeded." << endl << flush;
+            LOG(INFO) << "SMPModel: Closing database succeeded.";
         }
         smpDB = nullptr;
     }
@@ -901,11 +911,10 @@ void SMPModel::sankeyOutput(string outputFile) const {
             KBase::nameFromEnum<SMPBargnModel>(brgnMod,SMPBargnModelNames).c_str());
 
     unsigned int nameLen = outputFile.length();
-    cout << endl;
     const char* appendEffPwr = "_effPow.csv";
     char* epName = newChars(nameLen + strlen(appendEffPwr) + 1);
     sprintf(epName, "%s%s", outputFile.c_str(), appendEffPwr);
-    cout << "Record effective power in " << epName << "  ...  " << flush;
+    LOG(INFO) << "Record effective power in" << epName << "...";
     FILE* f1 = fopen(epName, "w");
     fprintf(f1,"%s\n",headLine);
     for (unsigned int i = 0; i < numAct; i++) {
@@ -926,14 +935,14 @@ void SMPModel::sankeyOutput(string outputFile) const {
     }
     fclose(f1);
     f1 = nullptr;
-    cout << "done" << endl;
+    LOG(INFO) << "done";
     delete epName;
     epName = nullptr;
 
     const char* appendPosLog = "_posLog.csv";
     char* plName = newChars(nameLen + strlen(appendPosLog) + 1);
     sprintf(plName, "%s%s", outputFile.c_str(), appendPosLog);
-    cout << "Record 1D positions over time, without dimension-name in " << plName << "  ...  " << flush;
+    LOG(INFO) << "Record 1D positions over time, without dimension-name in" << plName << "...";
     FILE* f2 = fopen(plName, "w");
     fprintf(f2,"%s\n",headLine);
     for (unsigned int i = 0; i < numAct; i++) {
@@ -951,7 +960,7 @@ void SMPModel::sankeyOutput(string outputFile) const {
     }
     fclose(f2);
     f2 = nullptr;
-    cout << "done." << endl;
+    LOG(INFO) << "done";
     delete plName;
     plName = nullptr;
     delete headLine;
@@ -962,13 +971,12 @@ void SMPModel::sankeyOutput(string outputFile) const {
 
 void SMPModel::sankeyOutput(string outputFile, string dbName, string scenarioId)
 {
-    cout<<dbName << endl << dbName.length() << endl;
-
     sqlite3 *db = nullptr;
     char* zErrMsg = nullptr;
     if (sqlite3_open_v2(dbName.c_str(), &db, SQLITE_OPEN_READONLY, NULL)) {
-        std::cerr << __FILE__ << ", Line: " << __LINE__ << ", Tried to open db file: " << dbName << endl;
-        std::cerr << "Error: " << sqlite3_errmsg(db) << endl;
+        LOG(INFO) << "Failed try to open db file :" << dbName;
+        LOG(INFO) << "SQLite Error:" << sqlite3_errmsg(db);
+
         sqlite3_close(db);
         exit(-1);
     }
@@ -978,7 +986,7 @@ void SMPModel::sankeyOutput(string outputFile, string dbName, string scenarioId)
         int rc = sqlite3_exec(db, sqlQry.c_str(), sankeyCallBack, nullptr, &zErrMsg);
         if (rc != SQLITE_OK)
         {
-            std::cerr <<  "SQL error: " <<  zErrMsg << endl;
+            LOG(INFO) << "SQL Error:" << zErrMsg;
             sqlite3_free(zErrMsg);
             sqlite3_close(db);
         }
@@ -1158,11 +1166,10 @@ void SMPModel::sankeyOutput(string outputFile, string dbName, string scenarioId)
             SMPBargnModelNames[std::stoi(scenarioData.at(12))].c_str());
 
     unsigned int nameLen = outputFile.length();
-    cout << endl;
     const char* appendEffPwr = "_effPow.csv";
     char* epName = newChars(nameLen + strlen(appendEffPwr) + 1);
     sprintf(epName, "%s%s", outputFile.c_str(), appendEffPwr);
-    cout << "Record effective power in " << epName << "  ...  " << flush;
+    LOG(INFO) << "Record effective power in " << epName;
     FILE* f1 = fopen(epName, "w");
     fprintf(f1,"%s\n",headLine);
 
@@ -1179,14 +1186,14 @@ void SMPModel::sankeyOutput(string outputFile, string dbName, string scenarioId)
     }
     fclose(f1);
     f1 = nullptr;
-    cout << "done" << endl;
+    LOG(INFO) << "done";
     delete epName;
     epName = nullptr;
 
     const char* appendPosLog = "_posLog.csv";
     char* plName = newChars(nameLen + strlen(appendPosLog) + 1);
     sprintf(plName, "%s%s", outputFile.c_str(), appendPosLog);
-    cout << "Record 1D positions over time, without dimension-name in " << plName << "  ...  " << flush;
+    LOG(INFO) << "Record 1D positions over time, without dimension-name in " << plName;
     FILE* f2 = fopen(plName, "w");
     fprintf(f2,"%s\n",headLine);
 
@@ -1209,7 +1216,7 @@ void SMPModel::sankeyOutput(string outputFile, string dbName, string scenarioId)
     }
     fclose(f2);
     f2 = nullptr;
-    cout << "done." << endl;
+    LOG(INFO) << "done";
     delete plName;
     plName = nullptr;
     delete headLine;
@@ -1267,10 +1274,13 @@ void SMPModel::showVPHistory() const {
 
         sqlite3_exec(smpDB, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 
+        LOG(INFO) << "History of actor positions over time:";
+        string actorPosHistory;
+
         // show positions over time
         for (unsigned int i = 0; i < numAct; i++) {
             for (unsigned int k = 0; k < numDim; k++) {
-                printf("%s , %s , ", actrs[i]->name.c_str(), dimName[k].c_str());
+                actorPosHistory += actrs[i]->name + ", " + dimName[k] + ":";
                 for (unsigned int t = 0; t < history.size(); t++) {
                     auto st = history[t];
                     auto pit = st->pstns[i];
@@ -1280,7 +1290,8 @@ void SMPModel::showVPHistory() const {
                     assert(1 == vpit->numC());
                     assert(numDim == vpit->numR());
                     const double pCoord = (*vpit)(k, 0) * 100.0; // Use the scale of [0,100]
-                    printf("%5.1f , ", pCoord); // have to print "100.0" sometimes
+                    // have to print "100.0" sometimes
+                    actorPosHistory += KBase::getFormattedString(" %5.1f", pCoord);
                     int rslt = 0;
                     rslt = sqlite3_bind_int(insStmt, 1, t);
                     assert(SQLITE_OK == rslt);
@@ -1308,13 +1319,13 @@ void SMPModel::showVPHistory() const {
                     rslt = sqlite3_reset(insStmt);
                     assert(SQLITE_OK == rslt);
                 }
-                cout << endl;
+                LOG(INFO) << actorPosHistory;
+                actorPosHistory.clear();
             }
         }
 
         sqlite3_exec(smpDB, "END TRANSACTION", NULL, NULL, &zErrMsg);
         sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-        cout << endl;
 
         delete sqlBuff;
         sqlBuff = nullptr;
@@ -1346,12 +1357,15 @@ void SMPModel::showVPHistory() const {
     // as we display the probability of their position winning. As multiple
     // actors often occupy the equivalent positions, this means the displayed probabilities
     // will often add up to more than 1.
+    LOG(INFO) << "History of actors' winning probabilities:";
+    string winProbsOfOneActr;
     for (unsigned int i = 0; i < numAct; i++) {
-        printf("%s , prob , ", actrs[i]->name.c_str());
+        winProbsOfOneActr += actrs[i]->name + ", prob :";
         for (unsigned int t = 0; t < history.size(); t++) {
-            printf("%.4f , ", probIT(i, t)); //  prbHist[t](i, 0),
+            winProbsOfOneActr += KBase::getFormattedString(" %.4f", probIT(i, t));
         }
-        cout << endl << flush;
+        LOG(INFO) << winProbsOfOneActr;
+        winProbsOfOneActr.clear();
     }
     return;
 }
@@ -1362,22 +1376,7 @@ SMPModel * SMPModel::initModel(vector<string> aName, vector<string> aDesc, vecto
                                const KMatrix & sal, // one row per actor, one column per dimension
                                const KMatrix & accM,
                                uint64_t s, vector<bool> f, string scenDesc, string scenName)
-{
-    
-    //  cout << "Num aName "<< aName.size() << endl;
-    //  cout << "Num aDesc "<< aDesc.size() << endl;
-    //  cout << "Num dName "<< dName.size() << endl;
-    //  auto sfn = [](const string str, const KMatrix & m) {
-    //  cout << "Dim "<<str<<": "<<m.numR() << ", "<<m.numC() <<endl;
-    //  m.mPrintf(" %.4f ");
-    //  return;
-    //  };
-    //  sfn("cap", cap);
-    //  sfn("pos", pos);
-    //  sfn("sal", sal);
-    //  sfn("accM", accM);
-    //  cout << flush;
-    
+{    
     assert(f.size() == Model::NumSQLLogGrps + NumSQLLogGrps);
     SMPModel * sm0 = new SMPModel(scenDesc, s, f, scenName); // JAH 20160711 added rng seed 20160730 JAH added sql flags
     SMPState * st0 = new SMPState(sm0);
@@ -1405,7 +1404,7 @@ SMPModel * SMPModel::initModel(vector<string> aName, vector<string> aDesc, vecto
             (*vpi)(j, 0) = pos(i, j);
         }
         sm0->addActor(ai);
-        st0->addPstn(vpi);
+        st0->pushPstn(vpi);
     }
 
     st0->setAccomodate(accM);
@@ -1420,17 +1419,16 @@ void SMPModel::setDBPath(std::string dbName)
 }
 void SMPModel::displayModelParams(SMPModel *md0)
 {
-    cout << "Model Paramaters to run the model...\n";
-    cout << "VictoryProbModel:  " << md0->vpm << endl;
-    cout << "VotingRule:  " << md0->vrCltn << endl;
-    cout << "PCEModel:  " << md0->pcem << endl;
-    cout << "StateTransitions:  " << md0->stm << endl;
-    cout << "BigRRange:  " << md0->bigRRng << endl;
-    cout << "BigRAdjust:  " << md0->bigRAdj << endl;
-    cout << "ThirdPartyCommit:  " << md0->tpCommit << endl;
-    cout << "InterVecBrgn:  " << md0->ivBrgn << endl;
-    cout << "BargnModel:  " << md0->brgnMod << endl;
-    cout << endl << flush;
+    LOG(INFO) << "Model Paramaters to run the model...";
+    LOG(INFO) << "VictoryProbModel:" << md0->vpm;
+    LOG(INFO) << "VotingRule:" << md0->vrCltn;
+    LOG(INFO) << "PCEModel:" << md0->pcem;
+    LOG(INFO) << "StateTransitions:" << md0->stm;
+    LOG(INFO) << "BigRRange:" << md0->bigRRng;
+    LOG(INFO) << "BigRAdjust:" << md0->bigRAdj;
+    LOG(INFO) << "ThirdPartyCommit:" << md0->tpCommit;
+    LOG(INFO) << "InterVecBrgn:" << md0->ivBrgn;
+    LOG(INFO) << "BargnModel:" << md0->brgnMod;
 }
 
 string SMPModel::runModel(vector<bool> sqlFlags, string dbFilePath,
@@ -1459,10 +1457,12 @@ string SMPModel::runModel(vector<bool> sqlFlags, string dbFilePath,
 
         if (-1 != seed) {
             md0->setSeed(seed);
-            printf("Using PRNG seed provided by the user: %020llu \n", md0->getSeed());
+            LOG(INFO) << KBase::getFormattedString(
+              "Using PRNG seed provided by the user: %020llu", md0->getSeed());
         }
         else {
-            printf("Using PRNG seed provided by xml file: %020llu \n", md0->getSeed());
+            LOG(INFO) << KBase::getFormattedString(
+              "Using PRNG seed provided by xml file: %020llu", md0->getSeed());
         }
     }
     else if (fileExt == "csv") {
@@ -1531,7 +1531,7 @@ void SMPModel::configExec(SMPModel * md0)
     md0->dropTableIndices();
 
     // execute
-    cout << "Starting model run" << endl << flush;
+    LOG(INFO) << "Starting model run";
     md0->run();
     const unsigned int nState = md0->history.size();
 
@@ -1558,9 +1558,9 @@ void SMPModel::configExec(SMPModel * md0)
         md0->sqlPosVote(nState - 1);
     }
 
-    cout << "Completed model run" << endl << endl;
-    printf("There were %u states, with %i steps between them\n", nState, nState - 1);
-    cout << "History of actor positions over time" << endl;
+    LOG(INFO) << "Completed model run";
+    LOG(INFO) << KBase::getFormattedString(
+      "There were %u states, with %i steps between them", nState, nState - 1);
     md0->showVPHistory();
 
     //Create indices in the tables
@@ -1685,8 +1685,7 @@ int SMPModel::callBack(void *data, int numCol, char **stringFields, char **colNa
 
     for (int i = 0; i < numCol; i++)
     {
-        //cout << colNames[i] << "= " << (stringFields[i] ? stringFields[i] : "NULL") << endl;
-        fieldVals.push_back(stringFields[i] ? stringFields[i] : "NULL");
+                fieldVals.push_back(stringFields[i] ? stringFields[i] : "NULL");
     }
 
     assert(fieldVals.size() > 0);
@@ -1712,8 +1711,8 @@ double SMPModel::getQuadMapPoint(string dbname, string scenarioID, size_t turn, 
     sqlite3 *db = nullptr;
     char* zErrMsg = nullptr;
     if (sqlite3_open_v2(dbname.c_str(), &db, SQLITE_OPEN_READONLY, NULL)) {
-        std::cerr << __FILE__ << ", Line: " << __LINE__ << ", Tried to open db file: " << dbname << endl;
-        std::cerr << "Error: " << sqlite3_errmsg(db) << endl;
+        LOG(INFO) << "Failed try to open db file :" << dbname;
+        LOG(INFO) << "SQLite Error:" << sqlite3_errmsg(db);
         sqlite3_close(db);
         exit(-1);
     }
@@ -1721,7 +1720,7 @@ double SMPModel::getQuadMapPoint(string dbname, string scenarioID, size_t turn, 
     auto sqlExec = [&db, &zErrMsg](string sqlQry) {
         int rc = sqlite3_exec(db, sqlQry.c_str(), callBack, nullptr, &zErrMsg);
         if (rc != SQLITE_OK) {
-            std::cerr <<  "SQL error: " <<  zErrMsg << endl;
+            LOG(INFO) << "SQL Error:" << zErrMsg;
             sqlite3_free(zErrMsg);
             sqlite3_close(db);
         }
@@ -1946,9 +1945,9 @@ void SMPModel::randomSMP(unsigned int numA, unsigned int sDim, bool accP, uint64
         sDim = 1 + (md0->rng->uniform() % 3); // i.e. [1,3] inclusive
     }
 
-    cout << "EU State for SMP actors with scalar capabilities" << endl;
-    printf("Number of actors; %u \n", numA);
-    printf("Number of SMP dimensions %u \n", sDim);
+    LOG(INFO) << "EU State for SMP actors with scalar capabilities";
+    LOG(INFO) << "Number of actors:" << numA;
+    LOG(INFO) << "Number of SMP dimensions:" << sDim;
 
     assert(0 < sDim);
     assert(2 < numA);
@@ -1986,38 +1985,37 @@ void SMPModel::randomSMP(unsigned int numA, unsigned int sDim, bool accP, uint64
         ai->randomize(md0->rng, sDim);
         auto iPos = new VctrPstn(KMatrix::uniform(md0->rng, sDim, 1, 0.0, 1.0)); // SMP is always on [0,1] scale
         md0->addActor(ai);
-        st0->addPstn(iPos);
+        st0->pushPstn(iPos);
     }
 
     for (unsigned int i = 0; i < numA; i++) {
         auto ai = ((SMPActor*)(md0->actrs[i]));
         double ri = 0.0; // st0->aNRA(i);
-        printf("%2u: %s , %s \n", i, ai->name.c_str(), ai->desc.c_str());
+        LOG(INFO) << KBase::getFormattedString(
+          "%2u: %s, %s", i, ai->name.c_str(), ai->desc.c_str());
         string vrs = KBase::nameFromEnum<VotingRule>(ai->vr, KBase::VotingRuleNames);
-        cout << "voting rule: " << vrs << endl;
-        cout << "Pos vector: ";
+        LOG(INFO) << "voting rule:" << vrs;
+        LOG(INFO) << "Pos vector:";
         VctrPstn * pi = ((VctrPstn*)(st0->pstns[i]));
         (trans(*pi) * 100.0).mPrintf(" %+7.4f "); // print on the scale of [0,100]
-        cout << "Sal vector: ";
+        LOG(INFO) << "Sal vector: ";
         trans(ai->vSal).mPrintf(" %+7.4f ");
-        printf("Capability: %.3f \n", ai->sCap);
-        printf("Risk attitude: %+.4f \n", ri);
-        cout << endl;
+        LOG(INFO) << KBase::getFormattedString("Capability: %.3f", ai->sCap);
+        LOG(INFO) << KBase::getFormattedString("Risk attitude: %+.4f", ri);
     }
 
     auto aMat = KBase::iMat(md0->numAct);
     if (accP) {
-        cout << "Using randomized matrix for ideal-accomodation" << endl << flush;
+        LOG(INFO) << "Using randomized matrix for ideal-accomodation";
         for (unsigned int i = 0; i<md0->numAct; i++) {
             aMat(i, i) = md0->rng->uniform(0.1, 0.5); // make them lag noticably
         }
     }
     else {
-        cout << "Using identity matrix for ideal-accomodation" << endl << flush;
+        LOG(INFO) << "Using identity matrix for ideal-accomodation";
     }
-    cout << "Accomodate matrix:" << endl;
+    LOG(INFO) << "Accomodate matrix:";
     aMat.mPrintf(" %.3f ");
-    cout << endl;
 
     st0->setAccomodate(aMat);
     st0->idealsFromPstns();
@@ -2036,9 +2034,8 @@ void SMPModel::randomSMP(unsigned int numA, unsigned int sDim, bool accP, uint64
     };
 
     auto u = KMatrix::map(uFn1, numA, numA);
-    cout << "Raw actor-pos util matrix" << endl;
+    LOG(INFO) << "Raw actor-pos util matrix";
     u.mPrintf(" %.4f ");
-    cout << endl << flush;
 
     auto w = st0->actrCaps(); //  KMatrix::map(wFn, 1, numA);
 
@@ -2049,20 +2046,18 @@ void SMPModel::randomSMP(unsigned int numA, unsigned int sDim, bool accP, uint64
     // voting rules - not necessarily the same as the actors would do.
     auto vr = VotingRule::Binary;
     string vrs = KBase::nameFromEnum<VotingRule>(vr, KBase::VotingRuleNames);
-    cout << "Using voting rule " << vrs << endl;
+    LOG(INFO) << "Using voting rule";
 
     const KBase::VPModel vpm = md0->vpm;
     const KBase::PCEModel pcem = md0->pcem;
 
     KMatrix p = Model::scalarPCE(numA, numA, w, u, vr, vpm, pcem, ReportingLevel::Medium);
 
-    cout << "Expected utility to actors: " << endl;
+    LOG(INFO) << "Expected utility to actors:";
     (u*p).mPrintf(" %.3f ");
-    cout << endl << flush;
 
-    cout << "Net support for positions: " << endl;
+    LOG(INFO) << "Net support for positions:";
     (w*u).mPrintf(" %.3f ");
-    cout << endl << flush;
 
     auto aCorr = [](const KMatrix & x, const KMatrix & y) {
         using KBase::lCorr;
@@ -2073,8 +2068,10 @@ void SMPModel::randomSMP(unsigned int numA, unsigned int sDim, bool accP, uint64
     // for nearly flat distributions, and nearly flat net support,
     // one can sometimes see negative affine-correlations because of
     // random variations in 3rd or 4th decimal places.
-    printf("L-corr of prob and net support: %+.4f \n", KBase::lCorr((w*u), trans(p)));
-    printf("A-corr of prob and net support: %+.4f \n", aCorr((w*u), trans(p)));
+    LOG(INFO) << KBase::getFormattedString(
+      "L-corr of prob and net support: %+.4f", KBase::lCorr((w*u), trans(p)));
+    LOG(INFO) << KBase::getFormattedString(
+      "A-corr of prob and net support: %+.4f", aCorr((w*u), trans(p)));
 
     SMPModel::configExec(md0);
 

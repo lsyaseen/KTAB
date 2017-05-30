@@ -24,12 +24,13 @@
 #include <assert.h> 
 
 #include "kutils.h"
-//#include "kmodel.h"
 #include "agenda.h"
 #include "demo.h"
-using std::cout;
-using std::endl;
-using std::flush;
+#include <easylogging++.h>
+
+INITIALIZE_EASYLOGGINGPP
+
+using std::string;
 using std::vector;
 using KBase::KMatrix;
 using KBase::PRNG;
@@ -97,29 +98,30 @@ void bestAgendaChair(vector<Agenda*> ars, const KMatrix& vals, const KMatrix& ca
       bestV = v0;
       bestK = ai;
     }
-    //  printf("%4u ", ai); cout << *ar << "  "; printf("%.4f \n", v0);
   }
-  printf("Best option for agenda-setting actor 0 is %u with value %.4f  is  ", bestK, bestV);
-  cout << *(ars[bestK]) << endl << flush;
+  LOG(INFO)
+    << KBase::getFormattedString(
+      "Best option for agenda-setting actor 0 is %u with value %.4f  is", bestK, bestV)
+    << *(ars[bestK]);
   //ars[bestK]->showProbs(1.0);
   return;
 }
 
 void demoCounting(unsigned int numI, unsigned int maxU, unsigned int maxS, unsigned int maxB) {
-  cout << endl << flush;
   unsigned int n = 5;
   unsigned int m = 2;
   auto cat = AgendaControl::chooseSet(n, m);
 
-  printf("Found |chooseSet(%u, %u)| = %llu \n", n, m, cat.size());
+  LOG(INFO) << KBase::getFormattedString("Found |chooseSet(%u, %u)| = %llu", n, m, cat.size());
+  string log;
   for (auto lst : cat) {
     for (auto i : lst) {
-      printf("%i ", i);
+      log += std::to_string(i) + " ";
     }
-    cout << endl << flush;
   }
+  LOG(INFO) << log;
+
   assert(cat.size() == AgendaControl::numSets(n, m));
-  cout << endl;
 
   VUI testI = {};
   for (unsigned int i = 0; i < numI; i++) {
@@ -129,23 +131,23 @@ void demoCounting(unsigned int numI, unsigned int maxU, unsigned int maxS, unsig
 
   for (unsigned int i = 1; i <= numI + 2; i++) {
     auto n = AgendaControl::numAgenda(i);
-    printf(" %2i -> %llu \n", i, n);
+    LOG(INFO) << KBase::getFormattedString(" %2i -> %llu", i, n);
   }
-  cout << endl << flush;
 
-  printf("Using %i items: ", numI);
+  log.clear();
+  log += "Using " + std::to_string(numI) + " items:";
   for (unsigned int i : testI) {
-    printf("%i ", i);
+    log += " " + std::to_string(i);
   }
-  cout << endl << flush;
+  LOG(INFO) << log;
 
   auto enumAg = [numI](Agenda::PartitionRule pr, std::string s) {
     vector<Agenda*> testA = Agenda::enumerateAgendas(numI, pr);
-    printf("For %i items, found %i distinct %s agendas \n", numI, testA.size(), s.c_str());
+    LOG(INFO) << KBase::getFormattedString(
+      "For %u items, found %i distinct %s agendas", numI, testA.size(), s.c_str());
     for (auto a : testA) {
-      cout << *a << endl;
+      LOG(INFO) << *a;
     }
-    cout << endl << flush;
     if (Agenda::PartitionRule::FreePR == pr) {
       assert(testA.size() == AgendaControl::numAgenda(numI));
     }
@@ -169,15 +171,14 @@ void demoCounting(unsigned int numI, unsigned int maxU, unsigned int maxS, unsig
 }; // end of namespace
 
 int main(int ac, char **av) {
-  using std::cout;
-  using std::endl;
-  using std::flush;
   using std::function;
   using KBase::dSeed;
   using AgendaControl::Agenda;
   using AgendaControl::Choice;
   using AgendaControl::Terminal;
 
+  el::Configurations confFromFile("./agenda-logger.conf");
+  el::Loggers::reconfigureAllLoggers(confFromFile);
   auto sTime = KBase::displayProgramStart();
   uint64_t seed = dSeed;
   bool enumP = false;
@@ -227,11 +228,11 @@ int main(int ac, char **av) {
 
   PRNG * rng = new PRNG();
   seed = rng->setSeed(seed); // 0 == get a random number
-  printf("Using PRNG seed:  %020llu \n", seed);
-  printf("Same seed in hex:   0x%016llX \n", seed);
-  unsigned int maxU = 8;
-  unsigned int maxS = 10;
-  unsigned int maxB = 10;
+  LOG(INFO) << KBase::getFormattedString("Using PRNG seed:  %020llu", seed);
+  LOG(INFO) << KBase::getFormattedString("Same seed in hex:   0x%016llX", seed);
+  const unsigned int maxU = 8;
+  const unsigned int maxS = 10;
+  const unsigned int maxB = 10;
   if (enumP) {
     AgendaControl::demoCounting(enumN, maxU, maxS, maxB);
   }
@@ -253,20 +254,17 @@ int main(int ac, char **av) {
   // find what's best for agenda-setting actor 0
   caps(0, 0) = caps(0, 0) / 25.0; // agenda-setter has little voting power
 
-  cout << "Value matrix" << endl;
+  LOG(INFO) << "Value matrix";
   vals.mPrintf(" %5.3f ");
-  cout << endl << flush;
 
 
-  cout << "Capability matrix" << endl;
+  LOG(INFO) << "Capability matrix";
   caps.mPrintf(" %5.2f ");
-  cout << endl << flush;
 
   auto enumA = [numItems, vals, caps](Agenda::PartitionRule pr, std::string name) {
-    cout << endl;
-    cout << "Enumerating all agendas ("<<name<<") over " << numItems << " items ... ";
+    LOG(INFO) << "Enumerating all agendas ("<<name<<") over " << numItems << " items ... ";
     auto ars = Agenda::enumerateAgendas(numItems, pr);
-    printf("found %i agendas \n", ars.size());
+    LOG(INFO) << "found" << ars.size() << "agendas";
     AgendaControl::bestAgendaChair(ars, vals, caps);
     for (auto ar : ars) {
       delete ar;

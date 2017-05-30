@@ -25,7 +25,6 @@
 #define DEMO_SQLITE_H
 
 #include <cstdlib>
-#include <iostream>
 #include <stdio.h>
 #include <string>
 #include <sqlite3.h> 

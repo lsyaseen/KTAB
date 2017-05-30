@@ -26,12 +26,10 @@
 // -------------------------------------------------
 
 #include "vimcp.h"
+#include <easylogging++.h>
 
 namespace KBase {
 
-using std::cout;
-using std::endl;
-using std::flush;
 using std::tuple;
 
 KMatrix projPos(const KMatrix & w) {
@@ -115,12 +113,10 @@ tuple<KMatrix, unsigned int, KMatrix> viBSHe96(const KMatrix & M, const KMatrix 
                                                function<KMatrix(const KMatrix &)> pK,
                                                KMatrix u0, const double eps, const unsigned int iMax) {
   if (false) {
-    cout << "Received M:" << endl;
+    LOG(INFO) << "Received M:";
     M.mPrintf("%+.4f  ");
-    cout << endl;
-    cout << "Received q:" << endl;
+    LOG(INFO) << "Received q:";
     trans(q).mPrintf("%+.4f  ");
-    cout << endl << endl << flush;
   }
 
   unsigned int n = q.numR();
