@@ -99,7 +99,9 @@ if(NOT MINICSV_DIR)
   message(FATAL "Could not find minicsv headers")
 endif(NOT MINICSV_DIR)
 
-# -------------------------------------------------
+# -------------------------------------------------    
+#Enable export of all classes and functions for windows platform
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 include_directories (
   ${KUTILS_INCLUDE_DIR}
@@ -126,12 +128,42 @@ message(STATUS "CMAKE_PREFIX_PATH" ${CMAKE_PREFIX_PATH})
 
 find_package(Qt5 REQUIRED COMPONENTS Core Sql)
 
+# this is the "object library" target: compiles the sources only once
+#add_library(smpObjLib OBJECT ${SMPLIB_SRCS})
+
+# shared libraries need PIC
+#set_property(TARGET ${smpObjLib} PROPERTY POSITION_INDEPENDENT_CODE 1)
+
+#add_library(smp SHARED $<TARGET_OBJECTS:smpObjLib>)
+#add_library(smp_static STATIC $<TARGET_OBJECTS:smpObjLib>)
+
+add_library(smp-shared SHARED ${SMPLIB_SRCS})
+set_target_properties(smp-shared PROPERTIES OUTPUT_NAME smp CLEAN_DIRECT_OUTPUT 1)
+
+target_link_libraries (smp-shared
+  ${KMODEL_LIBRARY}
+  ${KUTILS_LIBRARY}
+  ${SQLITE_LIBRARIES}
+  ${EFENCE_LIBRARIES}
+  ${TINYXML2_LIBRARIES}
+  Qt5::Core
+  Qt5::Sql
+ )
+
 add_library(smp STATIC ${SMPLIB_SRCS})
 
 target_link_libraries (smp
   Qt5::Core
   Qt5::Sql
   )
+
+#target_link_libraries (smp
+#  ${KMODEL_LIBRARY}
+#  ${KUTILS_LIBRARY}
+#  ${SQLITE_LIBRARIES}
+#  ${EFENCE_LIBRARIES}
+#  ${TINYXML2_LIBRARIES}
+# )
 
 # -------------------------------------------------
 # Under Linux, default start of DESTINATION path is /usr/local/ 
