@@ -100,11 +100,12 @@ errOK=$[PCerr+D3err+D6err+D4err==0]
 endOK=$[PCend+D3end+D6end+D4end==testcnt]
 allOK=$[difOK==errOK==endOK==1]
 echo "------------"
-echo "All OK: ${allOK}"
 
 if [ $allOK -eq 0 ]; then
 	echo "At least one test condition failed!"
     exit 42
+else
+	echo "All test conditions passed!"
 fi
 echo "========================="
 
