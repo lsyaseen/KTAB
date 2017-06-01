@@ -9,10 +9,11 @@
 rm *.out; rm *.db
 
 # initialize
-difOK=0; errOK=0; endOK=0; allOK=0
+difOK=0; errOK=0; endOK=0; allOK=0; testcnt=0
 
 # SOE-Pol-Comp
 echo "Running SOE-Pol-Comp.csv"
+testcnt=$[testcnt+1]
 ./smpc --logmin --csv ./doc/SOE-Pol-Comp.csv
 mv ./smpc*_log.txt ./smpc_PC.out
 egrep "Fractional|prob :" smpc_PC.out > run.out
@@ -23,6 +24,7 @@ PCend=$(grep -c "Finish time" ./smpc_PC.out)
 
 # dummyData_3Dim
 echo "Running dummyData_3Dim.csv"
+testcnt=$[testcnt+1]
 ./smpc --logmin --csv ./doc/dummyData_3Dim.csv
 mv ./smpc*_log.txt ./smpc_D3.out
 egrep "Fractional|prob :" smpc_D3.out > run.out
@@ -33,6 +35,7 @@ D3end=$(grep -c "Finish time" ./smpc_D3.out)
 
 # dummyData-6Dim
 echo "Running dummyData_6Dim.csv"
+testcnt=$[testcnt+1]
 ./smpc --logmin --csv ./doc/dummyData_6Dim.csv
 mv ./smpc*_log.txt ./smpc_D6.out
 egrep "Fractional|prob :" smpc_D6.out > run.out
@@ -43,6 +46,7 @@ D6end=$(grep -c "Finish time" ./smpc_D6.out)
 
 # dummyData-a040
 echo "Running dummyData-a040.csv"
+testcnt=$[testcnt+1]
 ./smpc --logmin --csv ./doc/dummyData-a040.csv
 mv ./smpc*_log.txt ./smpc_40.out
 egrep "Fractional|prob :" ./smpc_40.out > run.out
@@ -53,6 +57,7 @@ D4end=$(grep -c "Finish time" ./smpc_40.out)
 
 # dummyData-a080
 #echo "Running dummyData-a080.csv"
+#testcnt=$[testcnt+1]
 #./smpc --logmin --csv ./doc/dummyData-a080.csv
 #mv ./smpc*_log.txt smpc_80.out
 #egrep "Fractional|prob :" ./smpc_80.out > run.out
@@ -92,7 +97,7 @@ echo "# Finish lines ${D4end}"
 # summary
 difOK=$[PCdif+D3dif+D6dif+D4dif==0]
 errOK=$[PCerr+D3err+D6err+D4err==0]
-endOK=$[PCend+D3end+D6end+D4end==4]
+endOK=$[PCend+D3end+D6end+D4end==testcnt]
 allOK=$[difOK==errOK==endOK==1]
 echo "------------"
 echo "All OK: ${allOK}"
