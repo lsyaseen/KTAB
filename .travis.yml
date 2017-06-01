@@ -94,7 +94,21 @@ install:
   - git clone https://github.com/leethomason/tinyxml2.git
   - cd tinyxml2
   - cmake . -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_STATIC_LIBS:BOOL=ON && sudo make install
-  - cd ..
+
+  # install and build Elpp
+  - cd $TRAVIS_BUILD_DIR
+  # creating a dir to clone and build Elpp (Created due to name conflict with original folder "easyloggingpp"
+  - mkdir temp_elpp
+  - cd temp_elpp
+  - git clone https://github.com/muflihun/easyloggingpp.git
+  - mv $TRAVIS_BUILD_DIR/easyloggingpp/CMakeLists.txt $TRAVIS_BUILD_DIR/temp_elpp/easyloggingpp
+  - cd easyloggingpp
+  - mkdir build 
+  - cd build
+  - cmake ..
+  - cmake --build .
+  - sudo make install 
+  - cd $TRAVIS_BUILD_DIR
 
 before_script:
 #Set the script to execute
