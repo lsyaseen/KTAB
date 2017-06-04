@@ -113,6 +113,7 @@ install:
 before_script:
 #Set the script to execute
   - chmod a+x reconfig.sh
+  - chmod a+x KTAB_Test_Apps.sh
 
 script:
   - ./reconfig.sh
@@ -121,4 +122,5 @@ script:
   #- ./examples/smp/smpc --csv ./examples/smp/doc/SOE-Pol-Comp.csv
   #- ./examples/smp/smpc --csv ./examples/smp/doc/dummyData_3Dim.csv
   #- ./KTAB/kmodel/demomodel --emod
+  - ./KTAB_Test_Apps.sh
 
