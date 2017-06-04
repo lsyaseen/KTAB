@@ -124,5 +124,5 @@ script:
   #- ./examples/smp/smpc --csv ./examples/smp/doc/dummyData_3Dim.csv
   #- ./KTAB/kmodel/demomodel --emod
   - ./KTAB_Test_Apps.sh
-  - ./examples/smp/SMPC_RefRuns_Compare.sh
+  - $TRAVIS_BUILD_DIR/examples/smp/SMPC_RefRuns_Compare.sh
 
