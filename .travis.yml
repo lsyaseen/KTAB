@@ -17,6 +17,71 @@ matrix:
       env:
         - C_COMPILER=gcc-4.9
         - CXX_COMPILER=g++-4.9
+    - os: linux
+      dist: trusty
+      compiler: gcc
+      branches:
+        only:
+          - master
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env:
+        - C_COMPILER=gcc-5
+        - CXX_COMPILER=g++-5
+    - os: linux
+      dist: trusty
+      compiler: gcc
+      branches:
+        only:
+          - master
+          - testing
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env:
+        - C_COMPILER=gcc-6
+        - CXX_COMPILER=g++-6
+    - os: linux
+      dist: trusty
+      compiler: clang
+      branches:
+        only:
+          - master
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - sourceline: "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.5 main"
+          packages:
+            - g++-4.9
+            - clang-3.5
+      env:
+        - C_COMPILER=clang-3.5
+        - CXX_COMPILER=clang++-3.5
+    - os: linux
+      dist: trusty
+      compiler: clang
+      branches:
+        only:
+          - master
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - sourceline: "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.6 main"
+          packages:
+            - g++-4.9
+            - clang-3.6
+      env:
+        - C_COMPILER=clang-3.6
+        - CXX_COMPILER=clang++-3.6
 
 before_install:  # necessary because Travis overwrites CXX and CC!
   - if [[ $TRAVIS_OS_NAME == linux ]]; then export CXX=$CXX_COMPILER CC=$C_COMPILER; fi
@@ -49,6 +114,7 @@ before_script:
 #Set the script to execute
   - chmod a+x reconfig.sh
   - chmod a+x KTAB_Test_Apps.sh
+  - chmod a+x ./examples/smp/SMPC_RefRuns_Compare.sh
 
 script:
   - ./reconfig.sh
@@ -58,4 +124,5 @@ script:
   #- ./examples/smp/smpc --csv ./examples/smp/doc/dummyData_3Dim.csv
   #- ./KTAB/kmodel/demomodel --emod
   - ./KTAB_Test_Apps.sh
+  - ./examples/smp/SMPC_RefRuns_Compare.sh
 
