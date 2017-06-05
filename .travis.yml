@@ -69,12 +69,12 @@ before_script:
 script:
   - ./reconfig.sh
 
-#after_success:
   #- ./examples/smp/smpc --csv ./examples/smp/doc/SOE-Pol-Comp.csv
   #- ./examples/smp/smpc --csv ./examples/smp/doc/dummyData_3Dim.csv
   #- ./KTAB/kmodel/demomodel --emod
   - ./KTAB_Test_Apps.sh
   #- $TRAVIS_BUILD_DIR/examples/smp/SMPC_RefRuns_Compare.sh
+  after_success:
   - cd $TRAVIS_BUILD_DIR
   - ls
   - cat demoutilsLOG.out
