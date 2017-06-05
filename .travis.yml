@@ -77,4 +77,5 @@ script:
   #- $TRAVIS_BUILD_DIR/examples/smp/SMPC_RefRuns_Compare.sh
   - cd $TRAVIS_BUILD_DIR
   - ls
+  - cat demoutilsLOG.out
 
