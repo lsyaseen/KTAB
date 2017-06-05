@@ -74,7 +74,7 @@ script:
   #- ./KTAB/kmodel/demomodel --emod
   - ./KTAB_Test_Apps.sh
   #- $TRAVIS_BUILD_DIR/examples/smp/SMPC_RefRuns_Compare.sh
-  after_success:
+after_success:
   - cd $TRAVIS_BUILD_DIR
   - ls
   - cat demoutilsLOG.out
