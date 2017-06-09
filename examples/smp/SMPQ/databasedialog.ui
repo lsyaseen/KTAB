@@ -291,7 +291,7 @@
             <item>
              <widget class="QLineEdit" name="passwordLineEdit">
               <property name="text">
-               <string>arunsathvik</string>
+               <string/>
               </property>
               <property name="echoMode">
                <enum>QLineEdit::Password</enum>
