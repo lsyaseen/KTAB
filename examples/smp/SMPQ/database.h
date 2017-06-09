@@ -40,12 +40,14 @@ public:
     ~Database();
 
 public slots :
-    void openDB(QString dbPath,bool run=false);
-    void openDBEdit(QString dbPath);
+    void openDB(QString dbPath, QString dbType, QString connectionString, bool run=false);
     void getScenarioData(int turn, QString scenario, int dim);
     void getScenarioDataEdit(QString scenario);
     void getStateCount();
     void getDimensionCount();
+
+    //Postgres
+    void checkPostgresDB(QString connectionString, bool imp);
 
     //DB to CSV
     void getActorsDescriptionDB();
@@ -95,7 +97,8 @@ signals:
     //ActorMoved
     void actorMovedInfo(QStandardItemModel *);
 private:
-    QSqlDatabase db;
+    QSqlDatabase *db;
+    QSqlDatabase dbPostgres;
     QString dbName;
     //    QSqlTableModel * sqlmodel;
     QSqlTableModel * sqlmodelEdit;
@@ -113,6 +116,7 @@ private:
     QVector<int> scenarioModelParam;
     QString seedDB;
     QString scenarioM;
+    QSqlQuery *qry;
 
     //DB to CSV
     QVector <QString> actorNameList;
@@ -153,6 +157,15 @@ private:
     void getModelParameters();
 
     void readVectorPositionTableEdit(QString scenario);
+
+    //postgres
+    void getDatabaseList(bool imp);
+
+    QStringList * postgresDBList;
+
+signals:
+    void postgresExistingDBList(QStringList * dbs, bool imp);
+
 };
 
 #endif // DATABASE_H

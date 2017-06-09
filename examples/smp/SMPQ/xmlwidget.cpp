@@ -67,7 +67,7 @@ void MainWindow::importXmlGetFilePath(bool bl,QString filepath)
         homeDirectory = dir.absolutePath();
 
         setCurrentFile(filename);
-        emit releaseDatabase();
+
         lineGraphDock->setVisible(false);
         barGraphDock->setVisible(false);
         quadMapDock->setVisible(false);
