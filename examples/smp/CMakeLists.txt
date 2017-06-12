@@ -120,16 +120,11 @@ set(SMPLIB_SRCS
   ${PROJECT_SOURCE_DIR}/libsrc/smpsql.cpp
   )
 
-find_package(smpq)
-if(NOT SMPQ_FOUND)
-message(FATAL_ERROR "Could not find SMPQ")
-endif(NOT SMPQ_FOUND)
-
 find_package(qtlibs)
 set(CMAKE_PREFIX_PATH ${PREFIX_PATH})
 message(STATUS "CMAKE_PREFIX_PATH" ${CMAKE_PREFIX_PATH})
 
-find_package(Qt5 REQUIRED COMPONENTS Widgets Core Sql PrintSupport)
+find_package(Qt5 REQUIRED COMPONENTS Core Sql)
 
 add_library(smp STATIC ${SMPLIB_SRCS})
 
@@ -189,15 +184,12 @@ target_link_libraries (smpc
 
 if(ENABLE_QT_GUI)
 
-#  find_package(smpq)
-#  if(NOT SMPQ_FOUND)
-#    message(FATAL_ERROR "Could not find SMPQ")
-#  endif(NOT SMPQ_FOUND)
-#
-#  set(CMAKE_PREFIX_PATH ${PREFIX_PATH})
-#  message(STATUS "CMAKE_PREFIX_PATH" ${CMAKE_PREFIX_PATH})
-#
-#  find_package(Qt5 REQUIRED COMPONENTS Widgets Core Sql PrintSupport)
+  find_package(smpq)
+  if(NOT SMPQ_FOUND)
+  message(FATAL_ERROR "Could not find SMPQ")
+  endif(NOT SMPQ_FOUND)
+
+  find_package(Qt5 REQUIRED COMPONENTS Widgets Core Sql PrintSupport)
 
   qt5_wrap_cpp(QtProjectLib_hdr_moc ${QtProjectLib_hdr})
   qt5_wrap_ui(QtProjectLib_ui_uic ${QtProjectLib_ui})

@@ -66,6 +66,12 @@ endif (NOT SQLITE_FOUND)
 # --------------------------------------------------------
 
 find_package(Easyloggingpp)
+#--------------------------------------------------
+find_package(qtlibs)
+set(CMAKE_PREFIX_PATH ${PREFIX_PATH})
+message(STATUS "CMAKE_PREFIX_PATH" ${CMAKE_PREFIX_PATH})
+
+find_package(Qt5 REQUIRED COMPONENTS Core Sql)
 
 # -------------------------------------------------
 # See "Findkutils.cmake" in cmakemodules to figure
@@ -106,6 +112,10 @@ set(RPLIB_SRCS
 
 add_library(rplib STATIC ${RPLIB_SRCS})
 
+target_link_libraries (rplib
+  Qt5::Core
+  Qt5::Sql
+  )
 
 # -------------------------------------------------
 # demo program

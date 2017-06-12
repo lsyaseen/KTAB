@@ -41,6 +41,13 @@ if (NOT SQLITE_FOUND)
   message(FATAL_ERROR "Could not find SQLite")
 endif (NOT SQLITE_FOUND)
 
+#--------------------------------------------------
+find_package(qtlibs)
+set(CMAKE_PREFIX_PATH ${PREFIX_PATH})
+message(STATUS "CMAKE_PREFIX_PATH" ${CMAKE_PREFIX_PATH})
+
+find_package(Qt5 REQUIRED COMPONENTS Core Sql)
+
 # --------------------------------------------------------
 
 find_package(Easyloggingpp)
@@ -79,6 +86,11 @@ set(AGENDALIB_SRCS
 
 add_library(agenda STATIC ${AGENDALIB_SRCS})
  
+target_link_libraries (agenda
+  Qt5::Core
+  Qt5::Sql
+  )
+
 ADD_EXECUTABLE(agdemo
   src/demo.cpp 
   )

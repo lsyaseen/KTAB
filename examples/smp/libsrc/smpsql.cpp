@@ -601,15 +601,19 @@ void SMPState::updateBargnTable(const vector<vector<BargainSMP*>> & brgns,
 
     query.bindValue(":init_prob", initProb);
 
-    //Init_Seld
     query.bindValue(":init_seld", isInitSelected);
 
     // For SQ cases, there would be no receiver
     if (initActor != recvActor) {
       query.bindValue(":recd_prob", recvProb);
 
-      //Recd_Seld
       query.bindValue(":recd_seld", isRecvSelected);
+    }
+    else {
+      // Pass NULL values for SQ cases
+      query.bindValue(":recd_prob", QVariant::Double);
+
+      query.bindValue(":recd_seld", QVariant::Int);
     }
 
     query.bindValue(":turn_t", turn);
@@ -670,10 +674,6 @@ void SMPState::updateBargnTable(const vector<vector<BargainSMP*>> & brgns,
         initProb = (actorBargains[initActr])(initBgnNdx, 0);
         initSelected = initBgnNdx == actorMaxBrgNdx[initActr] ? 1 : 0;
 
-        /*cout << __LINE__ << " " << "SQ" << " " << bg->getID() \
-          << " " << initActr << ":" << rcvrActr << " " \
-          << initProb << " " << initSelected << endl;*/
-
         bindExecuteBargnTableUpdate(updateStmt, turn, bg->getID(),
                                     initActr, initProb, initSelected,
                                     rcvrActr, -1.0, 0);
@@ -691,7 +691,6 @@ void SMPState::updateBargnTable(const vector<vector<BargainSMP*>> & brgns,
           initProb = (actorBargains[initActr])(initBgnNdx, 0);
           initSelected = initBgnNdx == actorMaxBrgNdx[initActr] ? 1 : 0;
           rcvrActr = model->actrNdx(bg->actRcvr);
-          //bgID = bg->getID();
 
           // Get the bargains of receiver actor
           auto brgnRcvr = brgns[rcvrActr];
