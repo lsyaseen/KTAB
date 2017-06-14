@@ -21,7 +21,7 @@ set(CMAKE_MODULE_PATH
 
 set(CMAKE_BUILD_TYPE Debug)
 
-set(LIBRARY_OUTPUT_PATH      ${PROJECT_SOURCE_DIR}/)
+set(LIBRARY_OUTPUT_PATH  ${PROJECT_SOURCE_DIR}/)
 set(EXECUTABLE_OUTPUT_PATH   ${PROJECT_SOURCE_DIR}/)
 
 set (ENABLE_QT_GUI true CACHE  BOOL "Build app with QT GUI")
@@ -37,12 +37,12 @@ endif(UNIX)
 if (ENABLE_EFENCE)
   find_package(efence)
   if (NOT EFENCE_FOUND)
-    message(FATAL_ERROR "Could not find Electric Fence memory debugger")
+  message(FATAL_ERROR "Could not find Electric Fence memory debugger")
   endif (NOT EFENCE_FOUND)
 endif (ENABLE_EFENCE)
 
 # -------------------------------------------------
- 
+
 find_package(TinyXML2)
 if (NOT TINYXML2_FOUND)
   message(FATAL_ERROR "Could not find TinyXML2")
@@ -83,8 +83,8 @@ endif(NOT KMODEL_FOUND)
 # -------------------------------------------------
 
 set (MINICSV_PATHS
-    ${PROJECT_SOURCE_DIR}/../../minicsv/
-    )
+  ${PROJECT_SOURCE_DIR}/../../minicsv/
+  )
 
 
 find_path(MINICSV_DIR minicsv.h
@@ -99,7 +99,7 @@ if(NOT MINICSV_DIR)
   message(FATAL "Could not find minicsv headers")
 endif(NOT MINICSV_DIR)
 
-# -------------------------------------------------    
+# -------------------------------------------------
 
 include_directories (
   ${KUTILS_INCLUDE_DIR}
@@ -129,9 +129,9 @@ find_package(Qt5 REQUIRED COMPONENTS Core Sql)
 add_library(smp STATIC ${SMPLIB_SRCS})
 
 target_link_libraries (smp
-    Qt5::Core
-    Qt5::Sql
-)
+  Qt5::Core
+  Qt5::Sql
+  )
 
 # -------------------------------------------------
 # Under Linux, default start of DESTINATION path is /usr/local/ 
@@ -142,13 +142,13 @@ target_link_libraries (smp
 set (SMP_INSTALL_DIR)
 if (WIN32)
   set (SMP_INSTALL_DIR
-    c:/local/ktab
-    )
+  c:/local/ktab
+  )
 endif(WIN32)
 if (UNIX)
   set (SMP_INSTALL_DIR
-    /usr/local/ktab
-    )
+  /usr/local/ktab
+  )
 endif(UNIX)
 
 install(
@@ -184,6 +184,7 @@ target_link_libraries (smpc
 
 if(ENABLE_QT_GUI)
 
+
   find_package(smpq)
   if(NOT SMPQ_FOUND)
   message(FATAL_ERROR "Could not find SMPQ")
@@ -200,12 +201,12 @@ if(ENABLE_QT_GUI)
 
   add_library (QtProjectLib STATIC ${QtProjectLib_src} ${QtProjectLib_hdr_moc} ${QtProjectLib_ui_uic})
 
-  target_link_libraries (QtProjectLib 
-    Qt5::Core 
-    Qt5::Gui 
-    Qt5::Widgets 
-    Qt5::Sql 
-    Qt5::PrintSupport)
+  target_link_libraries (QtProjectLib
+  Qt5::Core
+  Qt5::Gui
+  Qt5::Widgets
+  Qt5::Sql
+  Qt5::PrintSupport)
 
   # WIN32 to suppress the console window under Windows
   add_executable(KTAB_SMP WIN32 ${QtProjectBin_src} ${QtProjectLib_qrc_rcc})
@@ -221,7 +222,7 @@ if(ENABLE_QT_GUI)
     ${LOGGER_LIBRARY})
 
   if(ENABLE_COPY_QT_LIBS AND WIN32)
-    find_package(qtdlls)
+  find_package(qtdlls)
   endif(ENABLE_COPY_QT_LIBS AND WIN32)
 
 endif (ENABLE_QT_GUI)
@@ -239,9 +240,9 @@ message (STATUS "QCUSTOMPLOT_DIR: " ${QCUSTOMPLOT_DIR})
 # As of early 2014, C++11 is still not the default
 # for g++, so I have to provide it here.
 if (UNIX OR MINGW)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 ")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++11 ")
   if (ENABLE_EFFCPP)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++ ")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weffc++ ")
   endif (ENABLE_EFFCPP)
 endif(UNIX OR MINGW)
 

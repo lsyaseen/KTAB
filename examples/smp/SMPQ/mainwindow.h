@@ -617,7 +617,11 @@ private :
     QLineEdit * dbDialogName;
     QString generateTimeStamp();
     bool menuconfig;
+    QString recentFileAccess;
     bool importedDBFile;
+
+    void postgresRecentAccess();
+    void removeFromRecentFileHistory(QString fileName);
 
 private slots:
     void connectionStrPath(QString str);
