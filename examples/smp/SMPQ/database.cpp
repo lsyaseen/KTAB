@@ -46,10 +46,24 @@ Database::~Database()
     releaseDB();
 }
 
+void Database::addDatabase(const QString &driver)
+{
+    qDebug() << "Inside adddb";
+    QSqlDatabase qdb = QSqlDatabase::addDatabase(driver, "guiDb");
+    if(db != nullptr) {
+        if(db->open()) {
+            db->close();
+        }
+        delete db;
+        db = nullptr;
+    }
+    db = new QSqlDatabase(qdb);
+}
+
 void Database::openDB(QString dbPath, QString dbType, QString connectionString, bool run)
 {
-    QSqlDatabase qdb = QSqlDatabase::addDatabase(dbType, "guiDb");
-    db = new QSqlDatabase(qdb);
+    //QSqlDatabase qdb = QSqlDatabase::addDatabase(dbType, "guiDb");
+    //db = new QSqlDatabase(qdb);
     if(dbType == "QSQLITE")
     {
         db->setDatabaseName(dbPath);
@@ -500,6 +514,11 @@ void Database::getActorMovedDataDB(QString scenario)
         colIndex=0;
     }
     emit actorMovedInfo(actorMovedModel);
+}
+
+QString Database::getConnectionName()
+{
+    return db->connectionName();
 }
 
 void Database::getVectorPosition(int actor, int dim, int turn, QString scenario)

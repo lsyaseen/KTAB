@@ -394,8 +394,8 @@ public:
   * This version of getQuadMapPoint is meant to be used on a db file which contains the results
   * of at least one model run
   */
-  static double getQuadMapPoint(string dbname, string scenarioID, size_t turn, size_t est_h,
-      size_t aff_k, size_t init_i, size_t rcvr_j);
+  static double getQuadMapPoint(const QString &connectionName, const string &scenarioID,
+    size_t turn, size_t est_h, size_t aff_k, size_t init_i, size_t rcvr_j);
 
 protected:
   //sqlite3 *smpDB = nullptr; // keep this protected, to ease multi-threading

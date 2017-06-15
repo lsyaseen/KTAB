@@ -48,6 +48,7 @@ void DatabaseDialog::on_sqliteDonePushButton_clicked()
     connectionSring.append("Database=").append("None").append(";");
 
     this->close();
+    emit configDbDriver(QString("QSQLITE"));
     emit connectionStringPath(connectionSring);
 
 }
@@ -97,6 +98,7 @@ void DatabaseDialog::on_postgrePushButton_clicked()
     if(status==true)
     {
         this->close();
+        emit configDbDriver(QString("QPSQL"));
         emit connectionStringPath(connectionSring);
     }
 }

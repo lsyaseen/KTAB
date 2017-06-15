@@ -24,7 +24,7 @@ private:
     QString dbFilePath;
 signals:
     void connectionStringPath(QString conStr);
-
+    void configDbDriver(QString dbDriver);
 
 private slots :
     void nextClicked(bool);

@@ -88,6 +88,7 @@ smpStopFn(unsigned int minIter, unsigned int maxIter, double minDeltaRatio, doub
 void MainWindow::configureDB(bool bl)
 {
     dbDialog = new DatabaseDialog;
+    connect(dbDialog,SIGNAL(configDbDriver(QString)),dbObj,SLOT(addDatabase(QString)));
     connect(dbDialog,SIGNAL(connectionStringPath(QString)),this,SLOT(connectionStrPath(QString)));
     dbDialog->showDialog();
 }
@@ -812,6 +813,8 @@ void MainWindow::setDefaultParameters()
 
 void MainWindow::saveTurnHistoryToCSV()
 {
+    SMPLib::SMPModel::loginCredentials(connectionString.toStdString());
+
     QString csvFileNameLocation = QFileDialog::getSaveFileName(
                 this, tr("Save Log File to "),QString(homeDirectory+QDir::separator()+"Log"),"CSV File (*.csv)");
 

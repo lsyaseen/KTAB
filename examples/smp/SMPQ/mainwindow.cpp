@@ -58,6 +58,8 @@ MainWindow::MainWindow()
 
     //Database
     dbObj = new Database();
+    dbObj->addDatabase("QSQLITE");
+
     //To open database by passing the path
     connect(this,SIGNAL(dbFilePath(QString,QString,QString,bool)),dbObj, SLOT(openDB(QString,QString,QString,bool)));
 
@@ -282,14 +284,8 @@ void MainWindow::dbGetFilePAth(bool bl, QString smpDBPath, bool run)
             connect(turnSlider,SIGNAL(valueChanged(int)),this,SLOT(sliderStateValueToQryDB(int)));
 
             modeltoDB->clear();
-            if(run)
-            {
-                emit dbFilePath(dbPath,conType,connectionString,run);
-            }
-            else
-            {
-                emit dbFilePath(dbPath,conType,connectionString,false);
-            }
+            emit dbFilePath(dbPath,conType,connectionString,run);
+
 
             reconnectPlotWidgetSignals();
             //To populate Line Graph Dimensions combo box
@@ -2862,6 +2858,7 @@ void MainWindow::loadRecentFile(const QString &fileName)
                 useHistory=false;
                 if(!connectionString.contains("QSQLITE"))
                 {
+                    dbObj->addDatabase("QSQLITE");
                     connectionString.clear();
                     connectionString.append("Driver=QSQLITE;");//connectionType
                     connectionString.append("Database=").append("None").append(";");
@@ -2877,6 +2874,7 @@ void MainWindow::loadRecentFile(const QString &fileName)
         {
             useHistory=false;
             recentFileAccess = fileName;
+            dbObj->addDatabase("QPSQL");
             if(!connectionString.contains("QPSQL"))
             {
                 //POSTGRESQL

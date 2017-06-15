@@ -40,6 +40,7 @@ public:
     ~Database();
 
 public slots :
+    void addDatabase(const QString &driver);
     void openDB(QString dbPath, QString dbType, QString connectionString, bool run=false);
     void getScenarioData(int turn, QString scenario, int dim);
     void getScenarioDataEdit(QString scenario);
@@ -68,6 +69,7 @@ public slots :
 
     //GetActorMovedData
     void getActorMovedDataDB(QString scenario);
+    QString getConnectionName();
 
 signals:
     void Message(QString , QString );
@@ -97,7 +99,7 @@ signals:
     //ActorMoved
     void actorMovedInfo(QStandardItemModel *);
 private:
-    QSqlDatabase *db;
+    QSqlDatabase *db = nullptr;
     QSqlDatabase dbPostgres;
     QString dbName;
     //    QSqlTableModel * sqlmodel;
