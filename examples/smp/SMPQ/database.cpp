@@ -48,22 +48,23 @@ Database::~Database()
 
 void Database::addDatabase(const QString &driver)
 {
-    qDebug() << "Inside adddb";
-    QSqlDatabase qdb = QSqlDatabase::addDatabase(driver, "guiDb");
     if(db != nullptr) {
-        if(db->open()) {
-            db->close();
-        }
-        delete db;
-        db = nullptr;
+      if(0 == driver.compare(db->driverName())) {
+          return;
+      }
+      if(db->open()) {
+          db->close();
+      }
+      delete db;
+      db = nullptr;
+      QSqlDatabase::removeDatabase("guiDb");
     }
+    QSqlDatabase qdb = QSqlDatabase::addDatabase(driver, "guiDb");
     db = new QSqlDatabase(qdb);
 }
 
 void Database::openDB(QString dbPath, QString dbType, QString connectionString, bool run)
 {
-    //QSqlDatabase qdb = QSqlDatabase::addDatabase(dbType, "guiDb");
-    //db = new QSqlDatabase(qdb);
     if(dbType == "QSQLITE")
     {
         db->setDatabaseName(dbPath);
@@ -178,7 +179,6 @@ void Database::checkPostgresDB(QString connectionString, bool imp)
         connectionValues = dbNm.split("=");
         dbNm  = connectionValues.at(1);
         dbPostgres.setDatabaseName(dbNm);
-        qDebug()<<dbNm << "database";
 
         if(connectionParameters.length()>=5)
         {
@@ -217,10 +217,13 @@ void Database::checkPostgresDB(QString connectionString, bool imp)
             {
                 qry = new QSqlQuery(dbPostgres);
                 getDatabaseList(imp);
+                delete qry;
+                qry = nullptr;
 
                 if(dbPostgres.isOpen())
                 {
                     dbPostgres.close();
+                    dbPostgres = QSqlDatabase();
                     QSqlDatabase::removeDatabase("checkDB");
                 }
             }
