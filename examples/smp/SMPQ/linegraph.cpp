@@ -225,7 +225,6 @@ void MainWindow::populateLineGraphActorsList()
         connect(actor,SIGNAL(toggled(bool)),this,SLOT(lineGraphActorsCheckboxClicked(bool)));
         lineActorCBList.append(actor);
     }
-
     lineGraphActorsScrollArea->setWidget(widget);
     lineCustomGraph->setBackground(QBrush(QColor(255,255,255)));
 
@@ -344,17 +343,6 @@ void MainWindow::lineGraphSelectAllActorsCheckBoxClicked(bool click)
         lineLabelToggleList[actors]=false;
     }
 
-    //    if(lineLabelToggleList.contains(true))
-    //    {
-    //        for(int i=0; i <lineLabelList.length();++i)
-    //        {
-    //             if(lineLabelToggleList.at(i)==true)
-    //            {
-    //                lineLabelList.at(i)->setVisible(false);
-    //                lineLabelToggleList[i]=false;
-    //            }
-    //        }
-    //    }
     lineCustomGraph->clearGraphs();
     emit getScenarioRunValues(lineGraphTurnSlider->value(),scenarioBox,dimension);
     lineCustomGraph->replot();
@@ -403,8 +391,6 @@ void MainWindow::lineGraphActorsCheckboxClicked(bool click)
 
     lineLabelList.at(actorId)->setVisible(false);
     lineLabelToggleList[actorId]=false;
-
-
 
     lineGraphCheckedActorsIdList[actorId]=click;
 

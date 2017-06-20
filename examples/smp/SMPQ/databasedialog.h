@@ -17,7 +17,7 @@ class DatabaseDialog : public QDialog
 public:
     explicit DatabaseDialog(QWidget *parent = 0);
     ~DatabaseDialog();
-    bool showDialog();
+    bool showDialog(quint8 indx);
 
 private:
     Ui::DatabaseDialog *ui;

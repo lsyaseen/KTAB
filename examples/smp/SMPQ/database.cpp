@@ -67,6 +67,7 @@ void Database::openDB(QString dbPath, QString dbType, QString connectionString, 
 {
     if(dbType == "QSQLITE")
     {
+        addDatabase(dbType);
         db->setDatabaseName(dbPath);
         dbName=dbPath;
 
@@ -97,6 +98,7 @@ void Database::openDB(QString dbPath, QString dbType, QString connectionString, 
     }
     else if (dbType == "QPSQL")
     {
+        addDatabase(dbType);
         db->setDatabaseName(dbPath);
         dbName=dbPath;
         //qry = new QSqlQuery(*db);
@@ -168,6 +170,7 @@ void Database::openDB(QString dbPath, QString dbType, QString connectionString, 
 
 void Database::checkPostgresDB(QString connectionString, bool imp)
 {
+    QSqlDatabase dbPostgres;
     if(connectionString.contains("QPSQL"))
     {
         dbPostgres = QSqlDatabase::addDatabase("QPSQL","checkDB");
@@ -215,10 +218,11 @@ void Database::checkPostgresDB(QString connectionString, bool imp)
             }
             else
             {
-                qry = new QSqlQuery(dbPostgres);
-                getDatabaseList(imp);
-                delete qry;
-                qry = nullptr;
+                QString cN = dbPostgres.connectionName();
+                //qry = new QSqlQuery(dbPostgres);
+                getDatabaseList(imp,cN);
+                //delete qry;
+                //qry = nullptr;
 
                 if(dbPostgres.isOpen())
                 {
@@ -611,12 +615,14 @@ void Database::readVectorPositionTableEdit(QString scenario)
     emit dbModelEdit(sqlmodelEdit);
 }
 
-void Database::getDatabaseList(bool imp)
+void Database::getDatabaseList(bool imp, QString &connectionName)
 {
     postgresDBList = new QStringList;
 
     QString query= QString("select datname from pg_database" ) ;
 
+    QSqlDatabase dbPostgres = QSqlDatabase::database(connectionName);
+    QSqlQuery *qry = new QSqlQuery(dbPostgres);
     qry->exec(query);
 
     while(qry->next())
@@ -624,6 +630,9 @@ void Database::getDatabaseList(bool imp)
         postgresDBList->append(qry->value(0).toString());
         //        qDebug()<<qry->value(0).toString();
     }
+    qry->finish();
+    delete qry;
+    qry = nullptr;
     emit postgresExistingDBList(postgresDBList,imp);
 }
 

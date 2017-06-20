@@ -72,6 +72,9 @@ void MainWindow::importXmlGetFilePath(bool bl,QString filepath)
         barGraphDock->setVisible(false);
         quadMapDock->setVisible(false);
 
+        tableControlsFrame->show();
+        stackWidget->show();
+
         xmlPath=filename;
         emit openXMLFile(filename);
     }

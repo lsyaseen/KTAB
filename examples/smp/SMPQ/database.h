@@ -100,7 +100,6 @@ signals:
     void actorMovedInfo(QStandardItemModel *);
 private:
     QSqlDatabase *db = nullptr;
-    QSqlDatabase dbPostgres;
     QString dbName;
     //    QSqlTableModel * sqlmodel;
     QSqlTableModel * sqlmodelEdit;
@@ -161,7 +160,7 @@ private:
     void readVectorPositionTableEdit(QString scenario);
 
     //postgres
-    void getDatabaseList(bool imp);
+    void getDatabaseList(bool imp, QString &connectionName);
 
     QStringList * postgresDBList;
 

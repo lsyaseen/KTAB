@@ -622,6 +622,7 @@ private :
 
     void postgresRecentAccess();
     void removeFromRecentFileHistory(QString fileName);
+    void resetGUI();
 
 private slots:
     void connectionStrPath(QString str);

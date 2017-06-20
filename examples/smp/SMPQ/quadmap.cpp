@@ -768,7 +768,7 @@ void MainWindow::quadMapAutoScale(bool status)
 void MainWindow::quadMapPlotPoints(bool status)
 {
     Q_UNUSED(status)
-    if(true==quadMapDock->isVisible() && actorsName.length() >0)
+    if(true==quadMapDock->isVisible() && actorsName.length() >0 && lineGraphDimensionComboBox->count()>0)
     {
         QApplication::setOverrideCursor(QCursor(QPixmap("://images/hourglass.png"))) ;
         plotQuadMap->setEnabled(false);

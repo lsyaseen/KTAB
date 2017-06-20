@@ -87,10 +87,15 @@ smpStopFn(unsigned int minIter, unsigned int maxIter, double minDeltaRatio, doub
 
 void MainWindow::configureDB(bool bl)
 {
+    quint8 conTypeIndex = 0 ;// 0- SQLITE, 1 - PostgreSQL index
+    if(connectionString.contains("QPSQL"))
+    {
+        conTypeIndex = 1;
+    }
     dbDialog = new DatabaseDialog;
-    connect(dbDialog,SIGNAL(configDbDriver(QString)),dbObj,SLOT(addDatabase(QString)));
+//    connect(dbDialog,SIGNAL(configDbDriver(QString)),dbObj,SLOT(addDatabase(QString)));
     connect(dbDialog,SIGNAL(connectionStringPath(QString)),this,SLOT(connectionStrPath(QString)));
-    dbDialog->showDialog();
+    dbDialog->showDialog(conTypeIndex);
 }
 
 void MainWindow::postgresDBList(QStringList *dbList, bool imp)
