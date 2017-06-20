@@ -425,6 +425,7 @@ public:
 
   void initDBDriver(QString connectionName);
   bool connectDB();
+  void closeDB();
   static void loginCredentials(string connString);
   void beginDBTransaction();
   void commitDBTransaction();

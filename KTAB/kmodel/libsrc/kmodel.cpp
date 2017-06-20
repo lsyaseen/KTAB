@@ -169,8 +169,11 @@ Model::~Model() {
     query.finish();
     query.clear();
     QString connName = qtDB->connectionName();
-    qtDB->close();
+    if(qtDB->open()) {
+        qtDB->close();
+    }
     delete qtDB;
+    qtDB = nullptr;
     QSqlDatabase::removeDatabase(connName);
   }
 }

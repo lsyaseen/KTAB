@@ -62,6 +62,13 @@ bool Model::connectDB() {
   return connect(server, port, databaseName, userName, password);
 }
 
+void Model::closeDB()
+{
+  if(qtDB != nullptr && qtDB->isValid()) {
+      qtDB->close();
+  }
+}
+
 bool Model::connect(const QString& server,
   const int port,
   const QString& databaseName,

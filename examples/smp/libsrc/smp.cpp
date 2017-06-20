@@ -763,6 +763,7 @@ void SMPModel::releaseDB() {
         }
         smpDB = nullptr;
     }
+    Model::closeDB();
 }
 
 void SMPModel::addDim(string dn) {
