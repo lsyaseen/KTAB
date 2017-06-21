@@ -207,6 +207,29 @@ SMPState* SMPState::doBCN() {
     recordProbEduChlg();
   }
 
+  if (model->sqlFlags[3]) {
+    for (auto brgnCoord : brgnCos) {
+      model->sqlBargainCoords(
+        get<0>(brgnCoord), //turn
+        get<1>(brgnCoord), //bargnId
+        get<2>(brgnCoord), //posInit
+        get<3>(brgnCoord)  //posRcvr
+      );
+    }
+  }
+
+  if (model->sqlFlags[4]) {
+    for (auto brgnVal : brgnVals) {
+      model->sqlBargainEntries(
+        get<0>(brgnVal), //turn
+        get<1>(brgnVal), //bargnId
+        get<2>(brgnVal), //initiator
+        get<3>(brgnVal), //receiver
+        get<4>(brgnVal)  //value
+      );
+    }
+  }
+
   LOG(INFO) << "Bargains to be resolved";
   showBargains(brgns);
 
@@ -221,6 +244,25 @@ SMPState* SMPState::doBCN() {
   };
 
   KBase::groupThreads(thrCalcPosts, 0, na - 1);
+
+  for (auto votes : brgnVotes) {
+    for (auto vote : votes) {
+      model->sqlBargainVote(
+        get<0>(vote), //turn
+        get<1>(vote), //barginIDsPair_i_j
+        get<2>(vote), //pv_ij
+        get<3>(vote)  //actor
+      );
+    }
+  }
+
+  for (auto util : brgnUtils) {
+    model->sqlBargainUtil(
+      get<0>(util), //turn
+      get<1>(util), //bargnIds
+      get<2>(util)  //utilities
+    );
+  }
 
   // record data so far
   updateBargnTable(brgns, actorBargains, actorMaxBrgNdx);
@@ -304,7 +346,9 @@ void SMPState::doBCN(unsigned int i) {
 
     if (model->sqlFlags[grpID])
     {
-      model->sqlBargainEntries(turn, sqBrgnI->getID(), i, i, 0);
+      brgnValsLock.lock();
+      brgnVals.push_back(BrgnValue(turn, sqBrgnI->getID(), i, i, 0));
+      brgnValsLock.unlock();
     }
 
     eduChlgsI eduI = bestChallengeUtils(i);
@@ -446,11 +490,15 @@ void SMPState::doBCN(unsigned int i) {
         // record the only one used into SQLite JAH 20160802 use the flag
         if(model->sqlFlags[grpID])
         {
-          model->sqlBargainEntries(turn, brgnIIJ->getID(), i, j, bestEU);
+          brgnValsLock.lock();
+          brgnVals.push_back(BrgnValue(turn, brgnIIJ->getID(), i, j, bestEU));
+          brgnValsLock.unlock();
         }
         if(model->sqlFlags[3])
         {          
-          model->sqlBargainCoords(turn, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr);
+          brgnCosLock.lock();
+          brgnCos.push_back(BrgnCoord(turn, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr));
+          brgnCosLock.unlock();
         }
         // record this one onto BOTH the initiator and receiver queues
         brgnsLock.lock();
@@ -469,13 +517,17 @@ void SMPState::doBCN(unsigned int i) {
         // record the pair used into SQLite JAH 20160802 use the flag
         if(model->sqlFlags[grpID])
         {
-          model->sqlBargainEntries(turn, brgnIIJ->getID(), i, j, bestEU);
-          model->sqlBargainEntries(turn, brgnJIJ->getID(), i, j, bestEU);
+          brgnValsLock.lock();
+          brgnVals.push_back(BrgnValue(turn, brgnIIJ->getID(), i, j, bestEU));
+          brgnVals.push_back(BrgnValue(turn, brgnJIJ->getID(), i, j, bestEU));
+          brgnValsLock.unlock();
         }
         if(model->sqlFlags[3])
         {
-          model->sqlBargainCoords(turn, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr);
-          model->sqlBargainCoords(turn, brgnJIJ->getID(), brgnJIJ->posInit, brgnJIJ->posRcvr);
+          brgnCosLock.lock();
+          brgnCos.push_back(BrgnCoord(turn, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr));
+          brgnCos.push_back(BrgnCoord(turn, brgnJIJ->getID(), brgnJIJ->posInit, brgnJIJ->posRcvr));
+          brgnCosLock.unlock();
         }
         // record these both onto BOTH the initiator and receiver queues
         brgnsLock.lock();
@@ -494,11 +546,15 @@ void SMPState::doBCN(unsigned int i) {
         // record the only one used into SQLite JAH 20160802 use the flag
         if(model->sqlFlags[grpID])
         {
-          model->sqlBargainEntries(turn, brgnIJ->getID(), i, j, bestEU);
+          brgnValsLock.lock();
+          brgnVals.push_back(BrgnValue(turn, brgnIJ->getID(), i, j, bestEU));
+          brgnValsLock.unlock();
         }
         if(model->sqlFlags[3])
         {
-          model->sqlBargainCoords(turn, brgnIJ->getID(), brgnIJ->posInit, brgnIJ->posRcvr);
+          brgnCosLock.lock();
+          brgnCos.push_back(BrgnCoord(turn, brgnIJ->getID(), brgnIJ->posInit, brgnIJ->posRcvr));
+          brgnCosLock.unlock();
         }
         // record this one onto BOTH the initiator and receiver queues
         brgnsLock.lock();
@@ -625,30 +681,34 @@ void SMPState::updateBestBrgnPositions(int k) {
 
     //populate the Bargain Vote & Util tables
     // JAH added sql flag logging control
-	if (model->sqlFlags[3])
-	{
-		auto brgns_k = brgns[k];
-		vector< std::tuple<uint64_t, uint64_t>> barginIDsPair_i_j;
-		vector<uint64_t> bargnIdsRows = {};
-		for (int j = 0; j < nb; j++)
-		{
-			bargnIdsRows.push_back(brgns[k][j]->getID());
-		}
-		for (unsigned int brgnFirst = 0; brgnFirst < nb; brgnFirst++)
-		{
-			for (unsigned int brgnSecond = 0; brgnSecond < brgnFirst; brgnSecond++)
-			{
-				barginIDsPair_i_j.push_back(tuple<uint64_t, uint64_t>(brgns_k[brgnFirst]->getID(), brgns_k[brgnSecond]->getID()));
-			}
-		}
+  if (model->sqlFlags[3])
+  {
+    auto brgns_k = brgns[k];
+    vector< std::tuple<uint64_t, uint64_t>> barginIDsPair_i_j;
+    vector<uint64_t> bargnIdsRows = {};
+    for (int j = 0; j < nb; j++)
+    {
+      bargnIdsRows.push_back(brgns[k][j]->getID());
+    }
+    for (unsigned int brgnFirst = 0; brgnFirst < nb; brgnFirst++)
+    {
+      for (unsigned int brgnSecond = 0; brgnSecond < brgnFirst; brgnSecond++)
+      {
+        barginIDsPair_i_j.push_back(tuple<uint64_t, uint64_t>(brgns_k[brgnFirst]->getID(), brgns_k[brgnSecond]->getID()));
+      }
+    }
 
-		for (unsigned int actor = 0; actor < na; ++actor) {
-			auto pv_ij = calcVotes(w, u_im, actor);
+    BrgnVotes votes;
+    for (unsigned int actor = 0; actor < na; ++actor) {
+      auto pv_ij = calcVotes(w, u_im, actor);
 
-			model->sqlBargainVote(turn, barginIDsPair_i_j, pv_ij, actor);
-		}
-		model->sqlBargainUtil(turn, bargnIdsRows, u_im);
-	}
+      votes.push_back(BrgnVote(turn, barginIDsPair_i_j, pv_ij, actor));
+    }
+    brgnPosLock.lock();
+    brgnVotes.push_back(votes);
+    brgnUtils.push_back(BrgnUtil(turn, bargnIdsRows, u_im));
+    brgnPosLock.unlock();
+  }
 
     // TODO: create a fresh position for k, from the selected bargain mMax.
     VctrPstn * pk = nullptr;

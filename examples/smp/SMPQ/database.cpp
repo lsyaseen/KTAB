@@ -39,10 +39,15 @@ Database::Database()
         emit Message("Database Error", "No QPSQL support! Check all needed dll-files!");
     }
 
+    addDatabase("QSQLITE");
 }
 
 Database::~Database()
 {
+    if(qry != nullptr) {
+        delete qry;
+        qry = nullptr;
+    }
     releaseDB();
 }
 
@@ -52,12 +57,13 @@ void Database::addDatabase(const QString &driver)
       if(0 == driver.compare(db->driverName())) {
           return;
       }
-      if(db->open()) {
-          db->close();
-      }
-      delete db;
-      db = nullptr;
-      QSqlDatabase::removeDatabase("guiDb");
+      releaseDB();
+//      if(db->open()) {
+//          db->close();
+//      }
+//      delete db;
+//      db = nullptr;
+//      QSqlDatabase::removeDatabase("guiDb");
     }
     QSqlDatabase qdb = QSqlDatabase::addDatabase(driver, "guiDb");
     db = new QSqlDatabase(qdb);
@@ -470,15 +476,14 @@ void Database::getUtilChlgAndSQvalues(QVector<int> VHAxisValues)
 
 void Database::releaseDB()
 {
-    QString connectionName = db->connectionName();;
-    //    qDebug()<<connectionName;
-    qry->finish();
-    qry->clear();
-    delete qry;
-    if(nullptr != db) {
+    if(db != nullptr) {
+        if(db->open()) {
+            db->close();
+        }
         delete db;
+        db = nullptr;
+        QSqlDatabase::removeDatabase("guiDb");
     }
-    QSqlDatabase::removeDatabase(connectionName);
 }
 
 void Database::getActorMovedDataDB(QString scenario)

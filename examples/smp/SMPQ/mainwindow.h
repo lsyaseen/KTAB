@@ -229,7 +229,7 @@ private:
     QFrame * modelParametersFrame;
 
     //Database Obj
-    Database * dbObj ;
+    Database * dbObj = nullptr;
     QSqlDatabase db;
     int dimensions;
     QString dbPath;

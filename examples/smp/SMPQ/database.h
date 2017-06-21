@@ -117,7 +117,7 @@ private:
     QVector<int> scenarioModelParam;
     QString seedDB;
     QString scenarioM;
-    QSqlQuery *qry;
+    QSqlQuery *qry = nullptr;
 
     //DB to CSV
     QVector <QString> actorNameList;

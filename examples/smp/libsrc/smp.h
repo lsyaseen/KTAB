@@ -309,6 +309,45 @@ private:
   void updateBestBrgnPositions(int k);
 
   vector<double> calcVotes(KMatrix w, KMatrix u, int actor) const;
+
+  using BrgnValue = tuple<
+    unsigned int,  //turn
+    uint64_t,      //bargain id
+    unsigned int,  //initiator actor
+    unsigned int,  //receiver actor
+    double         //bargain value
+  >;
+  using BrgnValues = std::vector<BrgnValue>;
+  BrgnValues brgnVals;
+  std::mutex brgnValsLock;
+
+  using BrgnCoord = tuple<
+    unsigned int,    //turn id
+    int,             //bargnID
+    KBase::VctrPstn, //initPos
+    KBase::VctrPstn  //rcvrPos
+  >;
+  using BrgnCos = std::vector<BrgnCoord>;
+  BrgnCos brgnCos;
+  std::mutex brgnCosLock;
+
+  using BrgnVote = tuple<
+    unsigned int,                       //turn id
+    vector< tuple<uint64_t, uint64_t>>, //barginidspair_i_j
+    vector<double>,                     //Vote matrix
+    unsigned int                        //actor k
+  >;
+  using BrgnVotes = vector<BrgnVote>;
+  vector<BrgnVotes> brgnVotes;
+
+  using BrgnUtil = tuple<
+    unsigned int,      //turn id
+    vector<uint64_t>,  //bargnIds
+    KBase::KMatrix     //Util_mat
+  >;
+  using BrgnUtils = vector<BrgnUtil>;
+  BrgnUtils brgnUtils;
+  std::mutex brgnPosLock;
 };
 
 class SMPModel : public Model {

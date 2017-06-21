@@ -58,7 +58,6 @@ MainWindow::MainWindow()
 
     //Database
     dbObj = new Database();
-    dbObj->addDatabase("QSQLITE");
 
     //To open database by passing the path
     connect(this,SIGNAL(dbFilePath(QString,QString,QString,bool)),dbObj, SLOT(openDB(QString,QString,QString,bool)));
@@ -180,7 +179,9 @@ MainWindow::MainWindow()
 
 MainWindow::~MainWindow()
 {
-    emit releaseDatabase();
+    if(dbObj != nullptr) {
+        delete dbObj;
+    }
 }
 
 void MainWindow::csvGetFilePAth(bool bl, QString filepath )
