@@ -854,7 +854,7 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
 
     sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
 
-    string thij = std::to_string(t)
+    string thij = std::to_string(turn)
       + "," + std::to_string(h)
       + "," + std::to_string(i)
       + "," + std::to_string(j);
@@ -891,7 +891,7 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
             model->getScenarioID().c_str(), turn, h, i, j, phij);
     sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
 
-    string thkij = std::to_string(t)
+    string thkij = std::to_string(turn)
       + "," + std::to_string(h)
       + "," + std::to_string(k)
       + "," + std::to_string(i)

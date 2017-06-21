@@ -23,7 +23,6 @@
 
 #include <assert.h>
 #include <easylogging++.h>
-#include <iostream>
 #include <sstream>
 #include <algorithm>
 
@@ -50,7 +49,7 @@ QString Model::password;
 
 void Model::initDBDriver(QString connectionName) {
   if (QSqlDatabase::contains(connectionName)) {
-    cout << "A database connection already exists with the name: " << connectionName.toStdString() << endl;
+    LOG(INFO) << "A database connection already exists with the name: " << connectionName.toStdString();
     return;
   }
   QSqlDatabase qdb = QSqlDatabase::addDatabase(dbDriver, connectionName);
@@ -97,10 +96,10 @@ bool Model::createDB(const QString& dbName) {
   QString createDBqry("CREATE DATABASE \"");
   createDBqry.append(dbName);
   createDBqry.append("\"");
-  cout << createDBqry.toStdString() << endl;
+  LOG(INFO) << createDBqry.toStdString();
 
   if (!query.exec(createDBqry)) {
-    cout << query.lastError().text().toStdString() << endl;
+    LOG(INFO) << query.lastError().text().toStdString();
     return false;
   }
 
@@ -122,8 +121,8 @@ void Model::configSqlite() const {
 
 void Model::execQuery(std::string& qry) {
   if (!query.exec(QString::fromStdString(qry))) {
-    std::cerr << "Failed Query: " << qry << std::endl;
-    std::cerr << query.lastError().text().toStdString() << endl;
+    LOG(INFO) << "Failed Query: " << qry;
+    LOG(INFO) << query.lastError().text().toStdString();
     assert(false);
   }
 }
@@ -614,7 +613,8 @@ void Model::sqlAUtil(unsigned int t)
         assert(SQLITE_OK == rslt);
         rslt = sqlite3_step(insStmt);
         if (!query.exec()) {
-          cout << query.lastError().text().toStdString() << endl;
+          LOG(INFO) << query.lastError().text().toStdString();
+          assert(false);
         }
         assert(SQLITE_DONE == rslt);
         sqlite3_clear_bindings(insStmt);
@@ -693,7 +693,8 @@ void Model::sqlPosEquiv(unsigned int t)
     assert(SQLITE_OK == rslt);
     rslt = sqlite3_step(insStmt);
     if (!query.exec()) {
-      cout << query.lastError().text().toStdString() << endl;
+      LOG(INFO) << query.lastError().text().toStdString();
+      assert(false);
     }
     assert(SQLITE_DONE == rslt);
     sqlite3_clear_bindings(insStmt);
@@ -763,7 +764,8 @@ void Model::sqlBargainEntries(unsigned int t, int bargainId, int initiator, int 
   assert(SQLITE_OK == rslt);
   rslt = sqlite3_step(insStmt);
   if (!query.exec()) {
-    cout << query.lastError().text().toStdString() << endl;
+    LOG(INFO) << query.lastError().text().toStdString();
+    assert(false);
   }
   assert(SQLITE_DONE == rslt);
   sqlite3_clear_bindings(insStmt);
@@ -841,7 +843,8 @@ void Model::sqlBargainCoords(unsigned int t, int bargnID, const KBase::VctrPstn 
     assert(SQLITE_OK == rslt);
     rslt = sqlite3_step(insStmt);
     if (!query.exec()) {
-      cout << query.lastError().text().toStdString() << endl;
+      LOG(INFO) << query.lastError().text().toStdString();
+      assert(false);
     }
     assert(SQLITE_DONE == rslt);
     sqlite3_clear_bindings(insStmt);
@@ -920,7 +923,8 @@ void Model::sqlBargainUtil(unsigned int t, vector<uint64_t> bargnIds,  KBase::KM
 			assert(SQLITE_OK == rslt);
 			rslt = sqlite3_step(insStmt);
       if (!query.exec()) {
-        cout << query.lastError().text().toStdString() << endl;
+        LOG(INFO) << query.lastError().text().toStdString();
+        assert(false);
       }
       assert(SQLITE_DONE == rslt);
 			sqlite3_clear_bindings(insStmt);
@@ -994,7 +998,8 @@ void Model::LogInfoTables()
     // record
     rslt = sqlite3_step(insStmtA);
     if (!query.exec()) {
-      cout << query.lastError().text().toStdString() << endl;
+      LOG(INFO) << query.lastError().text().toStdString();
+      assert(false);
     }
     assert(SQLITE_DONE == rslt);
     sqlite3_clear_bindings(insStmtA);
@@ -1116,7 +1121,8 @@ void Model::sqlBargainVote(unsigned int t, vector< tuple<uint64_t, uint64_t>> ba
 			assert(SQLITE_OK == rslt);
 			rslt = sqlite3_step(insStmt);
     if (!query.exec()) {
-      cout << query.lastError().text().toStdString() << endl;
+      LOG(INFO) << query.lastError().text().toStdString();
+      assert(false);
     }
       assert(SQLITE_DONE == rslt);
 			sqlite3_clear_bindings(insStmt);
@@ -1195,7 +1201,8 @@ void Model::sqlPosProb(unsigned int t)
       assert(SQLITE_OK == rslt);
       rslt = sqlite3_step(insStmt);
       if (!query.exec()) {
-        cout << query.lastError().text().toStdString() << endl;
+        LOG(INFO) << query.lastError().text().toStdString();
+        assert(false);
       }
       assert(SQLITE_DONE == rslt);
       sqlite3_clear_bindings(insStmt);
@@ -1291,7 +1298,8 @@ void Model::sqlPosVote(unsigned int t)
             assert(SQLITE_OK == rslt);
             rslt = sqlite3_step(insStmt);
             if (!query.exec()) {
-              cout << query.lastError().text().toStdString() << endl;
+              LOG(INFO) << query.lastError().text().toStdString();
+              assert(false);
             }
             assert(SQLITE_DONE == rslt);
             sqlite3_clear_bindings(insStmt);
@@ -1381,8 +1389,8 @@ void Model::loginCredentials(string connString) {
       userParam = mapStringToUserParams.at(key);
     }
     catch (const std::out_of_range& oor) {
-      std::cerr << "Error: Wrong connection string provided for DB!"
-        << endl << oor.what() << endl;
+      LOG(INFO) << "Error: Wrong connection string provided for DB!";
+      LOG(INFO) << oor.what();
       assert(false);
     }
 
@@ -1403,43 +1411,29 @@ void Model::loginCredentials(string connString) {
       userName = QString::fromStdString(value);
       break;
     case userParams::Pwd:
-      if (value.empty()) {
-        cout << "Enter the password to connect with database: ";
-        std::cin >> value;
-        cout << endl;
-      }
       password = QString::fromStdString(value);
       break;
     default:
-      cout << "Error in input credentials format." << endl;
+      LOG(INFO) << "Error in input credentials format.";
     }
   }
 
   if (dbDriver.isEmpty() || databaseName.isEmpty()) {
-    cout << "Error! Database type or database name can not be left blank." << endl;
+    LOG(INFO) << "Error! Database type or database name can not be left blank.";
     assert(false);
   }
 
   // We use either Postgresql or SQLITE
   if (dbDriver.compare("QPSQL") && dbDriver.compare("QSQLITE")) {
-    cout << "Error! Wrong driver name. Supported Drivers: postgres(QPSQL), sqlite3(QSQLITE)" << endl;
+    LOG(INFO) << "Error! Wrong driver name. Supported Drivers: postgres(QPSQL), sqlite3(QSQLITE)";
     assert(false);
   }
 
   // for a non-sqlite db
   if (!dbDriver.compare("QPSQL")) {
     if (server.isEmpty()) {
-      cout << "Error! Please provide address for postgres server" << endl;
+      LOG(INFO) << "Error! Please provide address for postgres server";
       assert(false);
-    }
-
-    // Prompt for password if the password has not been provided
-    if (password.isEmpty()) {
-      cout << "Enter the password to connect with database: ";
-      string value;
-      std::cin >> value;
-      cout << endl;
-      password = QString::fromStdString(value);
     }
   }
 

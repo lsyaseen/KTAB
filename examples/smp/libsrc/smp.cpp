@@ -763,7 +763,6 @@ void SMPModel::releaseDB() {
         }
         smpDB = nullptr;
     }
-    Model::closeDB();
 }
 
 void SMPModel::addDim(string dn) {
@@ -906,26 +905,24 @@ void SMPModel::sankeyOutput(string outputFile, string dbName, string scenarioId)
     QSqlDatabase qdb = QSqlDatabase::addDatabase(dbDriver, QString("sankey"));
     qdb.setDatabaseName(QString::fromStdString(dbName));
     if (0 == dbDriver.compare("QPSQL")) {
-      //qdb.setDatabaseName(QString::fromStdString(dbName));
       qdb.setHostName(server);
       qdb.setPort(port);
 
       if(!qdb.open(userName, password)) {
-        cout << "Could not connect with postgres DB." << endl;
-        cout << qdb.lastError().text().toStdString() << endl;
-        return;
+        LOG(INFO) << "Could not connect with postgres DB.";
+        LOG(INFO) << qdb.lastError().text().toStdString();
+        assert(false);
       }
     }
     else if (0 == dbDriver.compare("QSQLITE")) {
-      //qdb.setDatabaseName(QString::fromStdString(dbName));
       if (!qdb.open()) {
-        cout << "Could not connect with sqlite DB." << endl;
-        cout << qdb.lastError().text().toStdString() << endl;
-        return;
+        LOG(INFO) << "Could not connect with sqlite DB.";
+        LOG(INFO) << qdb.lastError().text().toStdString();
+        assert(false);
       }
     }
     else {
-      cout << "Invalid DB driver name" << endl;
+      LOG(INFO) << "Invalid DB driver name";
       assert(false);
     }
 
@@ -1213,7 +1210,7 @@ void SMPModel::sankeyOutput(string outputFile, string dbName, string scenarioId)
     FILE* f1_1 = fopen(effPowDump.c_str(), "w");
     fprintf(f1_1, "%s\n", headLine);
 
-    cout << "Record effective power in " << effPowDump << "  ...  " << flush;
+    LOG(INFO) << "Record effective power in " << effPowDump << "  ...  ";
     for (auto actor : actorList) {
       fprintf(f1_1, "%s", actor.second.c_str());
       for (size_t dim = 0; dim < numDims1; ++dim) {
@@ -1222,7 +1219,6 @@ void SMPModel::sankeyOutput(string outputFile, string dbName, string scenarioId)
       }
       fprintf(f1_1, "\n");
     }
-    cout << "done." << endl;
 
     fclose(f1_1);
 
@@ -1235,7 +1231,7 @@ void SMPModel::sankeyOutput(string outputFile, string dbName, string scenarioId)
 
     qtQry.prepare(getPosCoord.c_str());
 
-    cout << "Record 1D positions over time, without dimension-name in " << posVectDump << "  ...  " << flush;
+    LOG(INFO) << "Record 1D positions over time, without dimension-name in " << posVectDump << "  ...  ";
     for (auto actor : actorList) {
       fprintf(f2_1, "%s", actor.second.c_str());
 
@@ -1247,7 +1243,6 @@ void SMPModel::sankeyOutput(string outputFile, string dbName, string scenarioId)
       }
       fprintf(f2_1, "\n");
     }
-    cout << "done." << endl;
 
     fclose(f2_1);
     f2_1 = nullptr;
@@ -1395,7 +1390,8 @@ void SMPModel::showVPHistory() const {
                     }
                     rslt = sqlite3_step(insStmt);
                     if (!query.exec()) {
-                      cout << query.lastError().text().toStdString() << endl;
+                      LOG(INFO) << query.lastError().text().toStdString();
+                      assert(false);
                     }
                     assert(SQLITE_DONE == rslt);
                     sqlite3_clear_bindings(insStmt);

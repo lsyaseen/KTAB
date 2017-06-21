@@ -151,7 +151,7 @@ void SMPModel::sqlTest() {
     if (!connectDB()) {
       // connect with the default postgres db (the user should have admin privilege)
       if(!connect(server, port, "postgres", userName, password)) {
-        cout << "Please check the login credentials, ip address or port number" << endl;
+        LOG(INFO) << "Please check the login credentials, ip address or port number";
         assert(false);
       }
 
@@ -163,12 +163,12 @@ void SMPModel::sqlTest() {
           qtDB->close();
           // connect to the newly created database
           if (connectDB()) {
-            cout << "Connected to newly created database." << endl;
+            LOG(INFO) << "Connected to newly created database.";
             query = QSqlQuery(*qtDB);
           }
           else {
-            cout << "Not connected to new db" << endl;
-            cout << qtDB->lastError().text().toStdString() << endl;
+            LOG(INFO) << "Not connected to new db";
+            LOG(INFO) << qtDB->lastError().text().toStdString();
             assert(false);
           }
         }
@@ -177,8 +177,8 @@ void SMPModel::sqlTest() {
         }
       }
       else {
-        cout << "Database " << databaseName.toStdString()
-          << " exists but not able to connect to it." << endl;
+        LOG(INFO) << "Database " << databaseName.toStdString()
+          << " exists but not able to connect to it.";
         assert(false);
       }
     }
@@ -379,7 +379,8 @@ void SMPModel::LogInfoTables()
           // record
           rslt = sqlite3_step(insStmtAccomod);
           if (!query.exec()) {
-            cout << query.lastError().text().toStdString() << endl;
+            LOG(INFO) << query.lastError().text().toStdString();
+            assert(false);
           }
           assert(SQLITE_DONE == rslt);
           sqlite3_clear_bindings(insStmtAccomod);
@@ -403,7 +404,8 @@ void SMPModel::LogInfoTables()
     // record
     rslt = sqlite3_step(insStmtD);
     if (!query.exec()) {
-      cout << query.lastError().text().toStdString() << endl;
+      LOG(INFO) << query.lastError().text().toStdString();
+      assert(false);
     }
     assert(SQLITE_DONE == rslt);
     sqlite3_clear_bindings(insStmtD);
@@ -434,7 +436,8 @@ void SMPModel::LogInfoTables()
       // record
       rslt = sqlite3_step(insStmtC);
       if (!query.exec()) {
-        cout << query.lastError().text().toStdString() << endl;
+        LOG(INFO) << query.lastError().text().toStdString();
+        assert(false);
       }
       assert(SQLITE_DONE == rslt);
       sqlite3_clear_bindings(insStmtC);
@@ -475,7 +478,8 @@ void SMPModel::LogInfoTables()
         // record
         rslt = sqlite3_step(insStmtS);
         if (!query.exec()) {
-          cout << query.lastError().text().toStdString() << endl;
+          LOG(INFO) << query.lastError().text().toStdString();
+          assert(false);
         }
         assert(SQLITE_DONE == rslt);
         sqlite3_clear_bindings(insStmtS);
@@ -509,7 +513,8 @@ void SMPModel::LogInfoTables()
 
   rslt = sqlite3_step(insStmtScene);
   if (!query.exec()) {
-    cout << query.lastError().text().toStdString() << endl;
+    LOG(INFO) << query.lastError().text().toStdString();
+    assert(false);
   }
   assert(SQLITE_DONE == rslt);
   sqlite3_clear_bindings(insStmtScene);
@@ -626,6 +631,7 @@ void SMPState::updateBargnTable(const vector<vector<BargainSMP*>> & brgns,
 
     if (!query.exec()) {
       LOG(INFO) << query.lastError().text().toStdString();
+      assert(false);
     }
 
     return;
@@ -791,7 +797,8 @@ void SMPState::recordProbEduChlg() const {
 
       // actually record it
       if (!query.exec()) {
-        cout << query.lastError().text().toStdString() << endl;
+        LOG(INFO) << query.lastError().text().toStdString();
+        assert(false);
       }
     }
   }
@@ -823,7 +830,8 @@ void SMPState::recordProbEduChlg() const {
 
     // actually record it
     if (!query.exec()) {
-      cout << query.lastError().text().toStdString() << endl;
+      LOG(INFO) << query.lastError().text().toStdString();
+      assert(false);
     }
   }
 
@@ -863,7 +871,8 @@ void SMPState::recordProbEduChlg() const {
 
     // actually record it
     if (!query.exec()) {
-      cout << query.lastError().text().toStdString() << endl;
+      LOG(INFO) << query.lastError().text().toStdString();
+      assert(false);
     }
   }
 
