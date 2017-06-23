@@ -63,7 +63,7 @@ bool Model::connectDB() {
 
 void Model::closeDB()
 {
-  if(qtDB != nullptr && qtDB->isValid()) {
+  if(qtDB != nullptr && qtDB->isValid() && qtDB->isOpen()) {
       qtDB->close();
   }
 }
@@ -549,7 +549,6 @@ KTable * Model::createSQL(unsigned int n)
 
 void Model::sqlAUtil(unsigned int t)
 {
-  assert(nullptr != smpDB);
   assert(t < history.size());
   State* st = history[t];
   assert(nullptr != st);
@@ -561,31 +560,15 @@ void Model::sqlAUtil(unsigned int t)
   // mission-critical RDBMS, rather than a 1-off record of this run,
   // doing so might be disasterous in case the system crashed before
   // things were cleaned up.
-  sqlite3 * db = smpDB;
-  smpDB = nullptr;
-
-  char* zErrMsg = nullptr;
-  auto sqlBuff = newChars(200);
-  sprintf(sqlBuff,
-          "INSERT INTO PosUtil (ScenarioId, Turn_t, Est_h, Act_i, Pos_j, Util) VALUES ('%s', ?1, ?2, ?3, ?4, ?5)",
-          scenId.c_str());
-
   string sql = "INSERT INTO PosUtil (ScenarioId, Turn_t, Est_h, Act_i, Pos_j, Util) VALUES ('"
     + scenId + "', :turn_t, :est_h, :act_i, :pos_j, :util)";
-  assert(nullptr != db);
-  const char* insStr = sqlBuff;
-  sqlite3_stmt *insStmt;
 
-  sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
   query.prepare(QString::fromStdString(sql));
 
   // Prepared statements cache the execution plan for a query after the query optimizer has
   // found the best plan, so there is no big gain with simple insertions.
   // What makes a huge difference is bundling a few hundred into one atomic "transaction".
   // For this case, runtime droped from 62-65 seconds to 0.5-0.6 (vs. 0.30-0.33 with no SQL at all).
-  assert(nullptr != insStmt); // make sure it is ready
-
-  sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
   qtDB->transaction();
 
   for (unsigned int h = 0; h < numAct; h++)   // estimator is h
@@ -595,45 +578,19 @@ void Model::sqlAUtil(unsigned int t)
     {
       for (unsigned int j = 0; j < numAct; j++)
       {
-        int rslt = 0;
-        rslt = sqlite3_bind_int(insStmt, 1, t);
         query.bindValue(":turn_t", t);
-        assert(SQLITE_OK == rslt);
-        rslt = sqlite3_bind_int(insStmt, 2, h);
         query.bindValue(":est_h", h);
-        assert(SQLITE_OK == rslt);
-        rslt = sqlite3_bind_int(insStmt, 3, i);
         query.bindValue(":act_i", i);
-        assert(SQLITE_OK == rslt);
-        rslt = sqlite3_bind_int(insStmt, 4, j);
         query.bindValue(":pos_j", j);
-        assert(SQLITE_OK == rslt);
-        rslt = sqlite3_bind_double(insStmt, 5, uij(i, j));
         query.bindValue(":util", uij(i, j));
-        assert(SQLITE_OK == rslt);
-        rslt = sqlite3_step(insStmt);
         if (!query.exec()) {
           LOG(INFO) << query.lastError().text().toStdString();
           assert(false);
         }
-        assert(SQLITE_DONE == rslt);
-        sqlite3_clear_bindings(insStmt);
-        assert(SQLITE_DONE == rslt);
-        rslt = sqlite3_reset(insStmt);
-        assert(SQLITE_OK == rslt);
       }
     }
   }
-  sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
   qtDB->commit();
-  sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-  //printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
-
-  delete sqlBuff;
-  sqlBuff = nullptr;
-
-  smpDB = db; // give it the new pointer
-
   return;
 }
 
@@ -641,35 +598,17 @@ void Model::sqlAUtil(unsigned int t)
 // module run
 void Model::sqlPosEquiv(unsigned int t)
 {
-  // Check database intact
-  assert(nullptr != smpDB);
   assert(t < history.size());
   State* st = history[t];
   assert(nullptr != st);
-  sqlite3 * db = smpDB;
-  smpDB = nullptr;
-  // In case of error
-  char* zErrMsg = nullptr;
-  auto sqlBuff = newChars(200);
-  sprintf(sqlBuff,
-          "INSERT INTO PosEquiv (ScenarioId, Turn_t, Pos_i, Eqv_j) VALUES ('%s', ?1, ?2, ?3)",
-          scenId.c_str());
-
-  assert(nullptr != db);
-  const char* insStr = sqlBuff;
-  sqlite3_stmt *insStmt;
-  sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
 
   string qsql = string("INSERT INTO PosEquiv (ScenarioId, Turn_t, Pos_i, Eqv_j) VALUES ('")
     + scenId + "', :turn_t, :pos_i, :eqv_j)";
   query.prepare(QString::fromStdString(qsql));
 
-  assert(nullptr != insStmt); // make sure it is ready
-
   qtDB->transaction();
 
   // Start inserting record
-  sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
   for (unsigned int i = 0; i < numAct; i++)
   {
     // calculate the equivalance
@@ -681,106 +620,45 @@ void Model::sqlPosEquiv(unsigned int t)
         je = j;
       }
     }
-    int rslt = 0;
-    rslt = sqlite3_bind_int(insStmt, 1, t);
     query.bindValue(":turn_t", t);
-    assert(SQLITE_OK == rslt);
-    rslt = sqlite3_bind_int(insStmt, 2, i);
     query.bindValue(":pos_i", i);
-    assert(SQLITE_OK == rslt);
-    rslt = sqlite3_bind_int(insStmt, 3, je);
     query.bindValue(":eqv_j", je);
-    assert(SQLITE_OK == rslt);
-    rslt = sqlite3_step(insStmt);
     if (!query.exec()) {
       LOG(INFO) << query.lastError().text().toStdString();
       assert(false);
     }
-    assert(SQLITE_DONE == rslt);
-    sqlite3_clear_bindings(insStmt);
-    assert(SQLITE_DONE == rslt);
-    rslt = sqlite3_reset(insStmt);
-    assert(SQLITE_OK == rslt);
   }
   // end databse transaction
-  sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
   qtDB->commit();
 
-  sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-  //printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
-  delete sqlBuff;
-  sqlBuff = nullptr;
-  smpDB = db;
   return;
 }
 
 void Model::sqlBargainEntries(unsigned int t, int bargainId, int initiator, int receiver, double val)
 {
-  // initiate the database
-  sqlite3 * db = smpDB;
-
-  // Error message in case
-  char* zErrMsg = nullptr;
-  auto sqlBuff = newChars(200);
   // prepare the sql statement to insert
-  sprintf(sqlBuff,
-          "INSERT INTO Bargn (ScenarioId, Turn_t, BargnID, Init_Act_i, Recd_Act_j,Value) VALUES ('%s',?1, ?2, ?3, ?4,?5)",
-          scenId.c_str());
-
-  assert(nullptr != db);
-  const char* insStr = sqlBuff;
-  sqlite3_stmt *insStmt;
-  sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
-  assert(nullptr != insStmt); // make sure it is ready
-
   string sql = string("INSERT INTO Bargn (ScenarioId, Turn_t, BargnID, Init_Act_i, Recd_Act_j, Value) VALUES ('")
     + scenId + "', :turn_t, :bargnid, :init_i, :recd_j, :value)";
   query.prepare(QString::fromStdString(sql));
 
   // start for the transaction
-  sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
   qtDB->transaction();
 
-  int rslt = 0;
   // Turn_t
-  rslt = sqlite3_bind_int(insStmt, 1, t);
   query.bindValue(":turn_t", t);
-  assert(SQLITE_OK == rslt);
   //BargnID
-  rslt = sqlite3_bind_int(insStmt, 2, bargainId);
   query.bindValue(":bargnid", bargainId);
-  assert(SQLITE_OK == rslt);
   //Init_Act_i
-  rslt = sqlite3_bind_int(insStmt, 3, initiator);
   query.bindValue(":init_i", initiator);
-  assert(SQLITE_OK == rslt);
   //Recd_Act_j
-  rslt = sqlite3_bind_int(insStmt, 4, receiver);
   query.bindValue(":recd_j", receiver);
-  assert(SQLITE_OK == rslt);
   //Value
-  rslt = sqlite3_bind_double(insStmt, 5, val);
   query.bindValue(":value", val);
-  assert(SQLITE_OK == rslt);
-  rslt = sqlite3_step(insStmt);
   if (!query.exec()) {
     LOG(INFO) << query.lastError().text().toStdString();
     assert(false);
   }
-  assert(SQLITE_DONE == rslt);
-  sqlite3_clear_bindings(insStmt);
-  assert(SQLITE_DONE == rslt);
-  rslt = sqlite3_reset(insStmt);
-  assert(SQLITE_OK == rslt);
-
-  sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
   qtDB->commit();
-  //printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
-  sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-  delete sqlBuff;
-  sqlBuff = nullptr;
-
-  smpDB = db;
 }
 
 
@@ -790,158 +668,76 @@ void Model::sqlBargainCoords(unsigned int t, int bargnID, const KBase::VctrPstn 
   int nDim = initPos.numR();
   assert(nDim == rcvrPos.numR());
 
-  // initiate the database
-  sqlite3 * db = smpDB;
-  // Error message in case
-  char* zErrMsg = nullptr;
-  auto sqlBuff = newChars(200);
-
   // prepare the sql statement to insert
-  sprintf(sqlBuff,
-          "INSERT INTO BargnCoords (ScenarioId, Turn_t,BargnId, Dim_k, Init_Coord,Recd_Coord) VALUES ('%s',?1, ?2, ?3, ?4,?5)",
-          scenId.c_str());
-
-  assert(nullptr != db);
-  const char* insStr = sqlBuff;
-  sqlite3_stmt *insStmt;
-  sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
-  assert(nullptr != insStmt); // make sure it is ready
-
   string sql = string("INSERT INTO BargnCoords (ScenarioId, Turn_t, BargnID, Dim_k, Init_Coord, Recd_Coord) VALUES ('")
     + scenId + "', :turn_t, :bargnid, :dim_k, :init_coord, :recd_coord)";
   query.prepare(QString::fromStdString(sql));
 
   // start for the transaction
-  sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
   qtDB->transaction();
 
   for (int k = 0; k < nDim; k++)
   {
 
-    int rslt = 0;
     // Turn_t
-    rslt = sqlite3_bind_int(insStmt, 1, t);
     query.bindValue(":turn_t", t);
-    assert(SQLITE_OK == rslt);
     //Baragainer
-    rslt = sqlite3_bind_int(insStmt, 2, bargnID);
     query.bindValue(":bargnid", bargnID);
-    assert(SQLITE_OK == rslt);
     //Dim_K
-    rslt = sqlite3_bind_int(insStmt, 3, k);
     query.bindValue(":dim_k", k);
-    assert(SQLITE_OK == rslt);
 
     //Init_Coord
-    rslt = sqlite3_bind_double(insStmt, 4, initPos(k,0) * 100.0); // Log at the scale of [0,100]
     query.bindValue(":init_coord", initPos(k, 0) * 100.0);
-    assert(SQLITE_OK == rslt);
     //Recd_Coord
 
-    rslt = sqlite3_bind_double(insStmt, 5, rcvrPos(k, 0) * 100.0); // Log at the scale of [0,100]
     query.bindValue(":recd_coord", rcvrPos(k, 0) * 100.0);
-    assert(SQLITE_OK == rslt);
-    rslt = sqlite3_step(insStmt);
     if (!query.exec()) {
       LOG(INFO) << query.lastError().text().toStdString();
       assert(false);
     }
-    assert(SQLITE_DONE == rslt);
-    sqlite3_clear_bindings(insStmt);
-    assert(SQLITE_DONE == rslt);
-    rslt = sqlite3_reset(insStmt);
-    assert(SQLITE_OK == rslt);
-
   }
 
-  sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
   qtDB->commit();
-  sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-  delete sqlBuff;
-  sqlBuff = nullptr;
-  smpDB = db;
 }
 
 
 
 void Model::sqlBargainUtil(unsigned int t, vector<uint64_t> bargnIds,  KBase::KMatrix Util_mat)
 {
-  // initiate the database
-  sqlite3 * db = smpDB;
-
-  // Error message in case
-  char* zErrMsg = nullptr;
-  auto sqlBuff = newChars(200);
-
   int Util_mat_row = Util_mat.numR();
   int Util_mat_col = Util_mat.numC();
 
 
   // prepare the sql statement to insert
-  sprintf(sqlBuff,
-          "INSERT INTO BargnUtil  (ScenarioId, Turn_t,BargnId, Act_i, Util) VALUES ('%s',?1, ?2, ?3, ?4)",
-          scenId.c_str());
-
   string sql = string("INSERT INTO BargnUtil  (ScenarioId, Turn_t,BargnId, Act_i, Util) VALUES ('")
     + scenId + "', :turn_t, :bgnId, :act_i, :util)";
 
-  assert(nullptr != db);
-  const char* insStr = sqlBuff;
-  sqlite3_stmt *insStmt;
-
-  sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
   query.prepare(QString::fromStdString(sql));
-  assert(nullptr != insStmt); // make sure it is ready
-	// start for the transaction
-	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+  // start for the transaction
   qtDB->transaction();
   uint64_t Bargn_i = 0;
-    for (unsigned int i = 0; i < Util_mat_row; i++)
+  for (unsigned int i = 0; i < Util_mat_row; i++)
+  {
+    for (unsigned int j = 0; j < Util_mat_col; j++)
     {
-		for (unsigned int j = 0; j < Util_mat_col; j++)
-		{
-			
-			int rslt = 0;
-			// Turn_t
-			rslt = sqlite3_bind_int(insStmt, 1, t);
+      // Turn_t
       query.bindValue(":turn_t", t);
-      assert(SQLITE_OK == rslt);
-			//Bargn_i
-			Bargn_i = bargnIds[j];
-			rslt = sqlite3_bind_int(insStmt, 2, Bargn_i);
+      //Bargn_i
+      Bargn_i = bargnIds[j];
       query.bindValue(":bgnId", (qulonglong)Bargn_i);
-      assert(SQLITE_OK == rslt);
-			//Act_i
-			rslt = sqlite3_bind_int(insStmt, 3, i);
+      //Act_i
       query.bindValue(":act_i", i);
-			assert(SQLITE_OK == rslt);
-			//Util
-			rslt = sqlite3_bind_double(insStmt, 4, Util_mat(i, j));
+      //Util
       query.bindValue(":util", Util_mat(i, j));
-      assert(SQLITE_OK == rslt);
-			// finish  
-			assert(SQLITE_OK == rslt);
-			rslt = sqlite3_step(insStmt);
+      // finish
       if (!query.exec()) {
         LOG(INFO) << query.lastError().text().toStdString();
         assert(false);
       }
-      assert(SQLITE_DONE == rslt);
-			sqlite3_clear_bindings(insStmt);
-			assert(SQLITE_DONE == rslt);
-			rslt = sqlite3_reset(insStmt);
-			assert(SQLITE_OK == rslt);
-		}
-	}
+    }
+  }
 
-  sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
   qtDB->commit();
-  sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-
-  delete sqlBuff;
-  sqlBuff = nullptr;
-
-  smpDB = db;
 }
 
 // JAH 20160731 added this function in replacement to the separate
@@ -949,73 +745,35 @@ void Model::sqlBargainUtil(unsigned int t, vector<uint64_t> bargnIds,  KBase::KM
 // this only covers the general "Model" info tables; currently only Actors and Scenarios
 void Model::LogInfoTables()
 {
-  int rslt = 0;
-  // check the database availability
-  sqlite3 * db = smpDB;
-  assert(nullptr != smpDB);
-  char* zErrMsg = nullptr;
-
   // assert tests for all tables here at the start
   assert(numAct == actrs.size());
 
   // for efficiency sake, we'll do all tables in a single transaction
   // form the insert cmmands
-  auto sqlBuffA = newChars(sqlBuffSize);
-  sprintf(sqlBuffA,"INSERT INTO ActorDescription (ScenarioId,Act_i,Name,Desc) VALUES ('%s', ?1, ?2, ?3)",
-          scenId.c_str());
-  auto sqlBuffS = newChars(sqlBuffSize);
-  sprintf(sqlBuffS,"INSERT INTO ScenarioDesc (Scenario,Desc,ScenarioId,RNGSeed,"
-      "VictoryProbModel,ProbCondorcetElection,StateTransition) VALUES ('%s',?1,?2,?3,?4,?5,?6)",
-          scenName.c_str());
   // prepare the prepared statement statements
-  sqlite3_stmt *insStmtA;
-
   string sql = "INSERT INTO ActorDescription (ScenarioId,Act_i,Name,\"Desc\") VALUES ('"
     + scenId + "', :act_i, :name, :desc)";
-  sqlite3_prepare_v2(smpDB, sqlBuffA, strlen(sqlBuffA), &insStmtA, NULL);
   query.prepare(QString::fromStdString(sql));
-  assert(nullptr != insStmtA);
-  sqlite3_stmt *insStmtS;
-  sqlite3_prepare_v2(smpDB, sqlBuffS, strlen(sqlBuffS), &insStmtS, NULL);
-  assert(nullptr != insStmtS);
-
-  sqlite3_exec(smpDB, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
   qtDB->transaction();
   // Actor Description Table
   // For each actor fill the required information
   for (unsigned int i = 0; i < actrs.size(); i++) {
     Actor * act = actrs.at(i);
     // bind the data
-    rslt = sqlite3_bind_int(insStmtA, 1, i);
     query.bindValue(":act_i", i);
-    assert(SQLITE_OK == rslt);
-    rslt = sqlite3_bind_text(insStmtA, 2, act->name.c_str(), -1, SQLITE_TRANSIENT);
     query.bindValue(":name", act->name.c_str());
-    assert(SQLITE_OK == rslt);
-    rslt = sqlite3_bind_text(insStmtA, 3, act->desc.c_str(), -1, SQLITE_TRANSIENT);
     query.bindValue(":desc", act->desc.c_str());
-    assert(SQLITE_OK == rslt);
     // record
-    rslt = sqlite3_step(insStmtA);
     if (!query.exec()) {
       LOG(INFO) << query.lastError().text().toStdString();
       assert(false);
     }
-    assert(SQLITE_DONE == rslt);
-    sqlite3_clear_bindings(insStmtA);
-    assert(SQLITE_DONE == rslt);
-    rslt = sqlite3_reset(insStmtA);
-    assert(SQLITE_OK == rslt);
   }
   qtDB->commit();
 
   // Scenario Description
   // Turn_t
-  rslt = sqlite3_bind_text(insStmtS, 1, scenDesc.c_str(), -1, SQLITE_TRANSIENT);
-  assert(SQLITE_OK == rslt);
   // Scen Id
-  rslt = sqlite3_bind_text(insStmtS, 2, scenId.c_str(), -1, SQLITE_TRANSIENT);
-  assert(SQLITE_OK == rslt);
   // rng seed JAH 20160711
   // have to convert to text and store it that way, since sqlite3 doesn't really understand unsigned ints
   char *seedBuff = newChars(50);
@@ -1030,148 +788,62 @@ void Model::LogInfoTables()
     + " )");
 
   execQuery(sql);
-  rslt = sqlite3_bind_text(insStmtS, 3, strSeed, -1, SQLITE_TRANSIENT);
-  assert(SQLITE_OK == rslt);
-  rslt = sqlite3_bind_int(insStmtS, 4, static_cast<int>(vpm));
-  assert(SQLITE_OK == rslt);
-  rslt = sqlite3_bind_int(insStmtS, 5, static_cast<int>(pcem));
-  assert(SQLITE_OK == rslt);
-  rslt = sqlite3_bind_int(insStmtS, 6, static_cast<int>(stm));
-  assert(SQLITE_OK == rslt);
-  // record
-  assert(SQLITE_OK == rslt);
-  rslt = sqlite3_step(insStmtS);
-  assert(SQLITE_DONE == rslt);
-  sqlite3_clear_bindings(insStmtS);
-  assert(SQLITE_DONE == rslt);
-  rslt = sqlite3_reset(insStmtS);
-  assert(SQLITE_OK == rslt);
-
-  // finish
-  sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
-  // finalize statement to avoid resource leaks
-  sqlite3_finalize(insStmtA);
-  sqlite3_finalize(insStmtS);
-  delete sqlBuffA;
-  sqlBuffA = nullptr;
-  delete sqlBuffS;
-  sqlBuffS = nullptr;
+  delete [] seedBuff;
   return;
 }
 
 void Model::sqlBargainVote(unsigned int t, vector< tuple<uint64_t, uint64_t>> barginidspair_i_j, vector<double> Vote_mat,unsigned int act_k)
 {
-	// initiate the database
-	sqlite3 * db = smpDB;
+  int Util_mat_row = Vote_mat.size();
 
-	// Error message in case
-	char* zErrMsg = nullptr;
-	auto sqlBuff = newChars(200);
-
-	int Util_mat_row = Vote_mat.size();
-//	int Util_mat_col = Vote_mat[0].size();
-
-	// prepare the sql statement to insert
-	sprintf(sqlBuff,
-		"INSERT INTO BargnVote  (ScenarioId, Turn_t,BargnId_i,  BargnId_j, Act_k, Vote) VALUES ('%s', ?1, ?2, ?3,?4,?5)",scenId.c_str());
-	
-    assert(nullptr != db);
-	const char* insStr = sqlBuff;
-	sqlite3_stmt *insStmt;
-	sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
-	assert(nullptr != insStmt); //make sure it is ready
-
+  // prepare the sql statement to insert
   string sql = string("INSERT INTO BargnVote (ScenarioId, Turn_t, BargnId_i, BargnId_j, Act_k, Vote) VALUES ('")
     + scenId + "', :turn_t, :bargnid_i, :bargnid_j, :act_k, :vote)";
   query.prepare(QString::fromStdString(sql));
 
-    // start for the transaction
-	sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
+  // start for the transaction
   qtDB->transaction();
 
-	for (unsigned int i = 0; i <Util_mat_row ; i++)
-	{
-		tuple<uint64_t, uint64_t> tijids = barginidspair_i_j[i];
-		uint64_t Bargn_i = std::get<0>(tijids);
-		uint64_t Bargn_j = std::get<1>(tijids);
-		
-			int rslt = 0;
-			// Turn_t
-			rslt = sqlite3_bind_int(insStmt, 1, t);
+  for (unsigned int i = 0; i <Util_mat_row ; i++)
+  {
+    tuple<uint64_t, uint64_t> tijids = barginidspair_i_j[i];
+    uint64_t Bargn_i = std::get<0>(tijids);
+    uint64_t Bargn_j = std::get<1>(tijids);
+
+    // Turn_t
     query.bindValue(":turn_t", t);
-      assert(SQLITE_OK == rslt);
-			//Bargn_i
-			rslt = sqlite3_bind_int(insStmt, 2, Bargn_i);
+    //Bargn_i
     query.bindValue(":bargnid_i", (qulonglong)Bargn_i);
-      assert(SQLITE_OK == rslt);
-			//Bargn_j
-			rslt = sqlite3_bind_int(insStmt, 3, Bargn_j);
+    //Bargn_j
     query.bindValue(":bargnid_j", (qulonglong)Bargn_j);
-      assert(SQLITE_OK == rslt);
-			//Act_i
-			rslt = sqlite3_bind_int(insStmt, 4, act_k);
+    //Act_i
     query.bindValue(":act_k", act_k);
-      assert(SQLITE_OK == rslt);
-			//Util
-			rslt = sqlite3_bind_double(insStmt, 5, Vote_mat[i]);
+    //Util
     double voteMat = Vote_mat[i];
     query.bindValue(":vote", voteMat);
-      assert(SQLITE_OK == rslt);
-			// finish  
-			assert(SQLITE_OK == rslt);
-			rslt = sqlite3_step(insStmt);
+    // finish
     if (!query.exec()) {
       LOG(INFO) << query.lastError().text().toStdString();
       assert(false);
     }
-      assert(SQLITE_DONE == rslt);
-			sqlite3_clear_bindings(insStmt);
-			assert(SQLITE_DONE == rslt);
-			rslt = sqlite3_reset(insStmt);
-			assert(SQLITE_OK == rslt);
-	}
-	sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
+  }
   qtDB->commit();
-  sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-
-	delete sqlBuff;
-	sqlBuff = nullptr;
-
-	smpDB = db;
 }
 
 // populates record for table PosProb for each step of
 // module run
 void Model::sqlPosProb(unsigned int t)
 {
-  assert(nullptr != smpDB);
   assert(t < history.size());
   State* st = history[t];
   // check module for null
   assert(nullptr != st);
-  // initiate the database
-  sqlite3 * db = smpDB;
-  smpDB = nullptr;
-  // Error message in case
-  char* zErrMsg = nullptr;
-  auto sqlBuff = newChars(200);
   // prepare the sql statement to insert
-  sprintf(sqlBuff,
-          "INSERT INTO PosProb (ScenarioId, Turn_t, Est_h,Pos_i, Prob) VALUES ('%s', ?1, ?2, ?3, ?4)",
-          scenId.c_str());
-  const char* insStr = sqlBuff;
-
-  assert(nullptr != db);
-  sqlite3_stmt *insStmt;
-  sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
-  assert(nullptr != insStmt); //make sure it is ready
-
   string sql = string("INSERT INTO PosProb (ScenarioId, Turn_t, Est_h,Pos_i, Prob) VALUES ('")
     + scenId + "', :turn_t, :est_h, :pos_i, :prob)";
   query.prepare(QString::fromStdString(sql));
 
   // start for the transaction
-  sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
   qtDB->transaction();
   // collect the information from each estimator,actor
   for (unsigned int h = 0; h < numAct; h++)   // estimator is h
@@ -1184,79 +856,37 @@ void Model::sqlPosProb(unsigned int t)
     // for each actor pupulate the probablity information
     for (unsigned int i = 0; i < numAct; i++)
     {
-      int rslt = 0;
       // Extract the probabity for each actor
       double prob = st->posProb(i, unq, pdt);
-      rslt = sqlite3_bind_int(insStmt, 1, t);
       query.bindValue(":turn_t", t);
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_bind_int(insStmt, 2, h);
       query.bindValue(":est_h", h);
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_bind_int(insStmt, 3, i);
       query.bindValue(":pos_i", i);
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_bind_double(insStmt, 4, prob);
       query.bindValue(":prob", prob);
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_step(insStmt);
       if (!query.exec()) {
         LOG(INFO) << query.lastError().text().toStdString();
         assert(false);
       }
-      assert(SQLITE_DONE == rslt);
-      sqlite3_clear_bindings(insStmt);
-      assert(SQLITE_DONE == rslt);
-      rslt = sqlite3_reset(insStmt);
-      assert(SQLITE_OK == rslt);
     }
   }
-  sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
   qtDB->commit();
-  sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-  //printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
-
-  delete sqlBuff;
-  sqlBuff = nullptr;
-
-  smpDB = db; // give it the new pointer
-
   return;
 }
 // populates record for table PosProb for each step of
 // module run
 void Model::sqlPosVote(unsigned int t)
 {
-  assert(nullptr != smpDB);
   assert(t < history.size());
   State* st = history[t];
 
 
   // check module for null
   assert(nullptr != st);
-  // initiate the database
-  sqlite3 * db = smpDB;
-  smpDB = nullptr;
-  // Error message in case
-  char* zErrMsg = nullptr;
-  auto sqlBuff = newChars(200);
   // prepare the sql statement to insert
-  sprintf(sqlBuff,
-          "INSERT INTO PosVote (ScenarioId, Turn_t, Est_h, Voter_k,Pos_i, Pos_j,Vote) VALUES ('%s', ?1, ?2, ?3, ?4,?5,?6)",
-          scenId.c_str());
-
-  assert(nullptr != db);
-  const char* insStr = sqlBuff;
-  sqlite3_stmt *insStmt;
-  sqlite3_prepare_v2(db, insStr, strlen(insStr), &insStmt, NULL);
-  assert(nullptr != insStmt); //make sure it is ready
-
   string sql = string("INSERT INTO PosVote (ScenarioId, Turn_t, Est_h, Voter_k, Pos_i, Pos_j, Vote) VALUES ('")
     + scenId + "', :turn_t, :est_h, :voter_k, :pos_i, :pos_j, :vote)";
   query.prepare(QString::fromStdString(sql));
 
   // start for the transaction
-  sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
   qtDB->transaction();
   auto vr = VotingRule::Proportional;
   // collect the information from each estimator
@@ -1273,85 +903,46 @@ void Model::sqlPosVote(unsigned int t)
           if (((h == i) || (h == j)) && (i!=j))
           {
             auto vij = rd->vote(h, i, j, st);
-            int rslt = 0;
-            rslt = sqlite3_bind_int(insStmt, 1, t);
             query.bindValue(":turn_t", t);
-            assert(SQLITE_OK == rslt);
-            rslt = sqlite3_bind_int(insStmt, 2, h);
             query.bindValue(":est_h", h);
-            assert(SQLITE_OK == rslt);
             //voter_k
-            rslt = sqlite3_bind_int(insStmt, 3, k);
             query.bindValue(":voter_k", k);
-            assert(SQLITE_OK == rslt);
             // position i
-            rslt = sqlite3_bind_int(insStmt, 4, i);
             query.bindValue(":pos_i", i);
-            assert(SQLITE_OK == rslt);
             //position j
-            rslt = sqlite3_bind_int(insStmt, 5, j);
             query.bindValue(":pos_j", j);
-            assert(SQLITE_OK == rslt);
             // vote ?
-            rslt = sqlite3_bind_double(insStmt, 6, vij);
             query.bindValue(":vote", vij);
-            assert(SQLITE_OK == rslt);
-            rslt = sqlite3_step(insStmt);
             if (!query.exec()) {
               LOG(INFO) << query.lastError().text().toStdString();
               assert(false);
             }
-            assert(SQLITE_DONE == rslt);
-            sqlite3_clear_bindings(insStmt);
-            assert(SQLITE_DONE == rslt);
-            rslt = sqlite3_reset(insStmt);
-            assert(SQLITE_OK == rslt);
           }
         }
       }
     }
   }
-  sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
   qtDB->commit();
-
-  sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-  //printf("Stored SQL for turn %u of all estimators, actors, and positions \n", t);
-
-  delete sqlBuff;
-  sqlBuff = nullptr;
-
-  smpDB = db; // give it the new pointer
 
   return;
 }
 
 void Model::createTableIndices() {
-    char * zErrMsg = nullptr;
     const char * indexUtil = "CREATE INDEX IF NOT EXISTS idx_util ON PosUtil(ScenarioId, Turn_t, Est_h, Act_i, Pos_j)";
-    int rc = sqlite3_exec(smpDB, indexUtil, nullptr, nullptr, &zErrMsg);
-    assert(rc == SQLITE_OK);
     string qry = string(indexUtil);
     execQuery(qry);
 
     const char *indexActor = "CREATE INDEX IF NOT EXISTS idx_actor ON ActorDescription(ScenarioId)";
-    rc = sqlite3_exec(smpDB, indexActor, nullptr, nullptr, &zErrMsg);
-    assert(rc == SQLITE_OK);
     qry = string(indexActor);
     execQuery(qry);
 }
 
 void Model::dropTableIndices() {
-    char * zErrMsg = nullptr;
     const char * indexUtil = "DROP INDEX IF EXISTS idx_util";
-    int rc = sqlite3_exec(smpDB, indexUtil, nullptr, nullptr, &zErrMsg);
     string qry = string(indexUtil);
     execQuery(qry);
 
-    assert(rc == SQLITE_OK);
-
     const char * indexActor = "DROP INDEX IF EXISTS idx_actor";
-    rc = sqlite3_exec(smpDB, indexActor, nullptr, nullptr, &zErrMsg);
-    assert(rc == SQLITE_OK);
     qry = string(indexActor);
     execQuery(qry);
 }

@@ -893,63 +893,13 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
     // record tpvArray into SQLite turn, est (h), init (i), third party (n), receiver (j), and tpvArray[n]
     // printf ("SMPState::probEduChlg(%2i, %2i, %2i, %i2) = %+6.4f - %+6.4f = %+6.4f\n", h, k, i, j, euCh, euSQ, euChlg);
 
-    sqlite3 * db = model->smpDB;
-    char* zErrMsg = nullptr; // Error message in case
-
-    auto sqlBuff = newChars(sqlBuffSize);
-    // prepare the sql statement to insert. as it does not depend on tpk, keep it outside the loop.
-
-    sprintf(sqlBuff,
-            "INSERT INTO TP_Prob_Vict_Loss (ScenarioId, Turn_t, Est_h,Init_i,ThrdP_k,Rcvr_j,Prob,Util_V,Util_L) VALUES ('%s', %u, %u, %u, ?1, %u, ?2, ?3, ?4)",
-            model->getScenarioID().c_str(), turn, h, i, j);
-
-    // The whole point of a prepared statement is to reuse it.
-    // Therefore, we prepare it before the loop, and reuse it inside the loop:
-    // just moving it outside loop cut dummyData_3Dim.csv run time from 30 to 10 seconds
-    // (with Electric Fence).
-    assert(nullptr != db);
-    sqlite3_stmt *insStmt;
-    sqlite3_prepare_v2(db, sqlBuff, strlen(sqlBuff), &insStmt, NULL);
-    assert(nullptr != insStmt); //make sure it is ready
-
-    sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
-
     string thij = std::to_string(turn)
       + "," + std::to_string(h)
       + "," + std::to_string(i)
       + "," + std::to_string(j);
 
-    for (int tpk = 0; tpk < na; tpk++) {  // third party voter, tpk
-      int rslt = 0;
-
-      rslt = sqlite3_bind_int(insStmt, 1, tpk);
-      assert(SQLITE_OK == rslt);
-
-      // bind the data
-      rslt = sqlite3_bind_double(insStmt, 2, tpvArray(tpk, 0));
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_bind_double(insStmt, 3, tpvArray(tpk, 1));
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_bind_double(insStmt, 4, tpvArray(tpk, 2));
-      assert(SQLITE_OK == rslt);
-
-      // actually record it
-      rslt = sqlite3_step(insStmt);
-      assert(SQLITE_DONE == rslt);
-      rslt = sqlite3_clear_bindings(insStmt);
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_reset(insStmt);
-      assert(SQLITE_OK == rslt);
-    }
-
     // formatting note: %d means an integer, base 10
     // we will use base 10 by default, and these happen to be unsigned integers, so %i is appropriate
-
-    memset(sqlBuff, '\0', sqlBuffSize);
-    sprintf(sqlBuff,
-            "INSERT INTO ProbVict (ScenarioId, Turn_t, Est_h,Init_i,Rcvr_j,Prob) VALUES ('%s',%u,%u,%u,%u,%f)",
-            model->getScenarioID().c_str(), turn, h, i, j, phij);
-    sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
 
     string thkij = std::to_string(turn)
       + "," + std::to_string(h)
@@ -969,19 +919,6 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
     tpvData.emplace(thij, tpvArray);
     phijData.emplace(thij, phij);
     utilDataLock.unlock();
-
-    // the following four statements could be combined into one table
-    memset(sqlBuff, '\0', sqlBuffSize);
-    sprintf(sqlBuff,
-            "INSERT INTO UtilChlg (ScenarioId, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util_SQ,Util_Vict,Util_Cntst,Util_Chlg) VALUES ('%s',%u,%u,%u,%u,%u,%f,%f,%f,%f)",
-            model->getScenarioID().c_str(), turn, h, k, i, j, euSQ, euVict, euCntst, euChlg);
-    sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
-
-    sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
-    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-
-    delete sqlBuff;
-    sqlBuff = nullptr;
   }
   return rslt;
 }

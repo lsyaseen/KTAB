@@ -356,29 +356,26 @@ public:
   explicit SMPModel( string desc = "", uint64_t s=KBase::dSeed, vector<bool> f={}, string sceName = ""); // JAH 20160711 added rng seed
   virtual ~SMPModel();
 
-  static string dbPath; //to store db file name from SMPQ GUI, default is testsmp.db
-  static void setDBPath(std::string dbName); // to initialize DB Name to dbPath variable
-
   static const unsigned int maxDimDescLen = 256; // JAH 20160727 added
 
   static double bsUtil(double sd, double R);
   static double bvDiff(const KMatrix & vd, const  KMatrix & vs);
   static double bvUtil(const KMatrix & vd, const  KMatrix & vs, double R);
 
-  static std::string runModel(std::vector<bool> sqlFlags, std::string dbFilePath,
+  static std::string runModel(std::vector<bool> sqlFlags,
       std::string inputDataFile, uint64_t seed, bool saveHist, std::vector<int> modelParams = std::vector<int>());
 
   // this sets up a standard configuration and runs it
   static void configExec(SMPModel * md0);
 
   // read, configure, and run from CSV
-  static string csvReadExec(uint64_t seed, string inputCSV, vector<bool> f, string dbFilePath,
+  static string csvReadExec(uint64_t seed, string inputCSV, vector<bool> f,
                           vector<int> par=vector<int>());
 
   // read, configure, and run from XML
-  static string xmlReadExec(string inputXML, vector<bool> f, string dbFilePath);
+  static string xmlReadExec(string inputXML, vector<bool> f);
 
-  static void randomSMP(unsigned int numA, unsigned int sDim, bool accP, uint64_t s, vector<bool> f, string inputDBname);
+  static void randomSMP(unsigned int numA, unsigned int sDim, bool accP, uint64_t s, vector<bool> f);
 
   static SMPModel * csvRead(string fName, uint64_t s, vector<bool> f);
   static SMPModel * xmlRead(string fName,vector<bool> f);

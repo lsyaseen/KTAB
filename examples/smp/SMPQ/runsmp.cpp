@@ -369,7 +369,7 @@ void MainWindow::runModel(QString conStr, QString fileName)
             SMPLib::SMPModel::loginCredentials(connectDBString.toStdString());
 
             currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
-                                                      (sqlFlags, "filename.db",
+                                                      (sqlFlags,
                                                        xmlPath.toStdString(),seed,false,parameters));
         }
         else
@@ -381,7 +381,7 @@ void MainWindow::runModel(QString conStr, QString fileName)
             SMPLib::SMPModel::loginCredentials(connectDBString.toStdString());
 
             currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
-                                                      (sqlFlags,"filename.db",
+                                                      (sqlFlags,
                                                        csvPath.toStdString(),seed,false,parameters));
         }
 

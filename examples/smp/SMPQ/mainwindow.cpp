@@ -2796,8 +2796,11 @@ void MainWindow::connectionStrPath(QString str)
 {
     connectionString = str;
 
-    turnSlider->setEnabled(false);
-    resetGUI();
+    if(tableType=="Database")
+    {
+        turnSlider->setEnabled(false);
+        resetGUI();
+    }
     if(menuconfig == false)
     {
         runPushButtonClicked(true);
@@ -2891,7 +2894,6 @@ void MainWindow::loadRecentFile(const QString &fileName)
                 useHistory=false;
                 if(!connectionString.contains("QSQLITE"))
                 {
-                    dbObj->addDatabase("QSQLITE");
                     connectionString.clear();
                     connectionString.append("Driver=QSQLITE;");//connectionType
                     connectionString.append("Database=").append("None").append(";");
@@ -2907,7 +2909,6 @@ void MainWindow::loadRecentFile(const QString &fileName)
         {
             useHistory=false;
             recentFileAccess = fileName;
-            dbObj->addDatabase("QPSQL");
             if(!connectionString.contains("QPSQL"))
             {
                 //POSTGRESQL
