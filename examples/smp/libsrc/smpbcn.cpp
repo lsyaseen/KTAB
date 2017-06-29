@@ -203,6 +203,8 @@ SMPState* SMPState::doBCN() {
 
   KBase::groupThreads(thrBCN, 0, na - 1);
 
+  model->beginDBTransaction();
+
   if (model->sqlFlags[2]) {
     recordProbEduChlg();
   }
@@ -230,6 +232,8 @@ SMPState* SMPState::doBCN() {
     }
   }
 
+  //model->commitDBTransaction();
+
   LOG(INFO) << "Bargains to be resolved";
   showBargains(brgns);
 
@@ -245,27 +249,35 @@ SMPState* SMPState::doBCN() {
 
   KBase::groupThreads(thrCalcPosts, 0, na - 1);
 
-  for (auto votes : brgnVotes) {
-    for (auto vote : votes) {
-      model->sqlBargainVote(
-        get<0>(vote), //turn
-        get<1>(vote), //barginIDsPair_i_j
-        get<2>(vote), //pv_ij
-        get<3>(vote)  //actor
+  //model->beginDBTransaction();
+
+  if (model->sqlFlags[3]) {
+    for (auto votes : brgnVotes) {
+      for (auto vote : votes) {
+        model->sqlBargainVote(
+          get<0>(vote), //turn
+          get<1>(vote), //barginIDsPair_i_j
+          get<2>(vote), //pv_ij
+          get<3>(vote)  //actor
+        );
+      }
+    }
+
+    for (auto util : brgnUtils) {
+      model->sqlBargainUtil(
+        get<0>(util), //turn
+        get<1>(util), //bargnIds
+        get<2>(util)  //utilities
       );
     }
   }
 
-  for (auto util : brgnUtils) {
-    model->sqlBargainUtil(
-      get<0>(util), //turn
-      get<1>(util), //bargnIds
-      get<2>(util)  //utilities
-    );
+  // record data so far
+  if (model->sqlFlags[4]) {
+    updateBargnTable(brgns, actorBargains, actorMaxBrgNdx);
   }
 
-  // record data so far
-  updateBargnTable(brgns, actorBargains, actorMaxBrgNdx);
+  model->commitDBTransaction();
 
   // Some bargains are nullptr, and there are two copies of every non-nullptr randomly
   // arranged. If we delete them as we find them, then the second occurance will be corrupted,

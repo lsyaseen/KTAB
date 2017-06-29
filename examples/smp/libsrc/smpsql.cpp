@@ -62,14 +62,14 @@ KTable * SMPModel::createSQL(unsigned int n)  {
   {
     switch (n-Model::NumTables) {
     case  0: // coordinates of each actor's position
-		sql = "create table if not exists VectorPosition ("  \
-			"ScenarioId VARCHAR(32) NOT NULL DEFAULT 'None', "\
-			"Turn_t		INTEGER NOT NULL DEFAULT 0, "\
-			"Act_i		INTEGER NOT NULL DEFAULT 0, "\
-			"Dim_k		INTEGER NOT NULL DEFAULT 0, "\
-			"Pos_Coord		FLOAT NOT NULL DEFAULT 0,"\
-			"Idl_Coord		FLOAT NOT NULL DEFAULT 0, " \
-			"Mover_BargnId	INTEGER NULL DEFAULT 0" \
+        sql = "create table if not exists VectorPosition ("  \
+            "ScenarioId VARCHAR(32) NOT NULL DEFAULT 'None', "\
+            "Turn_t  INTEGER NOT NULL DEFAULT 0, "\
+            "Act_i  INTEGER NOT NULL DEFAULT 0, "\
+            "Dim_k  INTEGER NOT NULL DEFAULT 0, "\
+            "Pos_Coord  FLOAT NOT NULL DEFAULT 0,"\
+            "Idl_Coord  FLOAT NOT NULL DEFAULT 0, " \
+            "Mover_BargnId INTEGER NULL DEFAULT 0" \
       ");";
       name = "VectorPosition";
       grpID = 4;// JAH 20161010 put in group 4 all by itself
@@ -78,10 +78,10 @@ KTable * SMPModel::createSQL(unsigned int n)  {
     case 1: // salience to each actor of each dimension
       sql = "create table if not exists SpatialSalience ("  \
             "ScenarioId VARCHAR(32) NOT NULL DEFAULT 'None', "\
-            "Turn_t		INTEGER NOT NULL DEFAULT 0, "\
-            "Act_i		INTEGER NOT NULL DEFAULT 0, "\
-            "Dim_k		INTEGER NOT NULL DEFAULT 0, "\
-            "Sal		FLOAT NOT NULL DEFAULT 0.0"\
+            "Turn_t  INTEGER NOT NULL DEFAULT 0, "\
+            "Act_i  INTEGER NOT NULL DEFAULT 0, "\
+            "Dim_k  INTEGER NOT NULL DEFAULT 0, "\
+            "Sal  FLOAT NOT NULL DEFAULT 0.0"\
             ");";
       name = "SpatialSalience";
       grpID = 0;
@@ -90,9 +90,9 @@ KTable * SMPModel::createSQL(unsigned int n)  {
     case 2: // scalar capability of each actor
       sql = "create table if not exists SpatialCapability ("  \
             "ScenarioId VARCHAR(32) NOT NULL DEFAULT 'None', "\
-            "Turn_t		INTEGER NOT NULL DEFAULT 0, "\
-            "Act_i		INTEGER NOT NULL DEFAULT 0, "\
-            "Cap		FLOAT NOT NULL DEFAULT 0.0"\
+            "Turn_t  INTEGER NOT NULL DEFAULT 0, "\
+            "Act_i  INTEGER NOT NULL DEFAULT 0, "\
+            "Cap  FLOAT NOT NULL DEFAULT 0.0"\
             ");";
       name = "SpatialCapability";
       grpID = 0;
@@ -104,7 +104,7 @@ KTable * SMPModel::createSQL(unsigned int n)  {
       char *sqlBuff = newChars(500);
       sprintf(sqlBuff, "create table if not exists DimensionDescription ("  \
                        "ScenarioId VARCHAR(32) NOT NULL DEFAULT 'None', "\
-                       "Dim_k	INTEGER NOT NULL DEFAULT 0, "\
+                       "Dim_k INTEGER NOT NULL DEFAULT 0, "\
                        "\"Desc\" VARCHAR(%u) NOT NULL DEFAULT 'NoDesc' "\
                        ");", maxDimDescLen);
       sql = std::string(sqlBuff);
@@ -148,6 +148,8 @@ void SMPModel::sqlTest() {
         LOG(INFO) << "Please check the login credentials, ip address or port number";
         assert(false);
       }
+
+      query = QSqlQuery(*qtDB);
 
       // Check if the database exists
       if (!isDB(databaseName)) {
@@ -396,7 +398,7 @@ void SMPState::updateBargnTable(const vector<vector<BargainSMP*>> & brgns,
   };
 
   // start for the transaction
-  model->beginDBTransaction();
+  //model->beginDBTransaction();
 
   // Update the bargain table for the bargain values for init actor and recd actor
   // along with the info whether a bargain got selected or not in the respective actor's queue
@@ -465,7 +467,7 @@ void SMPState::updateBargnTable(const vector<vector<BargainSMP*>> & brgns,
     }
   }
 
-  model->commitDBTransaction();
+  //model->commitDBTransaction();
 
   return;
 }
@@ -484,7 +486,7 @@ void SMPState::recordProbEduChlg() const {
 
   QSqlQuery query = model->getQuery();
   string qsql;
-  qsql = string("INSERT INTO TP_Prob_Vict_Loss "
+  qsql = string("INSERT INTO TpProbVictLoss "
     "(ScenarioId, Turn_t, Est_h, Init_i, ThrdP_k, Rcvr_j, Prob, Util_V, Util_L) "
     "VALUES ("
     "'") + model->getScenarioID() + "',"
@@ -492,7 +494,7 @@ void SMPState::recordProbEduChlg() const {
 
   query.prepare(QString::fromStdString(qsql));
 
-  model->beginDBTransaction();
+  //model->beginDBTransaction();
   for (auto &tpv : tpvData) {
     auto thij = tpv.first;
     auto tpvArray = tpv.second;
@@ -602,7 +604,7 @@ void SMPState::recordProbEduChlg() const {
     }
   }
 
-  model->commitDBTransaction();
+  //model->commitDBTransaction();
   return;
 }
 

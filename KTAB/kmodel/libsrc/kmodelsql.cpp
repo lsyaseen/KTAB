@@ -54,7 +54,6 @@ void Model::initDBDriver(QString connectionName) {
   }
   QSqlDatabase qdb = QSqlDatabase::addDatabase(dbDriver, connectionName);
   qtDB = new QSqlDatabase(qdb);
-  query = QSqlQuery(*qtDB);
 }
 
 bool Model::connectDB() {
@@ -335,11 +334,11 @@ KTable * Model::createSQL(unsigned int n)
     // the estimated utility to each actor of each other's position
     sql = "create table if not exists PosUtil ("  \
           "ScenarioId VARCHAR(32) NOT NULL DEFAULT 'None', "\
-          "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-          "Est_h	INTEGER NOT NULL DEFAULT 0, "\
-          "Act_i	INTEGER NOT NULL DEFAULT 0, "\
-          "Pos_j	INTEGER NOT NULL DEFAULT 0, "\
-          "Util	FLOAT NOT NULL DEFAULT 0.0"\
+          "Turn_t     INTEGER     NOT NULL DEFAULT 0, "\
+          "Est_h      INTEGER     NOT NULL DEFAULT 0, "\
+          "Act_i      INTEGER     NOT NULL DEFAULT 0, "\
+          "Pos_j      INTEGER     NOT NULL DEFAULT 0, "\
+          "Util       FLOAT       NOT NULL DEFAULT 0.0"\
           ");";
     name = "PosUtil";
     grpID = 4;
@@ -349,12 +348,12 @@ KTable * Model::createSQL(unsigned int n)
     // estimated vote of each actor between each pair of positions
     sql = "create table if not exists PosVote ("  \
           "ScenarioId VARCHAR(32) NOT NULL DEFAULT 'None', "\
-          "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-          "Est_h	INTEGER NOT NULL DEFAULT 0, "\
-          "Voter_k	INTEGER NOT NULL DEFAULT 0, "\
-          "Pos_i	INTEGER NOT NULL DEFAULT 0, "\
-          "Pos_j	INTEGER NOT NULL DEFAULT 0, "\
-          "Vote	FLOAT NOT NULL DEFAULT 0.0"\
+          "Turn_t     INTEGER     NOT NULL DEFAULT 0, "\
+          "Est_h      INTEGER     NOT NULL DEFAULT 0, "\
+          "Voter_k    INTEGER     NOT NULL DEFAULT 0, "\
+          "Pos_i      INTEGER     NOT NULL DEFAULT 0, "\
+          "Pos_j      INTEGER     NOT NULL DEFAULT 0, "\
+          "Vote       FLOAT       NOT NULL DEFAULT 0.0"\
           ");";
     name = "PosVote";
     grpID = 1;
@@ -363,10 +362,10 @@ KTable * Model::createSQL(unsigned int n)
   case 2: // pos-prob table. Note that there may be duplicates, unless we limit it to unique positions
     sql = "create table if not exists PosProb ("  \
           "ScenarioId VARCHAR(32) NOT NULL DEFAULT 'None', "\
-          "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-          "Est_h	INTEGER NOT NULL DEFAULT 0, "\
-          "Pos_i	INTEGER NOT NULL DEFAULT 0, "\
-          "Prob	FLOAT NOT NULL DEFAULT 0.0"\
+          "Turn_t     INTEGER     NOT NULL DEFAULT 0, "\
+          "Est_h      INTEGER     NOT NULL DEFAULT 0, "\
+          "Pos_i      INTEGER     NOT NULL DEFAULT 0, "\
+          "Prob       FLOAT       NOT NULL DEFAULT 0.0"\
           ");";
     name = "PosProb";
     grpID = 1;
@@ -375,9 +374,9 @@ KTable * Model::createSQL(unsigned int n)
   case 3: // pos-equiv table. E(i)= lowest j s.t. Pos(i) ~ Pos(j). if j < i, it is not unique.
     sql = "create table if not exists PosEquiv ("  \
           "ScenarioId VARCHAR(32) NOT NULL DEFAULT 'None', "\
-          "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-          "Pos_i	INTEGER NOT NULL DEFAULT 0, "\
-          "Eqv_j	INTEGER NOT NULL DEFAULT 0 "\
+          "Turn_t     INTEGER     NOT NULL DEFAULT 0, "\
+          "Pos_i      INTEGER     NOT NULL DEFAULT 0, "\
+          "Eqv_j      INTEGER     NOT NULL DEFAULT 0 "\
           ");";
     name = "PosEquiv";
     grpID = 1;
@@ -393,15 +392,15 @@ KTable * Model::createSQL(unsigned int n)
     // UtilTPVict, UtilTPLoss are comparable, i.e. the differences are meaningful
     sql = "create table if not exists UtilChlg ("  \
           "ScenarioId VARCHAR(32) NOT NULL DEFAULT 'none', "\
-          "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-          "Est_h	INTEGER NOT NULL DEFAULT 0, "\
-          "Aff_k	INTEGER NOT NULL DEFAULT 0, "\
-          "Init_i	INTEGER NOT NULL DEFAULT 0, "\
-          "Rcvr_j	INTEGER NOT NULL DEFAULT 0, "\
-          "Util_SQ	  FLOAT    NOT NULL DEFAULT 0, "\
-          "Util_Vict	FLOAT    NOT NULL DEFAULT 0, "\
-          "Util_Cntst	FLOAT    NOT NULL DEFAULT 0, "\
-          "Util_Chlg	FLOAT    NOT NULL DEFAULT 0  "\
+          "Turn_t     INTEGER     NOT NULL DEFAULT 0, "\
+          "Est_h      INTEGER     NOT NULL DEFAULT 0, "\
+          "Aff_k      INTEGER     NOT NULL DEFAULT 0, "\
+          "Init_i     INTEGER     NOT NULL DEFAULT 0, "\
+          "Rcvr_j     INTEGER     NOT NULL DEFAULT 0, "\
+          "Util_SQ    FLOAT       NOT NULL DEFAULT 0, "\
+          "Util_Vict  FLOAT       NOT NULL DEFAULT 0, "\
+          "Util_Cntst FLOAT       NOT NULL DEFAULT 0, "\
+          "Util_Chlg  FLOAT       NOT NULL DEFAULT 0  "\
           ");";
     name = "UtilChlg";
     grpID = 2;
@@ -412,11 +411,11 @@ KTable * Model::createSQL(unsigned int n)
     // P{^h}( i > j )
     sql = "create table if not exists ProbVict ("  \
           "ScenarioId VARCHAR(32) NOT NULL DEFAULT 'None', "\
-          "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-          "Est_h	INTEGER NOT NULL DEFAULT 0, "\
-          "Init_i	INTEGER NOT NULL DEFAULT 0, "\
-          "Rcvr_j	INTEGER NOT NULL DEFAULT 0, "\
-          "Prob	FLOAT NOT NULL DEFAULT 0"\
+          "Turn_t     INTEGER     NOT NULL DEFAULT 0, "\
+          "Est_h      INTEGER     NOT NULL DEFAULT 0, "\
+          "Init_i     INTEGER     NOT NULL DEFAULT 0, "\
+          "Rcvr_j     INTEGER     NOT NULL DEFAULT 0, "\
+          "Prob       FLOAT       NOT NULL DEFAULT 0"\
           ");";
     name = "PosVict";
     grpID = 2;
@@ -427,18 +426,18 @@ KTable * Model::createSQL(unsigned int n)
     // P{^h}( ik > j )      probability ik defeats j,
     // U{^h}{_k} (ik > j)   utility to k of winning with i, over j
     // U{^h}{_k} (i > jk)   utility to k of losing to i, with j
-    sql = "create table if not exists TP_Prob_Vict_Loss ("  \
+    sql = "create table if not exists TpProbVictLoss ("  \
           "ScenarioId VARCHAR(32) NOT NULL DEFAULT 'None', "\
-          "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-          "Est_h	INTEGER NOT NULL DEFAULT 0, "\
-          "Init_i	INTEGER NOT NULL DEFAULT 0, "\
-          "ThrdP_k	INTEGER NOT NULL DEFAULT 0, "\
-          "Rcvr_j	INTEGER NOT NULL DEFAULT 0, "\
-          "Prob	FLOAT    NOT NULL DEFAULT 0, "\
-          "Util_V	FLOAT    NOT NULL DEFAULT 0, "\
-          "Util_L	FLOAT    NOT NULL DEFAULT 0  "\
+          "Turn_t     INTEGER     NOT NULL DEFAULT 0, "\
+          "Est_h      INTEGER     NOT NULL DEFAULT 0, "\
+          "Init_i     INTEGER     NOT NULL DEFAULT 0, "\
+          "ThrdP_k    INTEGER     NOT NULL DEFAULT 0, "\
+          "Rcvr_j     INTEGER     NOT NULL DEFAULT 0, "\
+          "Prob       FLOAT       NOT NULL DEFAULT 0, "\
+          "Util_V     FLOAT       NOT NULL DEFAULT 0, "\
+          "Util_L     FLOAT       NOT NULL DEFAULT 0  "\
           ");";
-    name = "TP_Prob_Vict_Loss";
+    name = "TpProbVictLoss";
     grpID = 2;
     break;
 
@@ -447,9 +446,9 @@ KTable * Model::createSQL(unsigned int n)
     char *sqlBuff = newChars(500);
     sprintf(sqlBuff, "create table if not exists ActorDescription ("  \
                      "ScenarioId VARCHAR(32) NOT NULL DEFAULT 'None', "\
-                     "Act_i	INTEGER NOT NULL DEFAULT 0, "\
-                     "Name	VARCHAR(%u) NOT NULL DEFAULT 'NoName', "\
-                     "\"Desc\"	VARCHAR(%u) NOT NULL DEFAULT 'NoName' "\
+                     "Act_i      INTEGER NOT NULL DEFAULT 0, "\
+                     "Name       VARCHAR(%u) NOT NULL DEFAULT 'NoName', "\
+                     "\"Desc\"   VARCHAR(%u) NOT NULL DEFAULT 'NoName' "\
                      ");", maxActNameLen, maxActDescLen);
     sql = std::string(sqlBuff);
     delete sqlBuff;
@@ -462,15 +461,15 @@ KTable * Model::createSQL(unsigned int n)
   case 8: // Bargain table
     sql = "create table if not exists Bargn ("  \
           "ScenarioId VARCHAR(32) NOT NULL DEFAULT 'None', "\
-          "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
+          "Turn_t INTEGER NOT NULL DEFAULT 0, "\
           "BargnId INTEGER NOT NULL DEFAULT 0, "\
           "Init_Act_i INTEGER NOT NULL DEFAULT 0, "\
           "Recd_Act_j INTEGER NOT NULL DEFAULT 0, "\
           "Value FLOAT NOT NULL DEFAULT 0.0, "\
           "Init_Prob FLOAT NULL DEFAULT 0, "\
-          "Init_Seld	INTEGER NULL ,"\
+          "Init_Seld INTEGER NULL ,"\
           "Recd_Prob FLOAT NULL DEFAULT 0, "\
-          "Recd_Seld	INTEGER NULL, "\
+          "Recd_Seld INTEGER NULL, "\
           "CHECK (Init_Seld in (0,1) AND Recd_Seld in (0,1))"\
           ");";
     name = "Bargn";
@@ -480,11 +479,11 @@ KTable * Model::createSQL(unsigned int n)
     // BargnCoords table
     sql = "create table if not exists BargnCoords ("  \
           "ScenarioId VARCHAR(32) NOT NULL DEFAULT 'None', "\
-          "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
+          "Turn_t INTEGER NOT NULL DEFAULT 0, "\
           "BargnId INTEGER NOT NULL DEFAULT 0, "\
           "Dim_k INTEGER NOT NULL DEFAULT 0, "\
-          "Init_Coord	FLOAT NULL DEFAULT 0.0,"\
-          "Recd_Coord	FLOAT NOT NULL DEFAULT 0.0"\
+          "Init_Coord FLOAT NULL DEFAULT 0.0,"\
+          "Recd_Coord FLOAT NOT NULL DEFAULT 0.0"\
           ");";
     name = "BargnCoords";
     grpID = 3;
@@ -493,10 +492,10 @@ KTable * Model::createSQL(unsigned int n)
   case 10:  // BargnUtil table creation
     sql = "create table if not exists BargnUtil ("  \
           "ScenarioId VARCHAR(32) NOT NULL DEFAULT 'None', "\
-          "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
-          "BargnId    INTEGER NOT NULL	DEFAULT 0, "\
-          "Act_i 	INTEGER NOT NULL DEFAULT 0, "\
-          "Util	FLOAT NOT NULL DEFAULT 0.0"\
+          "Turn_t INTEGER NOT NULL DEFAULT 0, "\
+          "BargnId    INTEGER NOT NULL DEFAULT 0, "\
+          "Act_i  INTEGER NOT NULL DEFAULT 0, "\
+          "Util FLOAT NOT NULL DEFAULT 0.0"\
           ");";
     name = "BargnUtil";
     grpID = 3;
@@ -507,11 +506,11 @@ KTable * Model::createSQL(unsigned int n)
     // of each actor between each pair of competing bargains
     sql = "create table if not exists BargnVote ("  \
           "ScenarioId VARCHAR(32) NOT NULL DEFAULT 'None', "\
-          "Turn_t	INTEGER NOT NULL DEFAULT 0, "\
+          "Turn_t INTEGER NOT NULL DEFAULT 0, "\
           "BargnId_i  INTEGER NOT NULL DEFAULT 0, "\
           "BargnId_j INTEGER NOT NULL DEFAULT 0, "\
-          "Act_k 	INTEGER NOT NULL DEFAULT 0, "\
-          "Vote	FLOAT NOT NULL DEFAULT 0.0"\
+          "Act_k  INTEGER NOT NULL DEFAULT 0, "\
+          "Vote FLOAT NOT NULL DEFAULT 0.0"\
           ");";
     name = "BargnVote";
     grpID = 3;
@@ -642,7 +641,7 @@ void Model::sqlBargainEntries(unsigned int t, int bargainId, int initiator, int 
   query.prepare(QString::fromStdString(sql));
 
   // start for the transaction
-  qtDB->transaction();
+  //qtDB->transaction();
 
   // Turn_t
   query.bindValue(":turn_t", t);
@@ -658,7 +657,7 @@ void Model::sqlBargainEntries(unsigned int t, int bargainId, int initiator, int 
     LOG(INFO) << query.lastError().text().toStdString();
     assert(false);
   }
-  qtDB->commit();
+  //qtDB->commit();
 }
 
 
@@ -674,7 +673,7 @@ void Model::sqlBargainCoords(unsigned int t, int bargnID, const KBase::VctrPstn 
   query.prepare(QString::fromStdString(sql));
 
   // start for the transaction
-  qtDB->transaction();
+  //qtDB->transaction();
 
   for (int k = 0; k < nDim; k++)
   {
@@ -697,7 +696,7 @@ void Model::sqlBargainCoords(unsigned int t, int bargnID, const KBase::VctrPstn 
     }
   }
 
-  qtDB->commit();
+  //qtDB->commit();
 }
 
 
@@ -714,7 +713,7 @@ void Model::sqlBargainUtil(unsigned int t, vector<uint64_t> bargnIds,  KBase::KM
 
   query.prepare(QString::fromStdString(sql));
   // start for the transaction
-  qtDB->transaction();
+  //qtDB->transaction();
   uint64_t Bargn_i = 0;
   for (unsigned int i = 0; i < Util_mat_row; i++)
   {
@@ -737,7 +736,7 @@ void Model::sqlBargainUtil(unsigned int t, vector<uint64_t> bargnIds,  KBase::KM
     }
   }
 
-  qtDB->commit();
+  //qtDB->commit();
 }
 
 // JAH 20160731 added this function in replacement to the separate
@@ -802,7 +801,7 @@ void Model::sqlBargainVote(unsigned int t, vector< tuple<uint64_t, uint64_t>> ba
   query.prepare(QString::fromStdString(sql));
 
   // start for the transaction
-  qtDB->transaction();
+  //qtDB->transaction();
 
   for (unsigned int i = 0; i <Util_mat_row ; i++)
   {
@@ -827,7 +826,7 @@ void Model::sqlBargainVote(unsigned int t, vector< tuple<uint64_t, uint64_t>> ba
       assert(false);
     }
   }
-  qtDB->commit();
+  //qtDB->commit();
 }
 
 // populates record for table PosProb for each step of
