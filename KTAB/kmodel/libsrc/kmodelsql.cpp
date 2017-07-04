@@ -63,6 +63,7 @@ bool Model::connectDB() {
 void Model::closeDB()
 {
   if(qtDB != nullptr && qtDB->isValid() && qtDB->isOpen()) {
+      query.clear();
       qtDB->close();
   }
 }

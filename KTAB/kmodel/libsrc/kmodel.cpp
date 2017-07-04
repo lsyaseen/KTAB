@@ -166,11 +166,10 @@ Model::~Model() {
   if (nullptr != qtDB && qtDB->isValid()) {
     // Note: It is necessary to free the resources held by query object
     // Else the removeDatabase() method causes segmentation fault
-    query.finish();
-    query.clear();
     QString connName = qtDB->connectionName();
     if(qtDB->open()) {
-        qtDB->close();
+      query.clear();
+      qtDB->close();
     }
     delete qtDB;
     qtDB = nullptr;
