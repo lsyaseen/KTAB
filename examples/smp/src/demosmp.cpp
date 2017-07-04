@@ -70,13 +70,8 @@ std::string GenerateDBNameWithTimeStamp()
 }
 
 int main(int ac, char **av) {
-  // Set logging configuration from a file
-  el::Configurations confFromFile("./smpc-logger.conf");
-  el::Loggers::reconfigureAllLoggers(confFromFile);
-
   using std::string;
   using KBase::dSeed;
-  auto sTime = KBase::displayProgramStart(DemoSMP::appName, DemoSMP::appVersion);
   uint64_t seed = -1;
   bool run = true;
   bool euSmpP = false;
@@ -93,19 +88,18 @@ int main(int ac, char **av) {
   auto showHelp = []() {
     printf("\n");
     printf("Usage: specify one or more of these options\n");
-    printf("--help                  print this message\n");
-    printf("--euSMP                 exp. util. of spatial model of politics\n");
-    printf("--ra                    randomize the adjustment of ideal points with euSMP \n");
-    printf("--csv <f>               read a scenario from CSV \n");
-    printf("--xml <f>               read a scenario from XML \n");
-    printf("--logmin                log only scenario information + position histories\n");
-    printf("--savehist              export by-dim by-turn position histories (input+'_posLog.csv') and\n");
-    printf("                        by-dim actor effective powers (input+'_effPower.csv')\n");
-    printf("--seed <n>              set a 64bit seed\n");
-    printf("                        0 means truly random\n");
-    printf("                        default: %020llu \n", dSeed);
-    printf("--connstr               a comma separated string for database server credentials\n");
-    printf("Driver=<QPSQL|QSQLITE>;Server=<IP>;[Port=<port>];Database=<DB_name>;Uid=<user_id>;Pwd=<password>");
+    printf("--help           print this message\n");
+    printf("--euSMP          exp. util. of spatial model of politics\n");
+    printf("--ra             randomize the adjustment of ideal points with euSMP \n");
+    printf("--csv <f>        read a scenario from CSV\n");
+    printf("--xml <f>        read a scenario from XML\n");
+    printf("--logmin         log only scenario information + position histories\n");
+    printf("--savehist       export by-dim by-turn position histories (input+'_posLog.csv') and\n");
+    printf("                 by-dim actor effective powers (input+'_effPower.csv')\n");
+    printf("--seed <n>       set a 64bit seed; default is %020llu; 0 means truly random\n", dSeed);
+    printf("--connstr        a comma separated string for database server credentials:\n");
+    printf("                 Driver=<QPSQL|QSQLITE>;Server=<IP>;[Port=<port>];Database=<DB_name>;\n");
+    printf("                 Uid=<user_id>;Pwd=<password>\n");
   };
 
   if (ac > 1) {
@@ -186,6 +180,11 @@ int main(int ac, char **av) {
     return 0;
   }
 
+  // Set logging configuration from a file
+  el::Configurations confFromFile("./smpc-logger.conf");
+  el::Loggers::reconfigureAllLoggers(confFromFile);
+
+  auto sTime = KBase::displayProgramStart(DemoSMP::appName, DemoSMP::appVersion);
   if (0 == seed) {
     PRNG * rng = new PRNG();
     seed = rng->setSeed(seed); // 0 == get a random number
