@@ -17,13 +17,13 @@ class DatabaseDialog : public QDialog
 public:
     explicit DatabaseDialog(QWidget *parent = 0);
     ~DatabaseDialog();
-    bool showDialog(quint8 indx);
+    bool showDialog(quint8 indx, QStringList paraMem);
 
 private:
     Ui::DatabaseDialog *ui;
     QString dbFilePath;
 signals:
-    void connectionStringPath(QString conStr);
+    void connectionStringPath(QString conStr, QStringList paraMemory = QStringList());
     void configDbDriver(QString dbDriver);
 
 private slots :

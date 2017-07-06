@@ -94,8 +94,8 @@ void MainWindow::configureDB(bool bl)
     }
     dbDialog = new DatabaseDialog;
 //    connect(dbDialog,SIGNAL(configDbDriver(QString)),dbObj,SLOT(addDatabase(QString)));
-    connect(dbDialog,SIGNAL(connectionStringPath(QString)),this,SLOT(connectionStrPath(QString)));
-    dbDialog->showDialog(conTypeIndex);
+    connect(dbDialog,SIGNAL(connectionStringPath(QString,QStringList)),this,SLOT(connectionStrPath(QString,QStringList)));
+    dbDialog->showDialog(conTypeIndex,dbParaMemory);
 }
 
 void MainWindow::postgresDBList(QStringList *dbList, bool imp)

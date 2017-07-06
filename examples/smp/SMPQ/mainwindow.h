@@ -619,13 +619,14 @@ private :
     bool menuconfig;
     QString recentFileAccess;
     bool importedDBFile;
+    QStringList dbParaMemory;
 
     void postgresRecentAccess();
     void removeFromRecentFileHistory(QString fileName);
     void resetGUI();
 
 private slots:
-    void connectionStrPath(QString str);
+    void connectionStrPath(QString str, QStringList paraMem);
     void configureDB(bool bl);
     void postgresDBList(QStringList* dbList, bool imp);
     void dbListClicked(QModelIndex indx);

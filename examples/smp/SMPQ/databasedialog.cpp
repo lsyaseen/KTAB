@@ -21,9 +21,31 @@ DatabaseDialog::~DatabaseDialog()
     delete ui;
 }
 
-bool DatabaseDialog::showDialog(quint8 indx)
+bool DatabaseDialog::showDialog(quint8 indx, QStringList paraMem)
 {
     this->show();
+    if(!paraMem.isEmpty())
+    {
+        if(!QString(paraMem.at(0)).isEmpty())
+        {
+            ui->usernameLineEdit->setText(paraMem.at(0));
+        }
+
+        if(!QString(paraMem.at(1)).isEmpty())
+        {
+            ui->postgreDBLineEdit->setText(paraMem.at(1));
+        }
+
+        if(!QString(paraMem.at(2)).isEmpty())
+        {
+            ui->ipLineEdit->setText(paraMem.at(2));
+        }
+
+        if(!QString(paraMem.at(3)).isEmpty())
+        {
+            ui->portLineEdit->setText(paraMem.at(3));
+        }
+    }
     ui->stackedWidget->setCurrentIndex(0);
     ui->sqlComboBox->setCurrentIndex(indx);
     return false;
@@ -49,13 +71,13 @@ void DatabaseDialog::on_sqliteDonePushButton_clicked()
     connectionSring.append("Database=").append("None").append(";");
 
     this->close();
-//    emit configDbDriver(QString("QSQLITE"));
     emit connectionStringPath(connectionSring);
 
 }
 
 void DatabaseDialog::on_postgrePushButton_clicked()
 {
+    QStringList parametersMemory;
     bool status = true;
     QString connectionSring;
     connectionSring.append("Driver=QPSQL;");//connectionType
@@ -64,13 +86,16 @@ void DatabaseDialog::on_postgrePushButton_clicked()
 
     if(!ui->usernameLineEdit->text().trimmed().isEmpty())
     {
+        parametersMemory.append(ui->usernameLineEdit->text().trimmed());
         connectionSring.append("Uid=").append(ui->usernameLineEdit->text()).append(";");
     }
     else
     {
+        parametersMemory.clear();
         status=false;
         QMessageBox::warning(this,"Database Configuration","Please enter the Username "); // username
     }
+    parametersMemory.append(ui->postgreDBLineEdit->text().trimmed());
 
     if(!ui->passwordLineEdit->text().trimmed().isEmpty())
     {
@@ -78,6 +103,7 @@ void DatabaseDialog::on_postgrePushButton_clicked()
     }
     else
     {
+        parametersMemory.clear();
         status=false;
         QMessageBox::warning(this,"Database Configuration","Please enter the Password ");
     }
@@ -85,22 +111,29 @@ void DatabaseDialog::on_postgrePushButton_clicked()
     if(!ui->ipLineEdit->text().trimmed().isEmpty())
     {
         connectionSring.append("Server=").append(ui->ipLineEdit->text()).append(";");  //host address
+        parametersMemory.append(ui->ipLineEdit->text().trimmed());
+
     }
     else
     {
+        parametersMemory.clear();
         status=false;
         QMessageBox::warning(this,"Database Configuration","Please fill Database Server Address");
     }
     if(!ui->portLineEdit->text().trimmed().isEmpty())
     {
         connectionSring.append("Port=").append(ui->portLineEdit->text()).append(";");  //port address, optional
+        parametersMemory.append(ui->portLineEdit->text().trimmed());
+    }
+    else
+    {
+        parametersMemory.append("5432");
     }
 
     if(status==true)
     {
         this->close();
-//        emit configDbDriver(QString("QPSQL"));
-        emit connectionStringPath(connectionSring);
+        emit connectionStringPath(connectionSring,parametersMemory);
     }
 }
 

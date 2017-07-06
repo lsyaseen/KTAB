@@ -167,7 +167,7 @@ Model::~Model() {
     // Note: It is necessary to free the resources held by query object
     // Else the removeDatabase() method causes segmentation fault
     QString connName = qtDB->connectionName();
-    if(qtDB->open()) {
+    if(qtDB->isOpen()) {
       query.clear();
       qtDB->close();
     }

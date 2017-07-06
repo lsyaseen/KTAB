@@ -2792,10 +2792,13 @@ void MainWindow::resetGUI()
 
 }
 
-void MainWindow::connectionStrPath(QString str)
+void MainWindow::connectionStrPath(QString str,QStringList paraMem)
 {
     connectionString = str;
-
+    if(!paraMem.isEmpty())
+    {
+        dbParaMemory = paraMem;
+    }
     if(tableType=="Database")
     {
         turnSlider->setEnabled(false);
