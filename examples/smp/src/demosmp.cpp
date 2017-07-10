@@ -29,6 +29,7 @@
 #include "demosmp.h"
 #include <functional>
 #include <easylogging++.h>
+#include <QApplication>
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -179,6 +180,8 @@ int main(int ac, char **av) {
     showHelp();
     return 0;
   }
+
+  QCoreApplication::addLibraryPath("./plugins");
 
   // Set logging configuration from a file
   el::Configurations confFromFile("./smpc-logger.conf");

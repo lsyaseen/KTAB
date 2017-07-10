@@ -172,6 +172,7 @@ add_executable (smpc
 
 target_link_libraries (smpc
   smp
+  Qt5::Widgets
   ${KMODEL_LIBRARY}
   ${KUTILS_LIBRARY}
   ${SQLITE_LIBRARIES}
