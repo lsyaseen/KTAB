@@ -418,6 +418,7 @@ void MainWindow::barGraphActorsSalienceCapability(QVector<int> aId, QVector<doub
             QCPBars * bar = nullptr;
             double barHeight = 0;
 
+            QVector <QVector <double> > values ;
             range<< ((r1+r2)/2);
 
             prevBar = bar;

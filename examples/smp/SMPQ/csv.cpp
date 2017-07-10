@@ -136,7 +136,7 @@ void CSV::exportActorColors(QString path, QVector<int> actorIds, QVector<QString
             strList << QString::number(actorIds.at(row));
             strList << colorCode.at(row);
             data << strList.join(",") + "\n";
-            qDebug() << strList;
+//            qDebug() << strList;
         }
         f.close();
     }
@@ -179,7 +179,7 @@ void CSV::importActorColors(QString path, int actCount)
             }
             file.close();
         }
-        qDebug()<<colorCodeList.length() << actCount;
+//        qDebug()<<colorCodeList.length() << actCount;
 
         emit(importedColors(colorCodeList));
 

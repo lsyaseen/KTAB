@@ -26,6 +26,9 @@
 // --------------------------------------------
 
 #include "smp.h"
+#include <QSqlQuery>
+#include <QVariant>
+#include <QSqlError>
 
 namespace SMPLib {
 using std::function;
@@ -200,6 +203,37 @@ SMPState* SMPState::doBCN() {
 
   KBase::groupThreads(thrBCN, 0, na - 1);
 
+  model->beginDBTransaction();
+
+  if (model->sqlFlags[2]) {
+    recordProbEduChlg();
+  }
+
+  if (model->sqlFlags[3]) {
+    for (auto brgnCoord : brgnCos) {
+      model->sqlBargainCoords(
+        get<0>(brgnCoord), //turn
+        get<1>(brgnCoord), //bargnId
+        get<2>(brgnCoord), //posInit
+        get<3>(brgnCoord)  //posRcvr
+      );
+    }
+  }
+
+  if (model->sqlFlags[4]) {
+    for (auto brgnVal : brgnVals) {
+      model->sqlBargainEntries(
+        get<0>(brgnVal), //turn
+        get<1>(brgnVal), //bargnId
+        get<2>(brgnVal), //initiator
+        get<3>(brgnVal), //receiver
+        get<4>(brgnVal)  //value
+      );
+    }
+  }
+
+  //model->commitDBTransaction();
+
   LOG(INFO) << "Bargains to be resolved";
   showBargains(brgns);
 
@@ -215,8 +249,35 @@ SMPState* SMPState::doBCN() {
 
   KBase::groupThreads(thrCalcPosts, 0, na - 1);
 
+  //model->beginDBTransaction();
+
+  if (model->sqlFlags[3]) {
+    for (auto votes : brgnVotes) {
+      for (auto vote : votes) {
+        model->sqlBargainVote(
+          get<0>(vote), //turn
+          get<1>(vote), //barginIDsPair_i_j
+          get<2>(vote), //pv_ij
+          get<3>(vote)  //actor
+        );
+      }
+    }
+
+    for (auto util : brgnUtils) {
+      model->sqlBargainUtil(
+        get<0>(util), //turn
+        get<1>(util), //bargnIds
+        get<2>(util)  //utilities
+      );
+    }
+  }
+
   // record data so far
-  updateBargnTable(brgns, actorBargains, actorMaxBrgNdx);
+  if (model->sqlFlags[4]) {
+    updateBargnTable(brgns, actorBargains, actorMaxBrgNdx);
+  }
+
+  model->commitDBTransaction();
 
   // Some bargains are nullptr, and there are two copies of every non-nullptr randomly
   // arranged. If we delete them as we find them, then the second occurance will be corrupted,
@@ -297,7 +358,9 @@ void SMPState::doBCN(unsigned int i) {
 
     if (model->sqlFlags[grpID])
     {
-      model->sqlBargainEntries(turn, sqBrgnI->getID(), i, i, 0);
+      brgnValsLock.lock();
+      brgnVals.push_back(BrgnValue(turn, sqBrgnI->getID(), i, i, 0));
+      brgnValsLock.unlock();
     }
 
     eduChlgsI eduI = bestChallengeUtils(i);
@@ -322,9 +385,6 @@ void SMPState::doBCN(unsigned int i) {
         auto est = probEduChlg(h, k, i, j, recordTmpSQLP); // H's estimate of the effect on K of I->J
         double phij = get<0>(est);
         double edu_hk_ij = get<1>(est);
-        //LOG(INFO) << KBase::getFormattedString(
-        //  "Est by %2u of prob %.4f that [%2u>%2u], with expected gain to %2u of %+.4f",
-        //  h, phij, i, j, k, edu_hk_ij);
         return est;
       };
 
@@ -442,11 +502,15 @@ void SMPState::doBCN(unsigned int i) {
         // record the only one used into SQLite JAH 20160802 use the flag
         if(model->sqlFlags[grpID])
         {
-          model->sqlBargainEntries(turn, brgnIIJ->getID(), i, j, bestEU);
+          brgnValsLock.lock();
+          brgnVals.push_back(BrgnValue(turn, brgnIIJ->getID(), i, j, bestEU));
+          brgnValsLock.unlock();
         }
         if(model->sqlFlags[3])
         {          
-          model->sqlBargainCoords(turn, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr);
+          brgnCosLock.lock();
+          brgnCos.push_back(BrgnCoord(turn, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr));
+          brgnCosLock.unlock();
         }
         // record this one onto BOTH the initiator and receiver queues
         brgnsLock.lock();
@@ -465,13 +529,17 @@ void SMPState::doBCN(unsigned int i) {
         // record the pair used into SQLite JAH 20160802 use the flag
         if(model->sqlFlags[grpID])
         {
-          model->sqlBargainEntries(turn, brgnIIJ->getID(), i, j, bestEU);
-          model->sqlBargainEntries(turn, brgnJIJ->getID(), i, j, bestEU);
+          brgnValsLock.lock();
+          brgnVals.push_back(BrgnValue(turn, brgnIIJ->getID(), i, j, bestEU));
+          brgnVals.push_back(BrgnValue(turn, brgnJIJ->getID(), i, j, bestEU));
+          brgnValsLock.unlock();
         }
         if(model->sqlFlags[3])
         {
-          model->sqlBargainCoords(turn, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr);
-          model->sqlBargainCoords(turn, brgnJIJ->getID(), brgnJIJ->posInit, brgnJIJ->posRcvr);
+          brgnCosLock.lock();
+          brgnCos.push_back(BrgnCoord(turn, brgnIIJ->getID(), brgnIIJ->posInit, brgnIIJ->posRcvr));
+          brgnCos.push_back(BrgnCoord(turn, brgnJIJ->getID(), brgnJIJ->posInit, brgnJIJ->posRcvr));
+          brgnCosLock.unlock();
         }
         // record these both onto BOTH the initiator and receiver queues
         brgnsLock.lock();
@@ -490,11 +558,15 @@ void SMPState::doBCN(unsigned int i) {
         // record the only one used into SQLite JAH 20160802 use the flag
         if(model->sqlFlags[grpID])
         {
-          model->sqlBargainEntries(turn, brgnIJ->getID(), i, j, bestEU);
+          brgnValsLock.lock();
+          brgnVals.push_back(BrgnValue(turn, brgnIJ->getID(), i, j, bestEU));
+          brgnValsLock.unlock();
         }
         if(model->sqlFlags[3])
         {
-          model->sqlBargainCoords(turn, brgnIJ->getID(), brgnIJ->posInit, brgnIJ->posRcvr);
+          brgnCosLock.lock();
+          brgnCos.push_back(BrgnCoord(turn, brgnIJ->getID(), brgnIJ->posInit, brgnIJ->posRcvr));
+          brgnCosLock.unlock();
         }
         // record this one onto BOTH the initiator and receiver queues
         brgnsLock.lock();
@@ -621,30 +693,34 @@ void SMPState::updateBestBrgnPositions(int k) {
 
     //populate the Bargain Vote & Util tables
     // JAH added sql flag logging control
-	if (model->sqlFlags[3])
-	{
-		auto brgns_k = brgns[k];
-		vector< std::tuple<uint64_t, uint64_t>> barginIDsPair_i_j;
-		vector<uint64_t> bargnIdsRows = {};
-		for (int j = 0; j < nb; j++)
-		{
-			bargnIdsRows.push_back(brgns[k][j]->getID());
-		}
-		for (unsigned int brgnFirst = 0; brgnFirst < nb; brgnFirst++)
-		{
-			for (unsigned int brgnSecond = 0; brgnSecond < brgnFirst; brgnSecond++)
-			{
-				barginIDsPair_i_j.push_back(tuple<uint64_t, uint64_t>(brgns_k[brgnFirst]->getID(), brgns_k[brgnSecond]->getID()));
-			}
-		}
+  if (model->sqlFlags[3])
+  {
+    auto brgns_k = brgns[k];
+    vector< std::tuple<uint64_t, uint64_t>> barginIDsPair_i_j;
+    vector<uint64_t> bargnIdsRows = {};
+    for (int j = 0; j < nb; j++)
+    {
+      bargnIdsRows.push_back(brgns[k][j]->getID());
+    }
+    for (unsigned int brgnFirst = 0; brgnFirst < nb; brgnFirst++)
+    {
+      for (unsigned int brgnSecond = 0; brgnSecond < brgnFirst; brgnSecond++)
+      {
+        barginIDsPair_i_j.push_back(tuple<uint64_t, uint64_t>(brgns_k[brgnFirst]->getID(), brgns_k[brgnSecond]->getID()));
+      }
+    }
 
-		for (unsigned int actor = 0; actor < na; ++actor) {
-			auto pv_ij = calcVotes(w, u_im, actor);
+    BrgnVotes votes;
+    for (unsigned int actor = 0; actor < na; ++actor) {
+      auto pv_ij = calcVotes(w, u_im, actor);
 
-			model->sqlBargainVote(turn, barginIDsPair_i_j, pv_ij, actor);
-		}
-		model->sqlBargainUtil(turn, bargnIdsRows, u_im);
-	}
+      votes.push_back(BrgnVote(turn, barginIDsPair_i_j, pv_ij, actor));
+    }
+    brgnPosLock.lock();
+    brgnVotes.push_back(votes);
+    brgnUtils.push_back(BrgnUtil(turn, bargnIdsRows, u_im));
+    brgnPosLock.unlock();
+  }
 
     // TODO: create a fresh position for k, from the selected bargain mMax.
     VctrPstn * pk = nullptr;
@@ -829,72 +905,32 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
     // record tpvArray into SQLite turn, est (h), init (i), third party (n), receiver (j), and tpvArray[n]
     // printf ("SMPState::probEduChlg(%2i, %2i, %2i, %i2) = %+6.4f - %+6.4f = %+6.4f\n", h, k, i, j, euCh, euSQ, euChlg);
 
-    sqlite3 * db = model->smpDB;
-    char* zErrMsg = nullptr; // Error message in case
-
-    auto sqlBuff = newChars(sqlBuffSize);
-    // prepare the sql statement to insert. as it does not depend on tpk, keep it outside the loop.
-
-    sprintf(sqlBuff,
-            "INSERT INTO TP_Prob_Vict_Loss (ScenarioId, Turn_t, Est_h,Init_i,ThrdP_k,Rcvr_j,Prob,Util_V,Util_L) VALUES ('%s', %u, %u, %u, ?1, %u, ?2, ?3, ?4)",
-            model->getScenarioID().c_str(), turn, h, i, j);
-
-    // The whole point of a prepared statement is to reuse it.
-    // Therefore, we prepare it before the loop, and reuse it inside the loop:
-    // just moving it outside loop cut dummyData_3Dim.csv run time from 30 to 10 seconds
-    // (with Electric Fence).
-    assert(nullptr != db);
-    sqlite3_stmt *insStmt;
-    sqlite3_prepare_v2(db, sqlBuff, strlen(sqlBuff), &insStmt, NULL);
-    assert(nullptr != insStmt); //make sure it is ready
-
-    sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL, &zErrMsg);
-
-    for (int tpk = 0; tpk < na; tpk++) {  // third party voter, tpk
-      auto an = ((const SMPActor*)(model->actrs[tpk]));
-      int rslt = 0;
-
-      rslt = sqlite3_bind_int(insStmt, 1, tpk);
-      assert(SQLITE_OK == rslt);
-
-      // bind the data
-      rslt = sqlite3_bind_double(insStmt, 2, tpvArray(tpk, 0));
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_bind_double(insStmt, 3, tpvArray(tpk, 1));
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_bind_double(insStmt, 4, tpvArray(tpk, 2));
-      assert(SQLITE_OK == rslt);
-
-      // actually record it
-      rslt = sqlite3_step(insStmt);
-      assert(SQLITE_DONE == rslt);
-      rslt = sqlite3_clear_bindings(insStmt);
-      assert(SQLITE_OK == rslt);
-      rslt = sqlite3_reset(insStmt);
-      assert(SQLITE_OK == rslt);
-    }
+    string thij = std::to_string(turn)
+      + "," + std::to_string(h)
+      + "," + std::to_string(i)
+      + "," + std::to_string(j);
 
     // formatting note: %d means an integer, base 10
     // we will use base 10 by default, and these happen to be unsigned integers, so %i is appropriate
 
-    memset(sqlBuff, '\0', sqlBuffSize);
-    sprintf(sqlBuff,
-            "INSERT INTO ProbVict (ScenarioId, Turn_t, Est_h,Init_i,Rcvr_j,Prob) VALUES ('%s',%u,%u,%u,%u,%f)",
-            model->getScenarioID().c_str(), turn, h, i, j, phij);
-    sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
+    string thkij = std::to_string(turn)
+      + "," + std::to_string(h)
+      + "," + std::to_string(k)
+      + "," + std::to_string(i)
+      + "," + std::to_string(j);
 
-    // the following four statements could be combined into one table
-    memset(sqlBuff, '\0', sqlBuffSize);
-    sprintf(sqlBuff,
-            "INSERT INTO UtilChlg (ScenarioId, Turn_t, Est_h,Aff_k,Init_i,Rcvr_j,Util_SQ,Util_Vict,Util_Cntst,Util_Chlg) VALUES ('%s',%u,%u,%u,%u,%u,%f,%f,%f,%f)",
-            model->getScenarioID().c_str(), turn, h, k, i, j, euSQ, euVict, euCntst, euChlg);
-    sqlite3_exec(db, sqlBuff, NULL, NULL, &zErrMsg);
+    std::vector<double> eu;
+    eu.push_back(euSQ);
+    eu.push_back(euVict);
+    eu.push_back(euCntst);
+    eu.push_back(euChlg);
 
-    sqlite3_exec(db, "END TRANSACTION", NULL, NULL, &zErrMsg);
-    sqlite3_finalize(insStmt); // finalize statement to avoid resource leaks
-
-    delete sqlBuff;
-    sqlBuff = nullptr;
+    // Thread safety lock
+    utilDataLock.lock();
+    euData.emplace(thkij,eu);
+    tpvData.emplace(thij, tpvArray);
+    phijData.emplace(thij, phij);
+    utilDataLock.unlock();
   }
   return rslt;
 }

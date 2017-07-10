@@ -133,7 +133,7 @@ void ColorPickerDialog::showColorPickerWidget(bool bl)
     str = strlist.at(0);
 
     int actorId = actorNamesList.indexOf(str);
-    qDebug()<< "actorColorChooser" << actorColorChooser->objectName() <<str <<actorId;
+//    qDebug()<< "actorColorChooser" << actorColorChooser->objectName() <<str <<actorId;
 
     QColor color = QColorDialog::
             getColor(pickerColors.at(actorId),
@@ -141,7 +141,7 @@ void ColorPickerDialog::showColorPickerWidget(bool bl)
 
     if(color.isValid())
     {
-        qDebug()<<color << "here ";
+//        qDebug()<<color << "here ";
         pickerColors[actorId]=color;
         QColor mycolor =color;
 
@@ -178,7 +178,7 @@ void ColorPickerDialog::showContextMenuForActorPB(QPoint pos)
         str.prepend("#");
 
         copyColorCode=str;
-        qDebug()<< "copyColor" <<  actorColorButton->styleSheet()  << actorColorButton->objectName() <<str;
+//        qDebug()<< "copyColor" <<  actorColorButton->styleSheet()  << actorColorButton->objectName() <<str;
     }
     else if (act == pasteColor)
     {
@@ -194,6 +194,6 @@ void ColorPickerDialog::showContextMenuForActorPB(QPoint pos)
         colorButtons.at(actorId)->setStyleSheet(style);
         colorButtons.at(actorId)->setObjectName(str+copyColorCode.name());
         pickerColors[actorId]=copyColorCode;
-        qDebug()<<actorId << actorColorButton->objectName()<<"paste" <<colorButtons.at(actorId)->objectName();
+//        qDebug()<<actorId << actorColorButton->objectName()<<"paste" <<colorButtons.at(actorId)->objectName();
     }
 }
