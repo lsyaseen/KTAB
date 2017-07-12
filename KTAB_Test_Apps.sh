@@ -46,16 +46,16 @@ LAdif=$(diff -U 0 ../../ref.out ../../run.out | grep -v ^@ | wc -l)
 LAerr=$(egrep -c "assert|fail|error|except|abort|dump|segment" ../../leonAppLOG.out)
 LAend=$(grep -c "Finish time" ../../leonAppLOG.out)
 
-# mtchApp - DIFFERENT THOUGH SAME SEED???
-#echo "Running mtchApp"
-#testcnt=$[testcnt+1]
-#./mtchApp --mtchSUSN --maxSup
-#mv ./mtch*_log.txt ../../mtchAppLOG.out
-#egrep "Start time|Finish time|Elapsed time|Scenario" -v ./20170530_ref-mtchApp.txt > ../../ref.out
-#egrep "Start time|Finish time|Elapsed time|Scenario" -v ../../mtchAppLOG.out > ../../run.out
-#MAdif=$(diff -U 0 ../../ref.out ../../run.out | grep -v ^@ | wc -l)
-#MAerr=$(egrep -c "assert|fail|error|except|abort|dump|segment" ../../mtchAppLOG.out)
-#MAend=$(grep -c "Finish time" ../../mtchAppLOG.out)
+# mtchApp
+echo "Running mtchApp"
+testcnt=$[testcnt+1]
+./mtchApp --mtchSUSN --maxSup
+mv ./mtch*_log.txt ../../mtchAppLOG.out
+grep "at this matching: " ./20170530_ref-mtchApp.txt > ../../ref.out
+grep "at this matching: " ../../mtchAppLOG.out > ../../run.out
+MAdif=$(diff -U 0 ../../ref.out ../../run.out | grep -v ^@ | wc -l)
+MAerr=$(egrep -c "assert|fail|error|except|abort|dump|segment" ../../mtchAppLOG.out)
+MAend=$(grep -c "Finish time" ../../mtchAppLOG.out)
 
 # agdemo
 echo "Running agdemo"
@@ -81,17 +81,17 @@ RDdif=$(diff -U 0 ../../ref.out ../../run.out | grep -v ^@ | wc -l)
 RDerr=$(egrep -c "assert|fail|error|except|abort|dump|segment" ../../rpdemoLOG.out)
 RDend=$(grep -c "Finish time" ../../rpdemoLOG.out)
 
-# minwater - DIFFERENT THOUGH SAME SEED???
-#echo "Running minwater"
-#testcnt=$[testcnt+1]
-#cd ../minwater
-#./mwdemo --waterMin
-#mv ./minwater*_log.txt ../../mwdemoLOG.out
-#egrep "Start time|Finish time|Elapsed time|Scenario" -v ./20170530_ref-mwdemo.txt > ../../ref.out
-#egrep "Start time|Finish time|Elapsed time|Scenario" -v ../../mwdemoLOG.out > ../../run.out
-#MWdif=$(diff -U 0 ../../ref.out ../../run.out | grep -v ^@ | wc -l)
-#MWerr=$(egrep -c "assert|fail|error|except|abort|dump|segment" ../../mwdemoLOG.out)
-#MWend=$(grep -c "Finish time" ../../mwdemoLOG.out)
+# minwater
+echo "Running minwater"
+testcnt=$[testcnt+1]
+cd ../minwater
+./mwdemo --waterMin
+mv ./minwater*_log.txt ../../mwdemoLOG.out
+grep "Best current value: " ./20170530_ref-mwdemo.txt > ../../ref.out
+grep "Best current value: " ../../mwdemoLOG.out > ../../run.out
+MWdif=$(diff -U 0 ../../ref.out ../../run.out | grep -v ^@ | wc -l)
+MWerr=$(egrep -c "assert|fail|error|except|abort|dump|segment" ../../mwdemoLOG.out)
+MWend=$(grep -c "Finish time" ../../mwdemoLOG.out)
 
 # comsel
 echo "Running csg"
@@ -139,10 +139,9 @@ echo "# Finish lines ${LAend}"
 echo "------------"
 echo "mtchApp"
 echo "------------"
-echo "skipped due to stochasticity"
-#echo "# Differences  ${MAdif}"
-#echo "# Error Words  ${MAerr}"
-#echo "# Finish lines ${MAend}"
+echo "# Differences  ${MAdif}"
+echo "# Error Words  ${MAerr}"
+echo "# Finish lines ${MAend}"
 echo "------------"
 echo "agdemo"
 echo "------------"
@@ -158,10 +157,9 @@ echo "# Finish lines ${RDend}"
 echo "------------"
 echo "minwater"
 echo "------------"
-echo "skipped due to stochasticity"
-#echo "# Differences  ${MWdif}"
-#echo "# Error Words  ${MWerr}"
-#echo "# Finish lines ${MWend}"
+echo "# Differences  ${MWdif}"
+echo "# Error Words  ${MWerr}"
+echo "# Finish lines ${MWend}"
 echo "------------"
 echo "csg"
 echo "------------"
@@ -177,9 +175,9 @@ echo "# Finish lines ${PDend}"
 echo "------------"
 
 # summary
-difOK=$[DUdif+DMdif+LAdif+ADdif+RDdif+CSdif+PDdif==0]
-errOK=$[DUerr+DMerr+LAerr+ADerr+RDerr+CSerr+PDerr==0]
-endOK=$[DUend+DMend+LAend+ADend+RDend+CSend+PDend==testcnt]
+difOK=$[DUdif+DMdif+LAdif+MAdif+ADdif+RDdif+MWdif+CSdif+PDdif==0]
+errOK=$[DUerr+DMerr+LAerr+MAerr+ADerr+RDerr+MWerr+CSerr+PDerr==0]
+endOK=$[DUend+DMend+LAend+MAend+ADend+RDend+MWend+CSend+PDend==testcnt]
 allOK=$[difOK==errOK==endOK==1]
 echo "------------"
 
