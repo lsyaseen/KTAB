@@ -1,5 +1,5 @@
 Software version:  ComSel 0.1 
-Start time: Tue May 30 12:01:43 2017
+Start time: Wed Jul 12 05:26:37 2017
  
 Using PRNG seed: 15455440707583219804 
 Same seed in hex: 0xD67CC16FE69C185C 
@@ -10,29 +10,8 @@ Using default description generated from UTC start time.
 No scenario description provided to Model::Model 
 Using default description generated from UTC start time. 
 Using PRNG seed: 15455440707583219804 
-Scenario Name: -| Scenario-UTC-2017-05-2-1201-43 |- 
-Scenario Description:  Scenario-UTC-2017-05-2-1201-43 
-Successfully opened database # 1 
-Created SMPModel table PosUtil(0) successfully 
-Created SMPModel table PosVote(1) successfully 
-Created SMPModel table PosProb(2) successfully 
-Created SMPModel table PosEquiv(3) successfully 
-Created SMPModel table UtilChlg(4) successfully 
-Created SMPModel table PosVict(5) successfully 
-Created SMPModel table TP_Prob_Vict_Loss(6) successfully 
-Created SMPModel table ActorDescription(7) successfully 
-Created SMPModel table Bargn(8) successfully 
-Created SMPModel table BargnCoords(9) successfully 
-Created SMPModel table BargnUtil(10) successfully 
-Created SMPModel table BargnVote(11) successfully 
-Created SMPModel table ScenarioDesc(12) successfully 
-Created SMPModel table VectorPosition(13) successfully 
-Created SMPModel table SpatialSalience(14) successfully 
-Created SMPModel table SpatialCapability(15) successfully 
-Created SMPModel table DimensionDescription(16) successfully 
-Created SMPModel table Accommodation(17) successfully 
-SMPModel: Closing database 
-SMPModel: Closing database succeeded. 
+Scenario Name: -| Scenario-UTC-2017-07-3-0526-37 |- 
+Scenario Description:  Scenario-UTC-2017-07-3-0526-37 
 Done creating objects from SMPLib. 
 Using PRNG seed: 15455440707583219804 
 Num parties: 9 
@@ -42,7 +21,7 @@ SQL Logging Flags
 No scenario description provided to Model::Model 
 Using default description generated from UTC start time. 
 Using PRNG seed: 15455440707583219804 
-Scenario Name: -| Scenario-UTC-2017-05-2-1201-43 |- 
+Scenario Name: -| Scenario-UTC-2017-07-3-0526-37 |- 
 Scenario Description:  csm0 
 Configuring actors: randomizing 
 Scalar positions of actors (fixed) ... 
@@ -665,6 +644,6 @@ Actor expected utilities:
 numP:  9 
 s2->pstns.size():  9 
 State number 8 matched state number 6 
-Finish time: Tue May 30 12:01:43 2017
+Finish time: Wed Jul 12 05:26:37 2017
  
-Elapsed time: 0.3837 seconds 
+Elapsed time: 0.2530 seconds 
