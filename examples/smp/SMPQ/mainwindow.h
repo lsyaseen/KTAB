@@ -30,6 +30,7 @@
 #include "xmlparser.h"
 #include "colorpickerdialog.h"
 #include "popupwidget.h"
+#include "databasedialog.h"
 #include "../qcustomplot/qcustomplot.h"
 
 #include <QtSql>
@@ -43,6 +44,7 @@
 
 #include <fstream>
 #include <string>
+#include <QDateTime>
 
 #include <QtWidgets>
 #ifndef QT_NO_PRINTDIALOG
@@ -56,7 +58,7 @@
 #include <easylogging++.h>
 
 class QAction;
-class QListWidget;
+class QVectorWidget;
 class QMenu;
 class QTextEdit;
 
@@ -125,9 +127,7 @@ signals:
     void csvFilePath(QString path);
 
     //Database
-    void dbFilePath(QString path,bool runScenario = false);
-    void dbEditFilePath(QString path);
-
+    void dbFilePath(QString path,QString dbType, QString connection ,bool runScenario = false);
     void getScenarioRunValues(int state, QString scenarioBox,int dim);
     void getScenarioRunValuesEdit(QString scenarioBox);
     void getStateCountfromDB();
@@ -135,6 +135,7 @@ signals:
     void getDimforBar();
 
     void releaseDatabase();
+    void getPostgresDBList(QString,bool);
 
     //save DB to csv
     void getActorsDesc();
@@ -228,7 +229,7 @@ private:
     QFrame * modelParametersFrame;
 
     //Database Obj
-    Database * dbObj ;
+    Database * dbObj = nullptr;
     QSqlDatabase db;
     int dimensions;
     QString dbPath;
@@ -332,6 +333,7 @@ private :
     QVector<QColor> colorsList;
 
     QVector <QCheckBox * > barActorCBList;
+    QVector <int> actorsIdsClr;
 
     double yAxisLen;
 
@@ -414,6 +416,7 @@ private :
 
 private slots :
     void runPushButtonClicked(bool bl);
+    void runModel(QString conStr,QString fileName =0);
     void smpDBPath(QString smpdbPath);
     void disableRunButton(QTableWidgetItem * itm);
 
@@ -591,7 +594,7 @@ private :
     QAction *separatorAct;
 
     enum { maxRecentFilesCount = 5 };
-     QAction *recentFileActs[maxRecentFilesCount];
+    QAction *recentFileActs[maxRecentFilesCount];
 
     void setCurrentFile(const QString &fileName);
     void updateRecentFileActions();
@@ -607,7 +610,31 @@ private slots:
 
 private :
     el::Configurations loggerConf;
- };
+
+    //Databse dialog
+    QString connectionString;
+    DatabaseDialog * dbDialog;
+    QLineEdit * dbDialogName;
+    QString generateTimeStamp();
+    bool menuconfig;
+    QString recentFileAccess;
+    bool importedDBFile;
+    QStringList dbParaMemory;
+
+    void postgresRecentAccess();
+    void removeFromRecentFileHistory(QString fileName);
+    void resetGUI();
+
+private slots:
+    void connectionStrPath(QString str, QStringList paraMem);
+    void configureDB(bool bl);
+    void postgresDBList(QStringList* dbList, bool imp);
+    void dbListClicked(QModelIndex indx);
+    void dbDonePushButtonClicked(bool bl);
+    void getTimeStamp(bool bl);
+    void configUsingMenu(bool bl);
+
+};
 
 
 

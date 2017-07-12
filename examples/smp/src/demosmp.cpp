@@ -29,6 +29,7 @@
 #include "demosmp.h"
 #include <functional>
 #include <easylogging++.h>
+#include <QApplication>
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -70,13 +71,8 @@ std::string GenerateDBNameWithTimeStamp()
 }
 
 int main(int ac, char **av) {
-  // Set logging configuration from a file
-  el::Configurations confFromFile("./smpc-logger.conf");
-  el::Loggers::reconfigureAllLoggers(confFromFile);
-
   using std::string;
   using KBase::dSeed;
-  auto sTime = KBase::displayProgramStart(DemoSMP::appName, DemoSMP::appVersion);
   uint64_t seed = -1;
   bool run = true;
   bool euSmpP = false;
@@ -88,25 +84,25 @@ int main(int ac, char **av) {
   string inputCSV = "";
   string inputDBname = "";
   string inputXML = "";
+  string connstr;
 
   auto showHelp = []() {
     printf("\n");
     printf("Usage: specify one or more of these options\n");
-    printf("--help                  print this message\n");
-    printf("--euSMP                 exp. util. of spatial model of politics\n");
-    printf("--ra                    randomize the adjustment of ideal points with euSMP \n");
-    printf("--csv <f>               read a scenario from CSV \n");
-    printf("--xml <f>               read a scenario from XML \n");
-    printf("--dbname <f>            specify a db file name for logging \n");
-    printf("--logmin                log only scenario information + position histories\n");
-    printf("--savehist              export by-dim by-turn position histories (input+'_posLog.csv') and\n");
-    printf("                        by-dim actor effective powers (input+'_effPower.csv')\n");
-    printf("--seed <n>              set a 64bit seed\n");
-    printf("                        0 means truly random\n");
-    printf("                        default: %020llu \n", dSeed);
+    printf("--help           print this message\n");
+    printf("--euSMP          exp. util. of spatial model of politics\n");
+    printf("--ra             randomize the adjustment of ideal points with euSMP \n");
+    printf("--csv <f>        read a scenario from CSV\n");
+    printf("--xml <f>        read a scenario from XML\n");
+    printf("--logmin         log only scenario information + position histories\n");
+    printf("--savehist       export by-dim by-turn position histories (input+'_posLog.csv') and\n");
+    printf("                 by-dim actor effective powers (input+'_effPower.csv')\n");
+    printf("--seed <n>       set a 64bit seed; default is %020llu; 0 means truly random\n", dSeed);
+    printf("--connstr        a comma separated string for database server credentials:\n");
+    printf("                 Driver=<QPSQL|QSQLITE>;Server=<IP>;[Port=<port>];Database=<DB_name>;\n");
+    printf("                 Uid=<user_id>;Pwd=<password>\n");
   };
 
-  bool isdbflagexist = false;
   if (ac > 1) {
     for (int i = 1; i < ac; i++) {
       if (strcmp(av[i], "--seed") == 0) {
@@ -139,21 +135,6 @@ int main(int ac, char **av) {
                 break;
         }
       }
-      else if (strcmp(av[i], "--dbname") == 0) {
-        //csvP = true;
-        i++;
-        if (av[i] != NULL)
-        {
-                inputDBname = av[i];
-                isdbflagexist = true;
-        }
-        else
-        {
-                isdbflagexist = false;
-  //			  run = false;
-                //break;
-        }
-      }
       else if (strcmp(av[i], "--euSMP") == 0) {
         euSmpP = true;
       }
@@ -168,6 +149,10 @@ int main(int ac, char **av) {
       }
       else if (strcmp(av[i], "--savehist") == 0) {
         saveHist = true;
+      }
+      else if(strcmp(av[i], "--connstr") == 0) {
+        i++;
+        connstr = av[i];
       }
       else {
         run = false;
@@ -196,6 +181,13 @@ int main(int ac, char **av) {
     return 0;
   }
 
+  QCoreApplication::addLibraryPath("./plugins");
+
+  // Set logging configuration from a file
+  el::Configurations confFromFile("./smpc-logger.conf");
+  el::Loggers::reconfigureAllLoggers(confFromFile);
+
+  auto sTime = KBase::displayProgramStart(DemoSMP::appName, DemoSMP::appVersion);
   if (0 == seed) {
     PRNG * rng = new PRNG();
     seed = rng->setSeed(seed); // 0 == get a random number
@@ -217,21 +209,18 @@ int main(int ac, char **av) {
   // note that we reset the seed every time, so that in case something
   // goes wrong, we need not scroll back too far to find the
   // seed required to reproduce the bug.
-  if (!isdbflagexist)
-  {
-    inputDBname = GenerateDBNameWithTimeStamp();
-  }
   if (euSmpP) {
-    SMPLib::SMPModel::randomSMP(0, 0, randAccP, seed, sqlFlags, inputDBname);
+    SMPLib::SMPModel::loginCredentials(connstr);
+    SMPLib::SMPModel::randomSMP(0, 0, randAccP, seed, sqlFlags);
   }
   if (csvP) {
-    //SMPLib::SMPModel::csvReadExec(seed, inputCSV, sqlFlags, inputDBname);
-    SMPLib::SMPModel::runModel(sqlFlags, inputDBname, inputCSV, seed, saveHist);
+    SMPLib::SMPModel::loginCredentials(connstr);
+    SMPLib::SMPModel::runModel(sqlFlags, inputCSV, seed, saveHist);
     SMPLib::SMPModel::destroyModel();
   }
   if (xmlP) {
-    //SMPLib::SMPModel::xmlReadExec(inputXML, sqlFlags, inputDBname);
-    SMPLib::SMPModel::runModel(sqlFlags, inputDBname, inputXML, seed, saveHist);
+    SMPLib::SMPModel::loginCredentials(connstr);
+    SMPLib::SMPModel::runModel(sqlFlags, inputXML, seed, saveHist);
     SMPLib::SMPModel::destroyModel();
   }
 

@@ -431,18 +431,16 @@ void MainWindow::getUtilChlgHorizontalVerticalAxisData(int turn)
                                                      VHAxisValues.at(3),VHAxisValues.at(4));
                 x =SMPLib::SMPModel::getQuadMapPoint(VHAxisValues.at(5),VHAxisValues.at(6),VHAxisValues.at(7),
                                                      VHAxisValues.at(8),VHAxisValues.at(9));
-
             }
             else
             {
-                y =SMPLib::SMPModel::getQuadMapPoint(dbPath.toStdString(),scenarioBox.toStdString(),VHAxisValues.at(0),
+                QString connectionName = dbObj->getConnectionName();
+                y =SMPLib::SMPModel::getQuadMapPoint(connectionName,scenarioBox.toStdString(),VHAxisValues.at(0),
                                                      VHAxisValues.at(1),VHAxisValues.at(2),VHAxisValues.at(3),
                                                      VHAxisValues.at(4));
-                x =SMPLib::SMPModel::getQuadMapPoint(dbPath.toStdString(),scenarioBox.toStdString(),VHAxisValues.at(5),
+                x =SMPLib::SMPModel::getQuadMapPoint(connectionName,scenarioBox.toStdString(),VHAxisValues.at(5),
                                                      VHAxisValues.at(6),VHAxisValues.at(7),VHAxisValues.at(8),
                                                      VHAxisValues.at(9));
-
-                qDebug()<<VHAxisValues << scenarioBox;
             }
 
             quadMapUtilChlgandSQValues(VHAxisValues.at(0),x,y,VHAxisValues.at(4));
@@ -711,8 +709,6 @@ void MainWindow::quadMapUtilChlgandSQValues(int turn, double hor, double ver , i
 
     actorIdIndexH.append(actorID);
 
-    //    qDebug() << "hor" << hor << "ver" << ver << actorID <<actorsQueriedCount << deltaUtilV.length() << "del len";
-
     if(actorsQueriedCount==deltaUtilV.length())
     {
         plotDeltaValues();
@@ -772,11 +768,12 @@ void MainWindow::quadMapAutoScale(bool status)
 void MainWindow::quadMapPlotPoints(bool status)
 {
     Q_UNUSED(status)
-    if(true==quadMapDock->isVisible() && actorsName.length() >0)
+    if(true==quadMapDock->isVisible() && actorsName.length() >0 && lineGraphDimensionComboBox->count()>0)
     {
         QApplication::setOverrideCursor(QCursor(QPixmap("://images/hourglass.png"))) ;
         plotQuadMap->setEnabled(false);
         removeAllScatterPoints();
+        SMPLib::SMPModel::loginCredentials(connectionString.toStdString());
         getUtilChlgHorizontalVerticalAxisData(turnSlider->value());
         quadMapTitle->setText(QString(" E[ΔU] Quad Map for Actor %1, Turn "
                                       +QString::number(turnSlider->value())).arg(actorsName.at(initiatorTip)));
@@ -798,6 +795,11 @@ void MainWindow::dbImported(bool bl)
 {
     useHistory=false;
     sankeyOutputHistory=true;
+    importedDBFile=true;
+    if(connectionString.contains("QPSQL"))
+    {
+        emit getPostgresDBList(connectionString,true); // true == imported, false == run
+    }
 }
 
 void MainWindow::quadPlotContextMenuRequest(QPoint pos)

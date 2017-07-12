@@ -118,6 +118,12 @@ endif (NOT SQLITE_FOUND)
 # --------------------------------------------------------
 
 find_package(Easyloggingpp)
+#--------------------------------------------------
+find_package(qtlibs)
+set(CMAKE_PREFIX_PATH ${PREFIX_PATH})
+message(STATUS "CMAKE_PREFIX_PATH" ${CMAKE_PREFIX_PATH})
+
+find_package(Qt5 REQUIRED COMPONENTS Core Sql)
 
 # ------------------------------------------------- 
 # files to be built into a library go in libsrc/
@@ -139,6 +145,11 @@ set(PMATLIB_SRCS
   )
 
 add_library(pmatrix ${PMATLIB_SRCS})
+
+target_link_libraries (pmatrix
+  Qt5::Core
+  Qt5::Sql
+  )
 
 # -------------------------------------------------
 # demo programs

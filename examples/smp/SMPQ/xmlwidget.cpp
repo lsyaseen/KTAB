@@ -67,10 +67,13 @@ void MainWindow::importXmlGetFilePath(bool bl,QString filepath)
         homeDirectory = dir.absolutePath();
 
         setCurrentFile(filename);
-        emit releaseDatabase();
+
         lineGraphDock->setVisible(false);
         barGraphDock->setVisible(false);
         quadMapDock->setVisible(false);
+
+        tableControlsFrame->show();
+        stackWidget->show();
 
         xmlPath=filename;
         emit openXMLFile(filename);
