@@ -1,0 +1,998 @@
+Software version:    
+Start time: Tue May 30 11:32:02 2017
+ 
+Using PRNG seed:  15455440707583219804 
+ 
+Same seed in hex:   0xD67CC16FE69C185C 
+ 
+----------------------------------- 
+Using PRNG seed: 15455440707583219804 
+ 
+Random matching of  20  items to  7  actors 
+[MtchGene 4 6 2 4 6 0 2 5 0 5 6 3 4 6 2 5 5 6 6 6 ] 
+  
+Generate actors with random voting rules, values-of-sweets and positions (matchings) 
+Utilities are normalized to [0,1] scale 
+minCap:  100 
+maxCap:  225 
+Note: 2*maxCap          <= 5*minCap 
+      2*maxCap + minCap >= 4*minCap 
+ 0: MActor-0 , Random matching actor 
+ 
+Capability: 163.45 
+ 
+Voting rule:  PropCbc 
+Valuation of each sweet:  
+0.052   
+0.030   
+0.021   
+0.070   
+0.038   
+0.029   
+0.024   
+0.080   
+0.077   
+0.069   
+0.034   
+0.057   
+0.078   
+0.041   
+0.089   
+0.017   
+0.057   
+0.040   
+0.036   
+0.061   
+Current position:  
+[MtchPstn 4 0 6 4 1 3 0 0 4 3 6 1 3 0 6 0 6 2 3 3] 
+ 1: MActor-1 , Random matching actor 
+ 
+Capability: 156.36 
+ 
+Voting rule:  PropBin 
+Valuation of each sweet:  
+0.070   
+0.003   
+0.034   
+0.055   
+0.057   
+0.039   
+0.084   
+0.049   
+0.045   
+0.022   
+0.046   
+0.049   
+0.077   
+0.032   
+0.010   
+0.094   
+0.080   
+0.072   
+0.039   
+0.042   
+Current position:  
+[MtchPstn 3 2 4 4 1 1 3 0 5 2 5 1 6 0 3 0 5 4 0 2] 
+ 2: MActor-2 , Random matching actor 
+ 
+Capability: 192.25 
+ 
+Voting rule:  PropBin 
+Valuation of each sweet:  
+0.010   
+0.079   
+0.068   
+0.040   
+0.023   
+0.127   
+0.002   
+0.084   
+0.065   
+0.039   
+0.063   
+0.052   
+0.062   
+0.049   
+0.048   
+0.036   
+0.076   
+0.027   
+0.024   
+0.025   
+Current position:  
+[MtchPstn 3 5 0 2 3 0 1 4 0 5 2 1 1 6 6 0 6 4 6 3] 
+ 3: MActor-3 , Random matching actor 
+ 
+Capability: 147.20 
+ 
+Voting rule:  PropBin 
+Valuation of each sweet:  
+0.021   
+0.027   
+0.076   
+0.022   
+0.025   
+0.093   
+0.037   
+0.041   
+0.080   
+0.007   
+0.005   
+0.090   
+0.022   
+0.084   
+0.087   
+0.035   
+0.049   
+0.094   
+0.038   
+0.065   
+Current position:  
+[MtchPstn 5 5 6 4 0 1 3 3 5 3 2 1 5 6 6 5 5 4 6 1] 
+ 4: MActor-4 , Random matching actor 
+ 
+Capability: 175.34 
+ 
+Voting rule:  PropBin 
+Valuation of each sweet:  
+0.054   
+0.053   
+0.049   
+0.022   
+0.019   
+0.020   
+0.010   
+0.090   
+0.063   
+0.071   
+0.071   
+0.048   
+0.087   
+0.029   
+0.043   
+0.054   
+0.065   
+0.023   
+0.065   
+0.063   
+Current position:  
+[MtchPstn 1 5 1 0 0 3 6 0 6 1 2 0 1 1 6 2 3 2 5 3] 
+ 5: MActor-5 , Random matching actor 
+ 
+Capability: 172.17 
+ 
+Voting rule:  PropBin 
+Valuation of each sweet:  
+0.060   
+0.044   
+0.049   
+0.092   
+0.083   
+0.058   
+0.050   
+0.009   
+0.059   
+0.017   
+0.013   
+0.041   
+0.080   
+0.047   
+0.057   
+0.082   
+0.019   
+0.014   
+0.096   
+0.030   
+Current position:  
+[MtchPstn 3 1 4 6 6 2 1 4 3 6 4 3 4 0 2 1 0 0 0 5] 
+ 6: MActor-6 , Random matching actor 
+ 
+Capability: 140.68 
+ 
+Voting rule:  PropBin 
+Valuation of each sweet:  
+0.071   
+0.073   
+0.052   
+0.038   
+0.028   
+0.091   
+0.053   
+0.040   
+0.014   
+0.030   
+0.076   
+0.042   
+0.050   
+0.087   
+0.050   
+0.021   
+0.060   
+0.069   
+0.015   
+0.040   
+Current position:  
+[MtchPstn 2 2 5 1 3 6 1 6 2 3 2 2 5 1 3 6 6 5 4 0] 
+Raw actor-pos util matrix 
+ 0.3452  0.3164  0.2683  0.0748  0.4287  0.3176  0.1187  
+ 0.2020  0.2695  0.3755  0.2429  0.4158  0.3294  0.3137  
+ 0.0529  0.2661  0.1961  0.1226  0.2360  0.3201  0.4661  
+ 0.4012  0.2686  0.2097  0.1636  0.3723  0.3463  0.2237  
+ 0.2599  0.1794  0.2131  0.0888  0.0000  0.5049  0.1250  
+ 0.0000  0.1734  0.1179  0.5703  0.2601  0.0588  0.2661  
+ 0.4193  0.0967  0.3803  0.3664  0.2210  0.1829  0.3801  
+zeta[0] = 261.783 
+ 
+zeta[1] = 259.441 
+ 
+zeta[2] = 282.292 
+ 
+zeta[3] = 263.163 
+ 
+zeta[4] = 311.158 
+ 
+zeta[5] = 340.300 
+ 
+zeta[6] = 312.181 
+ 
+gpool: 20   
+ 
+Filling gpool ... 
+Initial fully random gpool:  
+   0   289.378 
+[MtchGene 2 5 6 0 6 5 2 1 3 5 1 4 0 4 5 5 0 1 1 4 ] 
+   1   252.958 
+[MtchGene 2 4 3 6 3 3 2 0 6 6 1 6 6 3 0 0 5 1 6 0 ] 
+   2   284.362 
+[MtchGene 4 3 5 6 3 4 2 0 4 0 6 4 1 1 5 3 6 3 1 6 ] 
+   3   344.875 
+[MtchGene 0 2 1 0 5 2 1 3 2 6 3 4 4 0 6 4 4 6 2 2 ] 
+   4   313.712 
+[MtchGene 6 6 3 2 6 4 5 2 3 6 2 2 6 5 2 4 1 4 1 3 ] 
+   5   289.958 
+[MtchGene 4 3 3 0 1 1 6 3 1 0 1 6 1 6 1 2 1 2 2 4 ] 
+   6   282.642 
+[MtchGene 3 1 2 2 5 5 4 6 0 3 4 4 5 4 2 0 5 3 0 4 ] 
+   7   281.308 
+[MtchGene 2 1 6 5 6 6 0 6 2 3 5 4 2 3 0 1 5 5 4 2 ] 
+   8   302.050 
+[MtchGene 4 2 1 0 1 2 4 0 5 1 5 5 3 2 1 6 2 5 4 4 ] 
+   9   297.859 
+[MtchGene 4 3 3 1 4 2 3 0 1 2 5 4 2 0 4 4 3 4 4 2 ] 
+  10   254.872 
+[MtchGene 0 1 6 6 5 2 6 5 6 3 5 3 4 5 4 6 5 5 3 2 ] 
+  11   302.396 
+[MtchGene 5 1 6 5 4 4 5 4 3 2 6 6 3 0 5 2 0 0 5 0 ] 
+  12   303.551 
+[MtchGene 3 4 5 2 6 3 6 1 6 4 6 5 1 2 3 2 4 4 0 4 ] 
+  13   306.022 
+[MtchGene 5 5 6 6 6 5 1 4 0 4 4 6 2 1 1 0 4 0 4 5 ] 
+  14   292.767 
+[MtchGene 5 3 4 6 0 4 1 6 4 5 1 4 5 4 3 0 2 1 6 0 ] 
+  15   227.858 
+[MtchGene 6 1 6 0 2 0 3 6 6 5 4 1 6 1 6 0 4 0 1 6 ] 
+  16   289.702 
+[MtchGene 1 6 4 1 1 3 3 2 4 3 5 0 0 2 1 2 5 0 2 1 ] 
+  17   294.983 
+[MtchGene 5 6 2 2 1 0 6 1 4 1 0 6 1 6 3 4 5 4 1 1 ] 
+  18   260.413 
+[MtchGene 2 5 2 4 0 5 5 3 0 3 5 2 1 5 4 2 4 4 6 6 ] 
+  19   258.130 
+[MtchGene 0 4 6 3 2 5 0 2 3 6 3 0 6 5 1 0 5 0 5 6 ] 
+  
+crossFrac: 2.00  mutFrac: 2.00 
+ 
+Search completed after 74/1000 iterations and 50/50 stable
+best value: +493.1561
+best gene: 
+[MtchGene 1 2 2 5 5 2 1 4 0 4 6 3 4 6 0 1 2 3 5 0 ]
+Final gpool:  
+   0   493.156 
+[MtchGene 1 2 2 5 5 2 1 4 0 4 6 3 4 6 0 1 2 3 5 0 ] 
+   1   492.997 
+[MtchGene 1 2 2 5 5 2 1 4 0 0 6 3 4 6 0 1 2 3 5 4 ] 
+   2   492.975 
+[MtchGene 1 2 2 5 5 2 1 4 0 4 6 3 4 6 0 1 2 3 5 4 ] 
+   3   492.871 
+[MtchGene 1 2 3 5 5 2 1 4 0 4 6 3 4 6 0 1 2 3 5 0 ] 
+   4   492.711 
+[MtchGene 1 2 3 5 5 2 1 4 0 0 6 3 4 6 0 1 2 3 5 4 ] 
+   5   492.690 
+[MtchGene 1 2 3 5 5 2 1 4 0 4 6 3 4 6 0 1 2 3 5 4 ] 
+   6   492.511 
+[MtchGene 6 2 2 5 5 2 1 4 0 0 4 3 4 6 0 1 2 3 5 4 ] 
+   7   492.467 
+[MtchGene 6 2 2 5 5 2 1 4 0 4 4 3 4 6 0 1 2 3 5 0 ] 
+   8   492.343 
+[MtchGene 1 2 2 5 5 2 1 4 0 0 4 3 4 6 0 1 2 3 5 4 ] 
+   9   492.299 
+[MtchGene 1 2 2 5 5 2 1 4 0 4 4 3 4 6 0 1 2 3 5 0 ] 
+  10   492.226 
+[MtchGene 6 2 3 5 5 2 1 4 0 0 4 3 4 6 0 1 2 3 5 4 ] 
+  11   492.182 
+[MtchGene 6 2 3 5 5 2 1 4 0 4 4 3 4 6 0 1 2 3 5 0 ] 
+  12   492.145 
+[MtchGene 1 2 2 5 5 2 1 4 0 4 6 3 4 6 0 1 2 3 5 3 ] 
+  13   492.099 
+[MtchGene 6 2 2 5 5 2 1 4 0 0 4 3 4 6 0 1 1 3 5 4 ] 
+  14   492.058 
+[MtchGene 1 2 3 5 5 2 1 4 0 0 4 3 4 6 0 1 2 3 5 4 ] 
+  15   492.014 
+[MtchGene 1 2 3 5 5 2 1 4 0 4 4 3 4 6 0 1 2 3 5 0 ] 
+  16   491.823 
+[MtchGene 6 2 2 5 5 2 1 4 0 4 6 3 4 6 0 1 2 3 5 0 ] 
+  17   491.669 
+[MtchGene 6 2 2 5 5 2 1 4 0 0 4 3 4 6 0 1 2 3 5 3 ] 
+  18   491.663 
+[MtchGene 6 2 2 5 5 2 1 4 0 0 6 3 4 6 0 1 2 3 5 4 ] 
+  19   491.641 
+[MtchGene 6 2 2 5 5 2 1 4 0 4 6 3 4 6 0 1 2 3 5 4 ] 
+
+1/100 iterations    0/3 stable 
+newBest value: +340.8809 up +44.4082 
+newBest point: 
+[MtchPstn 5 5 4 6 0 3 6 2 0 4 2 5 0 5 4 2 1 4 3 3] 
+2/100 iterations    0/3 stable 
+newBest value: +371.9930 up +31.1121 
+newBest point: 
+[MtchPstn 5 5 4 6 0 3 6 2 0 4 2 5 0 5 4 2 1 3 5 3] 
+3/100 iterations    0/3 stable 
+newBest value: +403.0165 up +31.0235 
+newBest point: 
+[MtchPstn 5 5 4 6 0 2 6 2 0 4 2 5 0 5 4 1 1 3 5 3] 
+4/100 iterations    0/3 stable 
+newBest value: +426.3621 up +23.3456 
+newBest point: 
+[MtchPstn 5 5 4 5 0 2 6 2 0 4 2 3 0 5 4 1 1 3 5 3] 
+5/100 iterations    0/3 stable 
+newBest value: +447.3739 up +21.0118 
+newBest point: 
+[MtchPstn 5 2 4 5 0 2 6 2 0 4 2 3 0 6 4 1 1 3 5 3] 
+6/100 iterations    0/3 stable 
+newBest value: +467.7761 up +20.4022 
+newBest point: 
+[MtchPstn 5 2 4 5 5 2 6 2 0 4 2 3 0 6 0 1 1 3 5 3] 
+7/100 iterations    0/3 stable 
+newBest value: +480.3619 up +12.5858 
+newBest point: 
+[MtchPstn 5 2 4 5 5 2 1 2 0 4 2 3 4 6 0 1 1 3 5 3] 
+8/100 iterations    0/3 stable 
+newBest value: +487.4202 up +7.0584 
+newBest point: 
+[MtchPstn 5 2 2 5 5 2 1 2 0 4 4 3 4 6 0 1 1 3 5 3] 
+9/100 iterations    0/3 stable 
+newBest value: +491.5916 up +4.1713 
+newBest point: 
+[MtchPstn 6 2 2 5 5 2 1 2 0 4 4 3 4 6 0 1 1 3 5 4] 
+10/100 iterations    0/3 stable 
+newBest value: +492.0994 up +0.5078 
+newBest point: 
+[MtchPstn 6 2 2 5 5 2 1 4 0 0 4 3 4 6 0 1 1 3 5 4] 
+11/100 iterations    0/3 stable 
+newBest value: +492.5112 up +0.4118 
+newBest point: 
+[MtchPstn 6 2 2 5 5 2 1 4 0 0 4 3 4 6 0 1 2 3 5 4] 
+12/100 iterations    0/3 stable 
+newBest value: +492.9965 up +0.4854 
+newBest point: 
+[MtchPstn 1 2 2 5 5 2 1 4 0 0 6 3 4 6 0 1 2 3 5 4] 
+13/100 iterations    0/3 stable 
+newBest value: +493.1561 up +0.1596 
+newBest point: 
+[MtchPstn 1 2 2 5 5 2 1 4 0 4 6 3 4 6 0 1 2 3 5 0] 
+14/100 iterations    1/3 stable 
+newBest value: +493.1561 up +0.0000 
+newBest point: 
+[MtchPstn 1 2 2 5 5 2 1 4 0 4 6 3 4 6 0 1 2 3 5 0] 
+15/100 iterations    2/3 stable 
+newBest value: +493.1561 up +0.0000 
+newBest point: 
+[MtchPstn 1 2 2 5 5 2 1 4 0 4 6 3 4 6 0 1 2 3 5 0] 
+16/100 iterations    3/3 stable 
+newBest value: +493.1561 up +0.0000 
+newBest point: 
+[MtchPstn 1 2 2 5 5 2 1 4 0 4 6 3 4 6 0 1 2 3 5 0] 
+GHCSearch::run ended with 16/100 iterations    3/3 stable 
+newBest value: +493.1561 
+newBest point: 
+[MtchPstn 1 2 2 5 5 2 1 4 0 4 6 3 4 6 0 1 2 3 5 0] 
+----------------------------------- 
+Using PRNG seed: 15455440707583219804 
+ 
+Actors maximize expected utility, given positions of others 
+Using voting rule  Prop 
+Randomly generated actors with random positions:  
+SQL Logging Flags  
+No scenario description provided to Model::Model 
+Using default description generated from UTC start time. 
+No scenario description provided to Model::Model 
+Using default description generated from UTC start time. 
+Using PRNG seed: 15455440707583219804 
+Scenario Name: -| Scenario-UTC-2017-05-2-1132-03 |- 
+Scenario Description:  Scenario-UTC-2017-05-2-1132-03 
+ 0: MActor-0,  Random matching actor 
+ 
+Scalar capability: 159.83 
+ 
+Voting rule: Prop 
+ 
+Values assigned to each sweet: 
+ 
+ 0.0310  
+ 0.0524  
+ 0.0329  
+ 0.0620  
+ 0.0340  
+ 0.0498  
+ 0.0508  
+ 0.1119  
+ 0.0745  
+ 0.0393  
+ 0.0597  
+ 0.0855  
+ 0.0739  
+ 0.0300  
+ 0.1098  
+ 0.0376  
+ 0.0647  
+[MtchPstn 0 5 5 4 1 2 0 0 3 3 2 5 5 2 4 1 4] 
+  
+ 1: MActor-1,  Random matching actor 
+ 
+Scalar capability: 145.85 
+ 
+Voting rule: Prop 
+ 
+Values assigned to each sweet: 
+ 
+ 0.0448  
+ 0.1013  
+ 0.0352  
+ 0.0771  
+ 0.0610  
+ 0.0817  
+ 0.0427  
+ 0.0661  
+ 0.0567  
+ 0.0585  
+ 0.0333  
+ 0.0012  
+ 0.0713  
+ 0.0451  
+ 0.0683  
+ 0.0922  
+ 0.0634  
+[MtchPstn 4 1 0 3 1 4 2 4 4 0 3 5 3 1 0 4 0] 
+  
+ 2: MActor-2,  Random matching actor 
+ 
+Scalar capability: 106.92 
+ 
+Voting rule: Prop 
+ 
+Values assigned to each sweet: 
+ 
+ 0.0385  
+ 0.0627  
+ 0.0649  
+ 0.0437  
+ 0.0946  
+ 0.0551  
+ 0.0511  
+ 0.0251  
+ 0.0516  
+ 0.0557  
+ 0.0868  
+ 0.0367  
+ 0.0112  
+ 0.1065  
+ 0.0907  
+ 0.0814  
+ 0.0437  
+[MtchPstn 5 3 3 2 0 5 3 2 2 2 2 3 0 0 5 0 4] 
+  
+ 3: MActor-3,  Random matching actor 
+ 
+Scalar capability: 112.53 
+ 
+Voting rule: Prop 
+ 
+Values assigned to each sweet: 
+ 
+ 0.0714  
+ 0.0675  
+ 0.0662  
+ 0.0769  
+ 0.0682  
+ 0.0559  
+ 0.0100  
+ 0.0912  
+ 0.0678  
+ 0.0064  
+ 0.0798  
+ 0.0692  
+ 0.0615  
+ 0.0277  
+ 0.0942  
+ 0.0353  
+ 0.0507  
+[MtchPstn 1 2 5 1 2 0 2 3 4 2 3 3 4 5 1 5 2] 
+  
+ 4: MActor-4,  Random matching actor 
+ 
+Scalar capability: 218.38 
+ 
+Voting rule: Prop 
+ 
+Values assigned to each sweet: 
+ 
+ 0.0695  
+ 0.1058  
+ 0.0316  
+ 0.0714  
+ 0.0775  
+ 0.0875  
+ 0.0295  
+ 0.0256  
+ 0.0326  
+ 0.0936  
+ 0.0273  
+ 0.0304  
+ 0.1145  
+ 0.0455  
+ 0.0503  
+ 0.0984  
+ 0.0089  
+[MtchPstn 4 4 3 5 3 1 5 3 2 1 4 1 1 2 0 3 5] 
+  
+ 5: MActor-5,  Random matching actor 
+ 
+Scalar capability: 167.01 
+ 
+Voting rule: Prop 
+ 
+Values assigned to each sweet: 
+ 
+ 0.0806  
+ 0.0766  
+ 0.0593  
+ 0.1166  
+ 0.0437  
+ 0.0897  
+ 0.0727  
+ 0.0343  
+ 0.0538  
+ 0.0656  
+ 0.0279  
+ 0.0505  
+ 0.0862  
+ 0.0445  
+ 0.0579  
+ 0.0329  
+ 0.0071  
+[MtchPstn 5 5 1 1 5 1 1 5 2 2 3 4 5 2 2 4 4] 
+  
+Demonstrate SUSN bargaining over division of sweets with  6  actors and  17  sweets 
+With non-Proportional voting, the actors generally do not stabilize their positions (within 10 turns, if ever) 
+When it does stabilze, the positions of utility-maximizers stabilize but do not converge, while 
+the positions of probability-maximizers do converge. 
+Util matrix for U(actor_r, pstn_c) in random initial state:  
+ 0.3499  0.4327  0.3203  0.0971  0.2076  0.0000  
+ 0.2828  0.3718  0.0000  0.3443  0.3803  0.4174  
+ 0.4352  0.0996  0.4566  0.5209  0.2913  0.5164  
+ 0.1429  0.3889  0.3806  0.4227  0.4537  0.1533  
+ 0.2443  0.5290  0.0178  0.2726  0.3641  0.2565  
+ 0.4710  0.0985  0.4043  0.2549  0.3543  0.5394  
+Probability of outcomes in random initial state:  
+ 0.2043  
+ 0.2462  
+ 0.0081  
+ 0.0577  
+ 0.3736  
+ 0.1101  
+Expected utility to actors in random initial state:  
+ 0.2638  
+ 0.3572  
+ 0.3128  
+ 0.3388  
+ 0.3603  
+ 0.3302  
+Starting Model::run iteration 1 
+maxProb search for actor 0 ... 
+ 
+Found 0.9712 at this matching: 
+ 
+[MtchPstn 3 4 3 5 1 5 0 0 3 4 2 3 4 2 0 1 1] 
+Old position  0:  
+[MtchPstn 0 5 5 4 1 2 0 0 3 3 2 5 5 2 4 1 4] 
+New position  0:  
+[MtchPstn 3 4 3 5 1 5 0 0 3 4 2 3 4 2 0 1 1] 
+maxEU search for actor 1 ... 
+ 
+Found 0.6767 at this matching: 
+ 
+[MtchPstn 4 1 5 5 1 1 5 0 1 1 2 0 4 2 3 1 1] 
+Old position  1:  
+[MtchPstn 4 1 0 3 1 4 2 4 4 0 3 5 3 1 0 4 0] 
+New position  1:  
+[MtchPstn 4 1 5 5 1 1 5 0 1 1 2 0 4 2 3 1 1] 
+maxEU search for actor 2 ... 
+ 
+Found 0.6813 at this matching: 
+ 
+[MtchPstn 5 1 2 5 2 1 5 0 3 4 2 0 4 2 2 2 2] 
+Old position  2:  
+[MtchPstn 5 3 3 2 0 5 3 2 2 2 2 3 0 0 5 0 4] 
+New position  2:  
+[MtchPstn 5 1 2 5 2 1 5 0 3 4 2 0 4 2 2 2 2] 
+maxProb search for actor 3 ... 
+ 
+Found 0.9748 at this matching: 
+ 
+[MtchPstn 3 4 2 5 2 5 5 0 1 4 3 3 4 2 0 1 1] 
+Old position  3:  
+[MtchPstn 1 2 5 1 2 0 2 3 4 2 3 3 4 5 1 5 2] 
+New position  3:  
+[MtchPstn 3 4 2 5 2 5 5 0 1 4 3 3 4 2 0 1 1] 
+maxEU search for actor 4 ... 
+ 
+Found 0.7739 at this matching: 
+ 
+[MtchPstn 4 4 5 5 4 4 5 0 1 4 2 0 4 2 3 4 1] 
+Old position  4:  
+[MtchPstn 4 4 3 5 3 1 5 3 2 1 4 1 1 2 0 3 5] 
+New position  4:  
+[MtchPstn 4 4 5 5 4 4 5 0 1 4 2 0 4 2 3 4 1] 
+maxEU search for actor 5 ... 
+ 
+Found 0.7015 at this matching: 
+ 
+[MtchPstn 5 1 5 5 2 5 5 0 5 4 3 0 5 2 3 4 1] 
+Old position  5:  
+[MtchPstn 5 5 1 1 5 1 1 5 2 2 3 4 5 2 2 4 4] 
+New position  5:  
+[MtchPstn 5 1 5 5 2 5 5 0 5 4 3 0 5 2 3 4 1] 
+Util matrix for U(actor_r, pstn_c) in new state:  
+ 0.4708  0.3559  0.3559  0.3943  0.3559  0.3559  
+ 0.3862  0.7646  0.3326  0.3795  0.2258  0.3024  
+ 0.3493  0.3493  0.8139  0.4612  0.3493  0.3617  
+ 0.4738  0.1794  0.1310  0.3923  0.1794  0.3177  
+ 0.5292  0.3341  0.3729  0.5292  0.8752  0.3471  
+ 0.3701  0.4356  0.4670  0.4803  0.4356  0.8055  
+Probability of outcomes in new state:  
+ 0.2043  
+ 0.2462  
+ 0.0081  
+ 0.0577  
+ 0.3736  
+ 0.1101  
+
+Expected utility to actors in new state:  
+ 0.3816  
+ 0.4094  
+ 0.3609  
+ 0.2667  
+ 0.5892  
+ 0.4658  
+Number of changed matchings: 6 
+ 
+Starting Model::run iteration 2 
+maxProb search for actor 0 ... 
+ 
+Found 0.4259 at this matching: 
+ 
+[MtchPstn 5 1 3 5 4 4 5 0 3 4 2 0 4 2 0 4 1] 
+Old position  0:  
+[MtchPstn 3 4 3 5 1 5 0 0 3 4 2 3 4 2 0 1 1] 
+New position  0:  
+[MtchPstn 5 1 3 5 4 4 5 0 3 4 2 0 4 2 0 4 1] 
+maxEU search for actor 1 ... 
+ 
+Found 0.4020 at this matching: 
+ 
+[MtchPstn 4 1 5 5 4 1 5 0 1 4 3 0 4 2 0 1 1] 
+Old position  1:  
+[MtchPstn 4 1 5 5 1 1 5 0 1 1 2 0 4 2 3 1 1] 
+New position  1:  
+[MtchPstn 4 1 5 5 4 1 5 0 1 4 3 0 4 2 0 1 1] 
+maxEU search for actor 2 ... 
+ 
+Found 0.4521 at this matching: 
+ 
+[MtchPstn 5 1 2 5 2 4 5 0 0 4 2 0 4 2 2 4 1] 
+Old position  2:  
+[MtchPstn 5 1 2 5 2 1 5 0 3 4 2 0 4 2 2 2 2] 
+New position  2:  
+[MtchPstn 5 1 2 5 2 4 5 0 0 4 2 0 4 2 2 4 1] 
+maxProb search for actor 3 ... 
+ 
+Found 0.4701 at this matching: 
+ 
+[MtchPstn 5 1 3 5 2 4 5 0 1 4 3 0 4 2 0 4 1] 
+Old position  3:  
+[MtchPstn 3 4 2 5 2 5 5 0 1 4 3 3 4 2 0 1 1] 
+New position  3:  
+[MtchPstn 5 1 3 5 2 4 5 0 1 4 3 0 4 2 0 4 1] 
+maxEU search for actor 4 ... 
+ 
+Found 0.5877 at this matching: 
+ 
+[MtchPstn 4 1 5 5 4 4 5 0 0 4 2 0 4 2 3 4 1] 
+Old position  4:  
+[MtchPstn 4 4 5 5 4 4 5 0 1 4 2 0 4 2 3 4 1] 
+New position  4:  
+[MtchPstn 4 1 5 5 4 4 5 0 0 4 2 0 4 2 3 4 1] 
+maxEU search for actor 5 ... 
+ 
+Found 0.5255 at this matching: 
+ 
+[MtchPstn 5 1 5 5 2 5 5 0 5 4 3 0 4 2 0 4 1] 
+Old position  5:  
+[MtchPstn 5 1 5 5 2 5 5 0 5 4 3 0 5 2 3 4 1] 
+New position  5:  
+[MtchPstn 5 1 5 5 2 5 5 0 5 4 3 0 4 2 0 4 1] 
+Util matrix for U(actor_r, pstn_c) in new state:  
+ 0.5201  0.5201  0.4700  0.5201  0.4700  0.5201  
+ 0.3024  0.6344  0.3024  0.3939  0.3024  0.3024  
+ 0.3493  0.2017  0.6903  0.3617  0.3493  0.3617  
+ 0.2501  0.1533  0.0000  0.2708  0.1794  0.1533  
+ 0.7207  0.5840  0.6328  0.6328  0.7893  0.5190  
+ 0.4670  0.4356  0.4670  0.4670  0.4356  0.7220  
+Probability of outcomes in new state:  
+ 0.1753  
+ 0.0683  
+ 0.0472  
+ 0.3205  
+ 0.2675  
+ 0.1211  
+
+Expected utility to actors in new state:  
+ 0.5043  
+ 0.3544  
+ 0.3608  
+ 0.2077  
+ 0.6730  
+ 0.4873  
+Number of changed matchings: 6 
+ 
+Starting Model::run iteration 3 
+maxProb search for actor 0 ... 
+ 
+Found 0.2984 at this matching: 
+ 
+[MtchPstn 5 1 3 5 4 4 5 0 0 4 2 0 4 2 0 4 1] 
+Old position  0:  
+[MtchPstn 5 1 3 5 4 4 5 0 3 4 2 0 4 2 0 4 1] 
+New position  0:  
+[MtchPstn 5 1 3 5 4 4 5 0 0 4 2 0 4 2 0 4 1] 
+maxEU search for actor 1 ... 
+ 
+Found 0.3614 at this matching: 
+ 
+[MtchPstn 4 1 5 5 4 1 5 0 1 4 3 0 4 2 0 1 1] 
+Old position  1:  
+[MtchPstn 4 1 5 5 4 1 5 0 1 4 3 0 4 2 0 1 1] 
+New position  1:  
+[MtchPstn 4 1 5 5 4 1 5 0 1 4 3 0 4 2 0 1 1] 
+maxEU search for actor 2 ... 
+ 
+Found 0.3724 at this matching: 
+ 
+[MtchPstn 5 1 2 5 2 4 5 0 0 4 2 0 4 2 0 4 1] 
+Old position  2:  
+[MtchPstn 5 1 2 5 2 4 5 0 0 4 2 0 4 2 2 4 1] 
+New position  2:  
+[MtchPstn 5 1 2 5 2 4 5 0 0 4 2 0 4 2 0 4 1] 
+maxProb search for actor 3 ... 
+ 
+Found 0.2966 at this matching: 
+ 
+[MtchPstn 5 1 3 5 4 4 5 0 0 4 2 0 4 2 0 4 1] 
+Old position  3:  
+[MtchPstn 5 1 3 5 2 4 5 0 1 4 3 0 4 2 0 4 1] 
+New position  3:  
+[MtchPstn 5 1 3 5 4 4 5 0 0 4 2 0 4 2 0 4 1] 
+maxEU search for actor 4 ... 
+ 
+Found 0.6727 at this matching: 
+ 
+[MtchPstn 4 4 5 5 4 4 5 0 0 4 3 0 4 2 0 4 1] 
+Old position  4:  
+[MtchPstn 4 1 5 5 4 4 5 0 0 4 2 0 4 2 3 4 1] 
+New position  4:  
+[MtchPstn 4 4 5 5 4 4 5 0 0 4 3 0 4 2 0 4 1] 
+maxEU search for actor 5 ... 
+ 
+Found 0.5016 at this matching: 
+ 
+[MtchPstn 5 1 5 5 4 5 5 0 5 4 3 0 4 2 0 4 1] 
+Old position  5:  
+[MtchPstn 5 1 5 5 2 5 5 0 5 4 3 0 4 2 0 4 1] 
+New position  5:  
+[MtchPstn 5 1 5 5 4 5 5 0 5 4 3 0 4 2 0 4 1] 
+Util matrix for U(actor_r, pstn_c) in new state:  
+ 0.6178  0.5201  0.6178  0.6178  0.6178  0.5201  
+ 0.3024  0.6344  0.3024  0.3024  0.1229  0.3024  
+ 0.3493  0.2017  0.5811  0.3493  0.2017  0.2017  
+ 0.1280  0.1533  0.0000  0.1280  0.1533  0.1533  
+ 0.7207  0.5840  0.6328  0.7207  0.8752  0.6205  
+ 0.4670  0.4356  0.4670  0.4670  0.4356  0.7220  
+Probability of outcomes in new state:  
+ 0.2927  
+ 0.1141  
+ 0.0788  
+ 0.2305  
+ 0.1529  
+ 0.1310  
+
+Expected utility to actors in new state:  
+ 0.5939  
+ 0.3129  
+ 0.3088  
+ 0.1280  
+ 0.7087  
+ 0.4920  
+Number of changed matchings: 5 
+ 
+Starting Model::run iteration 4 
+maxProb search for actor 0 ... 
+ 
+Found 0.2691 at this matching: 
+ 
+[MtchPstn 5 1 5 5 4 4 5 0 0 4 3 0 4 2 0 4 1] 
+Old position  0:  
+[MtchPstn 5 1 3 5 4 4 5 0 0 4 2 0 4 2 0 4 1] 
+New position  0:  
+[MtchPstn 5 1 5 5 4 4 5 0 0 4 3 0 4 2 0 4 1] 
+maxEU search for actor 1 ... 
+ 
+Found 0.3152 at this matching: 
+ 
+[MtchPstn 4 1 5 5 4 1 5 0 1 4 3 0 4 2 0 1 1] 
+Old position  1:  
+[MtchPstn 4 1 5 5 4 1 5 0 1 4 3 0 4 2 0 1 1] 
+New position  1:  
+[MtchPstn 4 1 5 5 4 1 5 0 1 4 3 0 4 2 0 1 1] 
+maxEU search for actor 2 ... 
+ 
+Found 0.3241 at this matching: 
+ 
+[MtchPstn 5 4 2 5 2 5 5 0 0 4 2 0 4 2 0 4 1] 
+Old position  2:  
+[MtchPstn 5 1 2 5 2 4 5 0 0 4 2 0 4 2 0 4 1] 
+New position  2:  
+[MtchPstn 5 4 2 5 2 5 5 0 0 4 2 0 4 2 0 4 1] 
+maxProb search for actor 3 ... 
+ 
+Found 0.2691 at this matching: 
+ 
+[MtchPstn 5 1 5 5 4 4 5 0 0 4 3 0 4 2 0 4 1] 
+Old position  3:  
+[MtchPstn 5 1 3 5 4 4 5 0 0 4 2 0 4 2 0 4 1] 
+New position  3:  
+[MtchPstn 5 1 5 5 4 4 5 0 0 4 3 0 4 2 0 4 1] 
+maxEU search for actor 4 ... 
+ 
+Found 0.6997 at this matching: 
+ 
+[MtchPstn 4 4 5 5 4 4 5 0 0 4 3 0 4 2 0 4 1] 
+Old position  4:  
+[MtchPstn 4 4 5 5 4 4 5 0 0 4 3 0 4 2 0 4 1] 
+New position  4:  
+[MtchPstn 4 4 5 5 4 4 5 0 0 4 3 0 4 2 0 4 1] 
+maxEU search for actor 5 ... 
+ 
+Found 0.4979 at this matching: 
+ 
+[MtchPstn 5 1 5 5 4 5 5 0 5 4 3 0 4 2 0 4 1] 
+Old position  5:  
+[MtchPstn 5 1 5 5 4 5 5 0 5 4 3 0 4 2 0 4 1] 
+New position  5:  
+[MtchPstn 5 1 5 5 4 5 5 0 5 4 3 0 4 2 0 4 1] 
+Util matrix for U(actor_r, pstn_c) in new state:  
+ 0.6178  0.5201  0.6178  0.6178  0.6178  0.5201  
+ 0.3024  0.6344  0.1229  0.3024  0.1229  0.3024  
+ 0.2017  0.2017  0.5811  0.2017  0.2017  0.2017  
+ 0.1533  0.1533  0.0000  0.1533  0.1533  0.1533  
+ 0.7207  0.5840  0.6546  0.7207  0.8752  0.6205  
+ 0.5502  0.4356  0.5900  0.5502  0.4356  0.7220  
+Probability of outcomes in new state:  
+ 0.2524  
+ 0.1040  
+ 0.1210  
+ 0.2524  
+ 0.1214  
+ 0.1488  
+
+Expected utility to actors in new state:  
+ 0.5931  
+ 0.2934  
+ 0.2476  
+ 0.1348  
+ 0.7023  
+ 0.5547  
+Number of changed matchings: 3 
+ 
+Starting Model::run iteration 5 
+maxProb search for actor 0 ... 
+ 
+Found 0.2595 at this matching: 
+ 
+[MtchPstn 5 1 5 5 4 4 5 0 0 4 3 0 4 2 0 4 1] 
+Old position  0:  
+[MtchPstn 5 1 5 5 4 4 5 0 0 4 3 0 4 2 0 4 1] 
+New position  0:  
+[MtchPstn 5 1 5 5 4 4 5 0 0 4 3 0 4 2 0 4 1] 
+maxEU search for actor 1 ... 
+ 
+Found 0.2919 at this matching: 
+ 
+[MtchPstn 4 1 5 5 4 1 5 0 1 4 3 0 4 2 0 1 1] 
+Old position  1:  
+[MtchPstn 4 1 5 5 4 1 5 0 1 4 3 0 4 2 0 1 1] 
+New position  1:  
+[MtchPstn 4 1 5 5 4 1 5 0 1 4 3 0 4 2 0 1 1] 
+maxEU search for actor 2 ... 
+ 
+Found 0.2513 at this matching: 
+ 
+[MtchPstn 5 4 2 5 2 5 5 0 0 4 2 0 4 2 0 4 1] 
+Old position  2:  
+[MtchPstn 5 4 2 5 2 5 5 0 0 4 2 0 4 2 0 4 1] 
+New position  2:  
+[MtchPstn 5 4 2 5 2 5 5 0 0 4 2 0 4 2 0 4 1] 
+maxProb search for actor 3 ... 
+ 
+Found 0.2595 at this matching: 
+ 
+[MtchPstn 5 1 5 5 4 4 5 0 0 4 3 0 4 2 0 4 1] 
+Old position  3:  
+[MtchPstn 5 1 5 5 4 4 5 0 0 4 3 0 4 2 0 4 1] 
+New position  3:  
+[MtchPstn 5 1 5 5 4 4 5 0 0 4 3 0 4 2 0 4 1] 
+maxEU search for actor 4 ... 
+ 
+Found 0.7028 at this matching: 
+ 
+[MtchPstn 4 4 5 5 4 4 5 0 0 4 3 0 4 2 0 4 1] 
+Old position  4:  
+[MtchPstn 4 4 5 5 4 4 5 0 0 4 3 0 4 2 0 4 1] 
+New position  4:  
+[MtchPstn 4 4 5 5 4 4 5 0 0 4 3 0 4 2 0 4 1] 
+maxEU search for actor 5 ... 
+ 
+Found 0.5531 at this matching: 
+ 
+[MtchPstn 5 1 5 5 4 5 5 0 5 4 3 0 4 2 0 4 1] 
+Old position  5:  
+[MtchPstn 5 1 5 5 4 5 5 0 5 4 3 0 4 2 0 4 1] 
+New position  5:  
+[MtchPstn 5 1 5 5 4 5 5 0 5 4 3 0 4 2 0 4 1] 
+Util matrix for U(actor_r, pstn_c) in new state:  
+ 0.6178  0.5201  0.6178  0.6178  0.6178  0.5201  
+ 0.3024  0.6344  0.1229  0.3024  0.1229  0.3024  
+ 0.2017  0.2017  0.5811  0.2017  0.2017  0.2017  
+ 0.1533  0.1533  0.0000  0.1533  0.1533  0.1533  
+ 0.7207  0.5840  0.6546  0.7207  0.8752  0.6205  
+ 0.5502  0.4356  0.5900  0.5502  0.4356  0.7220  
+Probability of outcomes in new state:  
+ 0.2595  
+ 0.1020  
+ 0.1309  
+ 0.2595  
+ 0.1160  
+ 0.1321  
+
+Expected utility to actors in new state:  
+ 0.5949  
+ 0.2919  
+ 0.2513  
+ 0.1333  
+ 0.7028  
+ 0.5531  
+Number of changed matchings: 0 
+ 
+----------------------------------- 
+Finish time: Tue May 30 11:32:11 2017
+ 
+Elapsed time: 8.4082 seconds 
