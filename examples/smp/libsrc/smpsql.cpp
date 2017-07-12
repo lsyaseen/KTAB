@@ -486,7 +486,7 @@ void SMPState::recordProbEduChlg() const {
 
   QSqlQuery query = model->getQuery();
   string qsql;
-  qsql = string("INSERT INTO TpProbVictLoss "
+  qsql = string("INSERT INTO TPProbVictLoss "
     "(ScenarioId, Turn_t, Est_h, Init_i, ThrdP_k, Rcvr_j, Prob, Util_V, Util_L) "
     "VALUES ("
     "'") + model->getScenarioID() + "',"

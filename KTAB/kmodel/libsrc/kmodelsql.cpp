@@ -427,7 +427,7 @@ KTable * Model::createSQL(unsigned int n)
     // P{^h}( ik > j )      probability ik defeats j,
     // U{^h}{_k} (ik > j)   utility to k of winning with i, over j
     // U{^h}{_k} (i > jk)   utility to k of losing to i, with j
-    sql = "create table if not exists TpProbVictLoss ("  \
+    sql = "create table if not exists TPProbVictLoss ("  \
           "ScenarioId VARCHAR(32) NOT NULL DEFAULT 'None', "\
           "Turn_t     INTEGER     NOT NULL DEFAULT 0, "\
           "Est_h      INTEGER     NOT NULL DEFAULT 0, "\
@@ -438,7 +438,7 @@ KTable * Model::createSQL(unsigned int n)
           "Util_V     FLOAT       NOT NULL DEFAULT 0, "\
           "Util_L     FLOAT       NOT NULL DEFAULT 0  "\
           ");";
-    name = "TpProbVictLoss";
+    name = "TPProbVictLoss";
     grpID = 2;
     break;
 
