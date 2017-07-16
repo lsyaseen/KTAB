@@ -17,7 +17,7 @@ do
   timestamp="$(date --utc +%Y-%m-%d_%H-%M-%S-%NZ)"
   name="smpc-${timestamp}_GMT"
   echo "${i}: ${name}" 
-  ../smpc --seed 0 --logmin --dbname ${name}.db --euSMP
+  ../smpc --seed 0 --logmin --connstr "Driver=QSQLITE;Database=${name}" --euSMP
 done
 
 
