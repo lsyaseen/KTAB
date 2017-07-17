@@ -49,7 +49,9 @@ if (build_static_lib)
 
         require_cpp11()
         add_library(easyloggingpp STATIC src/easylogging++.cc)
-
+if(UNIX)
+        set_property(TARGET easyloggingpp PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif(UNIX)
         install(TARGETS
             easyloggingpp
             ARCHIVE DESTINATION lib)
