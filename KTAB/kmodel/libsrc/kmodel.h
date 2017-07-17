@@ -430,6 +430,8 @@ public:
   void commitDBTransaction();
   QSqlQuery getQuery();
 
+  static void configLogger(string logFile);
+
 protected:
   //static string createTableSQL(unsigned int tn);
   static const int NumTables = 13; //TODO: constant need to be redefined when new table is added

@@ -899,6 +899,11 @@ double Actor::vProbLittle(VotingRule vr, double wn, double uni, double unj, doub
   return pin;
 }
 
+void Model::configLogger(string logFile) {
+  el::Configurations confFromFile(logFile);
+  el::Loggers::reconfigureAllLoggers(confFromFile);
+}
+
 } // end of namespace
 
 // --------------------------------------------

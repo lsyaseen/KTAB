@@ -29,9 +29,6 @@
 #include "demosmp.h"
 #include <functional>
 #include <easylogging++.h>
-#include <QApplication>
-
-INITIALIZE_EASYLOGGINGPP
 
 using KBase::PRNG;
 using KBase::KMatrix;
@@ -181,11 +178,8 @@ int main(int ac, char **av) {
     return 0;
   }
 
-  QCoreApplication::addLibraryPath("./plugins");
-
   // Set logging configuration from a file
-  el::Configurations confFromFile("./smpc-logger.conf");
-  el::Loggers::reconfigureAllLoggers(confFromFile);
+  SMPLib::SMPModel::configLogger("./smpc-logger.conf");
 
   auto sTime = KBase::displayProgramStart(DemoSMP::appName, DemoSMP::appVersion);
   if (0 == seed) {
@@ -206,20 +200,19 @@ int main(int ac, char **av) {
       seed = KBase::dSeed;
   }
 
+  SMPLib::SMPModel::loginCredentials(connstr);
+
   // note that we reset the seed every time, so that in case something
   // goes wrong, we need not scroll back too far to find the
   // seed required to reproduce the bug.
   if (euSmpP) {
-    SMPLib::SMPModel::loginCredentials(connstr);
     SMPLib::SMPModel::randomSMP(0, 0, randAccP, seed, sqlFlags);
   }
   if (csvP) {
-    SMPLib::SMPModel::loginCredentials(connstr);
     SMPLib::SMPModel::runModel(sqlFlags, inputCSV, seed, saveHist);
     SMPLib::SMPModel::destroyModel();
   }
   if (xmlP) {
-    SMPLib::SMPModel::loginCredentials(connstr);
     SMPLib::SMPModel::runModel(sqlFlags, inputXML, seed, saveHist);
     SMPLib::SMPModel::destroyModel();
   }
