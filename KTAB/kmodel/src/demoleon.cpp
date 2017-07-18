@@ -26,9 +26,6 @@
 
 
 #include "demoleon.h"
-#include <easylogging++.h>
-
-INITIALIZE_EASYLOGGINGPP
 
 
 using KBase::PRNG;

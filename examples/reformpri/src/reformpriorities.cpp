@@ -27,9 +27,7 @@
 #include "reformpriorities.h"
 #include "rplib2.h"
 #include <tuple>
-#include <easylogging++.h>
 
-INITIALIZE_EASYLOGGINGPP
 
 namespace RfrmPri {
 // namespace to hold everything related to the

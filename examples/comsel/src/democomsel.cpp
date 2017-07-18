@@ -37,9 +37,7 @@
 #include "smp.h"
 #include "comsel.h"
 #include "democomsel.h"
-#include <easylogging++.h>
 
-INITIALIZE_EASYLOGGINGPP
 
 using namespace std;
 using KBase::VUI;

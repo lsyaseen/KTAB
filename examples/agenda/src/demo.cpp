@@ -28,7 +28,6 @@
 #include "demo.h"
 #include <easylogging++.h>
 
-INITIALIZE_EASYLOGGINGPP
 
 using std::string;
 using std::vector;

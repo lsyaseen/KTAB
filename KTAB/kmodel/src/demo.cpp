@@ -31,8 +31,6 @@
 #include "csvdemo.h"
 #include <easylogging++.h>
 
-INITIALIZE_EASYLOGGINGPP
-
 using std::get;
 using std::string;
 using std::tuple;
