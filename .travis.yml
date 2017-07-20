@@ -123,8 +123,8 @@ script:
   - ./SMPC_RefRuns_Compare.sh > ./smp.log
 
 after_success:
-  - cat ../../ktab.out
-  - cat ./smp.out
+  - cat ../../ktab.log
+  - cat ./smp.log
 
 after_failure:
   - cat ../../ktab.log
