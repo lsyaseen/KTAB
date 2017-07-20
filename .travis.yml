@@ -125,11 +125,11 @@ script:
   - ./KTAB_Test_Apps_Travis.sh > ./ktab.out
   - cd ./examples/smp
   - ./SMPC_RefRuns_Compare.sh > ./smp.out
-after_success:
+#after_success:
   #- cd $TRAVIS_BUILD_DIR
   #- ls
   #- cat demoutilsLOG.out
   
-after_failure:
+#after_failure:
   - cat ./ktab.out
   - cat .examples/smp/smp.out
