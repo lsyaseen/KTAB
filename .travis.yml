@@ -119,19 +119,10 @@ before_script:
 script:
   - ./reconfig.sh
 
-  #- ./examples/smp/smpc --csv ./examples/smp/doc/SOE-Pol-Comp.csv
-  #- ./examples/smp/smpc --csv ./examples/smp/doc/dummyData_3Dim.csv
-  #- ./KTAB/kmodel/demomodel --emod
+  - cd $TRAVIS_BUILD_DIR
   - ./KTAB_Test_Apps_Travis.sh > ./ktab.out
+  - cat ./ktab.out  
+  
   - cd $TRAVIS_BUILD_DIR/examples/smp
   - ./SMPC_RefRuns_Compare.sh > ./smp.out
-#after_success:
-  #- cd $TRAVIS_BUILD_DIR
-  #- ls
-  #- cat demoutilsLOG.out
-  
-#after_failure:
-  - cd $TRAVIS_BUILD_DIR
-  - cat ./ktab.out
-  - cd $TRAVIS_BUILD_DIR/examples/smp
   - cat ./smp.out
