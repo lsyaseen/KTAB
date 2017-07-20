@@ -21,7 +21,7 @@ Compilation of the SMP project now results in a dynamic link library for the SMP
 
 A few changes need to be made to how some supporting libraries for KTAB are compiled; specifically:
 
-- On Linux, Tinyxml must be recompiled with the `-fPIC` flag.  We recommend adding this into that project's `CMakeLists.txt` file by setting the POSITION_INDEPENDENT_CODE property; for example, as in "set_target_properties(tinyxml2_static PROPERTIES COMPILE_DEFINITONS "TINYXML2_EXPORT" VERSION "${GENERIC_LIB_VERSION}" SOVERSION "${GENERIC_LIB_SOVERSION}" POSITION_INDEPENDENT_CODE ON)"
+- On Linux, Tinyxml2 must be recompiled with the `-fPIC` flag.  We recommend adding this into that project's `CMakeLists.txt` file by setting the POSITION_INDEPENDENT_CODE property; for example, as in "set_target_properties(tinyxml2_static PROPERTIES COMPILE_DEFINITONS "TINYXML2_EXPORT" VERSION "${GENERIC_LIB_VERSION}" SOVERSION "${GENERIC_LIB_SOVERSION}" POSITION_INDEPENDENT_CODE ON)"
 
 - On both Windows & Linux, easylogging++ must be recompiled with the new CMakeLists.txt file available [here](./easyloggingpp/CMakeLists.txt); please see the [compilation instructions](./easyloggingpp/compiling_elpp.md).
 
