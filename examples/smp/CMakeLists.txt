@@ -100,6 +100,15 @@ if(NOT MINICSV_DIR)
 endif(NOT MINICSV_DIR)
 
 # -------------------------------------------------
+find_package(qtlibs)
+set(CMAKE_PREFIX_PATH ${PREFIX_PATH})
+message(STATUS "CMAKE_PREFIX_PATH" ${CMAKE_PREFIX_PATH})
+
+find_package(Qt5 REQUIRED COMPONENTS Core Sql)
+
+# -------------------------------------------------    
+#Enable export of all classes and functions for windows platform
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 include_directories (
   ${KUTILS_INCLUDE_DIR}
@@ -120,15 +129,55 @@ set(SMPLIB_SRCS
   ${PROJECT_SOURCE_DIR}/libsrc/smpsql.cpp
   )
 
-find_package(qtlibs)
-set(CMAKE_PREFIX_PATH ${PREFIX_PATH})
-message(STATUS "CMAKE_PREFIX_PATH" ${CMAKE_PREFIX_PATH})
+set(KTAB_DIR ${PROJECT_SOURCE_DIR}/../../KTAB)
 
-find_package(Qt5 REQUIRED COMPONENTS Core Sql)
+set(KUTILS_SRC_DIR ${KTAB_DIR}/kutils)
+set(KUTILS_SRCS
+  ${KUTILS_SRC_DIR}/libsrc/kutils.cpp
+  ${KUTILS_SRC_DIR}/libsrc/prng.cpp
+  ${KUTILS_SRC_DIR}/libsrc/gaopt.cpp
+  ${KUTILS_SRC_DIR}/libsrc/kmatrix.cpp
+  ${KUTILS_SRC_DIR}/libsrc/hcsearch.cpp
+  ${KUTILS_SRC_DIR}/libsrc/vimcp.cpp
+)
 
+set(KMODEL_SRC_DIR ${KTAB_DIR}/kmodel)
+set(KMODEL_SRCS
+  ${KMODEL_SRC_DIR}/libsrc/kmodel.cpp
+  ${KMODEL_SRC_DIR}/libsrc/kmodelsql.cpp
+  ${KMODEL_SRC_DIR}/libsrc/emodel.cpp
+  ${KMODEL_SRC_DIR}/libsrc/kstate.cpp
+  ${KMODEL_SRC_DIR}/libsrc/kposition.cpp
+  )
+
+add_library(smpDyn SHARED ${KUTILS_SRCS} ${KMODEL_SRCS} ${SMPLIB_SRCS})
+if(UNIX)
+  set_property(TARGET smpDyn PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif(UNIX)
+
+target_link_libraries (smpDyn
+  ${SQLITE_LIBRARIES}
+  ${EFENCE_LIBRARIES}
+  ${TINYXML2_LIBRARIES}
+  ${LOGGER_LIBRARY}
+  Qt5::Widgets
+  Qt5::Core
+  Qt5::Sql
+ )
+
+add_executable (smpcDyn
+  src/demosmp.cpp
+  )
+
+target_link_libraries (smpcDyn
+  smpDyn
+  )
+
+# -------------------------------------------------
 add_library(smp STATIC ${SMPLIB_SRCS})
 
 target_link_libraries (smp
+  Qt5::Widgets
   Qt5::Core
   Qt5::Sql
   )
@@ -164,7 +213,6 @@ install(
   ${SMP_INSTALL_DIR}/include)
 
 # -------------------------------------------------
-# -------------------------------------------------
 
 add_executable (smpc
   src/demosmp.cpp
@@ -172,7 +220,6 @@ add_executable (smpc
 
 target_link_libraries (smpc
   smp
-  Qt5::Widgets
   ${KMODEL_LIBRARY}
   ${KUTILS_LIBRARY}
   ${SQLITE_LIBRARIES}

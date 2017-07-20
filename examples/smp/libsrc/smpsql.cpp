@@ -30,6 +30,7 @@
 #include <QSqlQuery>
 #include <QVariant>
 #include <QSqlError>
+#include <QCoreApplication>
 
 namespace SMPLib {
 using std::function;
@@ -139,6 +140,7 @@ KTable * SMPModel::createSQL(unsigned int n)  {
 
 
 void SMPModel::sqlTest() {
+  QCoreApplication::addLibraryPath("./plugins");
   initDBDriver(QString("smpDB"));
 
   if (0 == dbDriver.compare("QPSQL")) {
@@ -187,6 +189,10 @@ void SMPModel::sqlTest() {
     qtDB->open();
     query = QSqlQuery(*qtDB);
     configSqlite();
+  }
+  else {
+      LOG(INFO) << "Invalid DB driver name";
+      assert(false);
   }
 
   // Create & execute SQL statements

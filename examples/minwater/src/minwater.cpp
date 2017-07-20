@@ -31,9 +31,7 @@
 #include "2015-10-24-merged-port.h"
 #include "2015-10-24-merged-prod.h"
 #include "2015-10-24-merged-scen.h"
-#include <easylogging++.h>
 
-INITIALIZE_EASYLOGGINGPP
 
 
 namespace DemoWaterMin {

@@ -34,8 +34,6 @@
 
 #include <inttypes.h>
 #include "demo.h"
-#include <easylogging++.h>
-INITIALIZE_EASYLOGGINGPP
 
 using KBase::newChars;
 using KBase::PRNG;
