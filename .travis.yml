@@ -118,11 +118,14 @@ before_script:
 
 script:
   - ./reconfig.sh
-
-  - cd $TRAVIS_BUILD_DIR
-  - ./KTAB_Test_Apps_Travis.sh > ./ktab.out
-  - cat ./ktab.out  
-  
+  - ./KTAB_Test_Apps_Travis.sh > ./ktab.log
   - cd $TRAVIS_BUILD_DIR/examples/smp
-  - ./SMPC_RefRuns_Compare.sh > ./smp.out
+  - ./SMPC_RefRuns_Compare.sh > ./smp.log
+
+after_success:
+  - cat ../../ktab.out
   - cat ./smp.out
+
+after_failure:
+  - cat ../../ktab.log
+  - cat ./smp.log
