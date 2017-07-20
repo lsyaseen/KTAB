@@ -13,6 +13,8 @@ The `smpc` application no longer has the `--dbname` flag, which has been supplan
 
 For PostgreSQL, the database user specified in database_user_name must have "connect" access to the default `postgres` database, as well as the rights to create tables, insert data, and select data on at least one database.  Optionally, the user could have rights to add databases.
 
+There are several new dynamic link libraries which are necessary to support this additional functionality.  These will be included in the KTAB_SMP.zip release archive.
+
 
 ## Compilation of SMP Dynamic Link Library
 Compilation of the SMP project now results in a dynamic link library for the SMP model, as well as the existing `smpc` and `KTAB_SMP` applications.  This library can be useful for embedding the SMP model in other applications - even those not built in C++.  On Windows, the library is named `smpDyn.dll`, and on Linux, it is `libsmpDyn.so`.  There is also a new application compiled named `smpcDyn` which uses the library; no change has been made to the existing SMP applications.  Use of the new SMP library will be documented elsewhere.
