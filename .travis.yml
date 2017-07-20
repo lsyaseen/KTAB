@@ -123,7 +123,7 @@ script:
   #- ./examples/smp/smpc --csv ./examples/smp/doc/dummyData_3Dim.csv
   #- ./KTAB/kmodel/demomodel --emod
   - ./KTAB_Test_Apps_Travis.sh > ./ktab.out
-  - cd ./examples/smp
+  - cd $TRAVIS_BUILD_DIR/examples/smp
   - ./SMPC_RefRuns_Compare.sh > ./smp.out
 #after_success:
   #- cd $TRAVIS_BUILD_DIR
@@ -133,4 +133,5 @@ script:
 #after_failure:
   - cd $TRAVIS_BUILD_DIR
   - cat ./ktab.out
-  - cat ./examples/smp/smp.out
+  - cd $TRAVIS_BUILD_DIR./examples/smp
+  - cat ./smp.out
