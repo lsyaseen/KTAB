@@ -1,3 +1,7 @@
+# --------------------------------------------
+# Copyright KAPSARC. Open source MIT License.
+# --------------------------------------------
+
 cmake_minimum_required(VERSION 2.8.12)
 
 project(Easyloggingpp CXX)
@@ -89,3 +93,10 @@ if (test)
 
     add_test(NAME easyloggingppUnitTests COMMAND easyloggingpp-unit-tests -v)
 endif()
+# --------------------------------------------
+if (UNIX OR MINGW)
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+endif(UNIX OR MINGW)
+# --------------------------------------------
+# Copyright KAPSARC. Open source MIT License.
+# --------------------------------------------
