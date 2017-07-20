@@ -131,5 +131,6 @@ script:
   #- cat demoutilsLOG.out
   
 #after_failure:
+  - cd $TRAVIS_BUILD_DIR
   - cat ./ktab.out
   - cat .examples/smp/smp.out
