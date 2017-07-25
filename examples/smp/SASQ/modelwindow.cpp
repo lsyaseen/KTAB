@@ -26,7 +26,7 @@
 ModelFrame::ModelFrame(QObject *parent)
 {
     frameMainLayout = new QGridLayout(this);
-    intializeFrameLayout();
+    initializeFrameLayout();
     setLayout(frameMainLayout);
 
 }
@@ -331,7 +331,7 @@ void ModelFrame::initializeModelSpecifications()
     modelSpecsGridLayout->addWidget(specsListView);
 }
 
-void ModelFrame::intializeFrameLayout()
+void ModelFrame::initializeFrameLayout()
 {
     QFrame * topFrame = new QFrame;
     QGridLayout * gridL = new QGridLayout;
@@ -408,18 +408,27 @@ void ModelFrame::addAllClicked(bool bl)
 void ModelFrame::addSpecClicked(bool bl)
 {
     int count = 0;
+    int specsCount = specsListModel->rowCount();
     QString specification;
     specification.append(parameterName->currentText()).append("=(");
+    QVector <QString> params;
     for(int para = 0 ; para < parametersCheckBoxList.length(); ++ para)
     {
         if(true==parametersCheckBoxList.at(para)->isChecked())
         {
+            params.append(parametersCheckBoxList.at(para)->text());
             specification.append(parametersCheckBoxList.at(para)->text()).append(",");
             count++;
         }
     }
+    if(!params.isEmpty())
+    {
+        modelParaLHS.append(parameterName->currentText());
+        modelParaRHS.append(params);
+    }
     specification.append(")");
     specification.remove(",)").append(")");
+    qDebug()<<modelParaRHS << modelParaLHS;
 
     if(count>0)
     {
@@ -430,18 +439,44 @@ void ModelFrame::addSpecClicked(bool bl)
         specsListModel->setItem(specsListModel->rowCount(),item);
         specsListView->scrollToBottom();
     }
+
+    if(specsCount != specsListModel->rowCount())
+    {
+        for(int i = 0 ; i < specsListModel->rowCount(); ++i)
+        {
+            qDebug()<<specsListModel->item(i)->data().toString();
+        }
+        QPair<DataValues,SpecsData> spec;
+        spec.first = modelParaLHS;
+        spec.second = modelParaRHS;
+
+        emit modelList(specsListModel,spec);
+    }
 }
 
 void ModelFrame::listViewClicked()
 {
+    int specsCount = specsListModel->rowCount();
+
     for(int index=0; index < specsListModel->rowCount();++index)
     {
         QStandardItem * item = specsListModel->item(index);
         if (item->data(Qt::CheckStateRole).toBool() == true)   // Item checked, remove
         {
             specsListModel->removeRow(index);
+            modelParaLHS.removeAt(index);
+            modelParaRHS.removeAt(index);
             index = index -1; // index changed to current row, deletion of item changes list index
         }
+    }
+
+    if(specsCount != specsListModel->rowCount())
+    {
+        QPair<DataValues,SpecsData> spec;
+        spec.first = modelParaLHS;
+        spec.second = modelParaRHS;
+        emit modelList(specsListModel,spec);
+
     }
 }
 
@@ -451,10 +486,30 @@ void ModelFrame::modelListViewContextMenu(QPoint pos)
     {
         QMenu *menu = new QMenu(this);
         menu->addAction("Remove Selected Items", this, SLOT(listViewClicked()));
+        menu->addAction("Remove All Items", this, SLOT(listViewRemoveAllClicked()));
         menu->popup(specsListView->mapToGlobal(pos));
     }
 }
 
+void ModelFrame::listViewRemoveAllClicked()
+{
+    int specsCount = specsListModel->rowCount();
 
+    for(int index=0; index < specsListModel->rowCount();++index)
+    {
+        specsListModel->removeRow(index);
+        modelParaLHS.removeAt(index);
+        modelParaRHS.removeAt(index);
+        index = index -1; // index changed to current row, deletion of item changes list index
+    }
+
+    if(specsCount != specsListModel->rowCount())
+    {
+        QPair<DataValues,SpecsData> spec;
+        spec.first = modelParaLHS;
+        spec.second = modelParaRHS;
+        emit modelList(specsListModel,spec);
+    }
+}
 
 

@@ -80,6 +80,11 @@ private :
     enum { maxRecentFilesCount = 5 };
     QAction *recentFileActs[maxRecentFilesCount];
 
+    using DataValues = QVector <QString>;
+    using SpecsData = QVector <DataValues>;
+    using SpecificationVector = QVector<SpecsData>;
+    using Specifications = QVector<SpecificationVector>;
+
     void setCurrentFile(const QString &fileName);
     void updateRecentFileActions();
     QString strippedName(const QString &fullFileName);
@@ -95,16 +100,15 @@ private slots:
     void runModel(bool bl);
     void displayMessage(QString cls, QString message);
 
-
     //GUI Initialization
 private :
-    QFrame * centralMainFrame;
-    QGridLayout * centralFrameGridLayout;
-    QStackedWidget * sasStackedWidget;
-    QFrame * modelFrame;
-    QFrame * actorFrame;
-    QFrame * specificationsFrame;
-    QFrame * navigationFrame;
+    QFrame * centralMainFrame= nullptr;
+    QGridLayout * centralFrameGridLayout= nullptr;
+    QStackedWidget * sasStackedWidget= nullptr;
+    QFrame * modelFrame= nullptr;
+    QFrame * actorFrame= nullptr;
+    QFrame * specificationsFrame= nullptr;
+    QFrame * navigationFrame= nullptr;
 
     void intializeGUI();
     void modelFrameInitialization();
@@ -112,9 +116,9 @@ private :
     void specsFrameInitialization();
 
     //navigation
-    QPushButton * modelPushButton;
-    QPushButton * actorPushButton;
-    QPushButton * specsPushButton;
+    QPushButton * modelPushButton= nullptr;
+    QPushButton * actorPushButton= nullptr;
+    QPushButton * specsPushButton= nullptr;
 
 private slots :
     void modelNaviClicked();
@@ -124,21 +128,42 @@ private slots :
     void openStatusXml(bool status);
     void xmlDataParsedFromFile(QStringList modelDesc,QStringList modelParametes,
                                QStringList dimensionNames,QStandardItemModel* xmlModel,
-                               QList<QStringList>idealAdjustmentList);
+                               QVector<QStringList>idealAdjustmentList);
+    void actorsItemListModel(QStandardItemModel*specsList, QStringList attributes, QPair<DataValues,SpecsData> specsVec);
+    void modelparamListModel(QStandardItemModel*specsList, QPair<DataValues, SpecsData> spec);
+    void filtersListModel(QStandardItemModel*specsList, QPair<SpecsData, SpecificationVector> specsVec);
+    void crossProdListModel(QStandardItemModel*specsList,  QPair<SpecsData,SpecificationVector> specsVec);
+    void combinedModel();
 
 private :
-    ModelFrame * modelFrameObj;
-    ActorFrame * actorFrameObj;
-    CSV * csvParserObj;
-    Xmlparser * xmlParserObj;
+    ModelFrame * modelFrameObj= nullptr;
+    ActorFrame * actorFrameObj= nullptr;
+    SpecificationFrame * specsFrameObj= nullptr;
+    CSV * csvParserObj= nullptr;
+    Xmlparser * xmlParserObj= nullptr;
+
+    QStandardItemModel * actorListModel= nullptr;
+    QStandardItemModel * modelListModel= nullptr;
+    QStandardItemModel * filterListModel= nullptr;
+    QStandardItemModel * crossProductListModel= nullptr;
+    QStandardItemModel * combinedSASModel= nullptr;
+
+    QPair<DataValues,SpecsData>  modelSpecs;
+    QPair<DataValues,SpecsData> actorSpecs;
+    QPair<SpecsData,SpecificationVector> filterSpecs ;
+    QPair<SpecsData,SpecificationVector> crossProductSpecs;
+
 signals:
     void csvFilePath(QString);
     void setActorModel(QStandardItemModel *,QStringList);
     void readXMLFile();
     void openXMLFile(QString file);
     void setAccomodationTableModel(QStandardItemModel *actModel,
-                                   QList<QStringList> idealAdjustmentList,
+                                   QVector<QStringList> idealAdjustmentList,
                                    QStringList dims,QStringList desc);
+    void specsItemListModel(QStandardItemModel*,QPair<DataValues,SpecsData>, QPair<DataValues,SpecsData>,
+                            QPair<SpecsData,SpecificationVector>,QPair<SpecsData,SpecificationVector>);
+    void actorAttributesAndSAS(QStringList attributes, QStringList sasValues);
 };
 
 

@@ -67,7 +67,7 @@ public:
     QStringList thridpartyList;
     QStringList interVecList;
     QStringList bargnList;
-    QList <QStringList>  modelParameters;
+    QVector <QStringList>  modelParameters;
 
     QComboBox * parameterName;
     QFrame * parmetersFrame;
@@ -91,16 +91,31 @@ public:
     void initializeModelControls();
     void initializeModelSpecifications();
 
-    QList <QCheckBox *> parametersCheckBoxList;
+    using DataValues = QVector <QString>;
+    using SpecsData = QVector <DataValues>;
+    using SpecificationVector = QVector<SpecsData>;
+    using Specifications = QVector<SpecificationVector>;
+
+    QVector <QCheckBox *> parametersCheckBoxList;
+    DataValues modelParaLHS;
+    SpecsData modelParaRHS = SpecsData();
+
 private :
-    void intializeFrameLayout();
+    void initializeFrameLayout();
+
+signals:
+    void modelList(QStandardItemModel *,  QPair<DataValues,SpecsData> );
+
 
 private slots:
     void parameterChanged(int index);
     void addAllClicked(bool bl);
     void addSpecClicked(bool bl);
     void listViewClicked();
-    void modelListViewContextMenu(QPoint pos);
+     void modelListViewContextMenu(QPoint pos);
+
+public slots:
+    void listViewRemoveAllClicked();
 
 };
 

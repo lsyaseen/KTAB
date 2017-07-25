@@ -63,13 +63,13 @@ void MainWindow::createConnections()
     connect(this,SIGNAL(readXMLFile()),xmlParserObj,SLOT(readXmlFile()));
     connect(xmlParserObj,SIGNAL(openXMLStatus(bool)),this,SLOT(openStatusXml(bool)));
     connect(xmlParserObj,SIGNAL(xmlParsedData(QStringList,QStringList,QStringList,QStandardItemModel*,
-                                              QList<QStringList>)),this,
+                                              QVector<QStringList>)),this,
             SLOT(xmlDataParsedFromFile(QStringList,QStringList,QStringList,QStandardItemModel*,
-                                       QList<QStringList>)));
+                                       QVector<QStringList>)));
 
-    connect(this,SIGNAL(setAccomodationTableModel(QStandardItemModel*,QList<QStringList>,
+    connect(this,SIGNAL(setAccomodationTableModel(QStandardItemModel*,QVector<QStringList>,
                                                   QStringList,QStringList)),actorFrameObj,
-            SLOT(setAccTableModel(QStandardItemModel*,QList<QStringList>,QStringList,QStringList)));
+            SLOT(setAccTableModel(QStandardItemModel*,QVector<QStringList>,QStringList,QStringList)));
 
     connect(this,SIGNAL(saveXMLDataToFile(QStringList,QStandardItemModel*,QStandardItemModel*,QString)),
             xmlParserObj,SLOT(saveToXmlFile(QStringList,QStandardItemModel*,QStandardItemModel*,QString)));
@@ -94,7 +94,9 @@ void MainWindow::intializeGUI()
 
     modelFrameInitialization(); // 1st Window
     actorFrameInitialization(); // 2nd Window
+    specsFrameInitialization(); // 3rd window
 
+    sasStackedWidget->addWidget(modelFrame);
     sasStackedWidget->addWidget(actorFrame);
     sasStackedWidget->addWidget(specificationsFrame);
 
@@ -138,12 +140,38 @@ void MainWindow::modelFrameInitialization()
 {
     modelFrameObj= new ModelFrame(sasStackedWidget);
     sasStackedWidget->addWidget(modelFrameObj);
+    connect(modelFrameObj,SIGNAL(modelList(QStandardItemModel*, QPair<DataValues,SpecsData> )),
+            this,SLOT(modelparamListModel(QStandardItemModel*, QPair<DataValues,SpecsData> )));
+    modelListModel= new QStandardItemModel;
 }
 
 void MainWindow::actorFrameInitialization()
 {
     actorFrameObj= new ActorFrame(sasStackedWidget);
     sasStackedWidget->addWidget(actorFrameObj);
+    connect(actorFrameObj,SIGNAL(modelList(QStandardItemModel*,QStringList, QPair<DataValues,SpecsData>)),
+            this,SLOT(actorsItemListModel(QStandardItemModel*,QStringList, QPair<DataValues,SpecsData>)));
+    actorListModel= new QStandardItemModel;
+
+}
+
+void MainWindow::specsFrameInitialization()
+{
+    specsFrameObj= new SpecificationFrame(sasStackedWidget);
+    sasStackedWidget->addWidget(specsFrameObj);
+    connect(this,SIGNAL(specsItemListModel(QStandardItemModel*, QPair<DataValues,SpecsData>,QPair<DataValues,SpecsData>,
+                                            QPair<SpecsData,SpecificationVector>, QPair<SpecsData,SpecificationVector>)),
+            specsFrameObj,SLOT(specsListMainWindow(QStandardItemModel*, QPair<DataValues,SpecsData>,QPair<DataValues,SpecsData>,
+                                                    QPair<SpecsData,SpecificationVector>, QPair<SpecsData,SpecificationVector>)));
+    connect(this,SIGNAL(actorAttributesAndSAS(QStringList,QStringList)),
+            specsFrameObj,SLOT(actorAtrributesSAS(QStringList,QStringList)));
+    connect(specsFrameObj,SIGNAL(filterList(QStandardItemModel*,  QPair<SpecsData,SpecificationVector>)),
+            this,SLOT(filtersListModel(QStandardItemModel*,  QPair<SpecsData,SpecificationVector>)));
+    connect(specsFrameObj,SIGNAL(crossProductList(QStandardItemModel*, QPair<SpecsData,SpecificationVector>)),
+            this,SLOT(crossProdListModel(QStandardItemModel*, QPair<SpecsData,SpecificationVector>)));
+
+    filterListModel = new QStandardItemModel;
+    crossProductListModel = new QStandardItemModel;
 }
 
 void MainWindow::modelNaviClicked()
@@ -495,6 +523,27 @@ void MainWindow::runModel(bool bl)
 void MainWindow::clearSpecifications(bool bl)
 {
     modelNaviClicked();//Model Attributes Window
+    //clear Model Frame Specs
+       modelFrameObj->listViewRemoveAllClicked();
+
+       //clear Actor Frame Specs
+       actorFrameObj->listViewRemoveAllClicked();
+       //    actorFrameObj->clearModels();
+
+       //clear Filter Specs
+       specsFrameObj->filterListViewRemoveAllClicked();
+
+       //clear CrossProduct Specs
+       specsFrameObj->crossproductRemoveAllClicked();
+
+       //clear Speceifications
+       specsFrameObj->listViewSpecsRemoveAllClicked();
+
+       actorListModel->clear();
+       modelListModel->clear();
+       filterListModel->clear();
+       crossProductListModel->clear();
+       combinedSASModel->clear();
 }
 
 void MainWindow::openStatusXml(bool status)
@@ -504,17 +553,99 @@ void MainWindow::openStatusXml(bool status)
         emit readXMLFile();
     }
     else
+    {
         displayMessage("Xml Parser", "Unable to open File");
-
+    }
 }
 
 void MainWindow::xmlDataParsedFromFile(QStringList modelDesc, QStringList modpara,
                                        QStringList dims, QStandardItemModel * actModel,
-                                       QList<QStringList> idealAdjustmentList)
+                                       QVector<QStringList> idealAdjustmentList)
 {
     emit setAccomodationTableModel(actModel,idealAdjustmentList,dims,modelDesc);
+}
+
+void MainWindow::actorsItemListModel(QStandardItemModel * specsList, QStringList attributes,
+                                     QPair<DataValues,SpecsData> specsVec)
+{
+    combinedSASModel = new QStandardItemModel;
+
+    actorSpecs = (specsVec);
+
+    actorListModel= new QStandardItemModel;
+    QStringList sasValues;
+    for(int i = 0 ; i < specsList->rowCount(); ++i)
+    {
+        actorListModel->appendRow(new QStandardItem(specsList->item(i)->text()));
+        sasValues.append(specsList->item(i)->text());
+    }
+    emit actorAttributesAndSAS(attributes,sasValues);
+    combinedModel();
+}
+
+void MainWindow::modelparamListModel(QStandardItemModel * specsList,  QPair<DataValues,SpecsData> spec)
+{
+    combinedSASModel = new QStandardItemModel;
+
+    modelSpecs = spec;
+    qDebug()<<"modelparamListModel";
+    modelListModel= new QStandardItemModel;
+    for(int i = 0 ; i < specsList->rowCount(); ++i)
+    {
+        modelListModel->appendRow(new QStandardItem(specsList->item(i)->text()));
+    }
+    combinedModel();
+}
+
+void MainWindow::filtersListModel(QStandardItemModel *specsList,  QPair<SpecsData,SpecificationVector> specsVec)
+{
+    combinedSASModel = new QStandardItemModel;
+    filterSpecs = (specsVec);
+    filterListModel= new QStandardItemModel;
+
+    for(int i = 0 ; i < specsList->rowCount(); ++i)
+    {
+        filterListModel->appendRow(new QStandardItem(specsList->item(i)->text()));
+    }
+    combinedModel();
+}
+
+void MainWindow::crossProdListModel(QStandardItemModel *specsList, QPair<SpecsData, SpecificationVector> specsVec)
+{
+    combinedSASModel = new QStandardItemModel;
+    crossProductSpecs = specsVec;
+    crossProductListModel= new QStandardItemModel;
+    for(int i = 0 ; i < specsList->rowCount(); ++i)
+    {
+        crossProductListModel->appendRow(new QStandardItem(specsList->item(i)->text()));
+    }
+    combinedModel();
+}
+
+void MainWindow::combinedModel()
+{
+    qDebug()<<"combinedModel";
+    //combined
+    for(int i = 0 ; i < modelListModel->rowCount(); ++i)
+    {
+        combinedSASModel->appendRow(new QStandardItem(modelListModel->item(i)->text()));
+    }
+    for(int i = 0 ; i < actorListModel->rowCount(); ++i)
+    {
+        combinedSASModel->appendRow(new QStandardItem(actorListModel->item(i)->text()));
+    }
+    for(int i = 0 ; i < filterListModel->rowCount(); ++i)
+    {
+        combinedSASModel->appendRow(new QStandardItem(filterListModel->item(i)->text()));
+    }
+    for(int i = 0 ; i < crossProductListModel->rowCount(); ++i)
+    {
+        combinedSASModel->appendRow(new QStandardItem(crossProductListModel->item(i)->text()));
+    }
+    emit specsItemListModel(combinedSASModel,modelSpecs,actorSpecs,filterSpecs,crossProductSpecs);
 
 }
+
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------

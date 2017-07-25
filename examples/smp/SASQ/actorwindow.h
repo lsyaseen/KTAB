@@ -49,17 +49,17 @@ private :
     QTableView * actorDataTableView;
     QTableView * accomodationMatrixTableView;
 
-    QStandardItemModel * csvAccModel;
-    QStandardItemModel * csvActorDataModel;
+    QStandardItemModel * csvAccModel = nullptr;
+       QStandardItemModel * csvActorDataModel = nullptr;
 
-    QStandardItemModel * xmlAccModel;
-    QStandardItemModel * xmlActorDataModel;
+       QStandardItemModel * xmlAccModel = nullptr;
+       QStandardItemModel * xmlActorDataModel = nullptr;
 
-    //sas Data Grid
-    QTableWidget * sasDataGridTableWidget;
+       //sas Data Grid
+       QTableWidget * sasDataGridTableWidget;
 
-    QListView * specsListView;
-    QStandardItemModel *specsListModel;
+       QListView * specsListView = nullptr;
+       QStandardItemModel *specsListModel = nullptr;
 
     QRadioButton * valueRadioButton;
     QRadioButton * minDeltaMaxRadioButton;
@@ -72,11 +72,21 @@ private :
 
     bool importedData;
 
-    void intializeFrameLayout();
+    QStringList attributeList;
+
+    using DataValues = QVector <QString>;
+    using SpecsData = QVector <DataValues>;
+    using SpecificationVector = QVector<SpecsData>;
+
+    DataValues actorSpecsLHS;
+    SpecsData actorSpecsRHS = SpecsData();
+
+
+    void initializeFrameLayout();
     void initializeInputDataTable();
     void initializeAccomodationMatrix(QString type);
     void initializeAccomodationRowCol(int count, QString tableType);
-    void populateAccomodationMatrix(QList<QStringList> idealAdj, QVector<QString> actors);
+    void populateAccomodationMatrix(QVector<QStringList> idealAdj, QVector<QString> actors);
 
     void initializeSASDataGrid();
     void intitalizeSasGridColumn();
@@ -84,17 +94,20 @@ private :
     void initializeSpecificationsList();
     void initializeAccMatrixRowCol(int count, QString table);
     void initializeBaseDataGrid();
-    QString processMinDeltaMax(QList<double> values);
-    QString processBasePM( QList<double> values);
-    QString processBasePMP(QList<double> values);
-    QString processValuesN( QList<double> values);
+    QString processMinDeltaMax(QVector<double> values);
+    QString processBasePM( QVector<double> values);
+    QString processBasePMP(QVector<double> values);
+    QString processValuesN( QVector<double> values);
+
+public slots:
+    void listViewRemoveAllClicked();
+    void clearModels();
 
 private slots:
     void actorComboBoxChanged(QString index);
     void actorListViewContextMenu(QPoint pos);
     void listViewRemoveSelectedClicked();
-    void listViewRemoveAllClicked();
-    void clearSpecsList();
+     void clearSpecsList();
 
     void minDeltaMaxRadioButtonClicked(bool bl);
     void basePMRadioButtonClicked(bool bl);
@@ -108,9 +121,15 @@ private slots:
     void displayMenuTableView(QPoint pos);
     void cellSelected(QStandardItem *in);
 
+
+signals:
+    void modelList(QStandardItemModel *, QStringList, QPair<DataValues,SpecsData>);
+
+
 public slots :
     void setActorTableModel(QStandardItemModel *model, QStringList scenarioList);
-    void setAccTableModel(QStandardItemModel *model, QList<QStringList> idealAdjustmentList, QStringList dimensionsXml, QStringList desc);
+    void setAccTableModel(QStandardItemModel *model, QVector<QStringList> idealAdjustmentList,
+                          QStringList dimensionsXml, QStringList desc);
 
 
 };

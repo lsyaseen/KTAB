@@ -27,7 +27,7 @@
 ActorFrame::ActorFrame(QObject *parent)
 {
     frameMainLayout = new QGridLayout(this);
-    intializeFrameLayout();
+    initializeFrameLayout();
     setLayout(frameMainLayout);
     importedData = true; //csv
 }
@@ -37,7 +37,7 @@ ActorFrame::~ActorFrame()
 
 }
 
-void ActorFrame::intializeFrameLayout()
+void ActorFrame::initializeFrameLayout()
 {
     QFrame * topFrame = new QFrame;
     QGridLayout * topGridLayout = new QGridLayout;
@@ -213,7 +213,7 @@ void ActorFrame::setActorTableModel(QStandardItemModel *model, QStringList scena
 }
 
 void ActorFrame::setAccTableModel(QStandardItemModel *model,
-                                  QList<QStringList> idealAdjustmentList,
+                                  QVector<QStringList> idealAdjustmentList,
                                   QStringList dimensionsXml,QStringList desc)
 {
     scenarioName->setText(desc.at(0));
@@ -266,7 +266,7 @@ void ActorFrame::setAccTableModel(QStandardItemModel *model,
 }
 
 
-void ActorFrame::populateAccomodationMatrix(QList<QStringList> idealAdj, QVector<QString> actors)
+void ActorFrame::populateAccomodationMatrix(QVector<QStringList> idealAdj, QVector<QString> actors)
 {
     QStandardItemModel * accModel = new QStandardItemModel;
 
@@ -293,10 +293,6 @@ void ActorFrame::populateAccomodationMatrix(QList<QStringList> idealAdj, QVector
     accomodationMatrixTableView->setModel(accModel);
     accomodationMatrixTableView->setContextMenuPolicy(Qt::CustomContextMenu);
     accomodationMatrixTableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
-
-    //    connect(xmlSmpDataModel,SIGNAL(itemChanged(QStandardItem*)),this, SLOT(xmlCellSelected(QStandardItem*)));
-    //    connect(xmlAffinityMatrixTableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(displayMenuXmlAffTableView(QPoint)));
-
 }
 
 void ActorFrame::initializeSASDataGrid()
@@ -340,6 +336,7 @@ void ActorFrame::intitalizeSasGridColumn()
                     actorDataTableView->model()->headerData(col,Qt::Horizontal)
                     .toString().remove("\n"));
         sasDataGridTableWidget->setVerticalHeaderItem(row,item);
+        attributeList.append(actorComboBox->currentText().append(".").append(item->text()));
         ++row;
     }
 
@@ -352,6 +349,7 @@ void ActorFrame::intitalizeSasGridColumn()
         QTableWidgetItem * item = new QTableWidgetItem(headerItem);
         sasDataGridTableWidget->insertRow(row);
         sasDataGridTableWidget->setVerticalHeaderItem(row,item);
+        attributeList.append(actorComboBox->currentText().append(".").append(item->text()));
         ++row;
     }
 
@@ -410,6 +408,7 @@ void ActorFrame::initializeSpecificationsList()
 
 void ActorFrame::actorComboBoxChanged(QString  index)
 {
+    attributeList.clear();
     sasDataGridTableWidget->clearContents();
     int row=0;
     for( int col =2; col < actorDataTableView->model()->columnCount(); ++col)
@@ -418,18 +417,13 @@ void ActorFrame::actorComboBoxChanged(QString  index)
                     actorDataTableView->model()->headerData(col,Qt::Horizontal)
                     .toString().remove("\n"));
         sasDataGridTableWidget->setVerticalHeaderItem(row,item);
+        attributeList.append(actorComboBox->currentText().append(".").append(item->text()));
+
         ++row;
     }
 
     row = actorDataTableView->model()->columnCount()-2;
-    //    for(int r =0 ; r < row ; ++r )
-    //    {
-    //        for(int c =0 ; c < sasDataGridTableWidget->columnCount() ; ++c)
-    //        {
-    ////                        sasDataGridTableWidget->setItem(r,c,new QTableWidgetItem(""));
-    ////             sasDataGridTableWidget->clearContents();
-    //        }
-    //    }
+
     while(sasDataGridTableWidget->rowCount()!=row)
     {
         sasDataGridTableWidget->removeRow(sasDataGridTableWidget->rowCount()-1);
@@ -443,6 +437,8 @@ void ActorFrame::actorComboBoxChanged(QString  index)
 
         sasDataGridTableWidget->insertRow(row);
         sasDataGridTableWidget->setVerticalHeaderItem(row,item);
+        attributeList.append(actorComboBox->currentText().append(".").append(item->text()));
+
         row++;
     }
 
@@ -465,15 +461,23 @@ void ActorFrame::actorListViewContextMenu(QPoint pos)
 
 void ActorFrame::listViewRemoveSelectedClicked()
 {
+
     for(int index=0; index < specsListModel->rowCount();++index)
     {
         QStandardItem * item = specsListModel->item(index);
         if (item->data(Qt::CheckStateRole).toBool() == true)   // Item checked, remove
         {
             specsListModel->removeRow(index);
+            actorSpecsRHS.removeAt(index);
+            actorSpecsLHS.removeAt(index);
             index = index -1; // index changed to current row, deletion of item changes list index
         }
     }
+    QPair<DataValues,SpecsData> spec;
+    spec.first = actorSpecsLHS;
+    spec.second = actorSpecsRHS;
+    emit modelList(specsListModel,attributeList,spec);
+
 }
 
 void ActorFrame::listViewRemoveAllClicked()
@@ -481,9 +485,36 @@ void ActorFrame::listViewRemoveAllClicked()
     for(int index=0; index < specsListModel->rowCount();++index)
     {
         specsListModel->removeRow(index);
+        actorSpecsRHS.removeAt(index);
+        actorSpecsLHS.removeAt(index);
         index = index -1; // index changed to current row, deletion of item changes list index
     }
+    QPair<DataValues,SpecsData> spec;
+    spec.first = actorSpecsLHS;
+    spec.second = actorSpecsRHS;
+    emit modelList(specsListModel,attributeList,spec);
+
 }
+
+void ActorFrame::clearModels()
+{
+    if(csvAccModel != nullptr)
+    {
+        csvAccModel->clear();
+        csvActorDataModel->clear();
+    }
+    if(xmlAccModel != nullptr)
+    {
+        xmlAccModel->clear();
+        xmlActorDataModel->clear();
+    }
+
+    inputDataTabWidget->clear();
+    actorComboBox->clear();
+    scenarioName->clear();
+    scenarioDescription->clear();
+}
+
 
 void ActorFrame::clearSpecsList()
 {
@@ -494,6 +525,7 @@ void ActorFrame::clearSpecsList()
     }
     disconnect(actorComboBox,SIGNAL(currentIndexChanged(QString)),this,SLOT(actorComboBoxChanged(QString)));
     actorComboBox->clear();
+    attributeList.clear();
 
 }
 
@@ -501,16 +533,21 @@ void ActorFrame::addSpecClicked(bool bl)
 {
     if(sasDataGridTableWidget->model()->rowCount()>0)
     {
+        int specsCount = specsListModel->rowCount();
+
         QString specification;
         for(int row =0; row < sasDataGridTableWidget->rowCount()-1; ++row)
         {
-            specification.append(actorComboBox->currentText());
-            specification.append(".");
-            specification.append(sasDataGridTableWidget->verticalHeaderItem(row)->text()).append("=(");
+            QString actorValue;
+            actorValue.append(actorComboBox->currentText()).append(".")
+                    .append(sasDataGridTableWidget->verticalHeaderItem(row)->text());
+            //            specification.append(actorComboBox->currentText());
+            //            specification.append(".");
+            specification.append(actorValue).append("=(");
             specification.remove("\n");
 
             QString str;
-            QList<double> values;
+            QVector<double> values;
             for(int col = 0 ; col < sasDataGridTableWidget->columnCount() ; ++col)
             {
                 auto ret = sasDataGridTableWidget->item(row,col);
@@ -521,7 +558,9 @@ void ActorFrame::addSpecClicked(bool bl)
                     {
                         double v = sasDataGridTableWidget->item(row,col)->text().toDouble();
                         if(v>0.0)
+                        {
                             values.append(v);
+                        }
                     }
                     else
                     {
@@ -535,23 +574,29 @@ void ActorFrame::addSpecClicked(bool bl)
                     str.clear();
                     break;
                 }
-
             }
             if(true==minDeltaMaxRadioButton->isChecked() && 3==values.count())
-            {
+            {   actorSpecsLHS.append(actorValue);
+                qDebug()<<actorSpecsLHS << " LHS";
                 str.append(processMinDeltaMax(values));
             }
             else if (true == basePMRadioButton->isChecked()&& 2==values.count())
             {
+                actorSpecsLHS.append(actorValue);
+                qDebug()<<actorSpecsLHS << " LHS";
                 str.append(processBasePM(values));
             }
             else if (true == basePMPRadioButton->isChecked()&& 2==values.count())
             {
+                actorSpecsLHS.append(actorValue);
+                qDebug()<<actorSpecsLHS << " LHS";
                 str.append(processBasePMP(values));
             }
             else if (true == valueRadioButton->isChecked() &&
                      sasDataGridTableWidget->columnCount()==values.count())
             {
+                actorSpecsLHS.append(actorValue);
+                qDebug()<<actorSpecsLHS << " LHS";
                 str.append(processValuesN(values));
             }
             else
@@ -588,6 +633,13 @@ void ActorFrame::addSpecClicked(bool bl)
                 values.clear();
                 str.clear();
             }
+        }
+        if(specsCount != specsListModel->rowCount())
+        {
+            QPair<DataValues,SpecsData> spec;
+            spec.first = actorSpecsLHS;
+            spec.second = actorSpecsRHS;
+            emit modelList(specsListModel,attributeList,spec);
         }
     }
 }
@@ -702,8 +754,11 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
 {
     if(basePMPRadioButton->isChecked()==true || basePMRadioButton->isChecked())
     {
+
         if(sasDataGridTableWidget->model()->rowCount()>0)
         {
+            int specsCount = specsListModel->rowCount();
+
             QString currentAct = actorComboBox->currentText();
             for(int act =0; act < actorComboBox->count(); ++act)
             {
@@ -711,13 +766,14 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
 
                 for(int row =0; row < sasDataGridTableWidget->rowCount()-1; ++row)
                 {
-                    specification.append(actorComboBox->itemText(act));
-                    specification.append(".");
-                    specification.append(sasDataGridTableWidget->verticalHeaderItem(row)->text()).append("=(");
+                    QString actorValue;
+                    actorValue.append(actorComboBox->itemText(act)).append(".")
+                            .append(sasDataGridTableWidget->verticalHeaderItem(row)->text());
+                    specification.append(actorValue).append("=(");
                     specification.remove("\n");
 
                     QString str;
-                    QList<double> values;
+                    QVector<double> values;
                     if(row <= actorDataTableView->model()->columnCount()-2)
                     {
                         auto ret = sasDataGridTableWidget->item(row,1); // col 1
@@ -766,10 +822,14 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
 
                     if (true == basePMRadioButton->isChecked()&& 2==values.count())
                     {
+                        actorSpecsLHS.append(actorValue);
+                        qDebug()<<actorSpecsLHS << " LHS";
                         str.append(processBasePM(values));
                     }
                     else if (true == basePMPRadioButton->isChecked()&& 2==values.count())
                     {
+                        actorSpecsLHS.append(actorValue);
+                        qDebug()<<actorSpecsLHS << " LHS";
                         str.append(processBasePMP(values));
                     }
                     else
@@ -808,6 +868,13 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
                         str.clear();
                     }
                 }
+            }
+            if(specsCount != specsListModel->rowCount())
+            {
+                QPair<DataValues,SpecsData> spec;
+                spec.first = actorSpecsLHS;
+                spec.second = actorSpecsRHS;
+                emit modelList(specsListModel,attributeList,spec);
             }
         }
     }
@@ -1153,18 +1220,26 @@ void ActorFrame::initializeBaseDataGrid()
     }
 }
 
-QString ActorFrame::processMinDeltaMax( QList<double> values)
+QString ActorFrame::processMinDeltaMax( QVector<double> values)
 {
     QString processedString;
     if(values.at(0)<values.at(2)) // min < max
     {
+        QVector <QString> actorValues;
         for(double min = values.at(0) ; min <= values.at(2) ; min +=  values.at(1))
         {
+            actorValues.append(QString::number(min));
+            //  qDebug()<<min << "val";
             processedString.append(QString::number(min)).append(",");
-            qDebug()<<processedString;
+            //qDebug()<<processedString;
+        }
+        if(!actorValues.isEmpty())
+        {
+            actorSpecsRHS.append(actorValues);
+            qDebug()<<actorSpecsRHS <<"RHS";
         }
         processedString.remove(processedString.length()-1,1);
-        qDebug()<<processedString;
+        //        qDebug()<<processedString;
         return processedString;
     }
     else // min > max
@@ -1174,42 +1249,65 @@ QString ActorFrame::processMinDeltaMax( QList<double> values)
     return processedString;
 }
 
-QString ActorFrame::processBasePM(QList<double> values)
+QString ActorFrame::processBasePM(QVector<double> values)
 {
     QString processedString;
-    qDebug()<<values;
+
+    QVector <QString> actorValues;
+
     double base = values.at(0) - values.at(1);
+    actorValues.append(QString::number(base));
     processedString.append(QString::number(base)).append(",");
+    actorValues.append(QString::number(values.at(0)));
     processedString.append(QString::number(values.at(0))).append(",");
     base = values.at(0)+values.at(1);
+    actorValues.append(QString::number(base));
     processedString.append(QString::number(base));
-
+    actorSpecsRHS.append(actorValues);
+    qDebug()<<actorSpecsRHS <<"RHS";
     return processedString;
 
 }
 
-QString ActorFrame::processBasePMP(QList<double> values)
+QString ActorFrame::processBasePMP(QVector<double> values)
 {
     QString processedString;
-    qDebug()<<values;
+    QVector <QString> actorValues;
+
+    //    qDebug()<<values;
     double base = values.at(0)-(values.at(0)*values.at(1))/100;
+    actorValues.append(QString::number(base));
     processedString.append(QString::number(base)).append(",");
+    actorValues.append(QString::number(values.at(0)));
     processedString.append(QString::number(values.at(0))).append(",");
     base = values.at(0)+(values.at(0)*values.at(1))/100;
+    actorValues.append(QString::number(base));
     processedString.append(QString::number(base));
+
+    actorSpecsRHS.append(actorValues);
+    qDebug()<<actorSpecsRHS <<"RHS";
 
     return processedString;
 }
 
-QString ActorFrame::processValuesN(QList<double> values)
+QString ActorFrame::processValuesN(QVector<double> values)
 {
     QString processedString;
-    qDebug()<<values;
+    QVector <QString> actorValues;
+
+    //    qDebug()<<values;
     for(int val = 0 ; val < values.count();++val)
     {
+        actorValues.append(QString::number(values.at(val)));
         processedString.append(QString::number(values.at(val))).append(",");
     }
     processedString.remove(processedString.length()-1,1);
 
+    if(!actorValues.isEmpty())
+    {
+        actorSpecsRHS.append(actorValues);
+        qDebug()<<actorSpecsRHS <<"RHS";
+
+    }
     return processedString;
 }
