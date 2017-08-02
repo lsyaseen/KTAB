@@ -282,6 +282,7 @@ void MainWindow::dbGetFilePAth(bool bl, QString smpDBPath, bool run)
             connect(scenarioComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(scenarioComboBoxValue(int)));
             connect(turnSlider,SIGNAL(valueChanged(int)),this,SLOT(sliderStateValueToQryDB(int)));
 
+            yAxisMaxFixedVal=0;
             modeltoDB->clear();
             emit dbFilePath(dbPath,conType,connectionString,run);
             turnSlider->setEnabled(true);
