@@ -29,6 +29,7 @@ SpecificationFrame::SpecificationFrame(QObject *parent)
     frameMainLayout = new QGridLayout(this);
     initializeFrameLayout();
     setLayout(frameMainLayout);
+
 }
 
 SpecificationFrame::~SpecificationFrame()
@@ -89,10 +90,12 @@ void SpecificationFrame::initializeFiltersFrame()
     headingLabel->setFrameStyle(6);
 
     QHBoxLayout * hBoxControlsLay = new QHBoxLayout;
+    actorListComboBox = new QComboBox;
     attributeComboBox = new QComboBox;
     sasAttributeComboBox = new QComboBox;
     relationshipComboBox = new QComboBox;
     valueLineEdit = new QLineEdit;
+
     QPushButton * addSpecification = new QPushButton("Add Specification");
     valueLineEdit->setMaximumWidth(100);
     connect(addSpecification,SIGNAL(clicked(bool)),this,SLOT(filterAddSpecificationClicked(bool)));
@@ -114,6 +117,7 @@ void SpecificationFrame::initializeFiltersFrame()
     valueLineEdit->setValidator( new QDoubleValidator(0,9999999, 2, this) );
     relationshipComboBox->setMaximumWidth(100);
 
+    hBoxControlsLay->addWidget(actorListComboBox);
     hBoxControlsLay->addWidget(attributeComboBox);
     hBoxControlsLay->addWidget(sasAttributeComboBox);
     hBoxControlsLay->addWidget(relationshipComboBox);
@@ -132,6 +136,7 @@ void SpecificationFrame::initializeFiltersFrame()
 
     filterFrameGridLayout->setSpacing(0);
     connect(filterListView,SIGNAL(customContextMenuRequested(QPoint)),SLOT(filterListViewContextMenu(QPoint)));
+    connect(actorListComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(actorIndexChangedComboBox(int)));
 
 }
 
@@ -182,19 +187,6 @@ void SpecificationFrame::initializeSensAnalysisFrame()
     specsListModel = new QStandardItemModel();
     specsListView->setModel(specsListModel);
     specsFrameGridLayout->addWidget(specsListView);
-}
-
-void SpecificationFrame::updateSasSpecsList()
-{
-    QPair<SpecsData,SpecificationVector> filterSpec;
-    filterSpec.first = filterSpecsLHS;
-    filterSpec.second = filterSpecsRHS;
-    emit filterList(filterListModel, filterSpec);
-
-    QPair<SpecsData,SpecificationVector> crossProdSpec;
-    crossProdSpec.first=crossProductSpecsLHS;
-    crossProdSpec.second=crossProductSpecsRHS;
-    emit crossProductList(crossProductListModel,crossProdSpec);
 }
 
 void SpecificationFrame::listViewClicked()
@@ -285,13 +277,198 @@ void SpecificationFrame::listViewSpecsRemoveAllClicked()
     populateCrossProductComboBox();
 
 }
+
+void SpecificationFrame::actorModelSpecification(QString spec,QPair<SpecificationFrame::DataValues,
+                                                 SpecificationFrame::SpecsData> specData, int type)
+{
+    if(0==type) //model
+    {
+        QStandardItem * item = new QStandardItem(spec);
+        item->setCheckable(true);
+        item->setCheckState(Qt::Unchecked);
+        item->setEditable(false);
+
+        specsListModel->insertRow(specsIndexlist[0],item);
+        qDebug()<< specsIndexlist[0]  << "apecs Index list" <<specsListModel->rowCount();
+        specsListView->scrollToBottom();
+
+        if(!specData.second.isEmpty())
+        {
+            modelSpecificationsLHS.insert(specsIndexlist[0],specData.first.at(0));
+            modelSpecificationsRHS.insert(specsIndexlist[0],specData.second.at(0));
+
+            //            specsIndexlist[0]=specData.second.length();
+            specsIndexlist[0]=specsIndexlist[0]+1;
+
+            qDebug()<< specsIndexlist[0]  << "apecs Index list";
+            qDebug()<< specsListModel->item(specsListModel->rowCount()-1)->text();
+        }
+    }
+
+    else if(1==type) //actor
+    {
+        QStandardItem * item = new QStandardItem(spec);
+        item->setCheckable(true);
+        item->setCheckState(Qt::Unchecked);
+        item->setEditable(false);
+
+        specsListModel->insertRow((specsIndexlist[0]+specsIndexlist[1]),item);
+        specsListView->scrollToBottom();
+
+        if(!specData.second.isEmpty())
+        {
+            actorSpecificationsLHS.insert(specsIndexlist[1],specData.first.at(0));
+            actorSpecificationsRHS.insert(specsIndexlist[1],specData.second.at(0));
+
+            //            specsIndexlist[1]=specData.second.length();
+            specsIndexlist[1] = specsIndexlist[1]+1;
+        }
+    }
+    populateCrossProductComboBox();
+
+}
+
+void SpecificationFrame::filterCrossProdSpecification(QString spec, QPair<SpecificationFrame::SpecsData,
+                                                      SpecificationFrame::SpecificationVector> specData, int type)
+{
+    if(2==type) //filter
+    {
+        QStandardItem * item = new QStandardItem(spec);
+        item->setCheckable(true);
+        item->setCheckState(Qt::Unchecked);
+        item->setEditable(false);
+
+        specsListModel->insertRow((specsIndexlist[0]+specsIndexlist[1]+specsIndexlist[2]),item);
+        specsListView->scrollToBottom();
+
+        if(!specData.second.isEmpty())
+        {
+            filterSpecificationsLHS.insert(specsIndexlist[2],specData.first.at(0));
+            filterSpecificationsRHS.insert(specsIndexlist[2],specData.second.at(0));
+
+            //            specsIndexlist[2]=specData.second.length();
+            specsIndexlist[2]=specsIndexlist[2]+1;
+        }
+    }
+    else if(3==type) //crossproduct
+    {
+        QStandardItem * item = new QStandardItem(spec);
+        item->setCheckable(true);
+        item->setCheckState(Qt::Unchecked);
+        item->setEditable(false);
+
+        specsListModel->insertRow((specsIndexlist[0]+specsIndexlist[1]+specsIndexlist[2]+specsIndexlist[3]),item);
+        specsListView->scrollToBottom();
+
+        if(!specData.second.isEmpty())
+        {
+            crossProdSpecificationsLHS.insert(specsIndexlist[3],specData.first.at(0));
+            crossProdSpecificationsRHS.insert(specsIndexlist[3],specData.second.at(0));
+
+            //            specsIndexlist[3]=specData.second.length();
+            specsIndexlist[3]=specsIndexlist[3]+1;
+
+        }
+    }
+    populateCrossProductComboBox();
+
+}
+
+void SpecificationFrame::removeSpecModelActor(int index, int type,QString specLHS)
+{
+    if(type==0)
+    {
+        if(index < specsIndexlist[0])
+        {
+            qDebug()<<modelSpecificationsLHS.at(index) << specLHS;
+
+            if(modelSpecificationsLHS.at(index)==specLHS)
+            {
+                modelSpecificationsLHS.remove(index);
+                modelSpecificationsRHS.remove(index);
+                specsListModel->removeRow(index);
+                specsIndexlist[0]-=1;
+            }
+        }
+    }
+    else if(type==1)
+    {
+        if(index < specsIndexlist[1])
+        {
+            qDebug()<<actorSpecificationsLHS.at(index) << specLHS;
+
+            if(actorSpecificationsLHS.at(index)==specLHS)
+            {
+                sasAttributeComboBox->removeItem(index);
+                actorSpecificationsLHS.remove(index);
+                actorSpecificationsRHS.remove(index);
+                specsListModel->removeRow(specsIndexlist[0]+index);
+                specsIndexlist[1]-=1;
+            }
+        }
+    }
+    populateCrossProductComboBox();
+}
+
+void SpecificationFrame::removeSpecFilterCrossProd(int index, int type, SpecificationFrame::DataValues specLHS)
+{
+
+    if(type==2)
+    {
+        if(index < specsIndexlist[2])
+        {
+            qDebug()<<filterSpecificationsLHS.at(index) << specLHS;
+
+            if(filterSpecificationsLHS.at(index).count()==specLHS.count())
+            {
+                for(int i=0; i < filterSpecificationsLHS.at(index).count(); ++i)
+                {
+                    if(filterSpecificationsLHS.at(index).at(i)!=specLHS.at(i))
+                    {
+                        return;
+                    }
+                }
+
+                filterSpecificationsLHS.remove(index);
+                filterSpecificationsRHS.remove(index);
+                specsListModel->removeRow(specsIndexlist[0]+specsIndexlist[1]+index);
+                specsIndexlist[2]-=1;
+            }
+        }
+    }
+    else if(type==3)
+    {
+        if(index < specsIndexlist[3])
+        {
+            qDebug()<<crossProdSpecificationsLHS.at(index) << specLHS;
+
+            if(crossProdSpecificationsLHS.at(index).count()==specLHS.count())
+            {
+                for(int i=0; i < crossProdSpecificationsLHS.at(index).count(); ++i)
+                {
+                    if(crossProdSpecificationsLHS.at(index).at(i)!=specLHS.at(i))
+                    {
+                        return;
+                    }
+                }
+                crossProdSpecificationsLHS.remove(index);
+                crossProdSpecificationsRHS.remove(index);
+                specsListModel->removeRow(specsIndexlist[0]+specsIndexlist[1]+specsIndexlist[2]+index);
+                specsIndexlist[3]-=1;
+            }
+        }
+    }
+    populateCrossProductComboBox();
+}
+
+
 void SpecificationFrame::specsListViewContextMenu(QPoint pos)
 {
     if(specsListView->model()->rowCount()>0)
     {
         QMenu *menu = new QMenu(this);
         menu->addAction("Remove Selected Items", this, SLOT(listViewClicked()));
-        //        menu->addAction("Remove All Items", this, SLOT(listViewSpecsRemoveAllClicked()));
+        menu->addAction("Remove All Items", this, SLOT(listViewSpecsRemoveAllClicked()));
         menu->popup(specsListView->mapToGlobal(pos));
     }
 }
@@ -371,15 +548,11 @@ void SpecificationFrame::populateCrossProductComboBox()
         att1ComboBox->addItem(specsListModel->item(i)->text());
         att2ComboBox->addItem(specsListModel->item(i)->text());
     }
-    qDebug()<<"populateCrossProductComboBox";
 }
 
-void SpecificationFrame::actorAtrributesSAS(QStringList attributes, QStringList sas)
+void SpecificationFrame::actorAtrributesSAS(QString sas)
 {
-    attributeComboBox->clear();
-    sasAttributeComboBox->clear();
-    attributeComboBox->addItems(attributes);
-    sasAttributeComboBox->addItems(sas);
+    sasAttributeComboBox->addItem(sas);
 }
 
 void SpecificationFrame::relationComboBoxChanged(int rel)
@@ -397,7 +570,7 @@ void SpecificationFrame::relationComboBoxChanged(int rel)
 
 void SpecificationFrame::filterAddSpecificationClicked(bool bl)
 {
-    if(attributeComboBox->count()>0)
+    if(attributeComboBox->count()>0 && sasAttributeComboBox->count()>0)
     {
         QString attributeValue = attributeComboBox->currentText();
         QString sasAttributeValue = sasAttributeComboBox->currentText();
@@ -563,7 +736,12 @@ void SpecificationFrame::filterAddSpecificationClicked(bool bl)
             filterDataRHS.clear();
         }
         filterListView->scrollToBottom();
-        updateSasSpecsList();
+
+        QPair<SpecsData,SpecificationVector> filterSpec;
+        filterSpec.first.append(filterSpecsLHS.at(filterSpecsLHS.count()-1));
+        filterSpec.second.append(filterSpecsRHS.at(filterSpecsRHS.count()-1));
+        filterCrossProdSpecification(filterListModel->item(filterListModel->rowCount()-1)->text(),filterSpec,2);
+
     }
 }
 
@@ -833,7 +1011,7 @@ void SpecificationFrame::crossproductAddSpecificationClicked(bool bl)
                     newSpec.clear();
                 }
             }
-            if(strLimitSpecs<0)
+            if(strLimitSpecs<=0)
             {
                 specsStr.append(".......))");
             }
@@ -857,7 +1035,13 @@ void SpecificationFrame::crossproductAddSpecificationClicked(bool bl)
         item->setCheckState(Qt::Unchecked);
         crossProductListModel->appendRow(item);
         crossProductListView->scrollToBottom();
-        updateSasSpecsList();
+
+        QPair<SpecsData,SpecificationVector> crossProdSpec;
+        crossProdSpec.first.append(crossProductSpecsLHS.at(crossProductSpecsLHS.count()-1));
+        crossProdSpec.second.append(crossProductSpecsRHS.at(crossProductSpecsRHS.count()-1));
+
+        filterCrossProdSpecification(crossProductListModel->item(crossProductListModel->rowCount()-1)->text(),crossProdSpec,3);
+
         QApplication::restoreOverrideCursor();
     }
 }
@@ -880,33 +1064,25 @@ void SpecificationFrame::filterListViewRemoveSelectedClicked()
         QStandardItem * item = filterListModel->item(index);
         if (item->data(Qt::CheckStateRole).toBool() == true)   // Item checked, remove
         {
+            removeSpecFilterCrossProd(index,2,filterSpecsLHS.at(index));//2 is type filter
             filterSpecsRHS.removeAt(index);
             filterSpecsLHS.removeAt(index);
             filterListModel->removeRow(index);
             index = index -1; // index changed to current row, deletion of item changes list index
         }
     }
-
-    QPair<SpecsData,SpecificationVector> filterSpec;
-    filterSpec.first = filterSpecsLHS;
-    filterSpec.second = filterSpecsRHS;
-    emit filterList(filterListModel, filterSpec);
 }
 
 void SpecificationFrame::filterListViewRemoveAllClicked()
 {
     for(int index=0; index < filterListModel->rowCount();++index)
     {
+        removeSpecFilterCrossProd(index,2,filterSpecsLHS.at(index));//2 is type filter
         filterSpecsRHS.removeAt(index);
         filterSpecsLHS.removeAt(index);
         filterListModel->removeRow(index);
         index = index -1; // index changed to current row, deletion of item changes list index
     }
-
-    QPair<SpecsData,SpecificationVector> filterSpec;
-    filterSpec.first = filterSpecsLHS;
-    filterSpec.second = filterSpecsRHS;
-    emit filterList(filterListModel, filterSpec);
 }
 
 void SpecificationFrame::crossproductContextMenu(QPoint pos)
@@ -927,27 +1103,52 @@ void SpecificationFrame::crossproductRemoveSelectedClicked()
         QStandardItem * item = crossProductListModel->item(index);
         if (item->data(Qt::CheckStateRole).toBool() == true)   // Item checked, remove
         {
+            removeSpecFilterCrossProd(index,3,crossProductSpecsLHS.at(index));//3 is type cross prod
+            crossProductSpecsLHS.removeAt(index);
+            crossProductSpecsRHS.removeAt(index);
             crossProductListModel->removeRow(index);
             index = index -1; // index changed to current row, deletion of item changes list index
         }
     }
+}
 
-    QPair<SpecsData,SpecificationVector> crossProdSpec;
-    crossProdSpec.first=crossProductSpecsLHS;
-    crossProdSpec.second=crossProductSpecsRHS;
-    emit crossProductList(crossProductListModel,crossProdSpec);
+void SpecificationFrame::actorNameAttributes(QStringList headers, QStringList actors)
+{
+    actorListComboBox->clear();
+    actorHeaders= headers;
+    actorListComboBox->addItems(actors);
+}
+
+void SpecificationFrame::actorIndexChangedComboBox(int indx)
+{
+    attributeComboBox->clear();
+
+    for(int hIndx = 0; hIndx < actorHeaders.length();++hIndx)
+    {
+        QString itemStr;
+        itemStr.append(actorListComboBox->currentText().trimmed()).append(".").append(actorHeaders.at(hIndx));
+        attributeComboBox->addItem(itemStr);
+    }
+
+    for(int actIndx = 0 ; actIndx < actorListComboBox->count();++actIndx)
+    {
+        QString itemStr;
+        itemStr.append(actorListComboBox->currentText().trimmed()).append(".").
+                append(actorListComboBox->currentText().trimmed()).append("<>").
+                append(actorListComboBox->itemText(actIndx));
+        attributeComboBox->addItem(itemStr);
+
+    }
 }
 
 void SpecificationFrame::crossproductRemoveAllClicked()
 {
     for(int index=0; index < crossProductListModel->rowCount();++index)
     {
+        removeSpecFilterCrossProd(index,3,crossProductSpecsLHS.at(index));//3 is type cross prod
+        crossProductSpecsLHS.removeAt(index);
+        crossProductSpecsRHS.removeAt(index);
         crossProductListModel->removeRow(index);
         index = index -1; // index changed to current row, deletion of item changes list index
     }
-
-    QPair<SpecsData,SpecificationVector> crossProdSpec;
-    crossProdSpec.first=crossProductSpecsLHS;
-    crossProdSpec.second=crossProductSpecsRHS;
-    emit crossProductList(crossProductListModel,crossProdSpec);
 }

@@ -209,7 +209,7 @@ void ActorFrame::setActorTableModel(QStandardItemModel *model, QStringList scena
     importedData=true;
     initializeAccomodationMatrix("CSV");
     intitalizeSasGridColumn();
-
+    actorAtrributesHeaderList();
 }
 
 void ActorFrame::setAccTableModel(QStandardItemModel *model,
@@ -263,6 +263,8 @@ void ActorFrame::setAccTableModel(QStandardItemModel *model,
         ++dim;
     }
     intitalizeSasGridColumn();
+    actorAtrributesHeaderList();
+
 }
 
 
@@ -467,33 +469,25 @@ void ActorFrame::listViewRemoveSelectedClicked()
         QStandardItem * item = specsListModel->item(index);
         if (item->data(Qt::CheckStateRole).toBool() == true)   // Item checked, remove
         {
+            removeSpecificationActor(index,1,actorSpecsLHS.at(index)); // 1 == actor type
             specsListModel->removeRow(index);
             actorSpecsRHS.removeAt(index);
             actorSpecsLHS.removeAt(index);
             index = index -1; // index changed to current row, deletion of item changes list index
         }
     }
-    QPair<DataValues,SpecsData> spec;
-    spec.first = actorSpecsLHS;
-    spec.second = actorSpecsRHS;
-    emit modelList(specsListModel,attributeList,spec);
-
 }
 
 void ActorFrame::listViewRemoveAllClicked()
 {
     for(int index=0; index < specsListModel->rowCount();++index)
     {
+        removeSpecificationActor(index,1,actorSpecsLHS.at(index)); // 1 == actor type
         specsListModel->removeRow(index);
         actorSpecsRHS.removeAt(index);
         actorSpecsLHS.removeAt(index);
         index = index -1; // index changed to current row, deletion of item changes list index
     }
-    QPair<DataValues,SpecsData> spec;
-    spec.first = actorSpecsLHS;
-    spec.second = actorSpecsRHS;
-    emit modelList(specsListModel,attributeList,spec);
-
 }
 
 void ActorFrame::clearModels()
@@ -515,6 +509,25 @@ void ActorFrame::clearModels()
     scenarioDescription->clear();
 }
 
+void ActorFrame::actorAtrributesHeaderList()
+{
+    QStringList headerAttribs;
+    QStringList actorNames;
+
+    for(int act = 0 ; act < actorComboBox->count();++act)
+    {
+        actorNames.append(actorComboBox->itemText(act));
+    }
+
+    for( int col =2; col < actorDataTableView->model()->columnCount(); ++col)
+    {
+        headerAttribs.append(actorDataTableView->model()->headerData(col,Qt::Horizontal).toString().remove("\n"));
+    }
+
+    emit actorHeaderAttributes(headerAttribs,actorNames);
+
+}
+
 
 void ActorFrame::clearSpecsList()
 {
@@ -533,7 +546,6 @@ void ActorFrame::addSpecClicked(bool bl)
 {
     if(sasDataGridTableWidget->model()->rowCount()>0)
     {
-        int specsCount = specsListModel->rowCount();
 
         QString specification;
         for(int row =0; row < sasDataGridTableWidget->rowCount()-1; ++row)
@@ -541,8 +553,6 @@ void ActorFrame::addSpecClicked(bool bl)
             QString actorValue;
             actorValue.append(actorComboBox->currentText()).append(".")
                     .append(sasDataGridTableWidget->verticalHeaderItem(row)->text());
-            //            specification.append(actorComboBox->currentText());
-            //            specification.append(".");
             specification.append(actorValue).append("=(");
             specification.remove("\n");
 
@@ -624,6 +634,15 @@ void ActorFrame::addSpecClicked(bool bl)
                     specsListModel->setItem(specsListModel->rowCount(),item);
                     specsListView->scrollToBottom();
                     qDebug()<<specification;
+
+                    //emit singleSpecification
+                    QPair<DataValues,SpecsData> spec;
+                    spec.first.append(actorSpecsLHS.at(actorSpecsLHS.count()-1));
+                    spec.second.append(actorSpecsRHS.at(actorSpecsRHS.count()-1));
+
+                    emit actorAttributesAndSAS(specification);
+                    emit specificationNew(specsListModel->item(specsListModel->rowCount()-1)->text(),spec,1);//1 == Actor
+
                     specification.clear();
                 }
             }
@@ -633,13 +652,6 @@ void ActorFrame::addSpecClicked(bool bl)
                 values.clear();
                 str.clear();
             }
-        }
-        if(specsCount != specsListModel->rowCount())
-        {
-            QPair<DataValues,SpecsData> spec;
-            spec.first = actorSpecsLHS;
-            spec.second = actorSpecsRHS;
-            emit modelList(specsListModel,attributeList,spec);
         }
     }
 }
@@ -858,6 +870,15 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
                             item->setEditable(false);
                             specsListModel->setItem(specsListModel->rowCount(),item);
                             specsListView->scrollToBottom();
+
+                            //emit singleSpecification
+                            QPair<DataValues,SpecsData> spec;
+                            spec.first.append(actorSpecsLHS.at(actorSpecsLHS.count()-1));
+                            spec.second.append(actorSpecsRHS.at(actorSpecsRHS.count()-1));
+
+                            emit actorAttributesAndSAS(specification);
+                            emit specificationNew(specsListModel->item(specsListModel->rowCount()-1)->text(),spec,1);//1 == Actor
+
                             specification.clear();
                         }
                     }
@@ -868,14 +889,15 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
                         str.clear();
                     }
                 }
+
             }
-            if(specsCount != specsListModel->rowCount())
-            {
-                QPair<DataValues,SpecsData> spec;
-                spec.first = actorSpecsLHS;
-                spec.second = actorSpecsRHS;
-                emit modelList(specsListModel,attributeList,spec);
-            }
+            //            if(specsCount != specsListModel->rowCount())
+            //            {
+            //                //                QPair<DataValues,SpecsData> spec;
+            //                //                spec.first = actorSpecsLHS;
+            //                //                spec.second = actorSpecsRHS;
+            //                //                emit modelList(specsListModel,attributeList,spec);
+            //            }
         }
     }
 }

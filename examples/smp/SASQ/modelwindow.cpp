@@ -380,6 +380,10 @@ void ModelFrame::parameterChanged(int index)
     parametersCheckBoxList.clear();
     parmetersFrame->close();
     controlsLayout->removeWidget(parmetersFrame);
+    if(parmetersFrame != nullptr)
+    {
+        delete parmetersFrame;
+    }
     parmetersFrame = new QFrame;
     parmetersFrame->setFrameStyle(QFrame::StyledPanel);
     QVBoxLayout* parametersLayout = new QVBoxLayout;
@@ -447,36 +451,25 @@ void ModelFrame::addSpecClicked(bool bl)
             qDebug()<<specsListModel->item(i)->data().toString();
         }
         QPair<DataValues,SpecsData> spec;
-        spec.first = modelParaLHS;
-        spec.second = modelParaRHS;
-
-        emit modelList(specsListModel,spec);
+        spec.first.append(modelParaLHS.at(modelParaLHS.count()-1));
+        spec.second.append(modelParaRHS.at(modelParaRHS.count()-1));
+        emit specificationNew(specsListModel->item(specsListModel->rowCount()-1)->text(),spec,0);//0 == model
     }
 }
 
 void ModelFrame::listViewClicked()
 {
-    int specsCount = specsListModel->rowCount();
-
     for(int index=0; index < specsListModel->rowCount();++index)
     {
         QStandardItem * item = specsListModel->item(index);
         if (item->data(Qt::CheckStateRole).toBool() == true)   // Item checked, remove
         {
+            removeSpecificationModel(index,0,modelParaLHS.at(index)); // 0 == model type
             specsListModel->removeRow(index);
             modelParaLHS.removeAt(index);
             modelParaRHS.removeAt(index);
             index = index -1; // index changed to current row, deletion of item changes list index
         }
-    }
-
-    if(specsCount != specsListModel->rowCount())
-    {
-        QPair<DataValues,SpecsData> spec;
-        spec.first = modelParaLHS;
-        spec.second = modelParaRHS;
-        emit modelList(specsListModel,spec);
-
     }
 }
 
@@ -493,22 +486,13 @@ void ModelFrame::modelListViewContextMenu(QPoint pos)
 
 void ModelFrame::listViewRemoveAllClicked()
 {
-    int specsCount = specsListModel->rowCount();
-
     for(int index=0; index < specsListModel->rowCount();++index)
     {
+        removeSpecificationModel(index,0,modelParaLHS.at(index)); // 0 == model type
         specsListModel->removeRow(index);
         modelParaLHS.removeAt(index);
         modelParaRHS.removeAt(index);
         index = index -1; // index changed to current row, deletion of item changes list index
-    }
-
-    if(specsCount != specsListModel->rowCount())
-    {
-        QPair<DataValues,SpecsData> spec;
-        spec.first = modelParaLHS;
-        spec.second = modelParaRHS;
-        emit modelList(specsListModel,spec);
     }
 }
 

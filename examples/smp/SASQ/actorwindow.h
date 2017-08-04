@@ -50,16 +50,16 @@ private :
     QTableView * accomodationMatrixTableView;
 
     QStandardItemModel * csvAccModel = nullptr;
-       QStandardItemModel * csvActorDataModel = nullptr;
+    QStandardItemModel * csvActorDataModel = nullptr;
 
-       QStandardItemModel * xmlAccModel = nullptr;
-       QStandardItemModel * xmlActorDataModel = nullptr;
+    QStandardItemModel * xmlAccModel = nullptr;
+    QStandardItemModel * xmlActorDataModel = nullptr;
 
-       //sas Data Grid
-       QTableWidget * sasDataGridTableWidget;
+    //sas Data Grid
+    QTableWidget * sasDataGridTableWidget;
 
-       QListView * specsListView = nullptr;
-       QStandardItemModel *specsListModel = nullptr;
+    QListView * specsListView = nullptr;
+    QStandardItemModel *specsListModel = nullptr;
 
     QRadioButton * valueRadioButton;
     QRadioButton * minDeltaMaxRadioButton;
@@ -102,12 +102,13 @@ private :
 public slots:
     void listViewRemoveAllClicked();
     void clearModels();
+    void actorAtrributesHeaderList();
 
 private slots:
     void actorComboBoxChanged(QString index);
     void actorListViewContextMenu(QPoint pos);
     void listViewRemoveSelectedClicked();
-     void clearSpecsList();
+    void clearSpecsList();
 
     void minDeltaMaxRadioButtonClicked(bool bl);
     void basePMRadioButtonClicked(bool bl);
@@ -121,9 +122,12 @@ private slots:
     void displayMenuTableView(QPoint pos);
     void cellSelected(QStandardItem *in);
 
-
 signals:
     void modelList(QStandardItemModel *, QStringList, QPair<DataValues,SpecsData>);
+    void actorHeaderAttributes(QStringList,QStringList);
+    void specificationNew(QString,QPair<DataValues,SpecsData>,int);
+    void actorAttributesAndSAS(QString sasValues);
+    void removeSpecificationActor(int index, int type, QString specLHS);
 
 
 public slots :

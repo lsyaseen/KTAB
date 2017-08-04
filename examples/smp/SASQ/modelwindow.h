@@ -105,6 +105,8 @@ private :
 
 signals:
     void modelList(QStandardItemModel *,  QPair<DataValues,SpecsData> );
+    void specificationNew(QString,QPair<DataValues,SpecsData>,int);
+    void removeSpecificationModel(int index, int type, QString specLHS);
 
 
 private slots:

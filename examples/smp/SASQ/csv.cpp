@@ -184,7 +184,6 @@ void CSV::importActorColors(QString path, int actCount)
 
         emit(importedColors(colorCodeList));
 
-
     }
     else
     {

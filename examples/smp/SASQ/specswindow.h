@@ -46,6 +46,7 @@ private :
     QGridLayout *crossProductFrameGridLayout;
     QGridLayout *specsFrameGridLayout;
 
+    QComboBox * actorListComboBox;
     QComboBox * attributeComboBox;
     QComboBox * sasAttributeComboBox;
     QComboBox * relationshipComboBox;
@@ -66,7 +67,7 @@ private :
     SpecsData crossProductSpecsLHS;
     SpecsData crossProductDataRHS;
 
-    int specsIndexlist[4];
+    int specsIndexlist[4]= {0};
 
     DataValues modelSpecificationsLHS ;
     DataValues actorSpecificationsLHS ;
@@ -78,15 +79,17 @@ private :
     SpecificationVector filterSpecificationsRHS;
     SpecificationVector crossProdSpecificationsRHS;
 
+    QStringList actorHeaders;
+
     void initializeFrameLayout();
     void initializeFiltersFrame();
     void initializeCrossProductFrame();
     void initializeSensAnalysisFrame();
-    void updateSasSpecsList();
 
 signals:
     void filterList(QStandardItemModel  *, QPair<SpecsData,SpecificationVector>);
     void crossProductList(QStandardItemModel *, QPair<SpecsData,SpecificationVector>);
+    void getActorAttributeheaders();
 
 private slots:
     void listViewClicked();
@@ -94,7 +97,7 @@ private slots:
     void specsListMainWindow(QStandardItemModel * modelList,  QPair<DataValues,SpecsData>,  QPair<DataValues,SpecsData>,
                              QPair<SpecsData,SpecificationVector>,  QPair<SpecsData,SpecificationVector> crossProdSpecs);
     void populateCrossProductComboBox();
-    void actorAtrributesSAS(QStringList attributes, QStringList sas);
+    void actorAtrributesSAS(QString sas);
     void relationComboBoxChanged(int rel);
     void filterAddSpecificationClicked(bool bl);
     void crossproductAddSpecificationClicked(bool bl);
@@ -102,11 +105,17 @@ private slots:
     void filterListViewRemoveSelectedClicked();
     void crossproductContextMenu(QPoint pos);
     void crossproductRemoveSelectedClicked();
+    void actorNameAttributes(QStringList headers, QStringList actors);
+    void actorIndexChangedComboBox(int indx);
 
 public slots:
     void filterListViewRemoveAllClicked();
     void crossproductRemoveAllClicked();
     void listViewSpecsRemoveAllClicked();
+    void actorModelSpecification(QString spec, QPair<DataValues,SpecsData> specData, int type);
+    void filterCrossProdSpecification(QString spec, QPair<SpecsData,SpecificationVector> specData, int type);
+    void removeSpecModelActor(int index, int type, QString specLHS);
+    void removeSpecFilterCrossProd(int index, int type, DataValues specLHS);
 
 };
 

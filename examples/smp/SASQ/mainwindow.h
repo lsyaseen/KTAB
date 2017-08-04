@@ -129,11 +129,6 @@ private slots :
     void xmlDataParsedFromFile(QStringList modelDesc,QStringList modelParametes,
                                QStringList dimensionNames,QStandardItemModel* xmlModel,
                                QVector<QStringList>idealAdjustmentList);
-    void actorsItemListModel(QStandardItemModel*specsList, QStringList attributes, QPair<DataValues,SpecsData> specsVec);
-    void modelparamListModel(QStandardItemModel*specsList, QPair<DataValues, SpecsData> spec);
-    void filtersListModel(QStandardItemModel*specsList, QPair<SpecsData, SpecificationVector> specsVec);
-    void crossProdListModel(QStandardItemModel*specsList,  QPair<SpecsData,SpecificationVector> specsVec);
-    void combinedModel();
 
 private :
     ModelFrame * modelFrameObj= nullptr;
@@ -163,7 +158,8 @@ signals:
                                    QStringList dims,QStringList desc);
     void specsItemListModel(QStandardItemModel*,QPair<DataValues,SpecsData>, QPair<DataValues,SpecsData>,
                             QPair<SpecsData,SpecificationVector>,QPair<SpecsData,SpecificationVector>);
-    void actorAttributesAndSAS(QStringList attributes, QStringList sasValues);
+    //    void actorAttributesAndSAS(QStringList attributes, QStringList sasValues);
+
 };
 
 
