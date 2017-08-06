@@ -41,3 +41,6 @@ We have added two new shell scripts to the KTAB project which automate testing a
 2. [SMP](./examples/smp/SMPC_RefRuns_Compare.sh): This script run the smpc application with four example datasets: `SOE-Pol-Comp`, `dummyData_3Dim`, `dummyData_6Dim`, and `dummyData-a040`. Results are compared against known results with the same datasets and parameters.  The user is notified in the case of any nontrivial deviation in application output, or indication of failure.
 
 The Travis Continual Integration process which runs to validate every Pull Request runs the `SMPC_RefRun_Compare.sh` script and fails if the script fails.  To test the other applications, Travis runs the script `KTAB_Test_Apps_Travis.sh`, which skips `demoutils`, due to an inexplicable error on only the Travis server.
+
+## Multi-threaded SMP Bargaining ##
+A major portion of the bargaining process in the SMP model has been refactored to take advantage of parallelization offered by modern computer systems with multiple CPUs. When run, the application will automatically generate as many independent threads as there are processors. This results in a substantial reduction in computation time.
