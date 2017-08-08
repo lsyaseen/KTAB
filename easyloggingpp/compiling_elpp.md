@@ -1,8 +1,8 @@
-#Compiling Easylogging++ for KTAB#
+# Compiling Easylogging++ for KTAB #
 
 KTAB Now uses the Easylogging++ framework, hosted on GitHub [here](https://github.com/muflihun/easyloggingpp), to log model progress.  Supported versions are currently 9.94.2 and above.  Compilation instructions under both Windows and Linux are documented here.  In both cases, you will need our [CMakeLists.txt file](.\CMakeLists.tdt)
 
-##Linux:##
+## Linux: ##
 
 	1. locally copy the easyloggingpp repository: git clone git@github.com:muflihun/easyloggingpp.git
 	2. enter the easyloggingpp directory
@@ -15,7 +15,7 @@ KTAB Now uses the Easylogging++ framework, hosted on GitHub [here](https://githu
 - sudo make install; this should copy the header file to /usr/local/include, and the library to /usr/local/lib
 
 
-##Windows:##
+## Windows: ##
 
 	1. same as Linux
 	2. same as Linux
