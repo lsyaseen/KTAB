@@ -38,15 +38,15 @@ extern "C" {
     }
   }
 
-  void dbLoginCredential(const char *connStr) {
-    KBase::Model::loginCredentials(std::string(connStr));
+  void dbLoginCredentials(const char *connStr) {
+    if (nullptr != connStr) {
+      KBase::Model::loginCredentials(std::string(connStr));
+    }
   }
-
-  //string SMPModel::runModel(vector<bool> sqlFlags,
-  //string inputDataFile, uint64_t seed, bool saveHist, vector<int> modelParams) {
 
   const char* runSmpModel(unsigned int sqlLogFlags[5], const char* inputDataFile,
     unsigned int seed, unsigned int saveHistory, int modelParams[9] = 0) {
+
     std::vector<bool> sqlFlags;
     for (unsigned int i = 0; i < 5; ++i) {
       if (0 == sqlLogFlags[i]) {
@@ -61,7 +61,18 @@ extern "C" {
     if (0 != saveHistory) {
       saveHist = true;
     }
-    std::string scenarioID = SMPLib::SMPModel::runModel(sqlFlags, std::string(inputDataFile), seed, saveHist);
+
+    std::vector<int> modelParameters;
+    if (modelParams) {
+      for (unsigned int i = 0; i < 9; ++i) {
+        modelParameters.push_back(modelParams[i]);
+      }
+    }
+
+    std::string scenarioID = SMPLib::SMPModel::runModel(
+      sqlFlags, std::string(inputDataFile), seed, saveHist, modelParameters
+    );
+
     return scenarioID.c_str();
   }
 }
