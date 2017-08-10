@@ -31,6 +31,41 @@
 #include <QSqlError>
 #include <QSqlRecord>
 
+extern "C" {
+  void configLogger(const char *cfgFile) {
+    if (nullptr != cfgFile) {
+      KBase::Model::configLogger(cfgFile);
+    }
+  }
+
+  void dbLoginCredential(const char *connStr) {
+    KBase::Model::loginCredentials(std::string(connStr));
+  }
+
+  //string SMPModel::runModel(vector<bool> sqlFlags,
+  //string inputDataFile, uint64_t seed, bool saveHist, vector<int> modelParams) {
+
+  const char* runSmpModel(unsigned int sqlLogFlags[5], const char* inputDataFile,
+    unsigned int seed, unsigned int saveHistory, int modelParams[9] = 0) {
+    std::vector<bool> sqlFlags;
+    for (unsigned int i = 0; i < 5; ++i) {
+      if (0 == sqlLogFlags[i]) {
+        sqlFlags.push_back(false);
+      }
+      else {
+        sqlFlags.push_back(true);
+      }
+    }
+
+    bool saveHist = false;
+    if (0 != saveHistory) {
+      saveHist = true;
+    }
+    std::string scenarioID = SMPLib::SMPModel::runModel(sqlFlags, std::string(inputDataFile), seed, saveHist);
+    return scenarioID.c_str();
+  }
+}
+
 namespace SMPLib {
 using std::function;
 using std::get;
