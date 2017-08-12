@@ -64,7 +64,7 @@ connString = bytes('Driver=QSQLITE;Database=pySMPTest',encoding="ascii")
 # the --logmin flag is equivalent to (True,False,False,False,True)
 sqlFlags = sqlFlagsType(True,False,False,False,True)
 # inputDataFile: self-explanatory
-inputDataFile = bytes(os.getcwd()+os.sep+'SOE-Pol-Comp.csv',encoding="ascii")
+inputDataFile = bytes(os.getcwd()+os.sep+'doc'+os.sep+'SOE-Pol-Comp.csv',encoding="ascii")
 # seed: 64-bit unsigned int seed for the random number generator
 seed = c.c_uint64(1024)
 # saveHist: boolean which enables/disables text output of 
