@@ -21,10 +21,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # --------------------------------------------
 #
-# This Python scrip demonstrates how to use the SMP shared library
-# to execute the KTAB SMP model in Python. The only difference in
-# running this script in Windows or Linux is the name of the library:
-# libsmpDyn.so for Linux, and smpDyn.dll for Windows.
+# This Python scrip demonstrates how to use the SMP shared library to execute the KTAB SMP
+# model in Python. The only difference in running this script in Windows or Linux should
+# be the name of the library: libsmpDyn.so for Linux, and smpDyn.dll for Windows. Please
+# note that this demo script has *not* been tested as extensively as the rest of KTAB.
 #
 # --------------------------------------------
 import ctypes as c
