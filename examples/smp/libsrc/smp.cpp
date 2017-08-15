@@ -73,8 +73,6 @@ extern "C" {
       sqlFlags, std::string(inputDataFile), seed, saveHist, modelParameters
     );
     scenarioID.copy(buffer,buffsize);
-
-    //return buffer;
   }
 }
 
