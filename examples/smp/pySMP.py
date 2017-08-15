@@ -49,7 +49,7 @@ dbLoginCredentials = proto_LC(('dbLoginCredentials',smpLib))
 # inputDataFile, unsigned int seed, unsigned int saveHistory,
 # int modelParams[9] = 0)
 sqlFlagsType = c.c_bool*5; modelParamsType = c.c_int*9
-proto_SMP = c.CFUNCTYPE(c.c_char_p,sqlFlagsType,c.c_char_p,c.c_uint64,c.c_bool,modelParamsType)
+proto_SMP = c.CFUNCTYPE(c.c_char_p,c.c_char_p,c.c_uint,sqlFlagsType,c.c_char_p,c.c_uint64,c.c_bool,modelParamsType)
 runSmpModel = proto_SMP(('runSmpModel',smpLib))
 
 ''' Prepare the C-type Variables '''
@@ -57,6 +57,8 @@ logFile = bytes(os.getcwd()+os.sep+'smpc-logger.conf',encoding="ascii")
 connString = bytes('Driver=QSQLITE;Database=pySMPTest',encoding="ascii")
 
 ''' runSmpModel Parameters '''
+bsize = 32*16
+scenID = c.create_string_buffer(bsize)
 # sqlFlags: vector of 5 booleans which enable/disable
 # database logging for 5 types of data (see ../../KTAB_SMP_Tables.md):
 # 0 = Information Tables, 1 = Position Tables, 2 = Challenge Tables,
@@ -87,14 +89,7 @@ modelParams = modelParamsType(0,0,0,2,1,1,1,1,0) # these are the defaul paramete
 ''' Finally, run the Model '''
 res = configLogger(logFile)
 res = dbLoginCredentials(connString)
-res = runSmpModel(sqlFlags,inputDataFile,seed,saveHist,modelParams)
-# need to figure out how to decode res...
-
-
-
-
-
-
-
-
-
+res = runSmpModel(scenID,bsize,sqlFlags,inputDataFile,seed,saveHist,modelParams)
+# get scenario ID
+scenID = scenID.value.decode('utf-8')
+print('Scenario ID: %s'%scenID)
