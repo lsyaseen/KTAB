@@ -25,7 +25,6 @@
 #define DEMO_MINICSV_H
 
 #include <cstdlib>
-#include <iostream>
 #include <stdio.h>
 #include <string>
 

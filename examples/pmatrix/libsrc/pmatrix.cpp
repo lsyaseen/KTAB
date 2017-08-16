@@ -22,11 +22,9 @@
 // --------------------------------------------
 
 #include "pmatrix.h" 
+#include <easylogging++.h>
 
 namespace PMatDemo {
-using std::cout;
-using std::endl;
-using std::flush;
 using std::get;
 using std::tuple;
 
@@ -51,7 +49,7 @@ string genName(const string & prefix, unsigned int i) {
 
 PMatrixModel* pmmCreation(uint64_t sd) {
   auto pmm = new PMatrixModel("Bob", sd);
-  cout << "Created pmm named " << pmm->getScenarioName() << endl << flush;
+  LOG(INFO) << "Created pmm named" << pmm->getScenarioName();
   pmm->pcem = KBase::PCEModel::MarkovIPCM;
   auto rng = new PRNG(sd);
   const unsigned int numAct = 17;
@@ -68,22 +66,22 @@ PMatrixModel* pmmCreation(uint64_t sd) {
     desc.push_back(genName("Description", i));
   }
   pmm->setActors(names, desc);
-  cout << "Added " << numAct << " actors " << endl << flush;
-  cout << "Configured " << pmm->getScenarioName() << endl << flush;
+  LOG(INFO) << "Added" << numAct << "actors ";
+  LOG(INFO) << "Configured" << pmm->getScenarioName();
   return pmm;
 }
 
 
 PMatrixPos* pmpCreation(PMatrixModel* pmm) {
   auto pmp = new PMatrixPos(pmm, 7);
-  cout << "Created pmp with index " << pmp->getIndex() << endl << flush;
+  LOG(INFO) << "Created pmp with index" << pmp->getIndex();
   return pmp;
 }
 
 PMatrixState* pmsCreation(PMatrixModel * pmm) {
   auto pms = new PMatrixState(pmm);
   pmm->addState(pms);
-  cout << "Added new state to PMatrixModel" << endl << flush;
+  LOG(INFO) << "Added new state to PMatrixModel";
   return pms;
 }
 
@@ -235,9 +233,9 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::minProbError(
   using KBase::vSlice;
   using KBase::VHCSearch;
 
-  printf("Starting minimization with R = %+.3f and errWeight = %.2f \n",
-         bigR, errWeight);
-  cout << endl << flush;
+  LOG(INFO) << KBase::getFormattedString(
+    "Starting minimization with R = %+.3f and errWeight = %.2f",
+    bigR, errWeight);
 
 
   auto  aNames = get<0>(fParams);
@@ -304,9 +302,8 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::minProbError(
 
   vhc->nghbrs = VHCSearch::vn1; // vn2 takes 10 times as long, w/o improvement
   auto p0 = KMatrix(numAct, 1); // all zeros
-  cout << "Initial point: ";
+  LOG(INFO) << "Initial point:";
   trans(p0).mPrintf(" %+.4f ");
-  cout << endl;
   auto rslt = vhc->run(p0,
                        2500, 10, 1E-5, // iMax, sMax, sTol
                        0.50, 0.618, 1.25, 1e-8, // step, shrink, grow, minStep
@@ -317,11 +314,10 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::minProbError(
   unsigned int sn = get<3>(rslt);
   delete vhc;
   vhc = nullptr;
-  printf("Iter: %u  Stable: %u \n", in, sn);
-  printf("Best value: %+.4f \n", vBest);
-  cout << "Best point:    ";
+  LOG(INFO) << "Iter:" << in << "Stable:" << sn;
+  LOG(INFO) << KBase::getFormattedString("Best value: %+.4f", vBest);
+  LOG(INFO) << "Best point:";
   trans(pBest).mPrintf(" %+.4f ");
-  cout << endl;
 
   // get more data: cost, w1, w2
 
@@ -332,7 +328,6 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::minProbError(
                       errWeight, ReportingLevel::High);
 
 
-  cout << endl;
   return c12;
 }
 
@@ -413,21 +408,18 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::probCost(const KMatrix& pnt,
   const double totalCost = (pCost + ((serr1 + serr2 + serr3)*errWeight)) / (1.0 + errWeight);
 
   if (ReportingLevel::Silent < rl) {
-    cout << "Point :";
+    LOG(INFO) << "Point:";
     trans(pnt).mPrintf(" %+7.4f ");
-    cout << endl;
 
-    cout << "w1: ";
+    LOG(INFO) << "w1:";
     w1.mPrintf(" %7.2f ");
-    cout << endl;
 
-    cout << "w2: ";
+    LOG(INFO) << "w2:";
     w2.mPrintf(" %7.2f ");
-    cout << endl;
 
-    printf("Total cost= %.5f = [ %f + (%f^2 + %f^2 + %f^2)*%.2f ] / %.2f",
-           totalCost, pCost, err1, err2, err3, errWeight, errWeight + 1.0);
-    cout << endl << flush;
+    LOG(INFO) << KBase::getFormattedString(
+      "Total cost= %.5f = [ %f + (%f^2 + %f^2 + %f^2)*%.2f ] / %.2f",
+      totalCost, pCost, err1, err2, err3, errWeight, errWeight + 1.0);
   }
 
   auto rslt = tuple<double, KMatrix, KMatrix>(totalCost, w1, w2);

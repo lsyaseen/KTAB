@@ -48,6 +48,17 @@ if (NOT SQLITE_FOUND)
   message(FATAL_ERROR "Could not find SQLite")
 endif (NOT SQLITE_FOUND)
 
+#--------------------------------------------------
+find_package(qtlibs)
+set(CMAKE_PREFIX_PATH ${PREFIX_PATH})
+message(STATUS "CMAKE_PREFIX_PATH" ${CMAKE_PREFIX_PATH})
+
+find_package(Qt5 REQUIRED COMPONENTS Core Sql)
+
+# --------------------------------------------------------
+
+find_package(Easyloggingpp)
+
 # --------------------------------------------------------
 
 set (COMSEL_XLIBS  )
@@ -107,6 +118,7 @@ include_directories (
   ${PROJECT_SOURCE_DIR}/src/
   ${SQLITE_INCLUDE_DIR}
   ${TINYXML2_INCLUDE_DIR}
+  ${LOGGER_INCLUDE_DIR}
   )
 
 
@@ -115,6 +127,11 @@ set(COMSELLIB_SRCS
   )
 
 add_library(comsel STATIC ${COMSELLIB_SRCS})
+
+target_link_libraries (comsel
+  Qt5::Core
+  Qt5::Sql
+  )
 
 # -------------------------------------------------
 
@@ -138,6 +155,7 @@ target_link_libraries(csg
   ${SQLITE_LIBRARIES}
   ${EFENCE_LIBRARIES}
   ${TINYXML2_LIBRARIES}
+  ${LOGGER_LIBRARY}
   )
   
 if (WIN32)  

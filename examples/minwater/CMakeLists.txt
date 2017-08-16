@@ -56,6 +56,16 @@ if (NOT SQLITE_FOUND)
   message(FATAL_ERROR "Could not find SQLite")
 endif (NOT SQLITE_FOUND) 
 
+# --------------------------------------------------------
+
+find_package(Easyloggingpp)
+#--------------------------------------------------
+find_package(qtlibs)
+set(CMAKE_PREFIX_PATH ${PREFIX_PATH})
+message(STATUS "CMAKE_PREFIX_PATH" ${CMAKE_PREFIX_PATH})
+
+find_package(Qt5 REQUIRED COMPONENTS Core Sql)
+
 # ------------------------------------------------- 
 # See "Findkutils.cmake" in cmakemodules to figure
 # out where it looks and what variables it sets
@@ -84,6 +94,7 @@ include_directories(
   ${KMODEL_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}/src/
   ${SQLITE_INCLUDE_DIR}
+  ${LOGGER_INCLUDE_DIR}
 )
 
 
@@ -93,6 +104,7 @@ include_directories(
 include_directories(
   ${PROJECT_SOURCE_DIR}/src/
   ${SQLITE_INCLUDE_DIR}
+  ${LOGGER_INCLUDE_DIR}
 )
 
 set(MWDEMO_SRCS
@@ -108,6 +120,9 @@ target_link_libraries(mwdemo
   ${KUTILS_LIBRARY}
   ${EFENCE_LIBRARIES}
   ${SQLITE_LIBRARIES}
+  ${LOGGER_LIBRARY}
+  Qt5::Core
+  Qt5::Sql
   )
 
 # -------------------------------------------------

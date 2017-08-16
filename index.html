@@ -26,11 +26,12 @@ ga('send', 'pageview');
     <div class="wrapper">
       <header>
         <h1>KTAB</h1>
-        <p>KAPSARC&#39;s Toolkit for building models of Collective Decision Making Processes</p>
+        <p>KAPSARC&#39;s Toolkit for building models of Collective Decision-Making Processes</p>
 
         <p class="view"><a href="https://github.com/KAPSARC/KTAB">View the Project on GitHub</a></p>		
 		
-		<p>SMP Release Version 1.0 Archive dated: 27 March 2017</p>
+		<p>SMP Release Version 1.1 Archive dated: 16 August 2017<br>
+	      Click <a href = "https://github.com/KAPSARC/KTAB/blob/master/whatsnew.md">here</a> to See What's New in this Version!</p>
 
         <ul>
           <!--<li><a href="https://github.com/KAPSARC/KTAB/zipball/master">Download <strong>ZIP File</strong></a></li><-->
@@ -52,18 +53,18 @@ ga('send', 'pageview');
 </header>
 <section>
 <h1>KAPSARC Toolkit for Behavioral Analysis (KTAB)</h1>
-<h2>KTAB SMP VERSION 1.0 RELEASED</h2>
-<p>KTAB is an open-source toolkit for assembling models that allow the systematic and rigorous analysis of Collective Decision-Making Processes (CDMPs). KTAB has been developed to meet the need for widely available, state-of-the-art, supported, and open-source software that facilitates the modeling and analysis of collective decision making.</p>
+<h2>KTAB SMP VERSION 1.1 RELEASED</h2>
+<p>KTAB is an open-source toolkit for assembling models that allow the systematic and rigorous analysis of Collective Decision-Making Processes (CDMPs). KTAB has been developed to meet the need for widely available, state-of-the-art, supported, and open-source software that facilitates the modeling and analysis of collective decision-making.</p>
 <p><img src="./smp_screenshot.png" /></p>
 <p>The main development site for KTAB is the <a href="http://www.kapsarc.org">King Abdullah Center for Petroleum Studies and Research</a>. Research is distributed at <a href="https://www.kapsarc.org/openkapsarc/">OpenKAPSARC</a>, and the main page for KTAB research and other information is <a href="https://www.kapsarc.org/openkapsarc/kapsarc-toolkit-for-behavioral-analysis-ktab/">here</a>.</p>
 <p>All KTAB models represent stochastic decision-making among comparatively small numbers of actors or stakeholder groups (more than one, but less than hundreds), within the paradigm of &quot;Probabilistic Condorcet Elections&quot;. PCEs are used to estimate the likelihood of different outcomes from a CDMP, depending on the options each agent has or can generate, how they value those options, and the coalitions they can form to support or oppose each option. Details can be found in the online documentation as well as articles on the <a href="https://www.kapsarc.org/openkapsarc/kapsarc-toolkit-for-behavioral-analysis-ktab/">main KTAB page</a>.</p>
-<p>KTAB is intended to be a platform that contains a number of models that can simulate CDMPs. The initial model that has been instantiated in KTAB is called the Spatial Model of Politics (SMP). The class of models represented by the SMP has a long history in the academic discipline of political science. More detail on the SMP, and references to the appropriate literature, can again be found in articles available for download on the main KTAB page. The majority of the development team’s current efforts are focused on producing a GUI for the SMP. A beta version with a working GUI is now available for download.</p>
+<p>KTAB is intended to be a platform that contains a number of models that can simulate CDMPs. The initial model that has been instantiated in KTAB is called the Spatial Model of Politics (SMP). The class of models represented by the SMP has a long history in the academic discipline of political science. More detail on the SMP, and references to the appropriate literature, can again be found in articles available for download on the main KTAB page. The majority of the development team’s current efforts are focused on producing a GUI for the SMP. The official version with a working GUI is now available for download.</p>
 
 <h2>Installing SMP Application on Windows</h2>
 <p>Installation of the SMP application on Windows is simple.</p>
 <ol>
-<li>Download and install the Visual C++ Runtime libraries for Visual Studio 2015 <a href="https://www.microsoft.com/en-us/download/details.aspx?id=48145">here</a></li>
-<li>Click the <a href="https://github.com/KAPSARC/KTAB/blob/master/KTAB_SMP.zip" download>SMP Release link on the left</a> to download a zip archive of the application compiled for 64-bit machines, along with all the required QT libraries</li>
+<li>Download and install, Microsoft Visual C++ Redistributable for Visual Studio 2015 or higher from <a href="https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads">here</a></li>
+<li>Click the <a href="https://github.com/KAPSARC/KTAB/blob/master/KTAB_SMP.zip" download>SMP Release link on the left</a> to download a zip archive of the application compiled for 64-bit machines, along with all the required shared libraries</li>
 <li>Extract the contents of the archive to your PC, maintaining the directory structure in the archive</li>
 </ol>
 <p>Nothing else should be required to run the application executable <i>KTAB_SMP.exe</i>.</p>
@@ -73,8 +74,8 @@ ga('send', 'pageview');
 <ul>
 <li>Using an input/output economic model to bargain over tax/subsidy rates,</li>
 <li>Simple discrete matching </li>
-<li>Negotiating the priority order to tasks to undertake (and which to drop)</li>
-<li>A simple but highly parameterizable version of the <a href="examples/smp/README.md">spatial model of politics</a>. The command line version is <i>smpc</i>; the GUI version is <i>KTAB_SMP</i>. Dummy data are provided to illustrate the format for both CSV and XML input files.</li>
+<li>Negotiating the priority order of tasks to undertake (and which to drop)</li>
+<li>A simple but highly parameterizable version of the <a href="examples/smp/README.md">spatial model of politics</a>. The command line version is <i>smpc</i> (or <i>smpcDyn</i>); the GUI version is <i>KTAB_SMP</i>. Dummy data are provided to illustrate the format for both CSV and XML input files.</li>
 <li>A simple model of bargaining over the order in which projects should be addressed, taking into account budget limits. Dummy data are provided.</li>
 <li>A simple example of using KTAB to fit parameters. Similar to econometric models, the parameters of a PCE are adjusted until the result closely matches the expected results. The fitted parameters could then be used to analyze possible changes.</li>
 </ul>
@@ -99,7 +100,7 @@ ga('send', 'pageview');
 <li>Fedora 22 with gcc/g++ 5.1,</li>
 <li>openSUSE 13.2 with clang/clang++ 3.5,</li>
 <li>Debian 8.1 with gcc/g++ 4.9,</li>
-<li>Ubuntu 16.04 with gcc/g++ 5.4.</li>
+<li>Ubuntu 14.04 &amp; 16.04 with gcc/g++ 5.4.</li>
 </ul>
 </ul>
 
@@ -111,12 +112,13 @@ these common compilers:</p>
 <li>Clang 3.5.0, or higher</li>
 <li>Visual Studio 2013, or higher</li>
 </ul>
-<p>We expect to upgrade to C++17 when it becomes well-supported by gcc, clang, and VS, especially structured bindings, aka parallel assignment with pattern matching.</p>
+<p>We expect to upgrade to C++17 when it becomes well-supported by gcc, clang, and Visual Studio, especially structured bindings, aka parallel assignment with pattern matching.</p>
 
 <h3>User Interfaces</h3>
 <p> A graphical front-end is under development. The current GUI version of the SMP, <i>KTAB_SMP</i> has been developed in <a href="https://www.qt.io/">Qt</a>.  Qt is dual-licensed under both commercial and open-source terms; details can be found <a href="https://www.qt.io/qt-licensing-terms/">here</a>. The Qt licensing page states that dynamically linking an application to the open-source Qt libraries does not make the application open-source.</p>
 <p>Previous work toward a graphical front-end was based on the <a href = "http://www.fltk.org">FLTK project</a>. FLTK is a cross-platform, C++ toolkit provided under the terms of the GNU Library Public License, Version 2 with exceptions that allow for static linking; details can be found <a href="http://www.fltk.org/COPYING.php">here</a>.  The source code and build instructions for the most recent stable version can be obtained <a href = "http://www.fltk.org/software.php">here</a>. FLTK also uses CMake for configuration, then your favorite IDE to build.</p>
 <p>Because the libraries that analyze negotiation are completely separate from the applications that use them, developers are perfectly free to write command line applications or use other GUI toolkits. Along these lines, the GUI work is expected to diversify into other toolkits, such as <a href="https://www.wxwidgets.org/">WxWidgets</a>, or even a web interface such as <a href="http://www.webtoolkit.eu/wt">Wt</a>. 
+<p> We have also included a python script, pySMP.py to demonstrate how to use the python to execute the SMP model using a shared library. We anticipate adding a similar sample script for Java at a later date.
 <p>For authoritative ruling on licensing issues, consult appropriate counsel.</p>
 
 <h3>Data Input Formats</h3>

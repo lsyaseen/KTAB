@@ -28,8 +28,7 @@
 #include "smp.h"
 #include "demosmp.h"
 #include <functional>
-
-
+#include <easylogging++.h>
 
 using KBase::PRNG;
 using KBase::KMatrix;
@@ -50,24 +49,27 @@ void ReplaceStringInPlace(std::string& subject, const std::string& search,
 }
 std::string GenerateDBNameWithTimeStamp()
 {
-	using namespace std::chrono;
-	system_clock::time_point today = system_clock::now();
-	time_t tt;
-	tt = system_clock::to_time_t(today);
-	std::string s = ctime(&tt);
-	ReplaceStringInPlace(s, " ", "_");
-	ReplaceStringInPlace(s, ":", "_");
-	ReplaceStringInPlace(s, "\n", "");
-	s += "_GMT.db";
-	return s;
-
+  // Generate a name with following format:
+  // smpc-YYYY-MM-DD-HH-MM-SS
+  // Ex: smpc-2017-05-24__14-46-29.db
+  using namespace std::chrono;
+  system_clock::time_point today = system_clock::now();
+  time_t tt;
+  tt = system_clock::to_time_t(today);
+  struct tm * ptm = gmtime(&tt);
+  size_t nameLength = 33;
+  char *dbname= new char [nameLength];
+  sprintf(dbname, "smpc-%d-%02d-%02d__%02d-%02d-%02d_GMT.db",
+    ptm->tm_year+1900, ptm->tm_mon+1, ptm->tm_mday,
+    ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
+  std::string name = std::string(dbname);
+  delete[] dbname;
+  return name;
 }
+
 int main(int ac, char **av) {
-  using std::cout;
-  using std::endl;
   using std::string;
   using KBase::dSeed;
-  auto sTime = KBase::displayProgramStart(DemoSMP::appName, DemoSMP::appVersion);
   uint64_t seed = -1;
   bool run = true;
   bool euSmpP = false;
@@ -79,25 +81,25 @@ int main(int ac, char **av) {
   string inputCSV = "";
   string inputDBname = "";
   string inputXML = "";
+  string connstr;
 
   auto showHelp = []() {
     printf("\n");
     printf("Usage: specify one or more of these options\n");
-    printf("--help                  print this message\n");
-    printf("--euSMP                 exp. util. of spatial model of politics\n");
-    printf("--ra                    randomize the adjustment of ideal points with euSMP \n");
-    printf("--csv <f>               read a scenario from CSV \n");
-    printf("--xml <f>               read a scenario from XML \n");
-    printf("--dbname <f>            specify a db file name for logging \n");
-    printf("--logmin                log only scenario information + position histories\n");
-    printf("--savehist              export by-dim by-turn position histories (input+'_posLog.csv') and\n");
-    printf("                        by-dim actor effective powers (input+'_effPower.csv')\n");
-    printf("--seed <n>              set a 64bit seed\n");
-    printf("                        0 means truly random\n");
-    printf("                        default: %020llu \n", dSeed);
+    printf("--help           print this message\n");
+    printf("--euSMP          exp. util. of spatial model of politics\n");
+    printf("--ra             randomize the adjustment of ideal points with euSMP \n");
+    printf("--csv <f>        read a scenario from CSV\n");
+    printf("--xml <f>        read a scenario from XML\n");
+    printf("--logmin         log only scenario information + position histories\n");
+    printf("--savehist       export by-dim by-turn position histories (input+'_posLog.csv') and\n");
+    printf("                 by-dim actor effective powers (input+'_effPower.csv')\n");
+    printf("--seed <n>       set a 64bit seed; default is %020llu; 0 means truly random\n", dSeed);
+    printf("--connstr        a comma separated string for database server credentials:\n");
+    printf("                 \"Driver=<QPSQL|QSQLITE>;Server=<IP>*;[Port=<port>]*;Database=<DB_name>;\n");
+    printf("                 Uid=<user_id>*;Pwd=<password>*\"*for QPSQL only\n");
   };
 
-  bool isdbflagexist = false;
   if (ac > 1) {
     for (int i = 1; i < ac; i++) {
       if (strcmp(av[i], "--seed") == 0) {
@@ -130,21 +132,6 @@ int main(int ac, char **av) {
                 break;
         }
       }
-      else if (strcmp(av[i], "--dbname") == 0) {
-        //csvP = true;
-        i++;
-        if (av[i] != NULL)
-        {
-                inputDBname = av[i];
-                isdbflagexist = true;
-        }
-        else
-        {
-                isdbflagexist = false;
-  //			  run = false;
-                //break;
-        }
-      }
       else if (strcmp(av[i], "--euSMP") == 0) {
         euSmpP = true;
       }
@@ -159,6 +146,10 @@ int main(int ac, char **av) {
       }
       else if (strcmp(av[i], "--savehist") == 0) {
         saveHist = true;
+      }
+      else if(strcmp(av[i], "--connstr") == 0) {
+        i++;
+        connstr = av[i];
       }
       else {
         run = false;
@@ -187,6 +178,10 @@ int main(int ac, char **av) {
     return 0;
   }
 
+  // Set logging configuration from a file
+  SMPLib::SMPModel::configLogger("./smpc-logger.conf");
+
+  auto sTime = KBase::displayProgramStart(DemoSMP::appName, DemoSMP::appVersion);
   if (0 == seed) {
     PRNG * rng = new PRNG();
     seed = rng->setSeed(seed); // 0 == get a random number
@@ -205,30 +200,22 @@ int main(int ac, char **av) {
       seed = KBase::dSeed;
   }
 
+  SMPLib::SMPModel::loginCredentials(connstr);
+
   // note that we reset the seed every time, so that in case something
   // goes wrong, we need not scroll back too far to find the
   // seed required to reproduce the bug.
-  if (!isdbflagexist)
-  {
-    inputDBname = GenerateDBNameWithTimeStamp();
-  }
   if (euSmpP) {
-    cout << "-----------------------------------" << endl;
-    SMPLib::SMPModel::randomSMP(0, 0, randAccP, seed, sqlFlags, inputDBname);
+    SMPLib::SMPModel::randomSMP(0, 0, randAccP, seed, sqlFlags);
   }
   if (csvP) {
-    cout << "-----------------------------------" << endl;
-    //SMPLib::SMPModel::csvReadExec(seed, inputCSV, sqlFlags, inputDBname);
-    SMPLib::SMPModel::runModel(sqlFlags, inputDBname, inputCSV, seed, saveHist);
+    SMPLib::SMPModel::runModel(sqlFlags, inputCSV, seed, saveHist);
     SMPLib::SMPModel::destroyModel();
   }
   if (xmlP) {
-    cout << "-----------------------------------" << endl;
-    //SMPLib::SMPModel::xmlReadExec(inputXML, sqlFlags, inputDBname);
-    SMPLib::SMPModel::runModel(sqlFlags, inputDBname, inputXML, seed, saveHist);
+    SMPLib::SMPModel::runModel(sqlFlags, inputXML, seed, saveHist);
     SMPLib::SMPModel::destroyModel();
   }
-  cout << "-----------------------------------" << endl;
 
   KBase::displayProgramEnd(sTime);
   return 0;

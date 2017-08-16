@@ -32,12 +32,9 @@
 #include "smp.h"
 #include "comsel.h"
 #include "hcsearch.h"
+#include <easylogging++.h>
 
 namespace ComSelLib {
-  using std::printf;
-  using std::cout;
-  using std::endl;
-  using std::flush;
   using std::get;
   using std::string;
 
@@ -136,9 +133,8 @@ namespace ComSelLib {
     };
     KMatrix::mapV(setuij, na, na);
 
-    cout << "Actor spatial position utility matrix: " << endl;
+    LOG(INFO) << "Actor spatial position utility matrix: ";
     actorSpPstnUtil->mPrintf(" %5.3f");
-    cout << endl << flush;
 
     return;
   }
@@ -179,8 +175,7 @@ namespace ComSelLib {
       case 1: // on committee, use full strength
         break;
       default:
-        cout << "CSModel::oneCSPstnUtil - unrecognized match value: " << vb[k];
-        cout << endl << flush;
+        LOG(INFO) << "CSModel::oneCSPstnUtil - unrecognized match value: " << vb[k];
         assert(false); // no way to recover from this programming error
         break;
       }
@@ -233,19 +228,17 @@ namespace ComSelLib {
     const unsigned int numA = model->numAct;
     for (unsigned int i = 0; i < numA; i++) {
       auto pi = ((MtchPstn*)(pstns[i]));
-      printf("Position %02u: ", i);
+      LOG(INFO) << "Position:" << i;
       printVUI(pi->match);
-      cout << endl << flush;
     }
     auto pu = pDist(-1);
     KMatrix p = get<0>(pu);
     auto uNdx = get<1>(pu);
-    printf("There are %zu unique positions \n", uNdx.size());
+    LOG(INFO) << "There are" << uNdx.size() << "unique positions";
     for (unsigned int i1 = 0; i1 < uNdx.size(); i1++) {
       unsigned int i2 = uNdx[i1];
-      printf("  %2u:  %.4f \n", i2, p(i1, 0));
+      LOG(INFO) << KBase::getFormattedString("  %2u:  %.4f", i2, p(i1, 0));
     }
-    cout << endl;
     return;
   }
 
@@ -268,7 +261,7 @@ namespace ComSelLib {
     auto numU = ((const unsigned int)(uIndices.size()));
     assert(numU <= numP); // might have dropped some duplicates
 
-    cout << "Number of aUtils: " << aUtil.size() << endl << flush;
+    LOG(INFO) << "Number of aUtils: " << aUtil.size();
 
     const KMatrix u = aUtil[0]; // all have same beliefs in this demo
 
@@ -313,8 +306,7 @@ namespace ComSelLib {
       const double tol = 1E-10;
       const double mij = m(i, j);
       if ((mij + tol < 0.0) || (1.0 + tol < mij)) {
-        printf("%f  %i  %i  \n", mij, i, j);
-        cout << flush;
+        LOG(INFO) << KBase::getFormattedString("%f  %i  %i", mij, i, j);
       }
       assert(0.0 <= mij + tol);
       assert(mij <= 1.0 + tol);
@@ -350,26 +342,21 @@ namespace ComSelLib {
     KMatrix::mapV(euRng, eu.numR(), eu.numC());
 
     if (ReportingLevel::Low < rl) {
-      printf("Util matrix is %i x %i \n", uMat.numR(), uMat.numC());
-      cout << "Assessing EU from util matrix: " << endl;
+      LOG(INFO) << "Util matrix is" << uMat.numR() << "x" << uMat.numC();
+      LOG(INFO) << "Assessing EU from util matrix: ";
       uMat.mPrintf(" %.6f ");
-      cout << endl << flush;
 
-      cout << "Coalition strength matrix" << endl;
+      LOG(INFO) << "Coalition strength matrix:";
       c.mPrintf(" %12.6f ");
-      cout << endl << flush;
 
-      cout << "Probability Opt_i > Opt_j" << endl;
+      LOG(INFO) << "Probability Opt_i > Opt_j:";
       pv.mPrintf(" %.6f ");
-      cout << endl << flush;
 
-      cout << "Probability Opt_i" << endl;
+      LOG(INFO) << "Probability Opt_i:";
       p.mPrintf(" %.6f ");
-      cout << endl << flush;
 
-      cout << "Expected utility to actors: " << endl;
+      LOG(INFO) << "Expected utility to actors: ";
       eu.mPrintf(" %.6f ");
-      cout << endl << flush;
     }
 
     return eu;
@@ -377,8 +364,7 @@ namespace ComSelLib {
 
 
   CSState* CSState::stepSUSN() {
-    cout << endl << flush;
-    cout << "State number " << model->history.size() - 1 << endl << flush;
+    LOG(INFO) << "State number " << model->history.size() - 1;
     if ((0 == uIndices.size()) || (0 == eIndices.size())) {
       setUENdx();
     }
@@ -389,14 +375,11 @@ namespace ComSelLib {
     s2->step = [s2]() {
       return s2->stepSUSN();
     };
-    cout << endl << flush;
     return s2;
   }
 
 
   CSState * CSState::doSUSN(ReportingLevel rl) const {
-    // cout << "CSState::doSUSN not yet implemented" << endl; // TODO: finish this
-    // assert(false);
 
     const unsigned int numA = model->numAct;
     assert(numA == model->actrs.size());
@@ -409,30 +392,29 @@ namespace ComSelLib {
 
     auto numP = ((const unsigned int)(pstns.size()));
 
+    LOG(INFO) << "numP: " << numP;
 
     // Given the utility matrix, uMat, calculate the expected utility to each actor,
     // as a column-vector. Again, this is from the perspective of whoever developed uMat.
     auto euMat = [rl, numA, numP, this](const KMatrix & uMat) { 
       return expUtilMat(rl, numA, numP, uMat); };
     auto euState = euMat(u);
-    cout << "Actor expected utilities: ";
+    LOG(INFO) << "Actor expected utilities: ";
     KBase::trans(euState).mPrintf("%6.4f, ");
-    cout << endl << flush;
 
     if (ReportingLevel::Low < rl) {
-      printf("--------------------------------------- \n");
-      printf("Assessing utility of actual state to all actors \n");
+      LOG(INFO) << "---------------------------------------";
+      LOG(INFO) << "Assessing utility of actual state to all actors";
       for (unsigned int h = 0; h < numA; h++) {
-        cout << "not available" << endl;
+        LOG(INFO) << "not available";
       }
-      cout << endl << flush;
-      printf("Out of %u positions, %u were unique: ", numA, numU);
-      cout << flush;
+      string log = "Out of " + std::to_string(numA)
+        + " positions, " + std::to_string(numU) + " were unique";
       for (auto i : uIndices) {
-        printf("%2i ", i);
+        log += std::to_string(i);
       }
-      cout << endl;
-      cout << flush;
+
+      LOG(INFO) << log;
     }
 
 
@@ -445,12 +427,7 @@ namespace ComSelLib {
     const KMatrix eu0 = euMat(uUnique); // 'u' with duplicates, 'uUnique' without duplicates
 
     CSState * s2 = new CSState((CSModel*)model);
-
-    //s2->pstns = vector<KBase::Position*>();
-    for (unsigned int h = 0; h < numA; h++) {
-      s2->pstns.push_back(nullptr);
-    }
-
+    assert(numP == s2->pstns.size());  // pre-allocated by constructor, all nullptr's
 
     // TODO: clean up the nesting of lambda-functions.
     // need to create a hypothetical state and run setOneAUtil(h,Silent) on it
@@ -480,9 +457,8 @@ namespace ComSelLib {
         assert(KBase::maxAbs(u - uh0) < 1E-10); // all have same beliefs in this demo
         const unsigned int nI = ((CSModel*)model)->numItm;
         if (mph.match.size() != nI) {
-          cout << "Size of match object " << mph.match.size();
-          cout << " does not match number of items " << nI << endl;
-          cout << flush;
+          LOG(INFO) << "Size of match object " << mph.match.size();
+          LOG(INFO) << " does not match number of items " << nI;
         }
         assert(mph.match.size() == nI);
         auto uh = uh0;
@@ -535,20 +511,17 @@ namespace ComSelLib {
         }
 
         if (false) {
-          cout << "constructed hypUtil matrix:" << endl << flush;
+          LOG(INFO) << "constructed hypUtil matrix:";
           hypUtil.mPrintf(" %8.2f ");
-          cout << endl << flush;
         }
 
 
         if (ReportingLevel::Low < rl) {
-          printf("--------------------------------------- \n");
-          printf("Assessing utility to %2i of hypo-pos: ", h);
+          LOG(INFO) << "---------------------------------------";
+          LOG(INFO) << "Assessing utility to" << h << "of hypo-pos: ";
           printVUI(mph.match);
-          cout << endl << flush;
-          printf("Hypo-util minus base util: \n");
+          LOG(INFO) << "Hypo-util minus base util:";
           (uh - uh0).mPrintf(" %+.4E ");
-          cout << endl << flush;
         }
         const KMatrix eu = euMat(hypUtil); // uh or hypUtil
         // BUG: If we use 'uh' here, it passes the (0 <= delta-EU) test, because
@@ -582,11 +555,10 @@ namespace ComSelLib {
         3, 0.001); // stable-max, stable-tol
 
       if (ReportingLevel::Low < rl) {
-        printf("---------------------------------------- \n");
-        printf("Search for best next-position of actor %2i \n", h);
+        LOG(INFO) << "----------------------------------------";
+        LOG(INFO) << "Search for best next-position of actor" << h;
         //printf("Search for best next-position of actor %2i starting from ", h);
         //trans(*aPos).printf(" %+.6f ");
-        cout << flush;
       }
 
       double vBest = get<0>(rslt);
@@ -597,14 +569,13 @@ namespace ComSelLib {
       delete ghc;
       ghc = nullptr;
       if (ReportingLevel::Medium < rl) {
-        printf("Iter: %u  Stable: %u \n", iterN, stblN);
-        printf("Best value for %2i: %+.6f \n", h, vBest);
-        cout << "Best position:    " << endl;
-        cout << "numCat: " << pBest.numCat << endl;
-        cout << "numItm: " << pBest.numItm << endl;
-        cout << "perm: ";
+        LOG(INFO) << "Iter:" << iterN << "Stable:" << stblN;
+        LOG(INFO) << KBase::getFormattedString("Best value for %2i: %+.6f", h, vBest);
+        LOG(INFO) << "Best position:    ";
+        LOG(INFO) << "numCat: " << pBest.numCat;
+        LOG(INFO) << "numItm: " << pBest.numItm;
+        LOG(INFO) << "perm: ";
         printVUI(pBest.match);
-        cout << endl << flush;
       }
       MtchPstn * posBest = new MtchPstn(pBest);
       s2->pstns[h] = posBest;
@@ -613,7 +584,7 @@ namespace ComSelLib {
 
       double du = vBest - eu0(h, 0); // (hypothetical, future) - (actual, current)
       if (ReportingLevel::Low < rl) {
-        printf("EU improvement for %2i of %+.4E \n", h, du);
+        LOG(INFO) << KBase::getFormattedString("EU improvement for %2i of %+.4E", h, du);
       }
       //printf("  vBest = %+.6f \n", vBest);
       //printf("  eu0(%i, 0) for %i = %+.6f \n", h, h, eu0(h,0));
@@ -651,6 +622,10 @@ namespace ComSelLib {
     }
 
     assert(nullptr != s2);
+
+    LOG(INFO) << "numP: " << numP;
+    LOG(INFO) << "s2->pstns.size(): " << s2->pstns.size();
+
     assert(numP == s2->pstns.size());
     assert(numA == s2->model->numAct);
     for (auto p : s2->pstns) {
@@ -665,7 +640,7 @@ namespace ComSelLib {
 
   CSState * CSState::doBCN(ReportingLevel rl) const {
     CSState * cs2 = nullptr;
-    cout << "CSState::doBCN not yet implemented" << endl; // TODO: finish this
+    LOG(INFO) << "CSState::doBCN not yet implemented"; // TODO: finish this
     assert(false);
     return cs2;
   }

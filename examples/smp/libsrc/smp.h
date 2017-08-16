@@ -24,10 +24,10 @@
 #ifndef SMP_LIB_H
 #define SMP_LIB_H
 
-#include <iostream>
 #include <string>
 #include <map>
 
+#include <easylogging++.h>
 #include "sqlite3.h"
 #include "kutils.h"
 #include "prng.h"
@@ -59,6 +59,7 @@ using KBase::VUI;
 using KBase::BigRAdjust;
 using KBase::BigRRange;
 using KBase::KTable; // JAH 20160728
+using eduChlgsI = std::map<unsigned int /*j*/, tuple<double, double> >;
 
 class SMPActor;
 class SMPState;
@@ -192,12 +193,14 @@ public:
   function<shared_ptr<void>(const Actor* ai, const State* s)> bestTarget = nullptr;
   function<shared_ptr<void>(const Actor* aInit, const Actor* aRcvr, shared_ptr<void> btData, const State* s)> bargain = nullptr;
 
-  virtual void addPstn(Position* p);
+
+  // See State::pushPstn for explanation of the two different ways to add positions to a State.
+  virtual void pushPstn(Position* p);
 
   // use the parameters of your state to compute the relative probability of each actor's position
   virtual tuple< KMatrix, VUI> pDist(int persp) const;
   void showBargains(const vector < vector < BargainSMP* > > & brgns) const;
-  void showOneBargain(const BargainSMP* b) const;
+  string showOneBargain(const BargainSMP* b) const;
 
   virtual bool equivNdx(unsigned int i, unsigned int j) const;
 
@@ -223,11 +226,16 @@ public:
 
   void setPosMoverBargain(unsigned int actor, uint64_t bargainID);
 
-  void calcUtils(unsigned int i) const;  // i == actor id 
-
 protected:
 
 private:
+
+  void calcUtils(unsigned int i, unsigned int bestJ) const;  // i == actor id
+  mutable std::mutex utilDataLock;
+  mutable std::multimap<string, KMatrix> tpvData;
+  mutable std::multimap<string, double>phijData;
+  mutable std::multimap<string, vector<double>> euData;
+  void recordProbEduChlg() const;
 
   // this sets the values in all the AUtil matrices
   virtual void setAllAUtil(ReportingLevel rl);
@@ -241,14 +249,16 @@ private:
 
   KMatrix nra = KMatrix();
 
-  SMPState* doBCN() const;
+  SMPState* doBCN();
+
+  void doBCN(unsigned int i);
 
   // returns estimated probability k wins (given likely coaltiions), and expected delta-util of that challenge.
   // If desired, record in SQLite.
   tuple<double, double> probEduChlg(unsigned int h, unsigned int k, unsigned int i, unsigned int j, bool sqlP) const;
 
   // return best j, p[i>j], edu[i->j]
-  tuple<int, double, double> bestChallenge(unsigned int i) const;
+  tuple<int, double, double> bestChallenge(eduChlgsI &eduI) const;
 
   // the actor's ideal, against which they judge others' positions
   vector<VctrPstn> ideals = {};
@@ -271,7 +281,7 @@ private:
   /**
    * Calculate all challenge utilities (i, i, i, j) which would be used to find the best challenge
    */
-  void bestChallengeUtils(unsigned int i /* actor id */) const;
+  eduChlgsI bestChallengeUtils(unsigned int i /* initiator actor */) const;
 
   // Record the bargain id that caused an actor to move in each turn
   using moverBargains = std::map<
@@ -280,14 +290,64 @@ private:
     >;
   mutable moverBargains positionMovers;
 
-  using eduChlgsJ = std::map<unsigned int /*j*/, tuple<double, double> >;
-  
-  mutable std::map<unsigned int /*i*/, eduChlgsJ> eduChlgsIJ;
-  
-  mutable int bestJ;
+  unsigned int turn;
 
-	private:
-		vector<double> calcVotes(KMatrix w, KMatrix u, int actor) const;
+  vector< vector < BargainSMP* > > brgns;
+
+  std::mutex brgnsLock;
+
+  KBase::KMatrix w;
+
+  SMPState* s2 = nullptr;
+
+  std::map<unsigned int, KBase::KMatrix> actorBargains;
+
+  std::map<unsigned int, unsigned int> actorMaxBrgNdx;
+
+  std::mutex mtxLock;
+
+  void updateBestBrgnPositions(int k);
+
+  vector<double> calcVotes(KMatrix w, KMatrix u, int actor) const;
+
+  using BrgnValue = tuple<
+    unsigned int,  //turn
+    uint64_t,      //bargain id
+    unsigned int,  //initiator actor
+    unsigned int,  //receiver actor
+    double         //bargain value
+  >;
+  using BrgnValues = std::vector<BrgnValue>;
+  BrgnValues brgnVals;
+  std::mutex brgnValsLock;
+
+  using BrgnCoord = tuple<
+    unsigned int,    //turn id
+    int,             //bargnID
+    KBase::VctrPstn, //initPos
+    KBase::VctrPstn  //rcvrPos
+  >;
+  using BrgnCos = std::vector<BrgnCoord>;
+  BrgnCos brgnCos;
+  std::mutex brgnCosLock;
+
+  using BrgnVote = tuple<
+    unsigned int,                       //turn id
+    vector< tuple<uint64_t, uint64_t>>, //barginidspair_i_j
+    vector<double>,                     //Vote matrix
+    unsigned int                        //actor k
+  >;
+  using BrgnVotes = vector<BrgnVote>;
+  vector<BrgnVotes> brgnVotes;
+
+  using BrgnUtil = tuple<
+    unsigned int,      //turn id
+    vector<uint64_t>,  //bargnIds
+    KBase::KMatrix     //Util_mat
+  >;
+  using BrgnUtils = vector<BrgnUtil>;
+  BrgnUtils brgnUtils;
+  std::mutex brgnPosLock;
 };
 
 class SMPModel : public Model {
@@ -296,29 +356,26 @@ public:
   explicit SMPModel( string desc = "", uint64_t s=KBase::dSeed, vector<bool> f={}, string sceName = ""); // JAH 20160711 added rng seed
   virtual ~SMPModel();
 
-  static string dbPath; //to store db file name from SMPQ GUI, default is testsmp.db
-  static void setDBPath(std::string dbName); // to initialize DB Name to dbPath variable
-
   static const unsigned int maxDimDescLen = 256; // JAH 20160727 added
 
   static double bsUtil(double sd, double R);
   static double bvDiff(const KMatrix & vd, const  KMatrix & vs);
   static double bvUtil(const KMatrix & vd, const  KMatrix & vs, double R);
 
-  static std::string runModel(std::vector<bool> sqlFlags, std::string dbFilePath,
+  static std::string runModel(std::vector<bool> sqlFlags,
       std::string inputDataFile, uint64_t seed, bool saveHist, std::vector<int> modelParams = std::vector<int>());
 
   // this sets up a standard configuration and runs it
   static void configExec(SMPModel * md0);
 
   // read, configure, and run from CSV
-  static string csvReadExec(uint64_t seed, string inputCSV, vector<bool> f, string dbFilePath,
+  static string csvReadExec(uint64_t seed, string inputCSV, vector<bool> f,
                           vector<int> par=vector<int>());
 
   // read, configure, and run from XML
-  static string xmlReadExec(string inputXML, vector<bool> f, string dbFilePath);
+  static string xmlReadExec(string inputXML, vector<bool> f);
 
-  static void randomSMP(unsigned int numA, unsigned int sDim, bool accP, uint64_t s, vector<bool> f, string inputDBname);
+  static void randomSMP(unsigned int numA, unsigned int sDim, bool accP, uint64_t s, vector<bool> f);
 
   static SMPModel * csvRead(string fName, uint64_t s, vector<bool> f);
   static SMPModel * xmlRead(string fName,vector<bool> f);
@@ -340,7 +397,6 @@ public:
 
   // output the two files needed to draw Sankey diagram for Database
   static void sankeyOutput(string outputFile, string dbName, std::string scenarioId) ;
-
 
   // number of spatial dimensions in this SMP
   void addDim(string dn);
@@ -374,8 +430,10 @@ public:
   * This version of getQuadMapPoint is meant to be used on a db file which contains the results
   * of at least one model run
   */
-  static double getQuadMapPoint(string dbname, string scenarioID, size_t turn, size_t est_h,
-      size_t aff_k, size_t init_i, size_t rcvr_j);
+  static double getQuadMapPoint(const QString &connectionName, const string &scenarioID,
+    size_t turn, size_t est_h, size_t aff_k, size_t init_i, size_t rcvr_j);
+
+  static uint getIterationCount();
 
 protected:
   //sqlite3 *smpDB = nullptr; // keep this protected, to ease multi-threading
@@ -387,10 +445,6 @@ protected:
   // note that the function to write to table #k must be kept
   // synchronized with the result of createTableSQL(k) !
   void sqlTest();
-
-  // compute several useful items implied by the risk attitudes, saliences, and the matrix of differences
-  //static void setUtilProb(const KMatrix& vR, const KMatrix& vS, const KMatrix& vD,
-  //  KBase::VotingRule vr, KBase::VPModel vpm);
 
   // voting rule for actors when forming coalitions over positions or bargains
   VotingRule vrCltn = VotingRule::Proportional;

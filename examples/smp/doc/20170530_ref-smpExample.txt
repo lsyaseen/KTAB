@@ -1,0 +1,4984 @@
+Software version:  smpc 0.1 
+Start time: Tue May 30 10:05:09 2017
+ 
+Start SMPModel::readXML of ./doc/smpExample.xml 
+Scenario Name: -| DummyData_3Dim |- 
+Scenario Description: A very simple test of multi-dim SMP, using psuedonyms 
+Read PRNG seed:  03507583219545544127 
+Reading model parameters from XML scenario ... 
+Found 3 dimensions 
+Found 5 actors 
+Read dimension 0: 52.80 
+Read dimension 1: 39.80 
+Read dimension 2: 39.60 
+Read 3 dimensional components 
+Read salience 0: 32.30 
+Read salience 1: 22.40 
+Read salience 2: 13.40 
+Read 3 salience components 
+Read dimension 0: 15.90 
+Read dimension 1: 61.40 
+Read dimension 2: 72.00 
+Read 3 dimensional components 
+Read salience 0: 25.20 
+Read salience 1: 34.50 
+Read salience 2: 26.50 
+Read 3 salience components 
+Read dimension 0: 61.10 
+Read dimension 1: 86.50 
+Read dimension 2: 44.50 
+Read 3 dimensional components 
+Read salience 0: 28.80 
+Read salience 1: 28.60 
+Read salience 2: 18.20 
+Read 3 salience components 
+Read dimension 0: 26.30 
+Read dimension 1: 16.50 
+Read dimension 2: 15.90 
+Read 3 dimensional components 
+Read salience 0: 15.60 
+Read salience 1: 42.00 
+Read salience 2: 14.30 
+Read 3 salience components 
+Read dimension 0: 73.30 
+Read dimension 1: 61.10 
+Read dimension 2: 26.30 
+Read 3 dimensional components 
+Read salience 0: 39.70 
+Read salience 1: 19.90 
+Read salience 2: 15.80 
+Read 3 salience components 
+Setting ideal-accomodation matrix to identity matrix (initially, needs reset) 
+Reading IdealAdjustment matrix 
+  Alice (0) :   Alice  (0) = 0.870 
+    Bob (1) :     Bob  (1) = 0.750 
+    Bob (1) :   Alice  (0) = 0.070 
+  Carol (2) :   Carol  (2) = 0.650 
+  Carol (2) :   David  (3) = 0.130 
+  David (3) :   David  (3) = 0.570 
+Found 6 iaPair 
+End SMPModel::readXML of ./doc/smpExample.xml 
+SQL Logging Flags  
+Grp 0 = 1 
+Grp 1 = 0 
+Grp 2 = 0 
+Grp 3 = 0 
+Grp 4 = 1 
+Using PRNG seed: 03507583219545544127 
+Scenario Name: -| DummyData_3Dim |- 
+Scenario Description:  A very simple test of multi-dim SMP, using psuedonyms 
+Successfully opened database # 1 
+Created SMPModel table PosUtil(0) successfully 
+Created SMPModel table PosVote(1) successfully 
+Created SMPModel table PosProb(2) successfully 
+Created SMPModel table PosEquiv(3) successfully 
+Created SMPModel table UtilChlg(4) successfully 
+Created SMPModel table PosVict(5) successfully 
+Created SMPModel table TP_Prob_Vict_Loss(6) successfully 
+Created SMPModel table ActorDescription(7) successfully 
+Created SMPModel table Bargn(8) successfully 
+Created SMPModel table BargnCoords(9) successfully 
+Created SMPModel table BargnUtil(10) successfully 
+Created SMPModel table BargnVote(11) successfully 
+Created SMPModel table ScenarioDesc(12) successfully 
+Created SMPModel table VectorPosition(13) successfully 
+Created SMPModel table SpatialSalience(14) successfully 
+Created SMPModel table SpatialCapability(15) successfully 
+Created SMPModel table DimensionDescription(16) successfully 
+Created SMPModel table Accommodation(17) successfully 
+Setting SMPModel parameters from XML scenario ... 
+Using PRNG seed provided by xml file: 03507583219545544127 
+Model Paramaters to run the model... 
+VictoryProbModel: Linear 
+VotingRule: PropCbc 
+PCEModel: MarkovIncentive 
+StateTransitions: Stochastic 
+BigRRange: Mid 
+BigRAdjust: OneThird 
+ThirdPartyCommit: SemiCommit 
+InterVecBrgn: S2P2 
+BargnModel: InitOnlyInterp 
+Starting model run 
+Starting Model::run iteration 1 
+Raw actor-pos value matrix (risk neutral) 
+ +1.000  +0.673  +0.739  +0.747  +0.799  
+ +0.708  +1.000  +0.681  +0.570  +0.625  
+ +0.694  +0.647  +1.000  +0.483  +0.804  
+ +0.763  +0.563  +0.358  +1.000  +0.571  
+ +0.800  +0.493  +0.839  +0.560  +1.000  
+Inferred risk attitudes: 
+ +1.000  
+ -0.387  
+ -0.500  
+ -0.001  
+ -0.298  
+Risk-aware actor-pos utility matrix (objective): 
+ +1.0000  +0.8931  +0.9321  +0.9359  +0.9595  
+ +0.6278  +1.0000  +0.5964  +0.4748  +0.5340  
+ +0.5882  +0.5332  +1.0000  +0.3584  +0.7251  
+ +0.7628  +0.5627  +0.3583  +1.0000  +0.5710  
+ +0.7526  +0.4183  +0.7992  +0.4867  +1.0000  
+RMS change in value vs utility:  0.0977395 
+Using OneThird : r^h_i = (2*rh + ri)/3 
+Estimate by 0 of risk-aware utility matrix: 
+ +1.0000  +0.8931  +0.9321  +0.9359  +0.9595  
+ +0.8190  +1.0000  +0.7975  +0.7015  +0.7508  
+ +0.8004  +0.7615  +1.0000  +0.6081  +0.8827  
+ +0.8835  +0.7269  +0.5116  +1.0000  +0.7344  
+ +0.8909  +0.6346  +0.9159  +0.7000  +1.0000  
+RMS change in util^h vs utility: 0.15186 
+Estimate by 1 of risk-aware utility matrix: 
+ +1.0000  +0.6896  +0.7540  +0.7610  +0.8109  
+ +0.6278  +1.0000  +0.5964  +0.4748  +0.5340  
+ +0.6041  +0.5504  +1.0000  +0.3772  +0.7369  
+ +0.7162  +0.4993  +0.2990  +1.0000  +0.5078  
+ +0.7431  +0.4035  +0.7912  +0.4721  +1.0000  
+RMS change in util^h vs utility: 0.0751448 
+Estimate by 2 of risk-aware utility matrix: 
+ +1.0000  +0.6731  +0.7395  +0.7468  +0.7988  
+ +0.6122  +1.0000  +0.5801  +0.4564  +0.5163  
+ +0.5882  +0.5332  +1.0000  +0.3584  +0.7251  
+ +0.7026  +0.4808  +0.2817  +1.0000  +0.4894  
+ +0.7311  +0.3847  +0.7811  +0.4536  +1.0000  
+RMS change in util^h vs utility: 0.0834596 
+Estimate by 3 of risk-aware utility matrix: 
+ +1.0000  +0.7463  +0.8036  +0.8097  +0.8523  
+ +0.6811  +1.0000  +0.6525  +0.5380  +0.5944  
+ +0.6589  +0.6092  +1.0000  +0.4415  +0.7776  
+ +0.7628  +0.5627  +0.3583  +1.0000  +0.5710  
+ +0.7843  +0.4679  +0.8260  +0.5357  +1.0000  
+RMS change in util^h vs utility: 0.0651481 
+Estimate by 4 of risk-aware utility matrix: 
+ +1.0000  +0.7027  +0.7654  +0.7722  +0.8204  
+ +0.6400  +1.0000  +0.6093  +0.4894  +0.5479  
+ +0.6167  +0.5639  +1.0000  +0.3920  +0.7463  
+ +0.7269  +0.5139  +0.3126  +1.0000  +0.5223  
+ +0.7526  +0.4183  +0.7992  +0.4867  +1.0000  
+RMS change in util^h vs utility: 0.0699709 
+In turn 0 actor 4 has most advantageous target 2 worth 0.063 
+Est by  4 of prob 0.5467 that [ 4> 2], with expected gain to  4 of +0.0632 
+Est by  4 of prob 0.5467 that [ 4> 2], with expected gain to  2 of -0.0798 
+Est by  2 of prob 0.5363 that [ 4> 2], with expected gain to  4 of +0.0654 
+Est by  2 of prob 0.5363 that [ 4> 2], with expected gain to  2 of -0.0822 
+ 
+Bargain [1004, 4:2] from 4's perspective (brgnIIJ) 
+   4 proposes 4 adopt:  70.060  76.000  34.980  
+   4 proposes 2 adopt:  70.060  76.010  34.980  
+ 
+Bargain [1005, 4:2] from 2's perspective (brgnIIJ) 
+   2 proposes 4 adopt:  61.210  86.440  44.430  
+   2 proposes 2 adopt:  61.210  86.440  44.430  
+ 
+Power-weighted compromise [1006, 4:2] bargain (brgnIJ) 
+     compromise proposes 4 adopt:  65.629  81.227  39.711  
+     compromise proposes 2 adopt:  65.629  81.232  39.711  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 0 actor 3 has most advantageous target 2 worth 0.432 
+Est by  3 of prob 0.7837 that [ 3> 2], with expected gain to  3 of +0.4318 
+Est by  3 of prob 0.7837 that [ 3> 2], with expected gain to  2 of -0.3758 
+Est by  2 of prob 0.7786 that [ 3> 2], with expected gain to  3 of +0.4779 
+Est by  2 of prob 0.7786 that [ 3> 2], with expected gain to  2 of -0.4268 
+ 
+Bargain [1008, 3:2] from 3's perspective (brgnIIJ) 
+   3 proposes 3 adopt:  33.480  18.890  19.040  
+   3 proposes 2 adopt:  33.480  18.890  19.040  
+ 
+Bargain [1009, 3:2] from 2's perspective (brgnIIJ) 
+   2 proposes 3 adopt:  54.230  41.440  34.750  
+   2 proposes 2 adopt:  54.240  41.440  34.750  
+ 
+Power-weighted compromise [1010, 3:2] bargain (brgnIJ) 
+     compromise proposes 3 adopt:  44.115  30.448  27.092  
+     compromise proposes 2 adopt:  44.120  30.448  27.092  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 0 actor 2 has most advantageous target 0 worth 0.098 
+turn 0 , i 2 , j 0 , bestEU worth 0.0975059 , piiJ  0.439627 
+Est by  2 of prob 0.4396 that [ 2> 0], with expected gain to  2 of +0.0975 
+Est by  2 of prob 0.4396 that [ 2> 0], with expected gain to  0 of -0.0617 
+Est by  0 of prob 0.6698 that [ 2> 0], with expected gain to  2 of +0.1098 
+Est by  0 of prob 0.6698 that [ 2> 0], with expected gain to  0 of -0.0373 
+ 
+Bargain [1011, 2:0] from 2's perspective (brgnIIJ) 
+   2 proposes 2 adopt:  55.530  63.190  42.210  
+   2 proposes 0 adopt:  55.530  63.190  42.210  
+ 
+Bargain [1013, 2:0] from 0's perspective (brgnIIJ) 
+   0 proposes 2 adopt:  52.900  40.930  39.730  
+   0 proposes 0 adopt:  52.900  40.930  39.730  
+ 
+Power-weighted compromise [1015, 2:0] bargain (brgnIJ) 
+     compromise proposes 2 adopt:  54.284  52.641  41.035  
+     compromise proposes 0 adopt:  54.284  52.641  41.035  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 0 actor 1 has most advantageous target 2 worth 0.231 
+Est by  1 of prob 0.7180 that [ 1> 2], with expected gain to  1 of +0.2315 
+Est by  1 of prob 0.7180 that [ 1> 2], with expected gain to  2 of -0.2579 
+Est by  2 of prob 0.7164 that [ 1> 2], with expected gain to  1 of +0.2399 
+Est by  2 of prob 0.7164 that [ 1> 2], with expected gain to  2 of -0.2666 
+ 
+Bargain [1012, 1:2] from 1's perspective (brgnIIJ) 
+   1 proposes 1 adopt:  23.480  63.810  70.130  
+   1 proposes 2 adopt:  23.480  63.810  70.130  
+ 
+Bargain [1014, 1:2] from 2's perspective (brgnIIJ) 
+   2 proposes 1 adopt:  57.900  83.320  49.290  
+   2 proposes 2 adopt:  57.900  83.320  49.290  
+ 
+Power-weighted compromise [1016, 1:2] bargain (brgnIJ) 
+     compromise proposes 1 adopt:  39.563  72.926  60.393  
+     compromise proposes 2 adopt:  39.563  72.926  60.393  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 0 actor 0 has most advantageous target 4 worth 0.012 
+Est by  0 of prob 0.5257 that [ 0> 4], with expected gain to  0 of +0.0115 
+Est by  0 of prob 0.5257 that [ 0> 4], with expected gain to  4 of -0.0311 
+Est by  4 of prob 0.6967 that [ 0> 4], with expected gain to  0 of +0.0974 
+Est by  4 of prob 0.6967 that [ 0> 4], with expected gain to  4 of -0.1343 
+ 
+Bargain [1017, 0:4] from 0's perspective (brgnIIJ) 
+   0 proposes 0 adopt:  64.110  48.130  32.540  
+   0 proposes 4 adopt:  64.110  48.130  32.540  
+ 
+Bargain [1018, 0:4] from 4's perspective (brgnIIJ) 
+   4 proposes 0 adopt:  73.140  60.790  26.410  
+   4 proposes 4 adopt:  73.140  60.790  26.410  
+ 
+Power-weighted compromise [1019, 0:4] bargain (brgnIJ) 
+     compromise proposes 0 adopt:  68.855  54.782  29.319  
+     compromise proposes 4 adopt:  68.855  54.782  29.319  
+ 
+Using InitOnlyInterp to form proposed bargains 
+Bargains to be resolved 
+Bargains involving actor  0: [1007, 0:0][1011, 2:0][1017, 0:4] 
+Bargains involving actor  1: [1002, 1:1][1012, 1:2] 
+Bargains involving actor  2: [1000, 2:2][1004, 4:2][1008, 3:2][1011, 2:0][1012, 1:2] 
+Bargains involving actor  3: [1001, 3:3][1008, 3:2] 
+Bargains involving actor  4: [1003, 4:4][1004, 4:2][1017, 0:4] 
+w: 
+ 117.70   93.20   61.40  135.40   63.80  
+u_im: 
+ 0.94413  0.95113  0.94812  
+ 0.64659  0.67104  0.64728  
+ 0.64098  0.63545  0.63969  
+ 0.65095  0.65249  0.65888  
+ 0.69137  0.70138  0.69155  
+Doing scalarPCE for the 3 bargains of actor 0 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.944    +0.951    +0.948  
+   +0.647    +0.671    +0.647  
+   +0.641    +0.635    +0.640  
+   +0.651    +0.652    +0.659  
+   +0.691    +0.701    +0.692  
+Coalition strengths of (i:j): 
+    0.000     0.170     0.039  
+    1.975     0.000     1.599  
+    0.809     0.563     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.0791  0.0465  
+ 0.9209  0.5000  0.7396  
+ 0.9535  0.2604  0.5000  
+Probability Opt_i 
+ 0.0054  
+ 0.7502  
+ 0.2444  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1011 2 out of 3 bargains 
+u_im: 
+ 0.94413  0.94769  
+ 0.64659  0.70395  
+ 0.64098  0.57105  
+ 0.65095  0.68524  
+ 0.69137  0.64050  
+Doing scalarPCE for the 2 bargains of actor 1 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.944    +0.948  
+   +0.647    +0.704  
+   +0.641    +0.571  
+   +0.651    +0.685  
+   +0.691    +0.641  
+Coalition strengths of (i:j): 
+    0.000     3.784  
+    5.215     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.4205  
+ 0.5795  0.5000  
+Probability Opt_i 
+ 0.4205  
+ 0.5795  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1012 2 out of 2 bargains 
+u_im: 
+ 0.94413  0.94325  0.95465  0.95113  0.94769  
+ 0.64659  0.64571  0.62947  0.67104  0.70395  
+ 0.64098  0.63957  0.52679  0.63545  0.57105  
+ 0.65095  0.64348  0.76595  0.65249  0.68524  
+ 0.69137  0.69349  0.65381  0.70138  0.64050  
+Doing scalarPCE for the 5 bargains of actor 2 ... 
+Num actors: 5 
+Num options: 5 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.944    +0.943    +0.955    +0.951    +0.948  
+   +0.647    +0.646    +0.629    +0.671    +0.704  
+   +0.641    +0.640    +0.527    +0.635    +0.571  
+   +0.651    +0.643    +0.766    +0.652    +0.685  
+   +0.691    +0.693    +0.654    +0.701    +0.641  
+Coalition strengths of (i:j): 
+    0.000     0.642     5.549     0.170     3.784  
+    0.068     0.000     5.531     0.126     3.808  
+    8.507     9.086     0.000     7.987     6.333  
+    1.975     2.506     6.837     0.000     4.137  
+    5.215     5.817     4.852     3.756     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.9046  0.3948  0.0791  0.4205  
+ 0.0954  0.5000  0.3784  0.0480  0.3957  
+ 0.6052  0.6216  0.5000  0.5388  0.5662  
+ 0.9209  0.9520  0.4612  0.5000  0.5242  
+ 0.5795  0.6043  0.4338  0.4758  0.5000  
+Probability Opt_i 
+ 0.0859  
+ 0.0695  
+ 0.4215  
+ 0.2255  
+ 0.1976  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1008 3 out of 5 bargains 
+u_im: 
+ 0.94413  0.95465  
+ 0.64659  0.62947  
+ 0.64098  0.52679  
+ 0.65095  0.76595  
+ 0.69137  0.65381  
+Doing scalarPCE for the 2 bargains of actor 3 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.944    +0.955  
+   +0.647    +0.629  
+   +0.641    +0.527  
+   +0.651    +0.766  
+   +0.691    +0.654  
+Coalition strengths of (i:j): 
+    0.000     5.549  
+    8.507     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.3948  
+ 0.6052  0.5000  
+Probability Opt_i 
+ 0.3948  
+ 0.6052  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1001 1 out of 2 bargains 
+u_im: 
+ 0.94413  0.94325  0.94812  
+ 0.64659  0.64571  0.64728  
+ 0.64098  0.63957  0.63969  
+ 0.65095  0.64348  0.65888  
+ 0.69137  0.69349  0.69155  
+Doing scalarPCE for the 3 bargains of actor 4 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.944    +0.943    +0.948  
+   +0.647    +0.646    +0.647  
+   +0.641    +0.640    +0.640  
+   +0.651    +0.643    +0.659  
+   +0.691    +0.693    +0.692  
+Coalition strengths of (i:j): 
+    0.000     0.642     0.039  
+    0.068     0.000     0.062  
+    0.809     1.406     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.9046  0.0465  
+ 0.0954  0.5000  0.0422  
+ 0.9535  0.9578  0.5000  
+Probability Opt_i 
+ 0.0264  
+ 0.0250  
+ 0.9486  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1017 3 out of 3 bargains 
+postn 0 , 0 : 
+ 55.5300  63.1900  42.2100  
+ideal 0 , 0 : 
+ 55.1751  60.1493  41.8707  
+postn-ideal distance  0,  0: 3.08009 
+postn 1 , 0 : 
+ 23.4800  63.8100  70.1300  
+ideal 1 , 0 : 
+ 24.3591  63.3328  68.5122  
+postn-ideal distance  1,  0: 1.90206 
+postn 2 , 0 : 
+ 33.4800  18.8900  19.0400  
+ideal 2 , 0 : 
+ 38.6230  33.4535  24.2330  
+postn-ideal distance  2,  0: 16.29458 
+postn 3 , 0 : 
+ 26.3000  16.5000  15.9000  
+ideal 3 , 0 : 
+ 26.3000  16.5000  15.9000  
+postn-ideal distance  3,  0: 0.00000 
+postn 4 , 0 : 
+ 64.1100  48.1300  32.5400  
+ideal 4 , 0 : 
+ 64.1100  48.1300  32.5400  
+postn-ideal distance  4,  0: 0.00000 
+postn-ideal distance RMS  0: 0.07465 
+rms (pstn, ideal) = 0.07465 
+Raw actor-pos value matrix (risk neutral) 
+ +0.983  +0.736  +0.711  +0.664  +0.900  
+ +0.791  +0.990  +0.596  +0.575  +0.706  
+ +0.768  +0.712  +0.898  +0.861  +0.807  
+ +0.565  +0.546  +0.967  +1.000  +0.687  
+ +0.898  +0.629  +0.710  +0.650  +1.000  
+Inferred risk attitudes: 
+ +0.516  
+ -0.500  
+ +0.770  
+ +0.299  
+ +1.000  
+Risk-aware actor-pos utility matrix (objective): 
+ +0.9918  +0.8366  +0.8172  +0.7791  +0.9466  
+ +0.7085  +0.9848  +0.4758  +0.4532  +0.6020  
+ +0.9050  +0.8698  +0.9687  +0.9530  +0.9269  
+ +0.6379  +0.6204  +0.9763  +1.0000  +0.7511  
+ +0.9897  +0.8626  +0.9162  +0.8776  +1.0000  
+RMS change in value vs utility:  0.114419 
+Using OneThird : r^h_i = (2*rh + ri)/3 
+Estimate by 0 of risk-aware utility matrix: 
+ +0.9918  +0.8366  +0.8172  +0.7791  +0.9466  
+ +0.8204  +0.9916  +0.6388  +0.6187  +0.7427  
+ +0.8748  +0.8351  +0.9532  +0.9327  +0.9005  
+ +0.6736  +0.6563  +0.9809  +1.0000  +0.7822  
+ +0.9602  +0.7874  +0.8498  +0.8043  +1.0000  
+RMS change in util^h vs utility: 0.0662354 
+Estimate by 1 of risk-aware utility matrix: 
+ +0.9807  +0.7051  +0.6780  +0.6280  +0.8858  
+ +0.7085  +0.9848  +0.4758  +0.4532  +0.6020  
+ +0.7541  +0.6962  +0.8914  +0.8515  +0.7949  
+ +0.5070  +0.4884  +0.9591  +1.0000  +0.6365  
+ +0.8984  +0.6294  +0.7104  +0.6502  +1.0000  
+RMS change in util^h vs utility: 0.119107 
+Estimate by 2 of risk-aware utility matrix: 
+ +0.9946  +0.8694  +0.8519  +0.8169  +0.9618  
+ +0.8484  +0.9933  +0.6796  +0.6601  +0.7778  
+ +0.9050  +0.8698  +0.9687  +0.9530  +0.9269  
+ +0.7152  +0.6983  +0.9864  +1.0000  +0.8186  
+ +0.9757  +0.8269  +0.8846  +0.8428  +1.0000  
+RMS change in util^h vs utility: 0.0798028 
+Estimate by 3 of risk-aware utility matrix: 
+ +0.9894  +0.8085  +0.7874  +0.7468  +0.9336  
+ +0.7965  +0.9902  +0.6039  +0.5833  +0.7126  
+ +0.8490  +0.8054  +0.9400  +0.9153  +0.8779  
+ +0.6379  +0.6204  +0.9763  +1.0000  +0.7511  
+ +0.9470  +0.7536  +0.8200  +0.7713  +1.0000  
+RMS change in util^h vs utility: 0.0640154 
+Estimate by 4 of risk-aware utility matrix: 
+ +0.9971  +0.8992  +0.8834  +0.8511  +0.9756  
+ +0.8737  +0.9949  +0.7165  +0.6976  +0.8096  
+ +0.9324  +0.9013  +0.9827  +0.9714  +0.9508  
+ +0.7529  +0.7363  +0.9913  +1.0000  +0.8516  
+ +0.9897  +0.8626  +0.9162  +0.8776  +1.0000  
+RMS change in util^h vs utility: 0.0984618 
+sDist [ 0, 1] = 1.26E+00    
+sDist [ 0, 1] = 1.26E+00    
+Fractional change compared to first step: 0.9999  (target=0.0200) 
+Starting Model::run iteration 2 
+In turn 1 actor 3 has most advantageous target 0 worth 0.224 
+Est by  3 of prob 0.7193 that [ 3> 0], with expected gain to  3 of +0.2237 
+Est by  3 of prob 0.7193 that [ 3> 0], with expected gain to  0 of -0.1499 
+Est by  0 of prob 0.7245 that [ 3> 0], with expected gain to  3 of +0.2039 
+Est by  0 of prob 0.7245 that [ 3> 0], with expected gain to  0 of -0.1329 
+ 
+Bargain [1025, 3:0] from 3's perspective (brgnIIJ) 
+   3 proposes 3 adopt:  37.840  18.440  19.000  
+   3 proposes 0 adopt:  37.850  18.440  19.000  
+ 
+Bargain [1026, 3:0] from 0's perspective (brgnIIJ) 
+   0 proposes 3 adopt:  55.090  54.430  40.380  
+   0 proposes 0 adopt:  55.090  54.440  40.380  
+ 
+Power-weighted compromise [1027, 3:0] bargain (brgnIJ) 
+     compromise proposes 3 adopt:  46.231  35.947  29.400  
+     compromise proposes 0 adopt:  46.236  35.951  29.400  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 1 actor 2 has most advantageous target 3 worth 0.014 
+Est by  2 of prob 0.9054 that [ 2> 3], with expected gain to  2 of +0.0135 
+Est by  2 of prob 0.9054 that [ 2> 3], with expected gain to  3 of -0.0118 
+Est by  3 of prob 0.7785 that [ 2> 3], with expected gain to  2 of +0.0168 
+Est by  3 of prob 0.7785 that [ 2> 3], with expected gain to  3 of -0.0162 
+ 
+Bargain [1028, 2:3] from 2's perspective (brgnIIJ) 
+   2 proposes 2 adopt:  33.460  18.840  19.020  
+   2 proposes 3 adopt:  33.460  18.840  19.020  
+ 
+Bargain [1029, 2:3] from 3's perspective (brgnIIJ) 
+   3 proposes 2 adopt:  26.310  16.500  15.900  
+   3 proposes 3 adopt:  26.310  16.500  15.900  
+ 
+Power-weighted compromise [1030, 2:3] bargain (brgnIJ) 
+     compromise proposes 2 adopt:  29.975  17.699  17.499  
+     compromise proposes 3 adopt:  29.975  17.699  17.499  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 1 actor 4 has most advantageous target 2 worth 0.074 
+Est by  4 of prob 0.9229 that [ 4> 2], with expected gain to  4 of +0.0741 
+Est by  4 of prob 0.9229 that [ 4> 2], with expected gain to  2 of -0.0282 
+Est by  2 of prob 0.9185 that [ 4> 2], with expected gain to  4 of +0.1012 
+Est by  2 of prob 0.9185 that [ 4> 2], with expected gain to  2 of -0.0367 
+ 
+Bargain [1031, 4:2] from 4's perspective (brgnIIJ) 
+   4 proposes 4 adopt:  64.000  47.710  32.420  
+   4 proposes 2 adopt:  64.000  47.710  32.420  
+ 
+Bargain [1032, 4:2] from 2's perspective (brgnIIJ) 
+   2 proposes 4 adopt:  34.200  19.070  19.170  
+   2 proposes 2 adopt:  34.200  19.070  19.170  
+ 
+Power-weighted compromise [1033, 4:2] bargain (brgnIJ) 
+     compromise proposes 4 adopt:  49.080  33.371  25.786  
+     compromise proposes 2 adopt:  49.080  33.371  25.786  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 1 actor 0 has most advantageous target 2 worth 0.147 
+Est by  0 of prob 0.8970 that [ 0> 2], with expected gain to  0 of +0.1474 
+Est by  0 of prob 0.8970 that [ 0> 2], with expected gain to  2 of -0.0662 
+Est by  2 of prob 0.8986 that [ 0> 2], with expected gain to  0 of +0.1208 
+Est by  2 of prob 0.8986 that [ 0> 2], with expected gain to  2 of -0.0539 
+ 
+Bargain [1034, 0:2] from 0's perspective (brgnIIJ) 
+   0 proposes 0 adopt:  55.300  62.260  41.660  
+   0 proposes 2 adopt:  55.300  62.260  41.660  
+ 
+Bargain [1035, 0:2] from 2's perspective (brgnIIJ) 
+   2 proposes 0 adopt:  33.990  19.400  19.280  
+   2 proposes 2 adopt:  33.990  19.400  19.270  
+ 
+Power-weighted compromise [1036, 0:2] bargain (brgnIJ) 
+     compromise proposes 0 adopt:  44.089  39.712  29.886  
+     compromise proposes 2 adopt:  44.089  39.712  29.881  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 1 actor 1 has most advantageous target 2 worth 0.443 
+Est by  1 of prob 0.9138 that [ 1> 2], with expected gain to  1 of +0.4427 
+Est by  1 of prob 0.9138 that [ 1> 2], with expected gain to  2 of -0.1697 
+Est by  2 of prob 0.9192 that [ 1> 2], with expected gain to  1 of +0.2754 
+Est by  2 of prob 0.9192 that [ 1> 2], with expected gain to  2 of -0.0868 
+ 
+Bargain [1037, 1:2] from 1's perspective (brgnIIJ) 
+   1 proposes 1 adopt:  23.590  63.540  69.920  
+   1 proposes 2 adopt:  23.600  63.540  69.920  
+ 
+Bargain [1038, 1:2] from 2's perspective (brgnIIJ) 
+   2 proposes 1 adopt:  32.480  26.700  31.020  
+   2 proposes 2 adopt:  32.480  26.690  31.020  
+ 
+Power-weighted compromise [1039, 1:2] bargain (brgnIJ) 
+     compromise proposes 1 adopt:  27.744  46.327  51.744  
+     compromise proposes 2 adopt:  27.749  46.322  51.744  
+ 
+Using InitOnlyInterp to form proposed bargains 
+Bargains to be resolved 
+Bargains involving actor  0: [1020, 0:0][1025, 3:0][1034, 0:2] 
+Bargains involving actor  1: [1021, 1:1][1037, 1:2] 
+Bargains involving actor  2: [1022, 2:2][1028, 2:3][1031, 4:2][1034, 0:2][1037, 1:2] 
+Bargains involving actor  3: [1024, 3:3][1025, 3:0][1028, 2:3] 
+Bargains involving actor  4: [1023, 4:4][1031, 4:2] 
+w: 
+ 117.70   93.20   61.40  135.40   63.80  
+u_im: 
+ 0.87426  0.85202  0.91023  
+ 0.64487  0.60042  0.69079  
+ 0.92468  0.94094  0.91342  
+ 0.79712  0.85723  0.73269  
+ 0.92922  0.92907  0.94406  
+Doing scalarPCE for the 3 bargains of actor 0 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.874    +0.852    +0.910  
+   +0.645    +0.600    +0.691  
+   +0.925    +0.941    +0.913  
+   +0.797    +0.857    +0.733  
+   +0.929    +0.929    +0.944  
+Coalition strengths of (i:j): 
+    0.000     3.390     4.726  
+    4.584     0.000     9.408  
+    4.737     8.161     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.4252  0.4994  
+ 0.5748  0.5000  0.5355  
+ 0.5006  0.4645  0.5000  
+Probability Opt_i 
+ 0.2020  
+ 0.4303  
+ 0.3678  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1025 2 out of 3 bargains 
+u_im: 
+ 0.87426  0.87850  
+ 0.64487  0.74768  
+ 0.92468  0.90545  
+ 0.79712  0.72691  
+ 0.92922  0.91891  
+Doing scalarPCE for the 2 bargains of actor 1 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.874    +0.879  
+   +0.645    +0.748  
+   +0.925    +0.905  
+   +0.797    +0.727  
+   +0.929    +0.919  
+Coalition strengths of (i:j): 
+    0.000     5.696  
+    5.091     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.5280  
+ 0.4720  0.5000  
+Probability Opt_i 
+ 0.5280  
+ 0.4720  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1021 1 out of 2 bargains 
+u_im: 
+ 0.87426  0.88177  0.89992  0.91023  0.87850  
+ 0.64487  0.64923  0.66960  0.69079  0.74768  
+ 0.92468  0.92775  0.91674  0.91342  0.90545  
+ 0.79712  0.79247  0.75335  0.73269  0.72691  
+ 0.92922  0.93687  0.94599  0.94406  0.91891  
+Doing scalarPCE for the 5 bargains of actor 2 ... 
+Num actors: 5 
+Num options: 5 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.874    +0.882    +0.900    +0.910    +0.879  
+   +0.645    +0.649    +0.670    +0.691    +0.748  
+   +0.925    +0.928    +0.917    +0.913    +0.905  
+   +0.797    +0.792    +0.753    +0.733    +0.727  
+   +0.929    +0.937    +0.946    +0.944    +0.919  
+Coalition strengths of (i:j): 
+    0.000     0.315     3.213     4.726     5.696  
+    0.984     0.000     2.991     4.502     5.908  
+    3.199     2.309     0.000     1.563     4.263  
+    4.737     3.845     1.595     0.000     3.307  
+    5.091     4.632     3.661     2.660     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.2424  0.5011  0.4994  0.5280  
+ 0.7576  0.5000  0.5643  0.5393  0.5605  
+ 0.4989  0.4357  0.5000  0.4950  0.5380  
+ 0.5006  0.4607  0.5050  0.5000  0.5543  
+ 0.4720  0.4395  0.4620  0.4457  0.5000  
+Probability Opt_i 
+ 0.1733  
+ 0.2608  
+ 0.1548  
+ 0.2051  
+ 0.2060  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1031 3 out of 5 bargains 
+u_im: 
+ 0.87426  0.85202  0.88177  
+ 0.64487  0.60042  0.64923  
+ 0.92468  0.94094  0.92775  
+ 0.79712  0.85723  0.79247  
+ 0.92922  0.92907  0.93687  
+Doing scalarPCE for the 3 bargains of actor 3 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.874    +0.852    +0.882  
+   +0.645    +0.600    +0.649  
+   +0.925    +0.941    +0.928  
+   +0.797    +0.857    +0.792  
+   +0.929    +0.929    +0.937  
+Coalition strengths of (i:j): 
+    0.000     3.390     0.315  
+    4.584     0.000     4.807  
+    0.984     4.282     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.4252  0.2424  
+ 0.5748  0.5000  0.5289  
+ 0.7576  0.4711  0.5000  
+Probability Opt_i 
+ 0.1539  
+ 0.5215  
+ 0.3246  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1025 2 out of 3 bargains 
+u_im: 
+ 0.87426  0.89992  
+ 0.64487  0.66960  
+ 0.92468  0.91674  
+ 0.79712  0.75335  
+ 0.92922  0.94599  
+Doing scalarPCE for the 2 bargains of actor 4 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.874    +0.900  
+   +0.645    +0.670  
+   +0.925    +0.917  
+   +0.797    +0.753  
+   +0.929    +0.946  
+Coalition strengths of (i:j): 
+    0.000     3.213  
+    3.199     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.5011  
+ 0.4989  0.5000  
+Probability Opt_i 
+ 0.5011  
+ 0.4989  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1031 2 out of 2 bargains 
+postn 0 , 0 : 
+ 37.8500  18.4400  19.0000  
+ideal 0 , 0 : 
+ 40.1023  23.8622  21.9732  
+postn-ideal distance  0,  0: 6.58125 
+postn 1 , 0 : 
+ 23.4800  63.8100  70.1300  
+ideal 1 , 0 : 
+ 24.6441  60.5482  66.2597  
+postn-ideal distance  1,  0: 5.19363 
+postn 2 , 0 : 
+ 64.0000  47.7100  32.4200  
+ideal 2 , 0 : 
+ 55.0163  40.7685  28.8743  
+postn-ideal distance  2,  0: 11.89389 
+postn 3 , 0 : 
+ 37.8400  18.4400  19.0000  
+ideal 3 , 0 : 
+ 32.8778  17.6058  17.6670  
+postn-ideal distance  3,  0: 5.20540 
+postn 4 , 0 : 
+ 64.0000  47.7100  32.4200  
+ideal 4 , 0 : 
+ 64.0000  47.7100  32.4200  
+postn-ideal distance  4,  0: 0.00000 
+postn-ideal distance RMS  0: 0.06912 
+rms (pstn, ideal) = 0.06912 
+Raw actor-pos value matrix (risk neutral) 
+ +0.965  +0.705  +0.771  +0.965  +0.771  
+ +0.613  +0.969  +0.720  +0.613  +0.720  
+ +0.814  +0.696  +0.925  +0.814  +0.925  
+ +0.981  +0.557  +0.709  +0.981  +0.709  
+ +0.743  +0.630  +1.000  +0.743  +1.000  
+Inferred risk attitudes: 
+ +1.000  
+ -0.500  
+ -0.019  
+ +0.998  
+ -0.019  
+Risk-aware actor-pos utility matrix (objective): 
+ +0.9987  +0.9127  +0.9478  +0.9987  +0.9478  
+ +0.4941  +0.9542  +0.6190  +0.4942  +0.6190  
+ +0.8112  +0.6926  +0.9240  +0.8112  +0.9240  
+ +0.9996  +0.8028  +0.9146  +0.9996  +0.9146  
+ +0.7399  +0.6255  +1.0000  +0.7399  +1.0000  
+RMS change in value vs utility:  0.110074 
+Using OneThird : r^h_i = (2*rh + ri)/3 
+Estimate by 0 of risk-aware utility matrix: 
+ +0.9987  +0.9127  +0.9478  +0.9987  +0.9478  
+ +0.7314  +0.9841  +0.8207  +0.7314  +0.8207  
+ +0.9140  +0.8361  +0.9709  +0.9140  +0.9709  
+ +0.9996  +0.8032  +0.9149  +0.9996  +0.9149  
+ +0.8694  +0.7838  +1.0000  +0.8694  +1.0000  
+RMS change in util^h vs utility: 0.109472 
+Estimate by 1 of risk-aware utility matrix: 
+ +0.9646  +0.7046  +0.7715  +0.9645  +0.7715  
+ +0.4941  +0.9542  +0.6190  +0.4942  +0.6190  
+ +0.7626  +0.6247  +0.9018  +0.7626  +0.9018  
+ +0.9814  +0.5564  +0.7084  +0.9815  +0.7084  
+ +0.6787  +0.5506  +1.0000  +0.6786  +1.0000  
+RMS change in util^h vs utility: 0.1054 
+Estimate by 2 of risk-aware utility matrix: 
+ +0.9755  +0.7714  +0.8281  +0.9755  +0.8281  
+ +0.5703  +0.9638  +0.6837  +0.5703  +0.6837  
+ +0.8112  +0.6926  +0.9240  +0.8112  +0.9240  
+ +0.9873  +0.6356  +0.7747  +0.9873  +0.7747  
+ +0.7399  +0.6255  +1.0000  +0.7399  +1.0000  
+RMS change in util^h vs utility: 0.0740921 
+Estimate by 3 of risk-aware utility matrix: 
+ +0.9987  +0.9124  +0.9475  +0.9987  +0.9475  
+ +0.7311  +0.9841  +0.8204  +0.7311  +0.8204  
+ +0.9138  +0.8358  +0.9708  +0.9138  +0.9708  
+ +0.9996  +0.8028  +0.9146  +0.9996  +0.9146  
+ +0.8692  +0.7835  +1.0000  +0.8691  +1.0000  
+RMS change in util^h vs utility: 0.109303 
+Estimate by 4 of risk-aware utility matrix: 
+ +0.9755  +0.7714  +0.8281  +0.9755  +0.8281  
+ +0.5703  +0.9638  +0.6837  +0.5703  +0.6837  
+ +0.8112  +0.6926  +0.9240  +0.8112  +0.9240  
+ +0.9873  +0.6356  +0.7747  +0.9873  +0.7747  
+ +0.7399  +0.6255  +1.0000  +0.7399  +1.0000  
+RMS change in util^h vs utility: 0.0740921 
+sDist [ 0, 1] = 1.26E+00    
+sDist [ 1, 2] = 1.10E+00    
+Fractional change compared to first step: 0.8713  (target=0.0200) 
+Starting Model::run iteration 3 
+In turn 2 actor 0 has most advantageous target 2 worth 0.008 
+turn 2 , i 0 , j 2 , bestEU worth 0.00849354 , piiJ  0.44882 
+Est by  0 of prob 0.4488 that [ 0> 2], with expected gain to  0 of +0.0085 
+Est by  0 of prob 0.4488 that [ 0> 2], with expected gain to  2 of -0.0095 
+Est by  2 of prob 0.7019 that [ 0> 2], with expected gain to  0 of +0.0810 
+Est by  2 of prob 0.7019 that [ 0> 2], with expected gain to  2 of -0.0620 
+ 
+Bargain [1043, 0:2] from 0's perspective (brgnIIJ) 
+   0 proposes 0 adopt:  52.110  39.250  28.870  
+   0 proposes 2 adopt:  52.110  39.250  28.870  
+ 
+Bargain [1044, 0:2] from 2's perspective (brgnIIJ) 
+   2 proposes 0 adopt:  63.750  47.570  32.360  
+   2 proposes 2 adopt:  63.750  47.570  32.360  
+ 
+Power-weighted compromise [1045, 0:2] bargain (brgnIJ) 
+     compromise proposes 0 adopt:  58.234  43.627  30.706  
+     compromise proposes 2 adopt:  58.234  43.627  30.706  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 2 actor 1 has most advantageous target 0 worth 0.315 
+Est by  1 of prob 0.7687 that [ 1> 0], with expected gain to  1 of +0.3151 
+Est by  1 of prob 0.7687 that [ 1> 0], with expected gain to  0 of -0.1781 
+Est by  0 of prob 0.8466 that [ 1> 0], with expected gain to  1 of +0.1999 
+Est by  0 of prob 0.8466 that [ 1> 0], with expected gain to  0 of -0.0681 
+ 
+Bargain [1046, 1:0] from 1's perspective (brgnIIJ) 
+   1 proposes 1 adopt:  25.340  62.140  68.970  
+   1 proposes 0 adopt:  25.340  62.140  68.970  
+ 
+Bargain [1047, 1:0] from 0's perspective (brgnIIJ) 
+   0 proposes 1 adopt:  37.320  24.290  29.030  
+   0 proposes 0 adopt:  37.320  24.290  29.030  
+ 
+Power-weighted compromise [1048, 1:0] bargain (brgnIJ) 
+     compromise proposes 1 adopt:  30.627  45.435  51.343  
+     compromise proposes 0 adopt:  30.627  45.435  51.343  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 2 actor 2 has most advantageous target 0 worth 0.005 
+turn 2 , i 2 , j 0 , bestEU worth 0.00495733 , piiJ  0.298058 
+Est by  2 of prob 0.2981 that [ 2> 0], with expected gain to  2 of +0.0050 
+Est by  2 of prob 0.2981 that [ 2> 0], with expected gain to  0 of -0.0065 
+Est by  0 of prob 0.5512 that [ 2> 0], with expected gain to  2 of +0.0221 
+Est by  0 of prob 0.5512 that [ 2> 0], with expected gain to  0 of -0.0198 
+ 
+Bargain [1051, 2:0] from 2's perspective (brgnIIJ) 
+   2 proposes 2 adopt:  41.130  25.090  22.350  
+   2 proposes 0 adopt:  41.130  25.090  22.350  
+ 
+Bargain [1052, 2:0] from 0's perspective (brgnIIJ) 
+   0 proposes 2 adopt:  37.860  18.470  19.010  
+   0 proposes 0 adopt:  37.860  18.460  19.010  
+ 
+Power-weighted compromise [1053, 2:0] bargain (brgnIJ) 
+     compromise proposes 2 adopt:  39.580  21.953  20.767  
+     compromise proposes 0 adopt:  39.580  21.948  20.767  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 2 actor 3 has most advantageous target 2 worth 0.059 
+Est by  3 of prob 0.8000 that [ 3> 2], with expected gain to  3 of +0.0593 
+Est by  3 of prob 0.8000 that [ 3> 2], with expected gain to  2 of -0.0398 
+Est by  2 of prob 0.8478 that [ 3> 2], with expected gain to  3 of +0.1637 
+Est by  2 of prob 0.8478 that [ 3> 2], with expected gain to  2 of -0.0869 
+ 
+Bargain [1054, 3:2] from 3's perspective (brgnIIJ) 
+   3 proposes 3 adopt:  42.430  19.260  20.230  
+   3 proposes 2 adopt:  42.430  19.260  20.230  
+ 
+Bargain [1055, 3:2] from 2's perspective (brgnIIJ) 
+   2 proposes 3 adopt:  63.710  45.480  32.110  
+   2 proposes 2 adopt:  63.710  45.480  32.110  
+ 
+Power-weighted compromise [1056, 3:2] bargain (brgnIJ) 
+     compromise proposes 3 adopt:  53.337  32.699  26.319  
+     compromise proposes 2 adopt:  53.337  32.699  26.319  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 2 actor 4 has most advantageous target 0 worth 0.125 
+Est by  4 of prob 0.6182 that [ 4> 0], with expected gain to  4 of +0.1248 
+Est by  4 of prob 0.6182 that [ 4> 0], with expected gain to  0 of -0.0708 
+Est by  0 of prob 0.7481 that [ 4> 0], with expected gain to  4 of +0.0858 
+Est by  0 of prob 0.7481 that [ 4> 0], with expected gain to  0 of -0.0335 
+ 
+Bargain [1057, 4:0] from 4's perspective (brgnIIJ) 
+   4 proposes 4 adopt:  58.730  38.180  29.530  
+   4 proposes 0 adopt:  58.730  38.170  29.530  
+ 
+Bargain [1058, 4:0] from 0's perspective (brgnIIJ) 
+   0 proposes 4 adopt:  38.190  18.640  19.160  
+   0 proposes 0 adopt:  38.190  18.640  19.160  
+ 
+Power-weighted compromise [1059, 4:0] bargain (brgnIJ) 
+     compromise proposes 4 adopt:  48.982  28.907  24.609  
+     compromise proposes 0 adopt:  48.982  28.902  24.609  
+ 
+Using InitOnlyInterp to form proposed bargains 
+Bargains to be resolved 
+Bargains involving actor  0: [1040, 0:0][1046, 1:0][1043, 0:2][1051, 2:0][1057, 4:0] 
+Bargains involving actor  1: [1042, 1:1][1046, 1:0] 
+Bargains involving actor  2: [1041, 2:2][1043, 0:2][1051, 2:0][1054, 3:2] 
+Bargains involving actor  3: [1049, 3:3][1054, 3:2] 
+Bargains involving actor  4: [1050, 4:4][1057, 4:0] 
+w: 
+ 117.70   93.20   61.40  135.40   63.80  
+u_im: 
+ 0.96115  0.94733  0.96540  0.97180  0.96083  
+ 0.63610  0.73551  0.66050  0.62989  0.65128  
+ 0.83258  0.81527  0.87691  0.82959  0.87358  
+ 0.92627  0.89233  0.92625  0.94120  0.92633  
+ 0.82106  0.80501  0.82956  0.78475  0.84836  
+Doing scalarPCE for the 5 bargains of actor 0 ... 
+Num actors: 5 
+Num options: 5 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.961    +0.947    +0.965    +0.972    +0.961  
+   +0.636    +0.736    +0.660    +0.630    +0.651  
+   +0.833    +0.815    +0.877    +0.830    +0.874  
+   +0.926    +0.892    +0.926    +0.941    +0.926  
+   +0.821    +0.805    +0.830    +0.785    +0.848  
+Coalition strengths of (i:j): 
+    0.000     4.157     0.001     1.541     0.019  
+    4.678     0.000     3.515     5.623     3.953  
+    3.023     6.046     0.000     4.316     0.801  
+    1.638     5.196     1.389     0.000     1.653  
+    2.844     6.280     0.605     4.388     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.4705  0.0004  0.4848  0.0066  
+ 0.5295  0.5000  0.3677  0.5197  0.3863  
+ 0.9996  0.6323  0.5000  0.7566  0.5697  
+ 0.5152  0.4803  0.2434  0.5000  0.2736  
+ 0.9934  0.6137  0.4303  0.7264  0.5000  
+Probability Opt_i 
+ 0.0303  
+ 0.2886  
+ 0.3304  
+ 0.0876  
+ 0.2631  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1043 3 out of 5 bargains 
+u_im: 
+ 0.96115  0.94733  
+ 0.63610  0.73551  
+ 0.83258  0.81527  
+ 0.92627  0.89233  
+ 0.82106  0.80501  
+Doing scalarPCE for the 2 bargains of actor 1 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.961    +0.947  
+   +0.636    +0.736  
+   +0.833    +0.815  
+   +0.926    +0.892  
+   +0.821    +0.805  
+Coalition strengths of (i:j): 
+    0.000     4.157  
+    4.678     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.4705  
+ 0.5295  0.5000  
+Probability Opt_i 
+ 0.4705  
+ 0.5295  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1046 2 out of 2 bargains 
+u_im: 
+ 0.96115  0.96540  0.97180  0.97145  
+ 0.63610  0.66050  0.62989  0.61277  
+ 0.83258  0.87691  0.82959  0.81879  
+ 0.92627  0.92625  0.94120  0.94288  
+ 0.82106  0.82956  0.78475  0.78317  
+Doing scalarPCE for the 4 bargains of actor 2 ... 
+Num actors: 5 
+Num options: 4 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.961    +0.965    +0.972    +0.971  
+   +0.636    +0.660    +0.630    +0.613  
+   +0.833    +0.877    +0.830    +0.819  
+   +0.926    +0.926    +0.941    +0.943  
+   +0.821    +0.830    +0.785    +0.783  
+Coalition strengths of (i:j): 
+    0.000     0.001     1.541     2.721  
+    3.023     0.000     4.316     5.502  
+    1.638     1.389     0.000     1.200  
+    1.731     1.482     0.114     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.0004  0.4848  0.6112  
+ 0.9996  0.5000  0.7566  0.7878  
+ 0.5152  0.2434  0.5000  0.9134  
+ 0.3888  0.2122  0.0866  0.5000  
+Probability Opt_i 
+ 0.0339  
+ 0.7155  
+ 0.1524  
+ 0.0982  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1051 3 out of 4 bargains 
+u_im: 
+ 0.96115  0.97145  
+ 0.63610  0.61277  
+ 0.83258  0.81879  
+ 0.92627  0.94288  
+ 0.82106  0.78317  
+Doing scalarPCE for the 2 bargains of actor 3 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.961    +0.971  
+   +0.636    +0.613  
+   +0.833    +0.819  
+   +0.926    +0.943  
+   +0.821    +0.783  
+Coalition strengths of (i:j): 
+    0.000     2.721  
+    1.731     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.6112  
+ 0.3888  0.5000  
+Probability Opt_i 
+ 0.6112  
+ 0.3888  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1049 1 out of 2 bargains 
+u_im: 
+ 0.96115  0.96083  
+ 0.63610  0.65128  
+ 0.83258  0.87358  
+ 0.92627  0.92633  
+ 0.82106  0.84836  
+Doing scalarPCE for the 2 bargains of actor 4 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.961    +0.961  
+   +0.636    +0.651  
+   +0.833    +0.874  
+   +0.926    +0.926  
+   +0.821    +0.848  
+Coalition strengths of (i:j): 
+    0.000     0.019  
+    2.844     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.0066  
+ 0.9934  0.5000  
+Probability Opt_i 
+ 0.0066  
+ 0.9934  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1057 2 out of 2 bargains 
+postn 0 , 0 : 
+ 52.1100  39.2500  28.8700  
+ideal 0 , 0 : 
+ 50.5490  37.2496  27.9734  
+postn-ideal distance  0,  0: 2.69114 
+postn 1 , 0 : 
+ 25.3400  62.1400  68.9700  
+ideal 1 , 0 : 
+ 27.0886  60.2512  65.6751  
+postn-ideal distance  1,  0: 4.18109 
+postn 2 , 0 : 
+ 41.1300  25.0900  22.3500  
+ideal 2 , 0 : 
+ 43.7573  27.6748  23.3498  
+postn-ideal distance  2,  0: 3.81880 
+postn 3 , 0 : 
+ 37.8400  18.4400  19.0000  
+ideal 3 , 0 : 
+ 35.7063  18.0813  18.4268  
+postn-ideal distance  3,  0: 2.23832 
+postn 4 , 0 : 
+ 58.7300  38.1800  29.5300  
+ideal 4 , 0 : 
+ 58.7300  38.1800  29.5300  
+postn-ideal distance  4,  0: 0.00000 
+postn-ideal distance RMS  0: 0.02977 
+rms (pstn, ideal) = 0.02977 
+Raw actor-pos value matrix (risk neutral) 
+ +0.984  +0.728  +0.900  +0.855  +0.936  
+ +0.728  +0.977  +0.660  +0.618  +0.709  
+ +0.905  +0.687  +0.976  +0.927  +0.879  
+ +0.801  +0.576  +0.934  +0.992  +0.802  
+ +0.944  +0.673  +0.840  +0.802  +1.000  
+Inferred risk attitudes: 
+ +1.000  
+ -0.500  
+ +0.989  
+ +0.429  
+ +0.154  
+Risk-aware actor-pos utility matrix (objective): 
+ +0.9997  +0.9260  +0.9900  +0.9791  +0.9959  
+ +0.6286  +0.9652  +0.5483  +0.5002  +0.6064  
+ +0.9901  +0.8995  +0.9992  +0.9940  +0.9843  
+ +0.8691  +0.6809  +0.9603  +0.9954  +0.8701  
+ +0.9522  +0.7071  +0.8607  +0.8266  +1.0000  
+RMS change in value vs utility:  0.0906196 
+Using OneThird : r^h_i = (2*rh + ri)/3 
+Estimate by 0 of risk-aware utility matrix: 
+ +0.9997  +0.9260  +0.9900  +0.9791  +0.9959  
+ +0.8268  +0.9880  +0.7725  +0.7362  +0.8126  
+ +0.9907  +0.9011  +0.9993  +0.9944  +0.9850  
+ +0.9299  +0.7739  +0.9838  +0.9984  +0.9306  
+ +0.9820  +0.8312  +0.9365  +0.9161  +1.0000  
+RMS change in util^h vs utility: 0.0969238 
+Estimate by 1 of risk-aware utility matrix: 
+ +0.9835  +0.7280  +0.9000  +0.8554  +0.9360  
+ +0.6286  +0.9652  +0.5483  +0.5002  +0.6064  
+ +0.9050  +0.6859  +0.9758  +0.9269  +0.8788  
+ +0.7704  +0.5297  +0.9220  +0.9905  +0.7718  
+ +0.9291  +0.6112  +0.8021  +0.7574  +1.0000  
+RMS change in util^h vs utility: 0.0888231 
+Estimate by 2 of risk-aware utility matrix: 
+ +0.9996  +0.9246  +0.9894  +0.9782  +0.9955  
+ +0.8254  +0.9879  +0.7709  +0.7345  +0.8111  
+ +0.9901  +0.8995  +0.9992  +0.9940  +0.9843  
+ +0.9288  +0.7721  +0.9834  +0.9984  +0.9294  
+ +0.9816  +0.8296  +0.9355  +0.9150  +1.0000  
+RMS change in util^h vs utility: 0.0960753 
+Estimate by 3 of risk-aware utility matrix: 
+ +0.9935  +0.8506  +0.9557  +0.9320  +0.9731  
+ +0.7513  +0.9793  +0.6871  +0.6463  +0.7341  
+ +0.9581  +0.8191  +0.9904  +0.9687  +0.9446  
+ +0.8691  +0.6809  +0.9603  +0.9954  +0.8701  
+ +0.9618  +0.7474  +0.8853  +0.8557  +1.0000  
+RMS change in util^h vs utility: 0.0615646 
+Estimate by 4 of risk-aware utility matrix: 
+ +0.9906  +0.8144  +0.9393  +0.9094  +0.9621  
+ +0.7151  +0.9752  +0.6461  +0.6032  +0.6963  
+ +0.9424  +0.7798  +0.9861  +0.9564  +0.9251  
+ +0.8400  +0.6362  +0.9490  +0.9940  +0.8411  
+ +0.9522  +0.7071  +0.8607  +0.8266  +1.0000  
+RMS change in util^h vs utility: 0.0574343 
+sDist [ 0, 1] = 1.26E+00    
+sDist [ 2, 3] = 7.48E-01    
+Fractional change compared to first step: 0.5924  (target=0.0200) 
+Starting Model::run iteration 4 
+In turn 3 actor 1 has most advantageous target 2 worth 0.309 
+Est by  1 of prob 0.8294 that [ 1> 2], with expected gain to  1 of +0.3094 
+Est by  1 of prob 0.8294 that [ 1> 2], with expected gain to  2 of -0.2151 
+Est by  2 of prob 0.8804 that [ 1> 2], with expected gain to  1 of +0.1777 
+Est by  2 of prob 0.8804 that [ 1> 2], with expected gain to  2 of -0.0816 
+ 
+Bargain [1065, 1:2] from 1's perspective (brgnIIJ) 
+   1 proposes 1 adopt:  26.170  61.090  68.060  
+   1 proposes 2 adopt:  26.170  61.090  68.060  
+ 
+Bargain [1066, 1:2] from 2's perspective (brgnIIJ) 
+   2 proposes 1 adopt:  40.580  27.450  26.550  
+   2 proposes 2 adopt:  40.580  27.450  26.550  
+ 
+Power-weighted compromise [1067, 1:2] bargain (brgnIJ) 
+     compromise proposes 1 adopt:  32.903  45.372  48.665  
+     compromise proposes 2 adopt:  32.903  45.372  48.665  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 3 actor 3 has most advantageous target 0 worth 0.091 
+Est by  3 of prob 0.7949 that [ 3> 0], with expected gain to  3 of +0.0910 
+Est by  3 of prob 0.7949 that [ 3> 0], with expected gain to  0 of -0.0444 
+Est by  0 of prob 0.8582 that [ 3> 0], with expected gain to  3 of +0.0553 
+Est by  0 of prob 0.8582 that [ 3> 0], with expected gain to  0 of -0.0166 
+ 
+Bargain [1068, 3:0] from 3's perspective (brgnIIJ) 
+   3 proposes 3 adopt:  41.010  18.830  19.550  
+   3 proposes 0 adopt:  41.010  18.830  19.550  
+ 
+Bargain [1069, 3:0] from 0's perspective (brgnIIJ) 
+   0 proposes 3 adopt:  52.100  39.000  28.830  
+   0 proposes 0 adopt:  52.100  39.000  28.830  
+ 
+Power-weighted compromise [1070, 3:0] bargain (brgnIJ) 
+     compromise proposes 3 adopt:  46.404  28.641  24.064  
+     compromise proposes 0 adopt:  46.404  28.641  24.064  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 3 actor 2 has most advantageous target 3 worth 0.003 
+Est by  2 of prob 0.6692 that [ 2> 3], with expected gain to  2 of +0.0027 
+Est by  2 of prob 0.6692 that [ 2> 3], with expected gain to  3 of -0.0079 
+Est by  3 of prob 0.2521 that [ 2> 3], with expected gain to  2 of -0.0016 
+Est by  3 of prob 0.2521 that [ 2> 3], with expected gain to  3 of +0.0027 
+ 
+Bargain [1071, 2:3] from 2's perspective (brgnIIJ) 
+   2 proposes 2 adopt:  40.910  22.800  21.910  
+   2 proposes 3 adopt:  40.910  22.800  21.910  
+ 
+Bargain [1072, 2:3] from 3's perspective (brgnIIJ) 
+   3 proposes 2 adopt:  37.840  18.440  19.000  
+   3 proposes 3 adopt:  37.840  18.440  19.000  
+ 
+Power-weighted compromise [1073, 2:3] bargain (brgnIJ) 
+     compromise proposes 2 adopt:  39.414  20.675  20.491  
+     compromise proposes 3 adopt:  39.414  20.675  20.491  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 3 actor 4 has most advantageous target 2 worth 0.115 
+Est by  4 of prob 0.8867 that [ 4> 2], with expected gain to  4 of +0.1154 
+Est by  4 of prob 0.8867 that [ 4> 2], with expected gain to  2 of -0.0505 
+Est by  2 of prob 0.9583 that [ 4> 2], with expected gain to  4 of +0.0604 
+Est by  2 of prob 0.9583 that [ 4> 2], with expected gain to  2 of -0.0140 
+ 
+Bargain [1074, 4:2] from 4's perspective (brgnIIJ) 
+   4 proposes 4 adopt:  58.580  37.750  29.380  
+   4 proposes 2 adopt:  58.580  37.750  29.380  
+ 
+Bargain [1075, 4:2] from 2's perspective (brgnIIJ) 
+   2 proposes 4 adopt:  41.270  25.120  22.370  
+   2 proposes 2 adopt:  41.270  25.120  22.370  
+ 
+Power-weighted compromise [1076, 4:2] bargain (brgnIJ) 
+     compromise proposes 4 adopt:  49.914  31.427  25.870  
+     compromise proposes 2 adopt:  49.914  31.427  25.870  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 3 actor 0 has most advantageous target 2 worth 0.009 
+Est by  0 of prob 0.9352 that [ 0> 2], with expected gain to  0 of +0.0088 
+Est by  0 of prob 0.9352 that [ 0> 2], with expected gain to  2 of -0.0078 
+Est by  2 of prob 0.9349 that [ 0> 2], with expected gain to  0 of +0.0092 
+Est by  2 of prob 0.9349 that [ 0> 2], with expected gain to  2 of -0.0082 
+ 
+Bargain [1077, 0:2] from 0's perspective (brgnIIJ) 
+   0 proposes 0 adopt:  52.070  39.140  28.810  
+   0 proposes 2 adopt:  52.070  39.140  28.810  
+ 
+Bargain [1078, 0:2] from 2's perspective (brgnIIJ) 
+   2 proposes 0 adopt:  41.130  25.090  22.350  
+   2 proposes 2 adopt:  41.130  25.090  22.350  
+ 
+Power-weighted compromise [1079, 0:2] bargain (brgnIJ) 
+     compromise proposes 0 adopt:  46.315  31.748  25.411  
+     compromise proposes 2 adopt:  46.315  31.748  25.411  
+ 
+Using InitOnlyInterp to form proposed bargains 
+Bargains to be resolved 
+Bargains involving actor  0: [1060, 0:0][1068, 3:0][1077, 0:2] 
+Bargains involving actor  1: [1061, 1:1][1065, 1:2] 
+Bargains involving actor  2: [1062, 2:2][1065, 1:2][1071, 2:3][1074, 4:2][1077, 0:2] 
+Bargains involving actor  3: [1063, 3:3][1068, 3:0][1071, 2:3] 
+Bargains involving actor  4: [1064, 4:4][1074, 4:2] 
+w: 
+ 117.70   93.20   61.40  135.40   63.80  
+u_im: 
+ 0.97815  0.97594  0.98011  
+ 0.64975  0.62464  0.66557  
+ 0.97339  0.97482  0.97164  
+ 0.87518  0.89783  0.85724  
+ 0.86933  0.85306  0.88752  
+Doing scalarPCE for the 3 bargains of actor 0 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.978    +0.976    +0.980  
+   +0.650    +0.625    +0.666  
+   +0.973    +0.975    +0.972  
+   +0.875    +0.898    +0.857  
+   +0.869    +0.853    +0.888  
+Coalition strengths of (i:j): 
+    0.000     1.820     1.268  
+    1.578     0.000     2.850  
+    1.432     3.256     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.5357  0.4696  
+ 0.4643  0.5000  0.4667  
+ 0.5304  0.5333  0.5000  
+Probability Opt_i 
+ 0.2515  
+ 0.3487  
+ 0.3998  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1077 3 out of 3 bargains 
+u_im: 
+ 0.97815  0.96726  
+ 0.64975  0.73836  
+ 0.97339  0.95571  
+ 0.87518  0.82299  
+ 0.86933  0.84187  
+Doing scalarPCE for the 2 bargains of actor 1 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.978    +0.967  
+   +0.650    +0.738  
+   +0.973    +0.956  
+   +0.875    +0.823  
+   +0.869    +0.842  
+Coalition strengths of (i:j): 
+    0.000     5.604  
+    4.161     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.5738  
+ 0.4262  0.5000  
+Probability Opt_i 
+ 0.5738  
+ 0.4262  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1061 1 out of 2 bargains 
+u_im: 
+ 0.97815  0.96726  0.97950  0.97940  0.98011  
+ 0.64975  0.73836  0.65353  0.66059  0.66557  
+ 0.97339  0.95571  0.97407  0.97065  0.97164  
+ 0.87518  0.82299  0.87297  0.85825  0.85724  
+ 0.86933  0.84187  0.87418  0.89642  0.88752  
+Doing scalarPCE for the 5 bargains of actor 2 ... 
+Num actors: 5 
+Num options: 5 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.978    +0.967    +0.980    +0.979    +0.980  
+   +0.650    +0.738    +0.654    +0.661    +0.666  
+   +0.973    +0.956    +0.974    +0.971    +0.972  
+   +0.875    +0.823    +0.873    +0.858    +0.857  
+   +0.869    +0.842    +0.874    +0.896    +0.888  
+Coalition strengths of (i:j): 
+    0.000     5.604     0.149     1.231     1.268  
+    4.161     0.000     3.981     3.646     3.410  
+    0.431     5.709     0.000     1.108     1.140  
+    1.443     5.309     1.038     0.000     0.352  
+    1.432     5.026     1.022     0.304     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.5738  0.2570  0.4603  0.4696  
+ 0.4262  0.5000  0.4109  0.4072  0.4042  
+ 0.7430  0.5891  0.5000  0.5162  0.5273  
+ 0.5397  0.5928  0.4838  0.5000  0.5367  
+ 0.5304  0.5958  0.4727  0.4633  0.5000  
+Probability Opt_i 
+ 0.1515  
+ 0.2745  
+ 0.2134  
+ 0.1886  
+ 0.1720  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1062 1 out of 5 bargains 
+u_im: 
+ 0.97815  0.97594  0.97950  
+ 0.64975  0.62464  0.65353  
+ 0.97339  0.97482  0.97407  
+ 0.87518  0.89783  0.87297  
+ 0.86933  0.85306  0.87418  
+Doing scalarPCE for the 3 bargains of actor 3 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.978    +0.976    +0.980  
+   +0.650    +0.625    +0.654  
+   +0.973    +0.975    +0.974  
+   +0.875    +0.898    +0.873  
+   +0.869    +0.853    +0.874  
+Coalition strengths of (i:j): 
+    0.000     1.820     0.149  
+    1.578     0.000     1.707  
+    0.431     2.231     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.5357  0.2570  
+ 0.4643  0.5000  0.4334  
+ 0.7430  0.5666  0.5000  
+Probability Opt_i 
+ 0.1835  
+ 0.4100  
+ 0.4065  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1071 3 out of 3 bargains 
+u_im: 
+ 0.97815  0.97940  
+ 0.64975  0.66059  
+ 0.97339  0.97065  
+ 0.87518  0.85825  
+ 0.86933  0.89642  
+Doing scalarPCE for the 2 bargains of actor 4 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.978    +0.979  
+   +0.650    +0.661  
+   +0.973    +0.971  
+   +0.875    +0.858  
+   +0.869    +0.896  
+Coalition strengths of (i:j): 
+    0.000     1.231  
+    1.443     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.4603  
+ 0.5397  0.5000  
+Probability Opt_i 
+ 0.4603  
+ 0.5397  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1064 1 out of 2 bargains 
+postn 0 , 0 : 
+ 52.0700  39.1400  28.8100  
+ideal 0 , 0 : 
+ 51.8723  38.8942  28.7012  
+postn-ideal distance  0,  0: 0.33365 
+postn 1 , 0 : 
+ 25.3400  62.1400  68.9700  
+ideal 1 , 0 : 
+ 27.5259  60.1900  65.5657  
+postn-ideal distance  1,  0: 4.49105 
+postn 2 , 0 : 
+ 41.1300  25.0900  22.3500  
+ideal 2 , 0 : 
+ 41.6794  25.3609  22.5128  
+postn-ideal distance  2,  0: 0.63383 
+postn 3 , 0 : 
+ 40.9100  22.8000  21.9100  
+ideal 3 , 0 : 
+ 38.6724  20.7710  20.4122  
+postn-ideal distance  3,  0: 3.37153 
+postn 4 , 0 : 
+ 58.7300  38.1800  29.5300  
+ideal 4 , 0 : 
+ 58.7300  38.1800  29.5300  
+postn-ideal distance  4,  0: 0.00000 
+postn-ideal distance RMS  0: 0.02532 
+rms (pstn, ideal) = 0.02532 
+Raw actor-pos value matrix (risk neutral) 
+ +0.998  +0.726  +0.886  +0.876  +0.946  
+ +0.729  +0.975  +0.662  +0.649  +0.711  
+ +0.886  +0.679  +0.996  +0.983  +0.859  
+ +0.828  +0.600  +0.960  +0.980  +0.829  
+ +0.944  +0.673  +0.840  +0.834  +1.000  
+Inferred risk attitudes: 
+ +1.000  
+ -0.500  
+ +0.660  
+ +0.611  
+ +0.132  
+Risk-aware actor-pos utility matrix (objective): 
+ +1.0000  +0.9248  +0.9871  +0.9847  +0.9971  
+ +0.6300  +0.9629  +0.5496  +0.5350  +0.6086  
+ +0.9526  +0.8227  +0.9986  +0.9939  +0.9391  
+ +0.9151  +0.7464  +0.9835  +0.9919  +0.9154  
+ +0.9507  +0.7023  +0.8578  +0.8528  +1.0000  
+RMS change in value vs utility:  0.0850032 
+Using OneThird : r^h_i = (2*rh + ri)/3 
+Estimate by 0 of risk-aware utility matrix: 
+ +1.0000  +0.9248  +0.9871  +0.9847  +0.9971  
+ +0.8276  +0.9872  +0.7735  +0.7628  +0.8140  
+ +0.9755  +0.8721  +0.9995  +0.9978  +0.9665  
+ +0.9520  +0.8086  +0.9935  +0.9970  +0.9522  
+ +0.9815  +0.8296  +0.9355  +0.9327  +1.0000  
+RMS change in util^h vs utility: 0.0946304 
+Estimate by 1 of risk-aware utility matrix: 
+ +0.9979  +0.7258  +0.8862  +0.8764  +0.9465  
+ +0.6300  +0.9629  +0.5496  +0.5350  +0.6086  
+ +0.8744  +0.6540  +0.9955  +0.9807  +0.8456  
+ +0.8097  +0.5686  +0.9552  +0.9773  +0.8102  
+ +0.9283  +0.6096  +0.8011  +0.7945  +1.0000  
+RMS change in util^h vs utility: 0.0844125 
+Estimate by 2 of risk-aware utility matrix: 
+ +0.9995  +0.8798  +0.9642  +0.9602  +0.9857  
+ +0.7829  +0.9817  +0.7228  +0.7112  +0.7675  
+ +0.9526  +0.8227  +0.9986  +0.9939  +0.9391  
+ +0.9198  +0.7543  +0.9848  +0.9926  +0.9201  
+ +0.9694  +0.7798  +0.9051  +0.9014  +1.0000  
+RMS change in util^h vs utility: 0.0705351 
+Estimate by 3 of risk-aware utility matrix: 
+ +0.9995  +0.8732  +0.9609  +0.9566  +0.9840  
+ +0.7764  +0.9809  +0.7155  +0.7037  +0.7607  
+ +0.9493  +0.8156  +0.9985  +0.9933  +0.9352  
+ +0.9151  +0.7464  +0.9835  +0.9919  +0.9154  
+ +0.9677  +0.7725  +0.9007  +0.8969  +1.0000  
+RMS change in util^h vs utility: 0.0676163 
+Estimate by 4 of risk-aware utility matrix: 
+ +0.9988  +0.8097  +0.9287  +0.9220  +0.9678  
+ +0.7133  +0.9732  +0.6440  +0.6310  +0.6952  
+ +0.9170  +0.7459  +0.9972  +0.9879  +0.8966  
+ +0.8697  +0.6698  +0.9713  +0.9856  +0.8701  
+ +0.9507  +0.7023  +0.8578  +0.8528  +1.0000  
+RMS change in util^h vs utility: 0.0541528 
+sDist [ 0, 1] = 1.26E+00    
+sDist [ 3, 4] = 6.21E-02    
+Fractional change compared to first step: 0.0491  (target=0.0200) 
+Starting Model::run iteration 5 
+In turn 4 actor 0 has most advantageous target 2 worth 0.011 
+Est by  0 of prob 0.8813 that [ 0> 2], with expected gain to  0 of +0.0106 
+Est by  0 of prob 0.8813 that [ 0> 2], with expected gain to  2 of -0.0197 
+Est by  2 of prob 0.8418 that [ 0> 2], with expected gain to  0 of +0.0269 
+Est by  2 of prob 0.8418 that [ 0> 2], with expected gain to  2 of -0.0350 
+ 
+Bargain [1085, 0:2] from 0's perspective (brgnIIJ) 
+   0 proposes 0 adopt:  51.910  38.740  28.600  
+   0 proposes 2 adopt:  51.910  38.740  28.600  
+ 
+Bargain [1086, 0:2] from 2's perspective (brgnIIJ) 
+   2 proposes 0 adopt:  41.140  25.100  22.350  
+   2 proposes 2 adopt:  41.140  25.100  22.350  
+ 
+Power-weighted compromise [1087, 0:2] bargain (brgnIJ) 
+     compromise proposes 0 adopt:  46.244  31.564  25.312  
+     compromise proposes 2 adopt:  46.244  31.564  25.312  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 4 actor 2 has most advantageous target 3 worth 0.002 
+Est by  2 of prob 0.5817 that [ 2> 3], with expected gain to  2 of +0.0019 
+Est by  2 of prob 0.5817 that [ 2> 3], with expected gain to  3 of -0.0031 
+Est by  3 of prob 0.5393 that [ 2> 3], with expected gain to  2 of +0.0017 
+Est by  3 of prob 0.5393 that [ 2> 3], with expected gain to  3 of -0.0028 
+ 
+Bargain [1088, 2:3] from 2's perspective (brgnIIJ) 
+   2 proposes 2 adopt:  41.100  23.880  22.240  
+   2 proposes 3 adopt:  41.100  23.880  22.240  
+ 
+Bargain [1089, 2:3] from 3's perspective (brgnIIJ) 
+   3 proposes 2 adopt:  40.910  22.800  21.910  
+   3 proposes 3 adopt:  40.910  22.800  21.910  
+ 
+Power-weighted compromise [1091, 2:3] bargain (brgnIJ) 
+     compromise proposes 2 adopt:  41.007  23.354  22.079  
+     compromise proposes 3 adopt:  41.007  23.354  22.079  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 4 actor 1 has most advantageous target 2 worth 0.286 
+Est by  1 of prob 0.7956 that [ 1> 2], with expected gain to  1 of +0.2856 
+Est by  1 of prob 0.7956 that [ 1> 2], with expected gain to  2 of -0.2360 
+Est by  2 of prob 0.8279 that [ 1> 2], with expected gain to  1 of +0.1916 
+Est by  2 of prob 0.8279 that [ 1> 2], with expected gain to  2 of -0.1302 
+ 
+Bargain [1088, 1:2] from 1's perspective (brgnIIJ) 
+   1 proposes 1 adopt:  26.590  60.530  67.560  
+   1 proposes 2 adopt:  26.590  60.530  67.560  
+ 
+Bargain [1090, 1:2] from 2's perspective (brgnIIJ) 
+   2 proposes 1 adopt:  40.480  27.890  27.310  
+   2 proposes 2 adopt:  40.480  27.890  27.310  
+ 
+Power-weighted compromise [1092, 1:2] bargain (brgnIJ) 
+     compromise proposes 1 adopt:  33.080  45.279  48.753  
+     compromise proposes 2 adopt:  33.080  45.279  48.753  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 4 actor 4 has most advantageous target 2 worth 0.096 
+Est by  4 of prob 0.7845 that [ 4> 2], with expected gain to  4 of +0.0959 
+Est by  4 of prob 0.7845 that [ 4> 2], with expected gain to  2 of -0.0679 
+Est by  2 of prob 0.8319 that [ 4> 2], with expected gain to  4 of +0.0708 
+Est by  2 of prob 0.8319 that [ 4> 2], with expected gain to  2 of -0.0444 
+ 
+Bargain [1093, 4:2] from 4's perspective (brgnIIJ) 
+   4 proposes 4 adopt:  58.060  36.420  28.880  
+   4 proposes 2 adopt:  58.060  36.410  28.880  
+ 
+Bargain [1094, 4:2] from 2's perspective (brgnIIJ) 
+   2 proposes 4 adopt:  41.320  25.130  22.380  
+   2 proposes 2 adopt:  41.320  25.130  22.380  
+ 
+Power-weighted compromise [1095, 4:2] bargain (brgnIJ) 
+     compromise proposes 4 adopt:  49.679  30.768  25.626  
+     compromise proposes 2 adopt:  49.679  30.763  25.626  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 4 actor 3 has most advantageous target 0 worth 0.048 
+Est by  3 of prob 0.7259 that [ 3> 0], with expected gain to  3 of +0.0481 
+Est by  3 of prob 0.7259 that [ 3> 0], with expected gain to  0 of -0.0268 
+Est by  0 of prob 0.7732 that [ 3> 0], with expected gain to  3 of +0.0311 
+Est by  0 of prob 0.7732 that [ 3> 0], with expected gain to  0 of -0.0106 
+ 
+Bargain [1096, 3:0] from 3's perspective (brgnIIJ) 
+   3 proposes 3 adopt:  45.140  23.440  22.680  
+   3 proposes 0 adopt:  45.140  23.440  22.680  
+ 
+Bargain [1097, 3:0] from 0's perspective (brgnIIJ) 
+   0 proposes 3 adopt:  52.070  39.080  28.800  
+   0 proposes 0 adopt:  52.070  39.080  28.800  
+ 
+Power-weighted compromise [1098, 3:0] bargain (brgnIJ) 
+     compromise proposes 3 adopt:  48.511  31.048  25.657  
+     compromise proposes 0 adopt:  48.511  31.048  25.657  
+ 
+Using InitOnlyInterp to form proposed bargains 
+Bargains to be resolved 
+Bargains involving actor  0: [1080, 0:0][1085, 0:2][1096, 3:0] 
+Bargains involving actor  1: [1081, 1:1][1088, 1:2] 
+Bargains involving actor  2: [1082, 2:2][1088, 2:3][1085, 0:2][1093, 4:2][1088, 1:2] 
+Bargains involving actor  3: [1083, 3:3][1088, 2:3][1096, 3:0] 
+Bargains involving actor  4: [1084, 4:4][1093, 4:2] 
+w: 
+ 117.70   93.20   61.40  135.40   63.80  
+u_im: 
+ 0.97874  0.96917  
+ 0.65722  0.74769  
+ 0.94139  0.91033  
+ 0.91049  0.86839  
+ 0.87272  0.84660  
+Doing scalarPCE for the 2 bargains of actor 1 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.979    +0.969  
+   +0.657    +0.748  
+   +0.941    +0.910  
+   +0.910    +0.868  
+   +0.873    +0.847  
+Coalition strengths of (i:j): 
+    0.000     5.207  
+    4.251     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.5506  
+ 0.4494  0.5000  
+Probability Opt_i 
+ 0.5506  
+ 0.4494  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1081 1 out of 2 bargains 
+u_im: 
+ 0.97874  0.98133  0.97777  
+ 0.65722  0.67237  0.63873  
+ 0.94139  0.93274  0.94844  
+ 0.91049  0.89768  0.92371  
+ 0.87272  0.89086  0.86517  
+Doing scalarPCE for the 3 bargains of actor 0 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.979    +0.981    +0.978  
+   +0.657    +0.672    +0.639  
+   +0.941    +0.933    +0.948  
+   +0.910    +0.898    +0.924  
+   +0.873    +0.891    +0.865  
+Coalition strengths of (i:j): 
+    0.000     1.133     1.159  
+    1.437     0.000     2.599  
+    1.112     2.246     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.4408  0.5105  
+ 0.5592  0.5000  0.5364  
+ 0.4895  0.4636  0.5000  
+Probability Opt_i 
+ 0.2168  
+ 0.4409  
+ 0.3423  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1096 3 out of 3 bargains 
+u_im: 
+ 0.97874  0.97878  0.98133  0.98091  0.96917  
+ 0.65722  0.65722  0.67237  0.66565  0.74769  
+ 0.94139  0.94146  0.93274  0.93166  0.91033  
+ 0.91049  0.91061  0.89768  0.90050  0.86839  
+ 0.87272  0.87294  0.89086  0.89783  0.84660  
+Doing scalarPCE for the 5 bargains of actor 2 ... 
+Num actors: 5 
+Num options: 5 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.979    +0.979    +0.981    +0.981    +0.969  
+   +0.657    +0.657    +0.672    +0.666    +0.748  
+   +0.941    +0.941    +0.933    +0.932    +0.910  
+   +0.910    +0.911    +0.898    +0.901    +0.868  
+   +0.873    +0.873    +0.891    +0.898    +0.847  
+Coalition strengths of (i:j): 
+    0.000     0.000     1.133     0.975     5.207  
+    0.020     0.000     1.143     0.985     5.227  
+    1.437     1.428     0.000     0.371     4.804  
+    1.322     1.312     0.414     0.000     5.161  
+    4.251     4.251     3.530     3.849     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.0000  0.4408  0.4245  0.5506  
+ 1.0000  0.5000  0.4447  0.4288  0.5515  
+ 0.5592  0.5553  0.5000  0.4731  0.5764  
+ 0.5755  0.5712  0.5269  0.5000  0.5728  
+ 0.4494  0.4485  0.4236  0.4272  0.5000  
+Probability Opt_i 
+ 0.1420  
+ 0.1475  
+ 0.1963  
+ 0.2082  
+ 0.3060  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1088 5 out of 5 bargains 
+u_im: 
+ 0.97874  0.97878  0.97777  
+ 0.65722  0.65722  0.63873  
+ 0.94139  0.94146  0.94844  
+ 0.91049  0.91061  0.92371  
+ 0.87272  0.87294  0.86517  
+Doing scalarPCE for the 3 bargains of actor 3 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.979    +0.979    +0.978  
+   +0.657    +0.657    +0.639  
+   +0.941    +0.941    +0.948  
+   +0.910    +0.911    +0.924  
+   +0.873    +0.873    +0.865  
+Coalition strengths of (i:j): 
+    0.000     0.000     1.159  
+    0.020     0.000     1.169  
+    1.112     1.102     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.0000  0.5105  
+ 1.0000  0.5000  0.5148  
+ 0.4895  0.4852  0.5000  
+Probability Opt_i 
+ 0.2411  
+ 0.2758  
+ 0.4831  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1096 3 out of 3 bargains 
+u_im: 
+ 0.97874  0.98091  
+ 0.65722  0.66565  
+ 0.94139  0.93166  
+ 0.91049  0.90050  
+ 0.87272  0.89783  
+Doing scalarPCE for the 2 bargains of actor 4 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.979    +0.981  
+   +0.657    +0.666  
+   +0.941    +0.932  
+   +0.910    +0.901  
+   +0.873    +0.898  
+Coalition strengths of (i:j): 
+    0.000     0.975  
+    1.322     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.4245  
+ 0.5755  0.5000  
+Probability Opt_i 
+ 0.4245  
+ 0.5755  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1093 2 out of 2 bargains 
+postn 0 , 0 : 
+ 45.1400  23.4400  22.6800  
+ideal 0 , 0 : 
+ 46.0152  25.4491  23.4628  
+postn-ideal distance  0,  0: 2.32701 
+postn 1 , 0 : 
+ 25.3400  62.1400  68.9700  
+ideal 1 , 0 : 
+ 27.1195  59.0800  65.1169  
+postn-ideal distance  1,  0: 5.23223 
+postn 2 , 0 : 
+ 26.5900  60.5300  67.5600  
+ideal 2 , 0 : 
+ 32.3212  47.9711  51.8152  
+postn-ideal distance  2,  0: 20.93969 
+postn 3 , 0 : 
+ 45.1400  23.4400  22.6800  
+ideal 3 , 0 : 
+ 42.3589  22.2923  21.7049  
+postn-ideal distance  3,  0: 3.16267 
+postn 4 , 0 : 
+ 58.0600  36.4200  28.8800  
+ideal 4 , 0 : 
+ 58.0600  36.4200  28.8800  
+postn-ideal distance  4,  0: 0.00000 
+postn-ideal distance RMS  0: 0.09811 
+rms (pstn, ideal) = 0.09811 
+Raw actor-pos value matrix (risk neutral) 
+ +0.987  +0.706  +0.719  +0.987  +0.888  
+ +0.656  +0.969  +0.984  +0.656  +0.709  
+ +0.786  +0.876  +0.890  +0.786  +0.795  
+ +0.986  +0.612  +0.627  +0.986  +0.862  
+ +0.876  +0.675  +0.688  +0.876  +1.000  
+Inferred risk attitudes: 
+ +1.000  
+ -0.500  
+ -0.262  
+ +1.000  
+ -0.215  
+Risk-aware actor-pos utility matrix (objective): 
+ +0.9998  +0.9134  +0.9211  +0.9998  +0.9874  
+ +0.5437  +0.9546  +0.9754  +0.5437  +0.6058  
+ +0.7414  +0.8480  +0.8646  +0.7414  +0.7520  
+ +0.9998  +0.8495  +0.8612  +0.9998  +0.9809  
+ +0.8531  +0.6276  +0.6417  +0.8531  +1.0000  
+RMS change in value vs utility:  0.103685 
+Using OneThird : r^h_i = (2*rh + ri)/3 
+Estimate by 0 of risk-aware utility matrix: 
+ +0.9998  +0.9134  +0.9211  +0.9998  +0.9874  
+ +0.7692  +0.9843  +0.9916  +0.7692  +0.8121  
+ +0.8831  +0.9392  +0.9468  +0.8831  +0.8893  
+ +0.9998  +0.8495  +0.8612  +0.9998  +0.9809  
+ +0.9409  +0.8053  +0.8156  +0.9409  +1.0000  
+RMS change in util^h vs utility: 0.108953 
+Estimate by 1 of risk-aware utility matrix: 
+ +0.9870  +0.7057  +0.7191  +0.9870  +0.8878  
+ +0.5437  +0.9546  +0.9754  +0.5437  +0.6058  
+ +0.7147  +0.8309  +0.8491  +0.7147  +0.7262  
+ +0.9859  +0.6121  +0.6275  +0.9859  +0.8618  
+ +0.8325  +0.5859  +0.6009  +0.8325  +1.0000  
+RMS change in util^h vs utility: 0.0952135 
+Estimate by 2 of risk-aware utility matrix: 
+ +0.9890  +0.7386  +0.7511  +0.9890  +0.9036  
+ +0.5794  +0.9593  +0.9780  +0.5794  +0.6385  
+ +0.7414  +0.8480  +0.8646  +0.7414  +0.7520  
+ +0.9881  +0.6497  +0.6645  +0.9881  +0.8806  
+ +0.8497  +0.6206  +0.6349  +0.8497  +1.0000  
+RMS change in util^h vs utility: 0.0798554 
+Estimate by 3 of risk-aware utility matrix: 
+ +0.9998  +0.9134  +0.9211  +0.9998  +0.9874  
+ +0.7692  +0.9843  +0.9916  +0.7692  +0.8121  
+ +0.8831  +0.9392  +0.9468  +0.8831  +0.8893  
+ +0.9998  +0.8495  +0.8612  +0.9998  +0.9809  
+ +0.9409  +0.8053  +0.8156  +0.9409  +1.0000  
+RMS change in util^h vs utility: 0.108953 
+Estimate by 4 of risk-aware utility matrix: 
+ +0.9894  +0.7452  +0.7575  +0.9894  +0.9067  
+ +0.5866  +0.9603  +0.9785  +0.5866  +0.6450  
+ +0.7467  +0.8514  +0.8677  +0.7467  +0.7572  
+ +0.9885  +0.6572  +0.6719  +0.9885  +0.8844  
+ +0.8531  +0.6276  +0.6417  +0.8531  +1.0000  
+RMS change in util^h vs utility: 0.0773383 
+sDist [ 0, 1] = 1.26E+00    
+sDist [ 4, 5] = 8.38E-01    
+Fractional change compared to first step: 0.6637  (target=0.0200) 
+Starting Model::run iteration 6 
+In turn 5 actor 1 has most advantageous target 0 worth 0.239 
+Est by  1 of prob 0.6929 that [ 1> 0], with expected gain to  1 of +0.2390 
+Est by  1 of prob 0.6929 that [ 1> 0], with expected gain to  0 of -0.1636 
+Est by  0 of prob 0.7947 that [ 1> 0], with expected gain to  1 of +0.1549 
+Est by  0 of prob 0.7947 that [ 1> 0], with expected gain to  0 of -0.0622 
+ 
+Bargain [1104, 1:0] from 1's perspective (brgnIIJ) 
+   1 proposes 1 adopt:  30.170  59.180  66.760  
+   1 proposes 0 adopt:  30.170  59.180  66.750  
+ 
+Bargain [1105, 1:0] from 0's perspective (brgnIIJ) 
+   0 proposes 1 adopt:  44.740  26.300  28.060  
+   0 proposes 0 adopt:  44.740  26.300  28.050  
+ 
+Power-weighted compromise [1106, 1:0] bargain (brgnIJ) 
+     compromise proposes 1 adopt:  36.600  44.668  49.680  
+     compromise proposes 0 adopt:  36.600  44.668  49.670  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 5 actor 2 has most advantageous target 1 worth 0.017 
+Est by  2 of prob 1.0000 that [ 2> 1], with expected gain to  2 of +0.0166 
+Est by  2 of prob 1.0000 that [ 2> 1], with expected gain to  1 of +0.0186 
+Est by  1 of prob 1.0000 that [ 2> 1], with expected gain to  2 of +0.0183 
+Est by  1 of prob 1.0000 that [ 2> 1], with expected gain to  1 of +0.0208 
+ 
+Bargain [1107, 2:1] from 2's perspective (brgnIIJ) 
+   2 proposes 2 adopt:  26.590  60.530  67.560  
+   2 proposes 1 adopt:  26.590  60.530  67.560  
+ 
+Bargain [1108, 2:1] from 1's perspective (brgnIIJ) 
+   1 proposes 2 adopt:  25.340  62.140  68.970  
+   1 proposes 1 adopt:  25.340  62.140  68.970  
+ 
+Power-weighted compromise [1109, 2:1] bargain (brgnIJ) 
+     compromise proposes 2 adopt:  25.924  61.388  68.311  
+     compromise proposes 1 adopt:  25.924  61.388  68.311  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 5 actor 3 has most advantageous target 2 worth 0.108 
+Est by  3 of prob 0.8544 that [ 3> 2], with expected gain to  3 of +0.1081 
+Est by  3 of prob 0.8544 that [ 3> 2], with expected gain to  2 of -0.0497 
+Est by  2 of prob 0.8767 that [ 3> 2], with expected gain to  3 of +0.2633 
+Est by  2 of prob 0.8767 that [ 3> 2], with expected gain to  2 of -0.1002 
+ 
+Bargain [1110, 3:2] from 3's perspective (brgnIIJ) 
+   3 proposes 3 adopt:  43.470  23.930  24.700  
+   3 proposes 2 adopt:  43.470  23.930  24.700  
+ 
+Bargain [1111, 3:2] from 2's perspective (brgnIIJ) 
+   2 proposes 3 adopt:  27.260  52.520  64.280  
+   2 proposes 2 adopt:  27.260  52.520  64.280  
+ 
+Power-weighted compromise [1112, 3:2] bargain (brgnIJ) 
+     compromise proposes 3 adopt:  35.162  38.584  44.986  
+     compromise proposes 2 adopt:  35.162  38.584  44.986  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 5 actor 4 has most advantageous target 2 worth 0.294 
+Est by  4 of prob 0.8805 that [ 4> 2], with expected gain to  4 of +0.2935 
+Est by  4 of prob 0.8805 that [ 4> 2], with expected gain to  2 of -0.0905 
+Est by  2 of prob 0.8812 that [ 4> 2], with expected gain to  4 of +0.2995 
+Est by  2 of prob 0.8812 that [ 4> 2], with expected gain to  2 of -0.0923 
+ 
+Bargain [1113, 4:2] from 4's perspective (brgnIIJ) 
+   4 proposes 4 adopt:  57.760  37.300  29.800  
+   4 proposes 2 adopt:  57.760  37.310  29.810  
+ 
+Bargain [1114, 4:2] from 2's perspective (brgnIIJ) 
+   2 proposes 4 adopt:  34.700  58.570  62.870  
+   2 proposes 2 adopt:  34.700  58.570  62.880  
+ 
+Power-weighted compromise [1115, 4:2] bargain (brgnIJ) 
+     compromise proposes 4 adopt:  46.215  47.949  46.357  
+     compromise proposes 2 adopt:  46.215  47.954  46.367  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 5 actor 0 has most advantageous target 2 worth 0.044 
+Est by  0 of prob 0.7063 that [ 0> 2], with expected gain to  0 of +0.0438 
+Est by  0 of prob 0.7063 that [ 0> 2], with expected gain to  2 of -0.0354 
+Est by  2 of prob 0.7961 that [ 0> 2], with expected gain to  0 of +0.1645 
+Est by  2 of prob 0.7961 that [ 0> 2], with expected gain to  2 of -0.0852 
+ 
+Bargain [1116, 0:2] from 0's perspective (brgnIIJ) 
+   0 proposes 0 adopt:  42.900  31.590  33.530  
+   0 proposes 2 adopt:  42.900  31.590  33.530  
+ 
+Bargain [1117, 0:2] from 2's perspective (brgnIIJ) 
+   2 proposes 0 adopt:  27.450  59.670  66.630  
+   2 proposes 2 adopt:  27.450  59.670  66.640  
+ 
+Power-weighted compromise [1118, 0:2] bargain (brgnIJ) 
+     compromise proposes 0 adopt:  34.772  46.363  50.944  
+     compromise proposes 2 adopt:  34.772  46.363  50.949  
+ 
+Using InitOnlyInterp to form proposed bargains 
+Bargains to be resolved 
+Bargains involving actor  0: [1099, 0:0][1104, 1:0][1116, 0:2] 
+Bargains involving actor  1: [1100, 1:1][1104, 1:0][1107, 2:1] 
+Bargains involving actor  2: [1101, 2:2][1107, 2:1][1110, 3:2][1113, 4:2][1116, 0:2] 
+Bargains involving actor  3: [1102, 3:3][1110, 3:2] 
+Bargains involving actor  4: [1103, 4:4][1113, 4:2] 
+w: 
+ 117.70   93.20   61.40  135.40   63.80  
+u_im: 
+ 0.96432  0.95455  0.96586  
+ 0.72465  0.81449  0.72880  
+ 0.78948  0.82433  0.79280  
+ 0.93825  0.91682  0.94059  
+ 0.79510  0.76798  0.79793  
+Doing scalarPCE for the 3 bargains of actor 1 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.964    +0.955    +0.966  
+   +0.725    +0.814    +0.729  
+   +0.789    +0.824    +0.793  
+   +0.938    +0.917    +0.941  
+   +0.795    +0.768    +0.798  
+Coalition strengths of (i:j): 
+    0.000     2.893     0.000  
+    5.292     0.000     4.992  
+    0.635     3.232     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.3534  0.0000  
+ 0.6466  0.5000  0.6070  
+ 1.0000  0.3930  0.5000  
+Probability Opt_i 
+ 0.1368  
+ 0.6093  
+ 0.2539  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1104 2 out of 3 bargains 
+u_im: 
+ 0.96432  0.95455  0.97904  
+ 0.72465  0.81449  0.67649  
+ 0.78948  0.82433  0.79670  
+ 0.93825  0.91682  0.96277  
+ 0.79510  0.76798  0.83430  
+Doing scalarPCE for the 3 bargains of actor 0 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.964    +0.955    +0.979  
+   +0.725    +0.814    +0.676  
+   +0.789    +0.824    +0.797  
+   +0.938    +0.917    +0.963  
+   +0.795    +0.768    +0.834  
+Coalition strengths of (i:j): 
+    0.000     2.893     2.250  
+    5.292     0.000     7.403  
+    4.001     6.684     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.3534  0.3599  
+ 0.6466  0.5000  0.5255  
+ 0.6401  0.4745  0.5000  
+Probability Opt_i 
+ 0.1045  
+ 0.4866  
+ 0.4089  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1116 3 out of 3 bargains 
+u_im: 
+ 0.96432  0.96586  0.97994  0.97747  0.97904  
+ 0.72465  0.72880  0.64363  0.65423  0.67649  
+ 0.78948  0.79280  0.76988  0.76943  0.79670  
+ 0.93825  0.94059  0.96592  0.96135  0.96277  
+ 0.79510  0.79793  0.83235  0.86410  0.83430  
+Doing scalarPCE for the 5 bargains of actor 2 ... 
+Num actors: 5 
+Num options: 5 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.964    +0.966    +0.980    +0.977    +0.979  
+   +0.725    +0.729    +0.644    +0.654    +0.676  
+   +0.789    +0.793    +0.770    +0.769    +0.797  
+   +0.938    +0.941    +0.966    +0.961    +0.963  
+   +0.795    +0.798    +0.832    +0.864    +0.834  
+Coalition strengths of (i:j): 
+    0.000     0.000     4.403     3.914     2.250  
+    0.635     0.000     4.702     4.212     2.444  
+    3.984     3.644     0.000     0.468     0.267  
+    4.550     4.210     1.508     0.000     0.952  
+    4.001     3.559     2.419     2.064     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.0000  0.5250  0.4624  0.3599  
+ 1.0000  0.5000  0.5634  0.5002  0.4072  
+ 0.4750  0.4366  0.5000  0.2370  0.0993  
+ 0.5376  0.4998  0.7630  0.5000  0.3156  
+ 0.6401  0.5928  0.9007  0.6844  0.5000  
+Probability Opt_i 
+ 0.1456  
+ 0.2472  
+ 0.0721  
+ 0.1769  
+ 0.3582  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1107 2 out of 5 bargains 
+u_im: 
+ 0.96432  0.97994  
+ 0.72465  0.64363  
+ 0.78948  0.76988  
+ 0.93825  0.96592  
+ 0.79510  0.83235  
+Doing scalarPCE for the 2 bargains of actor 3 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.964    +0.980  
+   +0.725    +0.644  
+   +0.789    +0.770  
+   +0.938    +0.966  
+   +0.795    +0.832  
+Coalition strengths of (i:j): 
+    0.000     4.403  
+    3.984     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.5250  
+ 0.4750  0.5000  
+Probability Opt_i 
+ 0.5250  
+ 0.4750  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1102 1 out of 2 bargains 
+u_im: 
+ 0.96432  0.97747  
+ 0.72465  0.65423  
+ 0.78948  0.76943  
+ 0.93825  0.96135  
+ 0.79510  0.86410  
+Doing scalarPCE for the 2 bargains of actor 4 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.964    +0.977  
+   +0.725    +0.654  
+   +0.789    +0.769  
+   +0.938    +0.961  
+   +0.795    +0.864  
+Coalition strengths of (i:j): 
+    0.000     3.914  
+    4.550     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.4624  
+ 0.5376  0.5000  
+Probability Opt_i 
+ 0.4624  
+ 0.5376  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1113 2 out of 2 bargains 
+postn 0 , 0 : 
+ 42.9000  31.5900  33.5300  
+ideal 0 , 0 : 
+ 43.3050  30.7917  32.2213  
+postn-ideal distance  0,  0: 1.58560 
+postn 1 , 0 : 
+ 30.1700  59.1800  66.7600  
+ideal 1 , 0 : 
+ 30.5120  57.2307  64.1381  
+postn-ideal distance  1,  0: 3.28494 
+postn 2 , 0 : 
+ 26.5900  60.5300  67.5600  
+ideal 2 , 0 : 
+ 30.2624  52.9453  58.2617  
+postn-ideal distance  2,  0: 12.54873 
+postn 3 , 0 : 
+ 45.1400  23.4400  22.6800  
+ideal 3 , 0 : 
+ 43.9441  22.9465  22.2607  
+postn-ideal distance  3,  0: 1.35995 
+postn 4 , 0 : 
+ 57.7600  37.3000  29.8000  
+ideal 4 , 0 : 
+ 57.7600  37.3000  29.8000  
+postn-ideal distance  4,  0: 0.00000 
+postn-ideal distance RMS  0: 0.05876 
+rms (pstn, ideal) = 0.05876 
+Raw actor-pos value matrix (risk neutral) 
+ +0.993  +0.785  +0.764  +0.948  +0.882  
+ +0.753  +0.981  +0.965  +0.673  +0.735  
+ +0.811  +0.947  +0.934  +0.742  +0.765  
+ +0.915  +0.646  +0.633  +0.994  +0.862  
+ +0.872  +0.721  +0.692  +0.876  +1.000  
+Inferred risk attitudes: 
+ +1.000  
+ -0.274  
+ -0.500  
+ +0.288  
+ -0.413  
+Risk-aware actor-pos utility matrix (objective): 
+ +1.0000  +0.9537  +0.9444  +0.9973  +0.9861  
+ +0.7025  +0.9755  +0.9558  +0.6129  +0.6820  
+ +0.7341  +0.9218  +0.9028  +0.6465  +0.6747  
+ +0.9377  +0.7121  +0.6995  +0.9957  +0.8962  
+ +0.8258  +0.6378  +0.6045  +0.8316  +1.0000  
+RMS change in value vs utility:  0.0741477 
+Using OneThird : r^h_i = (2*rh + ri)/3 
+Estimate by 0 of risk-aware utility matrix: 
+ +1.0000  +0.9537  +0.9444  +0.9973  +0.9861  
+ +0.8603  +0.9916  +0.9844  +0.7997  +0.8472  
+ +0.8875  +0.9721  +0.9647  +0.8379  +0.8547  
+ +0.9745  +0.8206  +0.8099  +0.9985  +0.9527  
+ +0.9310  +0.8274  +0.8051  +0.9337  +1.0000  
+RMS change in util^h vs utility: 0.111935 
+Estimate by 1 of risk-aware utility matrix: 
+ +0.9942  +0.8103  +0.7913  +0.9553  +0.8977  
+ +0.7025  +0.9755  +0.9558  +0.6129  +0.6820  
+ +0.7573  +0.9294  +0.9121  +0.6754  +0.7019  
+ +0.9088  +0.6265  +0.6126  +0.9934  +0.8517  
+ +0.8362  +0.6565  +0.6243  +0.8417  +1.0000  
+RMS change in util^h vs utility: 0.0545846 
+Estimate by 2 of risk-aware utility matrix: 
+ +0.9932  +0.7848  +0.7641  +0.9478  +0.8820  
+ +0.6744  +0.9727  +0.9507  +0.5796  +0.6526  
+ +0.7341  +0.9218  +0.9028  +0.6465  +0.6747  
+ +0.8971  +0.5920  +0.5775  +0.9925  +0.8337  
+ +0.8193  +0.6262  +0.5922  +0.8253  +1.0000  
+RMS change in util^h vs utility: 0.0670412 
+Estimate by 3 of risk-aware utility matrix: 
+ +0.9967  +0.8735  +0.8588  +0.9738  +0.9366  
+ +0.7720  +0.9826  +0.9684  +0.6952  +0.7548  
+ +0.8147  +0.9482  +0.9353  +0.7470  +0.7692  
+ +0.9377  +0.7121  +0.6995  +0.9957  +0.8962  
+ +0.8780  +0.7318  +0.7040  +0.8822  +1.0000  
+RMS change in util^h vs utility: 0.0583673 
+Estimate by 4 of risk-aware utility matrix: 
+ +0.9936  +0.7946  +0.7746  +0.9507  +0.8880  
+ +0.6852  +0.9737  +0.9526  +0.5924  +0.6638  
+ +0.7430  +0.9247  +0.9064  +0.6576  +0.6851  
+ +0.9016  +0.6053  +0.5909  +0.9929  +0.8406  
+ +0.8258  +0.6378  +0.6045  +0.8316  +1.0000  
+RMS change in util^h vs utility: 0.0616303 
+sDist [ 0, 1] = 1.26E+00    
+sDist [ 5, 6] = 2.11E-01    
+Fractional change compared to first step: 0.1674  (target=0.0200) 
+Starting Model::run iteration 7 
+In turn 6 actor 0 has most advantageous target 2 worth 0.023 
+Est by  0 of prob 0.6101 that [ 0> 2], with expected gain to  0 of +0.0228 
+Est by  0 of prob 0.6101 that [ 0> 2], with expected gain to  2 of -0.0317 
+Est by  2 of prob 0.8037 that [ 0> 2], with expected gain to  0 of +0.1611 
+Est by  2 of prob 0.8037 that [ 0> 2], with expected gain to  2 of -0.1186 
+ 
+Bargain [1124, 0:2] from 0's perspective (brgnIIJ) 
+   0 proposes 0 adopt:  38.900  43.160  48.150  
+   0 proposes 2 adopt:  38.900  43.160  48.160  
+ 
+Bargain [1125, 0:2] from 2's perspective (brgnIIJ) 
+   2 proposes 0 adopt:  27.310  59.890  66.890  
+   2 proposes 2 adopt:  27.310  59.890  66.890  
+ 
+Power-weighted compromise [1126, 0:2] bargain (brgnIJ) 
+     compromise proposes 0 adopt:  32.803  51.962  58.009  
+     compromise proposes 2 adopt:  32.803  51.962  58.014  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 6 actor 2 has most advantageous target 1 worth 0.014 
+turn 6 , i 2 , j 1 , bestEU worth 0.0137595 , piiJ  2.33063e-12 
+Est by  2 of prob 0.0000 that [ 2> 1], with expected gain to  2 of +0.0138 
+Est by  2 of prob 0.0000 that [ 2> 1], with expected gain to  1 of +0.0159 
+Est by  1 of prob 0.0000 that [ 2> 1], with expected gain to  2 of +0.0125 
+Est by  1 of prob 0.0000 that [ 2> 1], with expected gain to  1 of +0.0143 
+ 
+Bargain [1127, 2:1] from 2's perspective (brgnIIJ) 
+   2 proposes 2 adopt:  30.170  59.180  66.760  
+   2 proposes 1 adopt:  30.170  59.180  66.760  
+ 
+Bargain [1128, 2:1] from 1's perspective (brgnIIJ) 
+   1 proposes 2 adopt:  30.170  59.180  66.760  
+   1 proposes 1 adopt:  30.170  59.180  66.760  
+ 
+Power-weighted compromise [1129, 2:1] bargain (brgnIJ) 
+     compromise proposes 2 adopt:  30.170  59.180  66.760  
+     compromise proposes 1 adopt:  30.170  59.180  66.760  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 6 actor 1 has most advantageous target 0 worth 0.145 
+Est by  1 of prob 0.6569 that [ 1> 0], with expected gain to  1 of +0.1454 
+Est by  1 of prob 0.6569 that [ 1> 0], with expected gain to  0 of -0.0980 
+Est by  0 of prob 0.7977 that [ 1> 0], with expected gain to  1 of +0.0951 
+Est by  0 of prob 0.7977 that [ 1> 0], with expected gain to  0 of -0.0335 
+ 
+Bargain [1130, 1:0] from 1's perspective (brgnIIJ) 
+   1 proposes 1 adopt:  34.110  56.330  64.590  
+   1 proposes 0 adopt:  34.110  56.330  64.590  
+ 
+Bargain [1131, 1:0] from 0's perspective (brgnIIJ) 
+   0 proposes 1 adopt:  42.810  32.300  34.910  
+   0 proposes 0 adopt:  42.810  32.290  34.910  
+ 
+Power-weighted compromise [1134, 1:0] bargain (brgnIJ) 
+     compromise proposes 1 adopt:  37.950  45.724  51.491  
+     compromise proposes 0 adopt:  37.950  45.720  51.491  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 6 actor 3 has most advantageous target 2 worth 0.217 
+Est by  3 of prob 0.8226 that [ 3> 2], with expected gain to  3 of +0.2167 
+Est by  3 of prob 0.8226 that [ 3> 2], with expected gain to  2 of -0.1378 
+Est by  2 of prob 0.8390 that [ 3> 2], with expected gain to  3 of +0.3140 
+Est by  2 of prob 0.8390 that [ 3> 2], with expected gain to  2 of -0.1939 
+ 
+Bargain [1132, 3:2] from 3's perspective (brgnIIJ) 
+   3 proposes 3 adopt:  42.600  24.220  25.830  
+   3 proposes 2 adopt:  42.600  24.220  25.830  
+ 
+Bargain [1133, 3:2] from 2's perspective (brgnIIJ) 
+   2 proposes 3 adopt:  27.660  48.990  62.420  
+   2 proposes 2 adopt:  27.660  48.990  62.420  
+ 
+Power-weighted compromise [1135, 3:2] bargain (brgnIJ) 
+     compromise proposes 3 adopt:  34.943  36.916  44.584  
+     compromise proposes 2 adopt:  34.943  36.916  44.584  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 6 actor 4 has most advantageous target 2 worth 0.261 
+Est by  4 of prob 0.7754 that [ 4> 2], with expected gain to  4 of +0.2612 
+Est by  4 of prob 0.7754 that [ 4> 2], with expected gain to  2 of -0.1461 
+Est by  2 of prob 0.7771 that [ 4> 2], with expected gain to  4 of +0.2704 
+Est by  2 of prob 0.7771 that [ 4> 2], with expected gain to  2 of -0.1512 
+ 
+Bargain [1136, 4:2] from 4's perspective (brgnIIJ) 
+   4 proposes 4 adopt:  56.440  40.730  33.580  
+   4 proposes 2 adopt:  56.440  40.730  33.580  
+ 
+Bargain [1137, 4:2] from 2's perspective (brgnIIJ) 
+   2 proposes 4 adopt:  33.040  59.080  64.020  
+   2 proposes 2 adopt:  33.040  59.080  64.020  
+ 
+Power-weighted compromise [1138, 4:2] bargain (brgnIJ) 
+     compromise proposes 4 adopt:  44.725  49.917  48.820  
+     compromise proposes 2 adopt:  44.725  49.917  48.820  
+ 
+Using InitOnlyInterp to form proposed bargains 
+Bargains to be resolved 
+Bargains involving actor  0: [1120, 0:0][1124, 0:2][1130, 1:0] 
+Bargains involving actor  1: [1119, 1:1][1127, 2:1][1130, 1:0] 
+Bargains involving actor  2: [1123, 2:2][1124, 0:2][1127, 2:1][1132, 3:2][1136, 4:2] 
+Bargains involving actor  3: [1121, 3:3][1132, 3:2] 
+Bargains involving actor  4: [1122, 4:4][1136, 4:2] 
+w: 
+ 117.70   93.20   61.40  135.40   63.80  
+u_im: 
+ 0.97627  0.98410  0.97154  
+ 0.78572  0.78735  0.84037  
+ 0.77599  0.79409  0.81996  
+ 0.84824  0.85997  0.81303  
+ 0.77995  0.80148  0.75895  
+Doing scalarPCE for the 3 bargains of actor 0 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.976    +0.984    +0.972  
+   +0.786    +0.787    +0.840  
+   +0.776    +0.794    +0.820  
+   +0.848    +0.860    +0.813  
+   +0.780    +0.801    +0.759  
+Coalition strengths of (i:j): 
+    0.000     0.000     3.335  
+    2.575     0.000     5.284  
+    3.907     3.272     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.0000  0.4605  
+ 1.0000  0.5000  0.6176  
+ 0.5395  0.3824  0.5000  
+Probability Opt_i 
+ 0.0729  
+ 0.5352  
+ 0.3920  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1124 2 out of 3 bargains 
+u_im: 
+ 0.97627  0.97814  0.97154  
+ 0.78572  0.78967  0.84037  
+ 0.77599  0.77979  0.81996  
+ 0.84824  0.85075  0.81303  
+ 0.77995  0.78660  0.75895  
+Doing scalarPCE for the 3 bargains of actor 1 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.976    +0.978    +0.972  
+   +0.786    +0.790    +0.840  
+   +0.776    +0.780    +0.820  
+   +0.848    +0.851    +0.813  
+   +0.780    +0.787    +0.759  
+Coalition strengths of (i:j): 
+    0.000     0.000     3.335  
+    0.793     0.000     3.828  
+    3.907     3.604     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.0000  0.4605  
+ 1.0000  0.5000  0.5151  
+ 0.5395  0.4849  0.5000  
+Probability Opt_i 
+ 0.1463  
+ 0.3708  
+ 0.4828  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1130 3 out of 3 bargains 
+u_im: 
+ 0.97627  0.98410  0.97814  0.98726  0.98485  
+ 0.78572  0.78735  0.78967  0.72484  0.74409  
+ 0.77599  0.79409  0.77979  0.73312  0.74210  
+ 0.84824  0.85997  0.85075  0.90451  0.87807  
+ 0.77995  0.80148  0.78660  0.81696  0.84656  
+Doing scalarPCE for the 5 bargains of actor 2 ... 
+Num actors: 5 
+Num options: 5 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.976    +0.984    +0.978    +0.987    +0.985  
+   +0.786    +0.787    +0.790    +0.725    +0.744  
+   +0.776    +0.794    +0.780    +0.733    +0.742  
+   +0.848    +0.860    +0.851    +0.905    +0.878  
+   +0.780    +0.801    +0.787    +0.817    +0.847  
+Coalition strengths of (i:j): 
+    0.000     0.000     0.000     4.166     2.985  
+    2.575     0.000     1.889     4.803     3.620  
+    0.793     0.108     0.000     4.470     3.287  
+    5.651     3.701     5.157     0.000     1.933  
+    4.661     2.711     4.166     2.118     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.0000  0.0000  0.4244  0.3904  
+ 1.0000  0.5000  0.9460  0.5648  0.5718  
+ 1.0000  0.0540  0.5000  0.4643  0.4410  
+ 0.5756  0.4352  0.5357  0.5000  0.4771  
+ 0.6096  0.4282  0.5590  0.5229  0.5000  
+Probability Opt_i 
+ 0.0615  
+ 0.3351  
+ 0.1010  
+ 0.2733  
+ 0.2290  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1124 2 out of 5 bargains 
+u_im: 
+ 0.97627  0.98726  
+ 0.78572  0.72484  
+ 0.77599  0.73312  
+ 0.84824  0.90451  
+ 0.77995  0.81696  
+Doing scalarPCE for the 2 bargains of actor 3 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.976    +0.987  
+   +0.786    +0.725  
+   +0.776    +0.733  
+   +0.848    +0.905  
+   +0.780    +0.817  
+Coalition strengths of (i:j): 
+    0.000     4.166  
+    5.651     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.4244  
+ 0.5756  0.5000  
+Probability Opt_i 
+ 0.4244  
+ 0.5756  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1132 2 out of 2 bargains 
+u_im: 
+ 0.97627  0.98485  
+ 0.78572  0.74409  
+ 0.77599  0.74210  
+ 0.84824  0.87807  
+ 0.77995  0.84656  
+Doing scalarPCE for the 2 bargains of actor 4 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.976    +0.985  
+   +0.786    +0.744  
+   +0.776    +0.742  
+   +0.848    +0.878  
+   +0.780    +0.847  
+Coalition strengths of (i:j): 
+    0.000     2.985  
+    4.661     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.3904  
+ 0.6096  0.5000  
+Probability Opt_i 
+ 0.3904  
+ 0.6096  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1136 2 out of 2 bargains 
+postn 0 , 0 : 
+ 38.9000  43.1600  48.1500  
+ideal 0 , 0 : 
+ 39.4726  41.5521  46.0793  
+postn-ideal distance  0,  0: 2.68350 
+postn 1 , 0 : 
+ 34.1100  56.3300  64.5900  
+ideal 1 , 0 : 
+ 33.7977  55.5702  63.3579  
+postn-ideal distance  1,  0: 1.48087 
+postn 2 , 0 : 
+ 38.9000  43.1600  48.1600  
+ideal 2 , 0 : 
+ 37.4807  42.8506  47.4795  
+postn-ideal distance  2,  0: 1.60412 
+postn 3 , 0 : 
+ 42.6000  24.2200  25.8300  
+ideal 3 , 0 : 
+ 43.1780  23.6724  24.2952  
+postn-ideal distance  3,  0: 1.72903 
+postn 4 , 0 : 
+ 56.4400  40.7300  33.5800  
+ideal 4 , 0 : 
+ 56.4400  40.7300  33.5800  
+postn-ideal distance  4,  0: 0.00000 
+postn-ideal distance RMS  0: 0.01730 
+rms (pstn, ideal) = 0.01730 
+Raw actor-pos value matrix (risk neutral) 
+ +0.988  +0.892  +0.988  +0.883  +0.862  
+ +0.880  +0.992  +0.880  +0.704  +0.781  
+ +0.990  +0.886  +0.990  +0.847  +0.864  
+ +0.811  +0.682  +0.811  +0.993  +0.839  
+ +0.844  +0.775  +0.844  +0.862  +1.000  
+Inferred risk attitudes: 
+ +0.804  
+ -0.500  
+ +0.803  
+ +1.000  
+ -0.277  
+Risk-aware actor-pos utility matrix (objective): 
+ +0.9976  +0.9694  +0.9976  +0.9662  +0.9576  
+ +0.8276  +0.9873  +0.8276  +0.6003  +0.6957  
+ +0.9980  +0.9673  +0.9980  +0.9512  +0.9584  
+ +0.9643  +0.8990  +0.9642  +1.0000  +0.9741  
+ +0.8076  +0.7270  +0.8076  +0.8287  +1.0000  
+RMS change in value vs utility:  0.0873219 
+Using OneThird : r^h_i = (2*rh + ri)/3 
+Estimate by 0 of risk-aware utility matrix: 
+ +0.9976  +0.9694  +0.9976  +0.9662  +0.9576  
+ +0.9192  +0.9946  +0.9192  +0.7813  +0.8443  
+ +0.9980  +0.9673  +0.9980  +0.9513  +0.9584  
+ +0.9442  +0.8707  +0.9442  +0.9990  +0.9564  
+ +0.9024  +0.8525  +0.9024  +0.9146  +1.0000  
+RMS change in util^h vs utility: 0.0677349 
+Estimate by 1 of risk-aware utility matrix: 
+ +0.9874  +0.8857  +0.9874  +0.8766  +0.8542  
+ +0.8276  +0.9873  +0.8276  +0.6003  +0.6957  
+ +0.9896  +0.8799  +0.9896  +0.8389  +0.8563  
+ +0.8109  +0.6822  +0.8109  +0.9930  +0.8390  
+ +0.7880  +0.7011  +0.7880  +0.8110  +1.0000  
+RMS change in util^h vs utility: 0.0826636 
+Estimate by 2 of risk-aware utility matrix: 
+ +0.9976  +0.9694  +0.9976  +0.9661  +0.9575  
+ +0.9191  +0.9946  +0.9192  +0.7812  +0.8442  
+ +0.9980  +0.9673  +0.9980  +0.9512  +0.9584  
+ +0.9441  +0.8706  +0.9441  +0.9990  +0.9563  
+ +0.9024  +0.8524  +0.9024  +0.9145  +1.0000  
+RMS change in util^h vs utility: 0.0676966 
+Estimate by 3 of risk-aware utility matrix: 
+ +0.9991  +0.9820  +0.9991  +0.9797  +0.9732  
+ +0.9330  +0.9957  +0.9330  +0.8085  +0.8666  
+ +0.9993  +0.9805  +0.9993  +0.9682  +0.9738  
+ +0.9643  +0.8990  +0.9642  +1.0000  +0.9741  
+ +0.9197  +0.8753  +0.9197  +0.9302  +1.0000  
+RMS change in util^h vs utility: 0.0783686 
+Estimate by 4 of risk-aware utility matrix: 
+ +0.9892  +0.9000  +0.9891  +0.8920  +0.8719  
+ +0.8433  +0.9886  +0.8433  +0.6313  +0.7211  
+ +0.9910  +0.8948  +0.9910  +0.8581  +0.8738  
+ +0.8337  +0.7145  +0.8337  +0.9940  +0.8590  
+ +0.8076  +0.7270  +0.8076  +0.8287  +1.0000  
+RMS change in util^h vs utility: 0.0699962 
+sDist [ 0, 1] = 1.26E+00    
+sDist [ 6, 7] = 6.26E-01    
+Fractional change compared to first step: 0.4956  (target=0.0200) 
+Starting Model::run iteration 8 
+In turn 7 actor 1 has most advantageous target 4 worth 0.150 
+Est by  1 of prob 0.6782 that [ 1> 4], with expected gain to  1 of +0.1501 
+Est by  1 of prob 0.6782 that [ 1> 4], with expected gain to  4 of -0.1539 
+Est by  4 of prob 0.6797 that [ 1> 4], with expected gain to  1 of +0.1383 
+In turn 7 Actor 2 has no advantageous targets 
+In turn 7 Actor 0 has no advantageous targets 
+Est by  4 of prob 0.6797 that [ 1> 4], with expected gain to  4 of -0.1412 
+ 
+Bargain [1144, 1:4] from 1's perspective (brgnIIJ) 
+   1 proposes 1 adopt:  42.110  55.240  62.290  
+   1 proposes 4 adopt:  42.110  55.240  62.290  
+ 
+Bargain [1145, 1:4] from 4's perspective (brgnIIJ) 
+   4 proposes 1 adopt:  56.210  41.850  35.680  
+   4 proposes 4 adopt:  56.210  41.850  35.670  
+ 
+Power-weighted compromise [1146, 1:4] bargain (brgnIJ) 
+     compromise proposes 1 adopt:  48.689  48.992  49.874  
+     compromise proposes 4 adopt:  48.689  48.992  49.870  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 7 actor 4 has most advantageous target 2 worth 0.125 
+Est by  4 of prob 0.7695 that [ 4> 2], with expected gain to  4 of +0.1253 
+Est by  4 of prob 0.7695 that [ 4> 2], with expected gain to  2 of -0.0764 
+Est by  2 of prob 0.8292 that [ 4> 2], with expected gain to  4 of +0.0724 
+Est by  2 of prob 0.8292 that [ 4> 2], with expected gain to  2 of -0.0294 
+ 
+Bargain [1147, 4:2] from 4's perspective (brgnIIJ) 
+   4 proposes 4 adopt:  55.650  41.110  35.130  
+   4 proposes 2 adopt:  55.650  41.110  35.130  
+ 
+Bargain [1148, 4:2] from 2's perspective (brgnIIJ) 
+   2 proposes 4 adopt:  39.100  43.150  48.090  
+   2 proposes 2 adopt:  39.100  43.150  48.090  
+ 
+Power-weighted compromise [1149, 4:2] bargain (brgnIJ) 
+     compromise proposes 4 adopt:  47.364  42.131  41.619  
+     compromise proposes 2 adopt:  47.364  42.131  41.619  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 7 actor 3 has most advantageous target 0 worth 0.023 
+Est by  3 of prob 0.7363 that [ 3> 0], with expected gain to  3 of +0.0229 
+Est by  3 of prob 0.7363 that [ 3> 0], with expected gain to  0 of -0.0125 
+Est by  0 of prob 0.7699 that [ 3> 0], with expected gain to  3 of +0.0377 
+Est by  0 of prob 0.7699 that [ 3> 0], with expected gain to  0 of -0.0215 
+ 
+Bargain [1150, 3:0] from 3's perspective (brgnIIJ) 
+   3 proposes 3 adopt:  41.290  24.890  28.090  
+   3 proposes 0 adopt:  41.290  24.890  28.090  
+ 
+Bargain [1151, 3:0] from 0's perspective (brgnIIJ) 
+   0 proposes 3 adopt:  38.900  43.060  48.110  
+   0 proposes 0 adopt:  38.900  43.060  48.110  
+ 
+Power-weighted compromise [1152, 3:0] bargain (brgnIJ) 
+     compromise proposes 3 adopt:  40.127  33.728  37.828  
+     compromise proposes 0 adopt:  40.127  33.728  37.828  
+ 
+Using InitOnlyInterp to form proposed bargains 
+Bargains to be resolved 
+Bargains involving actor  0: [1139, 0:0][1150, 3:0] 
+Bargains involving actor  1: [1140, 1:1][1144, 1:4] 
+Bargains involving actor  2: [1142, 2:2][1147, 4:2] 
+Bargains involving actor  3: [1141, 3:3][1150, 3:0] 
+Bargains involving actor  4: [1143, 4:4][1144, 1:4][1147, 4:2] 
+w: 
+ 117.70   93.20   61.40  135.40   63.80  
+u_im: 
+ 0.97767  0.97271  
+ 0.78771  0.74817  
+ 0.97458  0.96702  
+ 0.96031  0.96735  
+ 0.83419  0.83508  
+Doing scalarPCE for the 2 bargains of actor 0 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.978    +0.973  
+   +0.788    +0.748  
+   +0.975    +0.967  
+   +0.960    +0.967  
+   +0.834    +0.835  
+Coalition strengths of (i:j): 
+    0.000     2.370  
+    0.505     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.8243  
+ 0.1757  0.5000  
+Probability Opt_i 
+ 0.8243  
+ 0.1757  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1139 1 out of 2 bargains 
+u_im: 
+ 0.97767  0.98222  
+ 0.78771  0.82620  
+ 0.97458  0.97771  
+ 0.96031  0.94856  
+ 0.83419  0.80702  
+Doing scalarPCE for the 2 bargains of actor 1 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.978    +0.982  
+   +0.788    +0.826  
+   +0.975    +0.978  
+   +0.960    +0.949  
+   +0.834    +0.807  
+Coalition strengths of (i:j): 
+    0.000     1.663  
+    2.160     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.4350  
+ 0.5650  0.5000  
+Probability Opt_i 
+ 0.4350  
+ 0.5650  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1140 1 out of 2 bargains 
+u_im: 
+ 0.97767  0.97089  
+ 0.78771  0.76601  
+ 0.97458  0.96787  
+ 0.96031  0.96183  
+ 0.83419  0.86829  
+Doing scalarPCE for the 2 bargains of actor 2 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.978    +0.971  
+   +0.788    +0.766  
+   +0.975    +0.968  
+   +0.960    +0.962  
+   +0.834    +0.868  
+Coalition strengths of (i:j): 
+    0.000     1.617  
+    1.192     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.5756  
+ 0.4244  0.5000  
+Probability Opt_i 
+ 0.5756  
+ 0.4244  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1142 1 out of 2 bargains 
+u_im: 
+ 0.97767  0.97271  
+ 0.78771  0.74817  
+ 0.97458  0.96702  
+ 0.96031  0.96735  
+ 0.83419  0.83508  
+Doing scalarPCE for the 2 bargains of actor 3 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.978    +0.973  
+   +0.788    +0.748  
+   +0.975    +0.967  
+   +0.960    +0.967  
+   +0.834    +0.835  
+Coalition strengths of (i:j): 
+    0.000     2.370  
+    0.505     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.8243  
+ 0.1757  0.5000  
+Probability Opt_i 
+ 0.8243  
+ 0.1757  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1141 1 out of 2 bargains 
+u_im: 
+ 0.97767  0.98222  0.97089  
+ 0.78771  0.82620  0.76601  
+ 0.97458  0.97771  0.96787  
+ 0.96031  0.94856  0.96183  
+ 0.83419  0.80702  0.86829  
+Doing scalarPCE for the 3 bargains of actor 4 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.978    +0.982    +0.971  
+   +0.788    +0.826    +0.766  
+   +0.975    +0.978    +0.968  
+   +0.960    +0.949    +0.962  
+   +0.834    +0.807    +0.868  
+Coalition strengths of (i:j): 
+    0.000     1.663     1.617  
+    2.160     0.000     3.784  
+    1.192     2.860     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.4350  0.5756  
+ 0.5650  0.5000  0.5695  
+ 0.4244  0.4305  0.5000  
+Probability Opt_i 
+ 0.2403  
+ 0.4797  
+ 0.2800  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1144 2 out of 3 bargains 
+postn 0 , 0 : 
+ 38.9000  43.1600  48.1500  
+ideal 0 , 0 : 
+ 38.9744  42.9510  47.8808  
+postn-ideal distance  0,  0: 0.34885 
+postn 1 , 0 : 
+ 34.1100  56.3300  64.5900  
+ideal 1 , 0 : 
+ 34.3891  55.2713  63.2174  
+postn-ideal distance  1,  0: 1.75574 
+postn 2 , 0 : 
+ 38.9000  43.1600  48.1600  
+ideal 2 , 0 : 
+ 39.0688  40.6297  45.1074  
+postn-ideal distance  2,  0: 3.96853 
+postn 3 , 0 : 
+ 42.6000  24.2200  25.8300  
+ideal 3 , 0 : 
+ 42.8485  23.9845  25.1700  
+postn-ideal distance  3,  0: 0.74348 
+postn 4 , 0 : 
+ 42.1100  55.2400  62.2900  
+ideal 4 , 0 : 
+ 42.1100  55.2400  62.2900  
+postn-ideal distance  4,  0: 0.00000 
+postn-ideal distance RMS  0: 0.01975 
+rms (pstn, ideal) = 0.01975 
+Raw actor-pos value matrix (risk neutral) 
+ +0.998  +0.902  +0.998  +0.873  +0.915  
+ +0.883  +0.990  +0.883  +0.707  +0.961  
+ +0.979  +0.867  +0.979  +0.866  +0.881  
+ +0.815  +0.686  +0.815  +0.997  +0.699  
+ +0.925  +0.932  +0.925  +0.821  +1.000  
+Inferred risk attitudes: 
+ +1.000  
+ -0.500  
+ +1.000  
+ +0.860  
+ -0.215  
+Risk-aware actor-pos utility matrix (objective): 
+ +1.0000  +0.9905  +1.0000  +0.9839  +0.9928  
+ +0.8311  +0.9845  +0.8312  +0.6032  +0.9422  
+ +0.9996  +0.9824  +0.9996  +0.9821  +0.9858  
+ +0.9445  +0.8712  +0.9445  +0.9996  +0.8799  
+ +0.9104  +0.9184  +0.9105  +0.7892  +1.0000  
+RMS change in value vs utility:  0.0856454 
+Using OneThird : r^h_i = (2*rh + ri)/3 
+Estimate by 0 of risk-aware utility matrix: 
+ +1.0000  +0.9905  +1.0000  +0.9839  +0.9928  
+ +0.9346  +0.9948  +0.9346  +0.8105  +0.9797  
+ +0.9996  +0.9824  +0.9996  +0.9821  +0.9858  
+ +0.9586  +0.8913  +0.9586  +0.9999  +0.8995  
+ +0.9664  +0.9697  +0.9664  +0.9083  +1.0000  
+RMS change in util^h vs utility: 0.0600404 
+Estimate by 1 of risk-aware utility matrix: 
+ +0.9985  +0.9023  +0.9984  +0.8733  +0.9154  
+ +0.8311  +0.9845  +0.8312  +0.6032  +0.9422  
+ +0.9795  +0.8674  +0.9795  +0.8663  +0.8810  
+ +0.8075  +0.6759  +0.8075  +0.9968  +0.6891  
+ +0.8973  +0.9064  +0.8973  +0.7612  +1.0000  
+RMS change in util^h vs utility: 0.0843321 
+Estimate by 2 of risk-aware utility matrix: 
+ +1.0000  +0.9904  +1.0000  +0.9839  +0.9928  
+ +0.9345  +0.9948  +0.9346  +0.8104  +0.9797  
+ +0.9996  +0.9824  +0.9996  +0.9821  +0.9858  
+ +0.9585  +0.8913  +0.9585  +0.9998  +0.8995  
+ +0.9664  +0.9697  +0.9664  +0.9083  +1.0000  
+RMS change in util^h vs utility: 0.0600246 
+Estimate by 3 of risk-aware utility matrix: 
+ +0.9999  +0.9822  +0.9999  +0.9736  +0.9856  
+ +0.9249  +0.9938  +0.9249  +0.7911  +0.9762  
+ +0.9977  +0.9717  +0.9977  +0.9713  +0.9761  
+ +0.9445  +0.8712  +0.9445  +0.9996  +0.8799  
+ +0.9600  +0.9638  +0.9600  +0.8946  +1.0000  
+RMS change in util^h vs utility: 0.0539547 
+Estimate by 4 of risk-aware utility matrix: 
+ +0.9988  +0.9190  +0.9987  +0.8943  +0.9301  
+ +0.8508  +0.9865  +0.8508  +0.6426  +0.9494  
+ +0.9833  +0.8893  +0.9833  +0.8883  +0.9009  
+ +0.8362  +0.7168  +0.8362  +0.9974  +0.7291  
+ +0.9104  +0.9184  +0.9105  +0.7892  +1.0000  
+RMS change in util^h vs utility: 0.0677402 
+sDist [ 0, 1] = 1.26E+00    
+sDist [ 7, 8] = 3.52E-01    
+Fractional change compared to first step: 0.2788  (target=0.0200) 
+Starting Model::run iteration 9 
+In turn 8 actor 0 has most advantageous target 4 worth 0.001 
+turn 8 , i 0 , j 4 , bestEU worth 0.000769505 , piiJ  0.408259 
+Est by  0 of prob 0.4083 that [ 0> 4], with expected gain to  0 of +0.0008 
+Est by  0 of prob 0.4083 that [ 0> 4], with expected gain to  4 of -0.0036 
+Est by  4 of prob 0.7111 that [ 0> 4], with expected gain to  0 of +0.0387 
+Est by  4 of prob 0.7111 that [ 0> 4], with expected gain to  4 of -0.0505 
+ 
+Bargain [1158, 0:4] from 0's perspective (brgnIIJ) 
+   0 proposes 0 adopt:  41.340  50.700  58.680  
+   0 proposes 4 adopt:  41.340  50.700  58.680  
+ 
+Bargain [1159, 0:4] from 4's perspective (brgnIIJ) 
+   4 proposes 0 adopt:  42.110  55.210  62.270  
+   4 proposes 4 adopt:  42.110  55.220  62.270  
+ 
+Power-weighted compromise [1160, 0:4] bargain (brgnIJ) 
+     compromise proposes 0 adopt:  41.745  53.070  60.566  
+     compromise proposes 4 adopt:  41.745  53.075  60.566  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 8 actor 1 has most advantageous target 2 worth 0.105 
+Est by  1 of prob 0.7918 that [ 1> 2], with expected gain to  1 of +0.1051 
+Est by  1 of prob 0.7918 that [ 1> 2], with expected gain to  2 of -0.0768 
+Est by  2 of prob 0.9117 that [ 1> 2], with expected gain to  1 of +0.0522 
+Est by  2 of prob 0.9117 that [ 1> 2], with expected gain to  2 of -0.0149 
+ 
+Bargain [1161, 1:2] from 1's perspective (brgnIIJ) 
+   1 proposes 1 adopt:  34.510  55.730  64.070  
+   1 proposes 2 adopt:  34.510  55.730  64.070  
+ 
+Bargain [1162, 1:2] from 2's perspective (brgnIIJ) 
+   2 proposes 1 adopt:  38.890  43.220  48.270  
+   2 proposes 2 adopt:  38.890  43.220  48.260  
+ 
+Power-weighted compromise [1163, 1:2] bargain (brgnIJ) 
+     compromise proposes 1 adopt:  36.557  49.885  56.688  
+     compromise proposes 2 adopt:  36.557  49.885  56.683  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 8 actor 2 has most advantageous target 4 worth 0.002 
+turn 8 , i 2 , j 4 , bestEU worth 0.00192396 , piiJ  0.429585 
+Est by  2 of prob 0.4296 that [ 2> 4], with expected gain to  2 of +0.0019 
+Est by  2 of prob 0.4296 that [ 2> 4], with expected gain to  4 of -0.0047 
+Est by  4 of prob 0.6264 that [ 2> 4], with expected gain to  2 of +0.0360 
+Est by  4 of prob 0.6264 that [ 2> 4], with expected gain to  4 of -0.0391 
+ 
+Bargain [1164, 2:4] from 2's perspective (brgnIIJ) 
+   2 proposes 2 adopt:  41.370  48.720  56.220  
+   2 proposes 4 adopt:  41.370  48.720  56.220  
+ 
+Bargain [1165, 2:4] from 4's perspective (brgnIIJ) 
+   4 proposes 2 adopt:  42.110  55.210  62.260  
+   4 proposes 4 adopt:  42.110  55.210  62.260  
+ 
+Power-weighted compromise [1166, 2:4] bargain (brgnIJ) 
+     compromise proposes 2 adopt:  41.740  51.961  59.236  
+     compromise proposes 4 adopt:  41.740  51.961  59.236  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 8 actor 3 has most advantageous target 4 worth 0.080 
+Est by  3 of prob 0.7823 that [ 3> 4], with expected gain to  3 of +0.0804 
+Est by  3 of prob 0.7823 that [ 3> 4], with expected gain to  4 of -0.0708 
+Est by  4 of prob 0.8067 that [ 3> 4], with expected gain to  3 of +0.1901 
+Est by  4 of prob 0.8067 that [ 3> 4], with expected gain to  4 of -0.1494 
+ 
+Bargain [1167, 3:4] from 3's perspective (brgnIIJ) 
+   3 proposes 3 adopt:  42.440  24.750  28.980  
+   3 proposes 4 adopt:  42.440  24.750  28.980  
+ 
+Bargain [1168, 3:4] from 4's perspective (brgnIIJ) 
+   4 proposes 3 adopt:  42.110  49.130  60.710  
+   4 proposes 4 adopt:  42.110  49.130  60.720  
+ 
+Power-weighted compromise [1169, 3:4] bargain (brgnIJ) 
+     compromise proposes 3 adopt:  42.271  37.230  45.222  
+     compromise proposes 4 adopt:  42.271  37.230  45.227  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 8 actor 4 has most advantageous target 1 worth 0.054 
+Est by  4 of prob 0.8008 that [ 4> 1], with expected gain to  4 of +0.0536 
+Est by  4 of prob 0.8008 that [ 4> 1], with expected gain to  1 of -0.0244 
+Est by  1 of prob 0.8034 that [ 4> 1], with expected gain to  4 of +0.0619 
+Est by  1 of prob 0.8034 that [ 4> 1], with expected gain to  1 of -0.0280 
+ 
+Bargain [1170, 4:1] from 4's perspective (brgnIIJ) 
+   4 proposes 4 adopt:  41.920  55.410  62.630  
+   4 proposes 1 adopt:  41.920  55.410  62.630  
+ 
+Bargain [1171, 4:1] from 1's perspective (brgnIIJ) 
+   1 proposes 4 adopt:  34.200  56.330  64.590  
+   1 proposes 1 adopt:  34.200  56.330  64.590  
+ 
+Power-weighted compromise [1172, 4:1] bargain (brgnIJ) 
+     compromise proposes 4 adopt:  37.802  55.901  63.675  
+     compromise proposes 1 adopt:  37.802  55.901  63.675  
+ 
+Using InitOnlyInterp to form proposed bargains 
+Bargains to be resolved 
+Bargains involving actor  0: [1153, 0:0][1158, 0:4] 
+Bargains involving actor  1: [1154, 1:1][1161, 1:2][1170, 4:1] 
+Bargains involving actor  2: [1155, 2:2][1161, 1:2][1164, 2:4] 
+Bargains involving actor  3: [1156, 3:3][1167, 3:4] 
+Bargains involving actor  4: [1157, 4:4][1158, 0:4][1164, 2:4][1167, 3:4][1170, 4:1] 
+w: 
+ 117.70   93.20   61.40  135.40   63.80  
+u_im: 
+ 0.99345  0.99188  0.99386  
+ 0.83846  0.87202  0.83066  
+ 0.98989  0.98695  0.99043  
+ 0.92794  0.91481  0.92920  
+ 0.90570  0.90901  0.92100  
+Doing scalarPCE for the 3 bargains of actor 1 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.993    +0.992    +0.994  
+   +0.838    +0.872    +0.831  
+   +0.990    +0.987    +0.990  
+   +0.928    +0.915    +0.929  
+   +0.906    +0.909    +0.921  
+Coalition strengths of (i:j): 
+    0.000     1.071     0.364  
+    1.671     0.000     1.930  
+    0.615     1.580     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.3906  0.3715  
+ 0.6094  0.5000  0.5499  
+ 0.6285  0.4501  0.5000  
+Probability Opt_i 
+ 0.1460  
+ 0.5253  
+ 0.3287  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1170 3 out of 3 bargains 
+u_im: 
+ 0.99345  0.99356  0.99406  0.99246  0.99386  
+ 0.83846  0.85277  0.84398  0.77734  0.83066  
+ 0.98989  0.98980  0.99080  0.99019  0.99043  
+ 0.92794  0.92538  0.92975  0.95122  0.92920  
+ 0.90570  0.91219  0.90679  0.86752  0.92100  
+Doing scalarPCE for the 5 bargains of actor 4 ... 
+Num actors: 5 
+Num options: 5 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.993    +0.994    +0.994    +0.992    +0.994  
+   +0.838    +0.853    +0.844    +0.777    +0.831  
+   +0.990    +0.990    +0.991    +0.990    +0.990  
+   +0.928    +0.925    +0.930    +0.951    +0.929  
+   +0.906    +0.912    +0.907    +0.868    +0.921  
+Coalition strengths of (i:j): 
+    0.000     0.176     0.000     4.137     0.364  
+    0.880     0.000     0.582     5.028     1.030  
+    0.479     0.357     0.000     4.487     0.681  
+    1.587     1.763     1.454     0.000     1.492  
+    0.615     0.577     0.453     4.293     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.1667  0.0000  0.7228  0.3715  
+ 0.8333  0.5000  0.6199  0.7404  0.6410  
+ 1.0000  0.3801  0.5000  0.7552  0.6004  
+ 0.2772  0.2596  0.2448  0.5000  0.2579  
+ 0.6285  0.3590  0.3996  0.7421  0.5000  
+Probability Opt_i 
+ 0.0412  
+ 0.4520  
+ 0.2083  
+ 0.1320  
+ 0.1665  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1158 2 out of 5 bargains 
+u_im: 
+ 0.99345  0.99188  0.99406  
+ 0.83846  0.87202  0.84398  
+ 0.98989  0.98695  0.99080  
+ 0.92794  0.91481  0.92975  
+ 0.90570  0.90901  0.90679  
+Doing scalarPCE for the 3 bargains of actor 2 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.993    +0.992    +0.994  
+   +0.838    +0.872    +0.844  
+   +0.990    +0.987    +0.991  
+   +0.928    +0.915    +0.930  
+   +0.906    +0.909    +0.907  
+Coalition strengths of (i:j): 
+    0.000     1.071     0.000  
+    1.671     0.000     1.378  
+    0.479     1.258     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.3906  0.0000  
+ 0.6094  0.5000  0.5228  
+ 1.0000  0.4772  0.5000  
+Probability Opt_i 
+ 0.1155  
+ 0.5291  
+ 0.3554  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1164 3 out of 3 bargains 
+u_im: 
+ 0.99345  0.99246  
+ 0.83846  0.77734  
+ 0.98989  0.99019  
+ 0.92794  0.95122  
+ 0.90570  0.86752  
+Doing scalarPCE for the 2 bargains of actor 3 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.993    +0.992  
+   +0.838    +0.777  
+   +0.990    +0.990  
+   +0.928    +0.951  
+   +0.906    +0.868  
+Coalition strengths of (i:j): 
+    0.000     4.137  
+    1.587     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.7228  
+ 0.2772  0.5000  
+Probability Opt_i 
+ 0.7228  
+ 0.2772  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1167 2 out of 2 bargains 
+u_im: 
+ 0.99345  0.99356  
+ 0.83846  0.85277  
+ 0.98989  0.98980  
+ 0.92794  0.92538  
+ 0.90570  0.91219  
+Doing scalarPCE for the 2 bargains of actor 0 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.993    +0.994  
+   +0.838    +0.853  
+   +0.990    +0.990  
+   +0.928    +0.925  
+   +0.906    +0.912  
+Coalition strengths of (i:j): 
+    0.000     0.176  
+    0.880     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.1667  
+ 0.8333  0.5000  
+Probability Opt_i 
+ 0.1667  
+ 0.8333  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1153 1 out of 2 bargains 
+postn 0 , 0 : 
+ 38.9000  43.1600  48.1500  
+ideal 0 , 0 : 
+ 38.9097  43.1328  48.1150  
+postn-ideal distance  0,  0: 0.04535 
+postn 1 , 0 : 
+ 41.9200  55.4100  62.6300  
+ideal 1 , 0 : 
+ 40.3530  54.5275  61.7221  
+postn-ideal distance  1,  0: 2.01453 
+postn 2 , 0 : 
+ 41.3700  48.7200  56.2200  
+ideal 2 , 0 : 
+ 41.0028  43.8240  50.2340  
+postn-ideal distance  2,  0: 7.74191 
+postn 3 , 0 : 
+ 42.4400  24.7500  28.9800  
+ideal 3 , 0 : 
+ 42.6157  24.4208  27.3417  
+postn-ideal distance  3,  0: 1.68023 
+postn 4 , 0 : 
+ 41.3400  50.7000  58.6800  
+ideal 4 , 0 : 
+ 41.3400  50.7000  58.6800  
+postn-ideal distance  4,  0: 0.00000 
+postn-ideal distance RMS  0: 0.03656 
+rms (pstn, ideal) = 0.03656 
+Raw actor-pos value matrix (risk neutral) 
+ +1.000  +0.916  +0.956  +0.880  +0.944  
+ +0.894  +0.989  +0.950  +0.732  +0.969  
+ +0.983  +0.910  +0.960  +0.849  +0.944  
+ +0.821  +0.703  +0.766  +0.994  +0.747  
+ +0.948  +0.976  +0.988  +0.852  +1.000  
+Inferred risk attitudes: 
+ +1.000  
+ -0.500  
+ -0.031  
+ +0.345  
+ -0.150  
+Risk-aware actor-pos utility matrix (objective): 
+ +1.0000  +0.9929  +0.9980  +0.9856  +0.9968  
+ +0.8465  +0.9835  +0.9269  +0.6343  +0.9537  
+ +0.9829  +0.9072  +0.9589  +0.8455  +0.9422  
+ +0.8715  +0.7752  +0.8278  +0.9962  +0.8120  
+ +0.9409  +0.9720  +0.9865  +0.8327  +1.0000  
+RMS change in value vs utility:  0.0450535 
+Using OneThird : r^h_i = (2*rh + ri)/3 
+Estimate by 0 of risk-aware utility matrix: 
+ +1.0000  +0.9929  +0.9980  +0.9856  +0.9968  
+ +0.9413  +0.9944  +0.9740  +0.8303  +0.9839  
+ +0.9941  +0.9636  +0.9852  +0.9334  +0.9786  
+ +0.9357  +0.8663  +0.9060  +0.9987  +0.8945  
+ +0.9785  +0.9903  +0.9954  +0.9296  +1.0000  
+RMS change in util^h vs utility: 0.0633449 
+Estimate by 1 of risk-aware utility matrix: 
+ +0.9998  +0.9156  +0.9557  +0.8800  +0.9436  
+ +0.8465  +0.9835  +0.9269  +0.6343  +0.9537  
+ +0.9778  +0.8815  +0.9469  +0.8054  +0.9256  
+ +0.7885  +0.6576  +0.7267  +0.9929  +0.7054  
+ +0.9294  +0.9665  +0.9838  +0.8033  +1.0000  
+RMS change in util^h vs utility: 0.0520721 
+Estimate by 2 of risk-aware utility matrix: 
+ +0.9999  +0.9398  +0.9690  +0.9131  +0.9602  
+ +0.8762  +0.9870  +0.9416  +0.6957  +0.9632  
+ +0.9829  +0.9072  +0.9589  +0.8455  +0.9422  
+ +0.8346  +0.7229  +0.7828  +0.9947  +0.7646  
+ +0.9448  +0.9739  +0.9874  +0.8428  +1.0000  
+RMS change in util^h vs utility: 0.0307971 
+Estimate by 3 of risk-aware utility matrix: 
+ +0.9999  +0.9591  +0.9796  +0.9395  +0.9736  
+ +0.8999  +0.9897  +0.9534  +0.7448  +0.9707  
+ +0.9870  +0.9278  +0.9685  +0.8775  +0.9555  
+ +0.8715  +0.7752  +0.8278  +0.9962  +0.8120  
+ +0.9571  +0.9799  +0.9903  +0.8744  +1.0000  
+RMS change in util^h vs utility: 0.0310144 
+Estimate by 4 of risk-aware utility matrix: 
+ +0.9998  +0.9336  +0.9656  +0.9047  +0.9560  
+ +0.8686  +0.9861  +0.9379  +0.6801  +0.9608  
+ +0.9816  +0.9006  +0.9558  +0.8353  +0.9380  
+ +0.8229  +0.7063  +0.7686  +0.9943  +0.7495  
+ +0.9409  +0.9720  +0.9865  +0.8327  +1.0000  
+RMS change in util^h vs utility: 0.0347725 
+sDist [ 0, 1] = 1.26E+00    
+sDist [ 8, 9] = 2.73E-01    
+Fractional change compared to first step: 0.2158  (target=0.0200) 
+Starting Model::run iteration 10 
+In turn 9 actor 2 has most advantageous target 1 worth 0.020 
+Est by  2 of prob 0.6452 that [ 2> 1], with expected gain to  2 of +0.0201 
+Est by  2 of prob 0.6452 that [ 2> 1], with expected gain to  1 of -0.0176 
+Est by  1 of prob 0.6391 that [ 2> 1], with expected gain to  2 of +0.0247 
+Est by  1 of prob 0.6391 that [ 2> 1], with expected gain to  1 of -0.0214 
+ 
+Bargain [1177, 2:1] from 2's perspective (brgnIIJ) 
+   2 proposes 2 adopt:  41.470  50.760  58.720  
+   2 proposes 1 adopt:  41.470  50.760  58.720  
+ 
+Bargain [1178, 2:1] from 1's perspective (brgnIIJ) 
+   1 proposes 2 adopt:  41.920  55.410  62.630  
+   1 proposes 1 adopt:  41.920  55.410  62.630  
+ 
+Power-weighted compromise [1179, 2:1] bargain (brgnIJ) 
+     compromise proposes 2 adopt:  41.710  53.237  60.803  
+     compromise proposes 1 adopt:  41.710  53.237  60.803  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 9 actor 0 has most advantageous target 2 worth 0.002 
+Est by  0 of prob 0.9225 that [ 0> 2], with expected gain to  0 of +0.0017 
+Est by  0 of prob 0.9225 that [ 0> 2], with expected gain to  2 of +0.0078 
+Est by  2 of prob 1.0000 that [ 0> 2], with expected gain to  0 of +0.0309 
+Est by  2 of prob 1.0000 that [ 0> 2], with expected gain to  2 of +0.0240 
+ 
+Bargain [1180, 0:2] from 0's perspective (brgnIIJ) 
+   0 proposes 0 adopt:  38.910  43.220  48.250  
+   0 proposes 2 adopt:  38.910  43.220  48.250  
+ 
+Bargain [1181, 0:2] from 2's perspective (brgnIIJ) 
+   2 proposes 0 adopt:  41.370  48.720  56.220  
+   2 proposes 2 adopt:  41.370  48.720  56.220  
+ 
+Power-weighted compromise [1182, 0:2] bargain (brgnIJ) 
+     compromise proposes 0 adopt:  40.204  46.114  52.443  
+     compromise proposes 2 adopt:  40.204  46.114  52.443  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 9 actor 1 has most advantageous target 0 worth 0.069 
+Est by  1 of prob 0.6336 that [ 1> 0], with expected gain to  1 of +0.0687 
+Est by  1 of prob 0.6336 that [ 1> 0], with expected gain to  0 of -0.0422 
+Est by  0 of prob 0.9164 that [ 1> 0], with expected gain to  1 of +0.0471 
+Est by  0 of prob 0.9164 that [ 1> 0], with expected gain to  0 of -0.0063 
+ 
+Bargain [1183, 1:0] from 1's perspective (brgnIIJ) 
+   1 proposes 1 adopt:  40.850  53.900  61.490  
+   1 proposes 0 adopt:  40.850  53.900  61.490  
+ 
+Bargain [1184, 1:0] from 0's perspective (brgnIIJ) 
+   0 proposes 1 adopt:  38.900  43.230  48.290  
+   0 proposes 0 adopt:  38.900  43.230  48.290  
+ 
+Power-weighted compromise [1185, 1:0] bargain (brgnIJ) 
+     compromise proposes 1 adopt:  39.989  49.191  55.664  
+     compromise proposes 0 adopt:  39.989  49.191  55.664  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 9 actor 4 has most advantageous target 1 worth 0.019 
+Est by  4 of prob 0.8173 that [ 4> 1], with expected gain to  4 of +0.0191 
+Est by  4 of prob 0.8173 that [ 4> 1], with expected gain to  1 of -0.0173 
+Est by  1 of prob 0.8146 that [ 4> 1], with expected gain to  4 of +0.0228 
+Est by  1 of prob 0.8146 that [ 4> 1], with expected gain to  1 of -0.0203 
+ 
+Bargain [1186, 4:1] from 4's perspective (brgnIIJ) 
+   4 proposes 4 adopt:  41.350  51.310  59.170  
+   4 proposes 1 adopt:  41.350  51.310  59.170  
+ 
+Bargain [1187, 4:1] from 1's perspective (brgnIIJ) 
+   1 proposes 4 adopt:  41.920  55.410  62.630  
+   1 proposes 1 adopt:  41.920  55.410  62.630  
+ 
+Power-weighted compromise [1188, 4:1] bargain (brgnIJ) 
+     compromise proposes 4 adopt:  41.654  53.497  61.016  
+     compromise proposes 1 adopt:  41.654  53.497  61.016  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 9 actor 3 has most advantageous target 4 worth 0.139 
+Est by  3 of prob 0.8358 that [ 3> 4], with expected gain to  3 of +0.1386 
+Est by  3 of prob 0.8358 that [ 3> 4], with expected gain to  4 of -0.0945 
+Est by  4 of prob 0.8367 that [ 3> 4], with expected gain to  3 of +0.1845 
+Est by  4 of prob 0.8367 that [ 3> 4], with expected gain to  4 of -0.1261 
+ 
+Bargain [1189, 3:4] from 3's perspective (brgnIIJ) 
+   3 proposes 3 adopt:  42.220  24.970  30.320  
+   3 proposes 4 adopt:  42.220  24.970  30.320  
+ 
+Bargain [1190, 3:4] from 4's perspective (brgnIIJ) 
+   4 proposes 3 adopt:  41.350  45.880  57.480  
+   4 proposes 4 adopt:  41.350  45.880  57.490  
+ 
+Power-weighted compromise [1191, 3:4] bargain (brgnIJ) 
+     compromise proposes 3 adopt:  41.775  35.673  44.223  
+     compromise proposes 4 adopt:  41.775  35.673  44.228  
+ 
+Using InitOnlyInterp to form proposed bargains 
+Bargains to be resolved 
+Bargains involving actor  0: [1173, 0:0][1180, 0:2][1183, 1:0] 
+Bargains involving actor  1: [1174, 1:1][1177, 2:1][1183, 1:0][1186, 4:1] 
+Bargains involving actor  2: [1174, 2:2][1177, 2:1][1180, 0:2] 
+Bargains involving actor  3: [1175, 3:3][1189, 3:4] 
+Bargains involving actor  4: [1176, 4:4][1186, 4:1][1189, 3:4] 
+w: 
+ 117.70   93.20   61.40  135.40   63.80  
+u_im: 
+ 0.99467  0.99506  0.99391  
+ 0.86899  0.85328  0.89992  
+ 0.92732  0.93227  0.91662  
+ 0.85653  0.86508  0.84199  
+ 0.94643  0.93749  0.95606  
+Doing scalarPCE for the 3 bargains of actor 0 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.995    +0.995    +0.994  
+   +0.869    +0.853    +0.900  
+   +0.927    +0.932    +0.917  
+   +0.857    +0.865    +0.842  
+   +0.946    +0.937    +0.956  
+Coalition strengths of (i:j): 
+    0.000     1.018     1.358  
+    0.754     0.000     2.112  
+    1.750     2.771     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.5744  0.4370  
+ 0.4256  0.5000  0.4326  
+ 0.5630  0.5674  0.5000  
+Probability Opt_i 
+ 0.2390  
+ 0.2701  
+ 0.4909  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1183 3 out of 3 bargains 
+u_im: 
+ 0.99467  0.99518  0.99391  0.99530  
+ 0.86899  0.86860  0.89992  0.86588  
+ 0.92732  0.93082  0.91662  0.93255  
+ 0.85653  0.86054  0.84199  0.86201  
+ 0.94643  0.95420  0.95606  0.95062  
+Doing scalarPCE for the 4 bargains of actor 1 ... 
+Num actors: 5 
+Num options: 4 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.995    +0.995    +0.994    +0.995  
+   +0.869    +0.869    +0.900    +0.866  
+   +0.927    +0.931    +0.917    +0.933  
+   +0.857    +0.861    +0.842    +0.862  
+   +0.946    +0.954    +0.956    +0.951  
+Coalition strengths of (i:j): 
+    0.000     0.018     1.358     0.145  
+    0.657     0.000     1.767     0.241  
+    1.750     1.520     0.000     1.762  
+    0.703     0.160     1.927     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.0272  0.4370  0.1713  
+ 0.9728  0.5000  0.5376  0.6014  
+ 0.5630  0.4624  0.5000  0.4776  
+ 0.8287  0.3986  0.5224  0.5000  
+Probability Opt_i 
+ 0.0604  
+ 0.2723  
+ 0.4370  
+ 0.2303  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1186 4 out of 4 bargains 
+u_im: 
+ 0.99467  0.99518  0.99506  
+ 0.86899  0.86860  0.85328  
+ 0.92732  0.93082  0.93227  
+ 0.85653  0.86054  0.86508  
+ 0.94643  0.95420  0.93749  
+Doing scalarPCE for the 3 bargains of actor 2 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.995    +0.995    +0.995  
+   +0.869    +0.869    +0.853  
+   +0.927    +0.931    +0.932  
+   +0.857    +0.861    +0.865  
+   +0.946    +0.954    +0.937  
+Coalition strengths of (i:j): 
+    0.000     0.018     1.018  
+    0.657     0.000     1.254  
+    0.754     0.352     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.0272  0.5744  
+ 0.9728  0.5000  0.7809  
+ 0.4256  0.2191  0.5000  
+Probability Opt_i 
+ 0.0630  
+ 0.7060  
+ 0.2311  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1177 2 out of 3 bargains 
+u_im: 
+ 0.99467  0.99276  
+ 0.86899  0.80793  
+ 0.92732  0.90974  
+ 0.85653  0.89216  
+ 0.94643  0.91465  
+Doing scalarPCE for the 2 bargains of actor 3 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.995    +0.993  
+   +0.869    +0.808  
+   +0.927    +0.910  
+   +0.857    +0.892  
+   +0.946    +0.915  
+Coalition strengths of (i:j): 
+    0.000     4.523  
+    2.416     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.6519  
+ 0.3481  0.5000  
+Probability Opt_i 
+ 0.6519  
+ 0.3481  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1175 1 out of 2 bargains 
+u_im: 
+ 0.99467  0.99530  0.99276  
+ 0.86899  0.86588  0.80793  
+ 0.92732  0.93255  0.90974  
+ 0.85653  0.86201  0.89216  
+ 0.94643  0.95062  0.91465  
+Doing scalarPCE for the 3 bargains of actor 4 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.995    +0.995    +0.993  
+   +0.869    +0.866    +0.808  
+   +0.927    +0.933    +0.910  
+   +0.857    +0.862    +0.892  
+   +0.946    +0.951    +0.915  
+Coalition strengths of (i:j): 
+    0.000     0.145     4.523  
+    0.703     0.000     4.708  
+    2.416     2.043     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.1713  0.6519  
+ 0.8287  0.5000  0.6974  
+ 0.3481  0.3026  0.5000  
+Probability Opt_i 
+ 0.1686  
+ 0.5453  
+ 0.2861  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1189 3 out of 3 bargains 
+postn 0 , 0 : 
+ 40.8500  53.9000  61.4900  
+ideal 0 , 0 : 
+ 40.5978  52.5003  59.7513  
+postn-ideal distance  0,  0: 2.24636 
+postn 1 , 0 : 
+ 41.3500  51.3100  59.1700  
+ideal 1 , 0 : 
+ 41.1355  52.0705  59.7918  
+postn-ideal distance  1,  0: 1.00544 
+postn 2 , 0 : 
+ 41.4700  50.7600  58.7200  
+ideal 2 , 0 : 
+ 41.4933  45.8528  52.9869  
+postn-ideal distance  2,  0: 7.54651 
+postn 3 , 0 : 
+ 42.4400  24.7500  28.9800  
+ideal 3 , 0 : 
+ 42.5155  24.6085  28.2755  
+postn-ideal distance  3,  0: 0.72250 
+postn 4 , 0 : 
+ 42.2200  24.9700  30.3200  
+ideal 4 , 0 : 
+ 42.2200  24.9700  30.3200  
+postn-ideal distance  4,  0: 0.00000 
+postn-ideal distance RMS  0: 0.03565 
+rms (pstn, ideal) = 0.03565 
+Raw actor-pos value matrix (risk neutral) 
+ +0.990  +0.991  +0.988  +0.820  +0.823  
+ +0.985  +0.994  +0.989  +0.752  +0.758  
+ +0.938  +0.957  +0.961  +0.832  +0.837  
+ +0.720  +0.744  +0.749  +0.998  +0.993  
+ +0.839  +0.852  +0.855  +0.995  +1.000  
+Inferred risk attitudes: 
+ -0.500  
+ +0.615  
+ +0.666  
+ +0.882  
+ +1.000  
+Risk-aware actor-pos utility matrix (objective): 
+ +0.9856  +0.9867  +0.9820  +0.7459  +0.7505  
+ +0.9939  +0.9976  +0.9958  +0.8667  +0.8706  
+ +0.9765  +0.9843  +0.9858  +0.9253  +0.9278  
+ +0.8975  +0.9118  +0.9147  +0.9997  +0.9991  
+ +0.9740  +0.9782  +0.9790  +1.0000  +1.0000  
+RMS change in value vs utility:  0.088033 
+Using OneThird : r^h_i = (2*rh + ri)/3 
+Estimate by 0 of risk-aware utility matrix: 
+ +0.9856  +0.9867  +0.9820  +0.7459  +0.7505  
+ +0.9826  +0.9929  +0.9879  +0.7280  +0.7341  
+ +0.9310  +0.9521  +0.9565  +0.8169  +0.8215  
+ +0.7116  +0.7362  +0.7414  +0.9974  +0.9927  
+ +0.8389  +0.8524  +0.8552  +0.9951  +1.0000  
+RMS change in util^h vs utility: 0.0916693 
+Estimate by 1 of risk-aware utility matrix: 
+ +0.9927  +0.9933  +0.9909  +0.8558  +0.8587  
+ +0.9939  +0.9976  +0.9958  +0.8667  +0.8706  
+ +0.9746  +0.9829  +0.9846  +0.9206  +0.9231  
+ +0.8617  +0.8779  +0.8813  +0.9993  +0.9979  
+ +0.9394  +0.9460  +0.9473  +0.9987  +1.0000  
+RMS change in util^h vs utility: 0.0350993 
+Estimate by 2 of risk-aware utility matrix: 
+ +0.9930  +0.9936  +0.9913  +0.8608  +0.8637  
+ +0.9944  +0.9978  +0.9962  +0.8730  +0.8768  
+ +0.9765  +0.9843  +0.9858  +0.9253  +0.9278  
+ +0.8685  +0.8844  +0.8876  +0.9993  +0.9981  
+ +0.9439  +0.9502  +0.9515  +0.9989  +1.0000  
+RMS change in util^h vs utility: 0.0352303 
+Estimate by 3 of risk-aware utility matrix: 
+ +0.9944  +0.9948  +0.9930  +0.8821  +0.8846  
+ +0.9966  +0.9987  +0.9977  +0.8998  +0.9033  
+ +0.9850  +0.9903  +0.9913  +0.9454  +0.9474  
+ +0.8975  +0.9118  +0.9147  +0.9997  +0.9991  
+ +0.9634  +0.9683  +0.9693  +0.9996  +1.0000  
+RMS change in util^h vs utility: 0.0400831 
+Estimate by 4 of risk-aware utility matrix: 
+ +0.9951  +0.9955  +0.9939  +0.8937  +0.8960  
+ +0.9978  +0.9992  +0.9985  +0.9145  +0.9177  
+ +0.9896  +0.9935  +0.9943  +0.9564  +0.9581  
+ +0.9134  +0.9268  +0.9295  +0.9999  +0.9997  
+ +0.9740  +0.9782  +0.9790  +1.0000  +1.0000  
+RMS change in util^h vs utility: 0.0450495 
+sDist [ 0, 1] = 1.26E+00    
+sDist [ 9,10] = 6.42E-01    
+Fractional change compared to first step: 0.5080  (target=0.0200) 
+Starting Model::run iteration 11 
+In turn 10 actor 0 has most advantageous target 4 worth 0.137 
+Est by  0 of prob 0.7228 that [ 0> 4], with expected gain to  0 of +0.1368 
+Est by  0 of prob 0.7228 that [ 0> 4], with expected gain to  4 of -0.0938 
+Est by  4 of prob 0.8761 that [ 0> 4], with expected gain to  0 of +0.0806 
+Est by  4 of prob 0.8761 that [ 0> 4], with expected gain to  4 of -0.0211 
+ 
+Bargain [1197, 0:4] from 0's perspective (brgnIIJ) 
+   0 proposes 0 adopt:  41.100  50.890  56.200  
+   0 proposes 4 adopt:  41.100  50.890  56.200  
+ 
+Bargain [1198, 0:4] from 4's perspective (brgnIIJ) 
+   4 proposes 0 adopt:  42.210  25.250  30.490  
+   4 proposes 4 adopt:  42.210  25.250  30.490  
+ 
+Power-weighted compromise [1199, 0:4] bargain (brgnIJ) 
+     compromise proposes 0 adopt:  41.683  37.418  42.691  
+     compromise proposes 4 adopt:  41.683  37.418  42.691  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 10 actor 1 has most advantageous target 4 worth 0.085 
+Est by  1 of prob 0.7829 that [ 1> 4], with expected gain to  1 of +0.0854 
+Est by  1 of prob 0.7829 that [ 1> 4], with expected gain to  4 of -0.0363 
+Est by  4 of prob 0.8467 that [ 1> 4], with expected gain to  1 of +0.0626 
+Est by  4 of prob 0.8467 that [ 1> 4], with expected gain to  4 of -0.0167 
+ 
+Bargain [1200, 1:4] from 1's perspective (brgnIIJ) 
+   1 proposes 1 adopt:  41.490  50.650  58.400  
+   1 proposes 4 adopt:  41.490  50.650  58.400  
+ 
+Bargain [1201, 1:4] from 4's perspective (brgnIIJ) 
+   4 proposes 1 adopt:  42.220  25.320  30.680  
+   4 proposes 4 adopt:  42.220  25.320  30.680  
+ 
+Power-weighted compromise [1202, 1:4] bargain (brgnIJ) 
+     compromise proposes 1 adopt:  41.831  38.831  45.466  
+     compromise proposes 4 adopt:  41.831  38.831  45.466  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 10 actor 4 has most advantageous target 2 worth 0.004 
+turn 10 , i 4 , j 2 , bestEU worth 0.00352921 , piiJ  0.449996 
+Est by  4 of prob 0.4500 that [ 4> 2], with expected gain to  4 of +0.0035 
+Est by  4 of prob 0.4500 that [ 4> 2], with expected gain to  2 of -0.0061 
+Est by  2 of prob 0.5396 that [ 4> 2], with expected gain to  4 of +0.0147 
+Est by  2 of prob 0.5396 that [ 4> 2], with expected gain to  2 of -0.0176 
+ 
+Bargain [1203, 4:2] from 4's perspective (brgnIIJ) 
+   4 proposes 4 adopt:  41.890  44.450  49.200  
+   4 proposes 2 adopt:  41.890  44.450  49.200  
+ 
+Bargain [1204, 4:2] from 2's perspective (brgnIIJ) 
+   2 proposes 4 adopt:  41.470  50.760  58.710  
+   2 proposes 2 adopt:  41.470  50.760  58.720  
+ 
+Power-weighted compromise [1205, 4:2] bargain (brgnIJ) 
+     compromise proposes 4 adopt:  41.680  47.609  53.961  
+     compromise proposes 2 adopt:  41.680  47.609  53.966  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 10 actor 2 has most advantageous target 4 worth 0.011 
+turn 10 , i 2 , j 4 , bestEU worth 0.0108265 , piiJ  0.460449 
+Est by  2 of prob 0.4604 that [ 2> 4], with expected gain to  2 of +0.0108 
+Est by  2 of prob 0.4604 that [ 2> 4], with expected gain to  4 of -0.0090 
+Est by  4 of prob 0.5500 that [ 2> 4], with expected gain to  2 of +0.0116 
+Est by  4 of prob 0.5500 that [ 2> 4], with expected gain to  4 of -0.0067 
+ 
+Bargain [1206, 2:4] from 2's perspective (brgnIIJ) 
+   2 proposes 2 adopt:  42.010  40.460  44.280  
+   2 proposes 4 adopt:  42.010  40.460  44.280  
+ 
+Bargain [1207, 2:4] from 4's perspective (brgnIIJ) 
+   4 proposes 2 adopt:  42.220  24.980  30.330  
+   4 proposes 4 adopt:  42.220  24.980  30.330  
+ 
+Power-weighted compromise [1208, 2:4] bargain (brgnIJ) 
+     compromise proposes 2 adopt:  42.115  32.730  37.314  
+     compromise proposes 4 adopt:  42.115  32.730  37.314  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 10 actor 3 has most advantageous target 2 worth 0.068 
+Est by  3 of prob 0.8682 that [ 3> 2], with expected gain to  3 of +0.0681 
+Est by  3 of prob 0.8682 that [ 3> 2], with expected gain to  2 of -0.0367 
+Est by  2 of prob 0.8644 that [ 3> 2], with expected gain to  3 of +0.0888 
+Est by  2 of prob 0.8644 that [ 3> 2], with expected gain to  2 of -0.0481 
+ 
+Bargain [1209, 3:2] from 3's perspective (brgnIIJ) 
+   3 proposes 3 adopt:  42.370  25.020  30.050  
+   3 proposes 2 adopt:  42.370  25.030  30.050  
+ 
+Bargain [1210, 3:2] from 2's perspective (brgnIIJ) 
+   2 proposes 3 adopt:  41.470  50.240  58.550  
+   2 proposes 2 adopt:  41.470  50.240  58.550  
+ 
+Power-weighted compromise [1211, 3:2] bargain (brgnIJ) 
+     compromise proposes 3 adopt:  41.909  37.946  44.657  
+     compromise proposes 2 adopt:  41.909  37.951  44.657  
+ 
+Using InitOnlyInterp to form proposed bargains 
+Bargains to be resolved 
+Bargains involving actor  0: [1192, 0:0][1197, 0:4] 
+Bargains involving actor  1: [1193, 1:1][1200, 1:4] 
+Bargains involving actor  2: [1194, 2:2][1203, 4:2][1206, 2:4][1209, 3:2] 
+Bargains involving actor  3: [1195, 3:3][1209, 3:2] 
+Bargains involving actor  4: [1196, 4:4][1200, 1:4][1197, 0:4][1203, 4:2][1206, 2:4] 
+w: 
+ 117.70   93.20   61.40  135.40   63.80  
+u_im: 
+ 0.89017  0.93404  
+ 0.94492  0.96874  
+ 0.95996  0.97409  
+ 0.94458  0.93148  
+ 0.98626  0.98361  
+Doing scalarPCE for the 2 bargains of actor 0 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.890    +0.934  
+   +0.945    +0.969  
+   +0.960    +0.974  
+   +0.945    +0.931  
+   +0.986    +0.984  
+Coalition strengths of (i:j): 
+    0.000     0.971  
+    4.131     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.1903  
+ 0.8097  0.5000  
+Probability Opt_i 
+ 0.1903  
+ 0.8097  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1197 2 out of 2 bargains 
+u_im: 
+ 0.89017  0.93500  
+ 0.94492  0.96934  
+ 0.95996  0.97209  
+ 0.94458  0.92855  
+ 0.98626  0.98235  
+Doing scalarPCE for the 2 bargains of actor 1 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.890    +0.935  
+   +0.945    +0.969  
+   +0.960    +0.972  
+   +0.945    +0.929  
+   +0.986    +0.982  
+Coalition strengths of (i:j): 
+    0.000     1.210  
+    4.155     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.2255  
+ 0.7745  0.5000  
+Probability Opt_i 
+ 0.2255  
+ 0.7745  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1200 2 out of 2 bargains 
+u_im: 
+ 0.89017  0.91064  0.89544  0.84463  
+ 0.94492  0.95841  0.95084  0.92050  
+ 0.95996  0.97473  0.96992  0.94874  
+ 0.94458  0.94042  0.94684  0.96137  
+ 0.98626  0.98614  0.98786  0.99045  
+Doing scalarPCE for the 4 bargains of actor 2 ... 
+Num actors: 5 
+Num options: 4 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.890    +0.911    +0.895    +0.845  
+   +0.945    +0.958    +0.951    +0.920  
+   +0.960    +0.975    +0.970    +0.949  
+   +0.945    +0.940    +0.947    +0.961  
+   +0.986    +0.986    +0.988    +0.990  
+Coalition strengths of (i:j): 
+    0.000     0.285     0.000     4.168  
+    2.288     0.000     1.395     6.469  
+    1.097     0.490     0.000     5.064  
+    1.271     1.556     1.066     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.1107  0.0000  0.7663  
+ 0.8893  0.5000  0.7402  0.8061  
+ 1.0000  0.2598  0.5000  0.8260  
+ 0.2337  0.1939  0.1740  0.5000  
+Probability Opt_i 
+ 0.0325  
+ 0.7072  
+ 0.1428  
+ 0.1175  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1203 2 out of 4 bargains 
+u_im: 
+ 0.89017  0.84463  
+ 0.94492  0.92050  
+ 0.95996  0.94874  
+ 0.94458  0.96137  
+ 0.98626  0.99045  
+Doing scalarPCE for the 2 bargains of actor 3 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.890    +0.845  
+   +0.945    +0.920  
+   +0.960    +0.949  
+   +0.945    +0.961  
+   +0.986    +0.990  
+Coalition strengths of (i:j): 
+    0.000     4.168  
+    1.271     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.7663  
+ 0.2337  0.5000  
+Probability Opt_i 
+ 0.7663  
+ 0.2337  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1195 1 out of 2 bargains 
+u_im: 
+ 0.89017  0.93500  0.93404  0.91064  0.89544  
+ 0.94492  0.96934  0.96874  0.95841  0.95084  
+ 0.95996  0.97209  0.97409  0.97473  0.96992  
+ 0.94458  0.92855  0.93148  0.94042  0.94684  
+ 0.98626  0.98235  0.98361  0.98614  0.98786  
+Doing scalarPCE for the 5 bargains of actor 4 ... 
+Num actors: 5 
+Num options: 5 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.890    +0.935    +0.934    +0.911    +0.895  
+   +0.945    +0.969    +0.969    +0.958    +0.951  
+   +0.960    +0.972    +0.974    +0.975    +0.970  
+   +0.945    +0.929    +0.931    +0.940    +0.947  
+   +0.986    +0.982    +0.984    +0.986    +0.988  
+Coalition strengths of (i:j): 
+    0.000     1.210     0.971     0.285     0.000  
+    4.155     0.000     0.085     1.944     3.261  
+    4.131     0.300     0.000     1.859     3.237  
+    2.288     1.006     0.706     0.000     1.395  
+    1.097     1.415     1.176     0.490     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.2255  0.1903  0.1107  0.0000  
+ 0.7745  0.5000  0.2205  0.6590  0.6974  
+ 0.8097  0.7795  0.5000  0.7249  0.7335  
+ 0.8893  0.3410  0.2751  0.5000  0.7402  
+ 1.0000  0.3026  0.2665  0.2598  0.5000  
+Probability Opt_i 
+ 0.0422  
+ 0.2197  
+ 0.4956  
+ 0.1221  
+ 0.1204  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1206 5 out of 5 bargains 
+postn 0 , 0 : 
+ 41.1000  50.8900  56.2000  
+ideal 0 , 0 : 
+ 41.0347  51.0993  56.6617  
+postn-ideal distance  0,  0: 0.51109 
+postn 1 , 0 : 
+ 41.4900  50.6500  58.4000  
+ideal 1 , 0 : 
+ 41.3989  50.9225  58.4965  
+postn-ideal distance  1,  0: 0.30309 
+postn 2 , 0 : 
+ 41.8900  44.4500  49.2000  
+ideal 2 , 0 : 
+ 41.8742  42.1976  47.4045  
+postn-ideal distance  2,  0: 2.88050 
+postn 3 , 0 : 
+ 42.4400  24.7500  28.9800  
+ideal 3 , 0 : 
+ 42.4725  24.6891  28.6771  
+postn-ideal distance  3,  0: 0.31067 
+postn 4 , 0 : 
+ 42.0100  40.4600  44.2800  
+ideal 4 , 0 : 
+ 42.0100  40.4600  44.2800  
+postn-ideal distance  4,  0: 0.00000 
+postn-ideal distance RMS  0: 0.01323 
+rms (pstn, ideal) = 0.01323 
+Raw actor-pos value matrix (risk neutral) 
+ +0.998  +0.993  +0.956  +0.832  +0.930  
+ +0.988  +0.998  +0.934  +0.762  +0.896  
+ +0.933  +0.929  +0.984  +0.865  +0.983  
+ +0.751  +0.751  +0.813  +0.999  +0.851  
+ +0.940  +0.936  +0.976  +0.916  +1.000  
+Inferred risk attitudes: 
+ -0.491  
+ -0.500  
+ +0.530  
+ +0.224  
+ +1.000  
+Risk-aware actor-pos utility matrix (objective): 
+ +0.9971  +0.9895  +0.9358  +0.7631  +0.8976  
+ +0.9818  +0.9970  +0.9029  +0.6717  +0.8497  
+ +0.9663  +0.9642  +0.9922  +0.9268  +0.9919  
+ +0.7934  +0.7931  +0.8470  +0.9992  +0.8798  
+ +0.9964  +0.9959  +0.9994  +0.9930  +1.0000  
+RMS change in value vs utility:  0.0412534 
+Using OneThird : r^h_i = (2*rh + ri)/3 
+Estimate by 0 of risk-aware utility matrix: 
+ +0.9971  +0.9895  +0.9358  +0.7631  +0.8976  
+ +0.9818  +0.9970  +0.9033  +0.6728  +0.8502  
+ +0.9240  +0.9195  +0.9814  +0.8472  +0.9805  
+ +0.7043  +0.7039  +0.7744  +0.9987  +0.8194  
+ +0.9404  +0.9362  +0.9765  +0.9165  +1.0000  
+RMS change in util^h vs utility: 0.0439199 
+Estimate by 1 of risk-aware utility matrix: 
+ +0.9971  +0.9895  +0.9355  +0.7622  +0.8972  
+ +0.9818  +0.9970  +0.9029  +0.6717  +0.8497  
+ +0.9236  +0.9191  +0.9813  +0.8465  +0.9804  
+ +0.7032  +0.7028  +0.7735  +0.9986  +0.8187  
+ +0.9400  +0.9359  +0.9764  +0.9161  +1.0000  
+RMS change in util^h vs utility: 0.0443596 
+Estimate by 2 of risk-aware utility matrix: 
+ +0.9984  +0.9943  +0.9642  +0.8583  +0.9421  
+ +0.9901  +0.9984  +0.9454  +0.7962  +0.9136  
+ +0.9663  +0.9642  +0.9922  +0.9268  +0.9919  
+ +0.8315  +0.8312  +0.8780  +0.9994  +0.9056  
+ +0.9788  +0.9771  +0.9922  +0.9689  +1.0000  
+RMS change in util^h vs utility: 0.0395793 
+Estimate by 3 of risk-aware utility matrix: 
+ +0.9980  +0.9928  +0.9557  +0.8298  +0.9287  
+ +0.9876  +0.9980  +0.9328  +0.7592  +0.8946  
+ +0.9536  +0.9508  +0.9890  +0.9030  +0.9885  
+ +0.7934  +0.7931  +0.8470  +0.9992  +0.8798  
+ +0.9673  +0.9649  +0.9875  +0.9532  +1.0000  
+RMS change in util^h vs utility: 0.0289138 
+Estimate by 4 of risk-aware utility matrix: 
+ +0.9990  +0.9965  +0.9773  +0.9022  +0.9626  
+ +0.9938  +0.9990  +0.9647  +0.8529  +0.9427  
+ +0.9858  +0.9847  +0.9972  +0.9634  +0.9971  
+ +0.8899  +0.8897  +0.9256  +0.9997  +0.9452  
+ +0.9964  +0.9959  +0.9994  +0.9930  +1.0000  
+RMS change in util^h vs utility: 0.063917 
+sDist [ 0, 1] = 1.26E+00    
+sDist [10,11] = 3.94E-01    
+Fractional change compared to first step: 0.3120  (target=0.0200) 
+Starting Model::run iteration 12 
+In turn 11 actor 3 has most advantageous target 2 worth 0.123 
+Est by  3 of prob 0.8736 that [ 3> 2], with expected gain to  3 of +0.1231 
+Est by  3 of prob 0.8736 that [ 3> 2], with expected gain to  2 of -0.0696 
+Est by  2 of prob 0.8789 that [ 3> 2], with expected gain to  3 of +0.0992 
+Est by  2 of prob 0.8789 that [ 3> 2], with expected gain to  2 of -0.0535 
+ 
+Bargain [1217, 3:2] from 3's perspective (brgnIIJ) 
+   3 proposes 3 adopt:  42.400  24.940  29.640  
+   3 proposes 2 adopt:  42.400  24.940  29.640  
+ 
+Bargain [1218, 3:2] from 2's perspective (brgnIIJ) 
+   2 proposes 3 adopt:  41.890  43.950  49.050  
+   2 proposes 2 adopt:  41.890  43.950  49.050  
+ 
+Power-weighted compromise [1219, 3:2] bargain (brgnIJ) 
+     compromise proposes 3 adopt:  42.139  34.683  39.588  
+     compromise proposes 2 adopt:  42.139  34.683  39.588  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 11 actor 2 has most advantageous target 0 worth 0.010 
+Est by  2 of prob 0.5572 that [ 2> 0], with expected gain to  2 of +0.0103 
+Est by  2 of prob 0.5572 that [ 2> 0], with expected gain to  0 of -0.0136 
+Est by  0 of prob 0.5669 that [ 2> 0], with expected gain to  2 of +0.0235 
+Est by  0 of prob 0.5669 that [ 2> 0], with expected gain to  0 of -0.0252 
+ 
+Bargain [1220, 2:0] from 2's perspective (brgnIIJ) 
+   2 proposes 2 adopt:  41.540  46.250  50.990  
+   2 proposes 0 adopt:  41.540  46.250  50.990  
+ 
+Bargain [1221, 2:0] from 0's perspective (brgnIIJ) 
+   0 proposes 2 adopt:  41.100  50.880  56.190  
+   0 proposes 0 adopt:  41.100  50.880  56.190  
+ 
+Power-weighted compromise [1222, 2:0] bargain (brgnIJ) 
+     compromise proposes 2 adopt:  41.331  48.444  53.454  
+     compromise proposes 0 adopt:  41.331  48.444  53.454  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 11 actor 0 has most advantageous target 4 worth 0.054 
+Est by  0 of prob 0.6979 that [ 0> 4], with expected gain to  0 of +0.0542 
+Est by  0 of prob 0.6979 that [ 0> 4], with expected gain to  4 of -0.0325 
+Est by  4 of prob 0.9571 that [ 0> 4], with expected gain to  0 of +0.0341 
+Est by  4 of prob 0.9571 that [ 0> 4], with expected gain to  4 of -0.0034 
+ 
+Bargain [1223, 0:4] from 0's perspective (brgnIIJ) 
+   0 proposes 0 adopt:  41.300  49.550  53.740  
+   0 proposes 4 adopt:  41.300  49.550  53.740  
+ 
+Bargain [1224, 0:4] from 4's perspective (brgnIIJ) 
+   4 proposes 0 adopt:  42.010  40.480  44.290  
+   4 proposes 4 adopt:  42.010  40.480  44.290  
+ 
+Power-weighted compromise [1225, 0:4] bargain (brgnIJ) 
+     compromise proposes 0 adopt:  41.673  44.784  48.775  
+     compromise proposes 4 adopt:  41.673  44.784  48.775  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 11 actor 1 has most advantageous target 4 worth 0.109 
+Est by  1 of prob 0.8273 that [ 1> 4], with expected gain to  1 of +0.1090 
+Est by  1 of prob 0.8273 that [ 1> 4], with expected gain to  4 of -0.0474 
+Est by  4 of prob 0.9726 that [ 1> 4], with expected gain to  1 of +0.0540 
+Est by  4 of prob 0.9726 that [ 1> 4], with expected gain to  4 of -0.0039 
+ 
+Bargain [1226, 1:4] from 1's perspective (brgnIIJ) 
+   1 proposes 1 adopt:  41.540  50.500  58.180  
+   1 proposes 4 adopt:  41.540  50.500  58.180  
+ 
+Bargain [1227, 1:4] from 4's perspective (brgnIIJ) 
+   4 proposes 1 adopt:  42.010  40.560  44.410  
+   4 proposes 4 adopt:  42.010  40.560  44.410  
+ 
+Power-weighted compromise [1228, 1:4] bargain (brgnIJ) 
+     compromise proposes 1 adopt:  41.759  45.862  51.755  
+     compromise proposes 4 adopt:  41.759  45.862  51.755  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 11 actor 4 has most advantageous target 2 worth 0.000 
+Est by  4 of prob 0.5528 that [ 4> 2], with expected gain to  4 of +0.0002 
+Est by  4 of prob 0.5528 that [ 4> 2], with expected gain to  2 of -0.0000 
+Est by  2 of prob 0.6844 that [ 4> 2], with expected gain to  4 of +0.0041 
+Est by  2 of prob 0.6844 that [ 4> 2], with expected gain to  2 of -0.0002 
+ 
+Bargain [1229, 4:2] from 4's perspective (brgnIIJ) 
+   4 proposes 4 adopt:  41.980  42.750  46.570  
+   4 proposes 2 adopt:  41.980  42.750  46.570  
+ 
+Bargain [1230, 4:2] from 2's perspective (brgnIIJ) 
+   2 proposes 4 adopt:  41.890  44.450  49.200  
+   2 proposes 2 adopt:  41.890  44.450  49.200  
+ 
+Power-weighted compromise [1231, 4:2] bargain (brgnIJ) 
+     compromise proposes 4 adopt:  41.935  43.601  47.887  
+     compromise proposes 2 adopt:  41.935  43.601  47.887  
+ 
+Using InitOnlyInterp to form proposed bargains 
+Bargains to be resolved 
+Bargains involving actor  0: [1213, 0:0][1220, 2:0][1223, 0:4] 
+Bargains involving actor  1: [1212, 1:1][1226, 1:4] 
+Bargains involving actor  2: [1214, 2:2][1217, 3:2][1220, 2:0][1229, 4:2] 
+Bargains involving actor  3: [1215, 3:3][1217, 3:2] 
+Bargains involving actor  4: [1216, 4:4][1223, 0:4][1226, 1:4][1229, 4:2] 
+w: 
+ 117.70   93.20   61.40  135.40   63.80  
+u_im: 
+ 0.91660  0.93499  
+ 0.88062  0.90924  
+ 0.96828  0.96304  
+ 0.86247  0.84566  
+ 0.99694  0.99617  
+Doing scalarPCE for the 2 bargains of actor 1 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.917    +0.935  
+   +0.881    +0.909  
+   +0.968    +0.963  
+   +0.862    +0.846  
+   +0.997    +0.996  
+Coalition strengths of (i:j): 
+    0.000     1.324  
+    2.417     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.3539  
+ 0.6461  0.5000  
+Probability Opt_i 
+ 0.3539  
+ 0.6461  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1226 2 out of 2 bargains 
+u_im: 
+ 0.91660  0.91105  0.93009  
+ 0.88062  0.87364  0.89840  
+ 0.96828  0.97075  0.96587  
+ 0.86247  0.86732  0.85006  
+ 0.99694  0.99732  0.99665  
+Doing scalarPCE for the 3 bargains of actor 0 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.917    +0.911    +0.930  
+   +0.881    +0.874    +0.898  
+   +0.968    +0.971    +0.966  
+   +0.862    +0.867    +0.850  
+   +0.997    +0.997    +0.997  
+Coalition strengths of (i:j): 
+    0.000     0.652     0.923  
+    0.416     0.000     1.340  
+    1.623     2.276     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.6104  0.3627  
+ 0.3896  0.5000  0.3706  
+ 0.6373  0.6294  0.5000  
+Probability Opt_i 
+ 0.1908  
+ 0.2234  
+ 0.5857  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1223 3 out of 3 bargains 
+u_im: 
+ 0.91660  0.88313  0.91105  0.91712  
+ 0.88062  0.83603  0.87364  0.88095  
+ 0.96828  0.95581  0.97075  0.97052  
+ 0.86247  0.89210  0.86732  0.86171  
+ 0.99694  0.99577  0.99732  0.99699  
+Doing scalarPCE for the 4 bargains of actor 2 ... 
+Num actors: 5 
+Num options: 4 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.917    +0.883    +0.911    +0.917  
+   +0.881    +0.836    +0.874    +0.881  
+   +0.968    +0.956    +0.971    +0.971  
+   +0.862    +0.892    +0.867    +0.862  
+   +0.997    +0.996    +0.997    +0.997  
+Coalition strengths of (i:j): 
+    0.000     4.474     0.652     0.051  
+    2.008     0.000     1.679     2.059  
+    0.416     3.907     0.000     0.397  
+    0.116     4.591     0.698     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.6903  0.6104  0.3059  
+ 0.3097  0.5000  0.3005  0.3097  
+ 0.3896  0.6995  0.5000  0.3626  
+ 0.6941  0.6903  0.6374  0.5000  
+Probability Opt_i 
+ 0.2468  
+ 0.2311  
+ 0.1782  
+ 0.3439  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1229 4 out of 4 bargains 
+u_im: 
+ 0.91660  0.88313  
+ 0.88062  0.83603  
+ 0.96828  0.95581  
+ 0.86247  0.89210  
+ 0.99694  0.99577  
+Doing scalarPCE for the 2 bargains of actor 3 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.917    +0.883  
+   +0.881    +0.836  
+   +0.968    +0.956  
+   +0.862    +0.892  
+   +0.997    +0.996  
+Coalition strengths of (i:j): 
+    0.000     4.474  
+    2.008     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.6903  
+ 0.3097  0.5000  
+Probability Opt_i 
+ 0.6903  
+ 0.3097  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1215 1 out of 2 bargains 
+u_im: 
+ 0.91660  0.93009  0.93499  0.91712  
+ 0.88062  0.89840  0.90924  0.88095  
+ 0.96828  0.96587  0.96304  0.97052  
+ 0.86247  0.85006  0.84566  0.86171  
+ 0.99694  0.99665  0.99617  0.99699  
+Doing scalarPCE for the 4 bargains of actor 4 ... 
+Num actors: 5 
+Num options: 4 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.917    +0.930    +0.935    +0.917  
+   +0.881    +0.898    +0.909    +0.881  
+   +0.968    +0.966    +0.963    +0.971  
+   +0.862    +0.850    +0.846    +0.862  
+   +0.997    +0.997    +0.996    +0.997  
+Coalition strengths of (i:j): 
+    0.000     0.923     1.324     0.051  
+    1.623     0.000     0.400     1.577  
+    2.417     0.793     0.000     2.371  
+    0.116     0.943     1.343     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.3627  0.3539  0.3059  
+ 0.6373  0.5000  0.3353  0.6259  
+ 0.6461  0.6647  0.5000  0.6384  
+ 0.6941  0.3741  0.3616  0.5000  
+Probability Opt_i 
+ 0.1474  
+ 0.1952  
+ 0.4930  
+ 0.1644  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1226 3 out of 4 bargains 
+postn 0 , 0 : 
+ 41.3000  49.5500  53.7400  
+ideal 0 , 0 : 
+ 41.2655  49.7514  54.1198  
+postn-ideal distance  0,  0: 0.43130 
+postn 1 , 0 : 
+ 41.5400  50.5000  58.1800  
+ideal 1 , 0 : 
+ 41.4978  50.5095  57.9262  
+postn-ideal distance  1,  0: 0.25749 
+postn 2 , 0 : 
+ 41.9800  42.7500  46.5700  
+ideal 2 , 0 : 
+ 42.0165  40.2885  44.4669  
+postn-ideal distance  2,  0: 3.23782 
+postn 3 , 0 : 
+ 42.4400  24.7500  28.9800  
+ideal 3 , 0 : 
+ 42.4540  24.7238  28.8497  
+postn-ideal distance  3,  0: 0.13359 
+postn 4 , 0 : 
+ 41.5400  50.5000  58.1800  
+ideal 4 , 0 : 
+ 41.5400  50.5000  58.1800  
+postn-ideal distance  4,  0: 0.00000 
+postn-ideal distance RMS  0: 0.01467 
+rms (pstn, ideal) = 0.01467 
+Raw actor-pos value matrix (risk neutral) 
+ +0.998  +0.986  +0.955  +0.842  +0.986  
+ +0.977  +0.999  +0.920  +0.766  +0.999  
+ +0.929  +0.914  +0.982  +0.882  +0.914  
+ +0.766  +0.753  +0.830  +1.000  +0.753  
+ +0.984  +1.000  +0.949  +0.854  +1.000  
+Inferred risk attitudes: 
+ +0.168  
+ -0.500  
+ +0.803  
+ +1.000  
+ -0.500  
+Risk-aware actor-pos utility matrix (objective): 
+ +0.9986  +0.9884  +0.9620  +0.8647  +0.9884  
+ +0.9657  +0.9980  +0.8830  +0.6769  +0.9980  
+ +0.9820  +0.9770  +0.9962  +0.9654  +0.9770  
+ +0.9451  +0.9390  +0.9712  +1.0000  +0.9390  
+ +0.9768  +1.0000  +0.9248  +0.7910  +1.0000  
+RMS change in value vs utility:  0.0784455 
+Using OneThird : r^h_i = (2*rh + ri)/3 
+Estimate by 0 of risk-aware utility matrix: 
+ +0.9986  +0.9884  +0.9620  +0.8647  +0.9884  
+ +0.9757  +0.9986  +0.9158  +0.7567  +0.9986  
+ +0.9542  +0.9436  +0.9887  +0.9213  +0.9436  
+ +0.8456  +0.8359  +0.8930  +0.9997  +0.8359  
+ +0.9836  +1.0000  +0.9464  +0.8467  +1.0000  
+RMS change in util^h vs utility: 0.046232 
+Estimate by 1 of risk-aware utility matrix: 
+ +0.9979  +0.9823  +0.9427  +0.8055  +0.9823  
+ +0.9657  +0.9980  +0.8830  +0.6769  +0.9980  
+ +0.9249  +0.9084  +0.9808  +0.8748  +0.9084  
+ +0.7657  +0.7531  +0.8302  +0.9995  +0.7531  
+ +0.9768  +1.0000  +0.9248  +0.7910  +1.0000  
+RMS change in util^h vs utility: 0.0764853 
+Estimate by 2 of risk-aware utility matrix: 
+ +0.9993  +0.9942  +0.9803  +0.9209  +0.9942  
+ +0.9853  +0.9991  +0.9470  +0.8324  +0.9991  
+ +0.9820  +0.9770  +0.9962  +0.9654  +0.9770  
+ +0.9215  +0.9146  +0.9527  +0.9999  +0.9146  
+ +0.9901  +1.0000  +0.9669  +0.8996  +1.0000  
+RMS change in util^h vs utility: 0.0438389 
+Estimate by 3 of risk-aware utility matrix: 
+ +0.9995  +0.9960  +0.9860  +0.9383  +0.9960  
+ +0.9882  +0.9993  +0.9567  +0.8559  +0.9993  
+ +0.9907  +0.9873  +0.9985  +0.9791  +0.9873  
+ +0.9451  +0.9390  +0.9712  +1.0000  +0.9390  
+ +0.9921  +1.0000  +0.9732  +0.9160  +1.0000  
+RMS change in util^h vs utility: 0.0501176 
+Estimate by 4 of risk-aware utility matrix: 
+ +0.9979  +0.9823  +0.9427  +0.8055  +0.9823  
+ +0.9657  +0.9980  +0.8830  +0.6769  +0.9980  
+ +0.9249  +0.9084  +0.9808  +0.8748  +0.9084  
+ +0.7657  +0.7531  +0.8302  +0.9995  +0.7531  
+ +0.9768  +1.0000  +0.9248  +0.7910  +1.0000  
+RMS change in util^h vs utility: 0.0764853 
+sDist [ 0, 1] = 1.26E+00    
+sDist [11,12] = 2.34E-01    
+Fractional change compared to first step: 0.1850  (target=0.0200) 
+Starting Model::run iteration 13 
+In turn 12 Actor 4 has no advantageous targets 
+In turn 12 actor 1 has most advantageous target 2 worth 0.069 
+Est by  1 of prob 0.7375 that [ 1> 2], with expected gain to  1 of +0.0693 
+Est by  1 of prob 0.7375 that [ 1> 2], with expected gain to  2 of -0.0437 
+Est by  2 of prob 0.8419 that [ 1> 2], with expected gain to  1 of +0.0397 
+Est by  2 of prob 0.8419 that [ 1> 2], with expected gain to  2 of -0.0146 
+ 
+Bargain [1237, 1:2] from 1's perspective (brgnIIJ) 
+   1 proposes 1 adopt:  41.600  49.880  57.530  
+   1 proposes 2 adopt:  41.600  49.880  57.520  
+ 
+Bargain [1238, 1:2] from 2's perspective (brgnIIJ) 
+   2 proposes 1 adopt:  41.980  42.770  46.610  
+   2 proposes 2 adopt:  41.980  42.770  46.610  
+ 
+Power-weighted compromise [1239, 1:2] bargain (brgnIJ) 
+     compromise proposes 1 adopt:  41.778  46.558  52.428  
+     compromise proposes 2 adopt:  41.778  46.558  52.422  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 12 actor 0 has most advantageous target 4 worth 0.009 
+Est by  0 of prob 0.8976 that [ 0> 4], with expected gain to  0 of +0.0086 
+Est by  0 of prob 0.8976 that [ 0> 4], with expected gain to  4 of -0.0139 
+Est by  4 of prob 0.9051 that [ 0> 4], with expected gain to  0 of +0.0133 
+Est by  4 of prob 0.9051 that [ 0> 4], with expected gain to  4 of -0.0199 
+ 
+Bargain [1240, 0:4] from 0's perspective (brgnIIJ) 
+   0 proposes 0 adopt:  41.300  49.560  53.820  
+   0 proposes 4 adopt:  41.300  49.560  53.820  
+ 
+Bargain [1241, 0:4] from 4's perspective (brgnIIJ) 
+   4 proposes 0 adopt:  41.540  50.500  58.180  
+   4 proposes 4 adopt:  41.540  50.500  58.180  
+ 
+Power-weighted compromise [1242, 0:4] bargain (brgnIJ) 
+     compromise proposes 0 adopt:  41.426  50.054  56.111  
+     compromise proposes 4 adopt:  41.426  50.054  56.111  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 12 actor 2 has most advantageous target 4 worth 0.009 
+Est by  2 of prob 0.6369 that [ 2> 4], with expected gain to  2 of +0.0087 
+Est by  2 of prob 0.6369 that [ 2> 4], with expected gain to  4 of -0.0150 
+Est by  4 of prob 0.7722 that [ 2> 4], with expected gain to  2 of +0.0475 
+Est by  4 of prob 0.7722 that [ 2> 4], with expected gain to  4 of -0.0493 
+ 
+Bargain [1243, 2:4] from 2's perspective (brgnIIJ) 
+   2 proposes 2 adopt:  41.810  43.800  48.850  
+   2 proposes 4 adopt:  41.810  43.800  48.860  
+ 
+Bargain [1244, 2:4] from 4's perspective (brgnIIJ) 
+   4 proposes 2 adopt:  41.540  50.460  58.140  
+   4 proposes 4 adopt:  41.540  50.460  58.140  
+ 
+Power-weighted compromise [1245, 2:4] bargain (brgnIJ) 
+     compromise proposes 2 adopt:  41.675  47.126  53.489  
+     compromise proposes 4 adopt:  41.675  47.126  53.494  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 12 actor 3 has most advantageous target 4 worth 0.037 
+Est by  3 of prob 0.7341 that [ 3> 4], with expected gain to  3 of +0.0365 
+Est by  3 of prob 0.7341 that [ 3> 4], with expected gain to  4 of -0.0503 
+Est by  4 of prob 0.8118 that [ 3> 4], with expected gain to  3 of +0.1765 
+Est by  4 of prob 0.8118 that [ 3> 4], with expected gain to  4 of -0.1497 
+ 
+Bargain [1246, 3:4] from 3's perspective (brgnIIJ) 
+   3 proposes 3 adopt:  42.030  25.490  33.010  
+   3 proposes 4 adopt:  42.030  25.490  33.010  
+ 
+Bargain [1247, 3:4] from 4's perspective (brgnIIJ) 
+   4 proposes 3 adopt:  41.550  46.130  57.120  
+   4 proposes 4 adopt:  41.550  46.130  57.120  
+ 
+Power-weighted compromise [1248, 3:4] bargain (brgnIJ) 
+     compromise proposes 3 adopt:  41.784  36.055  45.351  
+     compromise proposes 4 adopt:  41.784  36.055  45.351  
+ 
+Using InitOnlyInterp to form proposed bargains 
+Bargains to be resolved 
+Bargains involving actor  0: [1233, 0:0][1240, 0:4] 
+Bargains involving actor  1: [1232, 1:1][1237, 1:2] 
+Bargains involving actor  2: [1234, 2:2][1237, 1:2][1243, 2:4] 
+Bargains involving actor  3: [1235, 3:3][1246, 3:4] 
+Bargains involving actor  4: [1236, 4:4][1240, 0:4][1243, 2:4][1246, 3:4] 
+w: 
+ 117.70   93.20   61.40  135.40   63.80  
+u_im: 
+ 0.96043  0.96254  
+ 0.90431  0.89810  
+ 0.97951  0.98050  
+ 0.95888  0.96006  
+ 0.93853  0.93405  
+Doing scalarPCE for the 2 bargains of actor 0 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.960    +0.963  
+   +0.904    +0.898  
+   +0.980    +0.980  
+   +0.959    +0.960  
+   +0.939    +0.934  
+Coalition strengths of (i:j): 
+    0.000     0.432  
+    0.234     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.6483  
+ 0.3517  0.5000  
+Probability Opt_i 
+ 0.6483  
+ 0.3517  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1233 1 out of 2 bargains 
+u_im: 
+ 0.96043  0.96657  
+ 0.90431  0.92522  
+ 0.97951  0.97630  
+ 0.95888  0.95360  
+ 0.93853  0.95149  
+Doing scalarPCE for the 2 bargains of actor 1 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.960    +0.967  
+   +0.904    +0.925  
+   +0.980    +0.976  
+   +0.959    +0.954  
+   +0.939    +0.951  
+Coalition strengths of (i:j): 
+    0.000     0.456  
+    1.750     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.2066  
+ 0.7934  0.5000  
+Probability Opt_i 
+ 0.2066  
+ 0.7934  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1237 2 out of 2 bargains 
+u_im: 
+ 0.96043  0.96657  0.95809  
+ 0.90431  0.92522  0.88916  
+ 0.97951  0.97630  0.98234  
+ 0.95888  0.95360  0.96374  
+ 0.93853  0.95149  0.92859  
+Doing scalarPCE for the 3 bargains of actor 2 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.960    +0.967    +0.958  
+   +0.904    +0.925    +0.889  
+   +0.980    +0.976    +0.982  
+   +0.959    +0.954    +0.964  
+   +0.939    +0.951    +0.929  
+Coalition strengths of (i:j): 
+    0.000     0.456     1.161  
+    1.750     0.000     2.913  
+    0.416     0.872     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.2066  0.7362  
+ 0.7934  0.5000  0.7696  
+ 0.2638  0.2304  0.5000  
+Probability Opt_i 
+ 0.1063  
+ 0.7386  
+ 0.1550  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1243 3 out of 3 bargains 
+u_im: 
+ 0.96043  0.93921  
+ 0.90431  0.84897  
+ 0.97951  0.97906  
+ 0.95888  0.97098  
+ 0.93853  0.90285  
+Doing scalarPCE for the 2 bargains of actor 3 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.960    +0.939  
+   +0.904    +0.849  
+   +0.980    +0.979  
+   +0.959    +0.971  
+   +0.939    +0.903  
+Coalition strengths of (i:j): 
+    0.000     4.990  
+    0.820     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.8589  
+ 0.1411  0.5000  
+Probability Opt_i 
+ 0.8589  
+ 0.1411  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1235 1 out of 2 bargains 
+u_im: 
+ 0.96043  0.96254  0.95809  0.93921  
+ 0.90431  0.89810  0.88916  0.84897  
+ 0.97951  0.98050  0.98234  0.97906  
+ 0.95888  0.96006  0.96374  0.97098  
+ 0.93853  0.93405  0.92859  0.90285  
+Doing scalarPCE for the 4 bargains of actor 4 ... 
+Num actors: 5 
+Num options: 4 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.960    +0.963    +0.958    +0.939  
+   +0.904    +0.898    +0.889    +0.849  
+   +0.980    +0.980    +0.982    +0.979  
+   +0.959    +0.960    +0.964    +0.971  
+   +0.939    +0.934    +0.929    +0.903  
+Coalition strengths of (i:j): 
+    0.000     0.432     1.161     4.990  
+    0.234     0.000     0.853     4.709  
+    0.416     0.306     0.000     3.910  
+    0.820     0.740     0.490     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.6483  0.7362  0.8589  
+ 0.3517  0.5000  0.7360  0.8642  
+ 0.2638  0.2640  0.5000  0.8886  
+ 0.1411  0.1358  0.1114  0.5000  
+Probability Opt_i 
+ 0.6169  
+ 0.2248  
+ 0.1125  
+ 0.0458  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1236 1 out of 4 bargains 
+postn 0 , 0 : 
+ 41.3000  49.5500  53.7400  
+ideal 0 , 0 : 
+ 41.2955  49.5762  53.7894  
+postn-ideal distance  0,  0: 0.05607 
+postn 1 , 0 : 
+ 41.6000  49.8800  57.5300  
+ideal 1 , 0 : 
+ 41.5606  49.9702  57.3360  
+postn-ideal distance  1,  0: 0.21754 
+postn 2 , 0 : 
+ 41.8100  43.8000  48.8500  
+ideal 2 , 0 : 
+ 41.9373  40.5510  45.3026  
+postn-ideal distance  2,  0: 4.81211 
+postn 3 , 0 : 
+ 42.4400  24.7500  28.9800  
+ideal 3 , 0 : 
+ 42.4460  24.7387  28.9240  
+postn-ideal distance  3,  0: 0.05744 
+postn 4 , 0 : 
+ 41.5400  50.5000  58.1800  
+ideal 4 , 0 : 
+ 41.5400  50.5000  58.1800  
+postn-ideal distance  4,  0: 0.00000 
+postn-ideal distance RMS  0: 0.02155 
+rms (pstn, ideal) = 0.02155 
+Raw actor-pos value matrix (risk neutral) 
+ +1.000  +0.988  +0.965  +0.844  +0.985  
+ +0.981  +0.999  +0.938  +0.771  +0.994  
+ +0.932  +0.922  +0.975  +0.878  +0.917  
+ +0.766  +0.759  +0.819  +1.000  +0.753  
+ +0.984  +0.997  +0.958  +0.854  +1.000  
+Inferred risk attitudes: 
+ +0.265  
+ +0.076  
+ +0.753  
+ +1.000  
+ -0.500  
+Risk-aware actor-pos utility matrix (objective): 
+ +0.9998  +0.9908  +0.9738  +0.8787  +0.9888  
+ +0.9822  +0.9989  +0.9428  +0.7847  +0.9947  
+ +0.9799  +0.9761  +0.9932  +0.9588  +0.9744  
+ +0.9452  +0.9420  +0.9673  +1.0000  +0.9392  
+ +0.9768  +0.9948  +0.9375  +0.7910  +1.0000  
+RMS change in value vs utility:  0.0756885 
+Using OneThird : r^h_i = (2*rh + ri)/3 
+Estimate by 0 of risk-aware utility matrix: 
+ +0.9998  +0.9908  +0.9738  +0.8787  +0.9888  
+ +0.9846  +0.9990  +0.9501  +0.8069  +0.9954  
+ +0.9594  +0.9527  +0.9852  +0.9241  +0.9496  
+ +0.8574  +0.8525  +0.8948  +0.9999  +0.8481  
+ +0.9846  +0.9966  +0.9582  +0.8548  +1.0000  
+RMS change in util^h vs utility: 0.038592 
+Estimate by 1 of risk-aware utility matrix: 
+ +0.9998  +0.9893  +0.9695  +0.8621  +0.9869  
+ +0.9822  +0.9989  +0.9428  +0.7847  +0.9947  
+ +0.9515  +0.9436  +0.9820  +0.9106  +0.9400  
+ +0.8347  +0.8294  +0.8761  +0.9999  +0.8247  
+ +0.9827  +0.9962  +0.9531  +0.8390  +1.0000  
+RMS change in util^h vs utility: 0.0467731 
+Estimate by 2 of risk-aware utility matrix: 
+ +0.9999  +0.9948  +0.9848  +0.9216  +0.9937  
+ +0.9907  +0.9994  +0.9689  +0.8643  +0.9973  
+ +0.9799  +0.9761  +0.9932  +0.9588  +0.9744  
+ +0.9157  +0.9119  +0.9430  +1.0000  +0.9086  
+ +0.9896  +0.9977  +0.9713  +0.8955  +1.0000  
+RMS change in util^h vs utility: 0.0313887 
+Estimate by 3 of risk-aware utility matrix: 
+ +0.9999  +0.9968  +0.9904  +0.9433  +0.9961  
+ +0.9938  +0.9996  +0.9784  +0.8933  +0.9982  
+ +0.9903  +0.9880  +0.9973  +0.9764  +0.9869  
+ +0.9452  +0.9420  +0.9673  +1.0000  +0.9392  
+ +0.9921  +0.9983  +0.9780  +0.9160  +1.0000  
+RMS change in util^h vs utility: 0.0379515 
+Estimate by 4 of risk-aware utility matrix: 
+ +0.9997  +0.9846  +0.9565  +0.8114  +0.9812  
+ +0.9750  +0.9984  +0.9206  +0.7169  +0.9925  
+ +0.9273  +0.9159  +0.9725  +0.8696  +0.9108  
+ +0.7659  +0.7592  +0.8193  +0.9998  +0.7533  
+ +0.9768  +0.9948  +0.9375  +0.7910  +1.0000  
+RMS change in util^h vs utility: 0.0776899 
+sDist [ 0, 1] = 1.26E+00    
+sDist [12,13] = 3.42E-02    
+Fractional change compared to first step: 0.0270  (target=0.0200) 
+Starting Model::run iteration 14 
+In turn 13 actor 0 has most advantageous target 4 worth 0.009 
+Est by  0 of prob 0.9015 that [ 0> 4], with expected gain to  0 of +0.0094 
+Est by  0 of prob 0.9015 that [ 0> 4], with expected gain to  4 of -0.0131 
+Est by  4 of prob 0.9118 that [ 0> 4], with expected gain to  0 of +0.0161 
+Est by  4 of prob 0.9118 that [ 0> 4], with expected gain to  4 of -0.0201 
+ 
+Bargain [1253, 0:4] from 0's perspective (brgnIIJ) 
+   0 proposes 0 adopt:  41.300  49.560  53.810  
+   0 proposes 4 adopt:  41.300  49.560  53.810  
+ 
+Bargain [1254, 0:4] from 4's perspective (brgnIIJ) 
+   4 proposes 0 adopt:  41.540  50.500  58.180  
+   4 proposes 4 adopt:  41.540  50.500  58.180  
+ 
+Power-weighted compromise [1255, 0:4] bargain (brgnIJ) 
+     compromise proposes 0 adopt:  41.426  50.054  56.106  
+     compromise proposes 4 adopt:  41.426  50.054  56.106  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 13 actor 3 has most advantageous target 4 worth 0.036 
+Est by  3 of prob 0.7239 that [ 3> 4], with expected gain to  3 of +0.0355 
+Est by  3 of prob 0.7239 that [ 3> 4], with expected gain to  4 of -0.0490 
+In turn 13 Actor 4 has no advantageous targets 
+Est by  4 of prob 0.8083 that [ 3> 4], with expected gain to  3 of +0.1752 
+Est by  4 of prob 0.8083 that [ 3> 4], with expected gain to  4 of -0.1486 
+ 
+Bargain [1257, 3:4] from 3's perspective (brgnIIJ) 
+   3 proposes 3 adopt:  42.000  25.560  33.380  
+   3 proposes 4 adopt:  42.000  25.560  33.390  
+ 
+Bargain [1258, 3:4] from 4's perspective (brgnIIJ) 
+   4 proposes 3 adopt:  41.550  46.190  57.140  
+   4 proposes 4 adopt:  41.550  46.190  57.140  
+ 
+Power-weighted compromise [1259, 3:4] bargain (brgnIJ) 
+     compromise proposes 3 adopt:  41.770  36.120  45.542  
+     compromise proposes 4 adopt:  41.770  36.120  45.547  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 13 actor 2 has most advantageous target 4 worth 0.010 
+Est by  2 of prob 0.6994 that [ 2> 4], with expected gain to  2 of +0.0103 
+Est by  2 of prob 0.6994 that [ 2> 4], with expected gain to  4 of -0.0157 
+Est by  4 of prob 0.7969 that [ 2> 4], with expected gain to  2 of +0.0428 
+Est by  4 of prob 0.7969 that [ 2> 4], with expected gain to  4 of -0.0433 
+ 
+Bargain [1260, 2:4] from 2's perspective (brgnIIJ) 
+   2 proposes 2 adopt:  41.740  44.350  49.990  
+   2 proposes 4 adopt:  41.740  44.350  49.990  
+ 
+Bargain [1261, 2:4] from 4's perspective (brgnIIJ) 
+   4 proposes 2 adopt:  41.540  50.470  58.150  
+   4 proposes 4 adopt:  41.540  50.470  58.160  
+ 
+Power-weighted compromise [1262, 2:4] bargain (brgnIJ) 
+     compromise proposes 2 adopt:  41.640  47.406  54.065  
+     compromise proposes 4 adopt:  41.640  47.406  54.070  
+ 
+Using InitOnlyInterp to form proposed bargains 
+In turn 13 actor 1 has most advantageous target 3 worth 0.037 
+turn 13 , i 1 , j 3 , bestEU worth 0.037268 , piiJ  0.425573 
+Est by  1 of prob 0.4256 that [ 1> 3], with expected gain to  1 of +0.0373 
+Est by  1 of prob 0.4256 that [ 1> 3], with expected gain to  3 of -0.0297 
+Est by  3 of prob 0.5138 that [ 1> 3], with expected gain to  1 of +0.0320 
+Est by  3 of prob 0.5138 that [ 1> 3], with expected gain to  3 of -0.0174 
+ 
+Bargain [1263, 1:3] from 1's perspective (brgnIIJ) 
+   1 proposes 1 adopt:  41.950  31.540  47.630  
+   1 proposes 3 adopt:  41.950  31.540  47.630  
+ 
+Bargain [1264, 1:3] from 3's perspective (brgnIIJ) 
+   3 proposes 1 adopt:  42.440  24.770  29.090  
+   3 proposes 3 adopt:  42.440  24.770  29.090  
+ 
+Power-weighted compromise [1265, 1:3] bargain (brgnIJ) 
+     compromise proposes 1 adopt:  42.173  28.461  39.198  
+     compromise proposes 3 adopt:  42.173  28.461  39.198  
+ 
+Using InitOnlyInterp to form proposed bargains 
+Bargains to be resolved 
+Bargains involving actor  0: [1249, 0:0][1253, 0:4] 
+Bargains involving actor  1: [1250, 1:1][1263, 1:3] 
+Bargains involving actor  2: [1251, 2:2][1260, 2:4] 
+Bargains involving actor  3: [1252, 3:3][1257, 3:4][1263, 1:3] 
+Bargains involving actor  4: [1256, 4:4][1253, 0:4][1257, 3:4][1260, 2:4] 
+w: 
+ 117.70   93.20   61.40  135.40   63.80  
+u_im: 
+ 0.96640  0.96222  
+ 0.94064  0.93293  
+ 0.97648  0.98266  
+ 0.95874  0.96757  
+ 0.94004  0.93186  
+Doing scalarPCE for the 2 bargains of actor 1 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.966    +0.962  
+   +0.941    +0.933  
+   +0.976    +0.983  
+   +0.959    +0.968  
+   +0.940    +0.932  
+Coalition strengths of (i:j): 
+    0.000     0.866  
+    0.787     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.5239  
+ 0.4761  0.5000  
+Probability Opt_i 
+ 0.5239  
+ 0.4761  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1250 1 out of 2 bargains 
+u_im: 
+ 0.96640  0.96864  
+ 0.94064  0.93829  
+ 0.97648  0.97757  
+ 0.95874  0.95992  
+ 0.94004  0.93554  
+Doing scalarPCE for the 2 bargains of actor 0 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.966    +0.969  
+   +0.941    +0.938  
+   +0.976    +0.978  
+   +0.959    +0.960  
+   +0.940    +0.936  
+Coalition strengths of (i:j): 
+    0.000     0.253  
+    0.245     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.5088  
+ 0.4912  0.5000  
+Probability Opt_i 
+ 0.5088  
+ 0.4912  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1253 2 out of 2 bargains 
+u_im: 
+ 0.96640  0.96469  
+ 0.94064  0.93286  
+ 0.97648  0.97961  
+ 0.95874  0.96353  
+ 0.94004  0.93012  
+Doing scalarPCE for the 2 bargains of actor 2 ... 
+Num actors: 5 
+Num options: 2 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.966    +0.965  
+   +0.941    +0.933  
+   +0.976    +0.980  
+   +0.959    +0.964  
+   +0.940    +0.930  
+Coalition strengths of (i:j): 
+    0.000     0.780  
+    0.420     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.6501  
+ 0.3499  0.5000  
+Probability Opt_i 
+ 0.6501  
+ 0.3499  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1260 2 out of 2 bargains 
+u_im: 
+ 0.96640  0.94792  0.96222  
+ 0.94064  0.90590  0.93293  
+ 0.97648  0.97566  0.98266  
+ 0.95874  0.97082  0.96757  
+ 0.94004  0.90492  0.93186  
+Doing scalarPCE for the 3 bargains of actor 3 ... 
+Num actors: 5 
+Num options: 3 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.966    +0.948    +0.962  
+   +0.941    +0.906    +0.933  
+   +0.976    +0.976    +0.983  
+   +0.959    +0.971    +0.968  
+   +0.940    +0.905    +0.932  
+Coalition strengths of (i:j): 
+    0.000     3.856     0.866  
+    0.818     0.000     0.220  
+    0.787     3.177     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.8251  0.5239  
+ 0.1749  0.5000  0.0647  
+ 0.4761  0.9353  0.5000  
+Probability Opt_i 
+ 0.5610  
+ 0.0318  
+ 0.4072  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1252 1 out of 3 bargains 
+u_im: 
+ 0.96640  0.96864  0.94792  0.96469  
+ 0.94064  0.93829  0.90590  0.93286  
+ 0.97648  0.97757  0.97566  0.97961  
+ 0.95874  0.95992  0.97082  0.96353  
+ 0.94004  0.93554  0.90492  0.93012  
+Doing scalarPCE for the 4 bargains of actor 4 ... 
+Num actors: 5 
+Num options: 4 
+Actor strengths: 
+ 117.70   93.20   61.40  135.40   63.80  
+Voting rule: PropCbc 
+Utility to actors of options: 
+   +0.966    +0.969    +0.948    +0.965  
+   +0.941    +0.938    +0.906    +0.933  
+   +0.976    +0.978    +0.976    +0.980  
+   +0.959    +0.960    +0.971    +0.964  
+   +0.940    +0.936    +0.905    +0.930  
+Coalition strengths of (i:j): 
+    0.000     0.253     3.856     0.780  
+    0.245     0.000     3.767     0.658  
+    0.818     0.738     0.000     0.493  
+    0.420     0.307     3.170     0.000  
+Probability Opt_i > Opt_j 
+ 0.5000  0.5088  0.8251  0.6501  
+ 0.4912  0.5000  0.8363  0.6821  
+ 0.1749  0.1637  0.5000  0.1347  
+ 0.3499  0.3179  0.8653  0.5000  
+Probability Opt_i 
+ 0.4155  
+ 0.3692  
+ 0.0568  
+ 0.1585  
+Found stable PCE distribution 
+Chosen bargain ( Stochastic ): 1256 1 out of 4 bargains 
+postn 0 , 0 : 
+ 41.3000  49.5600  53.8100  
+ideal 0 , 0 : 
+ 41.2994  49.5621  53.8073  
+postn-ideal distance  0,  0: 0.00346 
+postn 1 , 0 : 
+ 41.6000  49.8800  57.5300  
+ideal 1 , 0 : 
+ 41.5719  49.8738  57.2347  
+postn-ideal distance  1,  0: 0.29671 
+postn 2 , 0 : 
+ 41.7400  44.3500  49.9900  
+ideal 2 , 0 : 
+ 41.8744  40.9662  46.2275  
+postn-ideal distance  2,  0: 5.06208 
+postn 3 , 0 : 
+ 42.4400  24.7500  28.9800  
+ideal 3 , 0 : 
+ 42.4426  24.7452  28.9559  
+postn-ideal distance  3,  0: 0.02470 
+postn 4 , 0 : 
+ 41.5400  50.5000  58.1800  
+ideal 4 , 0 : 
+ 41.5400  50.5000  58.1800  
+postn-ideal distance  4,  0: 0.00000 
+postn-ideal distance RMS  0: 0.02268 
+rms (pstn, ideal) = 0.02268 
+Raw actor-pos value matrix (risk neutral) 
+ +1.000  +0.988  +0.969  +0.844  +0.985  
+ +0.982  +0.998  +0.946  +0.772  +0.993  
+ +0.937  +0.926  +0.973  +0.874  +0.922  
+ +0.766  +0.759  +0.814  +1.000  +0.753  
+ +0.985  +0.997  +0.962  +0.854  +1.000  
+Inferred risk attitudes: 
+ +0.261  
+ +0.040  
+ +0.741  
+ +1.000  
+ -0.500  
+Risk-aware actor-pos utility matrix (objective): 
+ +1.0000  +0.9908  +0.9769  +0.8782  +0.9888  
+ +0.9825  +0.9985  +0.9482  +0.7792  +0.9937  
+ +0.9806  +0.9769  +0.9926  +0.9556  +0.9751  
+ +0.9452  +0.9421  +0.9653  +1.0000  +0.9392  
+ +0.9772  +0.9948  +0.9440  +0.7910  +1.0000  
+RMS change in value vs utility:  0.075656 
+Using OneThird : r^h_i = (2*rh + ri)/3 
+Estimate by 0 of risk-aware utility matrix: 
+ +1.0000  +0.9908  +0.9769  +0.8782  +0.9888  
+ +0.9851  +0.9987  +0.9557  +0.8051  +0.9946  
+ +0.9616  +0.9551  +0.9843  +0.9204  +0.9520  
+ +0.8568  +0.8520  +0.8905  +1.0000  +0.8477  
+ +0.9848  +0.9966  +0.9624  +0.8544  +1.0000  
+RMS change in util^h vs utility: 0.0388411 
+Estimate by 1 of risk-aware utility matrix: 
+ +1.0000  +0.9890  +0.9725  +0.8588  +0.9866  
+ +0.9825  +0.9985  +0.9482  +0.7792  +0.9937  
+ +0.9528  +0.9450  +0.9804  +0.9042  +0.9414  
+ +0.8304  +0.8251  +0.8682  +0.9999  +0.8203  
+ +0.9826  +0.9961  +0.9571  +0.8360  +1.0000  
+RMS change in util^h vs utility: 0.0484671 
+Estimate by 2 of risk-aware utility matrix: 
+ +1.0000  +0.9947  +0.9865  +0.9204  +0.9935  
+ +0.9909  +0.9992  +0.9720  +0.8614  +0.9967  
+ +0.9806  +0.9769  +0.9926  +0.9556  +0.9751  
+ +0.9142  +0.9105  +0.9391  +1.0000  +0.9071  
+ +0.9896  +0.9977  +0.9741  +0.8944  +1.0000  
+RMS change in util^h vs utility: 0.0314619 
+Estimate by 3 of risk-aware utility matrix: 
+ +1.0000  +0.9968  +0.9917  +0.9431  +0.9961  
+ +0.9939  +0.9995  +0.9808  +0.8918  +0.9979  
+ +0.9908  +0.9887  +0.9970  +0.9746  +0.9876  
+ +0.9452  +0.9421  +0.9653  +1.0000  +0.9392  
+ +0.9922  +0.9983  +0.9804  +0.9160  +1.0000  
+RMS change in util^h vs utility: 0.0381478 
+Estimate by 4 of risk-aware utility matrix: 
+ +1.0000  +0.9846  +0.9617  +0.8113  +0.9812  
+ +0.9760  +0.9979  +0.9299  +0.7159  +0.9913  
+ +0.9314  +0.9204  +0.9711  +0.8645  +0.9153  
+ +0.7658  +0.7593  +0.8136  +0.9999  +0.7534  
+ +0.9772  +0.9948  +0.9440  +0.7910  +1.0000  
+RMS change in util^h vs utility: 0.0775166 
+sDist [ 0, 1] = 1.26E+00    
+sDist [13,14] = 1.34E-02    
+Fractional change compared to first step: 0.0106  (target=0.0200) 
+Completed model run 
+There were 15 states, with 14 steps between them 
+History of actor positions over time: 
+Alice, FirstDim:  52.8  55.5  37.9  52.1  52.1  45.1  42.9  38.9  38.9  38.9  40.8  41.1  41.3  41.3  41.3 
+Alice, SecondDim:  39.8  63.2  18.4  39.2  39.1  23.4  31.6  43.2  43.2  43.2  53.9  50.9  49.5  49.5  49.6 
+Alice, YADN:  39.6  42.2  19.0  28.9  28.8  22.7  33.5  48.1  48.1  48.1  61.5  56.2  53.7  53.7  53.8 
+Bob, FirstDim:  15.9  23.5  23.5  25.3  25.3  25.3  30.2  34.1  34.1  41.9  41.3  41.5  41.5  41.6  41.6 
+Bob, SecondDim:  61.4  63.8  63.8  62.1  62.1  62.1  59.2  56.3  56.3  55.4  51.3  50.6  50.5  49.9  49.9 
+Bob, YADN:  72.0  70.1  70.1  69.0  69.0  69.0  66.8  64.6  64.6  62.6  59.2  58.4  58.2  57.5  57.5 
+Carol, FirstDim:  61.1  33.5  64.0  41.1  41.1  26.6  26.6  38.9  38.9  41.4  41.5  41.9  42.0  41.8  41.7 
+Carol, SecondDim:  86.5  18.9  47.7  25.1  25.1  60.5  60.5  43.2  43.2  48.7  50.8  44.5  42.8  43.8  44.4 
+Carol, YADN:  44.5  19.0  32.4  22.4  22.4  67.6  67.6  48.2  48.2  56.2  58.7  49.2  46.6  48.9  50.0 
+David, FirstDim:  26.3  26.3  37.8  37.8  40.9  45.1  45.1  42.6  42.6  42.4  42.4  42.4  42.4  42.4  42.4 
+David, SecondDim:  16.5  16.5  18.4  18.4  22.8  23.4  23.4  24.2  24.2  24.8  24.8  24.8  24.8  24.8  24.8 
+David, YADN:  15.9  15.9  19.0  19.0  21.9  22.7  22.7  25.8  25.8  29.0  29.0  29.0  29.0  29.0  29.0 
+Ellie, FirstDim:  73.3  64.1  64.0  58.7  58.7  58.1  57.8  56.4  42.1  41.3  42.2  42.0  41.5  41.5  41.5 
+Ellie, SecondDim:  61.1  48.1  47.7  38.2  38.2  36.4  37.3  40.7  55.2  50.7  25.0  40.5  50.5  50.5  50.5 
+Ellie, YADN:  26.3  32.5  32.4  29.5  29.5  28.9  29.8  33.6  62.3  58.7  30.3  44.3  58.2  58.2  58.2 
+History of actors' winning probabilities: 
+Alice, prob : 0.3154 0.1806 0.1924 0.1970 0.2102 0.1491 0.2281 0.3430 0.2378 0.2090 0.0910 0.2730 0.2197 0.2203 0.2290 
+Bob, prob : 0.1668 0.2446 0.2987 0.2431 0.2523 0.1773 0.2347 0.3499 0.2340 0.1097 0.3769 0.2986 0.6452 0.4282 0.4282 
+Carol, prob : 0.1082 0.2278 0.5088 0.1869 0.1675 0.3086 0.1422 0.3430 0.2378 0.2436 0.3189 0.1497 0.1030 0.1338 0.1358 
+David, prob : 0.2216 0.1716 0.1924 0.1620 0.1528 0.1491 0.1689 0.0393 0.0890 0.1784 0.1043 0.1529 0.0322 0.0385 0.0381 
+Ellie, prob : 0.1880 0.1754 0.5088 0.2110 0.2172 0.3650 0.2262 0.2679 0.4393 0.2593 0.1088 0.1258 0.6452 0.1792 0.1688 
+SMPModel: Closing database 
+SMPModel: Closing database succeeded. 
+Finish time: Tue May 30 10:05:09 2017
+ 
+Elapsed time: 0.2225 seconds 

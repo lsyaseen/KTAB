@@ -27,13 +27,11 @@
 
 #include "edemo.h" 
 #include "emodel.cpp" 
+#include <easylogging++.h>
 
 
 
 namespace MDemo { // a namespace of which M, A, P, S know nothing
-using std::cout;
-using std::endl;
-using std::flush;
 using std::function;
 using std::get;
 using KBase::ReportingLevel;
@@ -156,8 +154,7 @@ function < vector<VBool>()> tbv(unsigned int nAct, unsigned int nBits, PRNG* rng
   // structure by averaging each point with its n neighbors twice
   auto uMat1 = KMatrix::uniform(rng, nAct, ic, 0.0, 1.0);
   auto uMat2 = smooth(smooth(uMat1));
-  uMat2.mPrintf("%.4f ");
-  cout << endl;
+  uMat2.mPrintf("%.4f "); 
   return rfn;
 }
 
@@ -192,29 +189,29 @@ function < vector<VBool>()> thetaBV(unsigned int n) {
 
 void demoEMod(uint64_t s) {
   using KBase::EModel;
-  cout << endl;
-  printf("Using PRNG seed: %020llu \n", s);
+  LOG(INFO) << " ";
+  LOG(INFO) << KBase::getFormattedString("demoEMod using PRNG seed:  %020llu", s);
 
-  printf("Creating EModel objects ... \n");
+  LOG(INFO) << "Creating EModel objects ... ";
 
   string n2D = "EModel-TwoDPoint";
   auto em2D = new EModel<TwoDPoint>(n2D, s);
-  cout << "Populating " << n2D << endl;
+  LOG(INFO) << KBase::getFormattedString("Populating %s ", n2D.c_str());
   em2D->enumOptions = theta2D;
   em2D->setOptions();
-  cout << "Now have " << em2D->numOptions() << " enumerated options" << endl;
-
-  cout << endl;
+  LOG(INFO) << KBase::getFormattedString("Now have %u enumerated options", em2D->numOptions());
+   
   string nBV = "EModel-VBool";
-  EModel<VBool>* emBV = new EModel<VBool>( nBV, s);
-  cout << "Populating " << nBV << endl;
+  EModel<VBool>* emBV = new EModel<VBool>( nBV, s); 
+  LOG(INFO) << KBase::getFormattedString("Populating %s ", nBV.c_str());
   const unsigned int numActTBV = 17;
   const unsigned int numBitsTBV = 4;
   emBV->enumOptions = tbv(numActTBV, numBitsTBV, emBV->rng); //  thetaBV(4);
-  emBV->setOptions();
-  cout << "Now have " << emBV->numOptions() << " enumerated options" << endl;
+  emBV->setOptions(); 
+  LOG(INFO) << KBase::getFormattedString("Now have %u enumerated options", emBV->numOptions());
 
-  printf("Deleting EModel objects ... \n");
+
+  LOG(INFO) << "Deleting EModel objects ... ";
   delete em2D;
   delete emBV;
   return;

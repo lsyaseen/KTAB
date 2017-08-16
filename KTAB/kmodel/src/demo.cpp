@@ -25,22 +25,12 @@
 // and functions in the MDemo namespace.
 // --------------------------------------------
 
-#include "kutils.h"
-#include "kmodel.h"
-#include "emodel.h"
-#include "gaopt.h"
-#include "hcsearch.h"
 #include "demo.h"
-#include "demomtch.h"
-#include "demoleon.h"
-#include "sqlitedemo.h"
 #include "edemo.h"
 #include "tinyxml2demo.h" 
 #include "csvdemo.h"
+#include <easylogging++.h>
 
-using std::cout;
-using std::endl;
-using std::flush;
 using std::get;
 using std::string;
 using std::tuple;
@@ -59,18 +49,15 @@ using KBase::PCEModel;
 using KBase::VotingRule;
 using KBase::VPModel;
 
-using KBase::GAOpt;
-using KBase::GHCSearch;
-
 namespace MDemo { // a namespace of which M, A, P, S know nothing
 
 // --------------------------------------------
 
 void demoPCE(uint64_t s, PRNG* rng) {
-  printf("Using PRNG seed: %020llu \n", s);
+  LOG(INFO) << KBase::getFormattedString("demoPCE using PRNG seed:  %020llu", s);
   rng->setSeed(s);
 
-  cout << "Demonstrate minimal PCE" << endl << endl;
+  LOG(INFO) << "Demonstrate minimal PCE";
 
   VPModel vpm = VPModel::Linear;
   switch (rng->uniform() % 6) {
@@ -91,14 +78,14 @@ void demoPCE(uint64_t s, PRNG* rng) {
     vpm = VPModel::Binary;
     break;
   default:
-    cout << "Unrecognized VPModel option" << endl << flush;
+    LOG(INFO) << "Unrecognized VPModel option";
     assert(false);
     break;
   }
 
-  cout << "Using VPModel " << vpm << endl;
+  LOG(INFO) << "Using VPModel " << vpm;
 
-  cout << "First, stable distrib is exactly as expected in bilateral conflict" << endl;
+  LOG(INFO) << "First, stable distrib is exactly as expected in bilateral conflict";
 
   auto cFn = [rng](unsigned int i, unsigned int j) {
     if (i == j) {
@@ -111,53 +98,48 @@ void demoPCE(uint64_t s, PRNG* rng) {
   };
 
   auto show = [](const KMatrix & cMat, const KMatrix & pvMat, const KMatrix & pVec) {
-    cout << "Coalitions matrix:" << endl;
+    LOG(INFO) << "Coalitions matrix:";
     cMat.mPrintf(" %6.3f ");
-    cout << endl;
-    cout << "prob[i>j] Markov transitions matrix:" << endl;
+    LOG(INFO) << "prob[i>j] Markov transitions matrix:";
     pvMat.mPrintf(" %.4f ");
-    cout << endl;
-    cout << "limiting stable prob[i] vector:" << endl;
+    LOG(INFO) << "limiting stable prob[i] vector:";
     pVec.mPrintf(" %.4f ");
-    cout << endl;
     return;
   };
-  cout << "Compare simple " << vpm << " ratios to2-by-2  Markov-uniform ..." << endl;
+  LOG(INFO) << "Compare simple " << vpm << " ratios to2-by-2  Markov-uniform ...";
   auto c = KMatrix::map(cFn, 2, 2);
   auto p3 = Model::markovIncentivePCE(c, vpm);
   auto ppv = Model::probCE2(PCEModel::MarkovUPCM, vpm, c);
   auto p2 = get<0>(ppv); // column
   auto pv = get<1>(ppv); //square
-  cout << "2-Option Markov Uniform " << endl;
+  LOG(INFO) << "2-Option Markov Uniform ";
   show(c, pv, p2);
-  cout << "Markov Incentive" << endl;
+  LOG(INFO) << "Markov Incentive";
   show(c, pv, p3);
 
-  cout << endl;
   p3 = get<0>(Model::probCE2(PCEModel::MarkovIPCM, vpm, c));
-  cout << "2-Option Markov Incentive" << endl;
+  LOG(INFO) << "2-Option Markov Incentive";
   show(c, pv, p3);
-  cout << endl;
-  cout << "But not so clear with three options ..." << endl;
+  LOG(INFO) << "But not so clear with three options ...";
   c = KMatrix::map(cFn, 3, 3);
   ppv = Model::probCE2(PCEModel::MarkovUPCM, vpm, c);
   p2 = get<0>(ppv); // column
   pv = get<1>(ppv); //square
-  cout << "3-Option Markov Uniform " << endl;
+  LOG(INFO) << "3-Option Markov Uniform ";
   p3 = Model::markovIncentivePCE(c, vpm);
 
-  cout << endl << "Markov Uniform  " << endl;
+  LOG(INFO) << "Markov Uniform  ";
   show(c, pv, p2);
-  cout << "Markov Incentive" << endl;
+  LOG(INFO) << "Markov Incentive";
   show(c, pv, p3);
 
-  cout << "3-Option Markov Incentive" << endl << flush;
-  cout << "probCE2 ... " << endl << flush;
+  LOG(INFO) << "3-Option Markov Incentive";
+  LOG(INFO) << "probCE2 ... ";
   p3 = get<0>(Model::probCE2(PCEModel::MarkovIPCM, vpm, c));
-  cout << "tmpMarkovIncentivePCE ... " << endl << flush;
+  LOG(INFO) << "tmpMarkovIncentivePCE ... ";
   show(c, pv, p3);
   // ---------------------------
-  cout << endl << "Conditional PCE model: " << endl;
+  LOG(INFO) << "Conditional PCE model: ";
   p2 = get<0>(Model::probCE2(PCEModel::ConditionalPCM, vpm, c));
   show(c, pv, p2);
   return;
@@ -171,34 +153,32 @@ void demoSpVSR(uint64_t s, PRNG* rng) {
   using std::shared_ptr;
   using std::tuple;
 
-  printf("Using PRNG seed: %020llu \n", s);
+  LOG(INFO) << KBase::getFormattedString("demoSpVSR using PRNG seed:  %020llu", s);
   rng->setSeed(s);
 
-  cout << "Demonstrate shared_ptr<void> for returns" << endl;
-  cout << "This will be necessary to return arbitrary structures " << endl;
-  cout << "from bestTarget without using a bare void* pointer." << endl;
-  cout << endl;
+  LOG(INFO) << "Demonstrate shared_ptr<void> for returns";
+  LOG(INFO) << "This will be necessary to return arbitrary structures ";
+  LOG(INFO) << "from bestTarget without using a bare void* pointer.";
 
   // if x is of type shared_ptr(T), then x.get() is of type T*,
   // so we dereference a shared pointer as *(x.get()), aka *x.get()
 
   auto sp1 = make_shared<int>(42); // shared pointer to an integer
-  printf("Use count sp1: %li \n", sp1.use_count());
+  LOG(INFO) << KBase::getFormattedString("Use count sp1: %li", sp1.use_count());
   //int* p1 = sp1.get(); // gets the  pointer
-  cout << "The shared integer is " << *sp1.get() << endl;
+  LOG(INFO) << "The shared integer is " << *sp1.get();
   {   // create another reference
     auto sp2 = sp1;
-    printf("Use count sp1: %li \n", sp1.use_count());
+    LOG(INFO) << KBase::getFormattedString("Use count sp1: %li", sp1.use_count());
     // let it go out-of-scope
   }
-  printf("Use count sp1: %li \n", sp1.use_count());
-  cout << endl;
+  LOG(INFO) << KBase::getFormattedString("Use count sp1: %li", sp1.use_count());
   const string fs = " %+6.2f ";
   // function<shared_ptr<void>(unsigned int, unsigned int)> fn
   auto fn = [rng, &fs](unsigned int nr, unsigned int nc) {
     auto m1 = KMatrix::uniform(rng, nr, nc, -10, +50);
     auto d = KBase::norm(m1);
-    cout << "Inside lambda:" << endl;
+    LOG(INFO) << "Inside lambda:";
     m1.mPrintf(fs);
     shared_ptr<void> rslt = make_shared<tuple<double, KMatrix>>(d, m1); // shared_ptr version of (void*)
     return rslt;
@@ -206,13 +186,13 @@ void demoSpVSR(uint64_t s, PRNG* rng) {
 
 
   shared_ptr<void> r1 = fn(5, 3); // DO NOT try "void* r = fn(5,3).get()" - it will segv
-  printf("Reference count: %li \n", r1.use_count());
+  LOG(INFO) << KBase::getFormattedString("Reference count: %li", r1.use_count());
 
   auto r53 = *((tuple<double, KMatrix>*) r1.get());
   // we get() the bare pointer, a void*,
   // cast it to tuple<...>*,
   // then dereference that pointer.
-  cout << endl << "As retrieved:" << endl;
+  LOG(INFO) << "As retrieved:";
   get<1>(r53).mPrintf(fs);
 
   return;
@@ -223,8 +203,10 @@ void demoSpVSR(uint64_t s, PRNG* rng) {
 
 
 int main(int ac, char **av) {
-  using std::cout;
-  using std::endl;
+  // Set logging configuration from a file
+  el::Configurations confFromFile("./kmodel-logger.conf");
+  el::Loggers::reconfigureAllLoggers(confFromFile);
+  
   using KBase::dSeed;
 
   auto sTime = KBase::displayProgramStart();
@@ -251,7 +233,7 @@ int main(int ac, char **av) {
     printf("--pce             simple PCE\n");
     printf("--mi              markov incentives PCE\n");
     printf("--emod  (si|cp)   simple enumerated model, starting at self-interested or central position \n");
-    printf("--fit             fit weights \n");
+    //printf("--fit             fit weights \n"); // now in pmatrix demo
     printf("--spvsr           demonstrated shared_ptr<void> return\n");
     printf("--sql             demo SQLite \n");
     printf("--tx2  <file>     demo TinyXML2 library \n"); // e.g. dummyData_3Dim.xml
@@ -264,7 +246,7 @@ int main(int ac, char **av) {
 
   if (ac > 1) {
     for (int i = 1; i < ac; i++) {
-      cout << "Argument " << i << " is -|" << av[i] << "|-" << endl << flush;
+      LOG(INFO) << "Argument" << i << "is -|" << av[i] << "|-";
       if (strcmp(av[i], "--seed") == 0) {
         i++;
         seed = std::stoull(av[i]);
@@ -318,23 +300,23 @@ int main(int ac, char **av) {
 
   PRNG * rng = new PRNG();
   seed = rng->setSeed(seed); // 0 == get a random number
-  printf("Using PRNG seed:  %020llu \n", seed);
-  printf("Same seed in hex:   0x%016llX \n", seed);
+  LOG(INFO) << KBase::getFormattedString("Using PRNG seed:  %020llu", seed);
+  LOG(INFO) << KBase::getFormattedString("Same seed in hex:   0x%016llX", seed);
 
 
   // note that we reset the seed every time, so that in case something
   // goes wrong, we need not scroll back too far to find the
   // seed required to reproduce the bug.
   if (pceP) {
-    cout << "-----------------------------------" << endl;
+    LOG(INFO) << "-----------------------------------";
     MDemo::demoPCE(seed, rng);
   }
   if (spvsrP) {
-    cout << "-----------------------------------" << endl;
+    LOG(INFO) << "-----------------------------------";
     MDemo::demoSpVSR(seed, rng);
   }
   if (csvSMP) {
-    cout << "-----------------------------------" << endl;
+    LOG(INFO) << "-----------------------------------";
     MDemo::demoMiniCSV(inputCSVSMP);
   }
 
@@ -361,29 +343,28 @@ int main(int ac, char **av) {
       }
     }
     auto pDist = Model::markovIncentivePCE(coalitions, vpm);
-    cout << "Markov Incentive probabiities with " << vpm << endl;
+    LOG(INFO) << "Markov Incentive probabiities with " << vpm;
     trans(pDist).mPrintf(" %.4f");
-    cout << endl << flush;
   }
 
 
   if (emodP) {
-    cout << "-----------------------------------" << endl;
+    LOG(INFO) << "-----------------------------------";
     MDemo::demoEMod(seed);
   }
 
   if (sqlP) {
-    cout << "-----------------------------------" << endl;
+    LOG(INFO) << "-----------------------------------";
     Model::demoSQLite();
     MDemo::demoDBObject();
   }
 
   if (tx2P) {
-    cout << "-----------------------------------" << endl;
+    LOG(INFO) << "-----------------------------------";
     TXDemo::demoTX2(inputXML);
   }
 
-  cout << "-----------------------------------" << endl;
+  LOG(INFO) << "-----------------------------------";
 
   delete rng;
   KBase::displayProgramEnd(sTime);

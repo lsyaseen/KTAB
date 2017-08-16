@@ -26,9 +26,9 @@
 #define KBASE_HCSEARCH_H
 
 #include <functional>   // function
-#include <iostream>     // cout, etc.
 #include <tuple>        // tuple, get, etc.
 #include <vector>
+#include <easylogging++.h>
 
 #include "kutils.h"
 #include "kmatrix.h"
@@ -43,9 +43,6 @@
 
 namespace KBase {
 
-using std::cout;
-using std::endl;
-using std::flush;
 using std::tuple;
 
 using KBase::ReportingLevel;
@@ -178,20 +175,19 @@ GHCSearch<HCP>::run(HCP p0, ReportingLevel srl,
     iter++;
 
     if (ReportingLevel::Low < srl) {
-      printf("%u/%u iterations    %u/%u stable \n", iter, iMax, sIter, sMax);
-      printf("newBest value: %+.4f up %+.4f \n", vBest, dv);
-      printf("newBest point: ");
+      LOG(INFO) << KBase::getFormattedString("%u/%u iterations    %u/%u stable", iter, iMax, sIter, sMax);
+      LOG(INFO) << KBase::getFormattedString("newBest value: %+.4f up %+.4f", vBest, dv);
+      LOG(INFO) << "newBest point:";
       show(p0);
-      cout << endl << endl;
     }
   }
   if (ReportingLevel::Silent < srl) {
-    printf("GHCSearch::run ended with %u/%u iterations    %u/%u stable \n", iter,
-           iMax, sIter, sMax);
-    printf("newBest value: %+.4f\n", v0);
-    printf("newBest point: ");
+    LOG(INFO) << KBase::getFormattedString(
+      "GHCSearch::run ended with %u/%u iterations    %u/%u stable", iter,
+      iMax, sIter, sMax);
+    LOG(INFO) << KBase::getFormattedString("newBest value: %+.4f", v0);
+    LOG(INFO) << "newBest point:";
     show(p0);
-    cout << endl << endl;
   }
 
   auto rslt = tuple<double, HCP, unsigned int, unsigned int>(v0, p0, iter, sIter);

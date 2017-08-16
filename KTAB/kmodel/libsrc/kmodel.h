@@ -44,6 +44,10 @@
 #include "kutils.h"
 #include "kmatrix.h"
 #include "prng.h"
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <map>
+#include <memory>
 
 namespace KBase {
 using std::ostream;
@@ -59,6 +63,7 @@ class PRNG;
 class State;
 class Actor;
 class KTable;
+
 
 // -------------------------------------------------
 // The enum classes are quite repetitive.
@@ -83,7 +88,6 @@ ET enumFromName (const string& ets, const vector<string>& etNames) {
     }
   }
   if (!found) {
-    std::cout << "unrecognized enum-type name:  " << ets << std::endl<< std::flush;
     throw(KException("enumFromName: unrecognized enum-type name"));
   }
   return et;
@@ -284,12 +288,14 @@ protected:
 class Model {
 public:
 
-  sqlite3 *smpDB = nullptr; // keep this protected, to ease later multi-threading
   // JAH 20160711 added seed 20160730 JAH added sql flags
   // BPW 2016-09-28 removed redundant PRNG input variable
   //explicit Model(string d, uint64_t s, vector<bool> f);
   explicit Model(string d, uint64_t s, vector<bool> f, string Name = "");
   virtual ~Model();
+
+  // forbid copying of entire model objects
+  Model(const Model& that) = delete;
 
   static const unsigned int minNumActor = 3;
   static const unsigned int maxNumActor = 250; //quite generous, as we expect 10-30.
@@ -415,6 +421,17 @@ public:
   uint64_t getSeed() const;
 
   static KTable * createSQL(unsigned int n);
+
+  void initDBDriver(QString connectionName);
+  bool connectDB();
+  void closeDB();
+  static void loginCredentials(string connString);
+  void beginDBTransaction();
+  void commitDBTransaction();
+  QSqlQuery getQuery();
+
+  static void configLogger(string logFile);
+
 protected:
   //static string createTableSQL(unsigned int tn);
   static const int NumTables = 13; //TODO: constant need to be redefined when new table is added
@@ -423,7 +440,7 @@ protected:
   // synchronized with the result of createSQL(k) !
 
 
-  // TODO: rename this from 'smpDB' to 'scenarioDB'
+
   // Note that, with composite models, there many be dozens interacting.
   string scenName = "Scen"; // default is set from UTC time
   string scenDesc = ""; // default is set from UTC time
@@ -433,8 +450,23 @@ protected:
   // this is the basic model of victory dependent on strength-ratio
   static tuple<double, double> vProb(VPModel vpm, const double s1, const double s2);
 
-
-
+  static QString dbDriver;
+  static QString server;
+  static int port;
+  static QString databaseName;
+  static QString userName;
+  static QString password;
+  QSqlDatabase *qtDB = nullptr;
+  mutable QSqlQuery query;
+  void configSqlite() const;
+  void execQuery(std::string& qry);
+  bool createDB(const QString& dbName);
+  bool connect(const QString& server,
+    const int port,
+    const QString& databaseName,
+    const QString& userName,
+    const QString& password);
+  bool isDB(const QString& databaseName);
 private:
   static KMatrix markovUniformPCE(const KMatrix & pv);
   //static KMatrix markovIncentivePCE(const KMatrix & pv);
@@ -452,7 +484,19 @@ public:
   void randomizeUtils(double minU, double maxU, double uNoise); //testing only
 
   void clear();
-  virtual void addPstn(Position* p);
+
+  // Notice that there are two different ways to add positions.
+  // Because the state constructor pre-allocates the pstns array to match
+  // the number of actors, it sometimes makes an array of non-trivial size,
+  // and sometimes it makes an array of size zero.
+  // If you are in the former case, like when a model is doing bargaining from 
+  // the current state to the next, then you add positions by putting them
+  // in the right, pre-allocated space.
+  // However, if you are in the latter case, like when a new model is having
+  // its first round of actors created and their positions recorded, then
+  // you need to push actors into the Model and push their positions into the
+  // State. This function is for the latter case.
+  virtual void pushPstn(Position* p);
 
   // use the parameters of your state to compute the relative probability of each unique position.
   // persp = -1 means use everyone's separate perspectives (i.e. get actual probabilities, not one actor's beliefs).

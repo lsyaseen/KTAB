@@ -39,9 +39,6 @@ using KBase::VPModel;
 
 namespace DemoSMP {
 
-using std::cout;
-using std::endl;
-using std::flush;
 using std::function;
 using std::get;
 using std::string;
@@ -62,20 +59,23 @@ smpStopFn(unsigned int minIter, unsigned int maxIter, double minDeltaRatio, doub
         bool longEnough = (minIter <= iter);
         bool quiet = false;
         auto sf = [](unsigned int i1, unsigned int i2, double d12) {
-            printf("sDist [%2i,%2i] = %.2E   ", i1, i2, d12);
-            return;
+            return KBase::getFormattedString("sDist [%2i,%2i] = %.2E   ", i1, i2, d12);;
         };
         auto s0 = ((const SMPState*)(s->model->history[0]));
         auto s1 = ((const SMPState*)(s->model->history[1]));
         auto d01 = SMPModel::stateDist(s0, s1) + minSigDelta;
-        sf(0, 1, d01);
+        string logMsg;
+        logMsg += sf(0, 1, d01);
         auto sx = ((const SMPState*)(s->model->history[iter - 0]));
         auto sy = ((const SMPState*)(s->model->history[iter - 1]));
         auto dxy = SMPModel::stateDist(sx, sy);
-        sf(iter - 1, iter - 0, dxy);
+        logMsg += sf(iter - 1, iter - 0, dxy);
+        LOG(INFO) << logMsg;
         const double aRatio = dxy / d01;
         quiet = (aRatio < minDeltaRatio);
-        printf("\nFractional change compared to first step: %.4f  (target=%.4f) \n\n", aRatio, minDeltaRatio);
+        LOG(INFO) << KBase::getFormattedString(
+          "Fractional change compared to first step: %.4f  (target=%.4f)\n",
+          aRatio, minDeltaRatio);
         return tooLong || (longEnough && quiet);
     };
     return sfn;
@@ -84,35 +84,231 @@ smpStopFn(unsigned int minIter, unsigned int maxIter, double minDeltaRatio, doub
 
 } // end of namespace
 
+
+void MainWindow::configureDB(bool bl)
+{
+    quint8 conTypeIndex = 0 ;// 0- SQLITE, 1 - PostgreSQL index
+    if(connectionString.contains("QPSQL"))
+    {
+        conTypeIndex = 1;
+    }
+    dbDialog = new DatabaseDialog;
+//    connect(dbDialog,SIGNAL(configDbDriver(QString)),dbObj,SLOT(addDatabase(QString)));
+    connect(dbDialog,SIGNAL(connectionStringPath(QString,QStringList)),this,SLOT(connectionStrPath(QString,QStringList)));
+    dbDialog->showDialog(conTypeIndex,dbParaMemory);
+}
+
+void MainWindow::postgresDBList(QStringList *dbList, bool imp)
+{
+    if(recentFileAccess.isEmpty()==true)
+    {
+        QDialog * dbListDialog = new QDialog(this);
+        QGridLayout * mainLayout = new QGridLayout;
+        dbListDialog->setLayout(mainLayout);
+        dbListDialog->setMaximumWidth(500);
+        dbListDialog->setMaximumHeight(300);
+        dbListDialog->setModal(true);
+        dbListDialog->setWindowTitle("KTAB SMP: Databases ");
+        dbListDialog->setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+
+        QLabel *actorHLabel= new QLabel("Existing Postgres DB List");
+        mainLayout->addWidget(actorHLabel,0,0,Qt::AlignHCenter);
+
+        QListView * dbListView = new QListView(this);
+        QStandardItemModel *dbListModel = new QStandardItemModel;
+
+        for (int i = 0 ; i < dbList->count(); ++i)
+        {
+            QStandardItem * item = new QStandardItem(dbList->at(i));
+            item->setEditable(false);
+            dbListModel->setItem(i,0,item);
+        }
+        dbListView->setModel(dbListModel);
+
+        connect(dbListView,SIGNAL(clicked(QModelIndex)),this,SLOT(dbListClicked(QModelIndex)));
+
+        mainLayout->addWidget(actorHLabel,1,0,Qt::AlignHCenter);
+        mainLayout->addWidget(dbListView,2,0);
+
+        dbDialogName = new QLineEdit(generateTimeStamp());
+        QPushButton * generateTS = new QPushButton;
+        generateTS->setIcon(QIcon("://images/regenerate.png"));
+        generateTS->setMaximumWidth(50);
+        connect(generateTS,SIGNAL(clicked(bool)),this,SLOT(getTimeStamp(bool)));
+
+        QGridLayout * fileNameLayout = new QGridLayout;
+        fileNameLayout->addWidget(dbDialogName,0,0);
+        fileNameLayout->addWidget(generateTS,0,3);
+
+        mainLayout->addLayout(fileNameLayout,3,0);
+
+        QGridLayout * controlsLayout = new QGridLayout;
+        QPushButton * donePB = new QPushButton("Done");
+        QPushButton * cancelPB = new QPushButton("Cancel");
+        controlsLayout->addWidget(donePB,0,Qt::AlignRight);
+        controlsLayout->addWidget(cancelPB,0,Qt::AlignLeft);
+
+        connect(donePB,SIGNAL(clicked(bool)),dbListDialog,SLOT(close()));
+        connect(donePB,SIGNAL(clicked(bool)),this,SLOT(dbDonePushButtonClicked(bool)));
+        connect(cancelPB,SIGNAL(clicked(bool)),dbListDialog,SLOT(close()));
+
+        mainLayout->addLayout(controlsLayout,4,0,Qt::AlignBottom);
+
+        //Different options for Import and Run
+        if(true==imp)//DB import
+        {
+            dbDialogName->setText(dbList->last());
+            generateTS->hide();
+        }
+        else
+        {
+            generateTS->show();
+        }
+        dbListDialog->show();
+    }
+    else
+    {
+        if(dbList->contains(recentFileAccess))
+        {
+            postgresRecentAccess();
+        }
+        else
+        {
+            removeFromRecentFileHistory(recentFileAccess);
+            recentFileAccess.clear();
+        }
+    }
+}
+
+void MainWindow::getTimeStamp(bool bl)
+{
+    dbDialogName->setText(generateTimeStamp());
+}
+
+void MainWindow::configUsingMenu(bool bl)
+{
+    menuconfig = true;
+}
+
+void MainWindow::dbListClicked(QModelIndex indx)
+{
+    dbDialogName->setText(indx.data().toString());
+}
+
+void MainWindow::dbDonePushButtonClicked(bool bl)
+{
+    //index 1
+    QString dbName = dbDialogName->text();
+    dbPath=dbName;
+    QStringList connString = connectionString.split(";");
+
+    connectionString.clear();
+    for(int i = 0 ; i < connString.length() ; ++ i)
+    {
+        if(i==1)
+        {
+            connectionString.append("Database=").append(dbName).append(";");
+        }
+        else
+        {
+            QString str = connString.at(i);
+            if(!str.trimmed().isEmpty())
+            {
+                connectionString.append(str).append(";");
+            }
+        }
+    }
+
+    if(importedDBFile==false)
+    {
+        runModel(connectionString,dbName);
+    }
+    else
+    {
+        dbGetFilePAth(true,dbPath,false);
+    }
+}
+
 void MainWindow::runPushButtonClicked(bool bl)
 {
     Q_UNUSED(bl)
+    importedDBFile=false;
+    if(connectionString.isEmpty())
+    {
+        menuconfig = false;
+        configureDB(true);
+    }
+    else
+    {
+        if(connectionString.contains("QSQLITE")) // for SQLite
+        {
+            QDateTime UTC = QDateTime::currentDateTime().toTimeSpec(Qt::UTC);
+            QString name (UTC.toString());
+
+            name.replace(" ","_").replace(":","_");
+
+            QFileDialog fileDialog(this);
+            QString dbFilePath = fileDialog.getSaveFileName(this, tr("Save DB file as "),
+                                                            QString(homeDirectory+QDir::separator()+name),tr("DB File (*.db)"),
+                                                            0,QFileDialog::DontConfirmOverwrite);
+            if(!dbFilePath.isEmpty())
+            {
+                QString connectionStr;
+                connectionStr.append("Driver=QSQLITE;");//connectionType
+                //            connectionStr.append("Server=localhost;");//host address
+                connectionStr.append("Database=").append(dbFilePath.remove(".db").trimmed()).append(";");
+
+                QDir dir = QFileInfo(dbFilePath.append(".db")).absoluteDir();
+                homeDirectory = dir.absolutePath();
+
+                connectionString = connectionStr;
+                runModel(connectionString,dbFilePath.remove(".db"));
+            }
+        }
+        else // Postgres
+        {
+            emit getPostgresDBList(connectionString,false);// true == imported, false == run
+        }
+    }
+}
+
+void MainWindow::runModel(QString conStr, QString fileName)
+{
 
     QDateTime UTC = QDateTime::currentDateTime().toTimeSpec(Qt::UTC);
-    QString name (UTC.toString());
-
-    name.replace(" ","_").replace(":","_");
-
+    QString name("ktab-smp-");
+    name.append(QString::number(UTC.date().year())).append("-");
+    name.append(QString("%1").arg(UTC.date().month(), 2, 10, QLatin1Char('0'))).append("-");
+    name.append(QString("%1").arg(UTC.date().day(), 2, 10, QLatin1Char('0'))).append("__");
+    name.append(QString("%1").arg(UTC.time().hour(), 2, 10, QLatin1Char('0'))).append("-");
+    name.append(QString("%1").arg(UTC.time().minute(), 2, 10, QLatin1Char('0'))).append("-");
+    name.append(QString("%1").arg(UTC.time().second(), 2, 10, QLatin1Char('0')));
+    name.append("_GMT");
 
     logSMPDataOptionsAnalysis();
 
-    QString dbFilePath;
+    QString connectDBString;
 
-    QFileDialog fileDialog(this);
-    dbFilePath = fileDialog.getSaveFileName(this, tr("Save DB file as "),
-                                            QString(homeDirectory+QDir::separator()+name),tr("DB File (*.db)"),
-                                            0,QFileDialog::DontConfirmOverwrite);
+    //    QFileDialog fileDialog(this);
+    //    dbFilePath = fileDialog.getSaveFileName(this, tr("Save DB file as "),
+    //                                            QString(homeDirectory+QDir::separator()+name),tr("DB File (*.db)"),
+    //                                            0,QFileDialog::DontConfirmOverwrite);
 
-    if(!dbFilePath.isEmpty())
+    connectDBString = conStr;
+    //    qDebug()<<connectDBString << "db";
+
+    if(!connectDBString.isEmpty())
     {
         runButton->setEnabled(false);
         runButton->setStyleSheet("border-style: outset; border-width: 2px;border-color: red;");
 
-        if(!dbFilePath.endsWith(".db"))
-            dbFilePath.append(".db");
+        //        if(dbFilePath.endsWith(".db"))
+        //        {
+        //            dbFilePath.remove(".db");
+        //        }
 
-        QDir dir =QFileInfo(dbFilePath).absoluteDir();
-        homeDirectory = dir.absolutePath();
+        //        QDir dir =QFileInfo(dbFilePath).absoluteDir();
+        //        homeDirectory = dir.absolutePath();
 
         statusBar()->showMessage(" Please wait !! Executing SMP ....  This may take a while ....");
 
@@ -165,31 +361,37 @@ void MainWindow::runPushButtonClicked(bool bl)
         //        printf("Using PRNG seed:  %020llu \n", seed);
         //        printf("Same seed in hex:   0x%016llX \n", seed);
 
-        using std::cout;
-        using std::endl;
-        using std::flush;
-        cout << "-----------------------------------" << endl << flush;
         if(savedAsXml==true)
         {
+            //            currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
+            //                                                      (sqlFlags, dbFilePath.toStdString(),
+            //                                                       xmlPath.toStdString(),seed,false,parameters));
+            SMPLib::SMPModel::loginCredentials(connectDBString.toStdString());
+
             currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
-                                                      (sqlFlags, dbFilePath.toStdString(),
+                                                      (sqlFlags,
                                                        xmlPath.toStdString(),seed,false,parameters));
         }
         else
         {
+            //            currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
+            //                                                      (sqlFlags, dbFilePath.toStdString(),
+            //                                                       csvPath.toStdString(),seed,false,parameters));
+
+            SMPLib::SMPModel::loginCredentials(connectDBString.toStdString());
+
             currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
-                                                      (sqlFlags, dbFilePath.toStdString(),
+                                                      (sqlFlags,
                                                        csvPath.toStdString(),seed,false,parameters));
         }
-        cout << "-----------------------------------" << endl;
 
         KBase::displayProgramEnd(sTime);
-        cout << flush;
 
         QApplication::restoreOverrideCursor();
 
         statusBar()->showMessage(" Process Completed !! ");
-        smpDBPath(dbFilePath);
+
+        smpDBPath(fileName);
     }
     else
     {
@@ -225,61 +427,60 @@ void MainWindow::disableRunButton(QTableWidgetItem *itm)
 void MainWindow::logSMPDataOptionsAnalysis()
 {
     QDateTime UTC = QDateTime::currentDateTime().toTimeSpec(Qt::UTC);
-    QString name (UTC.toString());
-    name.replace(" ","_").replace(":","_");
+    QString name("ktab-smp-");
+    name.append(QString::number(UTC.date().year())).append("-");
+    name.append(QString("%1").arg(UTC.date().month(), 2, 10, QLatin1Char('0'))).append("-");
+    name.append(QString("%1").arg(UTC.date().day(), 2, 10, QLatin1Char('0'))).append("__");
+    name.append(QString("%1").arg(UTC.time().hour(), 2, 10, QLatin1Char('0'))).append("-");
+    name.append(QString("%1").arg(UTC.time().minute(), 2, 10, QLatin1Char('0'))).append("-");
+    name.append(QString("%1").arg(UTC.time().second(), 2, 10, QLatin1Char('0')));
+    name.append("_GMT");
 
     if(logDefaultAct->isChecked()==true)
     {
         if(logFileName.isEmpty())
         {
-            fclose(stdout);
-            fp_old = *stdout;
-            QString logFileNewName = QString(homeDirectory+QDir::separator()+name);
-            logFileNewName.append("DefaultLog.txt");
-            logFileName = logFileNewName;
+            logFileName = name.append("_log.txt");
         }
-        stream = freopen(logFileName.toStdString().c_str(),"a+",stdout);
+
+        loggerConf.setGlobally(el::ConfigurationType::Filename, logFileName.toStdString());
+        // Enable all the logging
+        loggerConf.set(el::Level::Global, el::ConfigurationType::Enabled, "true");
+        el::Loggers::reconfigureAllLoggers(loggerConf);
     }
     else if(logNewAct->isChecked()==true)
     {
         fclose(stdout);
         fp_old = *stdout;
         QString logFileNewName = QString(homeDirectory+QDir::separator()+name);
-        logFileNewName.append("Log");
         QString saveLogFilePath = QFileDialog::getSaveFileName(this, tr("Save Log File to "),logFileNewName,
                                                                tr("Text File (*.txt)"),0,QFileDialog::DontConfirmOverwrite);
         if(!saveLogFilePath.isEmpty())
         {
-            if(!saveLogFilePath.endsWith(".txt"))
-                saveLogFilePath.append(".txt");
-
+            if(saveLogFilePath.endsWith(".txt"))
+            {
+                saveLogFilePath.remove(".txt");
+            }
             QDir dir =QFileInfo(saveLogFilePath).absoluteDir();
             homeDirectory = dir.absolutePath();
 
             logFileNewName=saveLogFilePath;
+
+            std::string logFileName = logFileNewName.append("_log.txt").toStdString();
+            loggerConf.setGlobally(el::ConfigurationType::Filename, logFileName);
+            // Enable all the logging
+            loggerConf.set(el::Level::Global, el::ConfigurationType::Enabled, "true");
+            el::Loggers::reconfigureAllLoggers(loggerConf);
         }
-        stream = freopen(logFileNewName.toStdString().c_str(),"a+",stdout);
     }
     else
     {
         if(logNoneAct->isChecked()==true)
         {
-            fclose(stdout);
-            FILE* outfile = fopen ("/dev/null", "w");
-            if (outfile != NULL)
-            {
-                *stdout = *outfile;
-                stream=freopen("/dev/null", "w" ,stdout);
-            }
-            else
-            {
-                outfile = fopen ("NUL", "w");
-                if (outfile != NULL)
-                {
-                    *stdout = *outfile;
-                    stream=freopen("nul", "w" ,stdout);
-                }
-            }
+            // Disable all the logging
+            loggerConf.set(el::Level::Global, el::ConfigurationType::Enabled, "false");
+
+            el::Loggers::reconfigureAllLoggers(loggerConf);
         }
     }
 
@@ -617,6 +818,8 @@ void MainWindow::setDefaultParameters()
 
 void MainWindow::saveTurnHistoryToCSV()
 {
+    SMPLib::SMPModel::loginCredentials(connectionString.toStdString());
+
     QString csvFileNameLocation = QFileDialog::getSaveFileName(
                 this, tr("Save Log File to "),QString(homeDirectory+QDir::separator()+"Log"),"CSV File (*.csv)");
 
@@ -625,7 +828,6 @@ void MainWindow::saveTurnHistoryToCSV()
         QDir dir =QFileInfo(csvFileNameLocation).absoluteDir();
         homeDirectory = dir.absolutePath();
         //        setCurrentFile(csvFileNameLocation);
-        qDebug()<<csvFileNameLocation.remove(".csv") << dbPath <<scenarioBox ;
         if(sankeyOutputHistory==true)
         {
             SMPLib::md0->sankeyOutput(csvFileNameLocation.toStdString()

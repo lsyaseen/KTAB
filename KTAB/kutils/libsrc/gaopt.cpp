@@ -23,12 +23,6 @@
 // Very basic genetic optimization
 // -------------------------------------------------
 
-#include <assert.h>
-#include <iostream>
-#include <tuple>
-
-#include "kutils.h"
-#include "prng.h"
 #include "gaopt.h"
 
 namespace KBase {

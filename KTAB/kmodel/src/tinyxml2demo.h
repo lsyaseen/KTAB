@@ -25,7 +25,6 @@
 #define DEMO_TINYXML2_H
 
 #include <cstdlib>
-#include <iostream>
 #include <stdio.h>
 #include <string>
 #include <tinyxml2.h>

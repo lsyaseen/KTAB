@@ -225,7 +225,6 @@ void MainWindow::populateLineGraphActorsList()
         connect(actor,SIGNAL(toggled(bool)),this,SLOT(lineGraphActorsCheckboxClicked(bool)));
         lineActorCBList.append(actor);
     }
-
     lineGraphActorsScrollArea->setWidget(widget);
     lineCustomGraph->setBackground(QBrush(QColor(255,255,255)));
 
@@ -344,17 +343,6 @@ void MainWindow::lineGraphSelectAllActorsCheckBoxClicked(bool click)
         lineLabelToggleList[actors]=false;
     }
 
-    //    if(lineLabelToggleList.contains(true))
-    //    {
-    //        for(int i=0; i <lineLabelList.length();++i)
-    //        {
-    //             if(lineLabelToggleList.at(i)==true)
-    //            {
-    //                lineLabelList.at(i)->setVisible(false);
-    //                lineLabelToggleList[i]=false;
-    //            }
-    //        }
-    //    }
     lineCustomGraph->clearGraphs();
     emit getScenarioRunValues(lineGraphTurnSlider->value(),scenarioBox,dimension);
     lineCustomGraph->replot();
@@ -403,8 +391,6 @@ void MainWindow::lineGraphActorsCheckboxClicked(bool click)
 
     lineLabelList.at(actorId)->setVisible(false);
     lineLabelToggleList[actorId]=false;
-
-
 
     lineGraphCheckedActorsIdList[actorId]=click;
 
@@ -470,14 +456,14 @@ void MainWindow::createSpline(const QVector<double> &x, const QVector<double> &y
     {
         QVector<double> X(x), Y(y);
 
-        QList< double > deltaX;
-        QList< double > deltaY;
+        QVector< double > deltaX;
+        QVector< double > deltaY;
 
-        QList< double > absDeltaX;
-        QList< double > absDeltaY;
+        QVector< double > absDeltaX;
+        QVector< double > absDeltaY;
 
-        QList< qint8 > sgnDeltaX;
-        QList< qint8 > sgnDeltaY;
+        QVector< qint8 > sgnDeltaX;
+        QVector< qint8 > sgnDeltaY;
 
         double xDiff15 = 0.05;
         double xDiff24 = 0.05;

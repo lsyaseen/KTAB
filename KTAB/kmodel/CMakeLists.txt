@@ -101,6 +101,10 @@ if (NOT SQLITE_FOUND)
 endif (NOT SQLITE_FOUND) 
 
 # -------------------------------------------------
+
+find_package(Easyloggingpp)
+
+# -------------------------------------------------
 # See "Findkutils.cmake" in cmakemodules to figure
 # out where it looks and what variables it sets
 
@@ -108,6 +112,17 @@ find_package(kutils)
 if(NOT KUTILS_FOUND)
   message(FATAL_ERROR "Could not find kutils")
 endif(NOT KUTILS_FOUND)
+
+#--------------------------------------------------
+find_package(qtlibs)
+
+set(CMAKE_PREFIX_PATH ${PREFIX_PATH})
+message(STATUS "CMAKE_PREFIX_PATH" ${CMAKE_PREFIX_PATH})
+
+find_package(Qt5 REQUIRED COMPONENTS Core Sql)
+if(NOT Qt5_FOUND)
+  message(FATAL_ERROR "Could not find QT")
+endif(NOT Qt5_FOUND)
 
 # -------------------------------------------------
 # files to be built into a library go in libsrc/
@@ -117,6 +132,7 @@ include_directories(
   ${KUTILS_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}/libsrc/
   ${SQLITE_INCLUDE_DIR}
+  ${LOGGER_INCLUDE_DIR}
   )
 set(KTABMODEL_SRCS
   libsrc/kmodel.cpp
@@ -128,6 +144,9 @@ set(KTABMODEL_SRCS
 
 add_library(kmodel STATIC ${KTABMODEL_SRCS})
 
+target_link_libraries (kmodel
+    Qt5::Sql
+)
  
 # -------------------------------------------------
 # Under Linux, default start of DESTINATION path is /usr/local/ 
@@ -170,6 +189,7 @@ INCLUDE_DIRECTORIES(
   ${EFENCE_INCLUDE_DIR}
   ${SQLITE_INCLUDE_DIR}
   ${TINYXML2_INCLUDE_DIR}
+  ${LOGGER_INCLUDE_DIR}
   )
 
 
@@ -184,6 +204,7 @@ TARGET_LINK_LIBRARIES(leonApp
   ${KUTILS_LIBRARY}
   ${EFENCE_LIBRARIES}
   ${SQLITE_LIBRARIES}
+  ${LOGGER_LIBRARY}
   )
 
 # -------------------------------------------------
@@ -197,6 +218,7 @@ TARGET_LINK_LIBRARIES(mtchApp
   ${KUTILS_LIBRARY}
   ${EFENCE_LIBRARIES}
   ${SQLITE_LIBRARIES}
+  ${LOGGER_LIBRARY}
   )
 
 # -------------------------------------------------
@@ -215,6 +237,7 @@ TARGET_LINK_LIBRARIES(demomodel
   ${EFENCE_LIBRARIES}
   ${SQLITE_LIBRARIES}
   ${TINYXML2_LIBRARIES}
+  ${LOGGER_LIBRARY}
   )
 # -------------------------------------------------
 # show some useful status/debugging information

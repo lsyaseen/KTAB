@@ -48,7 +48,7 @@ The code is compiled, linked, and tested with absolutely no modification, simult
   * Fedora 22 with gcc/g++ 5.1,
   * openSUSE 13.2 with clang/clang++ 3.5,
   * Debian 8.1 with gcc/g++ 4.9,
-  * Ubuntu 16.04 with gcc/g++ 5.4.
+  * Ubuntu 14.04 &amp; 16.04 with gcc/g++ 5.4.
 
 ### Language Versions ###
 
@@ -65,17 +65,19 @@ parallel assignment with pattern matching.
 
 ## User Interfaces ##
 
-A graphical front-end is under development. The current GUI version of the SMP, `KTAB_SMP`, has been developed in [Qt](https://www.qt.io/). Qt is dual-licensed under both commercial and open-source terms; details can be found [here](https://www.qt.io/qt-licensing-terms/). The Qt licensing page states that dynamically linking an application to the open-source Qt libraries does not make the application open-source.
+A graphical front-end is under continual development. The current GUI version of the SMP, `KTAB_SMP`, has been developed in [Qt](https://www.qt.io/). Qt is dual-licensed under both commercial and open-source terms; details can be found [here](https://www.qt.io/qt-licensing-terms/). The Qt licensing page states that dynamically linking an application to the open-source Qt libraries does not make the application open-source.
 
 Previous work toward a graphical front-end was based on the FLTK project (http://www.fltk.org) [FLTK](http://www.fltk.org). FLTK is a cross-platform, C++ tookit provided under the terms of the GNU Library Public License, Version 2 with exceptions that allow for static linking; details can be found [here](http://www.fltk.org/COPYING.php).  The source code and build instructions for the most recent stable version can be obtained  [here](http://www.fltk.org/software.php). FLTK also uses CMake for configuration, then your favorite IDE to build.
 
 Because the libraries that analyze negotiation are completely separate from the applications that use them, developers are perfectly free to write command line applications or use other GUI toolkits. Along these lines, the GUI work is expected to diversify into other toolkits, such as [WxWidgets](https://www.wxwidgets.org/), or even a web interface such as [Wt](http://www.webtoolkit.eu/wt).
 
+We have also included a [python script](./examples/smp/pySMP.py) to demonstrate how to use the python to execute the SMP model using a shared library. We anticipate adding a similar sample script for Java at a later date.
+
 For authoritative ruling on licensing issues, consult appropriate counsel.
 
 ## Data Input Formats ##
 
-To read and write XML data files, KTAB uses the [TinyXML2](https://github.com/leethomason/tinyxml2) library, which is available on [GitHub](https://github.com/).
+To read and write XML data files, KTAB uses the [TinyXML2](https://github.com/leethomason/tinyxml2) library, which is available on [GitHub](https://github.com/). When configuring TinyXML2 with cmake, be sure to use the `DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_STATIC_LIBS:BOOL=ON -DCMAKE_CXX_FLAGS=-fPIC` flags.
 
 
 ## Contributing and License Information ##

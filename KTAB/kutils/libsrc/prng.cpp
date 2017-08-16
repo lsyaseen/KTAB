@@ -28,9 +28,6 @@
 
 
 namespace KBase {
-using std::cout;
-using std::endl;
-using std::flush;
 
 /*
   The q transformation is 1-to-1, mod 2^w, for any w>0,

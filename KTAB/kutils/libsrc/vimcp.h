@@ -30,7 +30,6 @@
 
 #include <assert.h>
 #include <functional>
-#include <iostream>
 #include <tuple>
 
 #include "kutils.h"

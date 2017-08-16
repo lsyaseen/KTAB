@@ -41,6 +41,17 @@ if (NOT SQLITE_FOUND)
   message(FATAL_ERROR "Could not find SQLite")
 endif (NOT SQLITE_FOUND)
 
+#--------------------------------------------------
+find_package(qtlibs)
+set(CMAKE_PREFIX_PATH ${PREFIX_PATH})
+message(STATUS "CMAKE_PREFIX_PATH" ${CMAKE_PREFIX_PATH})
+
+find_package(Qt5 REQUIRED COMPONENTS Core Sql)
+
+# --------------------------------------------------------
+
+find_package(Easyloggingpp)
+
 # --------------------------------------------------------
 # See "Findkutils.cmake" in cmakemodules to figure
 # out where it looks and what variables it sets
@@ -66,6 +77,7 @@ INCLUDE_DIRECTORIES(
   ${SQLITE_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}/libsrc/
   ${PROJECT_SOURCE_DIR}/src/ 
+  ${LOGGER_INCLUDE_DIR}
   )
   
 set(AGENDALIB_SRCS
@@ -74,6 +86,11 @@ set(AGENDALIB_SRCS
 
 add_library(agenda STATIC ${AGENDALIB_SRCS})
  
+target_link_libraries (agenda
+  Qt5::Core
+  Qt5::Sql
+  )
+
 ADD_EXECUTABLE(agdemo
   src/demo.cpp 
   )
@@ -84,6 +101,7 @@ target_link_libraries (agdemo
   ${KUTILS_LIBRARY}
   ${SQLITE_LIBRARIES}
   ${EFENCE_LIBRARIES}
+  ${LOGGER_LIBRARY}
   )
 # -------------------------------------------------
 # show some useful status/debugging information
