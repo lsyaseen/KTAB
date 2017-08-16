@@ -18,7 +18,7 @@ For PostgreSQL, the database user specified in database_user_name must have "con
 There are several new shared libraries which are necessary to support this additional functionality. These are included in the KTAB_SMP.zip release archive.
 
 
-## Compilation of SMP Dynamic Link Library
+## Compilation of SMP Shared Library
 Compilation of the SMP project now results in a dynamic link library for the SMP model, as well as the existing `smpc` and `KTAB_SMP` applications. This library can be used to embed the SMP model in other applications - even those not built in C++. On Windows, the library is named `smpDyn.dll`, and on Linux, it is `libsmpDyn.so`. There is also a new application compiled named `smpcDyn` which uses the library; no change has been made to the existing SMP applications. We have included a [python script](./examples/smp/pySMP.py) to demonstrate how to use the new shared library to execute the SMP model from python. We anticipate adding a similar sample script for Java at a later date.
 
 A few changes need to be made to how some supporting libraries for KTAB are compiled; specifically:
