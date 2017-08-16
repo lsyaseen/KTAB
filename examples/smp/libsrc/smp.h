@@ -433,6 +433,8 @@ public:
   static double getQuadMapPoint(const QString &connectionName, const string &scenarioID,
     size_t turn, size_t est_h, size_t aff_k, size_t init_i, size_t rcvr_j);
 
+  static uint getIterationCount();
+
 protected:
   //sqlite3 *smpDB = nullptr; // keep this protected, to ease multi-threading
   //string scenName = "Scen";

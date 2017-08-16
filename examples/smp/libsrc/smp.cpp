@@ -44,7 +44,7 @@ extern "C" {
     }
   }
 
-  void runSmpModel(char * buffer, const unsigned int buffsize, unsigned int sqlLogFlags[5], const char* inputDataFile,
+  uint runSmpModel(char * buffer, const unsigned int buffsize, unsigned int sqlLogFlags[5], const char* inputDataFile,
     unsigned int seed, unsigned int saveHistory, int modelParams[9] = 0) {
 
     std::vector<bool> sqlFlags;
@@ -73,6 +73,12 @@ extern "C" {
       sqlFlags, std::string(inputDataFile), seed, saveHist, modelParameters
     );
     scenarioID.copy(buffer,buffsize);
+
+    return SMPLib::SMPModel::getIterationCount();
+  }
+
+  void destroySMPModel() {
+    SMPLib::SMPModel::destroyModel();
   }
 }
 
@@ -1914,6 +1920,10 @@ void SMPModel::randomSMP(unsigned int numA, unsigned int sDim, bool accP, uint64
     md0 = nullptr;
 
     return;
+}
+
+uint SMPModel::getIterationCount() {
+  return md0->history.size();
 }
 
 }; // end of namespace
