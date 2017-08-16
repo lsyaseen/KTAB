@@ -15,7 +15,7 @@ The `smpc` application no longer has the `--dbname` flag; it has been supplanted
 
 For PostgreSQL, the database user specified in database_user_name must have "connect" access to the default `postgres` database, as well as the rights to create tables, insert data, and select data on at least one database. Ideally, the user could have rights to add databases.
 
-There are several new dynamic link libraries which are necessary to support this additional functionality. These will be included in the KTAB_SMP.zip release archive.
+There are several new shared libraries which are necessary to support this additional functionality. These are included in the KTAB_SMP.zip release archive.
 
 
 ## Compilation of SMP Dynamic Link Library
