@@ -98,4 +98,4 @@ modStates = runSmpModel(scenID,bsize,sqlFlags,inputDataFile,seed,saveHist,modelP
 res = destroySMPModel()
 # get scenario ID
 scenID = scenID.value.decode('utf-8')
-print('Scenario ID: %s, %d iterations'%(scenID,modStates))
+print('Scenario ID: %s, %d states'%(scenID,modStates))
