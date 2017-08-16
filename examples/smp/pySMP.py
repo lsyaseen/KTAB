@@ -45,12 +45,17 @@ proto_LC = c.CFUNCTYPE(c.c_voidp, c.c_char_p)
 dbLoginCredentials = proto_LC(('dbLoginCredentials',smpLib))
 
 # SMP model; the C function declaration is
-# const char* runSmpModel(unsigned int sqlLogFlags[5], const char*,
+# uint runSmpModel(unsigned int sqlLogFlags[5], const char*,
 # inputDataFile, unsigned int seed, unsigned int saveHistory,
 # int modelParams[9] = 0)
-sqlFlagsType = c.c_bool*5; modelParamsType = c.c_int*9
-proto_SMP = c.CFUNCTYPE(c.c_char_p,c.c_char_p,c.c_uint,sqlFlagsType,c.c_char_p,c.c_uint64,c.c_bool,modelParamsType)
+sqlFlagsType = c.c_int*5; modelParamsType = c.c_int*9
+proto_SMP = c.CFUNCTYPE(c.c_uint,c.c_char_p,c.c_uint,sqlFlagsType,c.c_char_p,c.c_uint64,c.c_bool,modelParamsType)
 runSmpModel = proto_SMP(('runSmpModel',smpLib))
+
+# model desctructor; the C function delaration is
+# void destroySMPModel()
+proto_DM = c.CFUNCTYPE(c.c_voidp)
+destroySMPModel = proto_DM(('destroySMPModel',smpLib))
 
 ''' Prepare the C-type Variables '''
 logFile = bytes(os.getcwd()+os.sep+'smpc-logger.conf',encoding="ascii")
@@ -89,7 +94,8 @@ modelParams = modelParamsType(0,0,0,2,1,1,1,1,0) # these are the defaul paramete
 ''' Finally, run the Model '''
 res = configLogger(logFile)
 res = dbLoginCredentials(connString)
-res = runSmpModel(scenID,bsize,sqlFlags,inputDataFile,seed,saveHist,modelParams)
+modStates = runSmpModel(scenID,bsize,sqlFlags,inputDataFile,seed,saveHist,modelParams)
+res = destroySMPModel()
 # get scenario ID
 scenID = scenID.value.decode('utf-8')
-print('Scenario ID: %s'%scenID)
+print('Scenario ID: %s, %d iterations'%(scenID,modStates))
