@@ -435,6 +435,12 @@ public:
 
   static uint getIterationCount();
 
+  static uint getNumActors();
+
+  static uint getNumDim();
+
+  static SMPModel * getSmpModel();
+
 protected:
   //sqlite3 *smpDB = nullptr; // keep this protected, to ease multi-threading
   //string scenName = "Scen";
