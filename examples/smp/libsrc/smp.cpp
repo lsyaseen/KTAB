@@ -44,6 +44,21 @@ extern "C" {
     }
   }
 
+  uint getNumAct() {
+    SMPLib::SMPModel * md = SMPLib::SMPModel::getSmpModel();
+    return md->numAct;
+  }
+
+  uint getNumDim() {
+    SMPLib::SMPModel * md = SMPLib::SMPModel::getSmpModel();
+    return md->numDim;
+  }
+
+  uint getIterationCount() {
+    SMPLib::SMPModel * md = SMPLib::SMPModel::getSmpModel();
+    return md->history.size();
+  }
+
   uint runSmpModel(char * buffer, const unsigned int buffsize, unsigned int sqlLogFlags[5], const char* inputDataFile,
     unsigned int seed, unsigned int saveHistory, int modelParams[9] = 0) {
 
@@ -79,6 +94,37 @@ extern "C" {
 
   void destroySMPModel() {
     SMPLib::SMPModel::destroyModel();
+  }
+
+  using actorPos = struct singleActorPositions {
+    unsigned int actor;
+    unsigned int dim;
+    uint nState; // This should be equal to number of iterations/states
+    float pos[1000]; // possible upper limit of nState
+  };
+
+  //uint numAct = getNumAct();
+  //uint numDim = getNumDim();
+  //uint actorDimPairCount = numAct * numDim;
+  //actorPos allPositions[200];
+
+  void getVPHistory(actorPos allPostions[], uint numAct, uint numDim) {
+    uint actorDimPairCount = numAct * numDim;
+
+    uint actorDimPairIndex = 0;
+    float val = 1.0;
+    for (uint actor = 0; actor < numAct; ++actor) {
+      for (uint dim = 0; dim < numDim; ++dim) {
+        actorPos ap = allPostions[actorDimPairIndex];
+        ++actorDimPairIndex;
+        ap.actor = actor;
+        ap.dim = dim;
+        for (uint state = 0; state < ap.nState; ++state) {
+          ap.pos[state] = val;
+          val += 0.5;
+        }
+      }
+    }
   }
 }
 
@@ -1924,6 +1970,18 @@ void SMPModel::randomSMP(unsigned int numA, unsigned int sDim, bool accP, uint64
 
 uint SMPModel::getIterationCount() {
   return md0->history.size();
+}
+
+uint SMPModel::getNumActors() {
+  return md0->numAct;
+}
+
+uint SMPModel::getNumDim() {
+  return md0->numDim;
+}
+
+SMPModel * SMPModel::getSmpModel() {
+  return md0;
 }
 
 }; // end of namespace
