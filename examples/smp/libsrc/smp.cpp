@@ -103,11 +103,6 @@ extern "C" {
     float pos[1000]; // possible upper limit of nState
   };
 
-  //uint numAct = getNumAct();
-  //uint numDim = getNumDim();
-  //uint actorDimPairCount = numAct * numDim;
-  //actorPos allPositions[200];
-
   void getVPHistory(actorPos allPostions[], uint numAct, uint numDim) {
     uint actorDimPairCount = numAct * numDim;
 
@@ -115,12 +110,12 @@ extern "C" {
     float val = 1.0;
     for (uint actor = 0; actor < numAct; ++actor) {
       for (uint dim = 0; dim < numDim; ++dim) {
-        actorPos ap = allPostions[actorDimPairIndex];
+        actorPos *ap = &allPostions[actorDimPairIndex];
         ++actorDimPairIndex;
-        ap.actor = actor;
-        ap.dim = dim;
-        for (uint state = 0; state < ap.nState; ++state) {
-          ap.pos[state] = val;
+        ap->actor = actor;
+        ap->dim = dim;
+        for (uint state = 0; state < ap->nState; ++state) {
+          ap->pos[state] = val;
           val += 0.5;
         }
       }
