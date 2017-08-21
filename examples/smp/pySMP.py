@@ -100,8 +100,8 @@ saveHist = c.c_bool(False)
 modelParams = modelParamsType(0,0,0,2,1,1,1,1,0) # these are the defaul parameters
 
 ''' Run the Model '''
-configLogger(logFile)
-dbLoginCredentials(connString)
+res = configLogger(logFile)
+res = dbLoginCredentials(connString)
 stateCnt = runSmpModel(scenID,bsize,sqlFlags,inputDataFile,seed,saveHist,modelParams)
 # might not need to get the # actors and dimensions if data was dynamically generated
 actorCnt = getNumAct()
@@ -137,21 +137,19 @@ posHistType = ((c.c_float * stateCnt) * dimensionCnt)*actorCnt
 proto_PS = c.CFUNCTYPE(c.c_voidp,c.POINTER(posHistType),c.c_uint,c.c_uint,c.c_uint)
 getVPHistory = proto_PS(('getVPHistory',smpLib))
 posHists = posHistType()
-getVPHistory(posHists,actorCnt,dimensionCnt,stateCnt)
+res = getVPHistory(posHists,actorCnt,dimensionCnt,stateCnt)
 for a in range(actorCnt):
   for d in range(dimensionCnt):
     print('Pos Hist for Actor %d, Dimension %d:'%(a,d))
     print('\t[%s]'%', '.join(['%0.2f'%p for p in posHists[a][d]]))
 
 
-
-destroySMPModel()
-# get scenario ID
+# show scenario ID
 scenID = scenID.value.decode('utf-8')
 print('Scenario ID: %s, %d states'%(scenID,stateCnt))
 
-
-
+# release the C model object memory
+res = destroySMPModel()
 
 
 
