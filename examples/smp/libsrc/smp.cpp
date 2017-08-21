@@ -30,6 +30,8 @@
 #include <QVariant>
 #include <QSqlError>
 #include <QSqlRecord>
+#include <iostream>
+using namespace std;
 
 extern "C" {
   void configLogger(const char *cfgFile) {
@@ -96,30 +98,65 @@ extern "C" {
     SMPLib::SMPModel::destroyModel();
   }
 
-  using actorPos = struct singleActorPositions {
-    unsigned int actor;
-    unsigned int dim;
-    uint nState; // This should be equal to number of iterations/states
-    float pos[1000]; // possible upper limit of nState
-  };
+using posHistory = struct posHistory {
+    int act;
+    int dim;
+    int stt;
+    float pos[100][100][100];
+};
+    
+//  using actorPos = struct singleActorPositions {
+//    unsigned int actor;
+//    unsigned int dim;
+//    unsigned int nState; // This should be equal to number of iterations/states
+//    float pos[1000][1000]; // possible upper limit of nState
+//  };
 
-  void getVPHistory(actorPos allPostions[], uint numAct, uint numDim) {
-    uint actorDimPairCount = numAct * numDim;
+/*void getVPHistory(actorPos * allPostions[], uint numAct, uint numDim, uint numState);
 
-    uint actorDimPairIndex = 0;
+
+void testVPHistory() {
+  actorPos allPositions[200];
+
+  uint na = 2;
+  uint nd = 2;
+uint ns = 3;
+  uint pairs = na * nd;
+
+  getVPHistory(allPositions, na, nd, ns);
+
+  for (uint i = 0; i < pairs; ++i) {
+    actorPos ap = allPositions[i];
+    cout << ap.actor << ", "
+      << ap.dim << endl;
+    for (uint state = 0; state < ap.nState; ++state) {
+      cout << ap.pos[state] << ", ";
+    }
+    cout << endl;
+  }
+}*/
+
+  void getVPHistory(float hist[100][100][100], uint numAct, uint numDim, uint numState)
+  {
+    // talk a little
+    cout << "Actors: " << numAct << " Dimensions: " << numDim << " States: " << numState << endl;
+    
+    // loop through all actors, dims, and states and store the positions
     float val = 1.0;
-    for (uint actor = 0; actor < numAct; ++actor) {
-      for (uint dim = 0; dim < numDim; ++dim) {
-        actorPos *ap = &allPostions[actorDimPairIndex];
-        ++actorDimPairIndex;
-        ap->actor = actor;
-        ap->dim = dim;
-        for (uint state = 0; state < ap->nState; ++state) {
-          ap->pos[state] = val;
+    for (uint actor = 0; actor < numAct; ++actor)
+    {
+  	  //cout << "Actor " << actor << endl;
+      for (uint dim = 0; dim < numDim; ++dim)
+      {
+        //cout << "Dimension " << dim << endl;
+        for (uint state = 0; state < numState; ++state)
+        {
+          hist[actor][dim][state] = val;
+          cout << "A: " << actor << " D: " << dim << " S: " << state << "\tAdded position: " << hist[actor][dim][state] << endl;
           val += 0.5;
         }
       }
-    }
+    }       
   }
 }
 

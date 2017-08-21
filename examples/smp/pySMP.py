@@ -45,12 +45,25 @@ proto_LC = c.CFUNCTYPE(c.c_voidp, c.c_char_p)
 dbLoginCredentials = proto_LC(('dbLoginCredentials',smpLib))
 
 # SMP model; the C function declaration is
-# const char* runSmpModel(unsigned int sqlLogFlags[5], const char*,
-# inputDataFile, unsigned int seed, unsigned int saveHistory,
-# int modelParams[9] = 0)
-sqlFlagsType = c.c_bool*5; modelParamsType = c.c_int*9
-proto_SMP = c.CFUNCTYPE(c.c_char_p,c.c_char_p,c.c_uint,sqlFlagsType,c.c_char_p,c.c_uint64,c.c_bool,modelParamsType)
+# uint runSmpModel(char * buffer, const unsigned int buffsize,
+#   unsigned int sqlLogFlags[5], const char* inputDataFile,
+#   unsigned int seed, unsigned int saveHistory, int modelParams[9] = 0)
+sqlFlagsType = c.c_bool*5     # array of 5 booleans
+modelParamsType = c.c_int*9   # array of 9 integers
+proto_SMP = c.CFUNCTYPE(c.c_uint,c.c_char_p,c.c_uint,sqlFlagsType,c.c_char_p,c.c_uint64,c.c_bool,modelParamsType)
 runSmpModel = proto_SMP(('runSmpModel',smpLib))
+
+# model desctructor; the C function delaration is
+# void destroySMPModel()
+proto_DM = c.CFUNCTYPE(c.c_voidp)
+destroySMPModel = proto_DM(('destroySMPModel',smpLib))
+
+# get number actors & dims; the C function delclarations are:
+# uint getNumAct() and uint getNumDim()
+proto_NA = c.CFUNCTYPE(c.c_uint)
+getNumAct = proto_NA(('getNumAct',smpLib))
+proto_ND = c.CFUNCTYPE(c.c_uint)
+getNumDim = proto_ND(('getNumDim',smpLib))
 
 ''' Prepare the C-type Variables '''
 logFile = bytes(os.getcwd()+os.sep+'smpc-logger.conf',encoding="ascii")
@@ -86,10 +99,76 @@ saveHist = c.c_bool(False)
 # (see the KTAB documentation & associated publications)
 modelParams = modelParamsType(0,0,0,2,1,1,1,1,0) # these are the defaul parameters
 
-''' Finally, run the Model '''
-res = configLogger(logFile)
-res = dbLoginCredentials(connString)
-res = runSmpModel(scenID,bsize,sqlFlags,inputDataFile,seed,saveHist,modelParams)
+''' Run the Model '''
+configLogger(logFile)
+dbLoginCredentials(connString)
+stateCnt = runSmpModel(scenID,bsize,sqlFlags,inputDataFile,seed,saveHist,modelParams)
+# might not need to get the # actors and dimensions if data was dynamically generated
+actorCnt = getNumAct()
+dimensionCnt = getNumDim()
+
+# debug
+actorCnt = 3
+dimensionCnt = 2
+stateCnt = 5
+
+#''' Setup to Get Some Model Results '''
+#class posHist(c.Structure):
+#	_fields_ = [("actorCnt",c.c_uint),\
+#             ("dimensionCnt",c.c_uint),\
+#             ("stateCnt",c.c_uint),\
+#             ('positions',((c.c_float * stateCnt) * dimensionCnt)*actorCnt)]
+#
+#posHists = posHist()
+#
+#proto_PS = c.CFUNCTYPE(c.c_voidp,c.POINTER(posHist),c.c_uint,c.c_uint,c.c_uint)
+#getVPHistory = proto_PS(('getVPHistory',smpLib))
+#
+#getVPHistory(posHists,actorCnt,dimensionCnt,stateCnt)
+#
+## print out what we got back
+#for a in range(posHists.actorCnt):
+#  for d in range(posHists.dimensionCnt):
+#    print('Pos Hist for Actor %d, Dimension %d:'%(a,d))
+#    print('\t[%s]'%', '.join(['%0.2f'%p for p in posHists.positions[a][d]]))
+
+# try a simple 3-d array
+posHistType = ((c.c_float * stateCnt) * dimensionCnt)*actorCnt
+proto_PS = c.CFUNCTYPE(c.c_voidp,c.POINTER(posHistType),c.c_uint,c.c_uint,c.c_uint)
+getVPHistory = proto_PS(('getVPHistory',smpLib))
+posHists = posHistType()
+getVPHistory(posHists,actorCnt,dimensionCnt,stateCnt)
+for a in range(actorCnt):
+  for d in range(dimensionCnt):
+    print('Pos Hist for Actor %d, Dimension %d:'%(a,d))
+    print('\t[%s]'%', '.join(['%0.2f'%p for p in posHists[a][d]]))
+
+
+
+destroySMPModel()
 # get scenario ID
 scenID = scenID.value.decode('utf-8')
-print('Scenario ID: %s'%scenID)
+print('Scenario ID: %s, %d states'%(scenID,stateCnt))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
