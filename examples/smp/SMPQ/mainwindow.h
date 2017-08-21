@@ -349,7 +349,8 @@ private :
     QCPPlotTitle * barGraphTitle;
 
 signals :
-    void getActorIdsInRange(double lowerRange, double upperRange, int dimension, int turn);
+    void getActorIdsInRange(double lowerRange, double upperRange, int dimension, int turn, bool yaxis);
+    void getYaxisMaxHeight(double range, int dim);
 
 private slots:
     void barGraphSelectAllActorsCheckBoxClicked(bool Click);
@@ -365,6 +366,7 @@ private slots:
     void saveBarPlotAsBMP();
     void saveBarPlotAsPDF();
     double updateYaxisMaxVal(int dim);
+    void yAxisMaxLength(double yAxis);
 
 
     //line Graph

@@ -169,15 +169,11 @@ void MainWindow::xAxisRangeChanged( const QCPRange &newRange, const QCPRange &ol
     {
         barCustomGraph->xAxis->setAutoTicks(false);
         barCustomGraph->xAxis->setAutoTickLabels(false);
-        // barCustomGraph->xAxis->setRangeLower( 0 );
-        // barCustomGraph->xAxis->setRangeUpper( oldRange.upper );
     }
     else
     {
         barCustomGraph->xAxis->setAutoTicks(true);
         barCustomGraph->xAxis->setAutoTickLabels(true);
-        //         barCustomGraph->xAxis->setTicks(true);
-        //        barCustomGraph->xAxis->setRangeUpper( newRange.upper );
     }
 }
 void MainWindow::yAxisRangeChanged( const QCPRange &newRange, const QCPRange &oldRange )
@@ -186,16 +182,11 @@ void MainWindow::yAxisRangeChanged( const QCPRange &newRange, const QCPRange &ol
     {
         barCustomGraph->yAxis->setAutoTicks(false);
         barCustomGraph->yAxis->setAutoTickLabels(false);
-        //        barCustomGraph->yAxis->setTicks(false);
-        //        barCustomGraph->yAxis->setRangeLower(0 );
-        //        barCustomGraph->yAxis->setRangeUpper( oldRange.upper );
     }
     else
     {
         barCustomGraph->yAxis->setAutoTicks(true);
         barCustomGraph->yAxis->setAutoTickLabels(true);
-        //         barCustomGraph->yAxis->setTicks(true);
-        //        barCustomGraph->yAxis->setRangeUpper( newRange.upper );
     }
 }
 
@@ -215,7 +206,6 @@ void MainWindow::saveBarPlotAsBMP()
     if(!fileName.isEmpty())
     {
         barCustomGraph->saveBmp(fileName);
-        //        setCurrentFile(fileName);
     }
 }
 
@@ -225,19 +215,24 @@ void MainWindow::saveBarPlotAsPDF()
     if(!fileName.isEmpty())
     {
         barCustomGraph->savePdf(fileName);
-        //        setCurrentFile(fileName);
     }
 }
 
 double MainWindow::updateYaxisMaxVal(int dim)
 {
     double maxLen = 0.0;
+
     for (int act=0; act < actorsInfl.length();++ act)
     {
         maxLen += actorsInfl.at(act).toDouble() * actorsSal[dim].at(act).toDouble();
     }
     return maxLen;
 
+}
+
+void MainWindow::yAxisMaxLength(double yAxis)
+{
+    yAxisMaxFixedVal=yAxis;
 }
 
 void MainWindow::populateBarGraphActorsList()
@@ -344,7 +339,7 @@ void MainWindow::getActorsInRange(int dim)
 
     while(r2 <=1.0)
     {
-        emit getActorIdsInRange(r1*100,r2*100,dim,barGraphTurnSlider->value());
+        emit getActorIdsInRange(r1*100,r2*100,dim,barGraphTurnSlider->value(),false);
         r1=r2;
         r2+=binWidth;
     }
@@ -365,15 +360,7 @@ void MainWindow::scaleBars()
     }
     else if (barGraphYaxisOptionsComboBox->currentIndex()==1)
     {
-        if(yAxisMaxFixedVal<=0)
-        {
-            yAxisMaxFixedVal = updateYaxisMaxVal(barGraphDimensionComboBox->currentIndex());
-            barCustomGraph->yAxis->setRange(0,yAxisMaxFixedVal+10);
-        }
-        else
-        {
-            barCustomGraph->yAxis->setRange(0,yAxisMaxFixedVal+10);
-        }
+        barCustomGraph->yAxis->setRange(0,yAxisMaxFixedVal+10);
     }
     else
     {
@@ -446,6 +433,8 @@ void MainWindow::barGraphDimensionChanged(int value)
     getActorsInRange(dimension);
     barCustomGraph->xAxis->setRange(0,100);
     yAxisMaxFixedVal=0;
+    //yaxis range
+    getYaxisMaxHeight(barGraphGroupRangeLineEdit->text().toDouble(),dimension);
     scaleBars();
 }
 
@@ -461,7 +450,7 @@ void MainWindow::barGraphTurnSliderChanged(int value)
 void MainWindow::barGraphBinWidthButtonClicked(bool bl)
 {
     Q_UNUSED(bl)
-
+    getYaxisMaxHeight(barGraphGroupRangeLineEdit->text().toDouble(),barGraphDimensionComboBox->currentIndex());
     barGraphTurnSliderChanged(barGraphTurnSlider->value());
 }
 
@@ -475,7 +464,7 @@ void MainWindow::barGraphScalingChanged(int index)
     {
         bool ok;
         int  yScale = QInputDialog::getInt(this, tr("Get Y axis scale for Bar Plot"),
-                                           tr("Enter the Y Axis Scale Value"),0,1,99999,1,&ok);
+                                           tr("Enter the Y axis Scale Value"),0,1,99999,1,&ok);
         if (ok && yScale>0)
         {
             yAxisFixedVal=yScale;

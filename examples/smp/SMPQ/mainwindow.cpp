@@ -111,9 +111,12 @@ MainWindow::MainWindow()
 
 
     //BAR Charts
-    connect(this,SIGNAL(getActorIdsInRange(double,double,int,int)),dbObj,SLOT(getActorsInRangeFromDB(double,double,int,int)));
+    connect(this,SIGNAL(getActorIdsInRange(double,double,int,int,bool)),dbObj,SLOT(getActorsInRangeFromDB(double,double,int,int,bool)));
     connect(dbObj,SIGNAL(listActorsSalienceCapability(QVector<int>,QVector<double>,QVector<double>,double,double)),this,
             SLOT(barGraphActorsSalienceCapability(QVector<int>,QVector<double>,QVector<double>,double,double)));
+    connect(this,SIGNAL(getYaxisMaxHeight(double,int)),dbObj,SLOT(getYaxisMaxLength(double,int)));
+    connect(dbObj,SIGNAL(maxYaxisLen(double)),this,SLOT(yAxisMaxLength(double)));
+
 
     //LINE GRAPHS
     //To get dimensions count
@@ -294,6 +297,9 @@ void MainWindow::dbGetFilePAth(bool bl, QString smpDBPath, bool run)
             //To populate Bar Graph Dimensions combo box
             populateBarGraphDimensions(dimensionsLineEdit->text().toInt());
 
+            //yaxis range
+            getYaxisMaxHeight(barGraphGroupRangeLineEdit->text().toDouble(),barGraphDimensionComboBox->currentIndex());
+
         }
         else
         {
@@ -367,7 +373,6 @@ void MainWindow::updateScenarioListComboBox(QStringList * scenarios,QStringList*
                              "this may take some time !!");
     emit getActorMovedData(scenarioBox);
     QApplication::restoreOverrideCursor();
-
 
     //qDebug() <<scenarioBox;
     //    sliderStateValueToQryDB(0);//when new database is opened, start from zero
@@ -452,6 +457,7 @@ void MainWindow::scenarioComboBoxValue(int scenario)
             emit getStateCountfromDB();
 
             emit getDimforBar();
+            getYaxisMaxHeight(barGraphGroupRangeLineEdit->text().toDouble(),barGraphDimensionComboBox->currentIndex());
             barGraphTurnSliderChanged(barGraphTurnSlider->value());
 
             if (prevScenario != scenarioBox)
