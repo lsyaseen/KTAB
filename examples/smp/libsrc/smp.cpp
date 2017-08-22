@@ -1,4 +1,4 @@
-﻿// --------------------------------------------
+// --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------
 // The MIT License (MIT)
@@ -46,20 +46,37 @@ extern "C" {
     }
   }
 
-  uint getNumAct() {
+  uint getActorCount() {
     SMPLib::SMPModel * md = SMPLib::SMPModel::getSmpModel();
     return md->numAct;
   }
 
-  uint getNumDim() {
+  uint getDimensionCount() {
     SMPLib::SMPModel * md = SMPLib::SMPModel::getSmpModel();
     return md->numDim;
   }
 
-  uint getIterationCount() {
+  uint getStateCount() {
     SMPLib::SMPModel * md = SMPLib::SMPModel::getSmpModel();
     return md->history.size();
   }
+
+  //vector<float> getActorPostions(uint actor, uint dim) {
+  //  SMPLib::SMPModel * md = SMPLib::SMPModel::getSmpModel();
+  //  auto &history = md->history;
+
+  //  vector<float> actorPositions;
+
+  //  for (uint state = 0; state < history.size(); ++state) {
+  //    auto st = history[state];
+  //    auto pit = st->pstns[actor];
+  //    auto vpit = (const KBase::VctrPstn*)pit;
+  //    const double pCoord = (*vpit)(dim, 0) * 100.0; // Use the scale of [0,100]
+  //    actorPositions[state] = pCoord;
+  //  }
+
+  //  return actorPositions;
+  //}
 
   uint runSmpModel(char * buffer, const unsigned int buffsize, unsigned int sqlLogFlags[5], const char* inputDataFile,
     unsigned int seed, unsigned int saveHistory, int modelParams[9] = 0) {
@@ -98,66 +115,33 @@ extern "C" {
     SMPLib::SMPModel::destroyModel();
   }
 
-using posHistory = struct posHistory {
-    int act;
-    int dim;
-    int stt;
-    float pos[100][100][100];
-};
-    
-//  using actorPos = struct singleActorPositions {
-//    unsigned int actor;
-//    unsigned int dim;
-//    unsigned int nState; // This should be equal to number of iterations/states
-//    float pos[1000][1000]; // possible upper limit of nState
-//  };
 
-/*void getVPHistory(actorPos * allPostions[], uint numAct, uint numDim, uint numState);
-
-
-void testVPHistory() {
-  actorPos allPositions[200];
-
-  uint na = 2;
-  uint nd = 2;
-uint ns = 3;
-  uint pairs = na * nd;
-
-  getVPHistory(allPositions, na, nd, ns);
-
-  for (uint i = 0; i < pairs; ++i) {
-    actorPos ap = allPositions[i];
-    cout << ap.actor << ", "
-      << ap.dim << endl;
-    for (uint state = 0; state < ap.nState; ++state) {
-      cout << ap.pos[state] << ", ";
-    }
-    cout << endl;
-  }
-}*/
-
-  void getVPHistory(float hist[100][100][100], uint numAct, uint numDim, uint numState)
+  void getVPHistory(float positions[])
   {
-    // talk a little
-    cout << "Actors: " << numAct << " Dimensions: " << numDim << " States: " << numState << endl;
-    
-    // loop through all actors, dims, and states and store the positions
+    // Now time for Amit to get rid of the hardcoded +0.5 increment sequence
+    // and also fill in the number of states from the model!
+    SMPLib::SMPModel * md = SMPLib::SMPModel::getSmpModel();
+    uint numAct = md->numAct;
+    uint numDim = md->numDim;
+    uint numStt = md->history.size();
+
     float val = 1.0;
-    for (uint actor = 0; actor < numAct; ++actor)
+    uint posIndex = 0;
+
+    for (uint act = 0; act < numAct; ++act)
     {
-  	  //cout << "Actor " << actor << endl;
       for (uint dim = 0; dim < numDim; ++dim)
       {
-        //cout << "Dimension " << dim << endl;
-        for (uint state = 0; state < numState; ++state)
-        {
-          hist[actor][dim][state] = val;
-          cout << "A: " << actor << " D: " << dim << " S: " << state << "\tAdded position: " << hist[actor][dim][state] << endl;
-          val += 0.5;
-        }
+          for (uint stt = 0; stt < numStt; ++stt)
+          {
+              positions[posIndex] = val;
+              cout << "A: " << act << " D: " << dim << " S: " << stt << "\tAdded position: " << positions[posIndex] << " at " << posIndex << endl;
+              val += 0.5; posIndex++;
+          }
       }
-    }       
+    }
   }
+
 }
 
 namespace SMPLib {
@@ -2016,8 +2000,19 @@ SMPModel * SMPModel::getSmpModel() {
   return md0;
 }
 
+//vector<vector<float>> SMPModel::getActorPostions(uint actor, uint dim) {
+//  auto &history = md0->history;
+//  for (uint state = 0; state < history.size(); ++state) {
+//    auto st = history[state];
+//    auto pit = st->pstns[actor];
+//    auto vpit = (const VctrPstn*)pit;
+//    const double pCoord = (*vpit)(dim, 0) * 100.0; // Use the scale of [0,100]
+//  }
+//}
+
 }; // end of namespace
 
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------
+
