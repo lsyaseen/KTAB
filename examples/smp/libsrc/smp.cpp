@@ -30,8 +30,6 @@
 #include <QVariant>
 #include <QSqlError>
 #include <QSqlRecord>
-#include <iostream>
-using namespace std;
 
 extern "C" {
   void configLogger(const char *cfgFile) {
@@ -61,17 +59,12 @@ extern "C" {
     return md->history.size();
   }
 
-  uint runSmpModel(char * buffer, const unsigned int buffsize, unsigned int sqlLogFlags[5], const char* inputDataFile,
+  uint runSmpModel(char * buffer, const unsigned int buffsize, bool sqlLogFlags[5], const char* inputDataFile,
     unsigned int seed, unsigned int saveHistory, int modelParams[9] = 0) {
 
     std::vector<bool> sqlFlags;
     for (unsigned int i = 0; i < 5; ++i) {
-      if (0 == sqlLogFlags[i]) {
-        sqlFlags.push_back(false);
-      }
-      else {
-        sqlFlags.push_back(true);
-      }
+      sqlFlags.push_back(sqlLogFlags[i]);
     }
 
     bool saveHist = false;
@@ -100,26 +93,28 @@ extern "C" {
 
   void getVPHistory(float positions[])
   {
-    // Now time for Amit to get rid of the hardcoded +0.5 increment sequence
-    // and also fill in the number of states from the model!
     SMPLib::SMPModel * md = SMPLib::SMPModel::getSmpModel();
     uint numAct = md->numAct;
     uint numDim = md->numDim;
     uint numStt = md->history.size();
 
-    float val = 1.0;
-    uint posIndex = 0;
+    auto &history = md->history;
 
-    for (uint act = 0; act < numAct; ++act)
-    {
-      for (uint dim = 0; dim < numDim; ++dim)
-      {
-          for (uint stt = 0; stt < numStt; ++stt)
-          {
-              positions[posIndex] = val;
-              cout << "A: " << act << " D: " << dim << " S: " << stt << "\tAdded position: " << positions[posIndex] << " at " << posIndex << endl;
-              val += 0.5; posIndex++;
-          }
+    auto actorPosition = [&history](uint actor, uint dim, uint state) {
+      auto st = history[state];
+      auto pit = st->pstns[actor];
+      auto vpit = static_cast<KBase::VctrPstn*>(pit);
+      const double pCoord = (*vpit)(dim, 0) * 100.0; // Use the scale of [0,100]
+      return pCoord;
+    };
+
+    uint posIndex = 0;
+    for (uint actor = 0; actor < numAct; ++actor) {
+      for (uint dim = 0; dim < numDim; ++dim) {
+        for (uint state = 0; state < numStt; ++state) {
+          positions[posIndex] = actorPosition(actor, dim, state);
+          ++posIndex;
+        }
       }
     }
   }
@@ -1981,19 +1976,6 @@ SMPModel * SMPModel::getSmpModel() {
   return md0;
 }
 
-<<<<<<< HEAD
-=======
-//vector<vector<float>> SMPModel::getActorPostions(uint actor, uint dim) {
-//  auto &history = md0->history;
-//  for (uint state = 0; state < history.size(); ++state) {
-//    auto st = history[state];
-//    auto pit = st->pstns[actor];
-//    auto vpit = (const VctrPstn*)pit;
-//    const double pCoord = (*vpit)(dim, 0) * 100.0; // Use the scale of [0,100]
-//  }
-//}
-
->>>>>>> upstream/JAHpySMP
 }; // end of namespace
 
 // --------------------------------------------
