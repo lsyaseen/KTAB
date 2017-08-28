@@ -1,4 +1,4 @@
-﻿// --------------------------------------------
+// --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------
 // The MIT License (MIT)
@@ -30,6 +30,8 @@
 #include <QVariant>
 #include <QSqlError>
 #include <QSqlRecord>
+#include <iostream>
+using namespace std;
 
 extern "C" {
   void configLogger(const char *cfgFile) {
@@ -44,17 +46,17 @@ extern "C" {
     }
   }
 
-  uint getNumAct() {
+  uint getActorCount() {
     SMPLib::SMPModel * md = SMPLib::SMPModel::getSmpModel();
     return md->numAct;
   }
 
-  uint getNumDim() {
+  uint getDimensionCount() {
     SMPLib::SMPModel * md = SMPLib::SMPModel::getSmpModel();
     return md->numDim;
   }
 
-  uint getIterationCount() {
+  uint getStateCount() {
     SMPLib::SMPModel * md = SMPLib::SMPModel::getSmpModel();
     return md->history.size();
   }
@@ -96,28 +98,28 @@ extern "C" {
     SMPLib::SMPModel::destroyModel();
   }
 
-  using actorPos = struct singleActorPositions {
-    unsigned int actor;
-    unsigned int dim;
-    uint nState; // This should be equal to number of iterations/states
-    float pos[1000]; // possible upper limit of nState
-  };
+  void getVPHistory(float positions[])
+  {
+    // Now time for Amit to get rid of the hardcoded +0.5 increment sequence
+    // and also fill in the number of states from the model!
+    SMPLib::SMPModel * md = SMPLib::SMPModel::getSmpModel();
+    uint numAct = md->numAct;
+    uint numDim = md->numDim;
+    uint numStt = md->history.size();
 
-  void getVPHistory(actorPos allPostions[], uint numAct, uint numDim) {
-    uint actorDimPairCount = numAct * numDim;
-
-    uint actorDimPairIndex = 0;
     float val = 1.0;
-    for (uint actor = 0; actor < numAct; ++actor) {
-      for (uint dim = 0; dim < numDim; ++dim) {
-        actorPos *ap = &allPostions[actorDimPairIndex];
-        ++actorDimPairIndex;
-        ap->actor = actor;
-        ap->dim = dim;
-        for (uint state = 0; state < ap->nState; ++state) {
-          ap->pos[state] = val;
-          val += 0.5;
-        }
+    uint posIndex = 0;
+
+    for (uint act = 0; act < numAct; ++act)
+    {
+      for (uint dim = 0; dim < numDim; ++dim)
+      {
+          for (uint stt = 0; stt < numStt; ++stt)
+          {
+              positions[posIndex] = val;
+              cout << "A: " << act << " D: " << dim << " S: " << stt << "\tAdded position: " << positions[posIndex] << " at " << posIndex << endl;
+              val += 0.5; posIndex++;
+          }
       }
     }
   }
@@ -1979,8 +1981,22 @@ SMPModel * SMPModel::getSmpModel() {
   return md0;
 }
 
+<<<<<<< HEAD
+=======
+//vector<vector<float>> SMPModel::getActorPostions(uint actor, uint dim) {
+//  auto &history = md0->history;
+//  for (uint state = 0; state < history.size(); ++state) {
+//    auto st = history[state];
+//    auto pit = st->pstns[actor];
+//    auto vpit = (const VctrPstn*)pit;
+//    const double pCoord = (*vpit)(dim, 0) * 100.0; // Use the scale of [0,100]
+//  }
+//}
+
+>>>>>>> upstream/JAHpySMP
 }; // end of namespace
 
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------
+

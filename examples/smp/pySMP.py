@@ -33,6 +33,7 @@ import os
 smpLib = c.cdll.LoadLibrary(os.getcwd()+os.sep+'libsmpDyn.so')#linux
 #smpLib = c.cdll.LoadLibrary(os.getcwd()+os.sep+'smpDyn.dll')#windows
 
+
 ''' Prepare the SMP Function Prototypes '''
 # logger configuration; the C function declaration is
 # void configLogger(const char *cfgFile)
@@ -45,10 +46,11 @@ proto_LC = c.CFUNCTYPE(c.c_voidp, c.c_char_p)
 dbLoginCredentials = proto_LC(('dbLoginCredentials',smpLib))
 
 # SMP model; the C function declaration is
-# uint runSmpModel(unsigned int sqlLogFlags[5], const char*,
-# inputDataFile, unsigned int seed, unsigned int saveHistory,
-# int modelParams[9] = 0)
-sqlFlagsType = c.c_int*5; modelParamsType = c.c_int*9
+# uint runSmpModel(char * buffer, const unsigned int buffsize,
+#   unsigned int sqlLogFlags[5], const char* inputDataFile,
+#   unsigned int seed, unsigned int saveHistory, int modelParams[9] = 0)
+sqlFlagsType = c.c_bool*5     # array of 5 booleans
+modelParamsType = c.c_int*9   # array of 9 integers
 proto_SMP = c.CFUNCTYPE(c.c_uint,c.c_char_p,c.c_uint,sqlFlagsType,c.c_char_p,c.c_uint64,c.c_bool,modelParamsType)
 runSmpModel = proto_SMP(('runSmpModel',smpLib))
 
@@ -57,9 +59,18 @@ runSmpModel = proto_SMP(('runSmpModel',smpLib))
 proto_DM = c.CFUNCTYPE(c.c_voidp)
 destroySMPModel = proto_DM(('destroySMPModel',smpLib))
 
+# get number actors & dimensions; the C function declarations are:
+# uint getActorCount() and uint getDimensionCount()
+proto_NA = c.CFUNCTYPE(c.c_uint)
+getActorCount = proto_NA(('getActorCount',smpLib))
+proto_ND = c.CFUNCTYPE(c.c_uint)
+getDimensionCount = proto_ND(('getDimensionCount',smpLib))
+
+
 ''' Prepare the C-type Variables '''
 logFile = bytes(os.getcwd()+os.sep+'smpc-logger.conf',encoding="ascii")
 connString = bytes('Driver=QSQLITE;Database=pySMPTest',encoding="ascii")
+
 
 ''' runSmpModel Parameters '''
 bsize = 32*16
@@ -91,11 +102,42 @@ saveHist = c.c_bool(False)
 # (see the KTAB documentation & associated publications)
 modelParams = modelParamsType(0,0,0,2,1,1,1,1,0) # these are the defaul parameters
 
-''' Finally, run the Model '''
+
+''' Run the Model '''
 res = configLogger(logFile)
 res = dbLoginCredentials(connString)
-modStates = runSmpModel(scenID,bsize,sqlFlags,inputDataFile,seed,saveHist,modelParams)
-res = destroySMPModel()
-# get scenario ID
+stateCnt = runSmpModel(scenID,bsize,sqlFlags,inputDataFile,seed,saveHist,modelParams)
+# won't need to get the # actors and dimensions if data was dynamically generated
+actorCnt = getActorCount()
+dimensionCnt = getDimensionCount()
+
+
+''' get the complete history of states; the C function declaration is:
+void getVPHistory(float positions[]) '''
+# have to do this after running the model, to know the size of posHist
+posHistType = c.c_float * (stateCnt*dimensionCnt*actorCnt)
+proto_PS = c.CFUNCTYPE(c.c_voidp,c.POINTER(posHistType))
+getVPHistory = proto_PS(('getVPHistory',smpLib))
+
+posHists = posHistType()
+res = getVPHistory(posHists)
+# reshape into a more useful shape; posHist is a long array in blocks of
+# length stateCnt, within blocks of length dimensionCnt, within blocks
+# of length actorCnt
+tmp = [posHists[i*stateCnt:(i*stateCnt+stateCnt)] for i in range(actorCnt*dimensionCnt)]
+posHists = [tmp[i*dimensionCnt:(i*dimensionCnt+dimensionCnt)] for i in range(actorCnt)]
+# could just use posHist = np.reshape(posHists,(actorCnt,dimensionCnt,stateCnt)),
+# but that would kind of hide what's actually happening in the parsing
+for a in range(actorCnt):
+  for d in range(dimensionCnt):
+    print('Pos Hist for Actor %d, Dimension %d:'%(a,d))
+    print('\t[%s]'%', '.join(['%0.2f'%p for p in posHists[a][d]]))
+
+
+# show scenario ID
 scenID = scenID.value.decode('utf-8')
-print('Scenario ID: %s, %d states'%(scenID,modStates))
+print('Scenario ID: %s, %d states'%(scenID,stateCnt))
+
+# release the C model object memory
+res = destroySMPModel()
+
