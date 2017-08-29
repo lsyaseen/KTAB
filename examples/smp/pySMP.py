@@ -47,7 +47,7 @@ dbLoginCredentials = proto_LC(('dbLoginCredentials',smpLib))
 
 # SMP model; the C function declaration is
 # uint runSmpModel(char * buffer, const unsigned int buffsize,
-#   unsigned int sqlLogFlags[5], const char* inputDataFile,
+#   bool sqlLogFlags[5], const char* inputDataFile,
 #   unsigned int seed, unsigned int saveHistory, int modelParams[9] = 0)
 sqlFlagsType = c.c_bool*5     # array of 5 booleans
 modelParamsType = c.c_int*9   # array of 9 integers
@@ -130,8 +130,11 @@ posHists = [tmp[i*dimensionCnt:(i*dimensionCnt+dimensionCnt)] for i in range(act
 # but that would kind of hide what's actually happening in the parsing
 for a in range(actorCnt):
   for d in range(dimensionCnt):
-    print('Pos Hist for Actor %d, Dimension %d:'%(a,d))
-    print('\t[%s]'%', '.join(['%0.2f'%p for p in posHists[a][d]]))
+    print('Pos Hist (alternating) for Actor %d, Dimension %d:'%(a,d))
+    # print the alternating positions of all actors
+    print('\t[%s]'%', '.join(['%0.2f'%p for p in posHists[a][d][::2]]))
+    # print the final position
+    print('\tFinal %0.2f'%posHists[a][d][-1])
 
 
 # show scenario ID
