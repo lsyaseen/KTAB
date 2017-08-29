@@ -60,14 +60,31 @@ void MainWindow::initializeBarGraphDock()
     barGraphTypeLabel->setFont(labelFont);
     barGraphTypeLabel->setFrameStyle(QFrame::Panel | QFrame::StyledPanel);
 
-    barControlsVerticalLayout->addWidget(barGraphTypeLabel);
+    //    barControlsVerticalLayout->addWidget(barGraphTypeLabel);
 
     barGraphRadioButton = new QRadioButton("Stacked Bar Chart");
     barGraphRadioButton->setChecked(true);
 
     QHBoxLayout * layout = new QHBoxLayout;
     layout->addWidget(barGraphRadioButton);
-    barControlsVerticalLayout->addLayout(layout);
+    //    barControlsVerticalLayout->addLayout(layout);
+
+    QLabel * barGraphScaleOptionsLabel = new QLabel("Scale Options");
+    barGraphScaleOptionsLabel->setAlignment(Qt::AlignHCenter);
+    barGraphScaleOptionsLabel->setFont(labelFont);
+    barGraphScaleOptionsLabel->setFrameStyle(QFrame::Panel | QFrame::StyledPanel);
+
+    barControlsVerticalLayout->addWidget(barGraphScaleOptionsLabel);
+
+    barGraphYaxisOptionsComboBox = new QComboBox;
+    barGraphYaxisOptionsComboBox->addItem("Automatic");
+    barGraphYaxisOptionsComboBox->addItem("Max");
+    barGraphYaxisOptionsComboBox->addItem("User Defined");
+
+    QHBoxLayout * comboLayout = new QHBoxLayout;
+    comboLayout->addWidget(barGraphYaxisOptionsComboBox);
+    barControlsVerticalLayout->addLayout(comboLayout);
+    connect(barGraphYaxisOptionsComboBox,SIGNAL(currentIndexChanged(int)),this, SLOT(barGraphScalingChanged(int)));
 
     QLabel * barGraphDimensionsLabel = new QLabel("Dimensions");
     barGraphDimensionsLabel->setAlignment(Qt::AlignHCenter);
@@ -152,15 +169,11 @@ void MainWindow::xAxisRangeChanged( const QCPRange &newRange, const QCPRange &ol
     {
         barCustomGraph->xAxis->setAutoTicks(false);
         barCustomGraph->xAxis->setAutoTickLabels(false);
-        // barCustomGraph->xAxis->setRangeLower( 0 );
-        // barCustomGraph->xAxis->setRangeUpper( oldRange.upper );
     }
     else
     {
         barCustomGraph->xAxis->setAutoTicks(true);
         barCustomGraph->xAxis->setAutoTickLabels(true);
-        //         barCustomGraph->xAxis->setTicks(true);
-        //        barCustomGraph->xAxis->setRangeUpper( newRange.upper );
     }
 }
 void MainWindow::yAxisRangeChanged( const QCPRange &newRange, const QCPRange &oldRange )
@@ -169,16 +182,11 @@ void MainWindow::yAxisRangeChanged( const QCPRange &newRange, const QCPRange &ol
     {
         barCustomGraph->yAxis->setAutoTicks(false);
         barCustomGraph->yAxis->setAutoTickLabels(false);
-        //        barCustomGraph->yAxis->setTicks(false);
-        //        barCustomGraph->yAxis->setRangeLower(0 );
-        //        barCustomGraph->yAxis->setRangeUpper( oldRange.upper );
     }
     else
     {
         barCustomGraph->yAxis->setAutoTicks(true);
         barCustomGraph->yAxis->setAutoTickLabels(true);
-        //         barCustomGraph->yAxis->setTicks(true);
-        //        barCustomGraph->yAxis->setRangeUpper( newRange.upper );
     }
 }
 
@@ -198,7 +206,6 @@ void MainWindow::saveBarPlotAsBMP()
     if(!fileName.isEmpty())
     {
         barCustomGraph->saveBmp(fileName);
-        //        setCurrentFile(fileName);
     }
 }
 
@@ -208,8 +215,24 @@ void MainWindow::saveBarPlotAsPDF()
     if(!fileName.isEmpty())
     {
         barCustomGraph->savePdf(fileName);
-        //        setCurrentFile(fileName);
     }
+}
+
+double MainWindow::updateYaxisMaxVal(int dim)
+{
+    double maxLen = 0.0;
+
+    for (int act=0; act < actorsInfl.length();++ act)
+    {
+        maxLen += actorsInfl.at(act).toDouble() * actorsSal[dim].at(act).toDouble();
+    }
+    return maxLen;
+
+}
+
+void MainWindow::yAxisMaxLength(double yAxis)
+{
+    yAxisMaxFixedVal=yAxis;
 }
 
 void MainWindow::populateBarGraphActorsList()
@@ -316,7 +339,7 @@ void MainWindow::getActorsInRange(int dim)
 
     while(r2 <=1.0)
     {
-        emit getActorIdsInRange(r1*100,r2*100,dim,barGraphTurnSlider->value());
+        emit getActorIdsInRange(r1*100,r2*100,dim,barGraphTurnSlider->value(),false);
         r1=r2;
         r2+=binWidth;
     }
@@ -326,6 +349,31 @@ void MainWindow::deleteBars()
 {
     qDeleteAll(bars.begin(),bars.end());
     bars.clear();
+}
+
+void MainWindow::scaleBars()
+{
+    if(barGraphYaxisOptionsComboBox->currentIndex()==0)
+    {
+        barCustomGraph->yAxis->setRange(0,yAxisLen+10); // +10 is buffer
+        yAxisLen=50;
+    }
+    else if (barGraphYaxisOptionsComboBox->currentIndex()==1)
+    {
+        barCustomGraph->yAxis->setRange(0,yAxisMaxFixedVal+10);
+    }
+    else
+    {
+        if(yAxisFixedVal>0)
+        {
+            barCustomGraph->yAxis->setRange(0,yAxisFixedVal);
+        }
+        else
+        {
+            barGraphScalingChanged(2);
+        }
+    }
+    barCustomGraph->replot();
 }
 
 QCPBars *MainWindow::createBar(int actorId)
@@ -384,9 +432,10 @@ void MainWindow::barGraphDimensionChanged(int value)
     barGraphTitle->setText(QString(barGraphDimensionComboBox->currentText() +"-Effective Power Landscape, Turn " +QString::number(barGraphTurnSlider->value())));
     getActorsInRange(dimension);
     barCustomGraph->xAxis->setRange(0,100);
-    barCustomGraph->yAxis->setRange(0,yAxisLen+20);
-    yAxisLen=50;
-    barCustomGraph->replot();
+    yAxisMaxFixedVal=0;
+    //yaxis range
+    getYaxisMaxHeight(barGraphGroupRangeLineEdit->text().toDouble(),dimension);
+    scaleBars();
 }
 
 void MainWindow::barGraphTurnSliderChanged(int value)
@@ -394,21 +443,46 @@ void MainWindow::barGraphTurnSliderChanged(int value)
     barGraphTitle->setText(QString(barGraphDimensionComboBox->currentText() +"-Effective Power Landscape, Turn " +QString::number(value)));
     getActorsInRange(dimension);
     barCustomGraph->xAxis->setRange(0,100);
-    barCustomGraph->yAxis->setRange(0,yAxisLen+20);
-    yAxisLen=50;
-    barCustomGraph->replot();
+
+    scaleBars();
 }
 
 void MainWindow::barGraphBinWidthButtonClicked(bool bl)
 {
     Q_UNUSED(bl)
-
+    getYaxisMaxHeight(barGraphGroupRangeLineEdit->text().toDouble(),barGraphDimensionComboBox->currentIndex());
     barGraphTurnSliderChanged(barGraphTurnSlider->value());
+}
+
+void MainWindow::barGraphScalingChanged(int index)
+{
+    if(index == 0)
+    {
+        barGraphTurnSliderChanged(barGraphTurnSlider->value());
+    }
+    else if(index == 2)
+    {
+        bool ok;
+        int  yScale = QInputDialog::getInt(this, tr("Get Y axis scale for Bar Plot"),
+                                           tr("Enter the Y axis Scale Value"),0,1,99999,1,&ok);
+        if (ok && yScale>0)
+        {
+            yAxisFixedVal=yScale;
+        }
+        else
+        {
+            yAxisFixedVal=0;
+        }
+        scaleBars();
+    }
+    else
+    {
+        scaleBars();
+    }
 }
 
 void MainWindow::barGraphActorsSalienceCapability(QVector<int> aId, QVector<double> sal, QVector<double> cap,double r1,double r2)
 {
-
     if( barActorCBList.length() == lineActorCBList.length())
     {
         if(!aId.isEmpty() && !barGraphCheckedActorsIdList.isEmpty())
@@ -418,7 +492,6 @@ void MainWindow::barGraphActorsSalienceCapability(QVector<int> aId, QVector<doub
             QCPBars * bar = nullptr;
             double barHeight = 0;
 
-            QVector <QVector <double> > values ;
             range<< ((r1+r2)/2);
 
             prevBar = bar;
@@ -441,9 +514,7 @@ void MainWindow::barGraphActorsSalienceCapability(QVector<int> aId, QVector<doub
                         // If the first selected actor starts the stacked bar
                         prevBar = bar;
                     }
-
                     bars.append(bar);
-
                 }
                 else
                 { // for not-selected actor

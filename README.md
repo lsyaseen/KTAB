@@ -48,7 +48,7 @@ The code is compiled, linked, and tested with absolutely no modification, simult
   * Fedora 22 with gcc/g++ 5.1,
   * openSUSE 13.2 with clang/clang++ 3.5,
   * Debian 8.1 with gcc/g++ 4.9,
-  * Ubuntu 16.04 with gcc/g++ 5.4.
+  * Ubuntu 14.04 &amp; 16.04 with gcc/g++ 5.4.
 
 ### Language Versions ###
 

@@ -141,9 +141,3 @@ print('Scenario ID: %s, %d states'%(scenID,stateCnt))
 # release the C model object memory
 res = destroySMPModel()
 
-
-
-
-
-
-
