@@ -344,3 +344,7 @@ if __name__ == "__main__":
 		  print('\t[%s]'%', '.join(['%0.2f'%p for p in posHists[a][d][::2]]))
 		  # print the final position
 		  print('\tFinal Position %0.2f'%posHists[a][d][-1])
+
+# ---------------------------------------------
+# Copyright KAPSARC. Open source MIT License.
+# ---------------------------------------------
