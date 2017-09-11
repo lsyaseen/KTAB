@@ -25,12 +25,12 @@
 # model in Python. The only difference in running this script in Windows or Linux should
 # be the name of the library: libsmpDyn.so for Linux, and smpDyn.dll for Windows. Please
 # note that this demo script has *not* been tested as extensively as the rest of KTAB. Usage
-# is demonstrated below after the SMP class declaration. See the KTAB documentation and
-# relevant publications for details on the model inputs.
+# is demonstrated below after the SMP class declaration.  If an .xml file is use as data
+# input, any model parameters stored in the .xml file will *not* be used.
+#
+# See the KTAB documentation and relevant publications for details on the model inputs.
 #
 # --------------------------------------------
-
-# What about xml files - how to handle the params coming from the xml file?
 
 import ctypes as c
 import os
