@@ -31,7 +31,10 @@ using KBase::KMatrix;
 
 
 State::State(Model * m) {
-  assert(nullptr != m);
+  //assert(nullptr != m);
+  if (nullptr == m) {
+    throw KException("State::State: Model is null pointer.");
+  }
   model = m;
 
   // As we pre-size the pstns array, we must make certain the pointers do not point at junk.
@@ -54,15 +57,19 @@ void State::clear() {
   // Actors persist across states, so they are not deleted here.
   aUtil = {}; // vector<KMatrix>();
   for (auto p : pstns) {
-    assert(nullptr != p);
-    delete p;
+    //assert(nullptr != p);
+    if(nullptr != p)
+      delete p;
   }
   pstns = {}; // vector<Position*>();
   step = nullptr;
 }
 
 void State::pushPstn(Position* p) {
-  assert(nullptr != p);
+  //assert(nullptr != p);
+  if (nullptr == p) {
+    throw KException("State::pushPstn: Position's pointer is null");
+  }
   pstns.push_back(p);
   return;
 }
@@ -89,10 +96,22 @@ double State::posProb(unsigned int i, const VUI & unq, const KMatrix & pdt) cons
       k = j1;
     }
   }
-  assert(k < numA);
-  assert(1 == pdt.numC());
-  assert(k < pdt.numR());
-  assert(nUnq == pdt.numR());
+  //assert(k < numA);
+  if (k >= numA) {
+    throw KException("State::posProb: k can not be more than number of actors");
+  }
+  //assert(1 == pdt.numC());
+  if (1 != pdt.numC()) {
+    throw KException("State::posProb: pdt matrix must have only one column");
+  }
+  //assert(k < pdt.numR());
+  if (k >= pdt.numR()) {
+    throw KException("State::posProb: kth row number doesn't exist in pdt matrix");
+  }
+  //assert(nUnq == pdt.numR());
+  if (nUnq != pdt.numR()) {
+    throw KException("State::posProb: nUnq should be equal to row count of pdt matrix");
+  }
   double pr = pdt(k, 0);
   return pr;
 }
@@ -101,42 +120,71 @@ double State::posProb(unsigned int i, const VUI & unq, const KMatrix & pdt) cons
 // 0 == initial state, and error if not in the model's history
 unsigned int State::myTurn() const {
   int t = -1; // flag an impossible value
-  assert(nullptr != model);
+  //assert(nullptr != model);
+  if (nullptr == model) {
+    throw KException("State::myTurn: model is a null pointer");
+  }
   auto hLen = ((const unsigned int)(model->history.size()));
   for (unsigned int i = 0; i < hLen; i++) { // cannot use range-for, as I need the value of 'i'
     State* si = model->history[i];
-    assert(nullptr != si);
+    //assert(nullptr != si);
+    if (nullptr == si) {
+      throw KException("State::myTurn: si is a null pointer");
+    }
     if (this == si) {
       t = i;
     }
   }
-  assert(0 <= t);
+  //assert(0 <= t);
+  if (0 > t) {
+    throw KException("State::myTurn: turn can't be negative");
+  }
   return t;
 }
 
 void State::setUENdx() {
   /// Looking only at the positions in this state, return a vector of indices of unique positions.
-  assert(0 == uIndices.size());
-  assert(0 == eIndices.size());
+  //assert(0 == uIndices.size());
+  if (0 != uIndices.size()) {
+    throw KException("State::setUENdx: uIndices not empty");
+  }
+
+  //assert(0 == eIndices.size());
+  if (0 != eIndices.size()) {
+    throw KException("State::setUENdx: eIndices not empty");
+  }
+
   // Note that we have to lambda-bind 'this'. Otherwise, we'd need a 'static' function
   // to give to uIndices.
   auto efn = [this](unsigned int i, unsigned int j) {
     return equivNdx(i, j);
   };
   const unsigned int na = model->numAct;
-  assert(Model::minNumActor <= na);
-  assert(na <= Model::maxNumActor);
+  //assert(Model::minNumActor <= na);
+  //assert(na <= Model::maxNumActor);
+  if (Model::minNumActor > na || Model::maxNumActor < na) {
+    throw KException("State::setUENdx: Number of actors out of bound");
+  }
+
   auto ns = KBase::uiSeq(0, na - 1);
   auto uePair = KBase::ueIndices<unsigned int>(ns, efn);
 
   uIndices = get<0>(uePair);
   auto nu = ((const unsigned int)(uIndices.size()));
-  assert(0 < nu);
-  assert(nu <= na);
+  //assert(0 < nu);
+  //assert(nu <= na);
+  if (0 >= nu || nu > na) {
+    throw KException("State::setUENdx: Out of bound value of uIndices");
+  }
+
 
   eIndices = get<1>(uePair);
   auto ne = ((const unsigned int)(eIndices.size()));
-  assert(na == ne);
+  //assert(na == ne);
+  if (na != ne) {
+    throw KException("State::setUENdx: Count of actors not matching with the eIndices");
+  }
+
 
   return;
 }
@@ -148,16 +196,27 @@ void State::setAUtil(int perspH, ReportingLevel rl) {
   // it is easiest to be precise all the time.
 
   if (-1 == perspH) { // calculate them all at once
-    assert(0 == aUtil.size());
+    //assert(0 == aUtil.size());
+    if (0 != aUtil.size()) {
+      throw KException("State::setAUtil: Util vector is not empty");
+    }
+
     setAllAUtil(rl);
   }
   else { // we might get the perspectives of just a few actors
     const unsigned int na = model->numAct;
-    assert(0 <= perspH); // -2 not OK
-    assert(perspH < na);
+    //assert(0 <= perspH); // -2 not OK
+    //assert(perspH < na);
+    if (0 > perspH || perspH >= na) {
+      throw KException("State::setAUtil: Perspective of h out of bound");
+    }
+
     bool firstP = (0 == aUtil.size());
     bool firstForH = ((na == aUtil.size()) && (0 == aUtil[perspH].numR()) && (0 == aUtil[perspH].numC()));
-    assert(firstP || firstForH);
+    //assert(firstP || firstForH);
+    if (!(firstP || firstForH)) {
+      throw KException("State::setAUtil: No first perspective");
+    }
     if (firstP) {
       aUtil.resize(na);
       for (unsigned int i = 0; i < na; i++) {
@@ -171,7 +230,8 @@ void State::setAUtil(int perspH, ReportingLevel rl) {
 
 void State::setOneAUtil(unsigned int perspH, ReportingLevel rl) {
   // TODO: make this non-dummy
-  assert(false);
+  //assert(false);
+  throw KException("State::setOneAUtil: Execution shouldn't have come here");
   return;
 }
 

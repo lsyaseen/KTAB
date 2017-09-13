@@ -123,7 +123,8 @@ void Model::execQuery(std::string& qry) {
   if (!query.exec(QString::fromStdString(qry))) {
     LOG(INFO) << "Failed Query: " << qry;
     LOG(INFO) << query.lastError().text().toStdString();
-    assert(false);
+    //assert(false);
+    throw KException("Model::execQuery:s DB query failed.");
   }
 }
 
@@ -327,7 +328,10 @@ KTable * Model::createSQL(unsigned int n)
   string name = "";
   unsigned int grpID = 0;
 
-  assert(n < Model::NumTables);
+  //assert(n < Model::NumTables);
+  if (n >= Model::NumTables) {
+    throw KException("Model::createSQL: Wrong count of tables for creation");
+  }
   switch (n)
   {
   case 0:
@@ -538,10 +542,13 @@ KTable * Model::createSQL(unsigned int n)
     grpID = 0;
     break;
   default:
-    throw(KException("Model::createTableSQL unrecognized table number"));
+    throw(KException("Model::createSQL unrecognized table number"));
   }
 
-  assert(grpID < NumSQLLogGrps);
+  //assert(grpID < NumSQLLogGrps);
+  if (grpID >= NumSQLLogGrps) {
+    throw KException("Model::createSQL: group id should be within the allowed range");
+  }
   auto tab = new KTable(n,name,sql,grpID);
   return tab;
 }
@@ -549,10 +556,19 @@ KTable * Model::createSQL(unsigned int n)
 
 void Model::sqlAUtil(unsigned int t)
 {
-  assert(t < history.size());
+  //assert(t < history.size());
+  if (t >= history.size()) {
+    throw KException("Model::sqlAUtil: Model ran for less number of turns.");
+  }
   State* st = history[t];
-  assert(nullptr != st);
-  assert(numAct == st->aUtil.size());
+  //assert(nullptr != st);
+  if (nullptr == st) {
+    throw KException("Model::sqlAUtil: st is a null pointer.");
+  }
+  //assert(numAct == st->aUtil.size());
+  if (numAct != st->aUtil.size()) {
+    throw KException("Model::sqlAUtil: Not all actors have utility values.");
+  }
 
   // I don't like passing 'this' into lambda-functions,
   // so I copy the pointer into a local variable I can pass in
@@ -585,7 +601,8 @@ void Model::sqlAUtil(unsigned int t)
         query.bindValue(":util", uij(i, j));
         if (!query.exec()) {
           LOG(INFO) << query.lastError().text().toStdString();
-          assert(false);
+          //assert(false);
+          throw KException("Model::sqlAUtil: DB query failed");
         }
       }
     }
@@ -598,9 +615,15 @@ void Model::sqlAUtil(unsigned int t)
 // module run
 void Model::sqlPosEquiv(unsigned int t)
 {
-  assert(t < history.size());
+  //assert(t < history.size());
+  if (t >= history.size()) {
+    throw KException("Model::sqlPosEquiv: Model ran for less number of turns.");
+  }
   State* st = history[t];
-  assert(nullptr != st);
+  //assert(nullptr != st);
+  if (nullptr == st) {
+    throw KException("Model::sqlPosEquiv: st is a null pointer.");
+  }
 
   string qsql = string("INSERT INTO PosEquiv (ScenarioId, Turn_t, Pos_i, Eqv_j) VALUES ('")
     + scenId + "', :turn_t, :pos_i, :eqv_j)";
@@ -625,7 +648,8 @@ void Model::sqlPosEquiv(unsigned int t)
     query.bindValue(":eqv_j", je);
     if (!query.exec()) {
       LOG(INFO) << query.lastError().text().toStdString();
-      assert(false);
+      //assert(false);
+      throw KException("Model::sqlPosEquiv: DB query failed");
     }
   }
   // end databse transaction
@@ -656,7 +680,8 @@ void Model::sqlBargainEntries(unsigned int t, int bargainId, int initiator, int 
   query.bindValue(":value", val);
   if (!query.exec()) {
     LOG(INFO) << query.lastError().text().toStdString();
-    assert(false);
+    //assert(false);
+    throw KException("Model::sqlBargainEntries: DB query failed");
   }
   //qtDB->commit();
 }
@@ -666,7 +691,10 @@ void Model::sqlBargainEntries(unsigned int t, int bargainId, int initiator, int 
 void Model::sqlBargainCoords(unsigned int t, int bargnID, const KBase::VctrPstn & initPos, const KBase::VctrPstn & rcvrPos)
 {
   int nDim = initPos.numR();
-  assert(nDim == rcvrPos.numR());
+  //assert(nDim == rcvrPos.numR());
+  if (nDim != rcvrPos.numR()) {
+    throw KException("Model::sqlBargainCoords: dimension mismatch between initiator and receiver actor's positions");
+  }
 
   // prepare the sql statement to insert
   string sql = string("INSERT INTO BargnCoords (ScenarioId, Turn_t, BargnID, Dim_k, Init_Coord, Recd_Coord) VALUES ('")
@@ -693,7 +721,8 @@ void Model::sqlBargainCoords(unsigned int t, int bargnID, const KBase::VctrPstn 
     query.bindValue(":recd_coord", rcvrPos(k, 0) * 100.0);
     if (!query.exec()) {
       LOG(INFO) << query.lastError().text().toStdString();
-      assert(false);
+      //assert(false);
+      throw KException("Model::sqlBargainCoords: DB query failed");
     }
   }
 
@@ -732,7 +761,8 @@ void Model::sqlBargainUtil(unsigned int t, vector<uint64_t> bargnIds,  KBase::KM
       // finish
       if (!query.exec()) {
         LOG(INFO) << query.lastError().text().toStdString();
-        assert(false);
+        //assert(false);
+        throw KException("Model::sqlBargainUtil: DB query failed");
       }
     }
   }
@@ -746,7 +776,10 @@ void Model::sqlBargainUtil(unsigned int t, vector<uint64_t> bargnIds,  KBase::KM
 void Model::LogInfoTables()
 {
   // assert tests for all tables here at the start
-  assert(numAct == actrs.size());
+  //assert(numAct == actrs.size());
+  if (numAct != actrs.size()) {
+    throw KException("Model::LogInfoTables: Actor count mismatched");
+  }
 
   // for efficiency sake, we'll do all tables in a single transaction
   // form the insert cmmands
@@ -766,7 +799,8 @@ void Model::LogInfoTables()
     // record
     if (!query.exec()) {
       LOG(INFO) << query.lastError().text().toStdString();
-      assert(false);
+      //assert(false);
+      throw KException("Model::LogInfoTables: DB query failed");
     }
   }
   qtDB->commit();
@@ -824,7 +858,8 @@ void Model::sqlBargainVote(unsigned int t, vector< tuple<uint64_t, uint64_t>> ba
     // finish
     if (!query.exec()) {
       LOG(INFO) << query.lastError().text().toStdString();
-      assert(false);
+      //assert(false);
+      throw KException("Model::sqlBargainVote: DB query failed");
     }
   }
   //qtDB->commit();
@@ -834,10 +869,16 @@ void Model::sqlBargainVote(unsigned int t, vector< tuple<uint64_t, uint64_t>> ba
 // module run
 void Model::sqlPosProb(unsigned int t)
 {
-  assert(t < history.size());
+  //assert(t < history.size());
+  if (t >= history.size()) {
+    throw KException("Model::sqlPosProb: Model ran for less number of turns.");
+  }
   State* st = history[t];
   // check module for null
-  assert(nullptr != st);
+  //assert(nullptr != st);
+  if (nullptr == st) {
+    throw KException("Model::sqlPosProb: st is a null pointer.");
+  }
   // prepare the sql statement to insert
   string sql = string("INSERT INTO PosProb (ScenarioId, Turn_t, Est_h,Pos_i, Prob) VALUES ('")
     + scenId + "', :turn_t, :est_h, :pos_i, :prob)";
@@ -851,7 +892,10 @@ void Model::sqlPosProb(unsigned int t)
     // calculate the probablity with respect to each estimator
     auto pn = st->pDist(h);
     auto pdt = std::get<0>(pn); // note that these are unique positions
-    assert( fabs(1 - sum(pdt)) < 1e-4);
+    //assert( fabs(1 - sum(pdt)) < 1e-4);
+    if (fabs(1 - sum(pdt)) >= 1e-4) {
+      throw KException("Model::sqlPosProb sum of all positions exceeded the limit value.");
+    }
     auto unq = std::get<1>(pn);
     // for each actor pupulate the probablity information
     for (unsigned int i = 0; i < numAct; i++)
@@ -864,7 +908,8 @@ void Model::sqlPosProb(unsigned int t)
       query.bindValue(":prob", prob);
       if (!query.exec()) {
         LOG(INFO) << query.lastError().text().toStdString();
-        assert(false);
+        //assert(false);
+        throw KException("Model::sqlPosProb: DB query failed");
       }
     }
   }
@@ -875,12 +920,18 @@ void Model::sqlPosProb(unsigned int t)
 // module run
 void Model::sqlPosVote(unsigned int t)
 {
-  assert(t < history.size());
+  //assert(t < history.size());
+  if (t >= history.size()) {
+    throw KException("Model::sqlPosVote: Model ran for less number of turns.");
+  }
   State* st = history[t];
 
 
   // check module for null
-  assert(nullptr != st);
+  //assert(nullptr != st);
+  if (nullptr == st) {
+    throw KException("Model::sqlPosVote: st is a null pointer.");
+  }
   // prepare the sql statement to insert
   string sql = string("INSERT INTO PosVote (ScenarioId, Turn_t, Est_h, Voter_k, Pos_i, Pos_j, Vote) VALUES ('")
     + scenId + "', :turn_t, :est_h, :voter_k, :pos_i, :pos_j, :vote)";
@@ -915,7 +966,8 @@ void Model::sqlPosVote(unsigned int t)
             query.bindValue(":vote", vij);
             if (!query.exec()) {
               LOG(INFO) << query.lastError().text().toStdString();
-              assert(false);
+              //assert(false);
+              throw KException("Model::sqlPosVote: DB query failed");
             }
           }
         }
@@ -982,7 +1034,8 @@ void Model::loginCredentials(string connString) {
     catch (const std::out_of_range& oor) {
       LOG(INFO) << "Error: Wrong connection string provided for DB!";
       LOG(INFO) << oor.what();
-      assert(false);
+      //assert(false);
+      throw KException("Model::loginCredentials: Wrong connection string for DB");
     }
 
     switch (mapStringToUserParams[key]) {
@@ -1011,20 +1064,23 @@ void Model::loginCredentials(string connString) {
 
   if (dbDriver.isEmpty() || databaseName.isEmpty()) {
     LOG(INFO) << "Error! Database type or database name can not be left blank.";
-    assert(false);
+    //assert(false);
+    throw KException("Model::loginCredentials: Database type or name is blank");
   }
 
   // We use either Postgresql or SQLITE
   if (dbDriver.compare("QPSQL") && dbDriver.compare("QSQLITE")) {
     LOG(INFO) << "Error! Wrong driver name. Supported Drivers: postgres(QPSQL), sqlite3(QSQLITE)";
-    assert(false);
+    //assert(false);
+    throw KException("Model::loginCredentials: Unsupported DB driver");
   }
 
   // for a non-sqlite db
   if (!dbDriver.compare("QPSQL")) {
     if (server.isEmpty()) {
       LOG(INFO) << "Error! Please provide address for postgres server";
-      assert(false);
+      //assert(false);
+      throw KException("Model::loginCredentials: No ip address provided for postgresql server");
     }
   }
 

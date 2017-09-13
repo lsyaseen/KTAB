@@ -58,7 +58,7 @@ using KBase::Position;
 using KBase::State;
 using KBase::VotingRule;
 using KBase::PCEModel;
-
+using KBase::KException;
 
 // -------------------------------------------------
 // row 0: waterchange
@@ -125,8 +125,14 @@ void setUInit(const KMatrix& sq) {
         maxQ = maxQ + (2.0*eps);
         for (unsigned int j = 0; j < np; j++) {
             double vij = (eps + sq(i, j) - minQ) / (maxQ - minQ);
-            assert(0.0 <= vij);
-            assert(vij <= 1.0);
+            //assert(0.0 <= vij);
+            if (0.0 > vij) {
+              throw KException("setUInit: vij must be non-negative");
+            }
+            //assert(vij <= 1.0);
+            if (vij > 1.0) {
+              throw KException("setUInit: vij must not be greater than 1.0");
+            }
             double uij = 1.0 - ((1.0 - vij)*(1.0 - vij));
             uInit(i, j) = uij;
         }
@@ -142,8 +148,14 @@ double waterMinProb(ReportingLevel rl, const KMatrix & p0) {
 
     //const unsigned int numA = 4;
     //const unsigned int numP = 4;
-    assert(p0.numR() == numA);
-    assert(p0.numC() == 1);
+    //assert(p0.numR() == numA);
+    if (p0.numR() != numA) {
+      throw KException("waterMinProb: p0 should have numA number of rows");
+    }
+    //assert(p0.numC() == 1);
+    if (p0.numC() != 1) {
+      throw KException("waterMinProb: p0 should be column vector");
+    }
 
     // base weights
     //double wArray[] = { 1600, 7000, 100, 1300 }; // numA
@@ -332,7 +344,9 @@ RsrcMinLP* RsrcMinLP::makeRMLP(PRNG* rng,
             f = rng->uniform(0.50, 1.00); // at most 50-100% increase (i.e. double)
             break;
         default:
-            assert(false);
+            //assert(false);
+            throw KException("RsrcMinLP::makeRMLP: case not valid");
+
             break;
         }
         return f;
@@ -403,13 +417,28 @@ void demoRMLP(PRNG* rng) {
     auto gBounds = KMatrix(rmlp->numProd, 1);
     for (unsigned int i = 0; i < rmlp->numProd; i++) {
         double xi = rmlp->xInit(i, 0);
-        assert(0.0 <= xi);
+        //assert(0.0 <= xi);
+        if (0.0 > xi) {
+          throw KException("demoRMLP: xi must be non-negative");
+        }
         double ri = rmlp->bounds(i, 0);
-        assert(0.0 <= ri);
-        assert(ri <= 1.10); // 100% reduction is OK, but not 110% (that would be negative)
+        //assert(0.0 <= ri);
+        if (0.0 > ri) {
+          throw KException("demoRMLP: ri must be non-negative");
+        }
+        //assert(ri <= 1.10); // 100% reduction is OK, but not 110% (that would be negative)
+        if (ri > 1.10) { // 100% reduction is OK, but not 110% (that would be negative))
+          throw KException("demoRMLP: 110% reduction not ok");
+        }
         double gi = rmlp->bounds(i, 1);
-        assert(-1.0 <= gi); // can force up to 100% reduction
-        assert(1.0 - ri <= 1.0 + gi);
+        //assert(-1.0 <= gi); // can force up to 100% reduction
+        if (-1.0 > gi) { // can force up to 100% reduction
+          throw KException("demoRMLP: can force upto 100% reduction");
+        }
+        //assert(1.0 - ri <= 1.0 + gi);
+        if (1.0 - ri > 1.0 + gi) {
+          throw KException("demoRMLP: inaccurate ri or gi");
+        }
         rBounds(i, 0) = (1.0 - ri)*xi;
         gBounds(i, 0) = (1.0 + gi)*xi;
     }
@@ -433,11 +462,23 @@ void demoRMLP(PRNG* rng) {
     LOG(INFO) << "Number of supply/demand ratio constraints:" << rmlp->numSpplyC;
 
     auto initS = rmlp->spplyWghts * rmlp->xInit;
-    assert(1 == initS.numC());
-    assert(initS.numR() == rmlp->numSpplyC);
+    //assert(1 == initS.numC());
+    if (1 != initS.numC()) {
+      throw KException("demoRMLP: initS must be a column vector");
+    }
+    //assert(initS.numR() == rmlp->numSpplyC);
+    if (initS.numR() != rmlp->numSpplyC) {
+      throw KException("demoRMLP: inaccurate row count in initS");
+    }
     auto initD = rmlp->dmndWghts * rmlp->xInit;
-    assert(1 == initD.numC());
-    assert(initD.numR() == rmlp->numSpplyC);
+    //assert(1 == initD.numC());
+    if (1 != initD.numC()) {
+      throw KException("demoRMLP: initD must be a column vector");
+    }
+    //assert(initD.numR() == rmlp->numSpplyC);
+    if (initD.numR() != rmlp->numSpplyC) {
+      throw KException("demoRMLP: inaccurate rows in initD");
+    }
     pfn("Initial supply values: ", "%8.2f", initS);
     pfn("Initial demand values: ", "%8.2f", initD);
 
@@ -446,8 +487,14 @@ void demoRMLP(PRNG* rng) {
         return rij;
     };
     auto sdRatio = KMatrix::map(ratFn, initS.numR(), initS.numC());
-    assert(1 == sdRatio.numC());
-    assert(sdRatio.numR() == rmlp->numSpplyC);
+    //assert(1 == sdRatio.numC());
+    if (1 != sdRatio.numC()) {
+      throw KException("demoRMLP: sdRatio must be a column vector");
+    }
+    //assert(sdRatio.numR() == rmlp->numSpplyC);
+    if (sdRatio.numR() != rmlp->numSpplyC) {
+      throw KException("demoRMLP: inaccurate row count in sdRatio");
+    }
     pfn("S/D ratios: ", "%8.4f", sdRatio);
 
     auto sdFn = [rmlp, sdRatio](unsigned int i, unsigned int j) {
@@ -486,10 +533,22 @@ void demoRMLP(PRNG* rng) {
     const unsigned int K1 = rmlp->numPortC;
     const unsigned int K2 = rmlp->numSpplyC;
     const unsigned int M = (K1 + K2) + (2 * N);
-    assert(M == matA.numR());
-    assert(N == matA.numC());
-    assert(M == matB.numR());
-    assert(1 == matB.numC());
+    //assert(M == matA.numR());
+    if (M != matA.numR()) {
+      throw KException("demoRMLP: inaccurate number of rows in matA");
+    }
+    //assert(N == matA.numC());
+    if (N != matA.numC()) {
+      throw KException("demoRMLP: inaccurate number of columns in matA");
+    }
+    //assert(M == matB.numR());
+    if (M != matB.numR()) {
+      throw KException("demoRMLP: inaccurate number of rows in matB");
+    }
+    //assert(1 == matB.numC());
+    if (1 != matB.numC()) {
+      throw KException("demoRMLP: matB must be a column vector");
+    }
 
     auto topMat = joinH(KMatrix(N, N), -1.0*trans(matA));
     auto botMat = joinH(matA, KMatrix(M, M));
@@ -498,10 +557,22 @@ void demoRMLP(PRNG* rng) {
     auto matQ = joinV(rmlp->rCosts, -1.0 * matB);
 
     // reaffirm that everything is structured as expected
-    assert(3 * N + (K1 + K2) == matM.numR());
-    assert(3 * N + (K1 + K2) == matM.numC());
-    assert(3 * N + (K1 + K2) == matQ.numR());
-    assert(1 == matQ.numC());
+    //assert(3 * N + (K1 + K2) == matM.numR());
+    if (3 * N + (K1 + K2) != matM.numR()) {
+      throw KException("demoRMLP: inaccurate number of rows in matM");
+    }
+    //assert(3 * N + (K1 + K2) == matM.numC());
+    if (3 * N + (K1 + K2) != matM.numC()) {
+      throw KException("demoRMLP: inaccurate number of columns in matM");
+    }
+    //assert(3 * N + (K1 + K2) == matQ.numR());
+    if (3 * N + (K1 + K2) != matQ.numR()) {
+      throw KException("demoRMLP: inaccurate number of rows in matQ");
+    }
+    //assert(1 == matQ.numC());
+    if (1 != matQ.numC()) {
+      throw KException("demoRMLP: matQ must be a column vector");
+    }
 
     const double eps = 1E-6;
 
@@ -526,10 +597,19 @@ void demoRMLP(PRNG* rng) {
         double e1 = sfe(u, u);
         double e2 = sfe(v, matM*u + matQ);
         LOG(INFO) << KBase::getFormattedString("SFE of u is %.3E,  SFE of v is %.3E", e1, e2);
-        assert(e1 < tol); // inaccurate U
-        assert(e2 < tol); // inaccurate V
+        //assert(e1 < tol); // inaccurate U
+        if (e1 >= tol) { // inaccurate U
+          throw KException("demoRMLP: inaccurate U");
+        }
+        //assert(e2 < tol); // inaccurate V
+        if (e2 >= tol) { // inaccurate V
+          throw KException("demoRMLP: inaccurate V");
+        }
         auto sFn = [u](unsigned int i, unsigned int j) {
-            assert(0 == j);
+            //assert(0 == j);
+            if (0 != j) {
+              throw KException("demoRMLP: j must be zero");
+            }
             return u(i, 0);
         };
         auto x = KMatrix::map(sFn, N, 1);
@@ -544,7 +624,6 @@ void demoRMLP(PRNG* rng) {
     };
 
     if (true) {
-        try {
             LOG(INFO) << "Solve via BSHe96";
             auto r1 = viBSHe96(matM, matQ, KBase::projPos, start, eps, iterLim);
             auto x1 = processRslt(r1);
@@ -553,14 +632,9 @@ void demoRMLP(PRNG* rng) {
             const double rsrc1 = dot(x1, rmlp->rCosts);
             LOG(INFO) << KBase::getFormattedString("Minimized resource usage: %10.2f", rsrc1);
             LOG(INFO) << KBase::getFormattedString("Percentage change %+.3f", (100.0*(rsrc1 - rsrc0) / rsrc0));
-        }
-        catch (...) {
-            LOG(INFO) << "Caught exception";
-        }
     }
 
     if (true) {
-        try {
             LOG(INFO) << "Solve via AEG";
             auto r2 = viABG(start, F, KBase::projPos, 0.5, eps, iterLim, true);
             auto x2 = processRslt(r2);
@@ -568,14 +642,9 @@ void demoRMLP(PRNG* rng) {
             const double rsrc2 = dot(x2, rmlp->rCosts);
             LOG(INFO) << KBase::getFormattedString("Minimized resource usage: %10.2f", rsrc2);
             LOG(INFO) << KBase::getFormattedString("Percentage change %+.3f", (100.0*(rsrc2 - rsrc0) / rsrc0));
-        }
-        catch (...) {
-            LOG(INFO) << "Caught exception";
-        }
     }
 
     if (true) { //  exceeds the iteration limit much more often than BSHe96
-        try {
             LOG(INFO) << "Solve via ABG";
             auto r2 = viABG(start, F, KBase::projPos, 0.5, eps, iterLim, false);
             auto x2 = processRslt(r2);
@@ -583,10 +652,6 @@ void demoRMLP(PRNG* rng) {
             const double rsrc2 = dot(x2, rmlp->rCosts);
             LOG(INFO) << KBase::getFormattedString("Minimized resource usage: %10.2f", rsrc2);
             LOG(INFO) << KBase::getFormattedString("Percentage change %+.3f", (100.0*(rsrc2 - rsrc0) / rsrc0));
-        }
-        catch (...) {
-            LOG(INFO) << "Caught exception";
-        }
     }
 
     delete rmlp;
@@ -658,10 +723,26 @@ int main(int ac, char **av) {
     LOG(INFO) << KBase::getFormattedString("Same seed in hex:   0x%016llX", seed);
 
     if (waterMinP) {
+      try {
         DemoWaterMin::waterMin();
+      }
+      catch (KBase::KException &ke) {
+        LOG(INFO) << ke.msg;
+      }
+      catch (...) {
+        LOG(INFO) << "Unknown exception from DemoWaterMin::waterMin";
+      }
     }
     if (rmlpP) {
+      try {
         DemoWaterMin::demoRMLP(rng);
+      }
+      catch (KBase::KException &ke) {
+        LOG(INFO) << ke.msg;
+      }
+      catch (...) {
+        LOG(INFO) << "Unknown exception from DemoWaterMin::demoRMLP";
+      }
     }
 
     delete rng;

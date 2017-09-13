@@ -33,6 +33,7 @@ using std::string;
 using std::vector;
 using KBase::KMatrix;
 using KBase::PRNG;
+using KBase::KException;
 
 namespace AgendaControl {
 
@@ -90,8 +91,14 @@ void bestAgendaChair(vector<Agenda*> ars, const KMatrix& vals, const KMatrix& ca
     auto ar = ars[ai];
     ars.push_back(ar);
     double v0 = ar->eval(vals, 0); //
-    assert(0.0 <= v0);
-    assert(v0 <= 1.0);
+    //assert(0.0 <= v0);
+    if (0.0 > v0) {
+      throw KException("bestAgendaChair: v0 must be non-negative");
+    }
+    //assert(v0 <= 1.0);
+    if (v0 > 1.0) {
+      throw KException("bestAgendaChair: v0 must not be greater than 1.0");
+    }
 
     if (bestV + sigDiff < v0) {
       bestV = v0;
@@ -120,7 +127,10 @@ void demoCounting(unsigned int numI, unsigned int maxU, unsigned int maxS, unsig
   }
   LOG(INFO) << log;
 
-  assert(cat.size() == AgendaControl::numSets(n, m));
+  //assert(cat.size() == AgendaControl::numSets(n, m));
+  if (cat.size() != AgendaControl::numSets(n, m)) {
+    throw KException("demoCounting: inaccurate size of cat");
+  }
 
   VUI testI = {};
   for (unsigned int i = 0; i < numI; i++) {
@@ -148,7 +158,10 @@ void demoCounting(unsigned int numI, unsigned int maxU, unsigned int maxS, unsig
       LOG(INFO) << *a;
     }
     if (Agenda::PartitionRule::FreePR == pr) {
-      assert(testA.size() == AgendaControl::numAgenda(numI));
+      //assert(testA.size() == AgendaControl::numAgenda(numI));
+      if (testA.size() != AgendaControl::numAgenda(numI)) {
+        throw KException("demoCounting: inaccurate test size of agenda");
+      }
     }
     return;
   };
@@ -233,7 +246,16 @@ int main(int ac, char **av) {
   const unsigned int maxS = 10;
   const unsigned int maxB = 10;
   if (enumP) {
-    AgendaControl::demoCounting(enumN, maxU, maxS, maxB);
+    try {
+      AgendaControl::demoCounting(enumN, maxU, maxS, maxB);
+    }
+    catch (KException &ke) {
+      LOG(INFO) << ke.msg;
+      return 0;
+    }
+    catch (...) {
+      LOG(INFO) << "Unknown exception from AgendaControl::demoCounting";
+    }
   }
 
   unsigned int numActor = 0;
@@ -262,9 +284,21 @@ int main(int ac, char **av) {
 
   auto enumA = [numItems, vals, caps](Agenda::PartitionRule pr, std::string name) {
     LOG(INFO) << "Enumerating all agendas ("<<name<<") over " << numItems << " items ... ";
-    auto ars = Agenda::enumerateAgendas(numItems, pr);
-    LOG(INFO) << "found" << ars.size() << "agendas";
-    AgendaControl::bestAgendaChair(ars, vals, caps);
+    //auto ars = Agenda::enumerateAgendas(numItems, pr);
+    //LOG(INFO) << "found" << ars.size() << "agendas";
+    //AgendaControl::bestAgendaChair(ars, vals, caps);
+    std::vector<AgendaControl::Agenda *> ars;
+    try {
+      ars = Agenda::enumerateAgendas(numItems, pr);
+      LOG(INFO) << "found" << ars.size() << "agendas";
+      AgendaControl::bestAgendaChair(ars, vals, caps);
+    }
+    catch (KException &ke) {
+      LOG(INFO) << ke.msg;
+    }
+    catch (...) {
+      LOG(INFO) << "Unknown exception";
+    }
     for (auto ar : ars) {
       delete ar;
       ar = nullptr;

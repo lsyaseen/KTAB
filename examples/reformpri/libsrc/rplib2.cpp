@@ -43,6 +43,7 @@ using KBase::ReportingLevel;
 using KBase::Model;
 using KBase::EActor;
 using KBase::EState;
+using KBase::KException;
 
 // --------------------------------------------
 
@@ -66,7 +67,10 @@ RP2Model* pmmCreation(uint64_t sd) {
   auto uMat = KMatrix::uniform(rng, numAct, numOpt, 0.0, 1.0);
   pmm->setWeights(wMat);
   pmm->setRP2(uMat);
-  assert(numOpt == pmm->numOptions());
+  //assert(numOpt == pmm->numOptions());
+  if (numOpt != pmm->numOptions()) {
+    throw KException("RPModel::readXML: inaccurate number of options in pmm");
+  }
   vector<string> names = {};
   vector<string> desc = {};
   for (unsigned int i = 0; i < numAct; i++) {
@@ -94,10 +98,22 @@ RP2State* pmsCreation(RP2Model * pmm) {
 double rawValPos(unsigned int ai, const VUI &pstn,
                  const KMatrix& riVal, const vector <double>& aCap, const KMatrix& govCost,
                  double govBudget, double obFactor, const vector<double>& prob) {
-  assert(0.0 < govBudget);
-  assert(govBudget < sum(govCost));
-  assert(0.0 < obFactor);
-  assert(obFactor < 1.0);
+  //assert(0.0 < govBudget);
+  if (0.0 >= govBudget) {
+    throw KException("RPModel::readXML: govtBudget must be positive");
+  }
+  //assert(govBudget < sum(govCost));
+  if (govBudget >= sum(govCost)) {
+    throw KException("RPModel::readXML: govtBudget must be less than the sum of all govtCost");
+  }
+  //assert(0.0 < obFactor);
+  if (0.0 >= obFactor) {
+    throw KException("RPModel::readXML: obFactor must be positive");
+  }
+  //assert(obFactor < 1.0);
+  if (obFactor >= 1.0) {
+    throw KException("RPModel::readXML: obFactor must be less than 1.0");
+  }
 
   double costSoFar = 0;
   double vip = 0.0;
@@ -264,14 +280,20 @@ void RP2Model::setRP2(const KMatrix & pm0) {
   const unsigned int nr = pm0.numR();
   const unsigned int nc = pm0.numC();
   if (0 < numAct) {
-    assert(nr == numAct);
+    //assert(nr == numAct);
+    if (nr != numAct) {
+      throw KException("RP2Model::setRP2: pm0 must have row count equal to actor count");
+    }
   }
   else {
     numAct = nr;
   }
 
   if (0 < numOptions()) {
-    assert(nc == numOptions());
+    //assert(nc == numOptions());
+    if (nc != numOptions()) {
+      throw KException("RP2Model::setRP2: pm0 must have column count equal to number of options");
+    }
   }
   else {
     theta.resize(nc); // was size zero
@@ -280,14 +302,29 @@ void RP2Model::setRP2(const KMatrix & pm0) {
     }
   }
 
-  assert(minNumActor <= numAct);
-  assert(numAct <= maxNumActor);
+  //assert(minNumActor <= numAct);
+  if (minNumActor > numAct) {
+    throw KException("RP2Model::setRP2: actor count must not be less than the minimum value");
+  }
+  //assert(numAct <= maxNumActor);
+  if (numAct > maxNumActor) {
+    throw KException("RP2Model::setRP2: actor count must not be more than the maximum value");
+  }
 
-  assert(minNumOptions <= numOptions());
+  //assert(minNumOptions <= numOptions());
+  if (minNumOptions > numOptions()) {
+    throw KException("RP2Model::setRP2: number of options must not be less than the minimum value");
+  }
 
   for (auto u : pm0) {
-    assert(0.0 <= u);
-    assert(u <= 1.0);
+    //assert(0.0 <= u);
+    if (0.0 > u) {
+      throw KException("RP2Model::setRP2: u must be non-negative");
+    }
+    //assert(u <= 1.0);
+    if (u > 1.0) {
+      throw KException("RP2Model::setRP2: u must not be more than 1.0");
+    }
   }
 
   // if all OK, set it
@@ -301,20 +338,35 @@ void RP2Model::setWeights(const KMatrix & w0) {
   const unsigned int nr = w0.numR();
   const unsigned int nc = w0.numC();
 
-  assert(1 == nr);
+  //assert(1 == nr);
+  if (1 != nr) {
+    throw KException("RP2Model::setWeights: w0 must be a row vector");
+  }
 
   if (0 < numAct) {
-    assert(nc == numAct);
+    //assert(nc == numAct);
+    if (nc != numAct) {
+      throw KException("RP2Model::setWeights: w0 must have columns equal to count of actors");
+    }
   }
   else {
     numAct = nc;
   }
 
   for (auto w : w0) {
-    assert(0.0 <= w);
+    //assert(0.0 <= w);
+    if (0.0 > w) {
+      throw KException("RP2Model::setWeights: w must be non-negative");
+    }
   }
-  assert(minNumActor <= numAct);
-  assert(numAct <= maxNumActor);
+  //assert(minNumActor <= numAct);
+  if (minNumActor > numAct) {
+    throw KException("RP2Model::setWeights: actor count must not be less than minimum value");
+  }
+  //assert(numAct <= maxNumActor);
+  if (numAct > maxNumActor) {
+    throw KException("RP2Model::setWeights: actor count must not be more than the maximum value");
+  }
 
   // if it is OK, set it
   wghtVect = w0;
@@ -326,11 +378,26 @@ void RP2Model::setActors(vector<string> names, vector<string> descriptions) {
   const unsigned int na = numAct;
   numAct = 0;
 
-  assert(0 < na);
-  assert(na == names.size());
-  assert(na == descriptions.size());
-  assert(na == wghtVect.numC());
-  assert(na == polUtilMat.numR());
+  //assert(0 < na);
+  if (0 >= na) {
+    throw KException("RP2Model::setActors: na must be positive");
+  }
+  //assert(na == names.size());
+  if (na != names.size()) {
+    throw KException("RP2Model::setActors: There must be names for each actor");
+  }
+  //assert(na == descriptions.size());
+  if (na != descriptions.size()) {
+    throw KException("RP2Model::setActors: There must be description for each actor");
+  }
+  //assert(na == wghtVect.numC());
+  if (na != wghtVect.numC()) {
+    throw KException("RP2Model::setActors: Column count of wghtVect must be equal to actor count");
+  }
+  //assert(na == polUtilMat.numR());
+  if (na != polUtilMat.numR()) {
+    throw KException("RP2Model::setActors: row count of polUtilMat must be equal to actor count");
+  }
 
   for (unsigned int i = 0; i < na; i++) {
     auto ai = new EActor<unsigned int>(this, names[i], descriptions[i]);
@@ -338,7 +405,10 @@ void RP2Model::setActors(vector<string> names, vector<string> descriptions) {
     ai->sCap = wghtVect(0, i);
     addActor(ai);
   }
-  assert(na == numAct);
+  //assert(na == numAct);
+  if (na != numAct) {
+    throw KException("RP2Model::setActors: inaccurate number of actor count");
+  }
   return;
 }
 
@@ -384,9 +454,18 @@ vector<double> RP2State::actorUtilVectFn(int h, int tj) const {
   const unsigned int na = eMod->numAct;
   const auto pMod = (const RP2Model*)eMod;
   const auto pMat = pMod->getPolUtilMat();
-  assert(na == pMat.numR());
-  assert(0 <= tj);
-  assert(tj < pMat.numC());
+  //assert(na == pMat.numR());
+  if (na != pMat.numR()) {
+    throw KException("RP2State::actorUtilVectFn: row count of pMat must be equal to actor count");
+  }
+  //assert(0 <= tj);
+  if (0 > tj) {
+    throw KException("RP2State::actorUtilVectFn: tj must be non-negative");
+  }
+  //assert(tj < pMat.numC());
+  if (tj >= pMat.numC()) {
+    throw KException("RP2State::actorUtilVectFn: column count of pMat must be more than tj");
+  }
   vector<double> rslt = {};
   rslt.resize(na);
   for (unsigned int i = 0; i < na; i++) {
@@ -401,8 +480,14 @@ vector<double> RP2State::actorUtilVectFn(int h, int tj) const {
 // If there are duplicate positions, there will be duplicate columns.
 void RP2State::setAllAUtil(ReportingLevel) {
   const unsigned int na = eMod->numAct;
-  assert(Model::minNumActor <= na);
-  assert(na <= Model::maxNumActor);
+  //assert(Model::minNumActor <= na);
+  if (Model::minNumActor > na) {
+    throw KException("RP2State::setAllAUtil: actor count must not be less than the minimum value");
+  }
+  //assert(na <= Model::maxNumActor);
+  if (na > Model::maxNumActor) {
+    throw KException("RP2State::setAllAUtil: actor count must not be more than the maximum value");
+  }
   aUtil = {};
   aUtil.resize(na);
   auto uMat = KMatrix(na, na); // they will all be the same in this demo

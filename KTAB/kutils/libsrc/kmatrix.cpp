@@ -39,12 +39,24 @@ KMatrix subMatrix(const KMatrix & m1,
                   unsigned int i1, unsigned int i2,
                   unsigned int j1, unsigned int j2) {
 
-    assert(i1 <= i2);
-    assert(i2 < m1.numR());
+    //assert(i1 <= i2);
+    if (i1 > i2) {
+      throw KException("subMatrix: i1 should not be greater than i2 ");
+    }
+    //assert(i2 < m1.numR());
+    if (i2 > m1.numR()) {
+      throw KException("subMatrix: i2 can't be more than rows of m1 matrix");
+    }
     const unsigned int nr = 1 + (i2 - i1);
 
-    assert(j1 <= j2);
-    assert(j2 < m1.numC());
+    //assert(j1 <= j2);
+    if (j1 > j2) {
+      throw KException("subMatrix: j1 should not be greater than j2");
+    }
+    //assert(j2 < m1.numC());
+    if (j2 >= m1.numC()) {
+      throw KException("subMatrix: j2 can't be more than columns of m1 matrix");
+    }
     const unsigned int nc = 1 + (j2 - j1);
 
     KMatrix m2 = KMatrix(nr, nc);
@@ -149,9 +161,18 @@ tuple<unsigned int, unsigned int>  ndxMaxAbs(const KMatrix & m) {
             }
         }
     }
-    assert (0.0 <= ma);
-    assert (ndxI < nr);
-    assert (ndxJ < nc);
+    //assert (0.0 <= ma);
+    if (0.0 > ma) {
+      throw KException("ndxMaxAbs: ma must be non-negative");
+    }
+    //assert (ndxI < nr);
+    if (ndxI >= nr) {
+      throw KException("ndxMaxAbs: invalid index for init actor");
+    }
+    //assert (ndxJ < nc);
+    if (ndxJ >= nc) {
+      throw KException("ndxMaxAbs: invalid index for receiver actor");
+    }
     auto ndx = tuple<unsigned int, unsigned int>(ndxI, ndxJ);
     return ndx;
 }
@@ -169,7 +190,10 @@ double  lCorr(const KMatrix & m1, const KMatrix & m2) {
 
 
 double  dot(const KMatrix & m1, const KMatrix & m2) {
-    assert(sameShape(m1, m2));
+    //assert(sameShape(m1, m2));
+    if (!sameShape(m1, m2)) {
+      throw KException(": m1 and m2 matrices don't have same shapes");
+    }
     double s12 = 0;
     for (unsigned int i = 0; i < m1.numR(); i++) {
         for (unsigned int j = 0; j < m1.numC(); j++) {
@@ -264,18 +288,33 @@ unsigned int KMatrix::numC() const {
 
 
 unsigned int KMatrix::nFromRC(const unsigned int r, const unsigned int c) const {
-    assert(r < rows);
-    assert(c < clms);
+    //assert(r < rows);
+    if (r >= rows) {
+      throw KException("KMatrix::nFromRC: r can not be more than number of rows");
+    }
+    //assert(c < clms);
+    if (c >= clms) {
+      throw KException("KMatrix::nFromRC: c can not be more than number of columns");
+    }
     return (r*clms + c);
 }
 
 
 void KMatrix::rcFromN(const unsigned int n, unsigned int & r, unsigned int &c) const {
-    assert(n < rows*clms);
+    //assert(n < rows*clms);
+    if (n >= rows*clms) {
+      throw KException("KMatrix::rcFromN: ");
+    }
     r = n / clms;
     c = n - (r*clms);
-    assert(r < rows);
-    assert(c < clms);
+    //assert(r < rows);
+    if (r >= rows) {
+      throw KException("KMatrix::rcFromN: row number is invalid");
+    }
+    //assert(c < clms);
+    if (c >= clms) {
+      throw KException("KMatrix::rcFromN: column number is invalid");
+    }
     return;
 }
 
@@ -304,7 +343,10 @@ bool sameShape(const KMatrix & m1, const KMatrix & m2) {
 
 
 KMatrix operator+ (const KMatrix & m1, const KMatrix & m2) {
-    assert(sameShape(m1, m2));
+    //assert(sameShape(m1, m2));
+    if (!sameShape(m1, m2)) {
+      throw KException("operator+: m1 and m2 matrices are not of same shape");
+    }
     auto af = [m1, m2](unsigned int i, unsigned int j) {
         return m1(i, j) + m2(i, j);
     };
@@ -313,8 +355,11 @@ KMatrix operator+ (const KMatrix & m1, const KMatrix & m2) {
 
 
 KMatrix operator- (const KMatrix & m1, const KMatrix & m2) {
-    assert(sameShape(m1, m2));
-    auto sf = [&m1, &m2](unsigned int i, unsigned int j) {
+  //assert(sameShape(m1, m2));
+  if (!sameShape(m1, m2)) {
+    throw KException("operator-: m1 and m2 matrices are not of same shape");
+  }
+  auto sf = [&m1, &m2](unsigned int i, unsigned int j) {
         return m1(i, j) - m2(i, j);
     };
     return KMatrix::map(sf, m1.numR(), m1.numC());
@@ -348,7 +393,10 @@ KMatrix operator/ (const KMatrix & m1, double x) {
 KMatrix operator* (const KMatrix & m1, const KMatrix & m2) {
     const unsigned int nr3 = m1.numR();
     const unsigned int nm3 = m1.numC();
-    assert(nm3 == m2.numR());
+    //assert(nm3 == m2.numR());
+    if (nm3 != m2.numR()) {
+      throw KException("operator*: m1 and m2 matrices don't qualify for matrix multiplication");
+    }
     const unsigned int nc3 = m2.numC();
     auto f = [nm3, &m1, &m2](unsigned int i, unsigned int j) {
         double sij = 0.0;
@@ -362,7 +410,7 @@ KMatrix operator* (const KMatrix & m1, const KMatrix & m2) {
 
 
 KMatrix KMatrix::map(function<double(unsigned int i, unsigned int j)> f, unsigned int nr, unsigned int nc) {
-    assert (f != nullptr);
+    //assert (f != nullptr);
     auto m = KMatrix(nr, nc);
     for (unsigned int i = 0; i < nr; i++) {
         for (unsigned int j = 0; j < nc; j++) {
@@ -374,7 +422,10 @@ KMatrix KMatrix::map(function<double(unsigned int i, unsigned int j)> f, unsigne
 
 KMatrix KMatrix::map(function<double(double mij, unsigned int i, unsigned int j)> f,
                      const KMatrix & mat) {
-    assert (f != nullptr);
+    //assert (f != nullptr);
+    if (f == nullptr) {
+      throw KException("KMatrix::map: f is a null pointer");
+    }
     const unsigned int nr = mat.numR();
     const unsigned int nc = mat.numC();
     auto m = KMatrix(nr,nc);
@@ -389,7 +440,10 @@ KMatrix KMatrix::map(function<double(double mij, unsigned int i, unsigned int j)
 
 KMatrix KMatrix::map(function<double(double x)> f,
                      const KMatrix & mat) {
-    assert (f != nullptr);
+    //assert (f != nullptr);
+    if (f == nullptr) {
+      throw KException("KMatrix::map: f is a null pointer");
+    }
     const unsigned int nr = mat.numR();
     const unsigned int nc = mat.numC();
     auto m = KMatrix(nr,nc);
@@ -403,7 +457,10 @@ KMatrix KMatrix::map(function<double(double x)> f,
 
 
 void KMatrix::mapV(function<void(unsigned int i, unsigned int j)> f, unsigned int nr, unsigned int nc) {
-    assert (f != nullptr);
+    //assert (f != nullptr);
+    if (f == nullptr) {
+      throw KException("KMatrix::mapV: f is a null pointer");
+    }
     for (unsigned int i = 0; i < nr; i++) {
         for (unsigned int j = 0; j < nc; j++) {
             f(i, j);
@@ -428,7 +485,10 @@ void KMatrix::pivot(unsigned int r, unsigned int c) {
     double xrc = x(r, c);
     double xrcAbs = fabs(xrc);
     const double minPivot = 1E-8;
-    assert(xrcAbs > minPivot); // nearly-singular?
+    //assert(xrcAbs > minPivot); // nearly-singular?
+    if (xrcAbs <= minPivot) { // nearly-singular?
+      throw KException("KMatrix::pivot: xrcAbs is very low");
+    }
 
     // pivot the four blocks outside the main row and main column
     for (unsigned int i = 0; i < rows; i++) {
@@ -463,7 +523,10 @@ void KMatrix::pivot(unsigned int r, unsigned int c) {
 // textbook algorithm
 KMatrix inv(const KMatrix & m) {
     const unsigned int n = m.numR();
-    assert(n == m.numC());
+    //assert(n == m.numC());
+    if (n != m.numC()) {
+      throw KException("inv: m is not a square matrix");
+    }
 
     KMatrix m2 = joinH(KMatrix(m), iMat(n));
     VBool ok = {};
@@ -485,7 +548,10 @@ KMatrix inv(const KMatrix & m) {
                 }
             }
         }
-        assert(0 < maxD);
+        //assert(0 < maxD);
+        if (0 >= maxD) {
+          throw KException("KMatrix::inv: maxD should be positive");
+        }
         m2.pivot(pk, pk);
         ok[pk] = false;
     }
@@ -501,7 +567,10 @@ KMatrix inv(const KMatrix & m) {
 
 
 KMatrix clip(const KMatrix & m, double xMin, double xMax) {
-    assert (xMin <= xMax);
+    //assert (xMin <= xMax);
+    if (xMin > xMax) {
+      throw KException("clip: min is more than max");
+    }
     const unsigned int nr = m.numR();
     const unsigned int nc = m.numC();
     auto cfn = [m, xMin, xMax] (unsigned int i, unsigned int j) {
@@ -544,7 +613,10 @@ KMatrix makePerp(const KMatrix & x, const KMatrix & p) {
 KMatrix  joinH(const KMatrix & mL, const KMatrix & mR) {
     unsigned int nr3 = mL.numR();
     unsigned int nc1 = mL.numC();
-    assert(nr3 == mR.numR());
+    //assert(nr3 == mR.numR());
+    if (nr3 != mR.numR()) {
+      throw KException("joinH: mL and mR can not be joined");
+    }
     unsigned int nc2 = mR.numC();
     auto m3 = KMatrix(nr3, nc1 + nc2);
     for (unsigned int i = 0; i < nr3; i++) {
@@ -563,7 +635,10 @@ KMatrix  joinV(const KMatrix & mT, const KMatrix & mB) {
     unsigned int nr1 = mT.numR();
     unsigned int nr2 = mB.numR();
     unsigned int nc3 = mT.numC();
-    assert(nc3 == mB.numC());
+    //assert(nc3 == mB.numC());
+    if (nc3 != mB.numC()) {
+      throw KException("joinV: mT and mB can not be joined");
+    }
     auto m3 = KMatrix(nr1 + nr2, nc3);
     for (unsigned int j = 0; j < nc3; j++) {
         for (unsigned int i = 0; i < nr1; i++) {
@@ -577,7 +652,10 @@ KMatrix  joinV(const KMatrix & mT, const KMatrix & mB) {
 }
 
 KMatrix rescaleRows(const KMatrix& m1, const double vMin, const double vMax) {
-    assert(vMin < vMax);
+    //assert(vMin < vMax);
+    if (vMin >= vMax) {
+      throw KException("rescaleRows: vMin is not less than vMax");
+    }
     const unsigned int nr = m1.numR();
     const unsigned int nc = m1.numC();
     KMatrix m2 = KMatrix(nr, nc);
@@ -595,7 +673,10 @@ KMatrix rescaleRows(const KMatrix& m1, const double vMin, const double vMax) {
             }
         }
         const double rowRange = rowMax - rowMin;
-        assert(0 < rowRange);
+        //assert(0 < rowRange);
+        if (0 >= rowRange) {
+          throw KException("rescaleRows: rowRange must be positive");
+        }
 
         for (unsigned int j = 0; j < nc; j++) {
             const double mij = m1(i, j);
@@ -621,11 +702,20 @@ KMatrix rescaleRows(const KMatrix& m1, const double vMin, const double vMax) {
 KMatrix KMatrix::vecInit(const vector<double> & vec, const unsigned int nr, const unsigned int nc)
 {
     // be sure the size of the desired matrix is consistent with the data
-    assert(vec.size() == nr*nc);
-    
+    //assert(vec.size() == nr*nc);
+    if (vec.size() != nr*nc) {
+      throw KException("KMatrix::vecInit: size of the matrix is not consistent with the data");
+    }
+
     // because we are subtracting from unsigned int, make sure the result does not underflow
-    assert (1 <= nc);
-    assert (1 <= nr);
+    //assert (1 <= nc);
+    if (1 > nc) {
+      throw KException("KMatrix::vecInit: nc must not be less than 1");
+    }
+    //assert (1 <= nr);
+    if (1 > nr) {
+      throw KException("KMatrix::vecInit: nr must not be less than 1");
+    }
 
     // init to the right size ...
     auto mat = KMatrix(nr,nc,0.0);
@@ -645,9 +735,18 @@ KMatrix KMatrix::vecInit(const vector<double> & vec, const unsigned int nr, cons
 
 KMatrix firstEigenvector( const KMatrix& A, double tol) {
     const unsigned int n = A.numR();
-    assert (A.numC() == n); // must be square
-    assert (1 < n);
-    assert (0.0 < tol);
+    //assert (A.numC() == n); // must be square
+    if (A.numC() != n) { // must be square
+      throw KException("firstEigenvector: A is not a square matrix");
+    }
+    //assert (1 < n);
+    if (1 >= n) {
+      throw KException("firstEigenvector: n must be greater than 1");
+    }
+    //assert (0.0 < tol);
+    if (0.0 >= tol) {
+      throw KException("firstEigenvector: tol must be positive");
+    }
 
     auto mDelta = [](const KMatrix& m1, const KMatrix& m2) {
         auto diff = norm(m1-m2);

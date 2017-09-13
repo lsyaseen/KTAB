@@ -69,7 +69,10 @@ MtchPstn::MtchPstn() : Position()  {
 MtchPstn::~MtchPstn() {}
 
 void MtchPstn::print(ostream& os) const {
-  assert(numItm == match.size());
+  //assert(numItm == match.size());
+  if (numItm != match.size()) {
+    throw KException("MtchPstn::print: Size of matched positions is not correct");
+  }
   os << "[MtchPstn ";
   for (auto m : match) {
     os << m << " ";
@@ -79,7 +82,10 @@ void MtchPstn::print(ostream& os) const {
 }
 
 vector< MtchPstn > MtchPstn::neighbors(unsigned int nVar) const {
-  assert(0 < nVar);
+  //assert(0 < nVar);
+  if (0 >= nVar) {
+    throw KException("MtchPstn::neighbors: nVar must be positive");
+  }
   auto nghbrs = vector<MtchPstn>();
 
 
@@ -151,8 +157,14 @@ vector< MtchPstn > MtchPstn::neighbors(unsigned int nVar) const {
 // numI: the number of items (sweets)
 // match: this particular gene, from {0 ... numCat-1}^numItm
 MtchGene::MtchGene() : MtchPstn() {
-  assert(0 == numCat);
-  assert(0 == numItm);
+  //assert(0 == numCat);
+  if (0 != numCat) {
+    throw KException("MtchGene::MtchGene: numCat should be zero");
+  }
+  //assert(0 == numItm);
+  if (0 != numItm) {
+    throw KException("MtchGene::MtchGene: numItm should be zero");
+  }
   actrs = vector<Actor*>();
   pstns = vector<MtchPstn*>();
   match = VUI();
@@ -162,7 +174,10 @@ MtchGene::~MtchGene() {};
 
 
 void MtchGene::print(ostream& os) const {
-  assert(numItm == match.size());
+  //assert(numItm == match.size());
+  if (0 != numCat) {
+    throw KException("MtchGene::MtchGene: numCat should be zero");
+  }
   os << "[MtchGene ";
   for (auto m : match) {
     os << m << " ";
@@ -172,8 +187,14 @@ void MtchGene::print(ostream& os) const {
 }
 
 void MtchGene::randomize(PRNG* rng) {
-  assert(0 < numCat);
-  assert(0 < numItm);
+  //assert(0 < numCat);
+  if (0 >= numCat) {
+    throw KException("MtchGene::randomize: numCat should be positive");
+  }
+  //assert(0 < numItm);
+  if (0 >= numItm) {
+    throw KException("MtchGene::randomize: numItm should be positive");
+  }
   match = VUI();
   for (unsigned int i = 0; i < numItm; i++) {
     unsigned int aID = ((unsigned int)(rng->uniform() % numCat));
@@ -183,9 +204,18 @@ void MtchGene::randomize(PRNG* rng) {
 }
 
 void  MtchGene::copySelf(MtchGene* mg2) const {
-  assert(0 < numCat);
-  assert(0 < numItm);
-  assert(numItm == match.size());
+  //assert(0 < numCat);
+  if (0 >= numCat) {
+    throw KException("MtchGene::copySelf: numCat should be positive");
+  }
+  //assert(0 < numItm);
+  if (0 >= numItm) {
+    throw KException("MtchGene::copySelf: numItm should be positive");
+  }
+  //assert(numItm == match.size());
+  if (numItm != match.size()) {
+    throw KException("MtchGene::copySelf: numItm should be equal to match's size");
+  }
 
   mg2->numCat = numCat;
   mg2->numItm = numItm;
@@ -235,7 +265,10 @@ tuple<MtchGene*, MtchGene*>  MtchGene::cross(const MtchGene * mg2, PRNG * rng) c
 
 
 bool MtchGene::equiv(const MtchGene * mg2) const {
-  assert((numItm == mg2->numItm) && (numCat == mg2->numCat));
+  //assert((numItm == mg2->numItm) && (numCat == mg2->numCat));
+  if ((numItm != mg2->numItm) || (numCat != mg2->numCat)) {
+    throw KException("MtchGene::equiv: Values not correct");
+  }
   bool e = (*this == *mg2);
   return e;
 }

@@ -179,14 +179,20 @@ Model::~Model() {
 
 
 void Model::run() {
-  assert(1 == history.size());
+  //assert(1 == history.size());
+  if (1 != history.size()) {
+    throw KException("Model::run: History size should not be more than 1 at this stage.");
+  }
   State* s0 = history[0];
   bool done = false;
   unsigned int iter = 0;
 
   while (!done) {
-    assert(nullptr != s0);
-    assert(nullptr != s0->step);
+    //assert(nullptr != s0);
+    //assert(nullptr != s0->step);
+    if (nullptr == s0 || nullptr == s0->step) {
+      throw KException("Model::run: Invalid state");
+    }
     iter++;
     LOG(INFO) << "Starting Model::run iteration" << iter;
     auto s1 = s0->step();
@@ -198,7 +204,10 @@ void Model::run() {
 }
 
 unsigned int Model::addActor(Actor* a) {
-  assert(nullptr != a);
+  //assert(nullptr != a);
+  if (nullptr == a) {
+    throw KException("Model::addActor Actor a is a null pointer");
+  }
   actrs.push_back(a);
   numAct = ((unsigned int)(actrs.size()));
   return numAct;
@@ -206,8 +215,15 @@ unsigned int Model::addActor(Actor* a) {
 
 
 unsigned int Model::addState(State* s) {
-  assert(nullptr != s);
-  assert(this == s->model);
+  //assert(nullptr != s);
+  if (nullptr == s) {
+    throw KException("Model::addState: State is null pointer.");
+  }
+
+  //assert(this == s->model);
+  if (this != s->model) {
+    throw KException("Model::addState: Invalid model object associated with the given State");
+  }
   history.push_back(s);
   auto hs = ((const unsigned int)(history.size()));
   return hs;
@@ -218,13 +234,19 @@ KMatrix Model::bigRfromProb(const KMatrix & p, BigRRange rr) {
   double pMin = 1.0;
   double pMax = 0.0;
   for (double pi : p) {
-    assert(0.0 <= pi);
+    //assert(0.0 <= pi);
+    if (0.0 > pi) {
+      throw KException("Model::bigRfromProb: pi must be non-negative");
+    }
     pMin = (pi < pMin) ? pi : pMin;
     pMax = (pi > pMax) ? pi : pMax;
   }
 
   const double pTol = 1E-8;
-  assert(fabs(1 - KBase::sum(p)) < pTol);
+  //assert(fabs(1 - KBase::sum(p)) < pTol);
+  if (fabs(1 - KBase::sum(p)) >= pTol) {
+    throw KException("Model::bigRfromProb: sum of probs exceeds upper limit");
+  }
 
   function<double(unsigned int, unsigned int)> rfn = nullptr;
   switch (rr) {
@@ -448,9 +470,18 @@ tuple<double, double> Model::vProb(VPModel vpm, const double s1, const double s2
   }
   double p1 = x1 / (x1 + x2);
   double p2 = x2 / (x1 + x2);
-  assert(0 <= p1);
-  assert(0 <= p2);
-  assert(fabs(p1 + p2 - 1.0) < tol);
+  //assert(0 <= p1);
+  if (0 > p1) {
+    throw KException("Model::vProb: p1 must be non-negative");
+  }
+  //assert(0 <= p2);
+  if (0 > p2) {
+    throw KException("Model::vProb: p2 must be non-negative");
+  }
+  //assert(fabs(p1 + p2 - 1.0) < tol);
+  if (fabs(p1 + p2 - 1.0) >= tol) {
+    throw KException("Model::vProb: Sum total of all probabilities must be less than 1.0");
+  }
 
   return tuple<double, double>(p1, p2);
 }
@@ -460,15 +491,27 @@ tuple<double, double> Model::vProb(VPModel vpm, const double s1, const double s2
 // (and hence pkk = 1/2).
 KMatrix Model::vProb(VPModel vpm, const KMatrix & c) {
   unsigned int numOpt = c.numR();
-  assert(numOpt == c.numC());
+  //assert(numOpt == c.numC());
+  if (numOpt != c.numC()) {
+    throw KException("Model::vProb: coalitions matrix is not square");
+  }
   auto p = KMatrix(numOpt, numOpt);
   for (unsigned int i = 0; i < numOpt; i++) {
     for (unsigned int j = 0; j < i; j++) {
       double cij = c(i, j);
-      assert(0 <= cij);
+      //assert(0 <= cij);
+      if (0 > cij) {
+        throw KException("Model::vProb: cij must be non-negative");
+      }
       double cji = c(j, i);
-      assert(0 <= cji);
-      assert((0 < cij) || (0 < cji));
+      //assert(0 <= cji);
+      if (0 > cji) {
+        throw KException("Model::vProb: cji must be non-negative");
+      }
+      //assert((0 < cij) || (0 < cji));
+      if ((0 >= cij) && (0 >= cji)) {
+        throw KException("Model::vProb: Either one of cij or cji must be positive");
+      }
       auto ppr = vProb(vpm, cij, cji);
       p(i, j) = get<0>(ppr); // set the lower left  probability: if Linear, cij / (cij + cji)
       p(j, i) = get<1>(ppr); // set the upper right probability: if Linear, cji / (cij + cji)
@@ -515,8 +558,14 @@ KMatrix Model::vProb(VotingRule vr, VPModel vpm, const KMatrix & w, const KMatri
   unsigned int numAct = u.numR();
   unsigned int numOpt = u.numC();
   // w_j is row-vector of actor weights, for simple voting
-  assert(numAct == w.numC()); // require 1-to-1 matching of actors and strengths
-  assert(1 == w.numR()); // weights must be a row-vector
+  //assert(numAct == w.numC()); // require 1-to-1 matching of actors and strengths
+  if (numAct != w.numC()) { // require 1-to-1 matching of actors and strengths
+    throw KException("Model::vProb: weight matrix's column size must be equal to number of actors");
+  }
+  //assert(1 == w.numR()); // weights must be a row-vector
+  if (1 != w.numR()) { // weights must be a row-vector
+    throw KException("Model::vProb: weights must be a row-vector");
+  }
 
   auto vfn = [vr, &w, &u](unsigned int k, unsigned int i, unsigned int j) {
     double vkij = vote(vr, w(0, k), u(k, i), u(k, j));
@@ -544,12 +593,21 @@ tuple<KMatrix, KMatrix> Model::probCE2(PCEModel pcm, VPModel vpm, const KMatrix 
     p = markovUniformPCE(victProb);
     break;
   default:
-    throw KException("Model::probCE unrecognized PCEModel");
+    throw KException("Model::probCE2: unrecognized PCEModel");
     break;
   }
-  assert(numOpt == p.numR());
-  assert(1 == p.numC());
-  assert(fabs(sum(p) - 1.0) < pTol);
+  //assert(numOpt == p.numR());
+  if (numOpt != p.numR()) {
+    throw KException("Model::probCE2: numOpt is not equal to number of rows in p");
+  }
+  //assert(1 == p.numC());
+  if (1 != p.numC()) {
+    throw KException("Model::probCE2: number of columns is not 1");
+  }
+  //assert(fabs(sum(p) - 1.0) < pTol);
+  if (fabs(sum(p) - 1.0) >= pTol) {
+    throw KException("Model::probCE2: Sum total of probs must be less than 1.0");
+  }
   return tuple<KMatrix, KMatrix>(p, victProb);
 }
 
@@ -595,8 +653,7 @@ KMatrix Model::markovIncentivePCE(const KMatrix & coalitions, VPModel vpm) {
   const bool printP = false;
   const double pTol = 1E-8;
   const unsigned int numOpt = coalitions.numR();
-  assert(numOpt == coalitions.numC());
-
+  //assert(numOpt == coalitions.numC());
   const auto victProbMatrix = vProb(vpm, coalitions);
 
   // given coalitions, calculate the total incentive for i to challenge j
@@ -667,7 +724,10 @@ KMatrix Model::markovIncentivePCE(const KMatrix & coalitions, VPModel vpm) {
         double cj = ct(i, j) + ct(j, i);
         qi = qi + vij* cj;
       }
-      assert(0 <= qi); // double-check
+      //assert(0 <= qi); // double-check
+      if (0 > qi) {
+        throw KException("Model::markovIncentivePCE: Probability qi must be non-negative");
+      }
       q(i, 0) = qi;
       double c = fabs(q(i, 0) - p(i, 0));
       change = (c > change) ? c : change;
@@ -675,10 +735,16 @@ KMatrix Model::markovIncentivePCE(const KMatrix & coalitions, VPModel vpm) {
     // Newton method improves convergence.
     p = (p+q)/2.0;
     iter++;
-    assert(fabs(sum(p) - 1.0) < pTol); // double-check
+    //assert(fabs(sum(p) - 1.0) < pTol); // double-check
+    if (fabs(sum(p) - 1.0) >= pTol) {
+      throw KException("Model::markovIncentivePCE: Sum total of prob p must be less than 1.0");
+    }
   }
 
-  assert(iter < iMax); // no way to recover
+  //assert(iter < iMax); // no way to recover
+  if (iter >= iMax) {
+    throw KException("Model::markovIncentivePCE: Iteration exceeded upper limit");
+  }
   return p;
 }
 
@@ -719,7 +785,10 @@ KMatrix Model::markovUniformPCE(const KMatrix & pv) {
       for (unsigned int j = 0; j < numOpt; j++) {
         pi = pi + pv(i, j)*(p(i, 0) + p(j, 0));
       }
-      assert(0 <= pi); // double-check
+      //assert(0 <= pi); // double-check
+      if (0 > pi) {
+        throw KException("Model::markovUniformPCE: Probability pi must be non-negative");
+      }
       q(i, 0) = pi / numOpt;
       double c = fabs(q(i, 0) - p(i, 0));
       change = (c > change) ? c : change;
@@ -727,9 +796,15 @@ KMatrix Model::markovUniformPCE(const KMatrix & pv) {
     // Newton method improves convergence.
     p = (p + q) / 2.0;
     iter++;
-    assert(fabs(sum(p) - 1.0) < pTol); // double-check
+    //assert(fabs(sum(p) - 1.0) < pTol); // double-check
+    if (fabs(sum(p) - 1.0) >= pTol) {
+      throw KException("Model::markovUniformPCE: Sum total of probabilities must be less than 1.0");
+    }
   }
-  assert(iter < iMax); // no way to recover
+  //assert(iter < iMax); // no way to recover
+  if (iter >= iMax) {
+    throw KException("Model::markovUniformPCE: Iteration exceeded the upper limit");
+  }
   return p;
 }
 
@@ -745,8 +820,12 @@ KMatrix Model::condPCE(const KMatrix & pv) {
       pi = pi * pv(i, j);
     }
     // double-check
-    assert(0 <= pi);
-    assert(pi <= 1);
+    //assert(0 <= pi);
+    //assert(pi <= 1);
+    if (0 > pi || 1 < pi) {
+      throw KException("Model::condPCE: value of probability pi is out of bound.");
+    }
+
     p(i, 0) = pi; // probability that i beats all alternatives
   }
   double probOne = sum(p); // probability that one option, any option, beats all alternatives
@@ -823,9 +902,19 @@ tuple<double, double, double>
 Actor::thirdPartyVoteSU(double wk, VotingRule vr, ThirdPartyCommit comm,
                         double pik, double pjk, double uki, double ukj, double ukk) {
   const double pTol = 1E-8;
-  assert(0 <= pik);
-  assert(0 <= pjk);
-  assert(fabs(pik + pjk - 1.0) < pTol);
+  //assert(0 <= pik);
+  if (0 > pik) {
+    throw KException("pik must be positive");
+  }
+
+  //assert(0 <= pjk);
+  if (0 > pjk) {
+    throw KException("pjk must be positive");
+  }
+  //assert(fabs(pik + pjk - 1.0) < pTol);
+  if (fabs(pik + pjk - 1.0) >= pTol) {
+    throw KException("sum of probabilities greater than permissible value");
+  }
   double p_ik_j = pik; // estimated probability ik > j
   double p_jk_i = pjk; // estimated probability jk > i
   double p_j_ik = pjk; // estimated probability j  > ik
@@ -877,10 +966,12 @@ double Actor::vProbLittle(VotingRule vr, double wn, double uni, double unj, doub
   // the primary actors are assigned at least the minisucle
   // minimum influence contribution, to avoid 0/0 errors.
   if (contrib_i_ij <= 0) {
-    assert(contrib_i_ij > 0);
+    //assert(contrib_i_ij > 0);
+    throw KException("Actor::vProbLittle: contribution of i must be positive");
   }
   if (contrib_j_ij <= 0) {
-    assert(contrib_j_ij > 0);
+    //assert(contrib_j_ij > 0);
+    throw KException("Actor::vProbLittle: contribution of j must be positive");
   }
 
   // order-zero estimate depends only on the voting between their two positions

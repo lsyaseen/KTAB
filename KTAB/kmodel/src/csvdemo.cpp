@@ -47,7 +47,10 @@ void pccCSV(const string) {
   inStream.set_delimiter(',', "$$");
   inStream.enable_trim_quote_on_str(true, '\"');
 
-  assert(inStream.is_open());
+  //assert(inStream.is_open());
+  if (!inStream.is_open()) {
+    throw KException("pccCSV: could not open file");
+  }
   string dummy = "";
   unsigned int numAct = 0;
   unsigned int numScen = 0;
@@ -56,15 +59,24 @@ void pccCSV(const string) {
 
   inStream.read_line();
   inStream >> dummy >> numAct;
-  assert(KBase::Model::minNumActor <= numAct);
+  //assert(KBase::Model::minNumActor <= numAct);
+  if (KBase::Model::minNumActor > numAct) {
+    throw KException("pccCSV: inaccurate number of actors");
+  }
 
   inStream.read_line();
   inStream >> dummy >> numScen;
-  assert(1 < numScen);
+  //assert(1 < numScen);
+  if (1 >= numScen) {
+    throw KException("pccCSV: numScen must be more than 1");
+  }
 
   inStream.read_line();
   inStream >> dummy >> numCase;
-  assert(1 <= numCase);
+  //assert(1 <= numCase);
+  if (1 > numCase) {
+    throw KException("pccCSV: numCase must be at least 1");
+  }
 
   LOG(INFO) << KBase::getFormattedString("Actors %u, Scenarios %u, Cases %u", numAct, numScen, numCase);
 
@@ -85,8 +97,14 @@ void pccCSV(const string) {
     for (unsigned int j = 0; j < numCase; j++) {
       double cw = 0.0;
       inStream >> cw;
-      assert(0.0 <= cw);
-      assert(cw <= 100.0);
+      //assert(0.0 <= cw);
+      if (0.0 > cw) {
+        throw KException("pccCSV: cw must be non-negative");
+      }
+      //assert(cw <= 100.0);
+      if (cw > 100.0) {
+        throw KException("pccCSV: cw must not be greater than 100.0");
+      }
       caseWeights(i, j) = cw / 100.0;
     } // loop over j, cases
     inStream >> dummy;
@@ -97,7 +115,7 @@ void pccCSV(const string) {
       maxVect.push_back(false);
     }
     else {
-      throw (KException("Unrecognized group-optimization direction"));
+      throw (KException("pccCSV: Unrecognized group-optimization direction"));
     }
 
     for (unsigned int j = 0; j < numScen; j++) {
@@ -127,8 +145,14 @@ void pccCSV(const string) {
     string dir;
     inStream >> dummy; // skip "prob-n"
     inStream >> tv; // read a threshold value
-    assert(0.0 <= tv);
-    assert(tv <= 1.0);
+    //assert(0.0 <= tv);
+    if (0.0 > tv) {
+      throw KException("pccCSV: tv must be non-negative");
+    }
+    //assert(tv <= 1.0);
+    if (tv > 1.0) {
+      throw KException("pccCSV: tv must not be greater than 1.0");
+    }
     threshVal.push_back(tv);
 
     inStream >> dir; // read dir
@@ -149,8 +173,14 @@ void pccCSV(const string) {
     for (unsigned int k = 0; k < numScen; k++) {
       double pw = 0.0;
       inStream >> pw;
-      assert(0.0 <= pw);
-      assert(pw <= 100.0);
+      //assert(0.0 <= pw);
+      if (0.0 > pw) {
+        throw KException("pccCSV: pw must be non-negative");
+      }
+      //assert(pw <= 100.0);
+      if (pw > 100.0) {
+        throw KException("pccCSV: pw must not be more than 100.0");
+      }
       probWeight(j, k) = pw / 100.0;
     }
   } // loop over j, cases

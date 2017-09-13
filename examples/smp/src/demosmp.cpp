@@ -179,7 +179,8 @@ int main(int ac, char **av) {
   }
 
   // Set logging configuration from a file
-  SMPLib::SMPModel::configLogger("./smpc-logger.conf");
+  //SMPLib::SMPModel::configLogger("./smpc-logger.conf");
+  KBase::Model::configLogger("./smpc-logger.conf");
 
   auto sTime = KBase::displayProgramStart(DemoSMP::appName, DemoSMP::appVersion);
   if (0 == seed) {

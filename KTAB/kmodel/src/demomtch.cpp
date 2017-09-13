@@ -46,6 +46,7 @@ using KBase::VotingRule;
 using KBase::VPModel;
 using KBase::GHCSearch;
 using KBase::ReportingLevel;
+using KBase::KException;
 
 // Are these matchings equivalent?
 bool equivMtchPstn(const MtchPstn & mp1, const MtchPstn & mp2) {
@@ -123,16 +124,28 @@ double MtchActor::vote(const Position * ap1, const Position * ap2) const {
 double MtchActor::posUtil(const Position * ap1) const  {
   auto p1 = ((const MtchPstn *)(ap1));
   const unsigned int n = vals.size();
-  assert(n == p1->numItm);
-  assert(n == p1->match.size());
+  //assert(n == p1->numItm);
+  if (n != p1->numItm) {
+    throw KException("MtchActor::posUtil: position count is inaccurate");
+  }
+  //assert(n == p1->match.size());
+  if (n != p1->match.size()) {
+    throw KException("MtchActor::posUtil: position count is inaccurate");
+  }
   double v = 0;
   for (unsigned int i = 0; i < n; i++){
     if (idNum == p1->match[i]){
       v = v + vals[i];
     }
   }
-  assert(0 <= v);
-  assert(v <= 1);
+  //assert(0 <= v);
+  if (0 > v) {
+    throw KException("MtchActor::posUtil: v must be non-negative");
+  }
+  //assert(v <= 1);
+  if (1 < v) {
+    throw KException("MtchActor::posUtil: v must not be greater than 1");
+  }
   double u = 1.0 - (1 - v)*(1 - v); // adds risk-aversion, declining marginal utility, first few candies matter most, etc.
   return u;
 }
@@ -214,8 +227,9 @@ tuple <KMatrix, VUI> MtchState::pDist(int persp) const {
     }
   }
   else {
-    LOG(INFO) << "SMPState::pDist: unrecognized perspective, " << persp ;
-    assert(false);
+    LOG(INFO) << "MtchState::pDist: unrecognized perspective, " << persp ;
+    //assert(false);
+    throw KException("MtchState::pDist: unrecognized perspective");
   }
   auto pd = Model::scalarPCE(na, na, w, uij, vr, vpm, pcem, rl);
 
@@ -229,7 +243,9 @@ tuple <KMatrix, VUI> MtchState::pDist(int persp) const {
 
 
 bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
-  assert (false); // TODO: finish this stub
+  //assert (false); // TODO: finish this stub
+  // TODO: finish this stub
+  throw KException("MtchState::equivNdx: TODO: finish this stub");
   return false;
 }
 
@@ -279,7 +295,10 @@ MtchModel* MtchModel::randomMS(unsigned int numA, unsigned int numI, VotingRule 
   auto st0 = new MtchState(md0);
   // pre-allocated by constructor, all nullptr's
   // However, there are no actors yet, so it is pre-allocated to zero items.
-  assert(0 == st0->pstns.size()); 
+  //assert(0 == st0->pstns.size()); 
+  if (0 != st0->pstns.size()) {
+    throw KException("MtchModel::randomMS: pstns vector should be preallocated with zero items");
+  }
   for (unsigned int i = 0; i < numA; i++) {
     auto ai = MtchActor::rAct(numI, minCap, maxCap, md0->rng, i);
     ai->vr = vr;
@@ -299,7 +318,10 @@ MtchModel* MtchModel::randomMS(unsigned int numA, unsigned int numI, VotingRule 
     showMtchPstn(*pi);
     LOG(INFO) << " " ; // force blank lines
   }
-  assert(numA == st0->pstns.size()); // now they shouuld match
+  //assert(numA == st0->pstns.size()); // now they shouuld match
+  if (numA != st0->pstns.size()) { // now they shouuld match
+    throw KException("MtchModel::randomMS: pstns vector size should be equal to number of actors");
+  }
   md0->addState(st0);
   return md0;
 }
@@ -440,8 +462,14 @@ void demoMaxSupport(uint64_t s) {
 
   const double minCap = 100;
   const double maxCap = 225;
-  assert(2 * maxCap <= 5 * minCap);
-  assert(2 * maxCap + minCap >= 4 * minCap);
+  //assert(2 * maxCap <= 5 * minCap);
+  if (2 * maxCap > 5 * minCap) {
+    throw KException("demoMaxSupport: 1. minCap and maxCap are inaccurate");
+  }
+  //assert(2 * maxCap + minCap >= 4 * minCap);
+  if (2 * maxCap + minCap < 4 * minCap) {
+    throw KException("demoMaxSupport: 2. minCap and maxCap are inaccurate");
+  }
 
   LOG(INFO) << "Generate actors with random voting rules, values-of-sweets and positions (matchings)" ;
   LOG(INFO) << "Utilities are normalized to [0,1] scale" ;
@@ -525,8 +553,14 @@ void demoMaxSupport(uint64_t s) {
   };
 
   gOpt->eval = [numC, numI, as, zeta](const MtchGene* mg) {
-    assert(numC == mg->numCat);
-    assert(numI == mg->numItm);
+    //assert(numC == mg->numCat);
+    if (numC != mg->numCat) {
+      throw KException("demoMaxSupport: numC must be equal to numCat of mg");
+    }
+    //assert(numI == mg->numItm);
+    if (numI != mg->numItm) {
+      throw KException("demoMaxSupport: numI must be equal to numItm of mg");
+    }
     double z = zeta(as, mg);
     return z;
   };
@@ -633,9 +667,18 @@ void demoMtchSUSN(uint64_t s) {
   auto a0 = ((MtchActor*)(md0->actrs[0]));
   auto p00 = ((MtchPstn*)(st0->pstns[0]));
 
-  assert(numI == p00->numItm);
-  assert(numA == md0->numAct);
-  assert(numC == p00->numCat);
+  //assert(numI == p00->numItm);
+  if (numI != p00->numItm) {
+    throw KException("demoMtchSUSN: numI must be equal to numItm of p00");
+  }
+  //assert(numA == md0->numAct);
+  if (numA != md0->numAct) {
+    throw KException("demoMtchSUSN: numA must be equal to numAct of md0");
+  }
+  //assert(numC == p00->numCat);
+  if (numC != p00->numCat) {
+    throw KException("demoMtchSUSN: numC must be equal to numCat of p00");
+  }
 
   unsigned int maxIter = 20;
   md0->stop = [maxIter](unsigned int iter, const State * s) {
@@ -707,9 +750,18 @@ bool oneMtchSUSN(uint64_t s) {
   auto a0 = ((MtchActor*)(md0->actrs[0]));
   auto p00 = ((MtchPstn*)(st0->pstns[0]));
 
-  assert(numI == p00->numItm);
-  assert(numA == md0->numAct);
-  assert(numC == p00->numCat);
+  //assert(numI == p00->numItm);
+  if (numI != p00->numItm) {
+    throw KException("oneMtchSUSN: numI must be equal to numItm of p00");
+  }
+  //assert(numA == md0->numAct);
+  if (numA != md0->numAct) {
+    throw KException("oneMtchSUSN: numA must be equal to numAct of md0");
+  }
+  //assert(numC == p00->numCat);
+  if (numC != p00->numCat) {
+    throw KException("oneMtchSUSN: numC must be equal to numCat of p00");
+  }
 
 
   LOG(INFO) << "Demonstrate SUSN bargaining over division of sweets with " << numA << " actors and " << numI << " sweets"  ;
@@ -931,7 +983,10 @@ MtchState * MtchState::doSUSN(ReportingLevel rl) const {
   const unsigned int numA = model->numAct;
 
   MtchState * s2 = new MtchState(model);
-  assert(numA == s2->pstns.size()); // pre-allocated by constructor, all nullptr's
+  //assert(numA == s2->pstns.size()); // pre-allocated by constructor, all nullptr's
+  if (numA != s2->pstns.size()) { // pre-allocated by constructor, all nullptr's
+    throw KException("doSUSN: pstns vector should be pre-allocated with all nullptr");
+  }
 
   for (unsigned int ih = 0; ih < numA; ih++) {
     MtchActor* ah = (MtchActor*)(model->actrs[ih]);
@@ -968,7 +1023,7 @@ MtchState * MtchState::doSUSN(ReportingLevel rl) const {
     MtchPstn* oldPi = (MtchPstn*)(pstns[ih]);
     MtchPstn* newPi = new MtchPstn(get<1>(evmp));
     s2->pstns[ih] = newPi;
-    assert(numA == s2->pstns.size());
+//    assert(numA == s2->pstns.size());
     if (ReportingLevel::Low < rl) {
       LOG(INFO) << KBase::getFormattedString("Old position %2u: ", ih); 
       showMtchPstn(*oldPi); 
@@ -1010,7 +1065,8 @@ MtchState * MtchState::stepBCN() {
 
 MtchState * MtchState::doBCN(ReportingLevel rl) const  {
   MtchState * s2 = nullptr;
-  assert(false);
+  //assert(false);
+  throw KException("MtchState::doBCN: dummy method");
   return s2;
 }
 
@@ -1086,15 +1142,39 @@ int main(int ac, char **av) {
   // seed required to reproduce the bug.
   if (dosP) {
     LOG(INFO) << "-----------------------------------"  ;
-    DemoMtch::demoDivideSweets(seed);
+    try {
+      DemoMtch::demoDivideSweets(seed);
+    }
+    catch (KBase::KException &ke) {
+      LOG(INFO) << ke.msg;
+    }
+    catch (...) {
+      LOG(INFO) << "Unknown exception from DemoMtch::demoDivideSweet";
+    }
   }
   if (maxSupP) {
     LOG(INFO) << "-----------------------------------"  ;
-    DemoMtch::demoMaxSupport(seed);
+    try {
+      DemoMtch::demoMaxSupport(seed);
+    }
+    catch (KBase::KException &ke) {
+      LOG(INFO) << ke.msg;
+    }
+    catch (...) {
+      LOG(INFO) << "Unknown exception from DemoMtch::demoMaxSupport";
+    }
   }
   if (mtchSUSNP) {
     LOG(INFO) << "-----------------------------------"  ;
-    DemoMtch::demoMtchSUSN(seed);
+    try {
+      DemoMtch::demoMtchSUSN(seed);
+    }
+    catch (KBase::KException &ke) {
+      LOG(INFO) << ke.msg;
+    }
+    catch (...) {
+      LOG(INFO) << "Unknown exception from DemoMtch::demoMtchSUSN";
+    }
   }
   LOG(INFO) << "-----------------------------------"  ;
 

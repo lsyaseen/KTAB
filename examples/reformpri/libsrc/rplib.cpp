@@ -38,6 +38,7 @@ using KBase::MtchPstn;
 using KBase::VPModel;
 using KBase::PCEModel;
 using KBase::printVUI;
+using KBase::KException;
 
 // -------------------------------------------------
 // function definitions
@@ -144,8 +145,14 @@ KMatrix RPState::expUtilMat(KBase::ReportingLevel rl,
                             const KMatrix & uMat) const
 {
   // BTW, be sure to lambda-bind uMat *after* it is modified.
-  assert(uMat.numR() == numA); // must include all actors
-  assert(uMat.numC() <= numP); // might have dropped some duplicates
+  //assert(uMat.numR() == numA); // must include all actors
+  if (uMat.numR() != numA) { // must include all actors
+    throw KException("KMatrix RPState::expUtilMat: inaccurate number of rows in uMat");
+  }
+  //assert(uMat.numC() <= numP); // might have dropped some duplicates
+  if (uMat.numC() > numP) { // might have dropped some duplicates
+    throw KException("KMatrix RPState::expUtilMat: inaccurate number of columns in uMat");
+  }
 
   auto assertRange = [](const KMatrix& m, unsigned int i, unsigned int j)
   {
@@ -156,8 +163,14 @@ KMatrix RPState::expUtilMat(KBase::ReportingLevel rl,
     {
       LOG(INFO) << KBase::getFormattedString("%f  %i  %i ", mij, i, j);
     }
-    assert(0.0 <= mij + tol);
-    assert(mij <= 1.0 + tol);
+    //assert(0.0 <= mij + tol);
+    if (0.0 > mij + tol) {
+      throw KException("KMatrix RPState::expUtilMat: mij is less than min value");
+    }
+    //assert(mij <= 1.0 + tol);
+    if (mij > 1.0 + tol) {
+      throw KException("KMatrix RPState::expUtilMat: mij is more than max value");
+    }
     return;
   };
 
@@ -182,8 +195,14 @@ KMatrix RPState::expUtilMat(KBase::ReportingLevel rl,
   const auto p = get<0>(pv2); // column
   const auto pv = get<1>(pv2); //square
   const KMatrix eu = uMat*p; // column
-  assert(numA == eu.numR());
-  assert(1 == eu.numC());
+  //assert(numA == eu.numR());
+  if (numA != eu.numR()) {
+    throw KException("KMatrix RPState::expUtilMat: inaccurate number of rows in ");
+  }
+  //assert(1 == eu.numC());
+  if (1 != eu.numC()) {
+    throw KException("KMatrix RPState::expUtilMat: eu must be a column matrix");
+  }
   auto euRng = [assertRange, eu](unsigned int i, unsigned int j) {
     assertRange(eu, i, j);
     return;
@@ -229,7 +248,10 @@ RPModel::~RPModel()
 bool RPModel::equivStates(const RPState * rs1, const RPState * rs2)
 {
   const unsigned int numA = rs1->pstns.size();
-  assert(numA == rs2->pstns.size());
+  //assert(numA == rs2->pstns.size());
+  if (numA != rs2->pstns.size()) {
+    throw KException("RPModel::equivStates: size of rs2->pstns must be equal to actor count");
+  }
   bool rslt = true;
   for (unsigned int i = 0; i < numA; i++)
   {
@@ -282,7 +304,10 @@ void RPModel::initScen(unsigned int ns)
 
 void RPModel::initScen0()
 {
-  assert(nullptr != rng);
+  //assert(nullptr != rng);
+  if (nullptr == rng) {
+    throw KException("RPModel::initScen0: rng is null pointer");
+  }
   const unsigned int numA = 40;
   numItm = 7;
   numCat = numItm;
@@ -331,7 +356,10 @@ void RPModel::readXML(string fileName)
 
       XMLElement* scenEl = d1.FirstChildElement("Scenario");
       XMLElement* scenNameEl = scenEl->FirstChildElement("name");
-      assert(nullptr != scenNameEl);
+      //assert(nullptr != scenNameEl);
+      if (nullptr == scenNameEl) {
+        throw KException("RPModel::readXML: scenNameEl is null pointer");
+      }
       try
       {
         const char * sName = scenNameEl->GetText();
@@ -343,35 +371,68 @@ void RPModel::readXML(string fileName)
       }
 
       XMLElement* scenDescEl = scenEl->FirstChildElement("desc");
-      assert(nullptr != scenDescEl);
+      //assert(nullptr != scenDescEl);
+      if (nullptr == scenDescEl) {
+        throw KException("RPModel::readXML: scenDescEl is null pointer");
+      }
       const char* sn2 = scenDescEl->GetText();
-      assert(nullptr != sn2);
+      //assert(nullptr != sn2);
+      if (nullptr == sn2) {
+        throw KException("RPModel::readXML: sn2 is null pointer");
+      }
 
       // get some top level values from the corresponding Elements (no Attributes)
 
 
       XMLElement* gbEl = scenEl->FirstChildElement("govBudget");
-      assert(nullptr != gbEl);
+      //assert(nullptr != gbEl);
+      if (nullptr == gbEl) {
+        throw KException("RPModel::readXML: gbEl is null pointer");
+      }
       double gb = 1000.0; // impossible value
       gbEl->QueryDoubleText(&gb);
-      assert(0.0 < gb);
-      assert(gb <= 100.0);
+      //assert(0.0 < gb);
+      if (0.0 >= gb) {
+        throw KException("RPModel::readXML: gb must be positive");
+      }
+      //assert(gb <= 100.0);
+      if (gb > 100.0) {
+        throw KException("RPModel::readXML: gb must not be more than 100.0");
+      }
       govBudget = ((unsigned int)(0.5 + gb));
 
       XMLElement* obEl = scenEl->FirstChildElement("outOfBudgetFactor");
-      assert(nullptr != obEl);
+      //assert(nullptr != obEl);
+      if (nullptr == obEl) {
+        throw KException("RPModel::readXML: obEl is null pointer");
+      }
       double obf = 1000.0; // impossible value
       obEl->QueryDoubleText(&obf);
-      assert(0.0 < obf);
-      assert(obf < 1.0);
+      //assert(0.0 < obf);
+      if (0.0 >= obf) {
+        throw KException("RPModel::readXML: obf must be positive");
+      }
+      //assert(obf < 1.0);
+      if (obf >= 1.0) {
+        throw KException("RPModel::readXML: obf must be less than 1.0");
+      }
       obFactor = obf;
 
       XMLElement* pdEl = scenEl->FirstChildElement("orderFactor");
-      assert(nullptr != pdEl);
+      //assert(nullptr != pdEl);
+      if (nullptr == pdEl) {
+        throw KException("RPModel::readXML: pdEl is null pointer");
+      }
       double pdf = 1000.0; // impossible value
       pdEl->QueryDoubleText(&pdf);
-      assert(0.0 < pdf);
-      assert(pdf < 1.0);
+      //assert(0.0 < pdf);
+      if (0.0 >= pdf) {
+        throw KException("RPModel::readXML: pdf must be positive");
+      }
+      //assert(pdf < 1.0);
+      if (pdf >= 1.0) {
+        throw KException("RPModel::readXML: pdf must be less than 1.0");
+      }
       pDecline = pdf;
 
       // TODO: read these two parameters from XML
@@ -383,9 +444,15 @@ void RPModel::readXML(string fileName)
       try
       {
         XMLElement* catsEl = scenEl->FirstChildElement("Categories");
-        assert(nullptr != catsEl);
+        //assert(nullptr != catsEl);
+        if (nullptr == catsEl) {
+          throw KException("RPModel::readXML: catsEl is null pointer");
+        }
         XMLElement* cEl = catsEl->FirstChildElement("category");
-        assert(nullptr != cEl); // has to be at least one
+        //assert(nullptr != cEl); // has to be at least one
+        if (nullptr == cEl) {
+          throw KException("RPModel::readXML: cEl is null pointer");
+        }
         while (nullptr != cEl)
         {
           nc++;
@@ -407,21 +474,33 @@ void RPModel::readXML(string fileName)
       try
       {
         XMLElement* itemsEl = scenEl->FirstChildElement("Items");
-        assert(nullptr != itemsEl);
+        //assert(nullptr != itemsEl);
+        if (nullptr == itemsEl) {
+          throw KException("RPModel::readXML: itemsEl is null pointer");
+        }
         XMLElement* iEl = itemsEl->FirstChildElement("Item");
-        assert(nullptr != iEl); // has to be at least one
+        //assert(nullptr != iEl); // has to be at least one
+        if (nullptr == iEl) {
+          throw KException("RPModel::readXML: iEl is null pointer");
+        }
         while (nullptr != iEl)
         {
           double gci = 0.0;
           XMLElement* gcEl = iEl->FirstChildElement("cost");
           gcEl->QueryDoubleText(&gci);
-          assert(0.0 < gci);
+          //assert(0.0 < gci);
+          if (0.0 >= gci) {
+            throw KException("RPModel::readXML: ");
+          }
           govCost(0, ni) = gci;
           ni++;
           iEl = iEl->NextSiblingElement("Item");
         }
         LOG(INFO) << "Found" << ni << "items" ;
-        assert(ni == nc); // for this problem, number of items and categories are equal
+        //assert(ni == nc); // for this problem, number of items and categories are equal
+        if (ni != nc) { // for this problem, number of items and categories are equal
+          throw KException("RPModel::readXML: number of items and categories must be equal");
+        }
         numItm = ni;
       }
       catch (...)
@@ -446,16 +525,25 @@ void RPModel::readXML(string fileName)
       {
         unsigned int na = 0;
         XMLElement* actorsEl = scenEl->FirstChildElement("Actors");
-        assert(nullptr != actorsEl);
+        //assert(nullptr != actorsEl);
+        if (nullptr == actorsEl) {
+          throw KException("RPModel::readXML: actorsEl is null pointer");
+        }
         XMLElement* aEl = actorsEl->FirstChildElement("Actor");
-        assert(nullptr != aEl); // has to be at least one
+        //assert(nullptr != aEl); // has to be at least one
+        if (nullptr == aEl) {
+          throw KException("RPModel::readXML: aEl is null pointer");
+        }
         while (nullptr != aEl)
         {
           const char* aName = aEl->FirstChildElement("name")->GetText();
           const char* aDesc = aEl->FirstChildElement("description")->GetText();
           double cap = 0.0; // another impossible value
           aEl->FirstChildElement("capability")->QueryDoubleText(&cap);
-          assert(0.0 < cap);
+          //assert(0.0 < cap);
+          if (0.0 >= cap) {
+            throw KException("RPModel::readXML: cap must be positive");
+          }
 
           auto ri = new RPActor(aName, aDesc, this);
           ri->sCap = cap;
@@ -467,25 +555,43 @@ void RPModel::readXML(string fileName)
           XMLElement* ivsEl = aEl->FirstChildElement("ItemValues");
           unsigned int numIVS = 0;
           XMLElement* ivEl = ivsEl->FirstChildElement("iVal");
-          assert(nullptr != ivEl);
+          //assert(nullptr != ivEl);
+          if (nullptr == ivEl) {
+            throw KException("RPModel::readXML: ivEl is null pointer");
+          }
           while (nullptr != ivEl)
           {
             numIVS++;
             double iv = -1.0; // impossible value
             ivEl->QueryDoubleText(&iv);
-            assert(0 <= iv);
+            //assert(0 <= iv);
+            if (0 > iv) {
+              throw KException("RPModel::readXML: iv must be non-negative");
+            }
             ri->riVals.push_back(iv);
             ivEl = ivEl->NextSiblingElement("iVal");
           }
-          assert(ni == numIVS); // must have a value for each item
+          //assert(ni == numIVS); // must have a value for each item
+          if (ni != numIVS) { // must have a value for each item
+            throw KException("RPModel::readXML: must have a value for each item");
+          }
           addActor(ri);
           // move to the next, if any
           na++;
           aEl = aEl->NextSiblingElement("Actor");
         }
         LOG(INFO) << "Found" << na << "actors";
-        assert(minNumActor <= na);
-        assert(na <= maxNumActor);
+        //assert(minNumActor <= na);
+        if (minNumActor > na) {
+          throw KException("RPModel::readXML: actor count can not be less than a minimum value");
+        }
+        //assert(na <= maxNumActor);
+        if (na > maxNumActor) {
+          throw KException("RPModel::readXML: actor count can not be more than a maximum value");
+        }
+      }
+      catch (KException &ke) {
+        throw ke;
       }
       catch (...)
       {
@@ -617,8 +723,14 @@ void RPModel::configScen(unsigned int numA, const double aCap[], const KMatrix &
     //cout << flush;
   }
 
-  assert(numAct == actrs.size());
-  assert(numA == numAct);
+  //assert(numAct == actrs.size());
+  if (numAct != actrs.size()) {
+    throw KException("RPModel::initScen1: ");
+  }
+  //assert(numA == numAct);
+  if (numA != numAct) {
+    throw KException("RPModel::initScen1: ");
+  }
 
   prob = vector<double>();
   double pj = 1.0;
@@ -633,15 +745,27 @@ void RPModel::configScen(unsigned int numA, const double aCap[], const KMatrix &
 }
 
 double RPModel::utilActorPos(unsigned int ai, const VUI &pstn) const {
-  assert(ai < numAct);
-  assert(numAct == actrs.size());
+  //assert(ai < numAct);
+  if (ai >= numAct) {
+    throw KException("RPModel::utilActorPos: actor index is out of range");
+  }
+  //assert(numAct == actrs.size());
+  if (numAct != actrs.size()) {
+    throw KException("RPModel::utilActorPos: inaccurate number of actors");
+  }
   auto rai = ((const RPActor*)(actrs[ai]));
   const double pvMin = rai->posValMin;
   const double pvMax = rai->posValMax;
-  assert(nullptr != rai);
+  //assert(nullptr != rai);
+  if (nullptr == rai) {
+    throw KException("RPModel::utilActorPos: rai is null pointer");
+  }
   double costSoFar = 0;
   double uip = 0.0;
-  assert(0 < govBudget);
+  //assert(0 < govBudget);
+  if (0 >= govBudget) {
+    throw KException("RPModel::utilActorPos: govtBudget must be positive");
+  }
   //cout << "govBudget: " << govBudget << endl;
 
 
@@ -703,8 +827,14 @@ bool RPState::equivNdx(unsigned int i, unsigned int j) const
   /// Compare two actual positions in the current state
   auto mpi = ((const MtchPstn *)(pstns[i]));
   auto mpj = ((const MtchPstn *)(pstns[j]));
-  assert(mpi != nullptr);
-  assert(mpj != nullptr);
+  //assert(mpi != nullptr);
+  if (mpi == nullptr) {
+    throw KException("RPState::equivNdx: mpi is null pointer");
+  }
+  //assert(mpj != nullptr);
+  if (mpj == nullptr) {
+    throw KException("RPState::equivNdx: mpj is null pointer");
+  }
   bool rslt = ((*mpi) == (*mpj));
   return rslt;
 }
@@ -720,11 +850,17 @@ tuple <KMatrix, VUI> RPState::pDist(int persp) const
   const unsigned int numP = numA; // for this demo, the number of positions is exactly the number of actors
 
   // get unique indices and their probability
-  assert(0 < uIndices.size()); // should have been set with setUENdx();
+  //assert(0 < uIndices.size()); // should have been set with setUENdx();
+  if (0 >= uIndices.size()) { // should have been set with setUENdx();
+    throw KException("RPState::equivNdx: uIndices size must be positive");
+  }
   //auto uNdx2 = uniqueNdx(); // get the indices to unique positions
 
   const unsigned int numU = uIndices.size();
-  assert(numU <= numP); // might have dropped some duplicates
+  //assert(numU <= numP); // might have dropped some duplicates
+  if (numU > numP) { // might have dropped some duplicates
+    throw KException("RPState::equivNdx: numU must not be more than numP");
+  }
 
   LOG(INFO) << "Number of aUtils: " << aUtil.size();
 
@@ -736,8 +872,14 @@ tuple <KMatrix, VUI> RPState::pDist(int persp) const
   };
 
   auto uMat = KMatrix::map(uufn, numA, numU);
-  assert(uMat.numR() == numA); // must include all actors
-  assert(uMat.numC() == numU);
+  //assert(uMat.numR() == numA); // must include all actors
+  if (uMat.numR() != numA) {
+    throw KException("RPState::equivNdx: uMat row count must be equal to number of actors");
+  }
+  //assert(uMat.numC() == numU);
+  if (uMat.numC() != numU) {
+    throw KException("RPState::equivNdx: uMat column count must be equal to numU");
+  }
 
   // vote_k ( i : j )
   auto vkij = [this, uMat](unsigned int k, unsigned int i, unsigned int j)
@@ -754,8 +896,14 @@ tuple <KMatrix, VUI> RPState::pDist(int persp) const
   const auto p = get<0>(pv2); // column
   const auto pv = get<1>(pv2); // square
   const auto eu = uMat*p; // column
-  assert(numA == eu.numR());
-  assert(1 == eu.numC());
+  //assert(numA == eu.numR());
+  if (numA != eu.numR()) {
+    throw KException("RPState::equivNdx: eu must have one row for each actor");
+  }
+  //assert(1 == eu.numC());
+  if (1 != eu.numC()) {
+    throw KException("RPState::equivNdx: eu must be a column vector");
+  }
   return tuple <KMatrix, VUI>(p, uIndices);
 }
 
@@ -782,10 +930,19 @@ RPState* RPState::stepSUSN()
 
 RPState* RPState::doSUSN(ReportingLevel rl) const {
   const unsigned int numA = model->numAct;
-  assert(numA == rpMod->actrs.size());
+  //assert(numA == rpMod->actrs.size());
+  if (numA != rpMod->actrs.size()) {
+    throw KException("RPState::equivNdx: rpMod's actor size is inaccurate");
+  }
   const unsigned int numU = uIndices.size();
-  assert((0 < numU) && (numU <= numA));
-  assert(numA == eIndices.size());
+  //assert((0 < numU) && (numU <= numA));
+  if ((0 >= numU) || (numU > numA)) {
+    throw KException("RPState::equivNdx: numU out of valid range");
+  }
+  //assert(numA == eIndices.size());
+  if (numA != eIndices.size()) {
+    throw KException("RPState::equivNdx: eIndices size must be equal to actor count");
+  }
   const KMatrix u = aUtil[0]; // all have same beliefs in this demo
   auto vpm = model->vpm;
   auto euMat = [rl, numA, vpm, this](const KMatrix & uMat)
@@ -826,7 +983,10 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
   const KMatrix eu0 = euMat(uUnique); // 'u' with duplicates, 'uUnique' without duplicates
 
   RPState* s2 = new RPState(model);
-  assert(numA == s2->pstns.size()); // pre-allocated by constructor, all nullptr's
+  //assert(numA == s2->pstns.size()); // pre-allocated by constructor, all nullptr's
+  if (numA != s2->pstns.size()) { // pre-allocated by constructor, all nullptr's
+    throw KException("RPState::equivNdx: postions size of s2 must be equal to actor count");
+  }
 
   // TODO: clean up the nesting of lambda-functions.
   // need to create a hypothetical state and run setOneAUtil(h,Silent) on it
@@ -855,13 +1015,19 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
       // corresponds to the given mph, but we need to prune duplicates as well.
       // This entails some type-juggling.
       const KMatrix uh0 = aUtil[h];
-      assert(KBase::maxAbs(u - uh0) < 1E-10); // all have same beliefs in this demo
+      //assert(KBase::maxAbs(u - uh0) < 1E-10); // all have same beliefs in this demo
+      if (KBase::maxAbs(u - uh0) >= 1E-10) { // all have same beliefs in this demo
+        throw KException("RPState::equivNdx: inaccurate value of uh0");
+      }
       if (mph.match.size() != rpMod->numItm)
       {
         LOG(INFO) << mph.match.size();
         LOG(INFO) << rpMod->numItm;
       }
-      assert(mph.match.size() == rpMod->numItm);
+      //assert(mph.match.size() == rpMod->numItm);
+      if (mph.match.size() != rpMod->numItm) {
+        throw KException("RPState::equivNdx: match's size in mph must be same as numItm in rpMod");
+      }
       auto uh = uh0;
       for (unsigned int i = 0; i < rpMod->numAct; i++)
       {
@@ -883,8 +1049,14 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
         bool rslt = false;
         auto mpi = ((const MtchPstn *)(pstns[i]));
         auto mpj = ((const MtchPstn *)(pstns[j]));
-        assert(mpi != nullptr);
-        assert(mpj != nullptr);
+        //assert(mpi != nullptr);
+        if (mpi == nullptr) {
+          throw KException("RPState::equivNdx: mpi is null pointer");
+        }
+        //assert(mpj != nullptr);
+        if (mpj == nullptr) {
+          throw KException("RPState::equivNdx: mpj is null pointer");
+        }
         if (i == j)
         {
           rslt = true; // Pi == Pj, always
@@ -938,7 +1110,10 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
       // the hypothetical drops duplicates but the actual (computed elsewhere) does not.
       // FIX: fix  the 'elsewhere'
       const double euh = eu(h, 0);
-      assert(0 < euh);
+      //assert(0 < euh);
+      if (0 >= euh) {
+        throw KException("RPState::equivNdx: euh must be positive");
+      }
       //cout << euh << endl << flush;
       //printPerm(mp.match);
       //cout << endl << flush;
@@ -1004,7 +1179,10 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
     // Logically, du should always be non-negative, as GHC never returns a worse value than the starting point.
     // However, actors plan on the assumption that all others do not change - yet they do.
     const double eps = 0.05; // 0.025; // enough to avoid problems with round-off error
-    assert(-eps <= du);
+    //assert(-eps <= du);
+    if (-eps > du) {
+      throw KException("RPState::equivNdx: inaccurate eps");
+    }
     return;
   }; // end of newPosFn
 
@@ -1035,12 +1213,24 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
     }
   }
 
-  assert(nullptr != s2);
-  assert(pstns.size() == s2->pstns.size());
-  assert(numA == s2->model->numAct);
+  //assert(nullptr != s2);
+  if (nullptr == s2) {
+    throw KException("RPState::equivNdx: s2 is null pointer");
+  }
+  //assert(pstns.size() == s2->pstns.size());
+  if (pstns.size() != s2->pstns.size()) {
+    throw KException("RPState::equivNdx: inaccurate number of positions");
+  }
+  //assert(numA == s2->model->numAct);
+  if (numA != s2->model->numAct) {
+    throw KException("RPState::equivNdx: inaccurate number of actors");
+  }
   for (auto p : s2->pstns)
   {
-    assert(nullptr != p);
+    //assert(nullptr != p);
+    if (nullptr == p) {
+      throw KException("RPState::equivNdx: p is null pointer");
+    }
   }
   s2->setUENdx();
   return s2;
@@ -1052,9 +1242,18 @@ void RPState::setAllAUtil(ReportingLevel rl)
   const unsigned int na = model->numAct;
 
   // make sure prerequisities are at least somewhat setup
-  assert(na == eIndices.size());
-  assert(0 < uIndices.size());
-  assert(uIndices.size() <= na);
+  //assert(na == eIndices.size());
+  if (na != eIndices.size()) {
+    throw KException("RPState::setAllAUtil: eIndices size must be equal to actor count");
+  }
+  //assert(0 < uIndices.size());
+  if (0 >= uIndices.size()) {
+    throw KException("RPState::setAllAUtil: uIndices size must be positive");
+  }
+  //assert(uIndices.size() <= na);
+  if (uIndices.size() > na) {
+    throw KException("RPState::setAllAUtil: uIndices size must not be more than actor count");
+  }
 
   /// For all states aUtil[h](i,j) is h's estimate of the utility to A_i of Pos_j,
   /// and this function calculates those matrices. Note that for this demo,
@@ -1072,7 +1271,10 @@ void RPState::setAllAUtil(ReportingLevel rl)
       LOG(INFO) << i << " " << j << "  " << uij;
       printVUI(rp->match);
     }
-    assert(0.0 <= uij);
+    //assert(0.0 <= uij);
+    if (0.0 > uij) {
+      throw KException("RPState::setAllAUtil: must be non-negative");
+    }
     return uij;
   };
 
@@ -1092,7 +1294,10 @@ void RPState::setAllAUtil(ReportingLevel rl)
     LOG(INFO) << "aUtil size: " << aUtil.size();
   }
 
-  assert(0 == aUtil.size());
+  //assert(0 == aUtil.size());
+  if (0 != aUtil.size()) {
+    throw KException("RPState::setAllAUtil: size of aUtil must be zero");
+  }
   for (unsigned int i = 0; i < numA; i++)
   {
     aUtil.push_back(normU);
@@ -1108,12 +1313,30 @@ void RPState::setOneAUtil(unsigned int perspH, ReportingLevel rl)
   const unsigned int numAct = model->numAct;
   const unsigned int numUnq = uIndices.size();
 
-  assert(perspH < numAct);
-  assert(numAct == aUtil.size());
-  assert((0 == aUtil[perspH].numR()) && (0 == aUtil[perspH].numC()));
-  assert(numAct == eIndices.size());
-  assert(0 < numUnq);
-  assert(numUnq < numAct);
+  //assert(perspH < numAct);
+  if (perspH >= numAct) {
+    throw KException("RPState::setOneAUtil: perspH must be less than actor count");
+  }
+  //assert(numAct == aUtil.size());
+  if (numAct != aUtil.size()) {
+    throw KException("RPState::setOneAUtil: aUtil's size must be equal to actor count");
+  }
+  //assert((0 == aUtil[perspH].numR()) && (0 == aUtil[perspH].numC()));
+  if ((0 != aUtil[perspH].numR()) || (0 != aUtil[perspH].numC())) {
+    throw KException("RPState::setOneAUtil: aUtil[perspH] must be empty");
+  }
+  //assert(numAct == eIndices.size());
+  if (numAct != eIndices.size()) {
+    throw KException("RPState::setOneAUtil: eIndices size must be equal to actor count");
+  }
+  //assert(0 < numUnq);
+  if (0 >= numUnq) {
+    throw KException("RPState::setOneAUtil: numUnq must be positive");
+  }
+  //assert(numUnq < numAct);
+  if (numUnq >= numAct) {
+    throw KException("RPState::setOneAUtil: numUnq must be less than actor count");
+  }
 
   auto uh = KMatrix(numAct, numUnq);
 

@@ -45,8 +45,14 @@ double qrtc(const double& x) {
 }
 
 double quadUfromV(double v, double bigR) {
-  assert (-1.0 <= bigR);
-  assert(bigR <= +1.0);
+  //assert (-1.0 <= bigR);
+  if (-1.0 > bigR) {
+    throw KException("quadUfromV: bigR must be greater than -1.0");
+  }
+  //assert(bigR <= +1.0);
+  if (bigR > +1.0) {
+    throw KException("quadUfromV: bigR must be less than 1.0");
+  }
 
   // We tolerate some round-off error, but not much.
   // In SMP,  v>1 corresponds to distance < 0, which is impossible.
@@ -54,7 +60,10 @@ double quadUfromV(double v, double bigR) {
   // v>1 corresponds to X > maxX, which is similarly impossible.
   const double tol = 1E-10;
   if (1 < v) {
-    assert (v <= 1.0 + tol);
+    //assert (v <= 1.0 + tol);
+    if (v > 1.0 + tol) {
+      throw KException("quadUfromV: value of v is not within limit");
+    }
     v=1.0;
   }
   // because searches try silly values, we have to deal with
@@ -63,13 +72,19 @@ double quadUfromV(double v, double bigR) {
   double u = 0.0;
   if (0< v) {
     u = v + (bigR * v * (1.0-v));
-    assert (0.0 <= u);
+    //assert (0.0 <= u);
+    if (0.0 > u) {
+      throw KException("quadUfromV: u must be non-negative");
+    }
   }
   else {
     // straightline interpolation past v=0
     u = (1.0+bigR)*v;
   }
-  assert (u <= 1.0);
+  //assert (u <= 1.0);
+  if (u > 1.0) {
+    throw KException("quadUfromV: u must be less than 1.0");
+  }
   return u;
 }
 
@@ -89,8 +104,14 @@ double trim(double x, double minX, double maxX, bool strict) {
   double x2 = x;
 
   if (strict) {
-    assert (minX <= x);
-    assert (x <= maxX);
+    //assert (minX <= x);
+    if (minX > x) {
+      throw KException("trim: x is below the lower limit");
+    }
+    //assert (x <= maxX);
+    if (x > maxX) {
+      throw KException("trim: x is above the upper limit");
+    }
   }
 
   if (x < minX) {
@@ -106,8 +127,16 @@ double trim(double x, double minX, double maxX, bool strict) {
 
 VUI uiSeq(const unsigned int n1, const unsigned int n2, const unsigned int ns) {
   VUI uis = {};
-  assert (n1 <= n2);
-  assert (0 < ns);
+  //assert (n1 <= n2);
+  if (n1 > n2) {
+    throw KException("uiSeq: n1 greater than n2");
+  }
+
+  //assert (0 < ns);
+  if (0 >= ns) {
+    throw KException("uiSeq: Negative value of ns not allowed");
+  }
+
   for (unsigned int i = n1; i <= n2; i=i+ns)
     uis.push_back(i);
   return uis;
@@ -217,7 +246,10 @@ char* newChars(unsigned int len) {
 };
 
 double rescale(double x, double x0, double x1, double y0, double y1) {
-  assert((x0 < x1) || (x1 < x0));
+  //assert((x0 < x1) || (x1 < x0));
+  if (x1 == x0) {
+    throw KException("rescale: x1 is equal to x0");
+  }
   const double f = (x - x0) / (x1 - x0);
   return y0 + (y1 - y0)*f;
 }

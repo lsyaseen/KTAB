@@ -48,6 +48,7 @@ using KBase::Model;
 using KBase::Position;
 using KBase::State;
 using KBase::VotingRule;
+using KBase::KException;
 
 
 namespace DemoComSel {
@@ -121,12 +122,21 @@ namespace DemoComSel {
     for (unsigned int i = 0; i < numPos; i++) {
       const VUI vbi = intToVB(i, numA);
       const unsigned int j = vbToInt(vbi);
-      assert(j == i);
+      //assert(j == i);
+      if (j != i) {
+        throw KException("LeonState::doSUSN: j and i must be same");
+      }
       const VUI vbj = intToVB(j, numA);
-      assert(vbj == vbi);
+      //assert(vbj == vbi);
+      if (vbj != vbi) {
+        throw KException("LeonState::doSUSN: vbj must be same as vbi");
+      }
       positions.push_back(vbi);
     }
-    assert(numPos == positions.size());
+    //assert(numPos == positions.size());
+    if (numPos != positions.size()) {
+      throw KException("LeonState::doSUSN: inaccurate number of positions");
+    }
 
     LOG(INFO) << "Num positions:" << numPos;
 
@@ -148,9 +158,15 @@ namespace DemoComSel {
       ai->randomize(csm->rng, nDim);
       csm->addActor(ai);
     }
-    assert(csm->numAct == numA);
+    //assert(csm->numAct == numA);
+    if (csm->numAct != numA) {
+      throw KException("LeonState::doSUSN: csm->numAct must be equal to actor count");
+    }
     csm->numItm = numA;
-    assert(csm->numCat == 2);
+    //assert(csm->numCat == 2);
+    if (csm->numCat != 2) {
+      throw KException("LeonState::doSUSN: csm->numCat must be equal to 2");
+    }
 
     if ((9 == numA) && (2 == nDim)) {
       for (unsigned int i = 0; i < 3; i++) {
@@ -238,7 +254,10 @@ namespace DemoComSel {
     // when we actually use PropBin
     LOG(INFO) << "Computing zeta ... "; 
     KMatrix zeta = aCap * uij;
-    assert((1 == zeta.numR()) && (numPos == zeta.numC()));
+    //assert((1 == zeta.numR()) && (numPos == zeta.numC()));
+    if ((1 != zeta.numR()) || (numPos != zeta.numC())) {
+      throw KException("LeonState::doSUSN: zeta must be a row vector with numPos number of columns");
+    }
 
     LOG(INFO) << "Sorting positions from most to least net support ...";
     auto betterPR = [](tuple<unsigned int, double, VUI> pr1,
@@ -278,7 +297,10 @@ namespace DemoComSel {
 
     auto css0 = new CSState(csm);
     csm->addState(css0);
-    assert(numA == css0->pstns.size()); // pre-allocated by constructor, all nullptr's
+    //assert(numA == css0->pstns.size()); // pre-allocated by constructor, all nullptr's
+    if (numA != css0->pstns.size()) {
+      throw KException("LeonState::doSUSN: css position array must have size equal to actor count");
+    }
     // Either start them all at the CP or have each choose an initial position which
     // maximizes their direct utility, regardless of expected utility.
     for (unsigned int i = 0; i < numA; i++) {
@@ -293,7 +315,10 @@ namespace DemoComSel {
       }
       css0->pstns[i] = pi;
 
-      assert(numA == css0->pstns.size()); // must be invariant
+      //assert(numA == css0->pstns.size()); // must be invariant
+      if (numA != css0->pstns.size()) { // must be invariant
+        throw KException("LeonState::doSUSN: css position array size must be invariant");
+      }
     }
     
 
@@ -412,10 +437,18 @@ int main(int ac, char **av) {
     // note that we reset the seed every time, so that in case something
     // goes wrong, we need not scroll back too far to find the
     // seed required to reproduce the bug.
+  try {
     DemoComSel::demoCSC(9, // actors trying to get onto committee
       2, // issues to be addressed by the committee
       cpP, siP,
       seed);
+  }
+  catch (KException &ke) {
+    LOG(INFO) << ke.msg;
+  }
+  catch (...) {
+    LOG(INFO) << "Unknown exception from DemoComSel::demoCSC";
+  }
   KBase::displayProgramEnd(sTime);
   return 0;
 }
