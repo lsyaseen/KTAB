@@ -68,6 +68,8 @@ public:
     QStringList interVecList;
     QStringList bargnList;
     QVector <QStringList>  modelParameters;
+    QStringList modelTips;
+    QVector<QStringList> parameterTips;
 
     QComboBox * parameterName;
     QFrame * parmetersFrame;

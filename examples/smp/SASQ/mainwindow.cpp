@@ -34,11 +34,18 @@ MainWindow::MainWindow()
     intializeHomeDirectory();
     intializeGUI();
     createConnections();
+
+
 }
 
 MainWindow::~MainWindow()
 {
 
+}
+
+void MainWindow::updateStatusMessage(QString message)
+{
+    statusBar()->showMessage(message);
 }
 
 void MainWindow::createConnections()
@@ -154,10 +161,6 @@ void MainWindow::specsFrameInitialization()
 {
     specsFrameObj= new SpecificationFrame(sasStackedWidget);
     sasStackedWidget->addWidget(specsFrameObj);
-    connect(this,SIGNAL(specsItemListModel(QStandardItemModel*, QPair<DataValues,SpecsData>,QPair<DataValues,SpecsData>,
-                                           QPair<SpecsData,SpecificationVector>, QPair<SpecsData,SpecificationVector>)),
-            specsFrameObj,SLOT(specsListMainWindow(QStandardItemModel*, QPair<DataValues,SpecsData>,QPair<DataValues,SpecsData>,
-                                                   QPair<SpecsData,SpecificationVector>, QPair<SpecsData,SpecificationVector>)));
     connect(actorFrameObj,SIGNAL(actorAttributesAndSAS(QString)),
             specsFrameObj,SLOT(actorAtrributesSAS(QString)));
     connect(specsFrameObj,SIGNAL(getActorAttributeheaders()),actorFrameObj,SLOT(actorAtrributesHeaderList()));
@@ -173,6 +176,9 @@ void MainWindow::specsFrameInitialization()
     //remove spec
     connect(modelFrameObj,SIGNAL(removeSpecificationModel(int,int,QString)),specsFrameObj,SLOT(removeSpecModelActor(int,int,QString)));
     connect(actorFrameObj,SIGNAL(removeSpecificationActor(int,int,QString)),specsFrameObj,SLOT(removeSpecModelActor(int,int,QString)));
+
+    //status Message
+    connect(specsFrameObj,SIGNAL(statusMessage(QString)),SLOT(updateStatusMessage(QString)));
 
     filterListModel = new QStandardItemModel;
     crossProductListModel = new QStandardItemModel;

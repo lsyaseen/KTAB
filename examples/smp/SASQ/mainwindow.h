@@ -44,6 +44,7 @@
 #include <QStackedWidget>
 #include <QLayout>
 #include <QLabel>
+#include <QStatusBar>
 
 class QTextEdit;
 
@@ -58,6 +59,10 @@ class MainWindow : public QMainWindow
 public:
     MainWindow();
     ~MainWindow();
+
+public slots:
+    void updateStatusMessage(QString message);
+
 
 private :
     void createActions();
@@ -99,6 +104,7 @@ private slots:
     void clearSpecifications(bool bl);
     void runModel(bool bl);
     void displayMessage(QString cls, QString message);
+
 
     //GUI Initialization
 private :
@@ -156,9 +162,6 @@ signals:
     void setAccomodationTableModel(QStandardItemModel *actModel,
                                    QVector<QStringList> idealAdjustmentList,
                                    QStringList dims,QStringList desc);
-    void specsItemListModel(QStandardItemModel*,QPair<DataValues,SpecsData>, QPair<DataValues,SpecsData>,
-                            QPair<SpecsData,SpecificationVector>,QPair<SpecsData,SpecificationVector>);
-    //    void actorAttributesAndSAS(QStringList attributes, QStringList sasValues);
 
 };
 

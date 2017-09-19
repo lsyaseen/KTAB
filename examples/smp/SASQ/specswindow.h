@@ -16,6 +16,7 @@
 #include <QMenu>
 #include <QLineEdit>
 #include <QPair>
+#include <QStatusBar>
 
 
 class SpecificationFrame: public QFrame
@@ -85,22 +86,23 @@ private :
     void initializeFiltersFrame();
     void initializeCrossProductFrame();
     void initializeSensAnalysisFrame();
+    void createCrossProductSpec(int att1, int att2);
 
 signals:
     void filterList(QStandardItemModel  *, QPair<SpecsData,SpecificationVector>);
     void crossProductList(QStandardItemModel *, QPair<SpecsData,SpecificationVector>);
-    void getActorAttributeheaders();
+    void getActorAttribQuteheaders();
+    void statusMessage(QString);
 
 private slots:
     void listViewClicked();
     void specsListViewContextMenu(QPoint pos);
-    void specsListMainWindow(QStandardItemModel * modelList,  QPair<DataValues,SpecsData>,  QPair<DataValues,SpecsData>,
-                             QPair<SpecsData,SpecificationVector>,  QPair<SpecsData,SpecificationVector> crossProdSpecs);
     void populateCrossProductComboBox();
     void actorAtrributesSAS(QString sas);
     void relationComboBoxChanged(int rel);
     void filterAddSpecificationClicked(bool bl);
     void crossproductAddSpecificationClicked(bool bl);
+    void crossAllSpecs(bool bl);
     void filterListViewContextMenu(QPoint pos);
     void filterListViewRemoveSelectedClicked();
     void crossproductContextMenu(QPoint pos);

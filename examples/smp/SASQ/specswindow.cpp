@@ -153,13 +153,21 @@ void SpecificationFrame::initializeCrossProductFrame()
     valueLabel->setAlignment(Qt::AlignCenter);
     att2ComboBox = new QComboBox;
     valueLabel->setMaximumWidth(100);
-    QPushButton * addSpecification = new QPushButton("Add Specification");
-    connect(addSpecification,SIGNAL(clicked(bool)),this,SLOT(crossproductAddSpecificationClicked(bool)));
 
     hBoxControlsLay->addWidget(att1ComboBox);
     hBoxControlsLay->addWidget(valueLabel);
     hBoxControlsLay->addWidget(att2ComboBox);
     hBoxControlsLay->setSpacing(0);
+
+    QHBoxLayout * addSpecsLay = new QHBoxLayout;
+    QPushButton * addSpecification = new QPushButton("Add Specification");
+    QPushButton * crossAllSpecifications = new QPushButton("Cross All Specifications");
+
+    connect(addSpecification,SIGNAL(clicked(bool)),this,SLOT(crossproductAddSpecificationClicked(bool)));
+    connect(crossAllSpecifications,SIGNAL(clicked(bool)),this,SLOT(crossAllSpecs(bool)));
+
+    addSpecsLay->addWidget(addSpecification);
+    addSpecsLay->addWidget(crossAllSpecifications);
 
     crossProductListView = new QListView;
     crossProductListModel = new QStandardItemModel;
@@ -169,7 +177,7 @@ void SpecificationFrame::initializeCrossProductFrame()
     crossProductFrameGridLayout->addWidget(headingLabel,0,0);
     crossProductFrameGridLayout->addLayout(hBoxControlsLay,1,0);
     crossProductFrameGridLayout->addWidget(crossProductListView,2,0);
-    crossProductFrameGridLayout->addWidget(addSpecification,3,0);
+    crossProductFrameGridLayout->addLayout(addSpecsLay,3,0);
     crossProductFrameGridLayout->setSpacing(0);
 
     connect(crossProductListView,SIGNAL(customContextMenuRequested(QPoint)),SLOT(crossproductContextMenu(QPoint)));
@@ -187,6 +195,307 @@ void SpecificationFrame::initializeSensAnalysisFrame()
     specsListModel = new QStandardItemModel();
     specsListView->setModel(specsListModel);
     specsFrameGridLayout->addWidget(specsListView);
+}
+
+void SpecificationFrame::createCrossProductSpec(int att1, int att2)
+{
+    if(att1ComboBox->count() >0 && att2ComboBox->count() >0)
+    {
+        QApplication::setOverrideCursor(QCursor(QPixmap("://images/hourglass.png")));
+        QApplication::processEvents();
+
+        int attributeIndex1 = att1;
+        int attributeIndex2 = att2;
+
+        int att1SpecType;
+        int att1SpecTypeIndex;
+        int att2SpecType;
+        int att2SpecTypeIndex;
+
+        if(attributeIndex1 < specsIndexlist[0])
+        {
+            att1SpecType = 0;
+            att1SpecTypeIndex = attributeIndex1;
+        }
+        else if(attributeIndex1 < (specsIndexlist[0]+specsIndexlist[1]))
+        {
+            att1SpecType = 1;
+            att1SpecTypeIndex =attributeIndex1- specsIndexlist[0];
+        }
+        else if (attributeIndex1 < (specsIndexlist[0]+specsIndexlist[1]+specsIndexlist[2]))
+        {
+            att1SpecType = 2;
+            att1SpecTypeIndex =attributeIndex1- (specsIndexlist[0]+specsIndexlist[1]);
+        }
+        else if (attributeIndex1 < (specsIndexlist[0]+specsIndexlist[1]+specsIndexlist[2]+specsIndexlist[3]))
+        {
+            att1SpecType = 3;
+            att1SpecTypeIndex = attributeIndex1 - (specsIndexlist[0]+specsIndexlist[1]+specsIndexlist[2]);
+        }
+        else
+        {
+            return;
+        }
+
+        if(attributeIndex2 < specsIndexlist[0])
+        {
+            att2SpecType = 0;
+            att2SpecTypeIndex = attributeIndex2;
+        }
+        else if(attributeIndex2 < (specsIndexlist[0]+specsIndexlist[1]))
+        {
+            att2SpecType = 1;
+            att2SpecTypeIndex = attributeIndex2-specsIndexlist[0];
+        }
+        else if (attributeIndex2 < (specsIndexlist[0]+specsIndexlist[1]+specsIndexlist[2]))
+        {
+            att2SpecType = 2;
+            att2SpecTypeIndex = attributeIndex2 - (specsIndexlist[0] + specsIndexlist[1]);
+        }
+        else if (attributeIndex2 < (specsIndexlist[0]+specsIndexlist[1]+specsIndexlist[2]+specsIndexlist[3]))
+        {
+            att2SpecType = 3;
+            att2SpecTypeIndex = attributeIndex2 -(specsIndexlist[0]+specsIndexlist[1]+specsIndexlist[2]);
+//            qDebug()<< att2SpecTypeIndex <<"att2SpecTypeIndex";
+        }
+        else
+        {
+            return;
+        }
+
+
+        QVector<QString> modActDataVal1;
+        SpecificationVector filCrosDataVals1;
+
+        QVector<QString> modActDataVal2;
+        SpecificationVector filCrosDataVals2;
+
+        QVector<QString> lhsVec;
+        QString specsStr;
+        specsStr.append("(");
+
+        //LHS specification of cross product
+        if(att1SpecType==0)
+        {
+//            qDebug()<< modelSpecificationsLHS <<"modelSpecificationsLHS";
+            lhsVec.append(modelSpecificationsLHS.at(att1SpecTypeIndex));
+            specsStr.append(modelSpecificationsLHS.at(att1SpecTypeIndex)).append(",");
+
+            modActDataVal1=(modelSpecificationsRHS.at(att1SpecTypeIndex));
+        }
+        else if(att1SpecType==1)
+        {
+//            qDebug()<< actorSpecificationsLHS<< "actorSpecificationsLHS";
+
+            lhsVec.append(actorSpecificationsLHS.at(att1SpecTypeIndex));
+            specsStr.append(actorSpecificationsLHS.at(att1SpecTypeIndex)).append(",");
+
+            modActDataVal1=(actorSpecificationsRHS.at(att1SpecTypeIndex));
+        }
+        else if(att1SpecType==2)
+        {
+//            qDebug()<< filterSpecificationsLHS<< "filterSpecificationsLHS";
+            for(int i =0; i <filterSpecificationsLHS.at(att1SpecTypeIndex).length();++i)
+            {
+                lhsVec.append(filterSpecificationsLHS.at(att1SpecTypeIndex).at(i));
+                specsStr.append(filterSpecificationsLHS.at(att1SpecTypeIndex).at(i)).append(",");
+            }
+            filCrosDataVals1.append(filterSpecificationsRHS.at(att1SpecTypeIndex));
+        }
+        else if(att1SpecType==3)
+        {
+//            qDebug()<< crossProdSpecificationsLHS<<"crossProdSpecificationsLHS";
+            for(int i =0; i <crossProdSpecificationsLHS.at(att1SpecTypeIndex).length();++i)
+            {
+                lhsVec.append(crossProdSpecificationsLHS.at(att1SpecTypeIndex).at(i));
+                specsStr.append(crossProdSpecificationsLHS.at(att1SpecTypeIndex).at(i)).append(",");
+            }
+            filCrosDataVals1.append(crossProdSpecificationsRHS.at(att1SpecTypeIndex));
+        }
+
+        //second specification of cross product
+        if(att2SpecType==0)
+        {
+//            qDebug()<< modelSpecificationsLHS<<"modelSpecificationsLHS";
+            lhsVec.append(modelSpecificationsLHS.at(att2SpecTypeIndex));
+            specsStr.append(modelSpecificationsLHS.at(att2SpecTypeIndex)).append(",");
+            specsStr.append("#").remove(",#").append(")=(");
+            modActDataVal2=(modelSpecificationsRHS.at(att2SpecTypeIndex));
+        }
+        else if(att2SpecType==1)
+        {
+//            qDebug()<< actorSpecificationsLHS<<"actorSpecificationsLHS";
+
+            lhsVec.append(actorSpecificationsLHS.at(att2SpecTypeIndex));
+            specsStr.append(actorSpecificationsLHS.at(att2SpecTypeIndex)).append(",");
+
+            specsStr.append("#").remove(",#").append(")=(");
+            modActDataVal2=(actorSpecificationsRHS.at(att2SpecTypeIndex));
+        }
+        else if(att2SpecType==2)
+        {
+//            qDebug()<< filterSpecificationsLHS<<"filterSpecificationsLHS";
+            for(int i =0; i <filterSpecificationsLHS.at(att2SpecTypeIndex).length();++i)
+            {
+                lhsVec.append(filterSpecificationsLHS.at(att2SpecTypeIndex).at(i));
+                specsStr.append(filterSpecificationsLHS.at(att2SpecTypeIndex).at(i)).append(",");
+            }
+            specsStr.append("#").remove(",#").append(")=(");
+            filCrosDataVals2.append(filterSpecificationsRHS.at(att2SpecTypeIndex));
+        }
+        else if(att2SpecType==3)
+        {
+//            qDebug()<< crossProdSpecificationsLHS<<"crossProdSpecificationsLHS";
+            for(int i =0; i <crossProdSpecificationsLHS.at(att2SpecTypeIndex).length();++i)
+            {
+                lhsVec.append(crossProdSpecificationsLHS.at(att2SpecTypeIndex).at(i));
+                specsStr.append(crossProdSpecificationsLHS.at(att2SpecTypeIndex).at(i)).append(",");
+            }
+            specsStr.append("#").remove(",#").append(")=(");
+            filCrosDataVals2.append(crossProdSpecificationsRHS.at(att2SpecTypeIndex));
+        }
+
+        QVector<QVector<QString>> specification;
+        if((att1SpecType==0||att1SpecType==1) && ((att2SpecType==0||att2SpecType==1)))
+        {
+            specification.clear();
+            QVector<QString> newSpec;
+
+            for(int i=0; i < modActDataVal1.length(); ++i)
+            {
+                for(int j=0; j < modActDataVal2.length(); ++j)
+                {
+                    specsStr.append("(").append(modActDataVal1.at(i)).append(":");
+                    newSpec.append(modActDataVal1.at(i));
+                    specsStr.append(modActDataVal2.at(j)).append("),");
+                    newSpec.append(modActDataVal2.at(j));
+                    specification.append(newSpec);
+//                    qDebug()<< newSpec << "newSpec" ;
+                    newSpec.clear();
+                }
+            }
+            specsStr.append("#").remove(",#").append(")");
+        }
+        else if((att1SpecType==0||att1SpecType==1) && ((att2SpecType==2||att2SpecType==3)))
+        {
+            specification.clear();
+            QVector<QString> newSpec;
+
+            for(int i=0; i < modActDataVal1.length(); ++i)
+            {
+                for(int itr =0; itr < filCrosDataVals2.at(0).length();++itr)
+                {
+                    specsStr.append("(").append(modActDataVal1.at(i)).append(":");
+                    newSpec.append(modActDataVal1.at(i));
+                    for(int j=0; j < filCrosDataVals2.at(0).at(itr).length(); ++j)
+                    {
+                        specsStr.append(filCrosDataVals2.at(0).at(itr).at(j)).append(":");
+                        newSpec.append(filCrosDataVals2.at(0).at(itr).at(j));
+                    }
+                    specsStr.append("#").remove(":#").append("),");
+                    specification.append(newSpec);
+                    newSpec.clear();
+                }
+            }
+            specsStr.append("#").remove(",#").append(")");
+
+        }
+        else if((att1SpecType==2||att1SpecType==3) && ((att2SpecType==0||att2SpecType==1)))
+        {
+
+            specification.clear();
+            QVector<QString> newSpec;
+
+            for(int i=0; i < modActDataVal2.length(); ++i)
+            {
+                for(int itr =0; itr < filCrosDataVals1.at(0).length();++itr)
+                {
+                    specsStr.append("(");
+                    for(int j=0; j < filCrosDataVals1.at(0).at(itr).length(); ++j)
+                    {
+                        specsStr.append(filCrosDataVals1.at(0).at(itr).at(j)).append(":");
+                        newSpec.append(filCrosDataVals1.at(0).at(itr).at(j));
+                    }
+                    specsStr.append(modActDataVal2.at(i)).append("),");
+                    newSpec.append(modActDataVal2.at(i));
+                    specification.append(newSpec);
+                    newSpec.clear();
+                }
+            }
+            specsStr.append("#").remove(",#").append(")");
+        }
+        else if((att1SpecType==2||att1SpecType==3) && ((att2SpecType==2||att2SpecType==3)))
+        {
+            specification.clear();
+            QVector<QString> newSpec;
+
+            int strLimitSpecs =20;
+            for(int itrI =0; itrI < filCrosDataVals1.at(0).length();++itrI)
+            {
+                for(int itrJ =0; itrJ < filCrosDataVals2.at(0).length();++itrJ)
+                {
+                    if(strLimitSpecs>0)
+                    {
+                        specsStr.append("(");
+                    }
+                    for(int i=0; i < filCrosDataVals1.at(0).at(itrI).length(); ++i)
+                    {
+                        if(strLimitSpecs>0)
+                        {
+                            specsStr.append(filCrosDataVals1.at(0).at(itrI).at(i)).append(":");
+                        }
+                        newSpec.append(filCrosDataVals1.at(0).at(itrI).at(i));
+                    }
+                    for(int j=0; j < filCrosDataVals2.at(0).at(itrJ).length(); ++j)
+                    {
+                        if(strLimitSpecs>0)
+                        {
+                            specsStr.append(filCrosDataVals2.at(0).at(itrJ).at(j)).append(":");
+                        }
+                        newSpec.append(filCrosDataVals2.at(0).at(itrJ).at(j));
+                    }
+                    if(strLimitSpecs>0)
+                    {
+                        specsStr.append("#").remove(":#").append("),");
+                        --strLimitSpecs;
+                    }
+                    specification.append(newSpec);
+                    newSpec.clear();
+                }
+            }
+            if(strLimitSpecs<=0)
+            {
+                specsStr.append(".......))");
+            }
+            else
+            {
+                specsStr.append("#").remove(",#").append(")");
+            }
+        }
+        else
+        {
+            return;
+        }
+
+        crossProductSpecsLHS.append(lhsVec);
+//        qDebug()<< lhsVec << "\n" << specsStr<<"lhsVec";
+        crossProductSpecsRHS.append(specification);
+
+        QStandardItem * item = new QStandardItem(specsStr);
+        item->setCheckable(true);
+        item->setEditable(false);
+        item->setCheckState(Qt::Unchecked);
+        crossProductListModel->appendRow(item);
+        crossProductListView->scrollToBottom();
+
+        QPair<SpecsData,SpecificationVector> crossProdSpec;
+        crossProdSpec.first.append(crossProductSpecsLHS.at(crossProductSpecsLHS.count()-1));
+        crossProdSpec.second.append(crossProductSpecsRHS.at(crossProductSpecsRHS.count()-1));
+
+        filterCrossProdSpecification(crossProductListModel->item(crossProductListModel->rowCount()-1)->text(),crossProdSpec,3);
+
+        QApplication::restoreOverrideCursor();
+    }
 }
 
 void SpecificationFrame::listViewClicked()
@@ -289,7 +598,7 @@ void SpecificationFrame::actorModelSpecification(QString spec,QPair<Specificatio
         item->setEditable(false);
 
         specsListModel->insertRow(specsIndexlist[0],item);
-        qDebug()<< specsIndexlist[0]  << "apecs Index list" <<specsListModel->rowCount();
+//        qDebug()<< specsIndexlist[0]  << "apecs Index list" <<specsListModel->rowCount();
         specsListView->scrollToBottom();
 
         if(!specData.second.isEmpty())
@@ -300,8 +609,8 @@ void SpecificationFrame::actorModelSpecification(QString spec,QPair<Specificatio
             //            specsIndexlist[0]=specData.second.length();
             specsIndexlist[0]=specsIndexlist[0]+1;
 
-            qDebug()<< specsIndexlist[0]  << "apecs Index list";
-            qDebug()<< specsListModel->item(specsListModel->rowCount()-1)->text();
+//            qDebug()<< specsIndexlist[0]  << "apecs Index list";
+//            qDebug()<< specsListModel->item(specsListModel->rowCount()-1)->text();
         }
     }
 
@@ -380,7 +689,7 @@ void SpecificationFrame::removeSpecModelActor(int index, int type,QString specLH
     {
         if(index < specsIndexlist[0])
         {
-            qDebug()<<modelSpecificationsLHS.at(index) << specLHS;
+//            qDebug()<<modelSpecificationsLHS.at(index) << specLHS;
 
             if(modelSpecificationsLHS.at(index)==specLHS)
             {
@@ -395,7 +704,7 @@ void SpecificationFrame::removeSpecModelActor(int index, int type,QString specLH
     {
         if(index < specsIndexlist[1])
         {
-            qDebug()<<actorSpecificationsLHS.at(index) << specLHS;
+//            qDebug()<<actorSpecificationsLHS.at(index) << specLHS;
 
             if(actorSpecificationsLHS.at(index)==specLHS)
             {
@@ -417,7 +726,7 @@ void SpecificationFrame::removeSpecFilterCrossProd(int index, int type, Specific
     {
         if(index < specsIndexlist[2])
         {
-            qDebug()<<filterSpecificationsLHS.at(index) << specLHS;
+//            qDebug()<<filterSpecificationsLHS.at(index) << specLHS;
 
             if(filterSpecificationsLHS.at(index).count()==specLHS.count())
             {
@@ -440,7 +749,7 @@ void SpecificationFrame::removeSpecFilterCrossProd(int index, int type, Specific
     {
         if(index < specsIndexlist[3])
         {
-            qDebug()<<crossProdSpecificationsLHS.at(index) << specLHS;
+//            qDebug()<<crossProdSpecificationsLHS.at(index) << specLHS;
 
             if(crossProdSpecificationsLHS.at(index).count()==specLHS.count())
             {
@@ -470,72 +779,6 @@ void SpecificationFrame::specsListViewContextMenu(QPoint pos)
         menu->addAction("Remove Selected Items", this, SLOT(listViewClicked()));
         menu->addAction("Remove All Items", this, SLOT(listViewSpecsRemoveAllClicked()));
         menu->popup(specsListView->mapToGlobal(pos));
-    }
-}
-
-void SpecificationFrame::specsListMainWindow(QStandardItemModel *modelList,
-                                             QPair<DataValues, SpecsData> modelSpecs, QPair<DataValues, SpecsData> actorSpecs,
-                                             QPair<SpecsData, SpecificationVector> filterSpecs , QPair<SpecsData, SpecificationVector> crossProdSpecs)
-{
-    specsListModel->clear();
-    for(int i = 0 ; i < modelList->rowCount();++ i)
-    {
-        QStandardItem * item = new QStandardItem(modelList->item(i)->text());
-        item->setCheckable(true);
-        item->setCheckState(Qt::Unchecked);
-        item->setEditable(false);
-        specsListModel->setItem(i,item);
-    }
-    specsListView->scrollToBottom();
-    populateCrossProductComboBox();
-
-    if(!modelSpecs.second.isEmpty())
-    {
-        modelSpecificationsLHS= modelSpecs.first;
-        modelSpecificationsRHS= modelSpecs.second;
-
-        specsIndexlist[0]=modelSpecs.second.length();
-
-    }
-    else
-    {
-        specsIndexlist[0]=0;
-    }
-    if(!actorSpecs.second.isEmpty())
-    {
-        actorSpecificationsLHS=actorSpecs.first;
-        actorSpecificationsRHS=actorSpecs.second;
-
-        specsIndexlist[1]=actorSpecs.second.length();
-    }
-    else
-    {
-        specsIndexlist[1]=0;
-    }
-    if(!filterSpecs.second.isEmpty())
-    {
-        filterSpecificationsLHS=filterSpecs.first;
-        filterSpecificationsRHS=filterSpecs.second;
-
-        specsIndexlist[2]=filterSpecs.second.length();
-
-    }
-    else
-    {
-        specsIndexlist[2]=0;
-    }
-
-    if(!crossProdSpecs.second.isEmpty())
-    {
-        crossProdSpecificationsLHS=crossProdSpecs.first;
-        crossProdSpecificationsRHS=crossProdSpecs.second;
-
-        specsIndexlist[3]=crossProdSpecs.second.length();
-
-    }
-    else
-    {
-        specsIndexlist[3]=0;
     }
 }
 
@@ -732,7 +975,7 @@ void SpecificationFrame::filterAddSpecificationClicked(bool bl)
                 return;
             }
             filterSpecsRHS.append(filterDataRHS);
-            qDebug()<<filterSpecsRHS <<"filterSpecsRHS"<<filterSpecsLHS;
+//            qDebug()<<filterSpecsRHS <<"filterSpecsRHS"<<filterSpecsLHS;
             filterDataRHS.clear();
         }
         filterListView->scrollToBottom();
@@ -749,300 +992,37 @@ void SpecificationFrame::crossproductAddSpecificationClicked(bool bl)
 {
     if(att1ComboBox->count() >0 && att2ComboBox->count() >0)
     {
-        QApplication::setOverrideCursor(QCursor(QPixmap("://images/hourglass.png")));
-        QApplication::processEvents();
+        QString msg;
+        msg="Please wait ! Computing cross product for all specifications, this might take a while !!";
+        emit statusMessage(msg);
 
         int attributeIndex1 = att1ComboBox->currentIndex();
         int attributeIndex2 = att2ComboBox->currentIndex();
 
-        int att1SpecType;
-        int att1SpecTypeIndex;
-        int att2SpecType;
-        int att2SpecTypeIndex;
+        createCrossProductSpec(attributeIndex1,attributeIndex2);
 
-        if(attributeIndex1 < specsIndexlist[0])
+        msg="completed";
+        emit statusMessage(msg);
+    }
+}
+
+void SpecificationFrame::crossAllSpecs(bool bl)
+{
+    if(att1ComboBox->count()>=1)
+    {
+        //Cross Product Spec for 1st two specs
+        createCrossProductSpec(0,1); // specs 1 and 2
+    }
+
+    if(att1ComboBox->count()>3)
+    {
+        int specsCount = att1ComboBox->count()-1;
+
+        //Cross Product Spec for the rest of specs
+        for(int specIndex=2; specIndex < specsCount;++specIndex)
         {
-            att1SpecType = 0;
-            att1SpecTypeIndex = attributeIndex1;
+            createCrossProductSpec(specIndex,att1ComboBox->count()-1);
         }
-        else if(attributeIndex1 < (specsIndexlist[0]+specsIndexlist[1]))
-        {
-            att1SpecType = 1;
-            att1SpecTypeIndex =attributeIndex1- specsIndexlist[0];
-        }
-        else if (attributeIndex1 < (specsIndexlist[0]+specsIndexlist[1]+specsIndexlist[2]))
-        {
-            att1SpecType = 2;
-            att1SpecTypeIndex =attributeIndex1- (specsIndexlist[0]+specsIndexlist[1]);
-        }
-        else if (attributeIndex1 < (specsIndexlist[0]+specsIndexlist[1]+specsIndexlist[2]+specsIndexlist[3]))
-        {
-            att1SpecType = 3;
-            att1SpecTypeIndex = attributeIndex1 - (specsIndexlist[0]+specsIndexlist[1]+specsIndexlist[2]);
-        }
-        else
-        {
-            return;
-        }
-
-        if(attributeIndex2 < specsIndexlist[0])
-        {
-            att2SpecType = 0;
-            att2SpecTypeIndex = attributeIndex2;
-        }
-        else if(attributeIndex2 < (specsIndexlist[0]+specsIndexlist[1]))
-        {
-            att2SpecType = 1;
-            att2SpecTypeIndex = attributeIndex2-specsIndexlist[0];
-        }
-        else if (attributeIndex2 < (specsIndexlist[0]+specsIndexlist[1]+specsIndexlist[2]))
-        {
-            att2SpecType = 2;
-            att2SpecTypeIndex = attributeIndex2 - (specsIndexlist[0] + specsIndexlist[1]);
-        }
-        else if (attributeIndex2 < (specsIndexlist[0]+specsIndexlist[1]+specsIndexlist[2]+specsIndexlist[3]))
-        {
-            att2SpecType = 3;
-            att2SpecTypeIndex = attributeIndex2 -(specsIndexlist[0]+specsIndexlist[1]+specsIndexlist[2]);
-            qDebug()<< att2SpecTypeIndex <<"att2SpecTypeIndex";
-        }
-        else
-        {
-            return;
-        }
-
-
-        QVector<QString> modActDataVal1;
-        SpecificationVector filCrosDataVals1;
-
-        QVector<QString> modActDataVal2;
-        SpecificationVector filCrosDataVals2;
-
-        QVector<QString> lhsVec;
-        QString specsStr;
-        specsStr.append("(");
-
-        //LHS specification of cross product
-        if(att1SpecType==0)
-        {
-            qDebug()<< modelSpecificationsLHS <<"modelSpecificationsLHS";
-            lhsVec.append(modelSpecificationsLHS.at(att1SpecTypeIndex));
-            specsStr.append(modelSpecificationsLHS.at(att1SpecTypeIndex)).append(",");
-
-            modActDataVal1=(modelSpecificationsRHS.at(att1SpecTypeIndex));
-        }
-        else if(att1SpecType==1)
-        {
-            qDebug()<< actorSpecificationsLHS<< "actorSpecificationsLHS";
-
-            lhsVec.append(actorSpecificationsLHS.at(att1SpecTypeIndex));
-            specsStr.append(actorSpecificationsLHS.at(att1SpecTypeIndex)).append(",");
-
-            modActDataVal1=(actorSpecificationsRHS.at(att1SpecTypeIndex));
-        }
-        else if(att1SpecType==2)
-        {
-            qDebug()<< filterSpecificationsLHS<< "filterSpecificationsLHS";
-            for(int i =0; i <filterSpecificationsLHS.at(att1SpecTypeIndex).length();++i)
-            {
-                lhsVec.append(filterSpecificationsLHS.at(att1SpecTypeIndex).at(i));
-                specsStr.append(filterSpecificationsLHS.at(att1SpecTypeIndex).at(i)).append(",");
-            }
-            filCrosDataVals1.append(filterSpecificationsRHS.at(att1SpecTypeIndex));
-        }
-        else if(att1SpecType==3)
-        {
-            qDebug()<< crossProdSpecificationsLHS<<"crossProdSpecificationsLHS";
-            for(int i =0; i <crossProdSpecificationsLHS.at(att1SpecTypeIndex).length();++i)
-            {
-                lhsVec.append(crossProdSpecificationsLHS.at(att1SpecTypeIndex).at(i));
-                specsStr.append(crossProdSpecificationsLHS.at(att1SpecTypeIndex).at(i)).append(",");
-            }
-            filCrosDataVals1.append(crossProdSpecificationsRHS.at(att1SpecTypeIndex));
-        }
-
-        //second specification of cross product
-        if(att2SpecType==0)
-        {
-            qDebug()<< modelSpecificationsLHS<<"modelSpecificationsLHS";
-            lhsVec.append(modelSpecificationsLHS.at(att2SpecTypeIndex));
-            specsStr.append(modelSpecificationsLHS.at(att2SpecTypeIndex)).append(",");
-            specsStr.append("#").remove(",#").append(")=(");
-            modActDataVal2=(modelSpecificationsRHS.at(att2SpecTypeIndex));
-        }
-        else if(att2SpecType==1)
-        {
-            qDebug()<< actorSpecificationsLHS<<"actorSpecificationsLHS";
-
-            lhsVec.append(actorSpecificationsLHS.at(att2SpecTypeIndex));
-            specsStr.append(actorSpecificationsLHS.at(att2SpecTypeIndex)).append(",");
-
-            specsStr.append("#").remove(",#").append(")=(");
-            modActDataVal2=(actorSpecificationsRHS.at(att2SpecTypeIndex));
-        }
-        else if(att2SpecType==2)
-        {
-            qDebug()<< filterSpecificationsLHS<<"filterSpecificationsLHS";
-            for(int i =0; i <filterSpecificationsLHS.at(att2SpecTypeIndex).length();++i)
-            {
-                lhsVec.append(filterSpecificationsLHS.at(att2SpecTypeIndex).at(i));
-                specsStr.append(filterSpecificationsLHS.at(att2SpecTypeIndex).at(i)).append(",");
-            }
-            specsStr.append("#").remove(",#").append(")=(");
-            filCrosDataVals2.append(filterSpecificationsRHS.at(att2SpecTypeIndex));
-        }
-        else if(att2SpecType==3)
-        {
-            qDebug()<< crossProdSpecificationsLHS<<"crossProdSpecificationsLHS";
-            for(int i =0; i <crossProdSpecificationsLHS.at(att2SpecTypeIndex).length();++i)
-            {
-                lhsVec.append(crossProdSpecificationsLHS.at(att2SpecTypeIndex).at(i));
-                specsStr.append(crossProdSpecificationsLHS.at(att2SpecTypeIndex).at(i)).append(",");
-            }
-            specsStr.append("#").remove(",#").append(")=(");
-            filCrosDataVals2.append(crossProdSpecificationsRHS.at(att2SpecTypeIndex));
-        }
-
-        QVector<QVector<QString>> specification;
-        if((att1SpecType==0||att1SpecType==1) && ((att2SpecType==0||att2SpecType==1)))
-        {
-            specification.clear();
-            QVector<QString> newSpec;
-
-            for(int i=0; i < modActDataVal1.length(); ++i)
-            {
-                for(int j=0; j < modActDataVal2.length(); ++j)
-                {
-                    specsStr.append("(").append(modActDataVal1.at(i)).append(":");
-                    newSpec.append(modActDataVal1.at(i));
-                    specsStr.append(modActDataVal2.at(j)).append("),");
-                    newSpec.append(modActDataVal2.at(j));
-                    specification.append(newSpec);
-                    qDebug()<< newSpec << "newSpec" ;
-                    newSpec.clear();
-                }
-            }
-            specsStr.append("#").remove(",#").append(")");
-        }
-        else if((att1SpecType==0||att1SpecType==1) && ((att2SpecType==2||att2SpecType==3)))
-        {
-            specification.clear();
-            QVector<QString> newSpec;
-
-            for(int i=0; i < modActDataVal1.length(); ++i)
-            {
-                for(int itr =0; itr < filCrosDataVals2.at(0).length();++itr)
-                {
-                    specsStr.append("(").append(modActDataVal1.at(i)).append(":");
-                    newSpec.append(modActDataVal1.at(i));
-                    for(int j=0; j < filCrosDataVals2.at(0).at(itr).length(); ++j)
-                    {
-                        specsStr.append(filCrosDataVals2.at(0).at(itr).at(j)).append(":");
-                        newSpec.append(filCrosDataVals2.at(0).at(itr).at(j));
-                    }
-                    specsStr.append("#").remove(":#").append("),");
-                    specification.append(newSpec);
-                    newSpec.clear();
-                }
-            }
-            specsStr.append("#").remove(",#").append(")");
-
-        }
-        else if((att1SpecType==2||att1SpecType==3) && ((att2SpecType==0||att2SpecType==1)))
-        {
-
-            specification.clear();
-            QVector<QString> newSpec;
-
-            for(int i=0; i < modActDataVal2.length(); ++i)
-            {
-                for(int itr =0; itr < filCrosDataVals1.at(0).length();++itr)
-                {
-                    specsStr.append("(");
-                    for(int j=0; j < filCrosDataVals1.at(0).at(itr).length(); ++j)
-                    {
-                        specsStr.append(filCrosDataVals1.at(0).at(itr).at(j)).append(":");
-                        newSpec.append(filCrosDataVals1.at(0).at(itr).at(j));
-                    }
-                    specsStr.append(modActDataVal2.at(i)).append("),");
-                    newSpec.append(modActDataVal2.at(i));
-                    specification.append(newSpec);
-                    newSpec.clear();
-                }
-            }
-            specsStr.append("#").remove(",#").append(")");
-        }
-        else if((att1SpecType==2||att1SpecType==3) && ((att2SpecType==2||att2SpecType==3)))
-        {
-            specification.clear();
-            QVector<QString> newSpec;
-
-            int strLimitSpecs =20;
-            for(int itrI =0; itrI < filCrosDataVals1.at(0).length();++itrI)
-            {
-                for(int itrJ =0; itrJ < filCrosDataVals2.at(0).length();++itrJ)
-                {
-                    if(strLimitSpecs>0)
-                    {
-                        specsStr.append("(");
-                    }
-                    for(int i=0; i < filCrosDataVals1.at(0).at(itrI).length(); ++i)
-                    {
-                        if(strLimitSpecs>0)
-                        {
-                            specsStr.append(filCrosDataVals1.at(0).at(itrI).at(i)).append(":");
-                        }
-                        newSpec.append(filCrosDataVals1.at(0).at(itrI).at(i));
-                    }
-                    for(int j=0; j < filCrosDataVals2.at(0).at(itrJ).length(); ++j)
-                    {
-                        if(strLimitSpecs>0)
-                        {
-                            specsStr.append(filCrosDataVals2.at(0).at(itrJ).at(j)).append(":");
-                        }
-                        newSpec.append(filCrosDataVals2.at(0).at(itrJ).at(j));
-                    }
-                    if(strLimitSpecs>0)
-                    {
-                        specsStr.append("#").remove(":#").append("),");
-                        --strLimitSpecs;
-                    }
-                    specification.append(newSpec);
-                    newSpec.clear();
-                }
-            }
-            if(strLimitSpecs<=0)
-            {
-                specsStr.append(".......))");
-            }
-            else
-            {
-                specsStr.append("#").remove(",#").append(")");
-            }
-        }
-        else
-        {
-            return;
-        }
-
-        crossProductSpecsLHS.append(lhsVec);
-        qDebug()<< lhsVec << "\n" << specsStr<<"lhsVec";
-        crossProductSpecsRHS.append(specification);
-
-        QStandardItem * item = new QStandardItem(specsStr);
-        item->setCheckable(true);
-        item->setEditable(false);
-        item->setCheckState(Qt::Unchecked);
-        crossProductListModel->appendRow(item);
-        crossProductListView->scrollToBottom();
-
-        QPair<SpecsData,SpecificationVector> crossProdSpec;
-        crossProdSpec.first.append(crossProductSpecsLHS.at(crossProductSpecsLHS.count()-1));
-        crossProdSpec.second.append(crossProductSpecsRHS.at(crossProductSpecsRHS.count()-1));
-
-        filterCrossProdSpecification(crossProductListModel->item(crossProductListModel->rowCount()-1)->text(),crossProdSpec,3);
-
-        QApplication::restoreOverrideCursor();
     }
 }
 

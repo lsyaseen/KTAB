@@ -210,6 +210,7 @@ void ActorFrame::setActorTableModel(QStandardItemModel *model, QStringList scena
     initializeAccomodationMatrix("CSV");
     intitalizeSasGridColumn();
     actorAtrributesHeaderList();
+    validateData();
 }
 
 void ActorFrame::setAccTableModel(QStandardItemModel *model,
@@ -264,7 +265,7 @@ void ActorFrame::setAccTableModel(QStandardItemModel *model,
     }
     intitalizeSasGridColumn();
     actorAtrributesHeaderList();
-
+    validateData();
 }
 
 
@@ -546,8 +547,16 @@ void ActorFrame::addSpecClicked(bool bl)
 {
     if(sasDataGridTableWidget->model()->rowCount()>0)
     {
+        //        validateSalienceData();
 
+        bool scaleSum = false;
+
+        QList <int> salIndex;
+        QList <int> posIndex;
         QString specification;
+        QList <QString> specList;
+        QList <QPair<DataValues,SpecsData>> specPairList;
+
         for(int row =0; row < sasDataGridTableWidget->rowCount()-1; ++row)
         {
             QString actorValue;
@@ -561,15 +570,14 @@ void ActorFrame::addSpecClicked(bool bl)
             for(int col = 0 ; col < sasDataGridTableWidget->columnCount() ; ++col)
             {
                 auto ret = sasDataGridTableWidget->item(row,col);
-
                 if(ret != 0)
                 {
                     if(col>0)
                     {
-                        double v = sasDataGridTableWidget->item(row,col)->text().toDouble();
-                        if(v>0.0)
+                        double val = sasDataGridTableWidget->item(row,col)->text().toDouble();
+                        if(val>0.0)
                         {
-                            values.append(v);
+                            values.append(val);
                         }
                     }
                     else
@@ -586,28 +594,100 @@ void ActorFrame::addSpecClicked(bool bl)
                 }
             }
             if(true==minDeltaMaxRadioButton->isChecked() && 3==values.count())
-            {   actorSpecsLHS.append(actorValue);
-                qDebug()<<actorSpecsLHS << " LHS";
-                str.append(processMinDeltaMax(values));
-            }
-            else if (true == basePMRadioButton->isChecked()&& 2==values.count())
             {
-                actorSpecsLHS.append(actorValue);
-                qDebug()<<actorSpecsLHS << " LHS";
-                str.append(processBasePM(values));
+                QString procStr = processMinDeltaMax(values,row);
+                if(!procStr.isEmpty())
+                {
+                    str.append(procStr);
+                    actorSpecsLHS.append(actorValue);
+//                    qDebug()<<actorSpecsLHS << " LHS";
+
+                    if(row >0 && row%2==0 && row < (sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount()))
+                    {
+                        salIndex.append(actorSpecsLHS.length()-1);
+                    }
+                    else
+                    {
+                        posIndex.append(actorSpecsLHS.length()-1);
+                    }
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else if (true == basePMRadioButton->isChecked() && 2==values.count())
+            {
+
+                QString procStr = processBasePM(values,row);
+                if(!procStr.isEmpty())
+                {
+                    actorSpecsLHS.append(actorValue);
+//                    qDebug()<<actorSpecsLHS << " LHS";
+                    str.append(procStr);
+
+                    if(row >0 && row%2==0 && row < (sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount()))
+                    {
+                        salIndex.append(actorSpecsLHS.length()-1);
+                    }
+                    else
+                    {
+                        posIndex.append(actorSpecsLHS.length()-1);
+                    }
+                }
+                else
+                {
+                    return;
+                }
             }
             else if (true == basePMPRadioButton->isChecked()&& 2==values.count())
             {
-                actorSpecsLHS.append(actorValue);
-                qDebug()<<actorSpecsLHS << " LHS";
-                str.append(processBasePMP(values));
+
+                QString procStr = processBasePMP(values,row);
+                if(!procStr.isEmpty())
+                {
+                    actorSpecsLHS.append(actorValue);
+//                    qDebug()<<actorSpecsLHS << " LHS";
+                    str.append(procStr);
+
+                    if(row >0 && row%2==0 && row < (sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount()))
+                    {
+                        salIndex.append(actorSpecsLHS.length()-1);
+                    }
+                    else
+                    {
+                        posIndex.append(actorSpecsLHS.length()-1);
+                    }
+                }
+                else
+                {
+                    return;
+                }
             }
             else if (true == valueRadioButton->isChecked() &&
                      sasDataGridTableWidget->columnCount()==values.count())
             {
-                actorSpecsLHS.append(actorValue);
-                qDebug()<<actorSpecsLHS << " LHS";
-                str.append(processValuesN(values));
+
+                QString procStr = processValuesN(values,row);
+                if(!procStr.isEmpty())
+                {
+                    actorSpecsLHS.append(actorValue);
+//                    qDebug()<<actorSpecsLHS << "LHS";
+                    str.append(procStr);
+
+                    if(row >0 && row%2==0 && row < (sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount()))
+                    {
+                        salIndex.append(actorSpecsLHS.length()-1);
+                    }
+                    else
+                    {
+                        posIndex.append(actorSpecsLHS.length()-1);
+                    }
+                }
+                else
+                {
+                    return;
+                }
             }
             else
             {
@@ -627,23 +707,15 @@ void ActorFrame::addSpecClicked(bool bl)
                 }
                 else
                 {
-                    QStandardItem *item = new QStandardItem(specification);
-                    item->setCheckable(true);
-                    item->setCheckState(Qt::Unchecked);
-                    item->setEditable(false);
-                    specsListModel->setItem(specsListModel->rowCount(),item);
-                    specsListView->scrollToBottom();
-                    qDebug()<<specification;
+                    specList.append(specification);
+                    specification.clear();
 
                     //emit singleSpecification
                     QPair<DataValues,SpecsData> spec;
                     spec.first.append(actorSpecsLHS.at(actorSpecsLHS.count()-1));
                     spec.second.append(actorSpecsRHS.at(actorSpecsRHS.count()-1));
+                    specPairList.append(spec);
 
-                    emit actorAttributesAndSAS(specification);
-                    emit specificationNew(specsListModel->item(specsListModel->rowCount()-1)->text(),spec,1);//1 == Actor
-
-                    specification.clear();
                 }
             }
             else
@@ -652,6 +724,191 @@ void ActorFrame::addSpecClicked(bool bl)
                 values.clear();
                 str.clear();
             }
+        }
+        //validate sal against other dimensions
+        if(salIndex.length()>1)
+        {
+            QVector<QVector<QString>> salValues;
+
+            for(int indx = 0; indx < salIndex.length(); ++indx)
+            {
+                QVector<QString> sal;
+                sal.append(actorSpecsRHS.at(salIndex.at(indx)));
+                salValues.append(sal);
+            }
+
+            QVector <int> salValLenVec;
+            double salLimit;
+            if(true==minDeltaMaxRadioButton->isChecked())
+            {
+                int maxLen=0;
+                int index=0;
+                for(int i=0; i < salValues.length();++i)
+                {
+                    salValLenVec.append(salValues.at(i).length());
+                    if(maxLen<salValues.at(i).length())
+                    {
+                        maxLen=salValues.at(i).length();
+                        index=i;
+                    }
+                }
+
+                for(int salValIndex = 0; salValIndex < salValues.at(index).length() ;++salValIndex)
+                {
+                    salLimit = 0.0;
+                    int salListIndex;
+
+                    for(salListIndex = 0; salListIndex < salValues.length(); ++salListIndex)
+                    {
+                        if(salValues.at(salListIndex).length()>salValIndex)
+                        {
+                            salLimit+= salValues.at(salListIndex).at(salValIndex).toDouble();
+                        }
+                    }
+
+
+                    if(salLimit>100.0)
+                    {
+                        scaleSum=true;
+                        for(int salIndex = 0; salIndex < salValues.length();++salIndex)
+                        {
+                            if(salValues.at(salIndex).length()>salValIndex)
+                            {
+                                //                                qDebug() << salValues[salIndex][salValIndex] << "Before ";
+
+                                salValues[salIndex][salValIndex]=
+                                        QString::number(salValues[salIndex][salValIndex].toDouble()/salLimit);
+
+                                //                                qDebug() << salValues[salIndex][salValIndex] << "After ";
+                                //                                qDebug() << salIndex << salValIndex << "Indices ";
+                            }
+                        }
+
+                        for(int indx = 0; indx < salIndex.length(); ++indx)
+                        {
+                            actorSpecsRHS[salIndex[indx]]=salValues[indx];
+                        }
+
+                    }
+
+                    for(int i = 0 ; i < salIndex.length(); ++i)
+                    {
+
+                        QStringList str = specList.at(salIndex.at(i)-(actorSpecsRHS.length()-specList.length())).split("=");
+                        QString newSpec = str.at(0);
+
+                        //                        qDebug()<<newSpec << "newSpec";
+                        newSpec.append("=(");
+                        for(int j =0 ; j < actorSpecsRHS.at(salIndex.at(i)).length(); ++j)
+                        {
+                            newSpec.append(actorSpecsRHS.at(salIndex.at(i)).at(j)).append(",");
+                        }
+                        newSpec.append("#").remove(",#").append(")");
+                        specList[salIndex.at(i)-(actorSpecsRHS.length()-specList.length())]=newSpec;
+                    }
+                    for(int i = 0 ; i < posIndex.length(); ++i)
+                    {
+
+                        QStringList str = specList.at(posIndex.at(i)-(actorSpecsRHS.length()-specList.length())).split("=");
+                        QString newSpec = str.at(0);
+
+                        //                        qDebug()<<newSpec << "newSpec";
+                        newSpec.append("=(");
+                        for(int j =0 ; j < actorSpecsRHS.at(posIndex.at(i)).length(); ++j)
+                        {
+                            newSpec.append(actorSpecsRHS.at(posIndex.at(i)).at(j)).append(",");
+                        }
+                        newSpec.append("#").remove(",#").append(")");
+                        specList[posIndex.at(i)-(actorSpecsRHS.length()-specList.length())]=newSpec;
+                    }
+                }
+            }
+            else
+            {
+                for(int salValIndex = 0; salValIndex < salValues.at(0).length();++salValIndex)
+                {
+                    salLimit = 0.0;
+                    int salListIndex;
+                    for(salListIndex = 0; salListIndex < salValues.length(); ++salListIndex)
+                    {
+                        salLimit+= salValues.at(salListIndex).at(salValIndex).toDouble();
+                    }
+
+                    if(salLimit>100.0)
+                    {
+                        scaleSum=true;
+                        for(int salIndex = 0; salIndex < salValues.length();++salIndex)
+                        {
+                            //                            qDebug() << salValues[salIndex][salValIndex] << "Before ";
+
+                            salValues[salIndex][salValIndex]=
+                                    QString::number(salValues[salIndex][salValIndex].toDouble()/salLimit);
+
+                            //                            qDebug() << salValues[salIndex][salValIndex] << "After ";
+                            //                            qDebug() << salIndex << salValIndex << "Indices ";
+                        }
+
+                        for(int indx = 0; indx < salIndex.length(); ++indx)
+                        {
+                            actorSpecsRHS[salIndex[indx]]=salValues[indx];
+                        }
+                    }
+
+                    for(int i = 0 ; i < salIndex.length(); ++i)
+                    {
+
+                        QStringList str = specList.at(salIndex.at(i)-(actorSpecsRHS.length()-specList.length())).split("=");
+                        QString newSpec = str.at(0);
+
+                        //                        qDebug()<<newSpec << "newSpec";
+                        newSpec.append("=(");
+                        for(int j =0 ; j < actorSpecsRHS.at(salIndex.at(i)).length(); ++j)
+                        {
+                            newSpec.append(actorSpecsRHS.at(salIndex.at(i)).at(j)).append(",");
+                        }
+                        newSpec.append("#").remove(",#").append(")");
+                        specList[salIndex.at(i)-(actorSpecsRHS.length()-specList.length())]=newSpec;
+
+                    }
+
+                    for(int i = 0 ; i < posIndex.length(); ++i)
+                    {
+
+                        QStringList str = specList.at(posIndex.at(i)-(actorSpecsRHS.length()-specList.length())).split("=");
+                        QString newSpec = str.at(0);
+
+                        //                        qDebug()<<newSpec << "newSpec";
+                        newSpec.append("=(");
+                        for(int j =0 ; j < actorSpecsRHS.at(posIndex.at(i)).length(); ++j)
+                        {
+                            newSpec.append(actorSpecsRHS.at(posIndex.at(i)).at(j)).append(",");
+                        }
+                        newSpec.append("#").remove(",#").append(")");
+                        specList[posIndex.at(i)-(actorSpecsRHS.length()-specList.length())]=newSpec;
+
+                    }
+                }
+            }
+            if(scaleSum==true)
+            {
+                QMessageBox::information(this,"Salience Values modified",
+                                         "Salience values against multiple dimensions cross limit hence values are scaled to 100");
+                scaleSum=false;
+            }
+        }
+        for(int specIndx=0; specIndx < specList.length(); ++specIndx )
+        {
+            QStandardItem *item = new QStandardItem(specList.at(specIndx));
+            item->setCheckable(true);
+            item->setCheckState(Qt::Unchecked);
+            item->setEditable(false);
+            specsListModel->setItem(specsListModel->rowCount(),item);
+            specsListView->scrollToBottom();
+//            qDebug()<<specList.at(specIndx);
+
+            emit actorAttributesAndSAS(specList.at(specIndx));
+            emit specificationNew(specsListModel->item(specsListModel->rowCount()-1)->text(),specPairList.at(specIndx),1);//1 == Actor
+
         }
     }
 }
@@ -762,6 +1019,117 @@ void ActorFrame::valueRadioButtonClicked(bool bl)
     }
 }
 
+bool ActorFrame::validateSalienceData()
+{
+    int dimensions = (sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount()-1)/2;
+    QVector<QVector<double>> salVec;
+    int dim=0;
+
+    for(int row=2; row < sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount(); row+=2)
+    {
+        for(int col=0; col < sasDataGridTableWidget->model()->columnCount();++col)
+        {
+            auto ret = sasDataGridTableWidget->item(row,col);
+
+            double val ;
+            QVector<double> v;
+            if(ret != 0 && (!ret->text().isEmpty()))
+            {
+                val = sasDataGridTableWidget->item(row,col)->text().toDouble();
+                if(val > 100.0 || val <0.0)
+                {
+                    return false;
+                }
+                v.append(val);
+            }
+            else
+            {
+                val =0.0;
+                v.append(val);
+            }
+            salVec.append(v);
+        }
+        ++dim;
+    }
+
+    double limit = 0.0;
+
+    for(int j=0; j < salVec.at(0).length(); ++j)
+    {
+        for(int dimensn=0; dimensn < salVec.length();++dimensn)
+        {
+            limit += salVec.at(j).at(dimensn);
+        }
+        if(limit > 100.00)
+        {
+            QMessageBox::information(this,"Limit Crossed","Salience limit has been "
+                                                          "crossed hence values are modified to scale the sum to 100");
+
+            for(int row = 0; row < dimensions; ++row)
+            {
+                auto ret = sasDataGridTableWidget->item(row,j);
+
+                if(ret != 0 && (!ret->text().isEmpty()))
+                {
+                    double val = sasDataGridTableWidget->item(row,j)->text().toDouble();
+
+                    val = (val/limit);
+
+                    QTableWidgetItem *item = new QTableWidgetItem(val);
+                    sasDataGridTableWidget->setItem(row+2,j,item);
+//                    qDebug()<<"here";
+                }
+                else
+                {
+                    continue;
+                }
+            }
+        }
+    }
+}
+
+//void ActorFrame::validateValues(QVector<double> values, int row)
+//{
+//    if(values.at(0)<values.at(2)) // min < max
+//    {
+//        QVector <QString> actorValues;
+//        for(double min = values.at(0) ; min <= values.at(2) ; min +=  values.at(1))
+//        {
+//            if(row > 0 && row < (sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount()))
+//            {
+//                if(row%2!=0) //position
+//                {
+//                    if(min>100.0 || min <0.0)
+//                    {
+//                        QMessageBox::information(this,"Limit Crossed","Limit [0,100] of Position values has Crossed");
+//                        return 0;
+//                    }
+//                }
+//                else // salience
+//                {
+//                    if(min>100.0 || min <0.0)
+//                    {
+//                        QMessageBox::information(this,"Limit Crossed","Limit [0,100] of Salience values has Crossed");
+//                        return 0;
+//                    }
+//                }
+//            }
+//            actorValues.append(QString::number(min));
+//        }
+
+//        if(row%2==0  && row < (sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount()))
+//        {
+//            for()
+
+
+//        }
+
+
+
+
+//    }
+//}
+
 void ActorFrame::addBasePushButtonClicked(bool bl)
 {
     if(basePMPRadioButton->isChecked()==true || basePMRadioButton->isChecked())
@@ -769,12 +1137,19 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
 
         if(sasDataGridTableWidget->model()->rowCount()>0)
         {
-            int specsCount = specsListModel->rowCount();
+
+            bool scaleSum=false;
 
             QString currentAct = actorComboBox->currentText();
             for(int act =0; act < actorComboBox->count(); ++act)
             {
+                //                QString specification;
+
+                QList <int> salIndex;
+                QList <int> posIndex;
                 QString specification;
+                QList <QString> specList;
+                QList <QPair<DataValues,SpecsData>> specPairList;
 
                 for(int row =0; row < sasDataGridTableWidget->rowCount()-1; ++row)
                 {
@@ -810,7 +1185,6 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
                     }
                     else if (row > actorDataTableView->model()->columnCount()-2)
                     {
-
                         auto ret = sasDataGridTableWidget->item(row,1); // col 1
 
                         if(ret != 0 && (!ret->text().isEmpty()))
@@ -831,18 +1205,52 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
                             str.clear();
                         }
                     }
-
                     if (true == basePMRadioButton->isChecked()&& 2==values.count())
                     {
-                        actorSpecsLHS.append(actorValue);
-                        qDebug()<<actorSpecsLHS << " LHS";
-                        str.append(processBasePM(values));
+                        QString procStr = processBasePM(values,row);
+                        if(!procStr.isEmpty())
+                        {
+                            actorSpecsLHS.append(actorValue);
+//                            qDebug()<<actorSpecsLHS << " LHS";
+                            str.append(procStr);
+
+                            if(row >0 && row%2==0 && row < (sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount()))
+                            {
+                                salIndex.append(actorSpecsLHS.length()-1);
+                            }
+                            else
+                            {
+                                posIndex.append(actorSpecsLHS.length()-1);
+                            }
+                        }
+                        else
+                        {
+                            return;
+                        }
                     }
                     else if (true == basePMPRadioButton->isChecked()&& 2==values.count())
                     {
-                        actorSpecsLHS.append(actorValue);
-                        qDebug()<<actorSpecsLHS << " LHS";
-                        str.append(processBasePMP(values));
+                        QString procStr = processBasePMP(values,row);
+                        if(!procStr.isEmpty())
+                        {
+                            actorSpecsLHS.append(actorValue);
+//                            qDebug()<<actorSpecsLHS << " LHS";
+                            str.append(procStr);
+
+                            if(row >0 && row%2==0 && row < (sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount()))
+                            {
+                                salIndex.append(actorSpecsLHS.length()-1);
+                            }
+                            else
+                            {
+                                posIndex.append(actorSpecsLHS.length()-1);
+                            }
+                        }
+                        else
+                        {
+                            return;
+                        }
+
                     }
                     else
                     {
@@ -855,7 +1263,6 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
                     {
                         specification.append(")");
 
-
                         if(specification.contains("()") || specification.contains("))")
                                 || specification.contains(",)"))
                         {
@@ -863,23 +1270,33 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
                         }
                         else
                         {
-                            specification.replace(QString(currentAct+" <"),QString(actorComboBox->itemText(act)+" <"));
-                            QStandardItem *item = new QStandardItem(specification);
-                            item->setCheckable(true);
-                            item->setCheckState(Qt::Unchecked);
-                            item->setEditable(false);
-                            specsListModel->setItem(specsListModel->rowCount(),item);
-                            specsListView->scrollToBottom();
+                            //                            specification.replace(QString(currentAct+" <"),QString(actorComboBox->itemText(act)+" <"));
+                            specList.append(specification);
+                            specification.clear();
 
                             //emit singleSpecification
                             QPair<DataValues,SpecsData> spec;
                             spec.first.append(actorSpecsLHS.at(actorSpecsLHS.count()-1));
                             spec.second.append(actorSpecsRHS.at(actorSpecsRHS.count()-1));
+                            specPairList.append(spec);
 
-                            emit actorAttributesAndSAS(specification);
-                            emit specificationNew(specsListModel->item(specsListModel->rowCount()-1)->text(),spec,1);//1 == Actor
+                            //                            specification.replace(QString(currentAct+" <"),QString(actorComboBox->itemText(act)+" <"));
+                            //                            QStandardItem *item = new QStandardItem(specification);
+                            //                            item->setCheckable(true);
+                            //                            item->setCheckState(Qt::Unchecked);
+                            //                            item->setEditable(false);
+                            //                            specsListModel->setItem(specsListModel->rowCount(),item);
+                            //                            specsListView->scrollToBottom();
 
-                            specification.clear();
+                            //                            //emit singleSpecification
+                            //                            QPair<DataValues,SpecsData> spec;
+                            //                            spec.first.append(actorSpecsLHS.at(actorSpecsLHS.count()-1));
+                            //                            spec.second.append(actorSpecsRHS.at(actorSpecsRHS.count()-1));
+
+                            //                            emit actorAttributesAndSAS(specification);
+                            //                            emit specificationNew(specsListModel->item(specsListModel->rowCount()-1)->text(),spec,1);//1 == Actor
+
+                            //                            specification.clear();
                         }
                     }
                     else
@@ -890,17 +1307,112 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
                     }
                 }
 
+
+                //validate sal against other dimensions
+                if(salIndex.length()>1)
+                {
+                    QVector<QVector<QString>> salValues;
+
+                    for(int indx = 0; indx < salIndex.length(); ++indx)
+                    {
+                        QVector<QString> sal;
+                        sal.append(actorSpecsRHS.at(salIndex.at(indx)));
+                        salValues.append(sal);
+                    }
+
+                    double salLimit;
+
+                    for(int salValIndex = 0; salValIndex < salValues.at(0).length();++salValIndex)
+                    {
+                        salLimit = 0.0;
+                        int salListIndex;
+                        for(salListIndex = 0; salListIndex < salValues.length(); ++salListIndex)
+                        {
+                            salLimit+= salValues.at(salListIndex).at(salValIndex).toDouble();
+                        }
+
+                        if(salLimit>100.0)
+                        {
+                            scaleSum=true;
+                            for(int salIndex = 0; salIndex < salValues.length();++salIndex)
+                            {
+//                                qDebug() << salValues[salIndex][salValIndex] << "Before ";
+
+                                salValues[salIndex][salValIndex]=
+                                        QString::number(salValues[salIndex][salValIndex].toDouble()/salLimit);
+
+//                                qDebug() << salValues[salIndex][salValIndex] << "After ";
+//                                qDebug() << salIndex << salValIndex << "Indices ";
+                            }
+
+                            for(int indx = 0; indx < salIndex.length(); ++indx)
+                            {
+                                actorSpecsRHS[salIndex[indx]]=salValues[indx];
+                            }
+
+                        }
+
+                        for(int i = 0 ; i < salIndex.length(); ++i)
+                        {
+
+                            QStringList str = specList.at(salIndex.at(i)-(actorSpecsRHS.length()-specList.length())).split("=");
+                            QString newSpec = str.at(0);
+
+//                            qDebug()<<newSpec << "newSpec";
+                            newSpec.append("=(");
+                            for(int j =0 ; j < actorSpecsRHS.at(salIndex.at(i)).length(); ++j)
+                            {
+                                newSpec.append(actorSpecsRHS.at(salIndex.at(i)).at(j)).append(",");
+                            }
+                            newSpec.append("#").remove(",#").append(")");
+                            specList[salIndex.at(i)-(actorSpecsRHS.length()-specList.length())]=newSpec;
+
+                        }
+
+                        for(int i = 0 ; i < posIndex.length(); ++i)
+                        {
+
+                            QStringList str = specList.at(posIndex.at(i)-(actorSpecsRHS.length()-specList.length())).split("=");
+                            QString newSpec = str.at(0);
+
+//                            qDebug()<<newSpec << "newSpec";
+                            newSpec.append("=(");
+                            for(int j =0 ; j < actorSpecsRHS.at(posIndex.at(i)).length(); ++j)
+                            {
+                                newSpec.append(actorSpecsRHS.at(posIndex.at(i)).at(j)).append(",");
+                            }
+                            newSpec.append("#").remove(",#").append(")");
+                            specList[posIndex.at(i)-(actorSpecsRHS.length()-specList.length())]=newSpec;
+
+                        }
+
+                    }
+                }
+
+                if(scaleSum==true)
+                {
+                    scaleSum=false;
+
+                }
+                for(int specIndx=0; specIndx < specList.length(); ++specIndx )
+                {
+                    QStandardItem *item = new QStandardItem(specList.at(specIndx));
+                    item->setCheckable(true);
+                    item->setCheckState(Qt::Unchecked);
+                    item->setEditable(false);
+                    specsListModel->setItem(specsListModel->rowCount(),item);
+                    specsListView->scrollToBottom();
+//                    qDebug()<<specList.at(specIndx);
+
+                    emit actorAttributesAndSAS(specList.at(specIndx));
+                    emit specificationNew(specsListModel->item(specsListModel->rowCount()-1)->text(),specPairList.at(specIndx),1);//1 == Actor
+
+                }
             }
-            //            if(specsCount != specsListModel->rowCount())
-            //            {
-            //                //                QPair<DataValues,SpecsData> spec;
-            //                //                spec.first = actorSpecsLHS;
-            //                //                spec.second = actorSpecsRHS;
-            //                //                emit modelList(specsListModel,attributeList,spec);
-            //            }
         }
     }
 }
+
 
 void ActorFrame::displayMenuTableView(QPoint pos)
 {
@@ -1242,23 +1754,45 @@ void ActorFrame::initializeBaseDataGrid()
     }
 }
 
-QString ActorFrame::processMinDeltaMax( QVector<double> values)
+QString ActorFrame::processMinDeltaMax(QVector<double> values, int row)
 {
+    //    salIndex(values,row);
+
     QString processedString;
     if(values.at(0)<values.at(2)) // min < max
     {
         QVector <QString> actorValues;
         for(double min = values.at(0) ; min <= values.at(2) ; min +=  values.at(1))
         {
+            if(row > 0 && row < (sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount()))
+            {
+                if(row%2!=0) //position
+                {
+                    if(min>100.0 || min <0.0)
+                    {
+                        QMessageBox::information(this,"Limit Crossed","Limit [0,100] of Position values has Crossed at Row "+ QString::number(row+1));
+                        return 0;
+                    }
+                }
+                else // salience
+                {
+                    if(min>100.0 || min <0.0)
+                    {
+                        QMessageBox::information(this,"Limit Crossed","Limit [0,100] of Salience values has Crossed at Row "+ QString::number(row+1));
+                        return 0;
+                    }
+                }
+            }
             actorValues.append(QString::number(min));
             //  qDebug()<<min << "val";
             processedString.append(QString::number(min)).append(",");
             //qDebug()<<processedString;
         }
+
         if(!actorValues.isEmpty())
         {
             actorSpecsRHS.append(actorValues);
-            qDebug()<<actorSpecsRHS <<"RHS";
+//            qDebug()<<actorSpecsRHS <<"RHS";
         }
         processedString.remove(processedString.length()-1,1);
         //        qDebug()<<processedString;
@@ -1271,7 +1805,7 @@ QString ActorFrame::processMinDeltaMax( QVector<double> values)
     return processedString;
 }
 
-QString ActorFrame::processBasePM(QVector<double> values)
+QString ActorFrame::processBasePM(QVector<double> values, int row)
 {
     QString processedString;
 
@@ -1280,18 +1814,43 @@ QString ActorFrame::processBasePM(QVector<double> values)
     double base = values.at(0) - values.at(1);
     actorValues.append(QString::number(base));
     processedString.append(QString::number(base)).append(",");
+
     actorValues.append(QString::number(values.at(0)));
     processedString.append(QString::number(values.at(0))).append(",");
-    base = values.at(0)+values.at(1);
+
+    base = values.at(0) + values.at(1);
     actorValues.append(QString::number(base));
     processedString.append(QString::number(base));
+
+    for(int i = 0 ; i  < actorValues.length(); ++ i)
+    {
+        if(row > 0 && row < (sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount()))
+        {
+            if(row%2!=0) //position
+            {
+                if(actorValues.at(i).toDouble()>100.0 || actorValues.at(i).toDouble()<0.0)
+                {
+                    QMessageBox::information(this,"Limit Crossed","Limit [0,100] of Position values has Crossed at Row "+ QString::number(row+1));
+                    return 0;
+                }
+            }
+            else // salience
+            {
+                if(actorValues.at(i).toDouble()>100.0 || actorValues.at(i).toDouble()<0.0)
+                {
+                    QMessageBox::information(this,"Limit Crossed","Limit [0,100] of Salience values has Crossed at Row "+ QString::number(row+1));
+                    return 0;
+                }
+            }
+        }
+    }
     actorSpecsRHS.append(actorValues);
-    qDebug()<<actorSpecsRHS <<"RHS";
+//    qDebug()<<actorSpecsRHS <<"RHS";
     return processedString;
 
 }
 
-QString ActorFrame::processBasePMP(QVector<double> values)
+QString ActorFrame::processBasePMP(QVector<double> values, int row)
 {
     QString processedString;
     QVector <QString> actorValues;
@@ -1300,19 +1859,43 @@ QString ActorFrame::processBasePMP(QVector<double> values)
     double base = values.at(0)-(values.at(0)*values.at(1))/100;
     actorValues.append(QString::number(base));
     processedString.append(QString::number(base)).append(",");
+
     actorValues.append(QString::number(values.at(0)));
     processedString.append(QString::number(values.at(0))).append(",");
+
     base = values.at(0)+(values.at(0)*values.at(1))/100;
     actorValues.append(QString::number(base));
     processedString.append(QString::number(base));
 
-    actorSpecsRHS.append(actorValues);
-    qDebug()<<actorSpecsRHS <<"RHS";
 
+    for(int i = 0 ; i  < actorValues.length(); ++ i)
+    {
+        if(row > 0 && row < (sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount()))
+        {
+            if(row%2!=0) //position
+            {
+                if(actorValues.at(i).toDouble()>100.0 || actorValues.at(i).toDouble()<0.0)
+                {
+                    QMessageBox::information(this,"Limit Crossed","Limit [0,100] of Position values has Crossed at Row "+ QString::number(row+1));
+                    return 0;
+                }
+            }
+            else // salience
+            {
+                if(actorValues.at(i).toDouble()>100.0 || actorValues.at(i).toDouble()<0.0)
+                {
+                    QMessageBox::information(this,"Limit Crossed","Limit [0,100] of Salience values has Crossed at Row "+ QString::number(row+1));
+                    return 0;
+                }
+            }
+        }
+    }
+    actorSpecsRHS.append(actorValues);
+//    qDebug()<<actorSpecsRHS <<"RHS";
     return processedString;
 }
 
-QString ActorFrame::processValuesN(QVector<double> values)
+QString ActorFrame::processValuesN(QVector<double> values,int row)
 {
     QString processedString;
     QVector <QString> actorValues;
@@ -1322,14 +1905,87 @@ QString ActorFrame::processValuesN(QVector<double> values)
     {
         actorValues.append(QString::number(values.at(val)));
         processedString.append(QString::number(values.at(val))).append(",");
+
+        if(row > 0 && row < (sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount()))
+        {
+            if(row%2!=0) //position
+            {
+                if(actorValues.at(val).toDouble()>100.0 || actorValues.at(val).toDouble()<0.0)
+                {
+                    QMessageBox::information(this,"Limit Crossed","Limit [0,100] of Position values has Crossed at Row "+ QString::number(row+1));
+                    return 0;
+                }
+            }
+            else // salience
+            {
+                if(actorValues.at(val).toDouble()>100.0 || actorValues.at(val).toDouble()<0.0)
+                {
+                    QMessageBox::information(this,"Limit Crossed","Limit [0,100] of Salience values has Crossed at Row "+ QString::number(row+1));
+                    return 0;
+                }
+            }
+        }
     }
     processedString.remove(processedString.length()-1,1);
 
     if(!actorValues.isEmpty())
     {
         actorSpecsRHS.append(actorValues);
-        qDebug()<<actorSpecsRHS <<"RHS";
+//        qDebug()<<actorSpecsRHS <<"RHS";
 
     }
     return processedString;
 }
+
+void ActorFrame::validateData()
+{
+    int actors = actorDataTableView->model()->rowCount();
+    bool vio = false;
+    QString violations;
+    violations.append("Position Values have crossed the limit [0,100] for \n");
+
+    //validate position values
+    for(int row = 0; row < actors; ++row)
+    {
+        for( int col =3 ; col < actorDataTableView->model()->columnCount();col+=2)
+        {
+            if((actorDataTableView->model()->data(actorDataTableView->model()->index(row,col)).toDouble()>100.00))
+            {
+                vio=true;
+                violations.append(actorDataTableView->model()->data(actorDataTableView->model()->index(row,0)).toString()+" at ");
+                violations.append("Row: "+QString::number(row+1)+ " and Column: ");
+                violations.append(actorDataTableView->model()->headerData(col,Qt::Horizontal).toString()+" \n");
+            }
+        }
+    }
+    if(vio==true)
+    {
+        vio=false;
+        QMessageBox::warning(this,"Position Limit Crossed",violations);
+    }
+
+    //validate salience values
+    violations.clear();
+    double sal;
+    violations.append("Salience Values have crossed the limit [0,1] for \n");
+    for(int row = 0; row < actors; ++row)
+    {
+        sal = 0.0;
+        for( int col=4 ; col < actorDataTableView->model()->columnCount(); col+=2)
+        {
+            sal += (actorDataTableView->model()->data(actorDataTableView->model()->index(row,col)).toDouble())/100.00;
+        }
+        if(sal>1.0)
+        {
+            vio=true;
+            violations.append(actorDataTableView->model()->data(actorDataTableView->model()->index(row,0)).toString()+" at ");
+            violations.append("Row: "+QString::number(row+1) + " \n");
+        }
+    }
+    if(vio==true)
+    {
+        vio=false;
+        QMessageBox::warning(this,"Position Limit Crossed",violations);
+    }
+}
+

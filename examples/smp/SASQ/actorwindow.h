@@ -23,6 +23,7 @@
 #include <QInputDialog>
 #include <QStandardItemModel>
 #include <QStringList>
+#include <QMessageBox>
 
 class ActorFrame: public QFrame
 {
@@ -94,10 +95,14 @@ private :
     void initializeSpecificationsList();
     void initializeAccMatrixRowCol(int count, QString table);
     void initializeBaseDataGrid();
-    QString processMinDeltaMax(QVector<double> values);
-    QString processBasePM( QVector<double> values);
-    QString processBasePMP(QVector<double> values);
-    QString processValuesN( QVector<double> values);
+    QString processMinDeltaMax(QVector<double> values, int row);
+    QString processBasePM(QVector<double> values, int row);
+    QString processBasePMP(QVector<double> values, int row);
+    QString processValuesN(QVector<double> values, int row);
+    void validateData();
+    bool validateSalienceData();
+//    void validateValues(QVector<double> values, int row);
+
 
 public slots:
     void listViewRemoveAllClicked();
