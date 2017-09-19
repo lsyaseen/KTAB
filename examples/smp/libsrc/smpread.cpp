@@ -84,7 +84,14 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
     unsigned int numActor = 0;
     unsigned int numDim = 0;
     inStream.read_line();
-    inStream >> scenName >> scenDesc >> numActor >> numDim;
+    try {
+      inStream >> scenName >> scenDesc >> numActor >> numDim;
+    }
+    catch (std::runtime_error &err) {
+      LOG(INFO) << "Error in reading csv file";
+      LOG(INFO) << err.what();
+      return nullptr;
+    }
 
     LOG(INFO) << "Scenario Name: -|" << scenName << "|-";
     LOG(INFO) << "Scenario Description: " << scenDesc;
@@ -116,14 +123,28 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
     // Actor,Description,Power,Pstn1,Sal1,Pstn2,Sal2,Pstn3,Sal3,
     inStream.read_line();
     string dummyField;
-    inStream >> dummyField; // skip "Actor"
-    inStream >> dummyField; // skip "Descripton"
-    inStream >> dummyField; // skip "Power"
+    try {
+      inStream >> dummyField; // skip "Actor"
+      inStream >> dummyField; // skip "Descripton"
+      inStream >> dummyField; // skip "Power"
+    }
+    catch (std::runtime_error &err) {
+      LOG(INFO) << "Error in reading csv file";
+      LOG(INFO) << err.what();
+      return nullptr;
+    }
     auto dNames = vector<string>();
     for (unsigned int d = 0; d < numDim; d++) {
         string dimName, salName;
-        inStream >> dimName;
-        inStream >> salName;
+        try {
+          inStream >> dimName;
+          inStream >> salName;
+        }
+        catch (std::runtime_error &err) {
+          LOG(INFO) << "Error in reading csv file";
+          LOG(INFO) << err.what();
+          return nullptr;
+        }
         //assert(dimName.length() <= maxDimDescLen);
         if (dimName.length() > maxDimDescLen) {
           throw KException("Dimension name is too long.");
@@ -145,7 +166,14 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
         string aDesc = "";
         double aCap = 0.0;
         inStream.read_line();
-        inStream >> aName >> aDesc >> aCap;
+        try {
+          inStream >> aName >> aDesc >> aCap;
+        }
+        catch (std::runtime_error &err) {
+          LOG(INFO) << "Error in reading csv file";
+          LOG(INFO) << err.what();
+          return nullptr;
+        }
 
         LOG(INFO) << "Actor:" << i << "name:" << aName;
         // names must have at least 1 character
@@ -182,7 +210,14 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
         for (unsigned int d = 0; d < numDim; d++) {
             double dPos = 0.0; // on [0, 100] scale
             double dSal = 0.0; // on [0, 100] scale
-            inStream >> dPos >> dSal;
+            try {
+              inStream >> dPos >> dSal;
+            }
+            catch (std::runtime_error &err) {
+              LOG(INFO) << "Error in reading csv file";
+              LOG(INFO) << err.what();
+              return nullptr;
+            }
 
             LOG(INFO) << KBase::getFormattedString("pos[%u, %u] =  %5.3f", i, d, dPos);
             if ((dPos < 0.0) || (+100.0 < dPos)) { // lower and upper limit

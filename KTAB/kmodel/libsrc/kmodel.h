@@ -425,7 +425,7 @@ public:
   void initDBDriver(QString connectionName);
   bool connectDB();
   void closeDB();
-  static void loginCredentials(string connString);
+  static bool loginCredentials(string connString);
   void beginDBTransaction();
   void commitDBTransaction();
   QSqlQuery getQuery();

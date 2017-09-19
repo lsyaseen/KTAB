@@ -201,7 +201,10 @@ int main(int ac, char **av) {
       seed = KBase::dSeed;
   }
 
-  SMPLib::SMPModel::loginCredentials(connstr);
+  bool checkCredentials = SMPLib::SMPModel::loginCredentials(connstr);
+  if (!checkCredentials) { // Some error with input credentials
+    return -1;
+  }
 
   // note that we reset the seed every time, so that in case something
   // goes wrong, we need not scroll back too far to find the

@@ -999,7 +999,7 @@ void Model::dropTableIndices() {
     execQuery(qry);
 }
 
-void Model::loginCredentials(string connString) {
+bool Model::loginCredentials(string connString) {
   enum class userParams {
     Driver,
     Server,
@@ -1011,12 +1011,12 @@ void Model::loginCredentials(string connString) {
 
   std::map<std::string, userParams> mapStringToUserParams =
   {
-    { "Driver", userParams::Driver },
-    { "Server", userParams::Server },
-    { "Port", userParams::Port },
-    { "Database", userParams::Database },
-    { "Uid", userParams::Uid },
-    { "Pwd", userParams::Pwd },
+    { "driver", userParams::Driver },
+    { "server", userParams::Server },
+    { "port", userParams::Port },
+    { "database", userParams::Database },
+    { "uid", userParams::Uid },
+    { "pwd", userParams::Pwd },
   };
 
   string parsedParam;
@@ -1026,6 +1026,7 @@ void Model::loginCredentials(string connString) {
     auto it = std::find(parsedParam.begin(), parsedParam.end(), '=');
     string key, value;
     key.assign(parsedParam.begin(), it);
+    std::transform(key.begin(), key.end(), key.begin(), ::tolower);
     value.assign(it + 1, parsedParam.end());
     userParams userParam;
     try {
@@ -1033,9 +1034,11 @@ void Model::loginCredentials(string connString) {
     }
     catch (const std::out_of_range& oor) {
       LOG(INFO) << "Error: Wrong connection string provided for DB!";
+      LOG(INFO) << "Is there a whitespace in connection string?";
       LOG(INFO) << oor.what();
       //assert(false);
-      throw KException("Model::loginCredentials: Wrong connection string for DB");
+      //throw KException("Model::loginCredentials: Wrong connection string for DB");
+      return false;
     }
 
     switch (mapStringToUserParams[key]) {
@@ -1059,20 +1062,23 @@ void Model::loginCredentials(string connString) {
       break;
     default:
       LOG(INFO) << "Error in input credentials format.";
+      return false;
     }
   }
 
   if (dbDriver.isEmpty() || databaseName.isEmpty()) {
     LOG(INFO) << "Error! Database type or database name can not be left blank.";
     //assert(false);
-    throw KException("Model::loginCredentials: Database type or name is blank");
+    //throw KException("Model::loginCredentials: Database type or name is blank");
+    return false;
   }
 
   // We use either Postgresql or SQLITE
   if (dbDriver.compare("QPSQL") && dbDriver.compare("QSQLITE")) {
     LOG(INFO) << "Error! Wrong driver name. Supported Drivers: postgres(QPSQL), sqlite3(QSQLITE)";
     //assert(false);
-    throw KException("Model::loginCredentials: Unsupported DB driver");
+    //throw KException("Model::loginCredentials: Unsupported DB driver");
+    return false;
   }
 
   // for a non-sqlite db
@@ -1080,7 +1086,8 @@ void Model::loginCredentials(string connString) {
     if (server.isEmpty()) {
       LOG(INFO) << "Error! Please provide address for postgres server";
       //assert(false);
-      throw KException("Model::loginCredentials: No ip address provided for postgresql server");
+      //throw KException("Model::loginCredentials: No ip address provided for postgresql server");
+      return false;
     }
   }
 

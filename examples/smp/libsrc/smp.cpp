@@ -38,9 +38,9 @@ extern "C" {
     }
   }
 
-  void dbLoginCredentials(const char *connStr) {
+  bool dbLoginCredentials(const char *connStr) {
     if (nullptr != connStr) {
-      KBase::Model::loginCredentials(std::string(connStr));
+      return KBase::Model::loginCredentials(std::string(connStr));
     }
   }
 
@@ -1574,6 +1574,14 @@ string SMPModel::runModel(vector<bool> sqlFlags,
         LOG(INFO) << ke.msg;
         return "";
       }
+      catch (std::exception &std_ex) {
+        LOG(INFO) << std_ex.what();
+        return "";
+      }
+      catch (...) {
+        LOG(INFO) << "SMPModel::runModel: Unknown Exception Caught from xmlRead";
+        return "";
+      }
 
         if (-1 != seed) {
             md0->setSeed(seed);
@@ -1588,9 +1596,20 @@ string SMPModel::runModel(vector<bool> sqlFlags,
     else if (fileExt == "csv") {
       try {
         md0 = csvRead(inputDataFile, seed, sqlFlags);
+        if (nullptr == md0) {
+          return "";
+        }
       }
       catch (KException &ke) {
         LOG(INFO) << ke.msg;
+        return "";
+      }
+      catch (std::exception &std_ex) {
+        LOG(INFO) << std_ex.what();
+        return "";
+      }
+      catch (...) {
+        LOG(INFO) << "SMPModel::runModel: Unknown Exception Caught from csvRead";
         return "";
       }
         //md0 = csvRead(inputDataFile, seed, sqlFlags);
@@ -1611,6 +1630,14 @@ string SMPModel::runModel(vector<bool> sqlFlags,
 
       delete md0;
       md0 = nullptr;
+      return "";
+    }
+    catch (std::exception &std_ex) {
+      LOG(INFO) << std_ex.what();
+      return "";
+    }
+    catch (...) {
+      LOG(INFO) << "SMPModel::runModel: Unknown Exception Caught from configExec";
       return "";
     }
     md0->releaseDB();
