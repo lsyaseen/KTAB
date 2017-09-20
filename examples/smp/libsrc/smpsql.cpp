@@ -153,9 +153,9 @@ void SMPModel::sqlTest() {
     if (!connectDB()) {
       // connect with the default postgres db (the user should have admin privilege)
       if(!connect(server, port, "postgres", userName, password)) {
-        LOG(INFO) << "Please check the login credentials, ip address or port number";
+        LOG(INFO) << "Error: Please check the login credentials, ip address or port number";
         //assert(false);
-        throw KException("SMPModel::sqlTest: Invalid login credentials to connect with database");
+        throw KException("Error: SMPModel::sqlTest: Invalid login credentials to connect with database");
       }
 
       query = QSqlQuery(*qtDB);
@@ -172,22 +172,22 @@ void SMPModel::sqlTest() {
             query = QSqlQuery(*qtDB);
           }
           else {
-            LOG(INFO) << "Not connected to new db";
+            LOG(INFO) << "Error: Not connected to new db";
             LOG(INFO) << qtDB->lastError().text().toStdString();
             //assert(false);
-            throw KException("SMPModel::sqlTest: Could not connect with newly created database");
+            throw KException("Error: SMPModel::sqlTest: Could not connect with newly created database");
           }
         }
         else {
           //assert(false);
-          throw KException("SMPModel::sqlTest: Could not create a new database");
+          throw KException("Error: SMPModel::sqlTest: Could not create a new database");
         }
       }
       else {
         LOG(INFO) << "Database " << databaseName.toStdString()
           << " exists but not able to connect to it.";
         //assert(false);
-        throw KException("SMPModel::sqlTest: Could not connect with the database");
+        throw KException("Error: SMPModel::sqlTest: Could not connect with the database");
       }
     }
     else {

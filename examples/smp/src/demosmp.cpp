@@ -203,6 +203,7 @@ int main(int ac, char **av) {
 
   bool checkCredentials = SMPLib::SMPModel::loginCredentials(connstr);
   if (!checkCredentials) { // Some error with input credentials
+    LOG(INFO) << "Error: Failed attempt to connect with the database";
     return -1;
   }
 

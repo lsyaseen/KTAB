@@ -1019,23 +1019,46 @@ bool Model::loginCredentials(string connString) {
     { "pwd", userParams::Pwd },
   };
 
+  auto trimWhites = [](string &input) {
+    // Trim all leading whitespaces
+    while (input.size() && std::isspace(input.front())) {
+      input.erase(input.begin());
+    }
+
+    // Trim all trailing whitespaces
+    while (input.size() && std::isspace(input.back())) {
+      input.pop_back();
+    }
+  };
+
+  auto parseKeyValue = [&trimWhites](const string &pair, string &key, string &value) {
+    auto it = std::find(pair.begin(), pair.end(), '=');
+    key.assign(pair.begin(), it);
+    trimWhites(key);
+    std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+
+    value.assign(it + 1, pair.end());
+    trimWhites(value);
+  };
+
   string parsedParam;
   std::stringstream  inputCredential(const_cast<char*>(connString.c_str()));
   while (getline(inputCredential, parsedParam, ';'))
   {
-    auto it = std::find(parsedParam.begin(), parsedParam.end(), '=');
+    //auto it = std::find(parsedParam.begin(), parsedParam.end(), '=');
     string key, value;
-    key.assign(parsedParam.begin(), it);
-    std::transform(key.begin(), key.end(), key.begin(), ::tolower);
-    value.assign(it + 1, parsedParam.end());
+    //key.assign(parsedParam.begin(), it);
+    //std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+    //value.assign(it + 1, parsedParam.end());
+    parseKeyValue(parsedParam, key, value);
     userParams userParam;
     try {
       userParam = mapStringToUserParams.at(key);
     }
     catch (const std::out_of_range& oor) {
       LOG(INFO) << "Error: Wrong connection string provided for DB!";
-      LOG(INFO) << "Is there a whitespace in connection string?";
-      LOG(INFO) << oor.what();
+      LOG(INFO) << "Parsing of connection string stopped at:" << key;
+      LOG(INFO) << "Error:" << oor.what();
       //assert(false);
       //throw KException("Model::loginCredentials: Wrong connection string for DB");
       return false;
@@ -1094,6 +1117,8 @@ bool Model::loginCredentials(string connString) {
   if (!dbDriver.compare("QSQLITE")) {
     databaseName.append(".db");
   }
+
+  return true;
 }
 
 } // end of namespace
