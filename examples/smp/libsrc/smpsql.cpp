@@ -450,7 +450,7 @@ void SMPState::updateBargnTable(const vector<vector<BargainSMP*>> & brgns,
     for (auto bg : bargains_i) {
       //assert(nullptr != bg);
       if (nullptr == bg) {
-        throw KException("SMPState::updateBargnTable: invalid bargain object");
+        throw KException("SMPState::updateBargnTable: bg is null pointer");
       }
       if (bg->actInit == bg->actRcvr) { // For SQ case
         initActr = model->actrNdx(bg->actInit);
@@ -481,7 +481,7 @@ void SMPState::updateBargnTable(const vector<vector<BargainSMP*>> & brgns,
           for (auto bgRcv : brgnRcvr) {
             //assert(nullptr != bgRcv);
             if (nullptr == bgRcv) {
-              throw KException("SMPState::updateBargnTable: invalid receiver bargain object");
+              throw KException("SMPState::updateBargnTable: bgRcv is null pointer");
             }
             if (ai == bgRcv->actInit) {
               rcvrProb = (actorBargains[rcvrActr])(rcvrBgNdx, 0);

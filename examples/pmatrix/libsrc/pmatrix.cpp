@@ -107,7 +107,7 @@ void PMatrixModel::setPMatrix(const KMatrix & pm0) {
   if (0 < numAct) {
     //assert(nr == numAct);
     if (nr != numAct) {
-      throw KException("PMatrixModel::setPMatrix: inaccurate number of rows in pm0");
+      throw KException("PMatrixModel::setPMatrix: Number of rows in pm0 should be equal to actor's count");
     }
   }
   else {

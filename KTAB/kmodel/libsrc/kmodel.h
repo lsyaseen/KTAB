@@ -88,7 +88,7 @@ ET enumFromName (const string& ets, const vector<string>& etNames) {
     }
   }
   if (!found) {
-    throw(KException("enumFromName: unrecognized enum-type name"));
+    throw(KException(string("enumFromName: unrecognized enum-type name: ") + ets));
   }
   return et;
 }

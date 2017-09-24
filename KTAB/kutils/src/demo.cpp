@@ -371,7 +371,7 @@ void demoMatrix(PRNG* rng) {
         LOG(INFO) << getFormattedString("Norm of diff T((a-b)*T(c)) - c*(T(a)-T(b)) is %.3E ", err);
         //assert(err < errTol);
         if (err >= errTol) {
-          throw KException("demoMatrix: norm of diff is out of error tolerance level");
+          throw KException("demoMatrix: error is out of tolerance level");
         }
     }
 
@@ -389,13 +389,13 @@ void demoMatrix(PRNG* rng) {
         LOG(INFO) << getFormattedString("Norm of diff I-a*inv(a) is %.3E  ", diff);
         //assert(diff < errTol);
         if (diff >= errTol) {
-          throw KException("demoMatrix: norm of diff is out of error tolerance level");
+          throw KException("demoMatrix: error is out of tolerance level");
         }
         diff = norm(iMat(n) - (b*a));
         LOG(INFO) << getFormattedString("Norm of diff I-inv(a)*a is %.3E  ", diff);
         //assert(diff < errTol);
         if (diff >= errTol) {
-          throw KException("demoMatrix: norm of diff is out of error tolerance level");
+          throw KException("demoMatrix: error is out of tolerance level");
         }
     }
 

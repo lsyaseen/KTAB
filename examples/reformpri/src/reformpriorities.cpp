@@ -52,7 +52,7 @@ vector<VUI> scanAllPossiblePositions(const RPModel * rpm) {
   unsigned int numRefItem = rpm->numItm;
   //assert(numRefItem == rpm->numCat);
   if (numRefItem != rpm->numCat) {
-    throw KException("scanAllPossiblePositions: inaccurate number of categories in rpm");
+    throw KException("scanAllPossiblePositions: Number of ref item should be equal to number of categories in rpm");
   }
 
   LOG(INFO) << "There are" << numA << "actors and" << numRefItem << "reform items";
@@ -194,7 +194,7 @@ vector<VUI> scanAllPossiblePositions(const RPModel * rpm) {
   KMatrix zeta = aCap * uij;
   //assert((1 == zeta.numR()) && (numPos == zeta.numC()));
   if ((1 != zeta.numR()) || (numPos != zeta.numC())) {
-    throw KException("scanAllPossiblePositions: ");
+    throw KException("scanAllPossiblePositions: zeta must be a row vector with numPos number of columns");
   }
 
 

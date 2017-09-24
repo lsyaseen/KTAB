@@ -83,18 +83,18 @@ double LeonActor::vote(const Position * ap1, const Position * ap2) const {
   // Correct first, fast later (unless architecture prevents speed-up!)
   //assert((0 < refU) && (refU < 1));
   if ((0 >= refU) || (refU >= 1)) {
-    throw KException("LeonActor::vote: inaccurate refU");
+    throw KException("LeonActor::vote: refU must be in the range (0, 1)");
   }
   //assert((minS < refS) && (refS < maxS));
   if ((minS >= refS) || (refS >= maxS)) {
-    throw KException("LeonActor::vote: inaccurate refS");
+    throw KException(string("LeonActor::vote: refS must be in the range (") + std::to_string(minS) + "," + std::to_string(maxS) + ")");
   }
   const double u1 = posUtil(p1);
   const double u2 = posUtil(p2);
   const double sCap = sum(vCap);
   //assert (0 < sCap);
   if (0 >= sCap) {
-    throw KException("LeonActor::vote: inaccurate sCap");
+    throw KException("LeonActor::vote: sCap must be positive");
   }
   const double v12 = Model::vote(vr, sCap, u1, u2);
   // for now, I do it the easy way.
@@ -184,14 +184,14 @@ void LeonActor::setShareUtilScale(const KMatrix & runs) {
 
   //assert((0 < minS) && (minS < maxS));
   if ((0 >= minS) || (minS >= maxS)) {
-    throw KException("LeonActor::setShareUtilScale: inaccurate si");
+    throw KException("LeonActor::setShareUtilScale: minS must be in the range [0,maxS]");
   }
   const double sf = 1.001;
   minS = minS / sf;
   maxS = maxS*sf;
   //assert((minS < refS) && (refS < maxS));
   if ((minS >= refS) || (refS >= maxS)) {
-    throw KException("LeonActor::setShareUtilScale: inaccurate sf");
+    throw KException("LeonActor::setShareUtilScale: refS must be in the range [minS,maxS]");
   }
 
   double slopeRatio = 2.0;//1.5;
@@ -305,7 +305,7 @@ LeonState* LeonState::doSUSN(ReportingLevel rl) const {
   auto assertSimilar = [](const KMatrix & x, const KMatrix & y) {
     //assert(KBase::maxAbs(x - y) < 1E-10);
     if (KBase::maxAbs(x - y) >= 1E-10) {
-      throw KException("LeonState::doSUSN: x and y are not similar");
+      throw KException("LeonState::doSUSN: x and y are not at same values");
     }
     return;
   };
@@ -411,7 +411,7 @@ LeonState* LeonState::doSUSN(ReportingLevel rl) const {
   s2 = new LeonState((LeonModel *)model);
   //assert(model->numAct == s2->pstns.size());
   if (model->numAct != s2->pstns.size()) {
-    throw KException("LeonState::doSUSN: inaccurate number of positions");
+    throw KException("LeonState::doSUSN: Number of positions should be equal to number of actors");
   }
   for (unsigned int h = 0; h < numA; h++) {
     auto vhc = new KBase::VHCSearch();
@@ -1439,6 +1439,9 @@ void LeonModel::prepModel(unsigned int numFac, unsigned int numCon, unsigned int
   auto budgetL = rho * qClm;
   budgetL.mPrintf(" %.4f "); //  these are the VA to factors
   //assert(mDelta(sumVARows, budgetL) < tol);
+  if (mDelta(sumVARows, budgetL) >= tol) {
+    throw KException("LeonModel::prepModel: inaccurate budgetL");
+  }
   LOG(INFO) << "ok";
 
   auto budgetS = KMatrix(1, N);
@@ -1776,7 +1779,7 @@ KMatrix  LeonModel::vaShares(const KMatrix & tax, bool normalizeSharesP) const {
     double s = budgetL(j, 0);
     //assert(0 < s);
     if(0 >= s) {
-      throw KException("LeonModel::infsDegree: s must be positive with L");
+      throw KException("LeonModel::infsDegree: s must be positive within L");
     }
     fShares(0, j) = s;
   }
@@ -1806,7 +1809,7 @@ KMatrix LeonModel::monteCarloShares(unsigned int nRuns, PRNG* rng) {
   const bool normP = false;
   //assert((0 <= maxSub) && (maxSub < 1));
   if((0 > maxSub) || (maxSub >= 1)) {
-    throw KException("LeonModel::monteCarloShares: maxSub is not in range");
+    throw KException("LeonModel::monteCarloShares: maxSub is not in range [0,1)");
   }
   //assert(0 <= maxTax);
   if(0 > maxTax) {
@@ -2029,7 +2032,7 @@ LeonModel* demoSetup(unsigned int numFctr, unsigned int numCGrp, unsigned int nu
   auto u = eSt0->aUtil[0];
   //assert(numA == eSt0->model->numAct);
   if(numA != eSt0->model->numAct) {
-    throw KException("LeonModel::monteCarloShares: inaccurate number of actors");
+    throw KException("LeonModel::monteCarloShares: inaccurate number of actors in eSt0 model");
   }
 
   auto vfn = [eMod0, eSt0](unsigned int k, unsigned int i, unsigned int j) {

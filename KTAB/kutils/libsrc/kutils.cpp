@@ -23,7 +23,7 @@
 // Define a few generally useful functions.
 // --------------------------------------------
 
-#include <assert.h>
+//#include <assert.h>
 #include <tuple>
 #include <easylogging++.h>
 
@@ -47,11 +47,11 @@ double qrtc(const double& x) {
 double quadUfromV(double v, double bigR) {
   //assert (-1.0 <= bigR);
   if (-1.0 > bigR) {
-    throw KException("quadUfromV: bigR must be greater than -1.0");
+    throw KException("quadUfromV: bigR must not be less than -1.0");
   }
   //assert(bigR <= +1.0);
   if (bigR > +1.0) {
-    throw KException("quadUfromV: bigR must be less than 1.0");
+    throw KException("quadUfromV: bigR must not be more than 1.0");
   }
 
   // We tolerate some round-off error, but not much.
@@ -83,7 +83,7 @@ double quadUfromV(double v, double bigR) {
   }
   //assert (u <= 1.0);
   if (u > 1.0) {
-    throw KException("quadUfromV: u must be less than 1.0");
+    throw KException("quadUfromV: u must not be more than 1.0");
   }
   return u;
 }
@@ -129,7 +129,7 @@ VUI uiSeq(const unsigned int n1, const unsigned int n2, const unsigned int ns) {
   VUI uis = {};
   //assert (n1 <= n2);
   if (n1 > n2) {
-    throw KException("uiSeq: n1 greater than n2");
+    throw KException("uiSeq: n1 can't be greater than n2");
   }
 
   //assert (0 < ns);
@@ -248,7 +248,7 @@ char* newChars(unsigned int len) {
 double rescale(double x, double x0, double x1, double y0, double y1) {
   //assert((x0 < x1) || (x1 < x0));
   if (x1 == x0) {
-    throw KException("rescale: x1 is equal to x0");
+    throw KException("rescale: x1 can't be equal to x0");
   }
   const double f = (x - x0) / (x1 - x0);
   return y0 + (y1 - y0)*f;

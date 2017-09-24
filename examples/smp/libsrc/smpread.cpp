@@ -76,7 +76,7 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
     const bool opened = inStream.is_open();
     //assert (opened);
     if (!opened) {
-      throw KException("Could not open the input csv file.");
+      throw KException(string("Could not open the input csv file ") + fName);
     }
 
     string scenName = "";
@@ -98,11 +98,13 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
 
     //assert(scenName.length() <= Model::maxScenNameLen);
     if (scenName.length() > Model::maxScenNameLen) {
-      throw KException("Scenario name is too long.");
+      throw KException(string("Scenario name can't have more than ")
+        + std::to_string(Model::maxScenNameLen) + " chars");
     }
     //assert(scenDesc.length() <= Model::maxScenDescLen);
     if (scenDesc.length() > Model::maxScenDescLen) {
-      throw KException("Scenario description is too long.");
+      throw KException(string("Scenario description can't have more than ")
+        + std::to_string(Model::maxScenDescLen) + " chars");
     }
 
     LOG(INFO) << "Number of actors:" << numActor;
@@ -221,8 +223,9 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
 
             LOG(INFO) << KBase::getFormattedString("pos[%u, %u] =  %5.3f", i, d, dPos);
             if ((dPos < 0.0) || (+100.0 < dPos)) { // lower and upper limit
+                LOG(INFO) << "SMPModel::csvRead: Actor's position must be within [0.0,100.0]";
                 string err = KBase::getFormattedString(
-                  "SMPModel::readCSVStream: Out-of-bounds position for actor %u on dimension %u:  %f",
+                  "SMPModel::csvRead: Out-of-bounds position for actor %u on dimension %u:  %f",
                   i, d, dPos);
                 throw(KException(err));
             }
@@ -231,8 +234,9 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
             pos(i, d) = dPos;
 
             if ((dSal < 0.0) || (+100.0 < dSal)) { // lower and upper limit
+                LOG(INFO) << "SMPModel::csvRead: Error: Actor's salience must be within [0.0,100.0]";
                 string err = KBase::getFormattedString(
-                  "SMPModel::readCSVStream: Out-of-bounds salience for actor %u on dimension %u:  %f",
+                  "SMPModel::csvRead: Out-of-bounds salience for actor %u on dimension %u:  %f",
                   i, d, dSal);
                 throw(KException(err));
             }
@@ -240,6 +244,7 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
             salI = salI + dSal;
             LOG(INFO) << KBase::getFormattedString("sal[%u, %u] = %5.3f", i, d, dSal);
             if (+100.0 < salI) { // upper limit: no more than 100% of attention to all issues
+                LOG(INFO) << "SMPModel::csvRead: Error: Actor's total salience must not be more than 100%";
                 string err = KBase::getFormattedString(
                   "SMPModel::readCSVStream: Out-of-bounds total salience for actor %u:  %f",
                   i, salI);

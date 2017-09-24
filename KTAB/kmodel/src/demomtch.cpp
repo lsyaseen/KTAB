@@ -126,11 +126,11 @@ double MtchActor::posUtil(const Position * ap1) const  {
   const unsigned int n = vals.size();
   //assert(n == p1->numItm);
   if (n != p1->numItm) {
-    throw KException("MtchActor::posUtil: position count is inaccurate");
+    throw KException("MtchActor::posUtil: numItm in p1 is not equal to size of vals");
   }
   //assert(n == p1->match.size());
   if (n != p1->match.size()) {
-    throw KException("MtchActor::posUtil: position count is inaccurate");
+    throw KException("MtchActor::posUtil: size of match in p1 is not equal to size of vals");
   }
   double v = 0;
   for (unsigned int i = 0; i < n; i++){

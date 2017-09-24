@@ -22,7 +22,7 @@
 // -------------------------------------------------
 
 
-#include <assert.h>
+//#include <assert.h>
 
 #include "prng.h"
 

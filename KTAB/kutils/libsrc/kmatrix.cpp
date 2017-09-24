@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // -------------------------------------------------
 
-#include <assert.h>
+//#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -192,7 +192,7 @@ double  lCorr(const KMatrix & m1, const KMatrix & m2) {
 double  dot(const KMatrix & m1, const KMatrix & m2) {
     //assert(sameShape(m1, m2));
     if (!sameShape(m1, m2)) {
-      throw KException(": m1 and m2 matrices don't have same shapes");
+      throw KException("dot: m1 and m2 matrices don't have same shapes");
     }
     double s12 = 0;
     for (unsigned int i = 0; i < m1.numR(); i++) {
@@ -303,7 +303,7 @@ unsigned int KMatrix::nFromRC(const unsigned int r, const unsigned int c) const 
 void KMatrix::rcFromN(const unsigned int n, unsigned int & r, unsigned int &c) const {
     //assert(n < rows*clms);
     if (n >= rows*clms) {
-      throw KException("KMatrix::rcFromN: ");
+      throw KException("KMatrix::rcFromN: n must be less than total number of elements");
     }
     r = n / clms;
     c = n - (r*clms);
@@ -411,7 +411,10 @@ KMatrix operator* (const KMatrix & m1, const KMatrix & m2) {
 
 KMatrix KMatrix::map(function<double(unsigned int i, unsigned int j)> f, unsigned int nr, unsigned int nc) {
     //assert (f != nullptr);
-    auto m = KMatrix(nr, nc);
+  if (f == nullptr) {
+    throw KException("KMatrix::map: f is a null pointer");
+  }
+  auto m = KMatrix(nr, nc);
     for (unsigned int i = 0; i < nr; i++) {
         for (unsigned int j = 0; j < nc; j++) {
             m(i, j) = f(i, j);
@@ -569,7 +572,7 @@ KMatrix inv(const KMatrix & m) {
 KMatrix clip(const KMatrix & m, double xMin, double xMax) {
     //assert (xMin <= xMax);
     if (xMin > xMax) {
-      throw KException("clip: min is more than max");
+      throw KException("clip: xMin can not be more than xMax");
     }
     const unsigned int nr = m.numR();
     const unsigned int nc = m.numC();
@@ -654,7 +657,7 @@ KMatrix  joinV(const KMatrix & mT, const KMatrix & mB) {
 KMatrix rescaleRows(const KMatrix& m1, const double vMin, const double vMax) {
     //assert(vMin < vMax);
     if (vMin >= vMax) {
-      throw KException("rescaleRows: vMin is not less than vMax");
+      throw KException("rescaleRows: vMax can not be less than vMin");
     }
     const unsigned int nr = m1.numR();
     const unsigned int nc = m1.numC();

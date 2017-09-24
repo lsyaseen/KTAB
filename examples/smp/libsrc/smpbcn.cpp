@@ -624,12 +624,12 @@ void SMPState::updateBestBrgnPositions(int k) {
       throw KException("SMPState::updateBestBrgnPositions: Sum of cv is greater than 1");
     }
     //assert(0 < cv.numR());
-    if (0 >= cv.numR()) {
+    if (0 == cv.numR()) {
       throw KException("SMPState::updateBestBrgnPositions: cv doesn't have records");
     }
     //assert(1 == cv.numC());
     if (1 != cv.numC()) {
-      throw KException("SMPState::updateBestBrgnPositions: cv doesn't have only one column");
+      throw KException("SMPState::updateBestBrgnPositions: cv must be a column matrix");
     }
     auto ndxIJ = ndxMaxAbs(cv);
     unsigned int iMax = get<0>(ndxIJ);
@@ -643,7 +643,7 @@ void SMPState::updateBestBrgnPositions(int k) {
     BargainSMP * b = brgns[nk][nbj];
     //assert(nullptr != b);
     if (nullptr == b) {
-      throw KException("SMPState::updateBestBrgnPositions: bargain smp is null");
+      throw KException("SMPState::updateBestBrgnPositions: bargain smp pointer is null");
     }
     double uAvrg = 0.0;
 
@@ -659,8 +659,8 @@ void SMPState::updateBestBrgnPositions(int k) {
       uAvrg = 0.0;
       auto ndxInit = model->actrNdx(b->actInit);
       //assert((0 <= ndxInit) && (ndxInit < na)); // must find it
-      if ((0 > ndxInit) || (ndxInit >= na)) {
-        throw KException("SMPState::updateBestBrgnPositions This initiator actor is not listed in model");
+      if ((0 > ndxInit) || (ndxInit >= na)) { // must find it
+        throw KException("SMPState::updateBestBrgnPositions This initiator actor number is not present in model");
       }
       double uPosInit = ((SMPActor*)(model->actrs[nai]))->posUtil(&(b->posInit), this);
       uAvrg = uAvrg + uPosInit;
@@ -668,7 +668,7 @@ void SMPState::updateBestBrgnPositions(int k) {
       auto ndxRcvr = model->actrNdx(b->actRcvr);
       //assert((0 <= ndxRcvr) && (ndxRcvr < na)); // must find it
       if ((0 > ndxRcvr) || (ndxRcvr >= na)) {
-        throw KException("SMPState::updateBestBrgnPositions: This receiver actor is not listed in model");
+        throw KException("SMPState::updateBestBrgnPositions: This receiver actor number is not present in model");
       }
       double uPosRcvr = ((SMPActor*)(model->actrs[nai]))->posUtil(&(b->posRcvr), this);
       uAvrg = uAvrg + uPosRcvr;
@@ -717,7 +717,7 @@ void SMPState::updateBestBrgnPositions(int k) {
     auto p = Model::scalarPCE(na, nb, w, u_im, smod->vrCltn, smod->vpm, smod->pcem, ReportingLevel::Medium);
     //assert(nb == p.numR());
     if (nb != p.numR()) {
-      throw KException("SMPState::updateBestBrgnPositions: number of bargains mismatched with scalar PCE rows");
+      throw KException("SMPState::updateBestBrgnPositions: number of bargains mismatched with scalar PCE row count");
     }
     //assert(1 == p.numC());
     if (1 != p.numC()) {
@@ -740,7 +740,7 @@ void SMPState::updateBestBrgnPositions(int k) {
     // 0 <= mMax assured for uint
     //assert(mMax < nb);
     if (mMax >= nb) {
-      throw KException("SMPState::updateBestBrgnPositions: Bargain with max prob is greater than bargain count");
+      throw KException("SMPState::updateBestBrgnPositions: Bargain number with max probability can't be more than bargain count");
     }
     actorMaxBrgNdx.insert(map<unsigned int, unsigned int>::value_type(k, mMax));
     auto bkm = brgns[k][mMax];
@@ -810,7 +810,7 @@ void SMPState::updateBestBrgnPositions(int k) {
     }
     //assert(nullptr != pk);
     if (nullptr == pk) {
-      throw KException("SMPState::updateBestBrgnPositions: vector position for actor is null");
+      throw KException("SMPState::updateBestBrgnPositions: pk is null pointer");
     }
 
     // Make sure that the pk is stored at right position in s2.
@@ -839,21 +839,24 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
   const double euSQ = aUtil[h](k, i) + aUtil[h](k, j);
   //assert((0.0 <= euSQ) && (euSQ <= 2.0));
   if ((0.0 > euSQ) || (euSQ > 2.0)) {
-    throw KException("SMPState::probEduChlg: euSQ out of bound");
+    LOG(INFO) << "euSQ =" << euSQ;
+    throw KException("SMPState::probEduChlg: euSQ must be in the range [0.0, 2.0]");
   }
 
   // h's estimate of utility to k of i defeating j, so j adopts i's position
   const double uhkij = aUtil[h](k, i) + aUtil[h](k, i);
   //assert((0.0 <= uhkij) && (uhkij <= 2.0));
   if ((0.0 > uhkij) || (uhkij > 2.0)) {
-    throw KException("SMPState::probEduChlg: uhkij out of bound");
+    LOG(INFO) << "uhkij =" << uhkij;
+    throw KException("SMPState::probEduChlg: uhkij must be in the range [0.0, 2.0]");
   }
 
   // h's estimate of utility to k of j defeating i, so i adopts j's position
   const double uhkji = aUtil[h](k, j) + aUtil[h](k, j);
   //assert((0.0 <= uhkji) && (uhkji <= 2.0));
   if ((0.0 > uhkji) || (uhkji > 2.0)) {
-    throw KException("SMPState::probEduChlg: uhkji out of bound");
+    LOG(INFO) << "uhkji =" << uhkji;
+    throw KException("SMPState::probEduChlg: uhkji must be in the range [0.0, 2.0]");
   }
 
   auto ai = ((const SMPActor*)(model->actrs[i]));
@@ -863,7 +866,8 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
   double sj = KBase::sum(aj->vSal);
   //assert((0 < sj) && (sj <= 1));
   if ((0 >= sj) || (sj > 1)) {
-    throw KException("SMPState::probEduChlg: sj is out of bound");
+    LOG(INFO) << "sj =" << sj;
+    throw KException("SMPState::probEduChlg: sj must be in the range (0, 1]");
   }
   double cj = aj->sCap;
   const double minCltn = 1E-10;

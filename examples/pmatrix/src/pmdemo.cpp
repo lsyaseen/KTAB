@@ -132,7 +132,7 @@ void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, cons
   auto es1 = new PMatrixState(eKEM); // pre-allocates the pstns array
   //assert(eKEM->numAct == es1->pstns.size());
   if (eKEM->numAct != es1->pstns.size()) {
-    throw KException("runPMM line 161: inaccurate position count");
+    throw KException("runPMM: inaccurate position count in es1");
   }
 
   if (cpP) {
@@ -158,7 +158,7 @@ void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, cons
 
   //assert(eKEM->numAct == es1->pstns.size());
   if (eKEM->numAct != es1->pstns.size()) {
-    throw KException("runPMM line 161: inaccurate position count");
+    throw KException("runPMM: inaccurate position count in es1");
   }
   es1->setUENdx();
 

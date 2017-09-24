@@ -177,16 +177,16 @@ namespace ComSelLib {
     // TODO: change this to handle only unique positions
     //assert(actorSpPstnUtil->numR() == numAct);
     if (actorSpPstnUtil->numR() != numAct) {
-      throw KException("CSModel::oneCSPstnUtil: inaccurate number of rows in actorSpPstnUtil");
+      throw KException("CSModel::oneCSPstnUtil: Number of rows in actorSpPstnUtil should be equal to actor's count");
     }
     //assert(actorSpPstnUtil->numC() == numAct);
     if (actorSpPstnUtil->numC() != numAct) {
-      throw KException("CSModel::oneCSPstnUtil: inaccurate number of columns in actorSpPstnUtil");
+      throw KException("CSModel::oneCSPstnUtil: Number of columns in actorSpPstnUtil should be equal to actor's count");
     }
 
     //assert(numAct == vb.size()); // must be correct size
     if (numAct != vb.size()) { // must be correct size
-      throw KException("CSModel::oneCSPstnUtil: incorrect size of vb");
+      throw KException("CSModel::oneCSPstnUtil: Size of vb should be equla to actor's count");
     }
 
     // noncommittee members must have reduced strength, with same sign
@@ -227,8 +227,8 @@ namespace ComSelLib {
 
   void CSModel::setActorCSPstnUtil() {
     //assert(actorSpPstnUtil != nullptr); // prerequisite data must be provided
-    if (actorSpPstnUtil != nullptr) { // prerequisite data must be provided
-      throw KException("CSModel::setActorCSPstnUtil: actorSpPstnUtil must be a null pointer");
+    if (actorSpPstnUtil == nullptr) { // prerequisite data must be provided
+      throw KException("CSModel::setActorCSPstnUtil: actorSpPstnUtil must not be a null pointer");
     }
     //assert(actorCSPstnUtil == nullptr);
     if (actorCSPstnUtil != nullptr) {
@@ -245,7 +245,7 @@ namespace ComSelLib {
       const KMatrix euj = oneCSPstnUtil(vbj);
       //assert(numAct == euj.numR());
       if (numAct != euj.numR()) {
-        throw KException("CSModel::setActorCSPstnUtil: inaccurate number of rows in euj");
+        throw KException("CSModel::setActorCSPstnUtil: Number of rows in euj should be equal to actor's count");
       }
       //assert(1 == euj.numC());
       if (1 != euj.numC()) {
@@ -325,11 +325,11 @@ namespace ComSelLib {
     auto uMat = KMatrix::map(uufn, numA, numU);
     //assert(uMat.numR() == numA); // must include all actors
     if (uMat.numR() != numA) { // must include all actors
-      throw KException("CSState::pDist: inaccurate number of rows in uMat");
+      throw KException("CSState::pDist: Number of rows in uMat should be equal to actor's count");
     }
     //assert(uMat.numC() == numU);
     if (uMat.numC() != numU) {
-      throw KException("CSState::pDist: inaccurate number of columns in uMat");
+      throw KException("CSState::pDist: Number of columns in uMat should be equal to number of utilities");
     }
 
     // vote_k ( i : j )
@@ -348,7 +348,7 @@ namespace ComSelLib {
     const auto eu = uMat*p; // column
     //assert(numA == eu.numR());
     if (numA != eu.numR()) {
-      throw KException("CSState::pDist: inaccurate number of rows in eu");
+      throw KException("CSState::pDist: Number of rows in eu should be equal to actor's count");
     }
     //assert(1 == eu.numC());
     if (1 != eu.numC()) {
@@ -365,11 +365,11 @@ namespace ComSelLib {
     // BTW, be sure to lambda-bind uMat *after* it is modified.
     //assert(uMat.numR() == numA); // must include all actors
     if (uMat.numR() != numA) { // must include all actors
-      throw KException("CSState::expUtilMat: inaccurate number of rows in uMat");
+      throw KException("CSState::expUtilMat: Number of rows in uMat should be equal to actor's count");
     }
     //assert(uMat.numC() <= numP); // might have dropped some duplicates
     if (uMat.numC() > numP) { // might have dropped some duplicates
-      throw KException("CSState::expUtilMat: inaccurate number of columns in uMat");
+      throw KException("CSState::expUtilMat: Number of columns in uMat should be equal to numP");
     }
 
     auto assertRange = [](const KMatrix& m, unsigned int i, unsigned int j) {
@@ -412,7 +412,7 @@ namespace ComSelLib {
     const auto eu = uMat*p; // column
     //assert(numA == eu.numR());
     if (numA != eu.numR()) {
-      throw KException("CSState::expUtilMat: inaccurate number of rows in eu");
+      throw KException("CSState::expUtilMat: Number of rows in eu should be equal to actor's count");
     }
     //assert(1 == eu.numC());
     if (1 != eu.numC()) {
@@ -467,17 +467,17 @@ namespace ComSelLib {
     const unsigned int numA = model->numAct;
     //assert(numA == model->actrs.size());
     if (numA != model->actrs.size()) {
-      throw KException("CSState::doSUSN: inaccurate number of actor in model");
+      throw KException("CSState::doSUSN: Number of actors in model is not matching with actor's list size");
     }
 
     auto numU = ((const unsigned int)(uIndices.size()));
     //assert((0 < numU) && (numU <= numA));
-    if ((0 >= numU) || (numU > numA)) {
-      throw KException("CSState::doSUSN: inaccurate numU");
+    if ((0 == numU) || (numU > numA)) {
+      throw KException("CSState::doSUSN: numU can't be zero or more than actor's count");
     }
     //assert(numA == eIndices.size());
     if (numA != eIndices.size()) {
-      throw KException("CSState::doSUSN: inaccurate eIndices size");
+      throw KException("CSState::doSUSN: Size of eIndices should be equal to actor's count");
     }
 
     const KMatrix u = aUtil[0]; // all have same beliefs in this demo
@@ -639,7 +639,7 @@ namespace ComSelLib {
         const double euh = eu(h, 0);
         //assert(0 < euh);
         if (0 >= euh) {
-          throw KException("CSState::doSUSN: inaccurate euh");
+          throw KException("CSState::doSUSN: euh must be positive");
         }
         return euh;
       }; // end of efn

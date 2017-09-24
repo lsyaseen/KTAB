@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // --------------------------------------------
 
-#include <assert.h>
+//#include <assert.h>
 #include <easylogging++.h>
 #include <sstream>
 #include <algorithm>
@@ -558,7 +558,7 @@ void Model::sqlAUtil(unsigned int t)
 {
   //assert(t < history.size());
   if (t >= history.size()) {
-    throw KException("Model::sqlAUtil: Model ran for less number of turns.");
+    throw KException("Model::sqlAUtil: Specified turn number is beyond the size of history");
   }
   State* st = history[t];
   //assert(nullptr != st);
@@ -617,7 +617,7 @@ void Model::sqlPosEquiv(unsigned int t)
 {
   //assert(t < history.size());
   if (t >= history.size()) {
-    throw KException("Model::sqlPosEquiv: Model ran for less number of turns.");
+    throw KException("Model::sqlPosEquiv: Specified turn number is beyond the size of history");
   }
   State* st = history[t];
   //assert(nullptr != st);
@@ -778,7 +778,7 @@ void Model::LogInfoTables()
   // assert tests for all tables here at the start
   //assert(numAct == actrs.size());
   if (numAct != actrs.size()) {
-    throw KException("Model::LogInfoTables: Actor count mismatched");
+    throw KException("Model::LogInfoTables: Wrong Actor count");
   }
 
   // for efficiency sake, we'll do all tables in a single transaction
@@ -871,7 +871,7 @@ void Model::sqlPosProb(unsigned int t)
 {
   //assert(t < history.size());
   if (t >= history.size()) {
-    throw KException("Model::sqlPosProb: Model ran for less number of turns.");
+    throw KException("Model::sqlPosProb: Specified turn number is beyond the size of history");
   }
   State* st = history[t];
   // check module for null
@@ -922,7 +922,7 @@ void Model::sqlPosVote(unsigned int t)
 {
   //assert(t < history.size());
   if (t >= history.size()) {
-    throw KException("Model::sqlPosVote: Model ran for less number of turns.");
+    throw KException("Model::sqlPosVote: Specified turn number is beyond the size of history");
   }
   State* st = history[t];
 
@@ -1107,7 +1107,7 @@ bool Model::loginCredentials(string connString) {
   // for a non-sqlite db
   if (!dbDriver.compare("QPSQL")) {
     if (server.isEmpty()) {
-      LOG(INFO) << "Error! Please provide address for postgres server";
+      LOG(INFO) << "Error! No ip address provided for postgres server";
       //assert(false);
       //throw KException("Model::loginCredentials: No ip address provided for postgresql server");
       return false;

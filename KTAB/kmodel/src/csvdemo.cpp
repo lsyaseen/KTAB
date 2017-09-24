@@ -61,7 +61,7 @@ void pccCSV(const string) {
   inStream >> dummy >> numAct;
   //assert(KBase::Model::minNumActor <= numAct);
   if (KBase::Model::minNumActor > numAct) {
-    throw KException("pccCSV: inaccurate number of actors");
+    throw KException("pccCSV: Number of actors should be above a minimum value");
   }
 
   inStream.read_line();

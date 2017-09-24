@@ -135,19 +135,19 @@ tuple<KMatrix, unsigned int, KMatrix> viBSHe96(const KMatrix & M, const KMatrix 
   }
   //assert(n == M.numR());
   if (n != M.numR()) {
-    throw KException("viBSHe96: M matrix doesn't have n rows");
+    throw KException(string("viBSHe96: M matrix doesn't have ") + std::to_string(n) + " rows");
   }
   //assert(n == M.numC());
   if (n != M.numC()) {
-    throw KException("viBSHe96: M matrix doesn't have n column");
+    throw KException(string("viBSHe96: M matrix doesn't have ") + std::to_string(n) + " column");
   }
   //assert(n == u0.numR());
   if (n != u0.numR()) {
-    throw KException("viBSHe96: u0 matrix doesn't have n rows");
+    throw KException(string("viBSHe96: u0 matrix doesn't have ") + std::to_string(n) + " rows");
   }
   //assert(1 == u0.numC());
   if (1 != u0.numC()) {
-    throw KException("viBSHe96: u0 matrix doesn't have one column");
+    throw KException(string("viBSHe96: u0 matrix doesn't have ") + std::to_string(n) + " column");
   }
   //assert(eps > 0.0);
   if (eps <= 0.0) {
@@ -189,7 +189,7 @@ tuple<KMatrix, unsigned int, KMatrix> viBSHe96(const KMatrix & M, const KMatrix 
     iter++;
     //assert(iter < iMax);
     if (iter >= iMax) {
-      throw KException("viBSHe96: iteration number crossed the limit");
+      throw KException("viBSHe96: iteration number crossed the upper limit");
     }
     u1 = u2;
     e1 = e2;

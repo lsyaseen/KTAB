@@ -71,7 +71,7 @@ MtchPstn::~MtchPstn() {}
 void MtchPstn::print(ostream& os) const {
   //assert(numItm == match.size());
   if (numItm != match.size()) {
-    throw KException("MtchPstn::print: Size of matched positions is not correct");
+    throw KException("MtchPstn::print: Size of match is not correct");
   }
   os << "[MtchPstn ";
   for (auto m : match) {
@@ -267,7 +267,7 @@ tuple<MtchGene*, MtchGene*>  MtchGene::cross(const MtchGene * mg2, PRNG * rng) c
 bool MtchGene::equiv(const MtchGene * mg2) const {
   //assert((numItm == mg2->numItm) && (numCat == mg2->numCat));
   if ((numItm != mg2->numItm) || (numCat != mg2->numCat)) {
-    throw KException("MtchGene::equiv: Values not correct");
+    throw KException("MtchGene::equiv: Values of numItm and numCat not correct");
   }
   bool e = (*this == *mg2);
   return e;

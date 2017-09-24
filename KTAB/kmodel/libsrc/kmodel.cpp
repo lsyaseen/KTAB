@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // --------------------------------------------
 
-#include <assert.h>
+//#include <assert.h>
 #include <easylogging++.h>
 
 #include <time.h>
@@ -245,7 +245,7 @@ KMatrix Model::bigRfromProb(const KMatrix & p, BigRRange rr) {
   const double pTol = 1E-8;
   //assert(fabs(1 - KBase::sum(p)) < pTol);
   if (fabs(1 - KBase::sum(p)) >= pTol) {
-    throw KException("Model::bigRfromProb: sum of probs exceeds upper limit");
+    throw KException("Model::bigRfromProb: sum of probabilities can't be greater than 1");
   }
 
   function<double(unsigned int, unsigned int)> rfn = nullptr;
@@ -602,7 +602,7 @@ tuple<KMatrix, KMatrix> Model::probCE2(PCEModel pcm, VPModel vpm, const KMatrix 
   }
   //assert(1 == p.numC());
   if (1 != p.numC()) {
-    throw KException("Model::probCE2: number of columns is not 1");
+    throw KException("Model::probCE2: p must be a column vector");
   }
   //assert(fabs(sum(p) - 1.0) < pTol);
   if (fabs(sum(p) - 1.0) >= pTol) {
@@ -823,7 +823,7 @@ KMatrix Model::condPCE(const KMatrix & pv) {
     //assert(0 <= pi);
     //assert(pi <= 1);
     if (0 > pi || 1 < pi) {
-      throw KException("Model::condPCE: value of probability pi is out of bound.");
+      throw KException("Model::condPCE: value of probability pi must be within [0,1]");
     }
 
     p(i, 0) = pi; // probability that i beats all alternatives

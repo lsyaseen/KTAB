@@ -58,8 +58,9 @@ void State::clear() {
   aUtil = {}; // vector<KMatrix>();
   for (auto p : pstns) {
     //assert(nullptr != p);
-    if(nullptr != p)
+    if (nullptr != p) {
       delete p;
+    }
   }
   pstns = {}; // vector<Position*>();
   step = nullptr;
@@ -102,7 +103,7 @@ double State::posProb(unsigned int i, const VUI & unq, const KMatrix & pdt) cons
   }
   //assert(1 == pdt.numC());
   if (1 != pdt.numC()) {
-    throw KException("State::posProb: pdt matrix must have only one column");
+    throw KException("State::posProb: pdt matrix must be a column matrix");
   }
   //assert(k < pdt.numR());
   if (k >= pdt.numR()) {
@@ -110,7 +111,7 @@ double State::posProb(unsigned int i, const VUI & unq, const KMatrix & pdt) cons
   }
   //assert(nUnq == pdt.numR());
   if (nUnq != pdt.numR()) {
-    throw KException("State::posProb: nUnq should be equal to row count of pdt matrix");
+    throw KException("State::posProb: row count of pdt matrix should be equal to nUnq");
   }
   double pr = pdt(k, 0);
   return pr;
@@ -146,12 +147,12 @@ void State::setUENdx() {
   /// Looking only at the positions in this state, return a vector of indices of unique positions.
   //assert(0 == uIndices.size());
   if (0 != uIndices.size()) {
-    throw KException("State::setUENdx: uIndices not empty");
+    throw KException("State::setUENdx: uIndices must be empty");
   }
 
   //assert(0 == eIndices.size());
   if (0 != eIndices.size()) {
-    throw KException("State::setUENdx: eIndices not empty");
+    throw KException("State::setUENdx: eIndices must be empty");
   }
 
   // Note that we have to lambda-bind 'this'. Otherwise, we'd need a 'static' function
@@ -161,9 +162,15 @@ void State::setUENdx() {
   };
   const unsigned int na = model->numAct;
   //assert(Model::minNumActor <= na);
+  if (Model::minNumActor > na) {
+    throw KException(string("State::setUENdx: Number of actors can not be less than ")
+      + std::to_string(Model::minNumActor));
+  }
+
   //assert(na <= Model::maxNumActor);
-  if (Model::minNumActor > na || Model::maxNumActor < na) {
-    throw KException("State::setUENdx: Number of actors out of bound");
+  if (Model::maxNumActor < na) {
+    throw KException(string("State::setUENdx: Number of actors can not be more than")
+      + std::to_string(Model::maxNumActor));
   }
 
   auto ns = KBase::uiSeq(0, na - 1);
@@ -174,7 +181,7 @@ void State::setUENdx() {
   //assert(0 < nu);
   //assert(nu <= na);
   if (0 >= nu || nu > na) {
-    throw KException("State::setUENdx: Out of bound value of uIndices");
+    throw KException(string("State::setUENdx: size of uIndices must be in the range of (0,") + std::to_string(na) + "]");
   }
 
 
@@ -182,7 +189,7 @@ void State::setUENdx() {
   auto ne = ((const unsigned int)(eIndices.size()));
   //assert(na == ne);
   if (na != ne) {
-    throw KException("State::setUENdx: Count of actors not matching with the eIndices");
+    throw KException("State::setUENdx: Count of actors not matching with the size of eIndices");
   }
 
 
@@ -208,7 +215,7 @@ void State::setAUtil(int perspH, ReportingLevel rl) {
     //assert(0 <= perspH); // -2 not OK
     //assert(perspH < na);
     if (0 > perspH || perspH >= na) {
-      throw KException("State::setAUtil: Perspective of h out of bound");
+      throw KException(string("State::setAUtil: Perspective of h must be in the range of [0,") + std::to_string(na) + ")");
     }
 
     bool firstP = (0 == aUtil.size());
@@ -231,7 +238,7 @@ void State::setAUtil(int perspH, ReportingLevel rl) {
 void State::setOneAUtil(unsigned int perspH, ReportingLevel rl) {
   // TODO: make this non-dummy
   //assert(false);
-  throw KException("State::setOneAUtil: Execution shouldn't have come here");
+  throw KException("State::setOneAUtil: A dummy function");
   return;
 }
 

@@ -150,7 +150,7 @@ double waterMinProb(ReportingLevel rl, const KMatrix & p0) {
     //const unsigned int numP = 4;
     //assert(p0.numR() == numA);
     if (p0.numR() != numA) {
-      throw KException("waterMinProb: p0 should have numA number of rows");
+      throw KException("waterMinProb: Number of rows in p0 should be equal to number of actors");
     }
     //assert(p0.numC() == 1);
     if (p0.numC() != 1) {
@@ -477,7 +477,7 @@ void demoRMLP(PRNG* rng) {
     }
     //assert(initD.numR() == rmlp->numSpplyC);
     if (initD.numR() != rmlp->numSpplyC) {
-      throw KException("demoRMLP: inaccurate rows in initD");
+      throw KException("demoRMLP: Number of rows in initD should be equal to number of supply constraints");
     }
     pfn("Initial supply values: ", "%8.2f", initS);
     pfn("Initial demand values: ", "%8.2f", initD);

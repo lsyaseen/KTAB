@@ -22,7 +22,7 @@
 // --------------------------------------------
 
 
-#include <assert.h>
+//#include <assert.h>
 
 #include "hcsearch.h"
 #include "emodel.h"
@@ -79,7 +79,9 @@ template <class PT>
 PT EModel<PT>::nthOption(unsigned int i) const {
   //assert(i < theta.size());
   if (i >= theta.size()) {
-    throw KException("EModel<PT>::nthOption: no member in theta at index i");
+    string err = string("EModel<PT>::nthOption: Provided index ")
+      + std::to_string(i) + " is more than the size of theta";
+    throw KException(err);
   }
   return theta[i];
 }
@@ -210,11 +212,11 @@ bool EState<PT>::equivNdx(unsigned int i, unsigned int j) const {
   //assert (i < pstns.size());
   //assert (j < pstns.size());
   if (i >= pstns.size()) {
-    throw KException("EState<PT>::equivNdx: Invalid index of Initiator actor");
+    throw KException("EState<PT>::equivNdx: Provided index of init actor is more than total number of actors");
   }
 
   if (j >= pstns.size()) {
-    throw KException("EState<PT>::equivNdx: Invalid index of Receiver actor");
+    throw KException("EState<PT>::equivNdx: Provided index of receiver actor is more than total number of actors");
   }
 
   auto pi = (const EPosition<PT>*) (pstns[i]);
@@ -340,7 +342,7 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
   const unsigned int numU = uIndices.size();
   //assert((0 < numU) && (numU <= numA));
   if ((0 >= numU) || (numU > numA)) {
-    throw KException("EState<PT>::doSUSN: numU is not in valid range");
+    throw KException(string("EState<PT>::doSUSN: numU is not in valid range (0,") + std::to_string(numA) + "]");
   }
   //assert(numA == eIndices.size());
   if (numA != eIndices.size()) {
@@ -608,7 +610,7 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
   }
   //assert(numP == s2->pstns.size());
   if (numP != s2->pstns.size()) {
-    throw KException("EState<PT>::doSUSN: Number of positions is not matching with s2's positions");
+    throw KException("EState<PT>::doSUSN: Number of positions is not matching with s2's positions count");
   }
   //assert(numA == s2->model->numAct);
   if (numA != s2->model->numAct) {
@@ -690,7 +692,7 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
   const unsigned int numU = uIndices.size();
   //assert((0 < numU) && (numU <= numA));
   if ((0 >= numU) || (numU > numA)) {
-    throw KException("EState<PT>::doMCN: numU is not within range");
+    throw KException(string("EState<PT>::doMCN: numU is not in valid range (0,") + std::to_string(numA) + "]");
   }
   //assert(numA == eIndices.size());
   if (numA != eIndices.size()) {
@@ -852,7 +854,7 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
     }
     //assert (numUi == uMati.numC());uMati
     if (numUi != uMati.numC()) {
-      throw KException("EState<PT>::doMCN: uMati matrix has different count for columns");
+      throw KException("EState<PT>::doMCN: uMati matrix has wrong number of columns");
     }
     auto eui = ns->expUtilMat(rlNewEU, numA, numP, eMod->vpm, uMati); // col-vec
     double zi = dot(trans(w), eui);
@@ -1059,7 +1061,7 @@ KMatrix EState<PT>::expUtilMat  (KBase::ReportingLevel rl,
 {
   //assert (numA == numP); // one-to-one matching of actors and their positions
   if (numA != numP) { // one-to-one matching of actors and their positions
-    throw KException("EState<PT>::expUtilMat: actors and their positions should match one-to-one");
+    throw KException("EState<PT>::expUtilMat: count of actors and count of positions should match");
   }
 
   // BTW, be sure to lambda-bind uMat *after* it is modified.

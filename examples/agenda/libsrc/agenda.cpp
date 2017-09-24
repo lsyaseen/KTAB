@@ -258,7 +258,7 @@ vector<Agenda*> Agenda::agendaSet(PartitionRule pr, const VUI xs) {
   if (PartitionRule::FreePR == pr) {
     //assert(as.size() == numAgenda(n));
     if (as.size() != numAgenda(n)) {
-      throw KException("Agenda::agendaSet: inaccurate size of as");
+      throw KException("Agenda::agendaSet: inaccurate number of agendas");
     }
   }
   if ((2 <= n) && (PartitionRule::SeqPR == pr)) {
@@ -288,8 +288,8 @@ vector<Agenda*> Agenda::enumerateAgendas(unsigned int n, PartitionRule pr) {
   for (auto a : as1) {
     bool ok = a->balanced(pr);
     //assert(ok); // should be true by construction
-    if (!ok) {
-      throw KException("Agenda::enumerateAgendas: not balanced");
+    if (!ok) { // should be true by construction
+      throw KException("Agenda::enumerateAgendas: not balanced agenda");
     }
     if (ok) {
       as2.push_back(a);

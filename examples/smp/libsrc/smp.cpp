@@ -224,14 +224,20 @@ double SMPActor::posUtil(const Position * ap1, const SMPState* as) const {
     }
     double ri = as->aNRA(ai); //as->nra(ai, 0);
     //assert(0 <= ai);
+    if (0 > ai) {
+      throw KException("SMPActor::posUtil: ai must be non-negative");
+    }
     const VctrPstn actorIdeal = as->getIdeal(ai);
     const VctrPstn* p0 = &actorIdeal;
     //assert(nullptr != p0);
     if (nullptr == p0) {
-      throw KException("SMPActor::posUtil: Could not fetch actor's ideal");
+      throw KException("SMPActor::posUtil: p0 is null pointer");
     }
     auto p1 = ((const VctrPstn*)ap1);
     //assert(nullptr != p1);
+    if (nullptr == p1) {
+      throw KException("SMPActor::posUtil: p1 is a null pointer");
+    }
     double u1 = SMPModel::bvUtil((*p0) - (*p1), vSal, ri);
     return u1;
 }
@@ -246,7 +252,7 @@ void SMPActor::randomize(PRNG* rng, unsigned int numD) {
     vSal = (s * vSal) / sum(vSal);
     //assert(fabs(s - sum(vSal)) < 1E-4);
     if (fabs(s - sum(vSal)) > 1E-4) {
-      throw KException("Value of salience invalid");
+      throw KException("SMPActor::randomize: Value of salience invalid");
     }
 
     // Note that we randomly assign different voting rules
@@ -323,7 +329,7 @@ BargainSMP* SMPActor::interpolateBrgn(const SMPActor* ai, const SMPActor* aj,
                                       double prbI, double prbJ, InterVecBrgn ivb) {
     //assert((1 == posI->numC()) && (1 == posJ->numC()));
     if ((1 != posI->numC()) || (1 != posJ->numC())) {
-      throw KException("SMPActor::interpolateBrgn: position vectors don't have exactly one column");
+      throw KException("SMPActor::interpolateBrgn: position vectors posI and posJ must be column vectors");
     }
 
     unsigned int numD = posI->numR();
@@ -443,12 +449,15 @@ void SMPState::setAllAUtil(ReportingLevel rl) {
     // make sure prerequisities are at least somewhat setup
     //assert(na == eIndices.size());
     if (na != eIndices.size()) {
-      throw KException("SMPState::setAllAUtil: Count of actors not matching with the eIndices");
+      throw KException("SMPState::setAllAUtil: Count of actors not matching with the eIndices size");
     }
     //assert(0 < uIndices.size());
+    if (0 == uIndices.size()) {
+      throw KException("SMPState::setAllAUtil: uIndices can't be empty");
+    }
     //assert(uIndices.size() <= na);
-    if (0 >= uIndices.size() || uIndices.size() > na) {
-      throw KException("SMPState::setAllAUtil: Out of bound value of uIndices");
+    if (uIndices.size() > na) {
+      throw KException("SMPState::setAllAUtil: size of uIndices can't exceed the count of actors");
     }
 
     auto w_j = actrCaps();
@@ -492,7 +501,7 @@ void SMPState::setAllAUtil(ReportingLevel rl) {
     const double duTol = 1E-6;
     //assert(duTol < norm(rnUtil_ij - raUtil_ij)); // I've never seen it below 0.07
     if (duTol >= norm(rnUtil_ij - raUtil_ij)) { // I've never seen it below 0.07
-      throw KException("SMPState::setAllAUtil: Change in value vs utility out of valid range");
+      throw KException("SMPState::setAllAUtil: utility values not in valid range");
     }
 
 
@@ -611,12 +620,13 @@ double SMPState::aNRA(unsigned int i) const {
     const unsigned int nr = nra.numR();
     //assert(nr == model->numAct);
     if (nr != model->numAct) {
-      throw KException("SMPState::aNRA: row count is not equal to number of actors");
+      throw KException("SMPState::aNRA: row count of nra is not equal to number of actors");
     }
     //assert(i < nr);
-    //if (i >= nr) {
-      //throw KException("SMPState::aNRA: invalid row number");
-    //}
+    if (i >= nr) {
+      throw KException(string("SMPState::aNRA: row number ") + std::to_string(i)
+        + " must be less than " + std::to_string(nr));
+    }
     const double ri = nra(i, 0);
     return ri;
 }
@@ -670,11 +680,11 @@ bool SMPState::equivNdx(unsigned int i, unsigned int j) const {
     auto vpj = ((const VctrPstn *)(pstns[j]));
     //assert(vpi != nullptr);
     if (vpi == nullptr) {
-      throw KException("SMPState::equivNdx: Vector position of an init actor is null");
+      throw KException("SMPState::equivNdx: vpi is a null pointer");
     }
     //assert(vpj != nullptr);
     if (vpj == nullptr) {
-      throw KException("SMPState::equivNdx: Vector position of a receiver actor is null");
+      throw KException("SMPState::equivNdx: vpj is a null pointer");
     }
     double diff = norm((*vpi) - (*vpj));
     auto sm = ((const SMPModel*)model);
@@ -769,8 +779,8 @@ void SMPState::newIdeals() {
             }
             si = si + aij;
             //assert(si <= 1.0 + tol); // cannot be more than slightly above at any point
-            if (si > 1.0 + tol) {
-              throw KException("SMPState::newIdeals: si is not within expected limit");
+            if (si > 1.0 + tol) { // cannot be more than slightly above at any point
+              throw KException("SMPState::newIdeals: si is not within expected limit of 1.0");
             }
             auto pJ = posK(j);
             newIP = newIP + (aij * pJ);
@@ -779,6 +789,7 @@ void SMPState::newIdeals() {
             if (identP && (i == j)) {
                 //assert(fabs(aij - 1.0) < tol);
                 if (fabs(aij - 1.0) >= tol) {
+                  LOG(INFO) << "value of aij: " << aij;
                   throw KException("SMPState::newIdeals: aij is not within expected limit");
                 }
             }
@@ -796,13 +807,16 @@ void SMPState::newIdeals() {
         if (identP) {
             //assert(fabs(lagI) < tol);
             if (fabs(lagI) >= tol) {
+              LOG(INFO) << "value of lagI: " << lagI;
               throw KException("SMPState::newIdeals: lagI is not within acceptable limit");
             }
         }
         newIP = newIP + (lagI * ideals[i]);
         if (identP) {
             //assert(KBase::norm(newIP - pI) < tol);
-            if (KBase::norm(newIP - pI) >= tol) {
+            auto normP = KBase::norm(newIP - pI);
+            if (normP >= tol) {
+              LOG(INFO) << "Change in old and new positions= " << normP;
               throw KException("SMPState::newIdeals: Difference in old and new positions not within acceptable limit");
             }
         }
@@ -813,7 +827,9 @@ void SMPState::newIdeals() {
 
     if (identP) {
         //assert(posIdealDist() < tol);
-        if (posIdealDist() >= tol) {
+        auto posIdDist = posIdealDist();
+        if (posIdDist >= tol) {
+          LOG(INFO) << "position dist of ideals=" << posIdDist;
           throw KException("SMPState::newIdeals: position distribution of ideals not within acceptable limit");
         }
     }
@@ -835,7 +851,7 @@ void SMPState::idealsFromPstns(const vector<VctrPstn> &  ps) {
     const bool givenP = (na == ps.size());
     //assert(givenP || (0 == ps.size()));
     if (!givenP && (0 != ps.size())) {
-      throw KException("SMPState::idealsFromPstns: Count of positions are not matching the expectation");
+      throw KException("SMPState::idealsFromPstns: Count of positions must be either 0 or equal to number of actors");
     }
 
     ideals = {};
@@ -904,7 +920,7 @@ void SMPState::setAccomodate(double adjRate) {
     }
     //assert(adjRate <= 1.0);
     if (adjRate > 1.0) {
-      throw KException("SMPState::setAccomodate: adjRate must not be beyond 1.0");
+      throw KException("SMPState::setAccomodate: adjRate must not be more than 1.0");
     }
     const unsigned int na = model->numAct;
 
@@ -932,8 +948,8 @@ tuple< KMatrix, VUI> SMPState::pDist(int persp) const {
 
     auto uij = KMatrix(na, na); // full utility matrix, including duplicate columns
     //assert(na == aUtil.size()); // must have been filled in
-    if (na != aUtil.size()) {
-      throw KException("SMPState::pDist: Each actor should have a utility value");
+    if (na != aUtil.size()) { // must have been filled in
+      throw KException("SMPState::pDist: size of utility matrix must be equal to number of actors");
     }
     if ((0 <= persp) && (persp < na)) {
         uij = aUtil[persp];
@@ -953,8 +969,8 @@ tuple< KMatrix, VUI> SMPState::pDist(int persp) const {
     }
 
     //assert(0 < uIndices.size()); // should have been set with setUENdx();
-    if (0 >= uIndices.size()) {
-      throw KException("SMPState::pDist: uIndices should have been set with setUENdx");
+    if (0 == uIndices.size()) {
+      throw KException("SMPState::pDist: uIndices' size is zero. uIndices should have been set with setUENdx");
     }
     if (ReportingLevel::Silent < rl) {
         string logMsg = "Unique positions ";
@@ -1070,11 +1086,11 @@ double SMPModel::bvUtil(const  KMatrix & vd, const  KMatrix & vs, double R) {
 void SMPModel::sankeyOutput(string outputFile) const {
     //assert(numAct == actrs.size());
     if (numAct != actrs.size()) {
-      throw KException("SMPModel::sankeyOutput: actor count mismatch");
+      throw KException("SMPModel::sankeyOutput: actor count is in error");
     }
     //assert(numDim == dimName.size());
     if (numDim == dimName.size()) {
-      throw KException("SMPModel::sankeyOutput: dimension count mismatch");
+      throw KException("SMPModel::sankeyOutput: dimension count is in error");
     }
 
     // first prepare the header line
@@ -1114,7 +1130,7 @@ void SMPModel::sankeyOutput(string outputFile) const {
             }
             //assert(si <= 1.0);
             if (si > 1.0) {
-              throw KException("SMPModel::sankeyOutput: si must note be more than 1.0");
+              throw KException("SMPModel::sankeyOutput: si must not be more than 1.0");
             }
             double epi = ci * si;
             // increased precision since we divided by 100 when the saliences were import
@@ -1143,7 +1159,7 @@ void SMPModel::sankeyOutput(string outputFile) const {
                 auto vpit = (const VctrPstn*)pit;
                 //assert(numDim == vpit->numR());
                 if (numDim != vpit->numR()) {
-                  throw KException("SMPModel::sankeyOutput: vpit should have as many number of rows as the count of dimensions");
+                  throw KException("SMPModel::sankeyOutput: number of rows in vpit should be equal to the count of dimensions");
                 }
                 fprintf(f2, ",%5.2f", 100 * (*vpit)(k, 0)); // have to print "100.0" sometimes
             }
@@ -1336,11 +1352,11 @@ void SMPModel::sankeyOutput(string outputFile, string dbName, string scenarioId)
 void SMPModel::showVPHistory() const {
     //assert(numAct == actrs.size());
     if (numAct != actrs.size()) {
-      throw KException("SMPModel::showVPHistory: actor count mismatch");
+      throw KException("SMPModel::showVPHistory: actor count in error");
     }
     //assert(numDim == dimName.size());
     if (numDim != dimName.size()) {
-      throw KException("SMPModel::showVPHistory: dimension count mismatch");
+      throw KException("SMPModel::showVPHistory: dimension count in error");
     }
 
     // first need to get the group ID for this table
@@ -1362,7 +1378,7 @@ void SMPModel::showVPHistory() const {
     }
     //assert(grpID < sqlFlags.size());
     if (grpID >= sqlFlags.size()) {
-      throw KException("SMPModel::showVPHistory: invalid group id in sqlflags");
+      throw KException(string("SMPModel::showVPHistory: invalid group id in sqlflags: ") + std::to_string(grpID));
     }
 
     // JAH 20160801 only populate the table if this group is turned on
@@ -1396,7 +1412,7 @@ void SMPModel::showVPHistory() const {
                     auto vidl = sst->getIdeal(i);
                     //assert(1 == vpit->numC());
                     if (1 != vpit->numC()) {
-                      throw KException("SMPModel::showVPHistory: vpit matrix's column count must be only 1");
+                      throw KException("SMPModel::showVPHistory: vpit should be a column matrix");
                     }
                     //assert(numDim == vpit->numR());
                     if (numDim != vpit->numR()) {
@@ -1548,7 +1564,7 @@ string SMPModel::runModel(vector<bool> sqlFlags,
     // Supported files for input data: xml, csv
     size_t dotPos = inputDataFile.find_last_of(".");
     //assert(dotPos != string::npos); // A file name without extension
-    if (string::npos == dotPos) {
+    if (string::npos == dotPos) { // A file name without extension
       LOG(INFO) << "Error: Input file name without extension is invalid.";
       return "";
     }
@@ -1621,23 +1637,33 @@ string SMPModel::runModel(vector<bool> sqlFlags,
 
     displayModelParams(md0);
 
+    auto cleanup = [] {
+      md0->releaseDB();
+
+      delete md0;
+      md0 = nullptr;
+    };
+
     try {
       configExec(md0);
     }
     catch (KException &ke) {
       LOG(INFO) << ke.msg;
-      md0->releaseDB();
+      //md0->releaseDB();
 
-      delete md0;
-      md0 = nullptr;
+      //delete md0;
+      //md0 = nullptr;
+      cleanup();
       return "";
     }
     catch (std::exception &std_ex) {
       LOG(INFO) << std_ex.what();
+      cleanup();
       return "";
     }
     catch (...) {
       LOG(INFO) << "SMPModel::runModel: Unknown Exception Caught from configExec";
+      cleanup();
       return "";
     }
     md0->releaseDB();

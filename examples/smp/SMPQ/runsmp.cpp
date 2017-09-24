@@ -361,29 +361,44 @@ void MainWindow::runModel(QString conStr, QString fileName)
         //        printf("Using PRNG seed:  %020llu \n", seed);
         //        printf("Same seed in hex:   0x%016llX \n", seed);
 
-        if(savedAsXml==true)
-        {
-            //            currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
-            //                                                      (sqlFlags, dbFilePath.toStdString(),
-            //                                                       xmlPath.toStdString(),seed,false,parameters));
-            SMPLib::SMPModel::loginCredentials(connectDBString.toStdString());
-
-            currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
-                                                      (sqlFlags,
-                                                       xmlPath.toStdString(),seed,false,parameters));
+        QString inputDataFile;
+        if(savedAsXml==true) {
+            inputDataFile = xmlPath;
+        } else {
+            inputDataFile = csvPath;
         }
-        else
-        {
-            //            currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
-            //                                                      (sqlFlags, dbFilePath.toStdString(),
-            //                                                       csvPath.toStdString(),seed,false,parameters));
 
-            SMPLib::SMPModel::loginCredentials(connectDBString.toStdString());
+        bool isDbConnected = SMPLib::SMPModel::loginCredentials(connectDBString.toStdString());
 
-            currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
-                                                      (sqlFlags,
-                                                       csvPath.toStdString(),seed,false,parameters));
-        }
+        currentScenarioId = QString::fromStdString(SMPLib::SMPModel::runModel
+                                                  (sqlFlags,
+                                                   inputDataFile.toStdString(),seed,false,parameters));
+
+//        if(savedAsXml==true)
+//        {
+//            //            currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
+//            //                                                      (sqlFlags, dbFilePath.toStdString(),
+//            //                                                       xmlPath.toStdString(),seed,false,parameters));
+//            bool isDbConnected = SMPLib::SMPModel::loginCredentials(connectDBString.toStdString());
+
+//            //if()
+
+//            currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
+//                                                      (sqlFlags,
+//                                                       xmlPath.toStdString(),seed,false,parameters));
+//        }
+//        else
+//        {
+//            //            currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
+//            //                                                      (sqlFlags, dbFilePath.toStdString(),
+//            //                                                       csvPath.toStdString(),seed,false,parameters));
+
+//            SMPLib::SMPModel::loginCredentials(connectDBString.toStdString());
+
+//            currentScenarioId =QString::fromStdString(SMPLib::SMPModel::runModel
+//                                                      (sqlFlags,
+//                                                       csvPath.toStdString(),seed,false,parameters));
+//        }
 
         KBase::displayProgramEnd(sTime);
 

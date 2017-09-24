@@ -317,7 +317,7 @@ namespace DemoComSel {
 
       //assert(numA == css0->pstns.size()); // must be invariant
       if (numA != css0->pstns.size()) { // must be invariant
-        throw KException("LeonState::doSUSN: css position array size must be invariant");
+        throw KException("LeonState::doSUSN: css position array size must be equal to actor's count");
       }
     }
     

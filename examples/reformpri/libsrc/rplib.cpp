@@ -147,11 +147,11 @@ KMatrix RPState::expUtilMat(KBase::ReportingLevel rl,
   // BTW, be sure to lambda-bind uMat *after* it is modified.
   //assert(uMat.numR() == numA); // must include all actors
   if (uMat.numR() != numA) { // must include all actors
-    throw KException("KMatrix RPState::expUtilMat: inaccurate number of rows in uMat");
+    throw KException("KMatrix RPState::expUtilMat: Number of rows in uMat should be equal to actor's count");
   }
   //assert(uMat.numC() <= numP); // might have dropped some duplicates
   if (uMat.numC() > numP) { // might have dropped some duplicates
-    throw KException("KMatrix RPState::expUtilMat: inaccurate number of columns in uMat");
+    throw KException("KMatrix RPState::expUtilMat: Number of columns in uMat should be equal to num of positions");
   }
 
   auto assertRange = [](const KMatrix& m, unsigned int i, unsigned int j)
@@ -165,11 +165,11 @@ KMatrix RPState::expUtilMat(KBase::ReportingLevel rl,
     }
     //assert(0.0 <= mij + tol);
     if (0.0 > mij + tol) {
-      throw KException("KMatrix RPState::expUtilMat: mij is less than min value");
+      throw KException("KMatrix RPState::expUtilMat: mij should be slightly above 0.0");
     }
     //assert(mij <= 1.0 + tol);
     if (mij > 1.0 + tol) {
-      throw KException("KMatrix RPState::expUtilMat: mij is more than max value");
+      throw KException("KMatrix RPState::expUtilMat: mij should be slightly below 1.0");
     }
     return;
   };
@@ -197,7 +197,7 @@ KMatrix RPState::expUtilMat(KBase::ReportingLevel rl,
   const KMatrix eu = uMat*p; // column
   //assert(numA == eu.numR());
   if (numA != eu.numR()) {
-    throw KException("KMatrix RPState::expUtilMat: inaccurate number of rows in ");
+    throw KException("KMatrix RPState::expUtilMat: Number of rows in eu should be equal to actor's count");
   }
   //assert(1 == eu.numC());
   if (1 != eu.numC()) {
@@ -490,7 +490,7 @@ void RPModel::readXML(string fileName)
           gcEl->QueryDoubleText(&gci);
           //assert(0.0 < gci);
           if (0.0 >= gci) {
-            throw KException("RPModel::readXML: ");
+            throw KException("RPModel::readXML: gci must be positive");
           }
           govCost(0, ni) = gci;
           ni++;
@@ -573,7 +573,7 @@ void RPModel::readXML(string fileName)
           }
           //assert(ni == numIVS); // must have a value for each item
           if (ni != numIVS) { // must have a value for each item
-            throw KException("RPModel::readXML: must have a value for each item");
+            throw KException("RPModel::readXML: numIVS must have a value for each item");
           }
           addActor(ri);
           // move to the next, if any
@@ -725,11 +725,11 @@ void RPModel::configScen(unsigned int numA, const double aCap[], const KMatrix &
 
   //assert(numAct == actrs.size());
   if (numAct != actrs.size()) {
-    throw KException("RPModel::initScen1: ");
+    throw KException("RPModel::initScen1: Size of actrs should be equal to actor's count");
   }
   //assert(numA == numAct);
   if (numA != numAct) {
-    throw KException("RPModel::initScen1: ");
+    throw KException("RPModel::initScen1: numA should be equal to numAct");
   }
 
   prob = vector<double>();
@@ -747,11 +747,11 @@ void RPModel::configScen(unsigned int numA, const double aCap[], const KMatrix &
 double RPModel::utilActorPos(unsigned int ai, const VUI &pstn) const {
   //assert(ai < numAct);
   if (ai >= numAct) {
-    throw KException("RPModel::utilActorPos: actor index is out of range");
+    throw KException("RPModel::utilActorPos: actor index should be less than actor count");
   }
   //assert(numAct == actrs.size());
   if (numAct != actrs.size()) {
-    throw KException("RPModel::utilActorPos: inaccurate number of actors");
+    throw KException("RPModel::utilActorPos: Size of actrs should be equal to actor's count");
   }
   auto rai = ((const RPActor*)(actrs[ai]));
   const double pvMin = rai->posValMin;
@@ -932,7 +932,7 @@ RPState* RPState::doSUSN(ReportingLevel rl) const {
   const unsigned int numA = model->numAct;
   //assert(numA == rpMod->actrs.size());
   if (numA != rpMod->actrs.size()) {
-    throw KException("RPState::equivNdx: rpMod's actor size is inaccurate");
+    throw KException("RPState::equivNdx: Size of actrs vector should be equal to actor's count");
   }
   const unsigned int numU = uIndices.size();
   //assert((0 < numU) && (numU <= numA));
