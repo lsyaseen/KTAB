@@ -431,6 +431,7 @@ public:
   QSqlQuery getQuery();
 
   static void configLogger(string logFile);
+  static string getLastError();
 
 protected:
   //static string createTableSQL(unsigned int tn);
@@ -467,6 +468,8 @@ protected:
     const QString& userName,
     const QString& password);
   bool isDB(const QString& databaseName);
+
+  static string lastExceptionMsg;
 private:
   static KMatrix markovUniformPCE(const KMatrix & pv);
   //static KMatrix markovIncentivePCE(const KMatrix & pv);

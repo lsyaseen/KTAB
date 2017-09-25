@@ -203,7 +203,7 @@ int main(int ac, char **av) {
 
   bool checkCredentials = SMPLib::SMPModel::loginCredentials(connstr);
   if (!checkCredentials) { // Some error with input credentials
-    LOG(INFO) << "Error: Failed attempt to connect with the database";
+    LOG(INFO) << KBase::Model::getLastError();
     return -1;
   }
 
@@ -211,14 +211,25 @@ int main(int ac, char **av) {
   // goes wrong, we need not scroll back too far to find the
   // seed required to reproduce the bug.
   if (euSmpP) {
-    SMPLib::SMPModel::randomSMP(0, 0, randAccP, seed, sqlFlags);
+    try {
+      SMPLib::SMPModel::randomSMP(0, 0, randAccP, seed, sqlFlags);
+    }
+    catch (...) {
+      LOG(INFO) << "Exception caught in randomSMP. Check previous messages for error";
+    }
   }
   if (csvP) {
-    SMPLib::SMPModel::runModel(sqlFlags, inputCSV, seed, saveHist);
+    string scenid = SMPLib::SMPModel::runModel(sqlFlags, inputCSV, seed, saveHist);
+    if (scenid.empty()) {
+      LOG(INFO) << "Error: " << KBase::Model::getLastError();
+    }
     SMPLib::SMPModel::destroyModel();
   }
   if (xmlP) {
-    SMPLib::SMPModel::runModel(sqlFlags, inputXML, seed, saveHist);
+    string scenid = SMPLib::SMPModel::runModel(sqlFlags, inputXML, seed, saveHist);
+    if (scenid.empty()) {
+      LOG(INFO) << "Error: " << KBase::Model::getLastError();
+    }
     SMPLib::SMPModel::destroyModel();
   }
 

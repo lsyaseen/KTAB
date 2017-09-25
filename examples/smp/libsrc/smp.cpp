@@ -1565,7 +1565,8 @@ string SMPModel::runModel(vector<bool> sqlFlags,
     size_t dotPos = inputDataFile.find_last_of(".");
     //assert(dotPos != string::npos); // A file name without extension
     if (string::npos == dotPos) { // A file name without extension
-      LOG(INFO) << "Error: Input file name without extension is invalid.";
+      lastExceptionMsg = "Error: Input file name without extension is invalid.";
+      LOG(INFO) << lastExceptionMsg;
       return "";
     }
 
@@ -1578,7 +1579,8 @@ string SMPModel::runModel(vector<bool> sqlFlags,
     // Make sure the file extension is either csv or xml only
     //assert((fileExt == "csv") || (fileExt == "xml"));
     if((0 != fileExt.compare("csv")) && (0 != fileExt.compare("xml"))) {
-      LOG(INFO) << "Error: Only xml or csv files supported.";
+      lastExceptionMsg = "Error: Only xml or csv files supported.";
+      LOG(INFO) << lastExceptionMsg;
       return "";
     }
 
@@ -1587,15 +1589,24 @@ string SMPModel::runModel(vector<bool> sqlFlags,
         md0 = xmlRead(inputDataFile, sqlFlags);
       }
       catch (KException &ke) {
-        LOG(INFO) << ke.msg;
+        lastExceptionMsg = ke.msg;
+        LOG(INFO) << lastExceptionMsg;
         return "";
       }
       catch (std::exception &std_ex) {
-        LOG(INFO) << std_ex.what();
+        lastExceptionMsg = std_ex.what();
+        LOG(INFO) << lastExceptionMsg;
         return "";
       }
       catch (...) {
-        LOG(INFO) << "SMPModel::runModel: Unknown Exception Caught from xmlRead";
+        lastExceptionMsg = "SMPModel::runModel: Unknown Exception Caught from xmlRead";
+        LOG(INFO) << lastExceptionMsg;
+        return "";
+      }
+
+      if (nullptr == md0) {
+        lastExceptionMsg = "Model object couldn't be created in xmlRead";
+        LOG(INFO) << lastExceptionMsg;
         return "";
       }
 
@@ -1612,20 +1623,26 @@ string SMPModel::runModel(vector<bool> sqlFlags,
     else if (fileExt == "csv") {
       try {
         md0 = csvRead(inputDataFile, seed, sqlFlags);
-        if (nullptr == md0) {
-          return "";
-        }
       }
       catch (KException &ke) {
-        LOG(INFO) << ke.msg;
+        lastExceptionMsg = ke.msg;
+        LOG(INFO) << lastExceptionMsg;
         return "";
       }
       catch (std::exception &std_ex) {
-        LOG(INFO) << std_ex.what();
+        lastExceptionMsg = std_ex.what();
+        LOG(INFO) << lastExceptionMsg;
         return "";
       }
       catch (...) {
-        LOG(INFO) << "SMPModel::runModel: Unknown Exception Caught from csvRead";
+        lastExceptionMsg = "SMPModel::runModel: Unknown Exception Caught from csvRead";
+        LOG(INFO) << lastExceptionMsg;
+        return "";
+      }
+
+      if (nullptr == md0) {
+        lastExceptionMsg = "Model object couldn't be created in csvRead";
+        LOG(INFO) << lastExceptionMsg;
         return "";
       }
         //md0 = csvRead(inputDataFile, seed, sqlFlags);
@@ -1648,7 +1665,8 @@ string SMPModel::runModel(vector<bool> sqlFlags,
       configExec(md0);
     }
     catch (KException &ke) {
-      LOG(INFO) << ke.msg;
+      lastExceptionMsg = ke.msg;
+      LOG(INFO) << lastExceptionMsg;
       //md0->releaseDB();
 
       //delete md0;
@@ -1657,12 +1675,14 @@ string SMPModel::runModel(vector<bool> sqlFlags,
       return "";
     }
     catch (std::exception &std_ex) {
-      LOG(INFO) << std_ex.what();
+      lastExceptionMsg = std_ex.what();
+      LOG(INFO) << lastExceptionMsg;
       cleanup();
       return "";
     }
     catch (...) {
-      LOG(INFO) << "SMPModel::runModel: Unknown Exception Caught from configExec";
+      lastExceptionMsg = "SMPModel::runModel: Unknown Exception Caught from configExec";
+      LOG(INFO) << lastExceptionMsg;
       cleanup();
       return "";
     }

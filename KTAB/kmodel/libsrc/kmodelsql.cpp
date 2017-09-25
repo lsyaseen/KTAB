@@ -1057,10 +1057,12 @@ bool Model::loginCredentials(string connString) {
     }
     catch (const std::out_of_range& oor) {
       LOG(INFO) << "Error: Wrong connection string provided for DB!";
-      LOG(INFO) << "Parsing of connection string stopped at:" << key;
       LOG(INFO) << "Error:" << oor.what();
       //assert(false);
       //throw KException("Model::loginCredentials: Wrong connection string for DB");
+      string err = "Error in connection string for key: ";
+      err += key;
+      lastExceptionMsg = err;
       return false;
     }
 
@@ -1084,13 +1086,23 @@ bool Model::loginCredentials(string connString) {
       password = QString::fromStdString(value);
       break;
     default:
-      LOG(INFO) << "Error in input credentials format.";
+      lastExceptionMsg = "Error in input credentials format";
+      LOG(INFO) << lastExceptionMsg;
       return false;
     }
   }
 
-  if (dbDriver.isEmpty() || databaseName.isEmpty()) {
-    LOG(INFO) << "Error! Database type or database name can not be left blank.";
+  if (dbDriver.isEmpty()) {
+    lastExceptionMsg = "Error! Database driver name can not be left blank.";
+    LOG(INFO) << lastExceptionMsg;
+    //assert(false);
+    //throw KException("Model::loginCredentials: Database type or name is blank");
+    return false;
+  }
+
+  if (databaseName.isEmpty()) {
+    lastExceptionMsg = "Error! Database name can not be left blank.";
+    LOG(INFO) << lastExceptionMsg;
     //assert(false);
     //throw KException("Model::loginCredentials: Database type or name is blank");
     return false;
@@ -1098,7 +1110,8 @@ bool Model::loginCredentials(string connString) {
 
   // We use either Postgresql or SQLITE
   if (dbDriver.compare("QPSQL") && dbDriver.compare("QSQLITE")) {
-    LOG(INFO) << "Error! Wrong driver name. Supported Drivers: postgres(QPSQL), sqlite3(QSQLITE)";
+    lastExceptionMsg = "Error! Wrong driver name. Supported Drivers: postgres(QPSQL), sqlite3(QSQLITE)";
+    LOG(INFO) << lastExceptionMsg;
     //assert(false);
     //throw KException("Model::loginCredentials: Unsupported DB driver");
     return false;
@@ -1107,7 +1120,8 @@ bool Model::loginCredentials(string connString) {
   // for a non-sqlite db
   if (!dbDriver.compare("QPSQL")) {
     if (server.isEmpty()) {
-      LOG(INFO) << "Error! No ip address provided for postgres server";
+      lastExceptionMsg = "Error! No ip address provided for postgres server";
+      LOG(INFO) << lastExceptionMsg;
       //assert(false);
       //throw KException("Model::loginCredentials: No ip address provided for postgresql server");
       return false;

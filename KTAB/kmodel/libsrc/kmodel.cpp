@@ -40,7 +40,11 @@ using KBase::nameFromEnum;
 static std::mutex mtx_spce_log; // control access to log inside Model::scalarPCE
 
 // --------------------------------------------
+string Model::lastExceptionMsg = string();
 
+string Model::getLastError() {
+  return lastExceptionMsg;
+}
 
 // JAH 20160711 added seed 20160730 JAH added sql flags
 // BPW 2016-09-28 removed redundant PRNG input variable
