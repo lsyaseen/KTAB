@@ -1663,6 +1663,11 @@ string SMPModel::runModel(vector<bool> sqlFlags,
 
     try {
       configExec(md0);
+
+      md0->releaseDB();
+      if (saveHist) {
+        md0->sankeyOutput(fileName);
+      }
     }
     catch (KException &ke) {
       lastExceptionMsg = ke.msg;
@@ -1686,11 +1691,11 @@ string SMPModel::runModel(vector<bool> sqlFlags,
       cleanup();
       return "";
     }
-    md0->releaseDB();
-    if (saveHist)
-    {
-        md0->sankeyOutput(fileName);
-    }
+    //md0->releaseDB();
+    //if (saveHist)
+    //{
+    //    md0->sankeyOutput(fileName);
+    //}
     return md0->getScenarioID();
 }
 
