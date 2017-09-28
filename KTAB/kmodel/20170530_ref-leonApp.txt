@@ -4,7 +4,7 @@ Start time: Tue May 30 11:24:36 2017
 Given PRNG seed:  15455440707583219804 
 Using PRNG seed:  15455440707583219804 
 Same seed in hex:   0xD67CC16FE69C185C 
----------------------------------- 
+E---------------------------------- 
 Setting up with PRNG seed:  15455440707583219804 
 SQL Logging Flags  
 No scenario description provided to Model::Model 
