@@ -240,8 +240,9 @@ int main(int ac, char **av) {
     return 0;
   }
 
-  if (enumN < 1 || enumN > KBase::Model::maxNumActor) {
-    LOG(INFO) << "Error: value of enum should be in the range [ 1, " << KBase::Model::maxNumActor << "]";
+  auto maxNA = KBase::Model::maxNumActor;
+  if (enumN < 1 || enumN > maxNA) {
+    LOG(INFO) << "Error: value of enum should be in the range [ 1, " << maxNA << "]";
     LOG(INFO) << "Exiting the program";
     return -1;
   }
