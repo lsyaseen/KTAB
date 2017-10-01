@@ -225,10 +225,12 @@ int main(int ac, char **av) {
       }
       else if (strcmp(av[i], "--help") == 0) {
         run = false;
+        break;
       }
       else {
         run = false;
         printf("Unrecognized argument %s\n", av[i]);
+        break;
       }
     }
   }
@@ -236,6 +238,12 @@ int main(int ac, char **av) {
   if (!run) {
     showHelp();
     return 0;
+  }
+
+  if (enumN < 1 || enumN > KBase::Model::maxNumActor) {
+    LOG(INFO) << "Error: value of enum should be in the range [ 1, " << KBase::Model::maxNumActor << "]";
+    LOG(INFO) << "Exiting the program";
+    return -1;
   }
 
   PRNG * rng = new PRNG();
@@ -253,6 +261,9 @@ int main(int ac, char **av) {
       LOG(INFO) << ke.msg;
       return 0;
     }
+    catch (std::exception &ex) {
+      LOG(INFO) << "Exception from AgendaControl::demoCounting: " << ex.what();
+    }
     catch (...) {
       LOG(INFO) << "Unknown exception from AgendaControl::demoCounting";
     }
@@ -263,12 +274,24 @@ int main(int ac, char **av) {
   auto vals = KMatrix();
   auto caps = KMatrix();
 
-  if (true) {
-    AgendaControl::setupScenario0(numActor, numItems, vals, caps, rng);
+  try {
+    if (true) {
+      AgendaControl::setupScenario0(numActor, numItems, vals, caps, rng);
+    }
+    else {
+      AgendaControl::setupScenario1(numActor, numItems, vals, caps);
+    }
   }
-  else {
-    AgendaControl::setupScenario1(numActor, numItems, vals, caps);
+  catch (KException &ke) {
+    LOG(INFO) << ke.msg;
   }
+  catch (std::exception &stdex) {
+    LOG(INFO) << "Exception from AgendaControl::setupScenario0: " << stdex.what();
+  }
+  catch (...) {
+    LOG(INFO) << "Unknown exception from AgendaControl::setupScenario0()";
+  }
+
 
 
 

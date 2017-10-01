@@ -1,6 +1,6 @@
 DummyData_3Dim ,"Dummy scenario to test reading format",7,3,
 Actor,Description,Power,Pstn1,Sal1,Pstn2,Sal2,Pstn3,Sal3,
-SActor-00, Random Spatial Actor, 102.543, 75.79, 49.53,  6.37,  5.91, 70.45, 28.15,
+SActor-00, Random Spatial Actor, 102.543, 75.79, 49.53,  6.37,  105.91, 70.45, 28.15,
 SActor-01, Random Spatial Actor,  53.393, 82.72, 30.33, 73.50, 21.22, 64.00, 24.79,
 SActor-02, Random Spatial Actor, 129.643, 82.45, 48.47, 90.89, 13.55,  0.07, 34.62,
 SActor-03, Random Spatial Actor,  75.920, 62.52, 20.76, 50.82, 39.24, 62.33, 22.21,

@@ -1590,23 +1590,23 @@ string SMPModel::runModel(vector<bool> sqlFlags,
       }
       catch (KException &ke) {
         lastExceptionMsg = ke.msg;
-        LOG(INFO) << lastExceptionMsg;
+        //LOG(INFO) << lastExceptionMsg;
         return "";
       }
       catch (std::exception &std_ex) {
         lastExceptionMsg = std_ex.what();
-        LOG(INFO) << lastExceptionMsg;
+        //LOG(INFO) << lastExceptionMsg;
         return "";
       }
       catch (...) {
         lastExceptionMsg = "SMPModel::runModel: Unknown Exception Caught from xmlRead";
-        LOG(INFO) << lastExceptionMsg;
+        //LOG(INFO) << lastExceptionMsg;
         return "";
       }
 
       if (nullptr == md0) {
         lastExceptionMsg = "Model object couldn't be created in xmlRead";
-        LOG(INFO) << lastExceptionMsg;
+        //LOG(INFO) << lastExceptionMsg;
         return "";
       }
 
@@ -1626,17 +1626,17 @@ string SMPModel::runModel(vector<bool> sqlFlags,
       }
       catch (KException &ke) {
         lastExceptionMsg = ke.msg;
-        LOG(INFO) << lastExceptionMsg;
+        //LOG(INFO) << lastExceptionMsg;
         return "";
       }
       catch (std::exception &std_ex) {
         lastExceptionMsg = std_ex.what();
-        LOG(INFO) << lastExceptionMsg;
+        //LOG(INFO) << lastExceptionMsg;
         return "";
       }
       catch (...) {
         lastExceptionMsg = "SMPModel::runModel: Unknown Exception Caught from csvRead";
-        LOG(INFO) << lastExceptionMsg;
+        //LOG(INFO) << lastExceptionMsg;
         return "";
       }
 

@@ -257,6 +257,7 @@ void KMatrix::mPrintf(string fs, string msg) const {
 void KMatrix::vFillVec(unsigned int nr, unsigned int nc, double iv) {
     rows = nr;
     clms = nc;
+
     const unsigned int n = nr*nc;
     vals = {}; // 0-length vector
     vals.resize(n);

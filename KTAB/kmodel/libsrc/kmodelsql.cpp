@@ -1125,7 +1125,7 @@ bool Model::loginCredentials(string connString) {
     lastExceptionMsg = "Error! Wrong driver name. Supported Drivers: postgres(QPSQL), sqlite3(QSQLITE)";
     LOG(INFO) << lastExceptionMsg;
     //assert(false);
-    //throw KException("Model::loginCredentials: Unsupported DB driver");
+    //throw KException("Model::loginCredentials: Unsuplported DB driver");
     return false;
   }
 
