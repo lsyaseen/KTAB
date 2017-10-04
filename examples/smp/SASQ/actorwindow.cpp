@@ -600,7 +600,7 @@ void ActorFrame::addSpecClicked(bool bl)
                 {
                     str.append(procStr);
                     actorSpecsLHS.append(actorValue);
-//                    qDebug()<<actorSpecsLHS << " LHS";
+                    //                    qDebug()<<actorSpecsLHS << " LHS";
 
                     if(row >0 && row%2==0 && row < (sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount()))
                     {
@@ -623,7 +623,7 @@ void ActorFrame::addSpecClicked(bool bl)
                 if(!procStr.isEmpty())
                 {
                     actorSpecsLHS.append(actorValue);
-//                    qDebug()<<actorSpecsLHS << " LHS";
+                    //                    qDebug()<<actorSpecsLHS << " LHS";
                     str.append(procStr);
 
                     if(row >0 && row%2==0 && row < (sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount()))
@@ -647,7 +647,7 @@ void ActorFrame::addSpecClicked(bool bl)
                 if(!procStr.isEmpty())
                 {
                     actorSpecsLHS.append(actorValue);
-//                    qDebug()<<actorSpecsLHS << " LHS";
+                    //                    qDebug()<<actorSpecsLHS << " LHS";
                     str.append(procStr);
 
                     if(row >0 && row%2==0 && row < (sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount()))
@@ -672,7 +672,7 @@ void ActorFrame::addSpecClicked(bool bl)
                 if(!procStr.isEmpty())
                 {
                     actorSpecsLHS.append(actorValue);
-//                    qDebug()<<actorSpecsLHS << "LHS";
+                    //                    qDebug()<<actorSpecsLHS << "LHS";
                     str.append(procStr);
 
                     if(row >0 && row%2==0 && row < (sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount()))
@@ -725,20 +725,25 @@ void ActorFrame::addSpecClicked(bool bl)
                 str.clear();
             }
         }
+
+        int dimensionCount = (actorDataTableView->model()->columnCount()-3/2);
+
+        //getting the user specified salience values
+        QVector<QVector<QString>> salValues;
+
+        for(int indx = 0; indx < salIndex.length(); ++indx)
+        {
+            QVector<QString> sal;
+            sal.append(actorSpecsRHS.at(salIndex.at(indx)));
+            salValues.append(sal);
+        }
+
+        QVector <int> salValLenVec;
+        double salLimit;
+
         //validate sal against other dimensions
         if(salIndex.length()>1)
         {
-            QVector<QVector<QString>> salValues;
-
-            for(int indx = 0; indx < salIndex.length(); ++indx)
-            {
-                QVector<QString> sal;
-                sal.append(actorSpecsRHS.at(salIndex.at(indx)));
-                salValues.append(sal);
-            }
-
-            QVector <int> salValLenVec;
-            double salLimit;
             if(true==minDeltaMaxRadioButton->isChecked())
             {
                 int maxLen=0;
@@ -772,15 +777,25 @@ void ActorFrame::addSpecClicked(bool bl)
                         scaleSum=true;
                         for(int salIndex = 0; salIndex < salValues.length();++salIndex)
                         {
-                            if(salValues.at(salIndex).length()>salValIndex)
+                            if(salValues.length()==dimensionCount)// if salience for all dimensions are specified
                             {
-                                //                                qDebug() << salValues[salIndex][salValIndex] << "Before ";
+                                if(salValues.at(salIndex).length()>salValIndex)
+                                {
+                                    salValues[salIndex][salValIndex]=
+                                            QString::number((salValues[salIndex][salValIndex].toDouble()/salLimit)*100); // scaling the values to 100
+                                }
+                            }
+                            else // if salience is not specified for all dimensions
+                            {
+                                if(salValues.at(salIndex).length()>salValIndex)
+                                {
 
-                                salValues[salIndex][salValIndex]=
-                                        QString::number(salValues[salIndex][salValIndex].toDouble()/salLimit);
+                                    70 - (70 + 48 - 100);
+                                    //subtract values
 
-                                //                                qDebug() << salValues[salIndex][salValIndex] << "After ";
-                                //                                qDebug() << salIndex << salValIndex << "Indices ";
+                                    salValues[salIndex][salValIndex]=
+                                            QString::number((salValues[salIndex][salValIndex].toDouble()/salLimit)*100); // scaling the values to 100
+                                }
                             }
                         }
 
@@ -896,6 +911,107 @@ void ActorFrame::addSpecClicked(bool bl)
                 scaleSum=false;
             }
         }
+
+        //salience calculation against unspecied dimensions (partial)
+
+        //        else
+        //        {
+
+        //            //get salience values for unspecified saliences
+        //            QPair<QVector<double>, QVector<int> > salConstData;
+        //            // first - allSalienceData, second - salConstIndices
+        //            salConstData = getConstantSalienceValues();
+
+
+
+        //            for (int iSal=0; iSal < dimensionCount; ++iSal)
+        //            {
+        //                // get constant Sal values for all actors
+        //            }
+
+
+
+        //            //for spec other than mid delta max
+        //            for(int salValIndex = 0; salValIndex < salValues.at(0).length();++salValIndex)
+        //            {
+        //                salLimit = 0.0;
+        //                int salListIndex;
+        //                for(salListIndex = 0; salListIndex < salValues.length(); ++salListIndex)
+        //                {
+        //                    salLimit+= salValues.at(salListIndex).at(salValIndex).toDouble();
+        //                }
+
+
+        //                if(salValues.count()>=1 && salValues.count()<dimensionCount)
+        //                {
+
+
+
+        //                }
+
+
+
+        //                if(salLimit>100.0)
+        //                {
+        //                    scaleSum=true;
+        //                    for(int salIndex = 0; salIndex < salValues.length();++salIndex)
+        //                    {
+        //                        //                            qDebug() << salValues[salIndex][salValIndex] << "Before ";
+
+        //                        salValues[salIndex][salValIndex]=
+        //                                QString::number(salValues[salIndex][salValIndex].toDouble()/salLimit);
+
+        //                        //                            qDebug() << salValues[salIndex][salValIndex] << "After ";
+        //                        //                            qDebug() << salIndex << salValIndex << "Indices ";
+        //                    }
+
+        //                    for(int indx = 0; indx < salIndex.length(); ++indx)
+        //                    {
+        //                        actorSpecsRHS[salIndex[indx]]=salValues[indx];
+        //                    }
+        //                }
+
+        //                for(int i = 0 ; i < salIndex.length(); ++i)
+        //                {
+
+        //                    QStringList str = specList.at(salIndex.at(i)-(actorSpecsRHS.length()-specList.length())).split("=");
+        //                    QString newSpec = str.at(0);
+
+        //                    //                        qDebug()<<newSpec << "newSpec";
+        //                    newSpec.append("=(");
+        //                    for(int j =0 ; j < actorSpecsRHS.at(salIndex.at(i)).length(); ++j)
+        //                    {
+        //                        newSpec.append(actorSpecsRHS.at(salIndex.at(i)).at(j)).append(",");
+        //                    }
+        //                    newSpec.append("#").remove(",#").append(")");
+        //                    specList[salIndex.at(i)-(actorSpecsRHS.length()-specList.length())]=newSpec;
+
+        //                }
+
+        //                for(int i = 0 ; i < posIndex.length(); ++i)
+        //                {
+
+        //                    QStringList str = specList.at(posIndex.at(i)-(actorSpecsRHS.length()-specList.length())).split("=");
+        //                    QString newSpec = str.at(0);
+
+        //                    //                        qDebug()<<newSpec << "newSpec";
+        //                    newSpec.append("=(");
+        //                    for(int j =0 ; j < actorSpecsRHS.at(posIndex.at(i)).length(); ++j)
+        //                    {
+        //                        newSpec.append(actorSpecsRHS.at(posIndex.at(i)).at(j)).append(",");
+        //                    }
+        //                    newSpec.append("#").remove(",#").append(")");
+        //                    specList[posIndex.at(i)-(actorSpecsRHS.length()-specList.length())]=newSpec;
+
+        //                }
+        //            }
+
+
+        //        }
+
+
+        // final spec code
+
         for(int specIndx=0; specIndx < specList.length(); ++specIndx )
         {
             QStandardItem *item = new QStandardItem(specList.at(specIndx));
@@ -904,7 +1020,7 @@ void ActorFrame::addSpecClicked(bool bl)
             item->setEditable(false);
             specsListModel->setItem(specsListModel->rowCount(),item);
             specsListView->scrollToBottom();
-//            qDebug()<<specList.at(specIndx);
+            //            qDebug()<<specList.at(specIndx);
 
             emit actorAttributesAndSAS(specList.at(specIndx));
             emit specificationNew(specsListModel->item(specsListModel->rowCount()-1)->text(),specPairList.at(specIndx),1);//1 == Actor
@@ -1077,7 +1193,7 @@ bool ActorFrame::validateSalienceData()
 
                     QTableWidgetItem *item = new QTableWidgetItem(val);
                     sasDataGridTableWidget->setItem(row+2,j,item);
-//                    qDebug()<<"here";
+                    //                    qDebug()<<"here";
                 }
                 else
                 {
@@ -1087,6 +1203,40 @@ bool ActorFrame::validateSalienceData()
         }
     }
 }
+
+//salience calculation against unspecied dimensions (partial)
+//QPair<QVector<double>, QVector<int> > ActorFrame::getConstantSalienceValues()
+//{
+//    QPair<QVector<double>, QVector<int> > salConstData;
+//    QVector<double> salConstValues;
+//    QVector<int> salConstIndices;
+//    //salience rows start from 2
+//    for(int row = 2; row < (sasDataGridTableWidget->rowCount()-accomodationMatrixTableView->model()->rowCount()); row +=2)
+//    {
+//        double val = sasDataGridTableWidget->item(row,1)->text().toDouble(); // col is 1 always
+//        if(val>0.0)
+//        {
+//            salConstValues.append(sasDataGridTableWidget->item(row,1)->text().toDouble());
+
+//        }
+//        else
+//        {
+//            salConstValues.append(actorDataTableView->model()
+//                                  ->index(actorComboBox->currentIndex(),row).data().toString());
+//            //here row index of sas Datagrid is the column index of actorData table
+
+//            salConstIndices.append(row);
+
+//        }
+
+//    }
+//    salConstData.first.append(salConstValues);
+//    salConstData.second.append(salConstIndices);\
+
+//    return salConstData;
+
+
+//}
 
 //void ActorFrame::validateValues(QVector<double> values, int row)
 //{
@@ -1211,7 +1361,7 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
                         if(!procStr.isEmpty())
                         {
                             actorSpecsLHS.append(actorValue);
-//                            qDebug()<<actorSpecsLHS << " LHS";
+                            //                            qDebug()<<actorSpecsLHS << " LHS";
                             str.append(procStr);
 
                             if(row >0 && row%2==0 && row < (sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount()))
@@ -1234,7 +1384,7 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
                         if(!procStr.isEmpty())
                         {
                             actorSpecsLHS.append(actorValue);
-//                            qDebug()<<actorSpecsLHS << " LHS";
+                            //                            qDebug()<<actorSpecsLHS << " LHS";
                             str.append(procStr);
 
                             if(row >0 && row%2==0 && row < (sasDataGridTableWidget->rowCount()-actorDataTableView->model()->rowCount()))
@@ -1336,13 +1486,13 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
                             scaleSum=true;
                             for(int salIndex = 0; salIndex < salValues.length();++salIndex)
                             {
-//                                qDebug() << salValues[salIndex][salValIndex] << "Before ";
+                                //                                qDebug() << salValues[salIndex][salValIndex] << "Before ";
 
                                 salValues[salIndex][salValIndex]=
                                         QString::number(salValues[salIndex][salValIndex].toDouble()/salLimit);
 
-//                                qDebug() << salValues[salIndex][salValIndex] << "After ";
-//                                qDebug() << salIndex << salValIndex << "Indices ";
+                                //                                qDebug() << salValues[salIndex][salValIndex] << "After ";
+                                //                                qDebug() << salIndex << salValIndex << "Indices ";
                             }
 
                             for(int indx = 0; indx < salIndex.length(); ++indx)
@@ -1358,7 +1508,7 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
                             QStringList str = specList.at(salIndex.at(i)-(actorSpecsRHS.length()-specList.length())).split("=");
                             QString newSpec = str.at(0);
 
-//                            qDebug()<<newSpec << "newSpec";
+                            //                            qDebug()<<newSpec << "newSpec";
                             newSpec.append("=(");
                             for(int j =0 ; j < actorSpecsRHS.at(salIndex.at(i)).length(); ++j)
                             {
@@ -1375,7 +1525,7 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
                             QStringList str = specList.at(posIndex.at(i)-(actorSpecsRHS.length()-specList.length())).split("=");
                             QString newSpec = str.at(0);
 
-//                            qDebug()<<newSpec << "newSpec";
+                            //                            qDebug()<<newSpec << "newSpec";
                             newSpec.append("=(");
                             for(int j =0 ; j < actorSpecsRHS.at(posIndex.at(i)).length(); ++j)
                             {
@@ -1402,7 +1552,7 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
                     item->setEditable(false);
                     specsListModel->setItem(specsListModel->rowCount(),item);
                     specsListView->scrollToBottom();
-//                    qDebug()<<specList.at(specIndx);
+                    //                    qDebug()<<specList.at(specIndx);
 
                     emit actorAttributesAndSAS(specList.at(specIndx));
                     emit specificationNew(specsListModel->item(specsListModel->rowCount()-1)->text(),specPairList.at(specIndx),1);//1 == Actor
@@ -1412,7 +1562,6 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
         }
     }
 }
-
 
 void ActorFrame::displayMenuTableView(QPoint pos)
 {
@@ -1792,7 +1941,7 @@ QString ActorFrame::processMinDeltaMax(QVector<double> values, int row)
         if(!actorValues.isEmpty())
         {
             actorSpecsRHS.append(actorValues);
-//            qDebug()<<actorSpecsRHS <<"RHS";
+            //            qDebug()<<actorSpecsRHS <<"RHS";
         }
         processedString.remove(processedString.length()-1,1);
         //        qDebug()<<processedString;
@@ -1845,7 +1994,7 @@ QString ActorFrame::processBasePM(QVector<double> values, int row)
         }
     }
     actorSpecsRHS.append(actorValues);
-//    qDebug()<<actorSpecsRHS <<"RHS";
+    //    qDebug()<<actorSpecsRHS <<"RHS";
     return processedString;
 
 }
@@ -1891,7 +2040,7 @@ QString ActorFrame::processBasePMP(QVector<double> values, int row)
         }
     }
     actorSpecsRHS.append(actorValues);
-//    qDebug()<<actorSpecsRHS <<"RHS";
+    //    qDebug()<<actorSpecsRHS <<"RHS";
     return processedString;
 }
 
@@ -1931,7 +2080,7 @@ QString ActorFrame::processValuesN(QVector<double> values,int row)
     if(!actorValues.isEmpty())
     {
         actorSpecsRHS.append(actorValues);
-//        qDebug()<<actorSpecsRHS <<"RHS";
+        //        qDebug()<<actorSpecsRHS <<"RHS";
 
     }
     return processedString;

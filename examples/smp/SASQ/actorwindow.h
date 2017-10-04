@@ -102,6 +102,7 @@ private :
     void validateData();
     bool validateSalienceData();
 //    void validateValues(QVector<double> values, int row);
+   QPair<QVector<double>,QVector<int>> getConstantSalienceValues();
 
 
 public slots:
