@@ -643,6 +643,12 @@ private slots:
     void getTimeStamp(bool bl);
     void configUsingMenu(bool bl);
 
+    //Open external link
+private slots :
+    void openTutorial();
+    void openBrowser(bool);
+
+
 };
 
 
