@@ -13,5 +13,6 @@
         <file>images/close.png</file>
         <file>images/configdb.png</file>
         <file>images/regenerate.png</file>
+        <file>images/visualization.png</file>
     </qresource>
 </RCC>
