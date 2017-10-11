@@ -160,16 +160,16 @@ img {
 header {
   width: 300px;
     position: fixed;
-    overflow-y: scroll;
     float: left;
-    max-height: 500px;
+    height: 500px;
+	overflow: hidden;
     -webkit-font-smoothing: subpixel-antialiased;
 }
-/*
-header::-webkit-scrollbar { 
-    display: none; 
+
+header:hover  { 
+    overflow-y: scroll;
 }
-*/
+
 header ul {
   list-style:none;
   height:40px;
