@@ -162,7 +162,7 @@ header {
     position: fixed;
     overflow-y: scroll;
     float: left;
-    max-height: 800px;
+    max-height: 500px;
     -webkit-font-smoothing: subpixel-antialiased;
 }
 /*
