@@ -158,10 +158,16 @@ img {
 }
 
 header {
-  width:270px;
-  float:left;
-  position:fixed;
-  -webkit-font-smoothing:subpixel-antialiased;
+  width: 300px;
+    position: fixed;
+    overflow-y: scroll;
+    float: left;
+    max-height: 800px;
+    -webkit-font-smoothing: subpixel-antialiased;
+}
+
+header::-webkit-scrollbar { 
+    display: none; 
 }
 
 header ul {
