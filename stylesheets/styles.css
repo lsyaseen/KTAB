@@ -158,10 +158,16 @@ img {
 }
 
 header {
-  width:270px;
-  float:left;
-  position:fixed;
-  -webkit-font-smoothing:subpixel-antialiased;
+  width: 300px;
+    position: fixed;
+    float: left;
+    height: 500px;
+	overflow: hidden;
+    -webkit-font-smoothing: subpixel-antialiased;
+}
+
+header:hover  { 
+    overflow-y: scroll;
 }
 
 header ul {
