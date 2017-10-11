@@ -165,11 +165,11 @@ header {
     max-height: 800px;
     -webkit-font-smoothing: subpixel-antialiased;
 }
-
+/*
 header::-webkit-scrollbar { 
     display: none; 
 }
-
+*/
 header ul {
   list-style:none;
   height:40px;
