@@ -69,7 +69,6 @@ MtchPstn::MtchPstn() : Position()  {
 MtchPstn::~MtchPstn() {}
 
 void MtchPstn::print(ostream& os) const {
-  //assert(numItm == match.size());
   if (numItm != match.size()) {
     throw KException("MtchPstn::print: Size of match is not correct");
   }
@@ -82,7 +81,6 @@ void MtchPstn::print(ostream& os) const {
 }
 
 vector< MtchPstn > MtchPstn::neighbors(unsigned int nVar) const {
-  //assert(0 < nVar);
   if (0 >= nVar) {
     throw KException("MtchPstn::neighbors: nVar must be positive");
   }
@@ -157,11 +155,9 @@ vector< MtchPstn > MtchPstn::neighbors(unsigned int nVar) const {
 // numI: the number of items (sweets)
 // match: this particular gene, from {0 ... numCat-1}^numItm
 MtchGene::MtchGene() : MtchPstn() {
-  //assert(0 == numCat);
   if (0 != numCat) {
     throw KException("MtchGene::MtchGene: numCat should be zero");
   }
-  //assert(0 == numItm);
   if (0 != numItm) {
     throw KException("MtchGene::MtchGene: numItm should be zero");
   }
@@ -174,7 +170,6 @@ MtchGene::~MtchGene() {};
 
 
 void MtchGene::print(ostream& os) const {
-  //assert(numItm == match.size());
   if (0 != numCat) {
     throw KException("MtchGene::MtchGene: numCat should be zero");
   }
@@ -187,11 +182,9 @@ void MtchGene::print(ostream& os) const {
 }
 
 void MtchGene::randomize(PRNG* rng) {
-  //assert(0 < numCat);
   if (0 >= numCat) {
     throw KException("MtchGene::randomize: numCat should be positive");
   }
-  //assert(0 < numItm);
   if (0 >= numItm) {
     throw KException("MtchGene::randomize: numItm should be positive");
   }
@@ -204,15 +197,12 @@ void MtchGene::randomize(PRNG* rng) {
 }
 
 void  MtchGene::copySelf(MtchGene* mg2) const {
-  //assert(0 < numCat);
   if (0 >= numCat) {
     throw KException("MtchGene::copySelf: numCat should be positive");
   }
-  //assert(0 < numItm);
   if (0 >= numItm) {
     throw KException("MtchGene::copySelf: numItm should be positive");
   }
-  //assert(numItm == match.size());
   if (numItm != match.size()) {
     throw KException("MtchGene::copySelf: numItm should be equal to match's size");
   }
@@ -265,7 +255,6 @@ tuple<MtchGene*, MtchGene*>  MtchGene::cross(const MtchGene * mg2, PRNG * rng) c
 
 
 bool MtchGene::equiv(const MtchGene * mg2) const {
-  //assert((numItm == mg2->numItm) && (numCat == mg2->numCat));
   if ((numItm != mg2->numItm) || (numCat != mg2->numCat)) {
     throw KException("MtchGene::equiv: Values of numItm and numCat not correct");
   }

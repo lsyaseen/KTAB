@@ -50,7 +50,6 @@ using std::get;
 vector<VUI> scanAllPossiblePositions(const RPModel * rpm) {
   unsigned int numA = rpm->numAct;
   unsigned int numRefItem = rpm->numItm;
-  //assert(numRefItem == rpm->numCat);
   if (numRefItem != rpm->numCat) {
     throw KException("scanAllPossiblePositions: Number of ref item should be equal to number of categories in rpm");
   }
@@ -71,7 +70,6 @@ vector<VUI> scanAllPossiblePositions(const RPModel * rpm) {
   LOG(INFO) << "Effective gov cost of items:";
   (rpm->govCost).mPrintf("%.3f ");
   LOG(INFO) << "Government budget: " << rpm->govBudget;
-  //assert(0 < rpm->govBudget);
   if (0 >= rpm->govBudget) {
     throw KException("scanAllPossiblePositions: govBudget must be positive");
   }
@@ -133,11 +131,9 @@ vector<VUI> scanAllPossiblePositions(const RPModel * rpm) {
         pvMax = rij;
       }
     }
-    //assert(0 <= pvMin);
     if (0 > pvMin) {
       throw KException("scanAllPossiblePositions: pvMin must be non-negative");
     }
-    //assert(pvMin < pvMax);
     if (pvMin >= pvMax) {
       throw KException("scanAllPossiblePositions: pvMin must be less than pvMax");
     }
@@ -192,7 +188,6 @@ vector<VUI> scanAllPossiblePositions(const RPModel * rpm) {
 
   LOG(INFO) << "Computing zeta ... ";
   KMatrix zeta = aCap * uij;
-  //assert((1 == zeta.numR()) && (numPos == zeta.numC()));
   if ((1 != zeta.numR()) || (numPos != zeta.numC())) {
     throw KException("scanAllPossiblePositions: zeta must be a row vector with numPos number of columns");
   }
@@ -445,8 +440,6 @@ int main(int ac, char **av) {
 
     default:
       LOG(INFO) << "Unrecognized scenario number" << sNum;
-      //assert(false);
-      //break;
       return -1;
     }
   }
@@ -462,18 +455,15 @@ int main(int ac, char **av) {
   // NOTE WELL: Records each actor's most self-interested position, but does not set them.
   // Further, it appends Central Position after the last actor position
   auto siPstns = RfrmPri::scanAllPossiblePositions(rpm);
-  //assert(numA + 1 == siPstns.size());
   if (numA + 1 != siPstns.size()) {
     LOG(INFO) << "main: inaccurate size of siPstns";
     return -1;
   }
   const KBase::VUI bestPerm = siPstns[numA];
-  //assert(numR == bestPerm.size());
   if (numR != bestPerm.size()) {
     LOG(INFO) << "main: inaccurate size of bestPerm";
     return -1;
   }
-  //assert(numA == rps0->pstns.size()); // pre-allocated by constructor, all nullptr's
   if (numA != rps0->pstns.size()) { // pre-allocated by constructor, all nullptr's
     LOG(INFO) << "main: inaccurate positions count in rps0";
     return -1;
@@ -493,7 +483,6 @@ int main(int ac, char **av) {
     }
     rps0->pstns[i] = pi;
   }
-  //assert(numA == rps0->pstns.size());
   if (numA != rps0->pstns.size()) {
     LOG(INFO) << "main: inaccurate positions count in rps0";
     return -1;

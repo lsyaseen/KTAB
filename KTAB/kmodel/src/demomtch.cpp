@@ -124,11 +124,9 @@ double MtchActor::vote(const Position * ap1, const Position * ap2) const {
 double MtchActor::posUtil(const Position * ap1) const  {
   auto p1 = ((const MtchPstn *)(ap1));
   const unsigned int n = vals.size();
-  //assert(n == p1->numItm);
   if (n != p1->numItm) {
     throw KException("MtchActor::posUtil: numItm in p1 is not equal to size of vals");
   }
-  //assert(n == p1->match.size());
   if (n != p1->match.size()) {
     throw KException("MtchActor::posUtil: size of match in p1 is not equal to size of vals");
   }
@@ -138,11 +136,9 @@ double MtchActor::posUtil(const Position * ap1) const  {
       v = v + vals[i];
     }
   }
-  //assert(0 <= v);
   if (0 > v) {
     throw KException("MtchActor::posUtil: v must be non-negative");
   }
-  //assert(v <= 1);
   if (1 < v) {
     throw KException("MtchActor::posUtil: v must not be greater than 1");
   }
@@ -228,7 +224,6 @@ tuple <KMatrix, VUI> MtchState::pDist(int persp) const {
   }
   else {
     LOG(INFO) << "MtchState::pDist: unrecognized perspective, " << persp ;
-    //assert(false);
     throw KException("MtchState::pDist: unrecognized perspective");
   }
   auto pd = Model::scalarPCE(na, na, w, uij, vr, vpm, pcem, rl);
@@ -243,7 +238,6 @@ tuple <KMatrix, VUI> MtchState::pDist(int persp) const {
 
 
 bool MtchState::equivNdx(unsigned int i, unsigned int j) const {
-  //assert (false); // TODO: finish this stub
   // TODO: finish this stub
   throw KException("MtchState::equivNdx: TODO: finish this stub");
   return false;
@@ -295,7 +289,6 @@ MtchModel* MtchModel::randomMS(unsigned int numA, unsigned int numI, VotingRule 
   auto st0 = new MtchState(md0);
   // pre-allocated by constructor, all nullptr's
   // However, there are no actors yet, so it is pre-allocated to zero items.
-  //assert(0 == st0->pstns.size()); 
   if (0 != st0->pstns.size()) {
     throw KException("MtchModel::randomMS: pstns vector should be preallocated with zero items");
   }
@@ -318,7 +311,6 @@ MtchModel* MtchModel::randomMS(unsigned int numA, unsigned int numI, VotingRule 
     showMtchPstn(*pi);
     LOG(INFO) << " " ; // force blank lines
   }
-  //assert(numA == st0->pstns.size()); // now they shouuld match
   if (numA != st0->pstns.size()) { // now they shouuld match
     throw KException("MtchModel::randomMS: pstns vector size should be equal to number of actors");
   }
@@ -462,11 +454,9 @@ void demoMaxSupport(uint64_t s) {
 
   const double minCap = 100;
   const double maxCap = 225;
-  //assert(2 * maxCap <= 5 * minCap);
   if (2 * maxCap > 5 * minCap) {
     throw KException("demoMaxSupport: 1. minCap and maxCap are inaccurate");
   }
-  //assert(2 * maxCap + minCap >= 4 * minCap);
   if (2 * maxCap + minCap < 4 * minCap) {
     throw KException("demoMaxSupport: 2. minCap and maxCap are inaccurate");
   }
@@ -553,11 +543,9 @@ void demoMaxSupport(uint64_t s) {
   };
 
   gOpt->eval = [numC, numI, as, zeta](const MtchGene* mg) {
-    //assert(numC == mg->numCat);
     if (numC != mg->numCat) {
       throw KException("demoMaxSupport: numC must be equal to numCat of mg");
     }
-    //assert(numI == mg->numItm);
     if (numI != mg->numItm) {
       throw KException("demoMaxSupport: numI must be equal to numItm of mg");
     }
@@ -667,15 +655,12 @@ void demoMtchSUSN(uint64_t s) {
   auto a0 = ((MtchActor*)(md0->actrs[0]));
   auto p00 = ((MtchPstn*)(st0->pstns[0]));
 
-  //assert(numI == p00->numItm);
   if (numI != p00->numItm) {
     throw KException("demoMtchSUSN: numI must be equal to numItm of p00");
   }
-  //assert(numA == md0->numAct);
   if (numA != md0->numAct) {
     throw KException("demoMtchSUSN: numA must be equal to numAct of md0");
   }
-  //assert(numC == p00->numCat);
   if (numC != p00->numCat) {
     throw KException("demoMtchSUSN: numC must be equal to numCat of p00");
   }
@@ -750,15 +735,12 @@ bool oneMtchSUSN(uint64_t s) {
   auto a0 = ((MtchActor*)(md0->actrs[0]));
   auto p00 = ((MtchPstn*)(st0->pstns[0]));
 
-  //assert(numI == p00->numItm);
   if (numI != p00->numItm) {
     throw KException("oneMtchSUSN: numI must be equal to numItm of p00");
   }
-  //assert(numA == md0->numAct);
   if (numA != md0->numAct) {
     throw KException("oneMtchSUSN: numA must be equal to numAct of md0");
   }
-  //assert(numC == p00->numCat);
   if (numC != p00->numCat) {
     throw KException("oneMtchSUSN: numC must be equal to numCat of p00");
   }
@@ -983,7 +965,6 @@ MtchState * MtchState::doSUSN(ReportingLevel rl) const {
   const unsigned int numA = model->numAct;
 
   MtchState * s2 = new MtchState(model);
-  //assert(numA == s2->pstns.size()); // pre-allocated by constructor, all nullptr's
   if (numA != s2->pstns.size()) { // pre-allocated by constructor, all nullptr's
     throw KException("doSUSN: pstns vector should be pre-allocated with all nullptr");
   }
@@ -1065,7 +1046,6 @@ MtchState * MtchState::stepBCN() {
 
 MtchState * MtchState::doBCN(ReportingLevel rl) const  {
   MtchState * s2 = nullptr;
-  //assert(false);
   throw KException("MtchState::doBCN: dummy method");
   return s2;
 }

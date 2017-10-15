@@ -59,7 +59,6 @@ PMatrixModel* pmmCreation(uint64_t sd) {
   auto uMat = KMatrix::uniform(rng, numAct, numOpt, 0.0, 1.0);
   pmm->setWeights(wMat);
   pmm->setPMatrix(uMat);
-  //assert(numOpt == pmm->numOptions());
   if (numOpt != pmm->numOptions()) {
     throw KException("pmmCreation: inaccurate number of options in pmm");
   }
@@ -105,7 +104,6 @@ void PMatrixModel::setPMatrix(const KMatrix & pm0) {
   const unsigned int nr = pm0.numR();
   const unsigned int nc = pm0.numC();
   if (0 < numAct) {
-    //assert(nr == numAct);
     if (nr != numAct) {
       throw KException("PMatrixModel::setPMatrix: Number of rows in pm0 should be equal to actor's count");
     }
@@ -115,7 +113,6 @@ void PMatrixModel::setPMatrix(const KMatrix & pm0) {
   }
 
   if (0 < numOptions()) {
-    //assert(nc == numOptions());
     if (nc != numOptions()) {
       throw KException("PMatrixModel::setPMatrix: inaccurate number of columns in pm0");
     }
@@ -127,26 +124,21 @@ void PMatrixModel::setPMatrix(const KMatrix & pm0) {
     }
   }
 
-  //assert(minNumActor <= numAct);
   if (minNumActor > numAct) {
     throw KException("PMatrixModel::setPMatrix: count of actors should not be below minimum value");
   }
-  //assert(numAct <= maxNumActor);
   if (numAct > maxNumActor) {
     throw KException("PMatrixModel::setPMatrix: count of actors should not be above maximum value");
   }
 
-  //assert(minNumOptions <= numOptions());
   if (minNumOptions > numOptions()) {
     throw KException("PMatrixModel::setPMatrix: inaccurate number of options");
   }
 
   for (auto u : pm0) {
-    //assert(0.0 <= u);
     if (0.0 > u) {
       throw KException("PMatrixModel::setPMatrix: u must be non-negative");
     }
-    //assert(u <= 1.0);
     if (u > 1.0) {
       throw KException("PMatrixModel::setPMatrix: u must not be greater than 1.0");
     }
@@ -163,13 +155,11 @@ void PMatrixModel::setWeights(const KMatrix & w0) {
   const unsigned int nr = w0.numR();
   const unsigned int nc = w0.numC();
 
-  //assert(1 == nr);
   if (1 != nr) {
     throw KException("PMatrixModel::setWeights: w0 must be a row vector");
   }
 
   if (0 < numAct) {
-    //assert(nc == numAct);
     if (nc != numAct) {
       throw KException("PMatrixModel::setWeights: inaccurate number of columns in w0");
     }
@@ -179,16 +169,13 @@ void PMatrixModel::setWeights(const KMatrix & w0) {
   }
 
   for (auto w : w0) {
-    //assert(0.0 <= w);
     if (0.0 > w) {
       throw KException("PMatrixModel::setWeights: w must be non-negative");
     }
   }
-  //assert(minNumActor <= numAct);
   if (minNumActor > numAct) {
     throw KException("PMatrixModel::setWeights: actor count must not be less than min allowed value");
   }
-  //assert(numAct <= maxNumActor);
   if (numAct > maxNumActor) {
     throw KException("PMatrixModel::setWeights: actor count must not be more than max allowed value");
   }
@@ -203,23 +190,18 @@ void PMatrixModel::setActors(vector<string> names, vector<string> descriptions) 
   const unsigned int na = numAct;
   numAct = 0;
 
-  //assert(0 < na);
   if (0 >= na) {
     throw KException("PMatrixModel::setActors: na must be positive");
   }
-  //assert(na == names.size());
   if (na != names.size()) {
     throw KException("PMatrixModel::setActors: inaccurate size of names");
   }
-  //assert(na == descriptions.size());
   if (na != descriptions.size()) {
     throw KException("PMatrixModel::setActors: inaccurate size of descriptions");
   }
-  //assert(na == wghtVect.numC());
   if (na != wghtVect.numC()) {
     throw KException("PMatrixModel::setActors: inaccurate number of columns in wghtVect");
   }
-  //assert(na == polUtilMat.numR());
   if (na != polUtilMat.numR()) {
     throw KException("PMatrixModel::setActors: inaccurate number of rows in polUtilMat");
   }
@@ -230,7 +212,6 @@ void PMatrixModel::setActors(vector<string> names, vector<string> descriptions) 
     ai->sCap = wghtVect(0, i);
     addActor(ai);
   }
-  //assert(na == numAct);
   if (na != numAct) {
     throw KException("PMatrixModel::setActors: inaccurate number of actors");
   }
@@ -250,7 +231,6 @@ KMatrix PMatrixModel::utilFromFP(const FittingParameters & fParams, double bigR)
   auto  maxVect = get<1>(fParams);
   auto  outcomes = get<2>(fParams);
   const unsigned int numAct = maxVect.size();
-  //assert(numAct == outcomes.numR());
   if (numAct != outcomes.numR()) {
     throw KException("PMatrixModel::utilFromFP: inaccurate number of rows in outcomes");
   }
@@ -270,7 +250,6 @@ KMatrix PMatrixModel::utilFromFP(const FittingParameters & fParams, double bigR)
         rowMax = oc;
       }
     }
-    //assert(rowMin < rowMax);
     if (rowMin >= rowMax) {
       throw KException("PMatrixModel::utilFromFP: rowMin must be less than rowMax");
     }
@@ -311,49 +290,39 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::minProbError(
   auto  overThresh = get<6>(fParams);
 
   const unsigned int numAct = aNames.size();
-  //assert(numAct == maxVect.size());
   if (numAct != maxVect.size()) {
     throw KException("PMatrixModel::minProbError: inaccurate size of maxVect");
   }
-  //assert(numAct == outcomes.numR());
   if (numAct != outcomes.numR()) {
     throw KException("PMatrixModel::minProbError: inaccurate number of rows in outcomes");
   }
   const unsigned int numScen = outcomes.numC();
-  //assert(numAct == caseWeights.numC());
   if (numAct != caseWeights.numC()) {
     throw KException("PMatrixModel::minProbError: inaccurate number of columns in caseWeights ");
   }
   const unsigned int numCase = caseWeights.numR();
-  //assert(numCase == probWeight.numC());
   if (numCase != probWeight.numC()) {
     throw KException("PMatrixModel::minProbError: inaccurate number of columns in probWeight");
   }
-  //assert(numScen == probWeight.numR());
   if (numScen != probWeight.numR()) {
     throw KException("PMatrixModel::minProbError: inaccurate number of rows in probWeight");
   }
-  //assert(numCase == threshVal.size());
   if (numCase != threshVal.size()) {
     throw KException("PMatrixModel::minProbError: threshVal size must be equal to numCase");
   }
-  //assert(numCase == overThresh.size());
   if (numCase != overThresh.size()) {
     throw KException("PMatrixModel::minProbError: overThresh size must be equal to numCase");
   }
 
   // TODO: handle more than two cases
-  //assert(2 == numCase);
   if (2 != numCase) {
     throw KException("PMatrixModel::minProbError: numCase must be only 2");
   }
 
   // TODO: handle 'under' thresholds, not just 'over'
-  //assert(true == overThresh[0]);
   if (true != overThresh[0]) {
     throw KException("PMatrixModel::minProbError: overThresh[0] value should be true");
   }
-  //assert(true == overThresh[1]);
   if (true != overThresh[1]) {
     throw KException("PMatrixModel::minProbError: overThresh[1] value should be true");
   }
@@ -370,11 +339,9 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::minProbError(
   double thresh2 = threshVal[1];
 
 
-  //assert(KBase::sameShape(wMat0, wAdj1));
   if (!KBase::sameShape(wMat0, wAdj1)) {
     throw KException("PMatrixModel::minProbError: wMat0 and wAdj1 must have same shapes");
   }
-  //assert(KBase::sameShape(wMat0, wAdj2));
   if (!KBase::sameShape(wMat0, wAdj2)) {
     throw KException("PMatrixModel::minProbError: wMat0 and wAdj2 must have same shapes");
   }
@@ -436,18 +403,15 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::probCost(const KMatrix& pnt,
                                                        const KMatrix& wAdj1, const KMatrix& pSel1, double thresh1,
                                                        const KMatrix& wAdj2, const KMatrix& pSel2, double thresh2,
                                                        double errWeight, ReportingLevel rl) {
-  //assert(1 == wMat.numR());
   if (1 != wMat.numR()) {
     throw KException("PMatrixModel::probCost: wMat must be a row vector");
   }
   const unsigned int nAct = wMat.numC();
   const unsigned int nOpt = uMat.numC();
 
-  //assert(1 == pnt.numC());
   if (1 != pnt.numC()) {
     throw KException("PMatrixModel::probCost: pnt must be a column vector");
   }
-  //assert(nAct == pnt.numR());
   if (nAct != pnt.numR()) {
     throw KException("PMatrixModel::probCost: inaccurate number of rows in pnt");
   }
@@ -492,7 +456,6 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::probCost(const KMatrix& pnt,
   for (unsigned int i = 0; i<nAct; i++) {
     w1(0, i) = wMat(0, i)*fVec(i, 0)*wAdj1(0, i);
     //printf("w1[%2i] = %7.2f \n", i, w1(0,i));
-    //assert(0.0 <= w1(0, i));
     if (0.0 > w1(0, i)) {
       throw KException("PMatrixModel::probCost: w1(0, i) must be non-negative");
     }
@@ -507,7 +470,6 @@ tuple<double, KMatrix, KMatrix> PMatrixModel::probCost(const KMatrix& pnt,
   for (unsigned int i = 0; i<nAct; i++) {
     w2(0, i) = wMat(0, i)*fVec(i, 0)*wAdj2(0, i);
     //printf("w2[%2i] = %7.2f \n", i, w2(0,i));
-    //assert(0.0 < w2(0, i));
     if (0.0 >= w2(0, i)) {
       throw KException("PMatrixModel::probCost: w2(0,i) must be positive");
     }
@@ -588,15 +550,12 @@ vector<double> PMatrixState::actorUtilVectFn(int h, int tj) const {
   const unsigned int na = eMod->numAct;
   const auto pMod = (const PMatrixModel*)eMod;
   const auto pMat = pMod->getPolUtilMat();
-  //assert(na == pMat.numR());
   if (na != pMat.numR()) {
     throw KException("PMatrixModel::actorUtilVectFn: inaccurate number of rows in pMat");
   }
-  //assert(0 <= tj);
   if (0 > tj) {
     throw KException("PMatrixModel::actorUtilVectFn: tj must be non-negative");
   }
-  //assert(tj < pMat.numC());
   if (tj >= pMat.numC()) {
     throw KException("PMatrixModel::actorUtilVectFn: inaccurate number of columns in pMat");
   }
@@ -614,11 +573,9 @@ vector<double> PMatrixState::actorUtilVectFn(int h, int tj) const {
 // If there are duplicate positions, there will be duplicate columns.
 void PMatrixState::setAllAUtil(ReportingLevel) {
   const unsigned int na = eMod->numAct;
-  //assert(Model::minNumActor <= na);
   if (Model::minNumActor > na) {
     throw KException("PMatrixModel::setAllAUtil: number of actors is less than allowed value");
   }
-  //assert(na <= Model::maxNumActor);
   if (na > Model::maxNumActor) {
     throw KException("PMatrixModel::setAllAUtil: number of actors is more than allowed value");
   }

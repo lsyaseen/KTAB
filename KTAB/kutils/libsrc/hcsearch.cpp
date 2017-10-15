@@ -48,7 +48,6 @@ vector<KMatrix> VHCSearch::vn1(const KMatrix & m0, double s) {
 
 vector<KMatrix> VHCSearch::vn2(const KMatrix & m0, double s) {
   unsigned int n = m0.numR();
-  //assert(1 < n);
   if (1 >= n) {
     throw KException("VHCSearch::vn2: m0 should have more than one rows");
   }
@@ -86,11 +85,9 @@ VHCSearch::run(KMatrix p0,
                ReportingLevel rl) {
   using std::thread;
 
-  //assert(eval != nullptr);
   if (eval == nullptr) {
     throw KException("VHCSearch::run: eval is a null pointer");
   }
-  //assert(nghbrs != nullptr);
   if (nghbrs == nullptr) {
     throw KException("VHCSearch::run: nghbrs is a null pointer");
   }
@@ -120,7 +117,6 @@ VHCSearch::run(KMatrix p0,
   }
 
   while ((iter < iMax) && (sIter < sMax) && (minStep < currStep)) {
-    //assert(vInitial <= v0);
     if (vInitial > v0) {
       throw KException("VHCSearch::run: either stay at orig point or improve it");
     }
@@ -181,7 +177,6 @@ VHCSearch::run(KMatrix p0,
     }
     vhcEvalMtx.unlock();
 
-    //assert(vInitial <= v0);
     if (vInitial > v0) {
       throw KException("VHCSearch::run: either stay at orig point or improve it");
     }
@@ -203,7 +198,6 @@ VHCSearch::run(KMatrix p0,
     }
   }
 
-  //assert(vInitial <= v0); // either stay at orig point or improve it: never less
   if (vInitial > v0) { // either stay at orig point or improve it: never less
     throw KException("VHCSearch::run: either stay at orig point or improve it");
   }

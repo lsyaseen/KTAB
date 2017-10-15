@@ -44,7 +44,6 @@ namespace DemoLeon {
 const double TolIFD = 1E-6;
 
 LeonActor::LeonActor(string n, string d, LeonModel* em, unsigned int id) : Actor(n, d) {
-  //assert(nullptr != em);
   if (nullptr == em) {
     throw KException("LeonActor::LeonActor: em is null pointer");
   }
@@ -81,18 +80,15 @@ double LeonActor::vote(const Position * ap1, const Position * ap2) const {
   // it rather inefficient to re-run the entire economic
   // model (yielding L+N utilities) separately for each actor.
   // Correct first, fast later (unless architecture prevents speed-up!)
-  //assert((0 < refU) && (refU < 1));
   if ((0 >= refU) || (refU >= 1)) {
     throw KException("LeonActor::vote: refU must be in the range (0, 1)");
   }
-  //assert((minS < refS) && (refS < maxS));
   if ((minS >= refS) || (refS >= maxS)) {
     throw KException(string("LeonActor::vote: refS must be in the range (") + std::to_string(minS) + "," + std::to_string(maxS) + ")");
   }
   const double u1 = posUtil(p1);
   const double u2 = posUtil(p2);
   const double sCap = sum(vCap);
-  //assert (0 < sCap);
   if (0 >= sCap) {
     throw KException("LeonActor::vote: sCap must be positive");
   }
@@ -182,14 +178,12 @@ void LeonActor::setShareUtilScale(const KMatrix & runs) {
     maxS = (si > maxS) ? si : maxS;
   }
 
-  //assert((0 < minS) && (minS < maxS));
   if ((0 >= minS) || (minS >= maxS)) {
     throw KException("LeonActor::setShareUtilScale: minS must be in the range [0,maxS]");
   }
   const double sf = 1.001;
   minS = minS / sf;
   maxS = maxS*sf;
-  //assert((minS < refS) && (refS < maxS));
   if ((minS >= refS) || (refS >= maxS)) {
     throw KException("LeonActor::setShareUtilScale: refS must be in the range [minS,maxS]");
   }
@@ -216,7 +210,6 @@ LeonState::~LeonState() {
 tuple <KMatrix, VUI> LeonState::pDist(int persp) const {
   KMatrix pd;
   auto un = VUI();
-  //assert(false);
   throw KException("LeonActor::setShareUtilScale: dummy function");
   return tuple <KMatrix, VUI>(pd, un);
 }
@@ -226,11 +219,9 @@ bool LeonState::equivNdx(unsigned int i, unsigned int j) const {
   /// Compare two actual positions in the current state
   auto vpi = ((const VctrPstn *)(pstns[i]));
   auto vpj = ((const VctrPstn *)(pstns[j]));
-  //assert(vpi != nullptr);
   if (vpi == nullptr) {
     throw KException("LeonState::equivNdx: vpi is null pointer");
   }
-  //assert(vpj != nullptr);
   if (vpj == nullptr) {
     throw KException("LeonState::equivNdx: vpj is null pointer");
   }
@@ -256,11 +247,9 @@ LeonState* LeonState::stepSUSN() {
 // the time-cost is negligable compared to the rest of the processing.
 double LeonState::estGDP(unsigned int i, unsigned int j) {
   auto lMod = (LeonModel*)model;
-  //assert(i < lMod->L + lMod->N);
   if (i >= lMod->L + lMod->N) {
     throw KException("LeonState::estGDP: i out of range");
   }
-  //assert(j < lMod->L + lMod->N);
   if (j >= lMod->L + lMod->N) {
     throw KException("LeonState::estGDP: j out of range");
   }
@@ -303,7 +292,6 @@ LeonState* LeonState::doSUSN(ReportingLevel rl) const {
   // TODO: filter out essentially-duplicate positions
 
   auto assertSimilar = [](const KMatrix & x, const KMatrix & y) {
-    //assert(KBase::maxAbs(x - y) < 1E-10);
     if (KBase::maxAbs(x - y) >= 1E-10) {
       throw KException("LeonState::doSUSN: x and y are not at same values");
     }
@@ -315,13 +303,11 @@ LeonState* LeonState::doSUSN(ReportingLevel rl) const {
 
 
   const unsigned int numA = model->numAct;
-  //assert(numA == eMod->actrs.size());
   if (numA != eMod->actrs.size()) {
     throw KException("LeonState::doSUSN: inaccurate number of actors");
   }
   auto vpm = VPModel::Linear;
   const unsigned int numP = pstns.size();
-  //assert(0 < numP);
   if (0 >= numP) {
     throw KException("LeonState::doSUSN: numP must be positive");
   }
@@ -382,7 +368,6 @@ LeonState* LeonState::doSUSN(ReportingLevel rl) const {
     auto uh = uh0;
     bool normP = false;
     const double ifd = eMod->infsDegree(hPos);
-    //assert(ifd < TolIFD);
     if (ifd >= TolIFD) {
       throw KException("LeonState::doSUSN: ifd must be less than TolIFD");
     }
@@ -409,7 +394,6 @@ LeonState* LeonState::doSUSN(ReportingLevel rl) const {
 
 
   s2 = new LeonState((LeonModel *)model);
-  //assert(model->numAct == s2->pstns.size());
   if (model->numAct != s2->pstns.size()) {
     throw KException("LeonState::doSUSN: Number of positions should be equal to number of actors");
   }
@@ -454,7 +438,6 @@ LeonState* LeonState::doSUSN(ReportingLevel rl) const {
 
     VctrPstn * posBest = new VctrPstn(rBest);
     //s2->pstns.push_back(posBest);
-    //assert(nullptr == s2->pstns[h]); // make sure it was empty
     if (nullptr != s2->pstns[h]) { // make sure it was empty
       throw KException("LeonState::doSUSN: position pointer is null");
     }
@@ -467,7 +450,6 @@ LeonState* LeonState::doSUSN(ReportingLevel rl) const {
     //cout << endl << flush;
     // Logically, du should always be non-negative, as VHC never returns a worse value than the starting point.
     //const double eps = 0; // 1E-5 ;
-    //assert(0 <= du);
     if (0 > du) {
       throw KException("LeonState::doSUSN: du must be non-negative");
     }
@@ -525,15 +507,12 @@ LeonState* LeonState::doSUSN(ReportingLevel rl) const {
 
 
 
-  //assert(nullptr != s2);
   if (nullptr == s2) {
     throw KException("LeonState::doSUSN: s2 is null pointer");
   }
-  //assert(numP == s2->pstns.size());
   if (numP != s2->pstns.size()) {
     throw KException("LeonState::doSUSN: inaccurate number of positions");
   }
-  //assert(numA == s2->model->numAct);
   if (numA != s2->model->numAct) {
     throw KException("LeonState::doSUSN: inaccurate numer of actors");
   }
@@ -564,7 +543,6 @@ void LeonState::setAllAUtil(ReportingLevel rl) {
   // even if they disagree on both facts and values.
   LOG(INFO) << "aUtil size:" << aUtil.size();
 
-  //assert(0 == aUtil.size());
   if (0 != aUtil.size()) {
     throw KException("LeonState::setAllAUtil: aUtil should have zero member values");
   }
@@ -590,7 +568,6 @@ LeonModel::~LeonModel() {
 
 double LeonModel::stateDist(const LeonState* s1, const LeonState* s2) {
   unsigned int n = s1->pstns.size();
-  //assert(n == s2->pstns.size());
   if(n != s2->pstns.size()) {
     throw KException("LeonModel::stateDist: inaccurate size of position in s2");
   }
@@ -647,19 +624,15 @@ tuple<KMatrix, KMatrix, KMatrix, KMatrix> LeonModel::makeBaseYear(unsigned int n
     << L << "factors," << M << "consumption groups," << N << "industrial sectors"
     << "and one export sector (with constant elasticity demand)";
 
-  //assert(nullptr != rng);
   if(nullptr == rng ) {
     throw KException("LeonModel::printEstGDP: rng is null pointer");
   }
-  //assert(L > 0);
   if(L <= 0) {
     throw KException("LeonModel::printEstGDP: L must be positive");
   }
-  //assert(M > 0);
   if(M <= 0) {
     throw KException("LeonModel::printEstGDP: M must be positive");
   }
-  //assert(N > 0);
   if(N <= 0) {
     throw KException("LeonModel::printEstGDP: N must be positive");
   }
@@ -782,50 +755,39 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
 
   x0 = xprt;
 
-  //assert(N == trns.numR());
   if(N != trns.numR()) {
     throw KException("LeonModel::makeIOModel: trns must have N number of rows");
   }
 
-  //assert(N == trns.numC());
   if(N != trns.numC()) {
     throw KException("LeonModel::makeIOModel: trns must have N number of columns");
   }
 
-  //assert(L == rev.numR());
   if(L != rev.numR()) {
     throw KException("LeonModel::makeIOModel: rev must have L number of rows");
   }
-  //assert(N == rev.numC());
   if(N != rev.numC()) {
     throw KException("LeonModel::makeIOModel: rev must have N number of columns");
   }
-  //assert(M == cons.numC());
   if(M != cons.numC()) {
     throw KException("LeonModel::makeIOModel: cons must have M number of columns");
   }
-  //assert(N == cons.numR());
   if(N != cons.numR()) {
     throw KException("LeonModel::makeIOModel: cons must have N number of rows");
   }
 
-  //assert(N == xprt.numR());
   if(N != xprt.numR()) {
     throw KException("LeonModel::makeIOModel: xprt must have N number of rows");
   }
-  //assert(1 == xprt.numC());
   if(1 != xprt.numC()) {
     throw KException("LeonModel::makeIOModel: xprt must be a column vector");
   }
-  //assert(L > 0);
   if(L <= 0) {
     throw KException("LeonModel::makeIOModel: L must be positive");
   }
-  //assert(M > 0);
   if(M <= 0) {
     throw KException("LeonModel::makeIOModel: M must be positive");
   }
-  //assert(N > 0);
   if(N <= 0) {
     throw KException("LeonModel::makeIOModel: N must be positive");
   }
@@ -879,7 +841,6 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
   }
 
   LOG(INFO) << " check (export + cons = value added)";
-  //assert(fabs(sxc + sCons - sVA) < 0.001);
   if (fabs(sxc + sCons - sVA) >= 0.001) {
     throw KException("LeonModel::makeIOModel: (sxc + sCons) and sVA have mismatched values");
   }
@@ -921,7 +882,6 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
   expnd.mPrintf(" %.2f ");
 
   LOG(INFO) << "check (sumConsClm = expnd * sumVARows) ... ";
-  //assert(mDelta(sumConsClm, expnd*sumVARows) < 1e-6);
   if (mDelta(sumConsClm, expnd*sumVARows) >= 1e-6) {
     throw KException("LeonModel::makeIOModel: sumConsClm and expnd*sumVARows have mismatched values");
   }
@@ -989,7 +949,6 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
   LOG(INFO) << "check row-sums == clm-sums ... ";
   double tol = 0.001; // tolerance in matching row and column sums
   for (unsigned int n = 0; n < N; n++) {
-    //assert(delta(qClm(n, 0), qRow(0, n)) < tol);
     if (delta(qClm(n, 0), qRow(0, n)) >= tol) {
       throw KException("LeonModel::makeIOModel: qClm and qRow have mismatched values");
     }
@@ -1031,7 +990,6 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
   LOG(INFO) << " check budgetL == rho x qClm:";
   auto budgetL = rho * qClm;
   budgetL.mPrintf(" %.2f "); //  these are the VA to factors
-  //assert(mDelta(sumVARows, budgetL) < tol);
   if (mDelta(sumVARows, budgetL) >= tol) {
     throw KException("LeonModel::makeIOModel: sumVARows and budgetL have mismatched values");
   }
@@ -1045,7 +1003,6 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
   LOG(INFO) << "Shares of GDP to industry sectors (using Alpha, not Beta)";
   LOG(INFO) << "budgetS:";
   budgetS.mPrintf(" %.2f ");
-  //assert(mDelta(sumVAClms, budgetS) < tol);
   if (mDelta(sumVAClms, budgetS) >= tol) {
     throw KException("LeonModel::makeIOModel: sumVAClms and budgetS have mismatched values");
   }
@@ -1066,7 +1023,6 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
   }
   LOG(INFO) << "budgetC";
   budgetC.mPrintf(" %.4f ");
-  //assert(mDelta(budgetC, sumConsClm) < tol);
   if (mDelta(budgetC, sumConsClm) >= tol) {
     throw KException("LeonModel::makeIOModel: budgetC and sumConsClm have mismatched values");
   }
@@ -1095,7 +1051,6 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
 
   LOG(INFO) << "check budgetC == expnd x budgetL";
   (expnd*budgetL).mPrintf("%.4f  ");
-  //assert(mDelta(budgetC, expnd*budgetL) < tol);
   if (mDelta(budgetC, expnd*budgetL) >= tol) {
     throw KException("LeonModel::makeIOModel: budgetC, expnd and budgetL have mismatched values");
   }
@@ -1105,7 +1060,6 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
   LOG(INFO) << "alpha ";
   alpha.mPrintf(" %.4f ");
   for (auto a : alpha) {
-    //assert(0.0 < a);
     if (0.0 >= a) {
       throw KException("LeonModel::makeIOModel: a must be positive");
     }
@@ -1116,12 +1070,10 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
 
   LOG(INFO) << "check aL * X == qClm";
   (aL*xprt).mPrintf(" %.4f ");
-  //assert(mDelta(aL*xprt, qClm) < tol);
   if (mDelta(aL*xprt, qClm) >= tol) {
     throw KException("LeonModel::makeIOModel: aL, xprt and qClm have mismatched values");
   }
   for (auto x : aL) {
-    //assert(0.0 < x);
     if (0.0 >= x) {
       throw KException("LeonModel::makeIOModel: x must be positive");
     }
@@ -1137,7 +1089,6 @@ void LeonModel::makeIOModel(const KMatrix & trns, const KMatrix & rev, const KMa
   LOG(INFO) << "check bL * X == betaQX";
   betaQX.mPrintf(" %.4f ");
   for (auto x : bL) {
-    //assert(0.0 < x);
     if (0.0 >= x) {
       throw KException("LeonModel::makeIOModel: x must be positive");
     }
@@ -1180,74 +1131,57 @@ void LeonModel::prepModel(unsigned int numFac, unsigned int numCon, unsigned int
   using KBase::norm;
 
   // check stuff first - compiler doesn't like the asserts for nullptr inequality(?), so comment out
-  //assert(numFac > 0);
   if(numFac <= 0) {
     throw KException("LeonModel::prepModel: numFac must be positive");
   }
-  //assert(numCon > 0);
   if(numCon <= 0) {
     throw KException("LeonModel::prepModel: numCon must be positive");
   }
-  //assert(numSec > 0);
   if(numSec <= 0) {
     throw KException("LeonModel::prepModel: numSec must be positive");
   }
-  //assert(xprt.numR() == numSec);
   if(xprt.numR() != numSec ) {
     throw KException("LeonModel::prepModel: inaccurate number of rows in xprt");
   }
-  //assert(xprt.numC() == 1);
   if(xprt.numC() != 1) {
     throw KException("LeonModel::prepModel: inaccurate number of columns in xprt");
   }
-  //assert(cons.numR() == numSec);
   if(cons.numR() != numSec) {
     throw KException("LeonModel::prepModel: inaccurate number of rows in cons");
   }
 
-  //assert(cons.numC() == numCon);
   if(cons.numC() != numCon) {
     throw KException("LeonModel::prepModel: inaccurate number of columns in cons");
   }
-  //assert(elast.numR() == numSec);
   if(elast.numR() != numSec) {
     throw KException("LeonModel::prepModel: inaccurate number of rows in elast");
   }
-  //assert(elast.numC() == 1);
   if(elast.numC() != 1) {
     throw KException("LeonModel::prepModel: elast must be a column vector");
   }
-  //assert(trns.numR() == numSec);
   if(trns.numR() != numSec) {
     throw KException("LeonModel::prepModel: inaccurate number of rows in trns");
   }
 
-  //assert(trns.numC() == numSec);
   if(trns.numC() != numSec) {
     throw KException("LeonModel::prepModel: inaccurate number of columns in trns");
   }
-  //assert(rev.numR() == numFac);
   if(rev.numR() != numFac) {
     throw KException("LeonModel::prepModel: inaccurate number of rows in rev");
   }
-  //assert(rev.numC() == numSec);
   if(rev.numC() != numSec) {
     throw KException("LeonModel::prepModel: inaccurate number of columns in rev");
   }
 
-  //assert(expnd.numR() == numCon);
   if(expnd.numR() != numCon) {
     throw KException("LeonModel::prepModel: inaccurate number of rows in expnd");
   }
-  //assert(expnd.numC() == numFac);
   if(expnd.numC() != numFac) {
     throw KException("LeonModel::prepModel: inaccurate number of columns in expnd");
   }
-  //assert(Bmat.numR() == numSec);
   if(Bmat.numR() != numSec) {
     throw KException("LeonModel::prepModel: inaccurate number of rows in Bmat");
   }
-  //assert(Bmat.numC() == numSec);
   if(Bmat.numC() != numSec) {
     throw KException("LeonModel::prepModel: inaccurate number of columns in Bmat");
   }
@@ -1352,7 +1286,6 @@ void LeonModel::prepModel(unsigned int numFac, unsigned int numCon, unsigned int
   vas.mPrintf(" %0.4f ");
 
   LOG(INFO) << " check (export + cons = value added) ... ";
-  //assert(fabs(sxc + sCons - sVA) < 0.001);
   if(fabs(sxc + sCons - sVA) >= 0.001) {
     throw KException("LeonModel::prepModel: diff between values not correct");
   }
@@ -1371,7 +1304,6 @@ void LeonModel::prepModel(unsigned int numFac, unsigned int numCon, unsigned int
   LOG(INFO) << "check (sumConsClm = expnd * sumVARows) ... ";
   auto expTSumVA = expnd*sumVARows;
   expTSumVA.mPrintf(" %0.4f ");
-  //assert(mDelta(sumConsClms, expTSumVA) < 1e-6);
   if(mDelta(sumConsClms, expTSumVA) >= 1e-6) {
     throw KException("LeonModel::prepModel: inaccurate values");
   }
@@ -1415,7 +1347,6 @@ void LeonModel::prepModel(unsigned int numFac, unsigned int numCon, unsigned int
   LOG(INFO) << "check row-sums == clm-sums ... ";
   double tol = 0.001; // tolerance in matching row and column sums
   for (unsigned int n = 0; n < N; n++) {
-    //assert(delta(qClm(n, 0), qRow(0, n)) < tol);
     if(delta(qClm(n, 0), qRow(0, n)) >= tol) {
       throw KException("LeonModel::prepModel: inaccurate row and col values");
     }
@@ -1438,7 +1369,6 @@ void LeonModel::prepModel(unsigned int numFac, unsigned int numCon, unsigned int
   LOG(INFO) << " check budgetL == rho x qClm:";
   auto budgetL = rho * qClm;
   budgetL.mPrintf(" %.4f "); //  these are the VA to factors
-  //assert(mDelta(sumVARows, budgetL) < tol);
   if (mDelta(sumVARows, budgetL) >= tol) {
     throw KException("LeonModel::prepModel: inaccurate budgetL");
   }
@@ -1452,7 +1382,6 @@ void LeonModel::prepModel(unsigned int numFac, unsigned int numCon, unsigned int
   LOG(INFO) << "Shares of GDP to industry sectors (using Alpha, not Beta)";
   LOG(INFO) << "budgetS:";
   budgetS.mPrintf(" %.4f ");
-  //assert(mDelta(sumVAClms, budgetS) < tol);
   if(mDelta(sumVAClms, budgetS) >= tol) {
     throw KException("LeonModel::prepModel: inaccurate budgetS");
   }
@@ -1472,7 +1401,6 @@ void LeonModel::prepModel(unsigned int numFac, unsigned int numCon, unsigned int
   }
   LOG(INFO) << "budgetC:";
   budgetC.mPrintf(" %.4f ");
-  //assert(mDelta(budgetC, sumConsClms) < tol);
   if(mDelta(budgetC, sumConsClms) >= tol) {
     throw KException("LeonModel::prepModel: inaccurate budget numbers for cons columns");
   }
@@ -1495,7 +1423,6 @@ void LeonModel::prepModel(unsigned int numFac, unsigned int numCon, unsigned int
 
   LOG(INFO) << "check budgetC == expnd x budgetL";
   (expnd*budgetL).mPrintf(" %.4f ");
-  //assert(mDelta(budgetC, expnd*budgetL) < tol);
   if(mDelta(budgetC, expnd*budgetL) >= tol) {
     throw KException("LeonModel::prepModel: inaccurate budget numbers for budgetL");
   }
@@ -1506,7 +1433,6 @@ void LeonModel::prepModel(unsigned int numFac, unsigned int numCon, unsigned int
   LOG(INFO) << "alpha:";
   alpha.mPrintf(" %.4f ");
   for (auto a : alpha) {
-    //assert(0.0 < a);
     if(0.0 >= a) {
       throw KException("LeonModel::prepModel: a must be positive");
     }
@@ -1516,12 +1442,10 @@ void LeonModel::prepModel(unsigned int numFac, unsigned int numCon, unsigned int
   aL = inv(id - alpha);
   LOG(INFO) << "check aL * X == qClm";
   (aL*xprt).mPrintf(" %.4f ");
-  //assert(mDelta(aL*xprt, qClm) < tol);
   if(mDelta(aL*xprt, qClm) >= tol) {
     throw KException("LeonModel::prepModel: inaccurate value");
   }
   for (auto x : aL) {
-    //assert(0.0 < x);
     if(0.0 >= x) {
       throw KException("LeonModel::prepModel: x must be positive");
     }
@@ -1538,7 +1462,6 @@ void LeonModel::prepModel(unsigned int numFac, unsigned int numCon, unsigned int
   LOG(INFO) << "check bL * X";
   betaQX.mPrintf(" %.4f ");
   for (auto x : bL) {
-    //assert(0.0 < x);
     if(0.0 >= x) {
       throw KException("LeonModel::prepModel: x must be positive");
     }
@@ -1570,7 +1493,6 @@ KMatrix LeonModel::xprtDemand(const KMatrix & tau) const {
   double p0 = 1;
   for (unsigned int i = 0; i < N; i++) {
     double pi = p0 + tau(i, 0);
-    //assert(0.0 < pi);
     if(0.0 >= pi) {
       throw KException("LeonModel::xprtDemand: pi can not be negative");
     }
@@ -1650,7 +1572,6 @@ KMatrix LeonModel::makeFTax(const KMatrix & tax) const {
 
 
   unsigned int N = x0.numR();
-  //assert(1 == x0.numC());
   if(1 != x0.numC()) {
     throw KException("LeonModel::makeFTax: x0 must be a column vector");
   }
@@ -1702,14 +1623,12 @@ KMatrix LeonModel::makeFTax(const KMatrix & tax) const {
   }
   for (unsigned int i = 0; i < N; i++) {
     double pi = 1.0 + tau(i, 0);
-    //assert(0.0 < pi); // no negative prices
     if(0.0 >= pi) { // no negative prices
       throw KException("LeonModel::makeFTax: pi can not be negative");
     }
   }
 
   const double ifd = infsDegree(tau);
-  //assert(ifd <= tol); // one last check that it is A-OK
   if(ifd > tol) { // one last check that it is A-OK
     throw KException("LeonModel::makeFTax: ifd must not be greater than tol");
   }
@@ -1725,7 +1644,6 @@ double LeonModel::infsDegree(const KMatrix & tax) const {
       mAbs = mAbs - (ti + maxSub); // e.g. ti = -0.7, maxSub = 0.5
       OK = false;
     }
-    //assert(0 <= mAbs);
     if(0 > mAbs) {
       throw KException("LeonModel::infsDegree: mAbs must be non-negative");
     }
@@ -1733,7 +1651,6 @@ double LeonModel::infsDegree(const KMatrix & tax) const {
       mAbs = mAbs + (ti - maxTax);
       OK = false;
     }
-    //assert(0 <= mAbs);
     if(0 > mAbs) {
       throw KException("LeonModel::infsDegree: mAbs must be non-negative");
     }
@@ -1755,7 +1672,6 @@ KMatrix  LeonModel::vaShares(const KMatrix & tax, bool normalizeSharesP) const {
 
   auto xt = xprtDemand(tax);
 
-  //assert(infsDegree(tax) < TolIFD); // make sure it is a feasible tax
   if(infsDegree(tax) >= TolIFD) { // make sure it is a feasible tax
     throw KException("LeonModel::infsDegree: It is not a feasible tax");
   }
@@ -1777,7 +1693,6 @@ KMatrix  LeonModel::vaShares(const KMatrix & tax, bool normalizeSharesP) const {
 
   for (unsigned int j = 0; j < L; j++) {
     double s = budgetL(j, 0);
-    //assert(0 < s);
     if(0 >= s) {
       throw KException("LeonModel::infsDegree: s must be positive within L");
     }
@@ -1785,7 +1700,6 @@ KMatrix  LeonModel::vaShares(const KMatrix & tax, bool normalizeSharesP) const {
   }
   for (unsigned int j = 0; j < N; j++) {
     double s = budgetS(0, j);
-    //assert(0 < s);
     if(0 >= s) {
       throw KException("LeonModel::infsDegree: s must be positive within N");
     }
@@ -1807,11 +1721,9 @@ KMatrix LeonModel::monteCarloShares(unsigned int nRuns, PRNG* rng) {
   // each run is a row of unnormalized [factor | sector] shares
   // the first row is the base case of zero taxes (row 0 <--> tax 0)
   const bool normP = false;
-  //assert((0 <= maxSub) && (maxSub < 1));
   if((0 > maxSub) || (maxSub >= 1)) {
     throw KException("LeonModel::monteCarloShares: maxSub is not in range [0,1)");
   }
-  //assert(0 <= maxTax);
   if(0 > maxTax) {
     throw KException("LeonModel::monteCarloShares: maxTax must be non-negative");
   }
@@ -1827,7 +1739,6 @@ KMatrix LeonModel::monteCarloShares(unsigned int nRuns, PRNG* rng) {
     tau = randomFTax(rng); // this occaisonally takes a long time
     tau = makeFTax(tau);
     double ifd = infsDegree(tau);
-    //assert(ifd < TolIFD);
     if(ifd >= TolIFD) {
       throw KException("LeonModel::monteCarloShares: ifd must be less than TolIFD");
     }
@@ -1970,7 +1881,6 @@ LeonModel* demoSetup(unsigned int numFctr, unsigned int numCGrp, unsigned int nu
       ai->setShareUtilScale(runs);
       es.push_back(ai);
     }
-    //assert(numA == es.size());
     if(numA != es.size()) {
       throw KException("LeonModel::monteCarloShares: size of es must be equal to actor count");
     }
@@ -1986,7 +1896,6 @@ LeonModel* demoSetup(unsigned int numFctr, unsigned int numCGrp, unsigned int nu
       VctrPstn* ep = nullptr;
       const double minU = 0.0; // could be ai->refU, or with default, 0.6
       const double maxU = 1.0; // could be (1+ai->refU)/2, or with default, 0.8
-      //assert(0 < ai->refU);
       if(0 >= ai->refU) {
         throw KException("LeonModel::monteCarloShares: refU must be positive");
       }
@@ -2002,7 +1911,6 @@ LeonModel* demoSetup(unsigned int numFctr, unsigned int numCGrp, unsigned int nu
       }
       ps.push_back(ep);
     }
-    //assert(numA == ps.size());
     if(numA != ps.size()) {
       throw KException("LeonModel::monteCarloShares: size of ps must be equal to actor count");
     }
@@ -2030,13 +1938,11 @@ LeonModel* demoSetup(unsigned int numFctr, unsigned int numCGrp, unsigned int nu
 
   eSt0->setAUtil(-1, KBase::ReportingLevel::Low);
   auto u = eSt0->aUtil[0];
-  //assert(numA == eSt0->model->numAct);
   if(numA != eSt0->model->numAct) {
     throw KException("LeonModel::monteCarloShares: inaccurate number of actors in eSt0 model");
   }
 
   auto vfn = [eMod0, eSt0](unsigned int k, unsigned int i, unsigned int j) {
-    //assert(j != i);
     if(j == i) {
       throw KException("LeonModel::monteCarloShares: j and i must not be same");
     }
@@ -2120,8 +2026,7 @@ void demoMaxEcon(uint64_t s, unsigned int numF, unsigned int numG, unsigned int 
 
   auto reportFn = [eMod0](const KMatrix & m) {
     KMatrix r = eMod0->makeFTax(m);
-    //assert(eMod0->infsDegree(r) < TolIFD); // make sure it is a feasible tax
-    if(eMod0->infsDegree(r) >= TolIFD) {
+    if(eMod0->infsDegree(r) >= TolIFD) { // make sure it is a feasible tax
       throw KException("LeonModel::monteCarloShares: It is not a feasible tax");
     }
 
@@ -2417,7 +2322,6 @@ void demoRealEcon(bool OSPonly, uint64_t s, PRNG* rng)
       ai->setShareUtilScale(runs);
       es.push_back(ai);
     }
-    //assert(numA == es.size());
     if(numA != es.size()) {
       throw KException("LeonModel::monteCarloShares: size of es must be equal to actor count");
     }
@@ -2433,7 +2337,6 @@ void demoRealEcon(bool OSPonly, uint64_t s, PRNG* rng)
       VctrPstn* ep = nullptr;
       const double minU = 0.0; // could be ai->refU, or with default, 0.6
       const double maxU = 1.0; // could be (1+ai->refU)/2, or with default, 0.8
-      //assert(0 < ai->refU);
       if(0 >= ai->refU) {
         throw KException("LeonModel::monteCarloShares: refU must be positive");
       }
@@ -2449,7 +2352,6 @@ void demoRealEcon(bool OSPonly, uint64_t s, PRNG* rng)
       }
       ps.push_back(ep);
     }
-    //assert(numA == ps.size());
     if(numA != ps.size()) {
       throw KException("LeonModel::monteCarloShares: size of ps should match with actor count");
     }
@@ -2477,13 +2379,11 @@ void demoRealEcon(bool OSPonly, uint64_t s, PRNG* rng)
 
   eSt0->setAUtil(-1, KBase::ReportingLevel::Low);
   auto u = eSt0->aUtil[0];
-  //assert(numA == eSt0->model->numAct);
   if(numA != eSt0->model->numAct) {
     throw KException("LeonModel::monteCarloShares: inaccurate number of actors");
   }
 
   auto vfn = [eMod0, eSt0](unsigned int k, unsigned int i, unsigned int j) {
-    //assert(j != i);
     if(j == i) {
       throw KException("LeonModel::monteCarloShares: j and i must not be same");
     }
@@ -2541,7 +2441,6 @@ void demoRealEcon(bool OSPonly, uint64_t s, PRNG* rng)
 
     auto reportFn = [eMod0](const KMatrix & m) {
       KMatrix r = eMod0->makeFTax(m);
-      //assert(eMod0->infsDegree(r) < TolIFD); // make sure it is a feasible tax
       if(eMod0->infsDegree(r) >= TolIFD) { // make sure it is a feasible tax
         throw KException("LeonModel::monteCarloShares: Not a feasible tax");
       }

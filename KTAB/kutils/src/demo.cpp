@@ -112,7 +112,6 @@ double bsu(double d, double R) {
 
 double bvu(const KBase::KMatrix & d, const KBase::KMatrix & s, double R) {
     // same as Model::bvUtil but we do not want to depend on anything but kutils
-    //assert(KBase::sameShape(d, s));
     if (false == KBase::sameShape(d, s)) {
       throw KException("bvu: Matrices d and s don't have same shapes");
     }
@@ -122,7 +121,6 @@ double bvu(const KBase::KMatrix & d, const KBase::KMatrix & s, double R) {
         for (unsigned int j = 0; j < d.numC(); j++) {
             double dij = d(i, j);
             double sij = s(i, j);
-            //assert(0 <= sij);
             if (0 > sij) {
               throw KException("bvu: sij must be non-negative");
             }
@@ -132,7 +130,6 @@ double bvu(const KBase::KMatrix & d, const KBase::KMatrix & s, double R) {
             ssSqr = ssSqr + ss;
         }
     }
-    //assert(0 < ssSqr);
     if (0 >= ssSqr) {
       throw KException("bvu: ssSqr must be positive");
     }
@@ -157,7 +154,6 @@ void demoThreadLambda(unsigned int n) {
         return k;
     };
 
-    //assert(0 < ifn(7, 10));
     if (0 >= ifn(7, 10)) {
       throw KException("demoThreadLambda: ifn must be positive");
     }
@@ -165,22 +161,18 @@ void demoThreadLambda(unsigned int n) {
     for (int i = 0; i < n; ++i) {
         ts.push_back(std::thread([i, ifn]() {
             string hello("Hello ");
-            //assert(0 < ifn(i, 500000000));
             if (0 >= ifn(i, 500000000)) {
               throw KException("demoThreadLambda: ifn must be positive");
             }
             hello += "from ";
-            //assert(0 < ifn(i, 500000000));
             if (0 >= ifn(i, 500000000)) {
               throw KException("demoThreadLambda: ifn must be positive");
             }
             hello += "thread";
-            //assert(0 < ifn(i, 500000000));
             if (0 >= ifn(i, 500000000)) {
               throw KException("demoThreadLambda: ifn must be positive");
             }
             LOG(INFO) << hello << i;
-            //assert(0 < ifn(i, 500000000));
             if (0 >= ifn(i, 500000000)) {
               throw KException("demoThreadLambda: ifn must be positive");
             }
@@ -193,7 +185,6 @@ void demoThreadLambda(unsigned int n) {
     }
 
     auto fn2 = [](unsigned int i) {
-        //assert(0 < i);
         if (0 >= i) {
           throw KException("demoThreadLambda: i must be positive");
         }
@@ -229,7 +220,6 @@ void demoThreadSynch(unsigned int n) {
         mutex m; // one mutex per concurrent-counter object
 
         explicit CCounter(Counter* c0) {
-            //assert(nullptr != c0);
             if (nullptr == c0) {
               throw KException("demoThreadSynch: c0 is a null pointer");
             }
@@ -369,7 +359,6 @@ void demoMatrix(PRNG* rng) {
         auto rhs = c * (trans(a) - trans(b));
         double err = norm(lhs - rhs);
         LOG(INFO) << getFormattedString("Norm of diff T((a-b)*T(c)) - c*(T(a)-T(b)) is %.3E ", err);
-        //assert(err < errTol);
         if (err >= errTol) {
           throw KException("demoMatrix: error is out of tolerance level");
         }
@@ -387,13 +376,11 @@ void demoMatrix(PRNG* rng) {
         auto b = inv(a);
         double diff = norm(iMat(n) - (a*b));
         LOG(INFO) << getFormattedString("Norm of diff I-a*inv(a) is %.3E  ", diff);
-        //assert(diff < errTol);
         if (diff >= errTol) {
           throw KException("demoMatrix: error is out of tolerance level");
         }
         diff = norm(iMat(n) - (b*a));
         LOG(INFO) << getFormattedString("Norm of diff I-inv(a)*a is %.3E  ", diff);
-        //assert(diff < errTol);
         if (diff >= errTol) {
           throw KException("demoMatrix: error is out of tolerance level");
         }
@@ -434,16 +421,13 @@ tuple<KMatrix, KMatrix> extendPCA (const KMatrix& xMat,
 
     const unsigned int nSample = xMat.numR();
     const unsigned int nDim = xMat.numC();
-    //assert (nSample == wght.numR());
     if (nSample != wght.numR()) {
       throw KException("extendPCA: row count of wght is not equal to nSample");
     }
     const unsigned int nFtr = wght.numC();
-    //assert (nFtr == ftr.numR());
     if (nFtr != ftr.numR()) {
       throw KException("extendPCA: row count of ftr is not equal to nFtr");
     }
-    //assert (nDim == ftr.numC());
     if (nDim != ftr.numC()) {
       throw KException("extendPCA: column count of ftr is not equal to nDim");
     }
@@ -455,7 +439,6 @@ tuple<KMatrix, KMatrix> extendPCA (const KMatrix& xMat,
         for (unsigned int j=0; j<m.numC(); j++) {
             auto mj = KBase::vSlice(m, j);
             auto meanJ = fabs(mean(mj));
-            //assert (meanJ < rmsM * rmsTol);
             if (meanJ >= rmsM * rmsTol) {
               throw KException("extendPCA: meanJ must be less than rms value");
             }
@@ -469,11 +452,9 @@ tuple<KMatrix, KMatrix> extendPCA (const KMatrix& xMat,
     checkColRMS(z);
 
     auto cvr = trans(z)*z; // covariance matrix
-    //assert (nDim == cvr.numR());
     if (nDim != cvr.numR()) {
       throw KException("extendPCA: row count of cvr is not equal to nDim");
     }
-    //assert (nDim == cvr.numC());
     if (nDim != cvr.numC()) {
       throw KException("extendPCA: column count of cvr is not equal to nDim");
     }
@@ -485,7 +466,6 @@ tuple<KMatrix, KMatrix> extendPCA (const KMatrix& xMat,
     const double dotTol = 1E-10;
     for (unsigned int i=0; i<nFtr; i++) {
         auto vi = KBase::hSlice(ftr,i);
-        //assert (fabs(dot(v, vi)) < dotTol);
         if (fabs(dot(v, vi)) >= dotTol) {
           throw KException("extendPCA: dot product of v and vi is not in valid range");
         }
@@ -618,7 +598,6 @@ void demoPCA(PRNG* rng) {
     LOG(INFO) <<"Sample means:";
     sMean.mPrintf("%+8.3f  ");
 
-    //assert (nComp <= nDim);
     if (nComp > nDim) {
       throw KException("demoPCA: nComp must not be greater than nDim");
     }
@@ -745,11 +724,9 @@ KMatrix eUnitize(const KMatrix & a, const KMatrix & x) {
 //
 KMatrix projEllipse(const KMatrix & a, const KMatrix & w) {
     unsigned int n = a.numR();
-    //assert(1 == a.numC());
     if (1 != a.numC()) {
       throw KException("projEllipse: a must be a column vector");
     }
-    //assert(sameShape(a, w));
     if (!sameShape(a, w)) {
       throw KException("projEllipse: a and w must have same shapes");
     }
@@ -762,7 +739,6 @@ KMatrix projEllipse(const KMatrix & a, const KMatrix & w) {
     double maxF = 0.0;
     for (unsigned int i = 0; i < n; i++) {
         double ai = a(i, 0);
-        //assert(0 < ai);
         if (0 >= ai) {
           throw KException("projEllipse: ai must be positive");
         }
@@ -792,11 +768,9 @@ KMatrix projEllipse(const KMatrix & a, const KMatrix & w) {
 
     double normMax = eNorm(a, adjust(w, minF));
     double normMin = eNorm(a, adjust(w, maxF));
-    //assert(1.0 < normMax); // true because 1 < eNorm(a, w), and adjust(w,0)=w
     if (1.0 >= normMax) { // true because 1 < eNorm(a, w), and adjust(w,0)=w
       throw KException("projEllipse: normMax must be greater than 1.0");
     }
-    //assert(1.0 > normMin); // true because maxF is constructed to make it so
     if (1.0 <= normMin) { // true because maxF is constructed to make it so
       throw KException("projEllipse: normMin must be less than 1.0");
     }
@@ -922,11 +896,9 @@ void demoEllipseLVI(PRNG* rng, unsigned int n) {
         double e1 = sfe(u, xStar);
         double e2 = sfe(v, M*xStar + q);
         LOG(INFO) << getFormattedString("SFE of u is %.3E,  SFE of v is %.3E", e1, e2);
-        //assert(e1 < tol); // inaccurate U
         if (e1 >= tol) { // inaccurate U
           throw KException("demoEllipseLVI: inaccurate U");
         }
-        //assert(e2 < tol); // inaccurate V
         if (e2 >= tol) { // inaccurate V
         throw KException("demoEllipseLVI: inaccurate V");
         }
@@ -1017,11 +989,9 @@ void demoAntiLemke(PRNG* rng, unsigned int n) {
         double e1 = sfe(u, u);
         double e2 = sfe(v, M*u + q);
         LOG(INFO) << getFormattedString("SFE of u is %.3E,  SFE of v is %.3E", e1, e2);
-        //assert(e1 < tol); // inaccurate U
         if (e1 >= tol) { // inaccurate U
           throw KException("demoAntiLemke: inaccurate U");
         }
-        //assert(e2 < tol); // inaccurate V
         if (e2 >= tol) { // inaccurate V
         throw KException("demoAntiLemke: inaccurate V");
         }
@@ -1356,11 +1326,9 @@ void demoVHC01(uint64_t sd) {
     vc->nghbrs = VHCSearch::vn2;
 
     auto eFn = [ti, uci, ri, tj, ucj, rj](const KMatrix & dij) {
-        //assert(2 == dij.numR());
         if (2 != dij.numR()) {
           throw KException("demoVHC01: dij must have only two rows");
         }
-        //assert(1 == dij.numC());
         if (1 != dij.numC()) {
           throw KException("demoVHC01: dij must be a column vector");
         }
@@ -1508,7 +1476,6 @@ void demoVHC02(uint64_t sd) {
 
     auto eFn = [efn2](KMatrix v) {
         unsigned int dim = v.numR();
-        //assert(8 == dim);
         if (8 != dim) {
           throw KException("demoVHC02: dim must be equal to 8");
         }
@@ -1634,9 +1601,7 @@ void demoVHC02(uint64_t sd) {
             dj = pi*pi;
             break;
         default:
-            //assert(false);
             throw KException("demoVHC02: invalid value of pm in switch case");
-            //break;
         }
         for (unsigned int k = 0; k < 4; k++) {
             double tik = ti(k, 0);
@@ -1655,9 +1620,7 @@ void demoVHC02(uint64_t sd) {
                 wjk = sjk*sjk;
                 break;
             default:
-                //assert(false);
                 throw KException("demoVHC02: invalid value of sn in switch case");
-                //break;
             }
             double bik = ((wik*(1 - di)*tik) + (wjk*di*tjk)) / ((wik*(1 - di)) + (wjk*di));
             double bjk = ((wjk*(1 - dj)*tjk) + (wik*dj*tik)) / ((wjk*(1 - dj)) + (wik*dj));
@@ -1836,8 +1799,7 @@ void demoVHC03(uint64_t sd) {
     double rj = rng->uniform(minR, maxR);
 
     auto piFn = [ci, cj](unsigned int k, unsigned int n) {
-        //assert(0 == n); // column vector
-        if (0 != n) {
+        if (0 != n) { // column vector
           throw KException("demoVHC03->piFn: n must be zero");
         }
         double cik = ci(k, 0);
@@ -1873,7 +1835,6 @@ void demoVHC03(uint64_t sd) {
     auto oneDimBargain = [si, sj, pi, pj, ti, tj](unsigned int k, unsigned int n) {
         // This is the eS2P2 estimator, in one dimension
         double eps = 1e-8;
-        //assert(0 == n);
         if (0 != n) {
           throw KException("demoVHC03->oneDimBargain: n must be zero");
         }
@@ -1931,7 +1892,6 @@ void demoVHC03(uint64_t sd) {
 
     auto eFn = [getT2I, getT2J, efn0](KMatrix v) {
         unsigned int dim = v.numR();
-        //assert(8 == dim);
         if (8 != dim) {
           throw KException("demoVHC03->eFn: dim must be equal to 8");
         }
@@ -1998,7 +1958,6 @@ TargetedBV::TargetedBV(const VBool & b) {
 TargetedBV::~TargetedBV() {  }
 void TargetedBV::setTarget(vector< bool > trgt)
 {
-    //assert(0 < trgt.size());
     if (0 == trgt.size()) {
       throw KException("TargetedBV::setTarget: trgt size must not be zero");
     }
@@ -2086,7 +2045,6 @@ double TargetedBV::evaluate() {
     return v;
 }
 unsigned int TargetedBV::hDist(VBool bv) const {
-    //assert(bv.size() == target.size());
     if (bv.size() != target.size()) {
       throw KException("TargetedBV::hDist: sizes of target and bv must be same");
     }
@@ -2101,7 +2059,6 @@ unsigned int TargetedBV::hDist(VBool bv) const {
     return hd;
 }
 double TargetedBV::tblEval(double minD, vector<double> wght, vector<VBool> tbl) const {
-    //assert(0 < minD);
     if (0 >= minD) {
       throw KException("TargetedBV::tblEval: minD must be positive");
     }
@@ -2145,7 +2102,6 @@ void parallelMatrixMult(PRNG * rng) {
         const unsigned int cr = m1.numC();
         const unsigned m = 7;
         const unsigned int st = 1;
-        //assert(m2.numR() == cr);
         if (m2.numR() != cr) {
           throw KException("parallelMatrixMult: columns of m1 and rows of m2 must have same size");
         }

@@ -123,7 +123,6 @@ void Model::execQuery(std::string& qry) {
   if (!query.exec(QString::fromStdString(qry))) {
     LOG(INFO) << "Failed Query: " << qry;
     LOG(INFO) << query.lastError().text().toStdString();
-    //assert(false);
     throw KException("Model::execQuery:s DB query failed.");
   }
 }
@@ -328,7 +327,6 @@ KTable * Model::createSQL(unsigned int n)
   string name = "";
   unsigned int grpID = 0;
 
-  //assert(n < Model::NumTables);
   if (n >= Model::NumTables) {
     throw KException("Model::createSQL: Wrong count of tables for creation");
   }
@@ -545,7 +543,6 @@ KTable * Model::createSQL(unsigned int n)
     throw(KException("Model::createSQL unrecognized table number"));
   }
 
-  //assert(grpID < NumSQLLogGrps);
   if (grpID >= NumSQLLogGrps) {
     throw KException("Model::createSQL: group id should be within the allowed range");
   }
@@ -556,16 +553,13 @@ KTable * Model::createSQL(unsigned int n)
 
 void Model::sqlAUtil(unsigned int t)
 {
-  //assert(t < history.size());
   if (t >= history.size()) {
     throw KException("Model::sqlAUtil: Specified turn number is beyond the size of history");
   }
   State* st = history[t];
-  //assert(nullptr != st);
   if (nullptr == st) {
     throw KException("Model::sqlAUtil: st is a null pointer.");
   }
-  //assert(numAct == st->aUtil.size());
   if (numAct != st->aUtil.size()) {
     throw KException("Model::sqlAUtil: Not all actors have utility values.");
   }
@@ -601,7 +595,6 @@ void Model::sqlAUtil(unsigned int t)
         query.bindValue(":util", uij(i, j));
         if (!query.exec()) {
           LOG(INFO) << query.lastError().text().toStdString();
-          //assert(false);
           throw KException("Model::sqlAUtil: DB query failed");
         }
       }
@@ -615,12 +608,10 @@ void Model::sqlAUtil(unsigned int t)
 // module run
 void Model::sqlPosEquiv(unsigned int t)
 {
-  //assert(t < history.size());
   if (t >= history.size()) {
     throw KException("Model::sqlPosEquiv: Specified turn number is beyond the size of history");
   }
   State* st = history[t];
-  //assert(nullptr != st);
   if (nullptr == st) {
     throw KException("Model::sqlPosEquiv: st is a null pointer.");
   }
@@ -648,7 +639,6 @@ void Model::sqlPosEquiv(unsigned int t)
     query.bindValue(":eqv_j", je);
     if (!query.exec()) {
       LOG(INFO) << query.lastError().text().toStdString();
-      //assert(false);
       throw KException("Model::sqlPosEquiv: DB query failed");
     }
   }
@@ -680,7 +670,6 @@ void Model::sqlBargainEntries(unsigned int t, int bargainId, int initiator, int 
   query.bindValue(":value", val);
   if (!query.exec()) {
     LOG(INFO) << query.lastError().text().toStdString();
-    //assert(false);
     throw KException("Model::sqlBargainEntries: DB query failed");
   }
   //qtDB->commit();
@@ -691,7 +680,6 @@ void Model::sqlBargainEntries(unsigned int t, int bargainId, int initiator, int 
 void Model::sqlBargainCoords(unsigned int t, int bargnID, const KBase::VctrPstn & initPos, const KBase::VctrPstn & rcvrPos)
 {
   int nDim = initPos.numR();
-  //assert(nDim == rcvrPos.numR());
   if (nDim != rcvrPos.numR()) {
     throw KException("Model::sqlBargainCoords: dimension mismatch between initiator and receiver actor's positions");
   }
@@ -721,7 +709,6 @@ void Model::sqlBargainCoords(unsigned int t, int bargnID, const KBase::VctrPstn 
     query.bindValue(":recd_coord", rcvrPos(k, 0) * 100.0);
     if (!query.exec()) {
       LOG(INFO) << query.lastError().text().toStdString();
-      //assert(false);
       throw KException("Model::sqlBargainCoords: DB query failed");
     }
   }
@@ -761,7 +748,6 @@ void Model::sqlBargainUtil(unsigned int t, vector<uint64_t> bargnIds,  KBase::KM
       // finish
       if (!query.exec()) {
         LOG(INFO) << query.lastError().text().toStdString();
-        //assert(false);
         throw KException("Model::sqlBargainUtil: DB query failed");
       }
     }
@@ -776,7 +762,6 @@ void Model::sqlBargainUtil(unsigned int t, vector<uint64_t> bargnIds,  KBase::KM
 void Model::LogInfoTables()
 {
   // assert tests for all tables here at the start
-  //assert(numAct == actrs.size());
   if (numAct != actrs.size()) {
     throw KException("Model::LogInfoTables: Wrong Actor count");
   }
@@ -799,7 +784,6 @@ void Model::LogInfoTables()
     // record
     if (!query.exec()) {
       LOG(INFO) << query.lastError().text().toStdString();
-      //assert(false);
       throw KException("Model::LogInfoTables: DB query failed");
     }
   }
@@ -858,7 +842,6 @@ void Model::sqlBargainVote(unsigned int t, vector< tuple<uint64_t, uint64_t>> ba
     // finish
     if (!query.exec()) {
       LOG(INFO) << query.lastError().text().toStdString();
-      //assert(false);
       throw KException("Model::sqlBargainVote: DB query failed");
     }
   }
@@ -869,13 +852,11 @@ void Model::sqlBargainVote(unsigned int t, vector< tuple<uint64_t, uint64_t>> ba
 // module run
 void Model::sqlPosProb(unsigned int t)
 {
-  //assert(t < history.size());
   if (t >= history.size()) {
     throw KException("Model::sqlPosProb: Specified turn number is beyond the size of history");
   }
   State* st = history[t];
   // check module for null
-  //assert(nullptr != st);
   if (nullptr == st) {
     throw KException("Model::sqlPosProb: st is a null pointer.");
   }
@@ -892,7 +873,6 @@ void Model::sqlPosProb(unsigned int t)
     // calculate the probablity with respect to each estimator
     auto pn = st->pDist(h);
     auto pdt = std::get<0>(pn); // note that these are unique positions
-    //assert( fabs(1 - sum(pdt)) < 1e-4);
     if (fabs(1 - sum(pdt)) >= 1e-4) {
       throw KException("Model::sqlPosProb sum of all positions exceeded the limit value.");
     }
@@ -908,7 +888,6 @@ void Model::sqlPosProb(unsigned int t)
       query.bindValue(":prob", prob);
       if (!query.exec()) {
         LOG(INFO) << query.lastError().text().toStdString();
-        //assert(false);
         throw KException("Model::sqlPosProb: DB query failed");
       }
     }
@@ -920,7 +899,6 @@ void Model::sqlPosProb(unsigned int t)
 // module run
 void Model::sqlPosVote(unsigned int t)
 {
-  //assert(t < history.size());
   if (t >= history.size()) {
     throw KException("Model::sqlPosVote: Specified turn number is beyond the size of history");
   }
@@ -928,7 +906,6 @@ void Model::sqlPosVote(unsigned int t)
 
 
   // check module for null
-  //assert(nullptr != st);
   if (nullptr == st) {
     throw KException("Model::sqlPosVote: st is a null pointer.");
   }
@@ -966,7 +943,6 @@ void Model::sqlPosVote(unsigned int t)
             query.bindValue(":vote", vij);
             if (!query.exec()) {
               LOG(INFO) << query.lastError().text().toStdString();
-              //assert(false);
               throw KException("Model::sqlPosVote: DB query failed");
             }
           }
@@ -1070,7 +1046,6 @@ bool Model::loginCredentials(string connString) {
     catch (const std::out_of_range& oor) {
       LOG(INFO) << "Error: Wrong connection string provided for DB!";
       LOG(INFO) << "Error:" << oor.what();
-      //assert(false);
       //throw KException("Model::loginCredentials: Wrong connection string for DB");
       string err = "Error in connection string for key: ";
       err += key;
@@ -1107,7 +1082,6 @@ bool Model::loginCredentials(string connString) {
   if (dbDriver.isEmpty()) {
     lastExceptionMsg = "Error! Database driver name can not be left blank.";
     LOG(INFO) << lastExceptionMsg;
-    //assert(false);
     //throw KException("Model::loginCredentials: Database type or name is blank");
     return false;
   }
@@ -1115,7 +1089,6 @@ bool Model::loginCredentials(string connString) {
   if (databaseName.isEmpty()) {
     lastExceptionMsg = "Error! Database name can not be left blank.";
     LOG(INFO) << lastExceptionMsg;
-    //assert(false);
     //throw KException("Model::loginCredentials: Database type or name is blank");
     return false;
   }
@@ -1124,7 +1097,6 @@ bool Model::loginCredentials(string connString) {
   if (dbDriver.compare("QPSQL") && dbDriver.compare("QSQLITE")) {
     lastExceptionMsg = "Error! Wrong driver name. Supported Drivers: postgres(QPSQL), sqlite3(QSQLITE)";
     LOG(INFO) << lastExceptionMsg;
-    //assert(false);
     //throw KException("Model::loginCredentials: Unsuplported DB driver");
     return false;
   }
@@ -1134,7 +1106,6 @@ bool Model::loginCredentials(string connString) {
     if (server.isEmpty()) {
       lastExceptionMsg = "Error! No ip address provided for postgres server";
       LOG(INFO) << lastExceptionMsg;
-      //assert(false);
       //throw KException("Model::loginCredentials: No ip address provided for postgresql server");
       return false;
     }

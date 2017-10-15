@@ -74,7 +74,6 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
     inStream.enable_trim_quote_on_str(true, '\"');
 
     const bool opened = inStream.is_open();
-    //assert (opened);
     if (!opened) {
       throw KException(string("Could not open the input csv file ") + fName);
     }
@@ -96,12 +95,10 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
     LOG(INFO) << "Scenario Name: -|" << scenName << "|-";
     LOG(INFO) << "Scenario Description: " << scenDesc;
 
-    //assert(scenName.length() <= Model::maxScenNameLen);
     if (scenName.length() > Model::maxScenNameLen) {
       throw KException(string("Scenario name can't have more than ")
         + std::to_string(Model::maxScenNameLen) + " chars");
     }
-    //assert(scenDesc.length() <= Model::maxScenDescLen);
     if (scenDesc.length() > Model::maxScenDescLen) {
       throw KException(string("Scenario description can't have more than ")
         + std::to_string(Model::maxScenDescLen) + " chars");
@@ -112,12 +109,9 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
     if (numDim < 1) { // lower limit
         throw(KBase::KException("SMPModel:csvRead: Invalid number of dimensions"));
     }
-    //assert(0 < numDim);
     if ((numActor < minNumActor) || (maxNumActor < numActor)) { // avoid impossibly low or ridiculously large
         throw(KBase::KException("SMPModel::csvRead: Invalid number of actors"));
     }
-    //assert(minNumActor <= numActor);
-    //assert(numActor <= maxNumActor);
 
 
     // get the names of dimensions.
@@ -147,7 +141,6 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
           LOG(INFO) << err.what();
           return nullptr;
         }
-        //assert(dimName.length() <= maxDimDescLen);
         if (dimName.length() > maxDimDescLen) {
           throw KException("Dimension name is too long.");
         }
@@ -179,8 +172,6 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
 
         LOG(INFO) << "Actor:" << i << "name:" << aName;
         // names must have at least 1 character
-        //assert(0 < aName.length());
-        //assert(aName.length() <= Model::maxActNameLen);
         if (0 == aName.length() || aName.length() > Model::maxActNameLen) {
           throw KException("Actor's name is either not there or too long.");
         }
@@ -188,7 +179,6 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
 
         LOG(INFO) << "Actor:" << i << "desc:" << aDesc;
         // empty descriptions are allowed
-        //assert(aDesc.length() <= Model::maxActDescLen);
         if (aDesc.length() > Model::maxActDescLen) {
           throw KException("Actor's description is too long.");
         }
@@ -196,11 +186,9 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
         //LOG(INFO) << "Actor:" << i << "desc:" << actorDescs[i];
 
         LOG(INFO) << KBase::getFormattedString("Actor: %u power: %5.1f", i, aCap);
-        //assert(0 <= aCap); // zero weight is pointless, but not incorrect
         if (0 > aCap) {
           throw KException("Negative capability is not possible.");
         }
-        //assert(aCap < 1E8); // no real upper limit, so this is just a sanity-check
         if (1E8 < aCap) {
           throw KException("Sanity check on upper limit of capability or weight.");
         }
@@ -229,8 +217,6 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
                   i, d, dPos);
                 throw(KException(err));
             }
-            //assert(0.0 <= dPos);
-            //assert(dPos <= 100.0);
             pos(i, d) = dPos;
 
             if ((dSal < 0.0) || (+100.0 < dSal)) { // lower and upper limit
@@ -240,7 +226,6 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
                   i, d, dSal);
                 throw(KException(err));
             }
-            //assert(0.0 <= dSal);
             salI = salI + dSal;
             LOG(INFO) << KBase::getFormattedString("sal[%u, %u] = %5.3f", i, d, dSal);
             if (+100.0 < salI) { // upper limit: no more than 100% of attention to all issues
@@ -250,7 +235,6 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
                   i, salI);
                 throw(KException(err));
             }
-            //assert(salI <= 100.0);
             sal(i, d) = dSal;
         }
     }
@@ -346,7 +330,6 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
     SMPLib::SMPBargnModel bModScen;
 
 
-    //try {
         d1.LoadFile(fName.c_str());
         auto eid = d1.ErrorID();
         if (0 != eid) {
@@ -356,7 +339,6 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
         }
         // missing data causes the missing XMLElement* to come back as nullptr
         XMLElement* scenEl = d1.FirstChildElement("Scenario");
-        //assert(nullptr != scenEl);
         if (nullptr == scenEl) {
           throw KException("SMPModel::xmlRead: Root element 'Scenario' is missing in the input xml file.");
         }
@@ -387,25 +369,6 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
           LOG(INFO) << ke.msg;
         }
 
-        //auto scenNameEl = getFirstChild(scenEl, "name");
-        //const char *name = scenNameEl->GetText();
-        //if (name) {
-        //    sName = name;
-        //}
-        //LOG(INFO) << "Scenario Name: -|" << sName << "|-";
-        //auto scenDescEl = getFirstChild(scenEl, "desc");
-        //const char *desc = scenDescEl->GetText();
-        //if (desc) {
-        //    sDesc = desc;
-        //}
-        //LOG(INFO) << "Scenario Description:" << sDesc;
-
-        //auto seedEl = getFirstChild(scenEl, "prngSeed");
-        //const char* sd2 = seedEl->GetText();
-        //assert(nullptr != sd2);
-        //if (nullptr == sd2) {
-        //  throw KException("SMPModel::xmlRead: prngSeed element is empty in the input xml file.");
-        //}
         const char* sd2 = getXMLText( scenEl, "prngSeed");
         seed = std::stoull(sd2);
         LOG(INFO) << KBase::getFormattedString("Read PRNG seed:  %020llu", seed);
@@ -421,16 +384,12 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
         if (nullptr != modelParamsEl) {
             function <string (const char*)> showChild = [getFirstChild, modelParamsEl](const char* name ) {
                 auto el = getFirstChild(modelParamsEl, name);
-                //if (nullptr == el) {
-                //    throw (KException(string("SMPModel::xmlRead - failed to find required XML element: ") + name));
-                //}
                 auto txt = el->GetText();
                 if( !txt ) {
                   string err = "SMPModel::xmlRead: Follwing Text element is empty: ";
                   err += name;
                   throw KException(err);
                 }
-                //string s = el->GetText();
                 string s = txt;
                 return s;
             };
@@ -450,19 +409,14 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
 
         // read all the dimensions
             numDim = 0;
-            //XMLElement* dimsEl = scenEl->FirstChildElement("Dimensions");
             XMLElement* dimsEl = getFirstChild(scenEl, "Dimensions");
-            //assert(nullptr != dimsEl);
-            //XMLElement* dEl = dimsEl->FirstChildElement("dName");
             XMLElement* dEl = getFirstChild(dimsEl, "dName");
-            //assert(nullptr != dEl); // has to be at least one}
             while (nullptr != dEl) {
                 const char* dn = dEl->GetText();
                 if (nullptr != dn) {
                   dNames.push_back(string(dn));
                 }
                 else {
-                  //LOG(INFO) << "A dimension element dName is there but the value is empty.";
                   throw KException("A dimension element dName is there but it is empty.");
                 }
                 // move to the next, if any
@@ -473,12 +427,8 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
         
         // Count the actors
           numAct = 0;
-          //XMLElement* actorsEl = scenEl->FirstChildElement("Actors");
           XMLElement* actors = getFirstChild(scenEl, "Actors");
-          //assert(nullptr != actorsEl);
-          //XMLElement* aEl = actorsEl->FirstChildElement("Actor");
           XMLElement* actor = getFirstChild(actors, "Actor");
-          //assert(nullptr != aEl); // has to be at least one
           while (nullptr != actor) {
             // move to the next, if any
             numAct++;
@@ -491,43 +441,31 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
         salM = KMatrix(numAct, numDim);
 
         // Read all the actors
-        //try {
-            //XMLElement* actorsEl = scenEl->FirstChildElement("Actors");
             XMLElement* actorsEl = getFirstChild(scenEl, "Actors");
-            //assert(nullptr != actorsEl);
-            //XMLElement* aEl = actorsEl->FirstChildElement("Actor");
             XMLElement* aEl = getFirstChild(actorsEl, "Actor");
-            //assert(nullptr != aEl); // has to be at least one
             unsigned int actCntr = 0;
             while (nullptr != aEl) { 
-                //const char* aName = aEl->FirstChildElement("name")->GetText();
                 const char* aName = getXMLText(aEl, "name");
-                //const char* aDesc = aEl->FirstChildElement("description")->GetText();
                 const char* aDesc = getXMLText(aEl, "description");
 
                 actorNames.push_back(string(aName));
                 actorDescs.push_back(string(aDesc));
 
                 double cap = -10.0; // another impossible value
-                //tinyxml2::XMLError xmlErr = aEl->FirstChildElement("capability")->QueryDoubleText(&cap);
                 auto capNode = getFirstChild(aEl, "capability");
 
                 queryDoubleText(capNode, cap);
 
-                //assert(0.0 < cap); // could be quite large
-                if (0.0 >= cap) {
+                if (0.0 >= cap) { // could be quite large
                   throw KException("SMPModel::xmlRead: capability value can't be negative");
                 }
                 capM(actCntr, 0) = cap;
-                //auto  posEl = aEl->FirstChildElement("Position");
                 auto  posEl = getFirstChild(aEl, "Position");
                 auto vPos = KMatrix(numDim, 1);
                 unsigned int dimCntr = 0; // count and verify dimensions
-                //auto pdEl = posEl->FirstChildElement("dCoord");
                 auto pdEl = getFirstChild(posEl, "dCoord");
                 while (nullptr != pdEl) {
                   double pd = 0.0;
-                  //pdEl->QueryDoubleText(&pd);
                   queryDoubleText(pdEl, pd);
                   LOG(INFO) << KBase::getFormattedString(
                     "Read dimension %u: %.2f", dimCntr, pd);
@@ -536,21 +474,17 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
                   dimCntr++; // got one
                 }
                 LOG(INFO) << "Read" << dimCntr << "dimensional components";
-                //assert(numDim == dimCntr);
                 if (numDim != dimCntr) {
                   throw KException("SMPModel::xmlRead: Count of dimensions doesn't match with the Positions data.");
                 }
 
-                //auto  salEl = aEl->FirstChildElement("Salience");
                 auto  salEl = getFirstChild(aEl, "Salience");
                 auto vSal = KMatrix(numDim, 1);
                 dimCntr = 0;
-                //auto vsEl = salEl->FirstChildElement("dSal");
                 auto vsEl = getFirstChild(salEl, "dSal");
                 double totalSal = 0.0;
                 while (nullptr != vsEl) {
                   double vs = 0.0;
-                  //vsEl->QueryDoubleText(&vs);
                   queryDoubleText(vsEl, vs);
                   if((vs < 0.0) || (+100.0 < vs)) {
                     LOG(INFO) << "SMPModel::xmlRead: Error: Actor's salience must be within [0.0,100.0]";
@@ -560,8 +494,6 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
                     throw(KException(err));
                   }
                   totalSal += vs;
-                  //LOG(INFO) << KBase::getFormattedString(
-                  //  "Read salience %u: %.2f", dimCntr, vs);
                   LOG(INFO) << KBase::getFormattedString("sal[%u, %u] = %5.3f", actCntr, dimCntr, vs);
                   vSal(dimCntr, 0) = vs;
                   vsEl = vsEl->NextSiblingElement("dSal");
@@ -576,7 +508,6 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
                 }
 
                 LOG(INFO) << "Read" << dimCntr << "salience components";
-                //assert(numDim == dimCntr);
                 if (numDim != dimCntr) {
                   throw KException("SMPModel::xmlRead: Count of dimensions doesn't match with the Salience data.");
                 }
@@ -590,20 +521,10 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
                 actCntr++;
                 aEl = aEl->NextSiblingElement("Actor");
             }
-        //}
-        //catch (KException &ke) {
-        //  throw ke;
-        //}
-        //catch (...)
-        //{
-        //    throw (KException("SMPModel::xmlRead: Error reading Actors data"));
-        //}
         
         // Read the accomodation matrix
         LOG(INFO) << "Setting ideal-accomodation matrix to identity matrix (initially, needs reset)";
         accM = KBase::iMat(numAct);
-        //try {
-            //XMLElement* iadEl = scenEl->FirstChildElement("IdealAdjustment");
             XMLElement* iadEl = getFirstChild(scenEl, "IdealAdjustment");
             if (nullptr != iadEl) {
                 LOG(INFO) << "Reading IdealAdjustment matrix";
@@ -615,26 +536,20 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
                             break;
                         }
                     }
-                    //assert (0 <= ndx);
                     if (0 > ndx) {
                       throw KException("SMPModel::xmlRead: Actor not found.");
                     }
                     return ndx;
                 };
                 unsigned int numIAPairs = 0;
-                //XMLElement* iaEl = iadEl->FirstChildElement("iaPair");
                 XMLElement* iaEl = getFirstChild(iadEl, "iaPair");
                 while (nullptr != iaEl){
-                    //auto aiStr = string(iaEl->FirstChildElement("adjustingIdeal")->GetText());
                     auto aiStr = string(getXMLText(iaEl, "adjustingIdeal"));
                     auto aiNdx = nameNdx(aiStr);
-                    //auto rpStr = string(iaEl->FirstChildElement("referencePos")->GetText());
                     auto rpStr = string(getXMLText(iaEl, "referencePos"));
                     auto rpNdx = nameNdx(rpStr);
-                    //auto adjEl = iaEl->FirstChildElement("adjust");
                     auto adjEl = getFirstChild(iaEl, "adjust");
                     double adjV = 0.0;
-                    //adjEl->QueryDoubleText(&adjV);
                     queryDoubleText(adjEl, adjV);
                     LOG(INFO) << KBase::getFormattedString(" %6s (%u) :  %6s  (%u) = %.3f",
                       aiStr.c_str(), aiNdx, rpStr.c_str(), rpNdx, adjV);
@@ -645,35 +560,12 @@ SMPModel * SMPModel::xmlRead(string fName, vector<bool> f) {
                 }
                 LOG(INFO) << "Found" << numIAPairs << "iaPair";
             }
-        //}
-        //catch (KException &ke) {
-        //  throw ke;
-        //}
-        //catch (...)
-        //{
-        //    throw (KException("SMPModel::xmlRead: Error reading accomodation data"));
-        //}
-
-    //}
-    //catch (const KException& ke)
-    //{
-    //  LOG(INFO) << "Caught KException in SMPModel::readXML:";
-    //  throw ke;
-    //    //assert(false);
-    //}
-    //catch (...)
-    //{
-    //    //LOG(INFO) << "Caught unidentified exception in SMPModel::readXML";
-    //    //assert(false);
-    //    throw KException("SMPModel::xmlRead: Caught unidentified exception");
-    //}
 
     posM = posM / 100.0;
     salM = salM / 100.0;
     LOG(INFO) << "End SMPModel::readXML of" << fName;
     // now that it is read and verified, use the data  
     smp = initModel(actorNames, actorDescs, dNames, capM, posM, salM, accM, seed, f, sDesc, sName);
-    //assert (smp != nullptr);
     if (nullptr == smp) {
       throw KException("SMPModel::xmlRead: Model Initialization failed to provide a valid smp object.");
     }

@@ -91,11 +91,9 @@ void bestAgendaChair(vector<Agenda*> ars, const KMatrix& vals, const KMatrix& ca
     auto ar = ars[ai];
     ars.push_back(ar);
     double v0 = ar->eval(vals, 0); //
-    //assert(0.0 <= v0);
     if (0.0 > v0) {
       throw KException("bestAgendaChair: v0 must be non-negative");
     }
-    //assert(v0 <= 1.0);
     if (v0 > 1.0) {
       throw KException("bestAgendaChair: v0 must not be greater than 1.0");
     }
@@ -127,7 +125,6 @@ void demoCounting(unsigned int numI, unsigned int maxU, unsigned int maxS, unsig
   }
   LOG(INFO) << log;
 
-  //assert(cat.size() == AgendaControl::numSets(n, m));
   if (cat.size() != AgendaControl::numSets(n, m)) {
     throw KException("demoCounting: inaccurate size of cat");
   }
@@ -158,7 +155,6 @@ void demoCounting(unsigned int numI, unsigned int maxU, unsigned int maxS, unsig
       LOG(INFO) << *a;
     }
     if (Agenda::PartitionRule::FreePR == pr) {
-      //assert(testA.size() == AgendaControl::numAgenda(numI));
       if (testA.size() != AgendaControl::numAgenda(numI)) {
         throw KException("demoCounting: inaccurate test size of agenda");
       }

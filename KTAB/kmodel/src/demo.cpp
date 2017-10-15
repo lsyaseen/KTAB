@@ -79,8 +79,6 @@ void demoPCE(uint64_t s, PRNG* rng) {
     break;
   default:
     LOG(INFO) << "Unrecognized VPModel option";
-    //assert(false);
-    //break;
     throw KBase::KException("demoPCE: Unrecognized VPModel option");
   }
 

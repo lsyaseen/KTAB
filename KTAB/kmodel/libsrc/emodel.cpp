@@ -45,16 +45,13 @@ EModel<PT>::EModel(string desc, uint64_t s, vector <bool> f) : Model(desc, s, f)
 
 template <class PT>
 void EModel<PT>::setOptions() {
-  //assert(nullptr != enumOptions);
   if (nullptr == enumOptions) {
     throw KException("EModel<PT>::setOptions: enumOptions is a null pointer");
   }
-  //assert(0 == theta.size());
   if (0 != theta.size()) {
     throw KException("EModel<PT>::setOptions: theta size is must be zero");
   }
   theta = enumOptions();
-  //assert (minNumOptions <= theta.size());
   if (minNumOptions > theta.size()) {
     throw KException("EModel<PT>::setOptions: invalid number of options");
   }
@@ -77,7 +74,6 @@ unsigned int EModel<PT>::numOptions() const {
 
 template <class PT>
 PT EModel<PT>::nthOption(unsigned int i) const {
-  //assert(i < theta.size());
   if (i >= theta.size()) {
     string err = string("EModel<PT>::nthOption: Provided index ")
       + std::to_string(i) + " is more than the size of theta";
@@ -135,7 +131,6 @@ double EActor<PT>::vote(unsigned int est,
   auto n2 = es->posNdx(p2);
 
   // TODO: lookup real utilities of Theta[n]
-  //assert (false);
   throw KException("EActor<PT>::vote: dummy method");
 
   double u1 = 0.0; // some fn of ep1
@@ -149,17 +144,14 @@ double EActor<PT>::vote(unsigned int est,
 // --------------------------------------------
 template <class PT>
 EPosition<PT>::EPosition(EModel<PT>* m, int n) : Position() {
-  //assert(nullptr != m);
   if (nullptr == m) {
     throw KException("EPosition<PT>::EPosition: m is a null pointer");
   }
   eMod = m;
-  //assert(0 <= n);
   if (0 > n) {
     throw KException("EPosition<PT>::EPosition: n must be non-negative");
   }
   const unsigned int numOpt = eMod->numOptions();
-  //assert(n < numOpt);
   if (n >= numOpt) {
     throw KException("EPosition<PT>::EPosition: n must be less than number of options");
   }
@@ -209,8 +201,6 @@ void EState<PT>::show() const {
 
 template <class PT>
 bool EState<PT>::equivNdx(unsigned int i, unsigned int j) const {
-  //assert (i < pstns.size());
-  //assert (j < pstns.size());
   if (i >= pstns.size()) {
     throw KException("EState<PT>::equivNdx: Provided index of init actor is more than total number of actors");
   }
@@ -220,13 +210,11 @@ bool EState<PT>::equivNdx(unsigned int i, unsigned int j) const {
   }
 
   auto pi = (const EPosition<PT>*) (pstns[i]);
-  //assert(nullptr != pi);
   if (nullptr == pi) {
     throw KException("EState<PT>::equivNdx: pi is a null pointer");
   }
 
   auto pj = (const EPosition<PT>*) (pstns[j]);
-  //assert(nullptr != pj);
   if (nullptr == pj) {
     throw KException("EState<PT>::equivNdx: pj is a null pointer");
   }
@@ -237,17 +225,14 @@ bool EState<PT>::equivNdx(unsigned int i, unsigned int j) const {
 
 template <class PT>
 unsigned int EState<PT>::posNdx(const unsigned int i) const {
-  //assert (i < pstns.size());
   if (i >= pstns.size()) {
     throw KException("EState<PT>::posNdx: index should be within pstns's size");
   }
   auto pi = (const EPosition<PT>*)(pstns[i]);
-  //assert (nullptr != pi);
   if (nullptr == pi) {
     throw KException("EState<PT>::posNdx: pi is a null pointer");
   }
   int ni = pi->getIndex();
-  //assert (0 <= ni);
   if (0 > ni) {
     throw KException("EState<PT>::posNdx: ni must be non-negative");
   }
@@ -265,7 +250,6 @@ EState<PT>* EState<PT>::stepSUSN() {
   LOG(INFO) << "Setting all utilities from objective perspective";
   setAUtil(-1, ReportingLevel::Low);
   auto s2 = doSUSN(ReportingLevel::Low);
-  //assert(nullptr != s2);
   if (nullptr == s2) {
     throw KException("EState<PT>::stepSUSN: s2 is a null pointer");
   }
@@ -281,16 +265,13 @@ template <class PT>
 KMatrix EState<PT>::uMatH(int h) const {
   const unsigned int numA = eMod->numAct;
   const unsigned int na2 = eMod->actrs.size();
-  //assert(numA == na2);
   if (numA != na2) {
     throw KException("EState<PT>::uMatH: count of actors not as per expectation");
   }
   const unsigned int numU = uIndices.size();
-  //assert((0 < numU) && (numU <= numA));
   if ((0 >= numU) || (numU > numA)) {
     throw KException("EState<PT>::uMatH: numU is not in valid range");
   }
-  //assert(numA == eIndices.size());
   if (numA != eIndices.size()) {
     throw KException("EState<PT>::uMatH: eIndices' size should be equal to number of actors");
   }
@@ -298,7 +279,6 @@ KMatrix EState<PT>::uMatH(int h) const {
   // These are each actor's beliefs about the utilities
   // to other actors of the currently occupied positions
   const unsigned int aus = aUtil.size();
-  //assert (KBase::Model::minNumActor <= aus);
   if (KBase::Model::minNumActor > aus) {
     throw KException("EState<PT>::uMatH: each actor doesn't have utility value");
   }
@@ -319,7 +299,6 @@ KMatrix EState<PT>::uMatH(int h) const {
 
   // In the state, one-to-one matching of actors and actually
   // occupied positions (probably including duplicates)
-  //assert(numA == numP);
   if (numA != numP) {
     throw KException("EState<PT>::uMatH: actors and corrsponding postitions don't match one-to-one");
   }
@@ -335,16 +314,13 @@ template <class PT>
 EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
   const unsigned int numA = eMod->numAct;
   const unsigned int na2 = eMod->actrs.size();
-  //assert(numA == na2);
   if (numA != na2) {
     throw KException("EState<PT>::doSUSN: count of actors not as per expectation");
   }
   const unsigned int numU = uIndices.size();
-  //assert((0 < numU) && (numU <= numA));
   if ((0 >= numU) || (numU > numA)) {
     throw KException(string("EState<PT>::doSUSN: numU is not in valid range (0,") + std::to_string(numA) + "]");
   }
-  //assert(numA == eIndices.size());
   if (numA != eIndices.size()) {
     throw KException("EState<PT>::doSUSN: eIndices' size should be equal to number of actors");
   }
@@ -382,7 +358,6 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
   // which can provide the extra structure of a derived class.
   auto s2 = makeNewEState();
 
-  //assert (0 == s2->pstns.size());
   if (0 != s2->pstns.size()) {
     throw KException("EState<PT>::doSUSN: s2 shouldn't have any positions yet");
   }
@@ -408,7 +383,6 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
     // This entails some type-juggling.
 
     const int eNdx = eph.getIndex();
-    //assert (0 <= eNdx);
     if (0 > eNdx) {
       throw KException("EState<PT>::doSUSN: index must be non-negative");
     }
@@ -416,7 +390,6 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
 
     // all have same beliefs in this demo: verify
     const KMatrix uh0 = aUtil[h]; // constant
-    //assert(KBase::maxAbs(u - uh0) < 1E-10);
     if (KBase::maxAbs(u - uh0) >= 1E-10) {
       throw KException("EState<PT>::doSUSN: all actors dont have beliefs");
     }
@@ -478,7 +451,6 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
                                   eMod->numAct, pstns.size(), eMod->vpm,
                                   hypUtil); // uh or hypUtil
     const double euh = eu(h, 0);
-    //assert(0.0 <= euh);
     if (0.0 > euh) {
       throw KException("EState<PT>::doSUSN: euh must be non-negative");
     }
@@ -518,7 +490,6 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
       if (ReportingLevel::Low < rl) {
         LOG(INFO) << "Found "<<ns.size()<<" neighbors";
       }
-      //assert (0 < ns.size());
       if (0 >= ns.size()) {
         throw KException("EState<PT>::doSUSN: ns must be positive");
       }
@@ -573,7 +544,6 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
     // Logically, du should always be non-negative, as GHC never returns a worse value than the starting point.
     // However, actors plan on the assumption that all others do not change - yet they do.
     const double eps = 0.0001; //  enough to avoid problems with round-off error
-    //assert(-eps <= du);
     if (-eps > du) {
       throw KException("EState<PT>::doSUSN: round off error in du making du negative");
     }
@@ -604,15 +574,12 @@ EState<PT>* EState<PT>::doSUSN(ReportingLevel rl) const {
       newPosFn(h);
     }
   }
-  //assert(nullptr != s2);
   if (nullptr == s2) {
     throw KException("EState<PT>::doSUSN: s2 is a null pointer");
   }
-  //assert(numP == s2->pstns.size());
   if (numP != s2->pstns.size()) {
     throw KException("EState<PT>::doSUSN: Number of positions is not matching with s2's positions count");
   }
-  //assert(numA == s2->model->numAct);
   if (numA != s2->model->numAct) {
     throw KException("EState<PT>::doSUSN: actor count mismatched");
   }
@@ -653,7 +620,6 @@ EState<PT>* EState<PT>::doBCN(ReportingLevel rl) const {
   LOG(INFO) << "EState<PT>::doBCN not yet implemented";
   // do something
 
-  //assert (s2 != nullptr);
   if (nullptr == s2) {
     throw KException("EState<PT>::doBCN: s2 is a null pointer");
   }
@@ -685,16 +651,13 @@ template <class PT>
 EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
   const unsigned int numA = eMod->numAct;
   const unsigned int na2 = eMod->actrs.size();
-  //assert(numA == na2);
   if (numA != na2) {
     throw KException("EState<PT>::doMCN: actor count in error");
   }
   const unsigned int numU = uIndices.size();
-  //assert((0 < numU) && (numU <= numA));
   if ((0 >= numU) || (numU > numA)) {
     throw KException(string("EState<PT>::doMCN: numU is not in valid range (0,") + std::to_string(numA) + "]");
   }
-  //assert(numA == eIndices.size());
   if (numA != eIndices.size()) {
     throw KException("EState<PT>::doMCN: eIndices should have size equal to count of actors");
   }
@@ -730,7 +693,6 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
     // Amit changed the constructor of ALL Models to (sometimes) pre-allocate data.
     // Sometimes it pre-allocates to the right size, filled with nullptr.
     // Sometimes it pre-allocates to size zero.
-    //assert((0 == est->pstns.size()) || (numA == est->pstns.size()));
     if ((0 != est->pstns.size()) && (numA != est->pstns.size())) {
       throw KException("EState<PT>::doMCN: there must be either no positions or each actor should have positions");
     }
@@ -825,7 +787,6 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
     clearPstns(ns);
     for (unsigned int j=0; j<numA; j++) {
       auto pij = new EPosition<PT>(eMod, ni[j]);
-      //assert (nullptr == ns->pstns[j]);
       if (nullptr != ns->pstns[j]) {
         throw KException("EState<PT>::doMCN: postition of j is a null pointer");
       }
@@ -848,11 +809,9 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
     const unsigned int numUi = ns->uIndices.size();
 
     auto uMati = ns->uMatH(0);
-    //assert(numA == uMati.numR());
     if (numA != uMati.numR()) {
       throw KException("EState<PT>::doMCN: uMati matrix doesn't have rows for each actor");
     }
-    //assert (numUi == uMati.numC());uMati
     if (numUi != uMati.numC()) {
       throw KException("EState<PT>::doMCN: uMati matrix has wrong number of columns");
     }
@@ -861,11 +820,9 @@ EState<PT>* EState<PT>::doMCN(ReportingLevel rl) const {
 
     // fast, critical section
     nsEvalMutex.lock();
-    //assert (0.0 <= bestZeta);
     if (0.0 > bestZeta) {
       throw KException("EState<PT>::doMCN: bestZeta must be non-negative");
     }
-    //assert (0.0 < zi);
     if (0.0 >= zi) {
       throw KException("EState<PT>::doMCN: zi must be positive");
     }
@@ -928,7 +885,6 @@ KMatrix EState<PT>::hypExpUtilMat () const {
   KMatrix eu;
 
   // TODO: fix or delete hypExpUtilMat?
-  //assert(false);
   throw KException("EState<PT>::hypExpUtilMat: dummy method");
 
   return eu;
@@ -946,7 +902,6 @@ VUI EState<PT>::powerWeightedSimilarity(const KMatrix& uMat, unsigned int ti, un
   for (unsigned int k = 0; k < numPos; k++) {
     double dk = 0.0;
     //const auto colK = KBase::vSlice(uMat, k);
-    //assert (numAct == colK.numR());
     for (unsigned int j=0; j<numAct; j++) {
       auto ej = (const KBase::EActor<unsigned int>*)(eMod->actrs[j]);
       double sj = ej->sCap;
@@ -985,14 +940,12 @@ tuple <KMatrix, VUI> EState<PT>::pDist(int persp) const {
   const unsigned int numP = numA;
 
   // get unique indices and their probability
-  //assert(0 < uIndices.size()); // should have been set with setUENdx();
   if (0 >= uIndices.size()) {
     throw KException("EState<PT>::pDist: size of uIndices must be positive");
   }
   //auto uNdx2 = uniqueNdx(); // get the indices to unique positions
 
   const unsigned int numU = uIndices.size();
-  //assert(numU <= numP); // might have dropped some duplicates
   if (numU > numP) {
     throw KException("EState<PT>::pDist: numU should not be greater than numP");
   }
@@ -1011,11 +964,9 @@ tuple <KMatrix, VUI> EState<PT>::pDist(int persp) const {
     */
 
   const auto uMat = uMatH(persp);
-  //assert(uMat.numR() == numA); // must include all actors
   if (uMat.numR() != numA) { // must include all actors
     throw KException("EState<PT>::pDist: uMat must include all actors");
   }
-  //assert(uMat.numC() == numU);
   if (uMat.numC() != numU) {
     throw KException("EState<PT>::pDist: uMat should have numU number of columns");
   }
@@ -1037,11 +988,9 @@ tuple <KMatrix, VUI> EState<PT>::pDist(int persp) const {
   const auto p = get<0>(ppv); // column
   //const auto pv = get<1>(ppv); // square
   const auto eu = uMat*p; // column
-  //assert(numA == eu.numR());
   if (numA != eu.numR()) {
     throw KException("EState<PT>::pDist: size of eu should be equal to the count of actors");
   }
-  //assert(1 == eu.numC());
   if (1 != eu.numC()) {
     throw KException("EState<PT>::pDist: eu should be a column vector");
   }
@@ -1059,17 +1008,14 @@ KMatrix EState<PT>::expUtilMat  (KBase::ReportingLevel rl,
                                  KBase::VPModel vpm,
                                  const KMatrix & uMat) const
 {
-  //assert (numA == numP); // one-to-one matching of actors and their positions
   if (numA != numP) { // one-to-one matching of actors and their positions
     throw KException("EState<PT>::expUtilMat: count of actors and count of positions should match");
   }
 
   // BTW, be sure to lambda-bind uMat *after* it is modified.
-  //assert(uMat.numR() == numA); // must include all actors
-  if (uMat.numR() != numA) {
+  if (uMat.numR() != numA) { // must include all actors
     throw KException("EState<PT>::expUtilMat: row count of uMat must be equal to count of actors");
   }
-  //assert(uMat.numC() <= numP); // might have dropped some duplicates
   if (uMat.numC() > numP) { // might have dropped some duplicates
     throw KException("EState<PT>::expUtilMat: column count of uMat must not be greater than numP");
   }
@@ -1083,11 +1029,9 @@ KMatrix EState<PT>::expUtilMat  (KBase::ReportingLevel rl,
     if (!okLower || !okUpper) {
       LOG(INFO) << KBase::getFormattedString("%f  %i  %i  \n", mij, i, j);
     }
-    //assert(okLower);
     if (!okLower) {
       throw KException("EState<PT>::expUtilMat: lower limit crossed");
     }
-    //assert(okUpper);
     if (!okUpper) {
       throw KException("EState<PT>::expUtilMat: upper limit crossed");
     }
@@ -1115,11 +1059,9 @@ KMatrix EState<PT>::expUtilMat  (KBase::ReportingLevel rl,
   const auto p = get<0>(ppv); // column
   const auto pv = get<1>(ppv); // square
   const auto eu = uMat*p; // column
-  //assert(numA == eu.numR());
   if (numA != eu.numR()) {
     throw KException("EState<PT>::expUtilMat: row count of eu must be equal to count of actors");
   }
-  //assert(1 == eu.numC());
   if (1 != eu.numC()) {
     throw KException("EState<PT>::expUtilMat: eu must be a column vector");
   }

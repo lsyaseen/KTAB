@@ -45,11 +45,9 @@ double qrtc(const double& x) {
 }
 
 double quadUfromV(double v, double bigR) {
-  //assert (-1.0 <= bigR);
   if (-1.0 > bigR) {
     throw KException("quadUfromV: bigR must not be less than -1.0");
   }
-  //assert(bigR <= +1.0);
   if (bigR > +1.0) {
     throw KException("quadUfromV: bigR must not be more than 1.0");
   }
@@ -60,7 +58,6 @@ double quadUfromV(double v, double bigR) {
   // v>1 corresponds to X > maxX, which is similarly impossible.
   const double tol = 1E-10;
   if (1 < v) {
-    //assert (v <= 1.0 + tol);
     if (v > 1.0 + tol) {
       throw KException("quadUfromV: value of v is not within limit");
     }
@@ -72,7 +69,6 @@ double quadUfromV(double v, double bigR) {
   double u = 0.0;
   if (0< v) {
     u = v + (bigR * v * (1.0-v));
-    //assert (0.0 <= u);
     if (0.0 > u) {
       throw KException("quadUfromV: u must be non-negative");
     }
@@ -81,7 +77,6 @@ double quadUfromV(double v, double bigR) {
     // straightline interpolation past v=0
     u = (1.0+bigR)*v;
   }
-  //assert (u <= 1.0);
   if (u > 1.0) {
     throw KException("quadUfromV: u must not be more than 1.0");
   }
@@ -104,11 +99,9 @@ double trim(double x, double minX, double maxX, bool strict) {
   double x2 = x;
 
   if (strict) {
-    //assert (minX <= x);
     if (minX > x) {
       throw KException("trim: x is below the lower limit");
     }
-    //assert (x <= maxX);
     if (x > maxX) {
       throw KException("trim: x is above the upper limit");
     }
@@ -127,12 +120,10 @@ double trim(double x, double minX, double maxX, bool strict) {
 
 VUI uiSeq(const unsigned int n1, const unsigned int n2, const unsigned int ns) {
   VUI uis = {};
-  //assert (n1 <= n2);
   if (n1 > n2) {
     throw KException("uiSeq: n1 can't be greater than n2");
   }
 
-  //assert (0 < ns);
   if (0 >= ns) {
     throw KException("uiSeq: Negative value of ns not allowed");
   }
@@ -246,7 +237,6 @@ char* newChars(unsigned int len) {
 };
 
 double rescale(double x, double x0, double x1, double y0, double y1) {
-  //assert((x0 < x1) || (x1 < x0));
   if (x1 == x0) {
     throw KException("rescale: x1 can't be equal to x0");
   }

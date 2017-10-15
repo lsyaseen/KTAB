@@ -43,7 +43,6 @@ FittingParameters pccCSV(const string fs) {
   inStream.set_delimiter(',', "$$");
   inStream.enable_trim_quote_on_str(true, '\"');
 
-  //assert(inStream.is_open());
   if (!inStream.is_open()) {
     throw KException("pccCSV: failed to open file");
   }
@@ -55,21 +54,18 @@ FittingParameters pccCSV(const string fs) {
 
   inStream.read_line();
   inStream >> dummy >> numAct;
-  //assert(KBase::Model::minNumActor <= numAct);
   if (KBase::Model::minNumActor > numAct) {
     throw KException("pccCSV: number of actors is less than the lower threshold");
   }
 
   inStream.read_line();
   inStream >> dummy >> numScen;
-  //assert(1 < numScen);
   if (1 >= numScen) {
     throw KException("pccCSV: num of scenarios must be more than one");
   }
 
   inStream.read_line();
   inStream >> dummy >> numCase;
-  //assert(1 <= numCase);
   if (1 > numCase) {
     throw KException("pccCSV: num of cases must be positive");
   }
@@ -93,11 +89,9 @@ FittingParameters pccCSV(const string fs) {
     for (unsigned int j = 0; j < numCase; j++) {
       double cw = 0.0;
       inStream >> cw;
-      //assert(0.0 <= cw);
       if (0.0 > cw) {
         throw KException("pccCSV: cw must be non-negative");
       }
-      //assert(cw <= 100.0);
       if (cw > 100.0) {
         throw KException("pccCSV: cw must be within 100.0");
       }
@@ -141,11 +135,9 @@ FittingParameters pccCSV(const string fs) {
     string dir;
     inStream >> dummy; // skip "prob-n"
     inStream >> tv; // read a threshold value
-    //assert(0.0 <= tv);
     if (0.0 > tv) {
       throw KException("pccCSV: threshold value must be non-negative");
     }
-    //assert(tv <= 1.0);
     if (tv > 1.0) {
       throw KException("pccCSV: threshold value must not be greater than 1.0");
     }
@@ -169,11 +161,9 @@ FittingParameters pccCSV(const string fs) {
     for (unsigned int k = 0; k < numScen; k++) {
       double pw = 0.0;
       inStream >> pw;
-      //assert(0.0 <= pw);
       if (0.0 > pw) {
         throw KException("pccCSV: pw must be non-negative");
       }
-      //assert(pw <= 100.0);
       if (pw > 100.0) {
         throw KException("pccCSV: pw must be within 100.0");
       }
