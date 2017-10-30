@@ -34,12 +34,23 @@ MainWindow::MainWindow()
     intializeHomeDirectory();
     intializeGUI();
     createConnections();
+    logSMPDataOptionsAnalysis();
 
-
+    updatedDataModel= new QStandardItemModel();
+    updatedAccModel = new QStandardItemModel();
 }
 
 MainWindow::~MainWindow()
 {
+    delete runSmp;
+    delete csvParserObj;
+    delete xmlParserObj;
+    delete actorFrameObj;
+    delete modelFrameObj;
+    delete specsFrameObj;
+
+    delete updatedDataModel;
+    delete updatedAccModel;
 
 }
 
@@ -83,6 +94,10 @@ void MainWindow::createConnections()
     connect(this,SIGNAL(saveNewSMPDataToXMLFile(QStringList,QTableWidget*,QTableWidget*)),
             xmlParserObj,SLOT(saveNewDataToXmlFile(QStringList,QTableWidget*,QTableWidget*)));
     connect(this,SIGNAL(homeDirChanged(QString)),xmlParserObj,SLOT(updateHomeDir(QString)));
+
+    //    generateXMLFile
+    connect(this,SIGNAL(generateXMLFile(QStringList,QStandardItemModel*,QStandardItemModel*,QString)),
+            xmlParserObj,SLOT(saveToXmlFile(QStringList,QStandardItemModel*,QStandardItemModel*,QString)));
 
 }
 
@@ -154,6 +169,10 @@ void MainWindow::actorFrameInitialization()
     sasStackedWidget->addWidget(actorFrameObj);
     actorListModel= new QStandardItemModel;
 
+    connect(this,SIGNAL(getActorDataModel()),actorFrameObj,SLOT(getDataModel()));
+    connect(actorFrameObj,SIGNAL(dataModel(QStandardItemModel*,QStandardItemModel*,QStringList)),
+            this,SLOT(dataAccModel(QStandardItemModel*,QStandardItemModel*,QStringList)));
+
 
 }
 
@@ -182,6 +201,24 @@ void MainWindow::specsFrameInitialization()
 
     filterListModel = new QStandardItemModel;
     crossProductListModel = new QStandardItemModel;
+
+    //get final Spec List
+    connect(this,SIGNAL(getFinalSpecs()),specsFrameObj,SLOT(getFinalSpecificationsList()));
+    connect(specsFrameObj,SIGNAL(finalSpecListModel(DataValues,SpecsData,int)),
+            this,SLOT(finalSpecificationsListModel(DataValues,SpecsData,int)));
+    connect(specsFrameObj,SIGNAL(finalSpecListActor(DataValues,SpecsData,int)),
+            this,SLOT(finalSpecificationsListActor(DataValues,SpecsData,int)));
+    connect(specsFrameObj,SIGNAL(finalSpecListFilter(SpecsData,SpecificationVector,int)),
+            this,SLOT(finalSpecificationsListFilter(SpecsData,SpecificationVector,int)));
+    connect(specsFrameObj,SIGNAL(finalSpecListCrossProduct(SpecsData,SpecificationVector,int)),
+            this,SLOT(finalSpecificationsListCrossProduct(SpecsData,SpecificationVector,int)));
+}
+
+void MainWindow::runModelInitialization()
+{
+    runSmp = new RunModel;
+
+    connect(this,SIGNAL(runSmpModelXMLFiles(QStringList)),runSmp,SLOT(runSMPModel(QStringList)));
 }
 
 void MainWindow::modelNaviClicked()
@@ -255,7 +292,7 @@ void MainWindow::createActions()
     QAction *runFileAct = new QAction(runIcon, tr("Run "), this);
     runFileAct->setShortcuts(seq);
     runFileAct->setStatusTip(tr("Run Model"));
-    connect(runFileAct, SIGNAL(triggered(bool)), this,SLOT(runModel(bool)));
+    connect(runFileAct, SIGNAL(triggered(bool)), this,SLOT(runSpecModel(bool)));
     fileMenu->addAction(runFileAct);
     fileToolBar->addAction(runFileAct);
 
@@ -507,6 +544,7 @@ void MainWindow::importDataFileCSVXML(bool bl)
         }
         else
         {
+            fileNameM = fileName;
             if(fileName.endsWith(".csv")||fileName.endsWith(".CSV"))
             {
                 emit csvFilePath(fileName);
@@ -524,10 +562,109 @@ void MainWindow::saveClicked(bool bl)
 
 }
 
-void MainWindow::runModel(bool bl)
+void MainWindow::runSpecModel(bool bl)
 {
+    //get final specs - Done
+    emit getFinalSpecs();
+
+    //get latest Data Model and Affinity Model from ActorObj
+    emit getActorDataModel();
+
+    //make a new local copy of thee model with changed spec values
+    //Generate  XML files for the model
+    updateModelwithSpecChanges();
+
+    //Run SMP Model
+    runSmp->runSMPModel(runFileNamesList);
+    qDebug()<<"runSmpModelXMLFiles";
+
+    //clear
+    dummy=0;
+    //    runFileNamesList.clear();
+    //    modelDimNames.clear();
+
+    //    specType.clear(); //0 - ModelParameter, 1 - ActorData, 2 - ActorAccData
+
+    //    modRowIndices.clear();
+    //    modColIndices.clear();
+
+    //    rowIndices.clear();
+    //    columnIndices.clear();
+
+    //    accRowIndices.clear();
+    //    accColumnIndices.clear();
+
+
 
 }
+void MainWindow::logSMPDataOptionsAnalysis()
+{
+    loggerConf.parseFromFile("./ktab-smp-logger.conf");
+    // Disable all the logging to begin with
+    loggerConf.set(el::Level::Global, el::ConfigurationType::Enabled, "false");
+    el::Loggers::reconfigureAllLoggers(loggerConf);
+
+    QDateTime UTC = QDateTime::currentDateTime().toTimeSpec(Qt::UTC);
+    QString name("ktab-sas-");
+    name.append(QString::number(UTC.date().year())).append("-");
+    name.append(QString("%1").arg(UTC.date().month(), 2, 10, QLatin1Char('0'))).append("-");
+    name.append(QString("%1").arg(UTC.date().day(), 2, 10, QLatin1Char('0'))).append("__");
+    name.append(QString("%1").arg(UTC.time().hour(), 2, 10, QLatin1Char('0'))).append("-");
+    name.append(QString("%1").arg(UTC.time().minute(), 2, 10, QLatin1Char('0'))).append("-");
+    name.append(QString("%1").arg(UTC.time().second(), 2, 10, QLatin1Char('0')));
+    name.append("_GMT");
+
+    //    if(logDefaultAct->isChecked()==true)
+    //    {
+    //        if(logFileName.isEmpty())
+    //        {
+    QString logFileName = name.append("_log.txt");
+    //        }
+
+    loggerConf.setGlobally(el::ConfigurationType::Filename, logFileName.toStdString());
+    // Enable all the logging
+    loggerConf.set(el::Level::Global, el::ConfigurationType::Enabled, "true");
+    el::Loggers::reconfigureAllLoggers(loggerConf);
+    //    }
+    //    else if(logNewAct->isChecked()==true)
+    //    {
+    //        fclose(stdout);
+    //        fp_old = *stdout;
+    //        QString logFileNewName = QString(homeDirectory+QDir::separator()+name);
+    //        QString saveLogFilePath = QFileDialog::getSaveFileName(this, tr("Save Log File to "),logFileNewName,
+    //                                                               tr("Text File (*.txt)"),0,QFileDialog::DontConfirmOverwrite);
+    //        if(!saveLogFilePath.isEmpty())
+    //        {
+    //            if(saveLogFilePath.endsWith(".txt"))
+    //            {
+    //                saveLogFilePath.remove(".txt");
+    //            }
+    //            QDir dir =QFileInfo(saveLogFilePath).absoluteDir();
+    //            homeDirectory = dir.absolutePath();
+
+    //            logFileNewName=saveLogFilePath;
+
+    //            std::string logFileName = logFileNewName.append("_log.txt").toStdString();
+    //            loggerConf.setGlobally(el::ConfigurationType::Filename, logFileName);
+    //            // Enable all the logging
+    //            loggerConf.set(el::Level::Global, el::ConfigurationType::Enabled, "true");
+    //            el::Loggers::reconfigureAllLoggers(loggerConf);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        if(logNoneAct->isChecked()==true)
+    //        {
+    //            // Disable all the logging
+    //            loggerConf.set(el::Level::Global, el::ConfigurationType::Enabled, "false");
+
+    //            el::Loggers::reconfigureAllLoggers(loggerConf);
+    //        }
+    //    }
+
+}
+
+
 
 void MainWindow::clearSpecifications(bool bl)
 {
@@ -570,8 +707,742 @@ void MainWindow::xmlDataParsedFromFile(QStringList modelDesc, QStringList modpar
                                        QStringList dims, QStandardItemModel * actModel,
                                        QVector<QStringList> idealAdjustmentList)
 {
+    actorScenarioList = modelDesc;
+    modelParams = modpara;
+    modelDimNames = dims;
     emit setAccomodationTableModel(actModel,idealAdjustmentList,dims,modelDesc);
 }
+
+void MainWindow::finalSpecificationsListModel(MainWindow::DataValues modelLhs, MainWindow::SpecsData modelRhs, int specCount)
+{
+    modelSpecificationsLHS=modelLhs;
+    modelSpecificationsRHS=modelRhs ;
+    specsIndexlist[0]=specCount;
+}
+
+void MainWindow::finalSpecificationsListActor(MainWindow::DataValues actorLhs, MainWindow::SpecsData actorRhs, int specCount)
+{
+    actorSpecificationsLHS=actorLhs ;
+    actorSpecificationsRHS=actorRhs ;
+    specsIndexlist[1]=specCount;
+}
+
+void MainWindow::finalSpecificationsListFilter(MainWindow::SpecsData filterLhs, MainWindow::SpecificationVector filterRhs, int specCount)
+{
+    filterSpecificationsLHS=filterLhs;
+    filterSpecificationsRHS=filterRhs;
+    specsIndexlist[2]=specCount;
+}
+
+void MainWindow::finalSpecificationsListCrossProduct(MainWindow::SpecsData crossProdLhs, MainWindow::SpecificationVector crossProdRhs, int specCount)
+{
+    crossProdSpecificationsLHS=crossProdLhs;
+    crossProdSpecificationsRHS=crossProdRhs;
+    specsIndexlist[3]=specCount;
+}
+
+void MainWindow::dataAccModel(QStandardItemModel *dataModel, QStandardItemModel *accModel, QStringList scenarioList)
+{
+    actorDataModel = dataModel;
+    actorAccModel = accModel;
+    actorScenarioList = scenarioList;
+
+}
+
+void MainWindow::updateModelwithSpecChanges()
+{
+    generateModelforScenZ();//scen 0
+
+    for(int spec=0; spec < modelSpecificationsRHS.count(); ++spec)
+    {
+        QString lhsList = modelSpecificationsLHS.at(spec);
+        QVector<QString> rhsList = modelSpecificationsRHS.at(spec);
+        getRowColumnIndicesModelActor(lhsList);
+        updateDataModelRowColumn(rhsList);
+        saveSpecsToFile(0);
+    }
+
+    for(int spec=0; spec < actorSpecificationsRHS.count(); ++spec)
+    {
+        QString lhsList = actorSpecificationsLHS.at(spec);
+        QVector<QString> rhsList = actorSpecificationsRHS.at(spec);
+        getRowColumnIndicesModelActor(lhsList);
+        updateDataModelRowColumn(rhsList);
+        saveSpecsToFile(1);
+
+    }
+
+    for(int spec=0; spec < filterSpecificationsRHS.count(); ++spec)
+    {
+        QVector<QString>  lhsList = filterSpecificationsLHS.at(spec);
+        QVector<QVector<QString>> rhsList = filterSpecificationsRHS.at(spec);
+        getRowColumnIndicesFilterCrossProd(lhsList);
+        for(int specsIndex =0 ; specsIndex < rhsList.count(); ++specsIndex)
+        {
+            updateFilterCrossProdRowColumn(rhsList.at(specsIndex));
+        }
+        saveSpecsToFile(2);
+    }
+
+    for(int spec=0; spec < crossProdSpecificationsRHS.count(); ++spec)
+    {
+
+        QVector<QString>  lhsList = crossProdSpecificationsLHS.at(spec);
+        QVector<QVector<QString>> rhsList = crossProdSpecificationsRHS.at(spec);
+        getRowColumnIndicesFilterCrossProd(lhsList);
+        for(int specsIndex =0 ; specsIndex < rhsList.count(); ++specsIndex)
+        {
+            updateFilterCrossProdRowColumn(rhsList.at(specsIndex));
+        }
+        saveSpecsToFile(3);
+    }
+}
+
+void MainWindow::getRowColumnIndicesModelActor(QString lhsList )
+{
+    modRowIndices.clear();
+    modColIndices.clear();
+    rowIndices.clear();
+    columnIndices.clear();
+    accRowIndices.clear();
+    accColumnIndices.clear();
+
+    // parse lhs list split spec for actor and get row id and column id
+    QStringList rowColumnData = lhsList.split(".");
+    if(rowColumnData.count()==1)
+    {
+        qDebug()<<lhsList <<"lhsList";
+        //need to work on model parameters
+        //model parameters
+
+        int row = modelFrameObj->modelParametersList.indexOf(lhsList.trimmed());
+
+        if(row != -1)
+        {
+            modRowIndices.append(row);
+        }
+
+    }
+    else
+    {
+        QString accString = rowColumnData.at(1);
+        if(accString.contains("<>"))
+        {
+            QStringList accStringList = accString.split(" <> ");
+            qDebug()<<accStringList <<"accstringList" << accString;
+            for(int rowIndex = 0; rowIndex < actorDataModel->rowCount(); ++ rowIndex)
+            {
+                if(accStringList.at(0)==actorDataModel->item(rowIndex)->text().trimmed())
+                {
+                    accRowIndices.append(rowIndex);
+                }
+                if(accStringList.at(1)==actorDataModel->item(rowIndex)->text().trimmed())
+                {
+                    accColumnIndices.append(rowIndex);
+                }
+            }
+        }
+        else
+        {
+            qDebug()<<rowColumnData.at(0) <<"lhsList" << rowColumnData.at(1);
+            for(int rowIndex = 0; rowIndex < actorDataModel->rowCount(); ++ rowIndex)
+            {
+                if(rowColumnData.at(0)==actorDataModel->item(rowIndex)->text())
+                {
+                    rowIndices.append(rowIndex);
+                }
+            }
+            for(int colIndex = 0; colIndex < actorDataModel->columnCount(); ++colIndex)
+            {
+                if(rowColumnData.at(1)==actorDataModel->horizontalHeaderItem(colIndex)->text())
+                {
+                    columnIndices.append(colIndex);
+                }
+            }
+        }
+    }
+}
+
+void MainWindow::getRowColumnIndicesFilterCrossProd(QVector<QString> lhsList)
+{
+    modRowIndices.clear();
+    modColIndices.clear();
+    rowIndices.clear();
+    columnIndices.clear();
+    accRowIndices.clear();
+    accColumnIndices.clear();
+    specType.clear();
+
+    for(int lIndex = 0; lIndex < lhsList.length(); ++lIndex)
+    {
+        // parse lhs list split spec for actor and get row id and column id
+        QStringList rowColumnData = lhsList.at(lIndex).split(".");
+        if(rowColumnData.count()==1)
+        {
+            qDebug()<<lhsList.at(lIndex) <<"lhsList";
+            //model parameters
+
+            int row = modelFrameObj->modelParametersList.indexOf(lhsList.at(lIndex).trimmed());
+
+            if(row != -1)
+            {
+                modRowIndices.append(row);
+                specType.append(0);
+            }
+        }
+        else
+        {
+            QString accString = rowColumnData.at(1);
+            if(accString.contains("<>") || accString.contains(" <> "))
+            {
+                QStringList accStringList = accString.split("<>");
+                if(accStringList.count()==1)
+                {
+                    accStringList.clear();
+                    accStringList = accString.split(" <> ");
+                }
+                qDebug()<<accStringList <<"accstringList" << accString;
+                for(int rowIndex = 0; rowIndex < actorDataModel->rowCount(); ++ rowIndex)
+                {
+                    QString actor =accStringList.at(0);
+                    if(actor.trimmed()==actorDataModel->item(rowIndex)->text().trimmed())
+                    {
+                        accRowIndices.append(rowIndex);
+                        specType.append(2);
+                    }
+                    actor =accStringList.at(1);
+                    if(actor.trimmed()==actorDataModel->item(rowIndex)->text().trimmed())
+                    {
+                        accColumnIndices.append(rowIndex);
+                    }
+                }
+            }
+            else
+            {
+                qDebug()<<rowColumnData.at(0) <<"lhsList" << rowColumnData.at(1);
+                for(int rowIndex = 0; rowIndex < actorDataModel->rowCount(); ++ rowIndex)
+                {
+                    if(rowColumnData.at(0)==actorDataModel->item(rowIndex)->text())
+                    {
+                        rowIndices.append(rowIndex);
+                        specType.append(1);
+                    }
+                }
+                for(int colIndex = 0; colIndex < actorDataModel->columnCount(); ++colIndex)
+                {
+                    if(rowColumnData.at(1)==actorDataModel->horizontalHeaderItem(colIndex)->text())
+                    {
+                        columnIndices.append(colIndex);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void MainWindow::generateModelforScenZ()
+{
+
+    QStandardItemModel * updatedDataModel= new QStandardItemModel;
+    QStandardItemModel * updatedAccModel = new QStandardItemModel;
+
+    //making a copy of the model to make modifications in it
+    updatedDataModel->clear();
+    updatedDataModel->insertColumns(0,actorDataModel->columnCount());
+    updatedDataModel->insertRows(0,actorDataModel->rowCount());
+
+    for(int col = 0; col <actorDataModel->columnCount();++col)
+    {
+        for (int row = 0 ; row < actorDataModel->rowCount() ; row++)
+        {
+            updatedDataModel->setItem(row,col,actorDataModel->item(row,col)->clone());
+        }
+    }
+
+    updatedAccModel->clear();
+    updatedAccModel->insertColumns(0,actorDataModel->rowCount());
+    updatedAccModel->insertRows(0,actorDataModel->rowCount());
+
+    if(actorAccModel==nullptr)
+    {
+        actorAccModel= new QStandardItemModel;
+        actorAccModel->insertColumns(0,actorDataModel->rowCount());
+        actorAccModel->insertRows(0,actorDataModel->rowCount());
+
+        for(int col = 0; col <actorDataModel->rowCount(); ++col)
+        {
+            actorAccModel->setHorizontalHeaderItem(col,new QStandardItem(actorDataModel->item(col)->text()));
+            actorAccModel->setVerticalHeaderItem(col,new QStandardItem(actorDataModel->item(col)->text()));
+
+            for (int row = 0 ; row < actorDataModel->rowCount() ; row++)
+            {
+                actorAccModel->setItem(row,col,new QStandardItem("0"));
+                if(row==col)
+                {
+                    actorAccModel->setItem(row,col,new QStandardItem("1"));
+                }
+            }
+        }
+    }
+
+    for(int col = 0; col <actorAccModel->columnCount();++col)
+    {
+        for (int row = 0 ; row < actorAccModel->rowCount() ; row++)
+        {
+            updatedAccModel->setItem(row,col,actorAccModel->item(row,col)->clone());
+        }
+    }
+
+    if(modelParams.count()<9)
+    {
+        //get default parameters from model and update
+        for(int i=0; i <9; ++i)
+        {
+            modelParams.append(modelFrameObj->modelParameters.at(i).at(0));
+        }
+    }
+
+    QStringList parameters;
+
+    parameters.append(QString("Scen_"+QString::number(dummy)+";"+actorScenarioList.at(0)));//name
+    parameters.append(QString("Scen_"+QString::number(dummy)+";"+actorScenarioList.at(1)));//desc
+    parameters.append(actorScenarioList.at(2));//seed
+
+    parameters.append(modelParams); // Modify Parameters
+
+    if(modelDimNames.length()==0)
+    {
+        //names of Dimensions
+        for(int d=0; d< (actorDataModel->columnCount()-3)/2 ; ++d)
+        {
+            modelDimNames.append("Dim" + QString::number(d)); // dummy
+        }
+
+    }
+    parameters.append(modelDimNames);
+
+    QStringList fileNameSplit = fileNameM.split(".");
+    QString file = fileNameSplit.at(0);
+    file.append("_scen_" + QString::number(dummy)+ ".xml");
+
+
+    for(int i=0; i < actorDataModel->rowCount(); ++i)
+    {
+        updatedAccModel->setHorizontalHeaderItem(i,new QStandardItem(updatedDataModel->item(i)->text()));
+        updatedAccModel->setVerticalHeaderItem(i,new QStandardItem(updatedDataModel->item(i)->text()));
+    }
+
+
+    // emit model and save to xml file
+    emit generateXMLFile(parameters,updatedDataModel,updatedAccModel,file);
+    runFileNamesList.append(file);
+
+
+    delete updatedDataModel;
+    delete updatedAccModel;
+
+    statusBar()->showMessage(" Done ...");
+}
+
+
+void MainWindow::updateDataModelRowColumn(QVector<QString> rhsList)
+{
+
+    QStandardItemModel * updatedDataModel= new QStandardItemModel;
+    QStandardItemModel * updatedAccModel = new QStandardItemModel;
+
+    for(int modelCount = 0 ; modelCount < rhsList.length(); ++modelCount)
+    {
+        //making a copy of the model to make modifications in it
+        updatedDataModel->clear();
+        updatedDataModel->insertColumns(0,actorDataModel->columnCount());
+        updatedDataModel->insertRows(0,actorDataModel->rowCount());
+
+        for(int col = 0; col <actorDataModel->columnCount();++col)
+        {
+            for (int row = 0 ; row < actorDataModel->rowCount() ; row++)
+            {
+                updatedDataModel->setItem(row,col,actorDataModel->item(row,col)->clone());
+            }
+        }
+
+        updatedAccModel->clear();
+        updatedAccModel->insertColumns(0,actorDataModel->rowCount());
+        updatedAccModel->insertRows(0,actorDataModel->rowCount());
+
+        if(actorAccModel==nullptr)
+        {
+            actorAccModel= new QStandardItemModel;
+            actorAccModel->insertColumns(0,actorDataModel->rowCount());
+            actorAccModel->insertRows(0,actorDataModel->rowCount());
+
+            for(int col = 0; col <actorDataModel->rowCount(); ++col)
+            {
+                actorAccModel->setHorizontalHeaderItem(col,new QStandardItem(actorDataModel->item(col)->text()));
+                actorAccModel->setVerticalHeaderItem(col,new QStandardItem(actorDataModel->item(col)->text()));
+
+                for (int row = 0 ; row < actorDataModel->rowCount() ; row++)
+                {
+                    actorAccModel->setItem(row,col,new QStandardItem("0"));
+                    if(row==col)
+                    {
+                        actorAccModel->setItem(row,col,new QStandardItem("1"));
+                    }
+                }
+            }
+        }
+
+        for(int col = 0; col <actorAccModel->columnCount();++col)
+        {
+            for (int row = 0 ; row < actorAccModel->rowCount() ; row++)
+            {
+                updatedAccModel->setItem(row,col,actorAccModel->item(row,col)->clone());
+            }
+        }
+
+        qDebug()<<actorDataModel->rowCount() << "RC" << updatedDataModel->rowCount();
+        qDebug()<<actorDataModel->columnCount() << "CC" << updatedDataModel->columnCount();
+
+        //updating Data Model with values
+        for(int r=0; r<rowIndices.length(); ++r)
+        {
+            for(int c=0; c < columnIndices.length(); ++ c)
+            {
+                QStandardItem * item = new QStandardItem(rhsList.at(modelCount));
+
+                updatedDataModel->setItem(rowIndices.at(r),columnIndices.at(c),item);
+            }
+        }
+
+        //updating Acc Model with values
+        for(int r=0; r<accRowIndices.length(); ++r)
+        {
+            for(int c=0; c < accColumnIndices.length(); ++ c)
+            {
+                QStandardItem * item = new QStandardItem(rhsList.at(modelCount));
+
+                updatedAccModel->setItem(accRowIndices.at(r),accColumnIndices.at(c),item);
+            }
+        }
+
+        if(modelParams.count()<9)
+        {
+            //get default parameters from model and update
+            for(int i=0; i <9; ++i)
+            {
+                modelParams.append(modelFrameObj->modelParameters.at(i).at(0));
+            }
+        //updating Modelparameters with values
+        }
+        for(int r=0; r<modRowIndices.length(); ++r)
+        {
+            modelParams[modRowIndices.at(modelCount)] = rhsList.at(modelCount);
+        }
+
+        QStringList parameters;
+
+        dummy++;
+
+        parameters.append(QString("Scen_"+QString::number(dummy)+";"+actorScenarioList.at(0)));//name
+        parameters.append(QString("Scen_"+QString::number(dummy)+";"+actorScenarioList.at(1)));//desc
+        parameters.append(actorScenarioList.at(2));//seed
+
+        parameters.append(modelParams); // Modify Parameters
+
+        if(modelDimNames.length()==0)
+        {
+            //names of Dimensions
+            for(int d=0; d< (actorDataModel->columnCount()-3)/2 ; ++d)
+            {
+                modelDimNames.append("Dim" + QString::number(d)); // dummy
+            }
+
+        }
+        parameters.append(modelDimNames);
+
+        QStringList fileNameSplit = fileNameM.split(".");
+        QString file = fileNameSplit.at(0);
+        file.append("_scen_" + QString::number(dummy)+ ".xml");
+
+        // emit model and save to xml file
+        emit generateXMLFile(parameters,updatedDataModel,updatedAccModel,file);
+        runFileNamesList.append(file);
+
+    }
+    delete updatedDataModel;
+    delete updatedAccModel;
+
+    statusBar()->showMessage(" Done ...");
+}
+
+void MainWindow::updateFilterCrossProdRowColumn(QVector<QString> rhsList)
+{
+
+    updatedDataModel->clear();
+    updatedAccModel->clear();
+    QStringList parameters;
+    int r=0;
+
+    //making a copy of the model to make modifications in it
+    updatedDataModel->insertColumns(0,actorDataModel->columnCount());
+    updatedDataModel->insertRows(0,actorDataModel->rowCount());
+
+    for(int col = 0; col <actorDataModel->columnCount();++col)
+    {
+        for (int row = 0 ; row < actorDataModel->rowCount() ; row++)
+        {
+            updatedDataModel->setItem(row,col,actorDataModel->item(row,col)->clone());
+        }
+    }
+
+    updatedAccModel->clear();
+    updatedAccModel->insertColumns(0,actorDataModel->rowCount());
+    updatedAccModel->insertRows(0,actorDataModel->rowCount());
+
+    if(actorAccModel==nullptr)
+    {
+        actorAccModel= new QStandardItemModel;
+        actorAccModel->insertColumns(0,actorDataModel->rowCount());
+        actorAccModel->insertRows(0,actorDataModel->rowCount());
+
+        for(int col = 0; col <actorDataModel->rowCount(); ++col)
+        {
+            for (int row = 0 ; row < actorDataModel->rowCount() ; row++)
+            {
+                actorAccModel->setItem(row,col,new QStandardItem("0"));
+                if(row==col)
+                {
+                    actorAccModel->setItem(row,col,new QStandardItem("1"));
+                }
+            }
+        }
+    }
+
+    for(int col = 0; col <actorAccModel->columnCount();++col)
+    {
+        for (int row = 0 ; row < actorAccModel->rowCount() ; row++)
+        {
+            updatedAccModel->setItem(row,col,actorAccModel->item(row,col)->clone());
+        }
+    }
+
+    // checking the count
+    if(modelParams.count()<9)
+    {
+        //get default parameters from model and update
+        for(int i=0; i <9; ++i)
+        {
+            modelParams.append(modelFrameObj->modelParameters.at(i).at(0));
+        }
+    }
+
+
+    for(int modelCount = 0 ; modelCount < rhsList.length(); ++modelCount)
+    {
+        qDebug() <<rhsList.length()<<" rhsList len and data"<< rhsList.at(modelCount);
+        qDebug() << specType << "specType";
+
+
+        qDebug()<<actorDataModel->rowCount() << "RC" << updatedDataModel->rowCount();
+        qDebug()<<actorDataModel->columnCount() << "CC" << updatedDataModel->columnCount();
+
+
+        if(specType.at(modelCount)==1)
+        {
+            //updating Data Model with values
+            for(int r=0; r<rowIndices.length(); ++r)
+            {
+                for(int c=0; c < columnIndices.length(); ++ c)
+                {
+                    QStandardItem * item = new QStandardItem(QString(rhsList.at(modelCount)));
+
+                    updatedDataModel->setItem(rowIndices.at(r),columnIndices.at(c),item);
+
+                    //                    qDebug()<< rhsList.at(modelCount) << "DataModel" << rowIndices.at(r) << columnIndices.at(c);
+                }
+            }
+        }
+        if(specType.at(modelCount)==2)
+        {
+            //updating Acc Model with values
+            for(int r=0; r<accRowIndices.length(); ++r)
+            {
+                for(int c=0; c < accColumnIndices.length(); ++ c)
+                {
+                    QStandardItem * item = new QStandardItem(QString(rhsList.at(modelCount)));
+
+                    updatedAccModel->setItem(accRowIndices.at(r),accColumnIndices.at(c),item);
+
+                    //                    qDebug()<< rhsList.at(modelCount) << "DataModel" << accRowIndices.at(r) << accColumnIndices.at(c);
+
+                }
+            }
+        }
+        if(specType.at(modelCount)==0)
+        {
+
+            //updating Modelparameters with values
+//            for(int r=0; r<modRowIndices.length(); ++r)
+            {
+
+                modelParams[modRowIndices.at(r++)] = rhsList.at(modelCount);
+
+            }
+        }
+    }
+
+    dummy++;
+
+    parameters.append(QString("Scen_"+QString::number(dummy)+";"+actorScenarioList.at(0)));//name
+    parameters.append(QString("Scen_"+QString::number(dummy)+";"+actorScenarioList.at(1)));//desc
+    parameters.append(actorScenarioList.at(2));//seed
+
+    parameters.append(modelParams); // Modify Parameters
+
+    if(modelDimNames.length()==0)
+    {
+        //names of Dimensions
+        for(int d=0; d< (actorDataModel->columnCount()-3)/2 ; ++d)
+        {
+            modelDimNames.append("Dim" + QString::number(d)); // dummy
+        }
+
+    }
+    parameters.append(modelDimNames);
+    QStringList fileNameSplit = fileNameM.split(".");
+    QString file = fileNameSplit.at(0);
+    file.append("_scen_" + QString::number(dummy)+ ".xml");
+
+
+    for(int i=0; i < actorDataModel->rowCount(); ++i)
+    {
+        updatedAccModel->setHorizontalHeaderItem(i,new QStandardItem(updatedDataModel->item(i)->text()));
+        updatedAccModel->setVerticalHeaderItem(i,new QStandardItem(updatedDataModel->item(i)->text()));
+    }
+
+    // emit model and save to xml file
+    emit generateXMLFile(parameters,updatedDataModel,updatedAccModel,file);
+    runFileNamesList.append(file);
+
+    statusBar()->showMessage(" Done ...");
+
+}
+
+void MainWindow::saveSpecsToFile(int specTypeIndex)
+{
+    QFile f("specListFile.txt");
+
+    if (f.open(QFile::WriteOnly | QFile::Append))
+    {
+        QTextStream data( &f );
+        QString scenIndex;
+        scenIndex.append("Spec_");
+        int val=1;
+
+        //appending data
+        if(specTypeIndex==0)
+        {
+            for(int indx = 0 ; indx < modelSpecificationsRHS.length();++indx)
+            {
+                QString spec;
+                spec.append(scenIndex + QString::number(val++)).append(";");
+                spec.append("(");
+                spec.append(modelSpecificationsLHS.at(indx).at(0));
+                spec.append(")=(");
+
+                for(int parIndex=0; parIndex < modelSpecificationsRHS.at(indx).length(); ++parIndex)
+                {
+                    spec.append(modelSpecificationsRHS.at(indx).at(parIndex)).append(",");
+                }
+                spec.append("#");
+                spec.remove(",#").append(")");
+                data <<spec + "\n";
+            }
+        }
+        if(specTypeIndex==1)
+        {
+            for(int indx = 0 ; indx < modelSpecificationsRHS.length();++indx)
+            {
+                QString spec;
+                spec.append(scenIndex + QString::number(val++)).append(";");
+                spec.append("(");
+                spec.append(actorSpecificationsLHS.at(indx).at(0));
+                spec.append(")=(");
+
+                for(int parIndex=0; parIndex < actorSpecificationsRHS.at(indx).length(); ++parIndex)
+                {
+                    spec.append(actorSpecificationsRHS.at(indx).at(parIndex)).append(",");
+                }
+                spec.append("#");
+                spec.remove(",#").append(")");
+                data <<spec + "\n";
+            }
+        }
+        if(specTypeIndex==2)
+        {
+
+            for(int specIndex = 0 ; specIndex < filterSpecificationsRHS.length(); ++ specIndex)
+            {
+
+                QString spec;
+                spec.append(scenIndex + QString::number(val++)).append(";");
+                spec.append("(");
+
+                for(int indx= 0 ; indx < filterSpecificationsLHS.at(specIndex).length();++indx)
+                {
+                    spec.append(filterSpecificationsLHS.at(specIndex).at(indx));
+                }
+                spec.append(")=(");
+
+                for(int parIndex=0; parIndex < filterSpecificationsRHS.at(specIndex).length(); ++parIndex)
+                {
+                    for(int valIndex = 0; valIndex < filterSpecificationsRHS.at(specIndex).at(parIndex).length() ; ++ valIndex)
+                    {
+                        spec.append(filterSpecificationsRHS.at(specIndex).at(parIndex).at(valIndex)).append(",");
+                    }
+                }
+                spec.append("#");
+                spec.remove(",#").append(")");
+
+                data <<spec + "\n";
+            }
+
+        }
+        if(specTypeIndex==3)
+        {
+            for(int specIndex = 0 ; specIndex <crossProdSpecificationsRHS.length(); ++ specIndex)
+            {
+                for(int parIndex=0; parIndex < crossProdSpecificationsRHS.at(specIndex).length(); ++parIndex)
+                {
+                    QString spec;
+                    spec.append(scenIndex + QString::number(val++)).append(";");
+                    spec.append("(");
+
+                    for(int indx= 0 ; indx < crossProdSpecificationsLHS.at(specIndex).length();++indx)
+                    {
+                        spec.append(crossProdSpecificationsLHS.at(specIndex).at(indx)).append(",");
+                    }
+                    spec.append("#").remove(",#");
+                    spec.append(")=(");
+
+                    for(int valIndex = 0; valIndex < crossProdSpecificationsRHS.at(specIndex).at(parIndex).length() ; ++ valIndex)
+                    {
+                        spec.append(crossProdSpecificationsRHS.at(specIndex).at(parIndex).at(valIndex)).append(",");
+                    }
+                    spec.append("#");
+                    spec.remove(",#").append(")");
+
+                    data <<spec + "\n";
+                }
+            }
+        }
+
+        f.close();
+    }
+}
+
+// preceding zeros in file name
+
 // --------------------------------------------
 // Copyright KAPSARC. Open source MIT License.
 // --------------------------------------------

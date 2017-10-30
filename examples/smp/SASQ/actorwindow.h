@@ -71,7 +71,7 @@ private :
     QLineEdit * scenarioName;
     QLineEdit * scenarioDescription;
 
-    bool importedData;
+    bool importedDataCSV;
 
     QStringList attributeList;
 
@@ -134,12 +134,14 @@ signals:
     void specificationNew(QString,QPair<DataValues,SpecsData>,int);
     void actorAttributesAndSAS(QString sasValues);
     void removeSpecificationActor(int index, int type, QString specLHS);
+    void dataModel(QStandardItemModel *dataModel,QStandardItemModel *accModel, QStringList scenarioList);
 
 
 public slots :
     void setActorTableModel(QStandardItemModel *model, QStringList scenarioList);
     void setAccTableModel(QStandardItemModel *model, QVector<QStringList> idealAdjustmentList,
                           QStringList dimensionsXml, QStringList desc);
+    void getDataModel();
 
 
 };

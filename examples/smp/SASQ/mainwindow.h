@@ -29,6 +29,9 @@
 #include "specswindow.h"
 #include "csv.h"
 #include "xmlparser.h"
+#include "runmodel.h"
+#include <easylogging++.h>
+
 
 #include <QMainWindow>
 #include <QtCore>
@@ -78,6 +81,7 @@ private :
     QString homeDirectory;
     QString defaultDirectory;
     QSettings recentFileSettings;
+    QString fileNameM;
 
     //recentfile history
     QAction *separatorAct;
@@ -102,7 +106,7 @@ private slots:
     void changeHomeDirectory(bool bl);
     void about();
     void clearSpecifications(bool bl);
-    void runModel(bool bl);
+    void runSpecModel(bool bl);
     void displayMessage(QString cls, QString message);
 
 
@@ -120,6 +124,7 @@ private :
     void modelFrameInitialization();
     void actorFrameInitialization();
     void specsFrameInitialization();
+    void runModelInitialization();
 
     //navigation
     QPushButton * modelPushButton= nullptr;
@@ -142,6 +147,7 @@ private :
     SpecificationFrame * specsFrameObj= nullptr;
     CSV * csvParserObj= nullptr;
     Xmlparser * xmlParserObj= nullptr;
+    RunModel * runSmp=nullptr;
 
     QStandardItemModel * actorListModel= nullptr;
     QStandardItemModel * modelListModel= nullptr;
@@ -154,6 +160,46 @@ private :
     QPair<SpecsData,SpecificationVector> filterSpecs ;
     QPair<SpecsData,SpecificationVector> crossProductSpecs;
 
+    int specsIndexlist[4]= {0};
+
+    DataValues modelSpecificationsLHS ;
+    DataValues actorSpecificationsLHS ;
+    SpecsData filterSpecificationsLHS;
+    SpecsData crossProdSpecificationsLHS;
+
+    SpecsData modelSpecificationsRHS ;
+    SpecsData actorSpecificationsRHS ;
+    SpecificationVector filterSpecificationsRHS;
+    SpecificationVector crossProdSpecificationsRHS;
+
+    QStandardItemModel *actorDataModel;
+    QStandardItemModel *actorAccModel;
+    QStringList actorScenarioList;
+
+    QVector<int> specType; //0 - ModelParameter, 1 - ActorData, 2 - ActorAccData
+
+    QVector<int> modRowIndices;
+    QVector<int> modColIndices;
+
+    QVector<int> rowIndices;
+    QVector<int> columnIndices;
+
+    QVector<int> accRowIndices;
+    QVector<int> accColumnIndices;
+
+    QStringList modelDescNames;
+    QStringList modelParams;
+    QStringList modelDimNames;
+
+    int dummy= 0;
+    QStandardItemModel * updatedDataModel;
+    QStandardItemModel * updatedAccModel;
+
+    QStringList runFileNamesList;
+
+    el::Configurations loggerConf;
+
+
 signals:
     void csvFilePath(QString);
     void setActorModel(QStandardItemModel *,QStringList);
@@ -163,9 +209,29 @@ signals:
                                    QVector<QStringList> idealAdjustmentList,
                                    QStringList dims,QStringList desc);
 
+    void getFinalSpecs();
+    void getActorDataModel();
+    void runSmpModelXMLFiles(QStringList fileNames);
+    void generateXMLFile(QStringList parameters,QStandardItemModel *smpData, QStandardItemModel *affMatrix, QString filename);
+
+private slots:
+    void finalSpecificationsListModel(DataValues modelLhs,SpecsData modelRhs,int specCount);
+    void finalSpecificationsListActor(DataValues actorLhs,SpecsData actorRhs,int specCount);
+    void finalSpecificationsListFilter(SpecsData filterLhs,SpecificationVector filterRhs,int specCount);
+    void finalSpecificationsListCrossProduct(SpecsData crossProdLhs,SpecificationVector crossProdRhs,int specCount);
+    void dataAccModel(QStandardItemModel *dataModel,QStandardItemModel *accModel, QStringList scenarioList);
+
+private:
+    void updateModelwithSpecChanges();
+    void getRowColumnIndicesModelActor(QString lhsList);
+    void getRowColumnIndicesFilterCrossProd(QVector<QString> lhsList);
+    void generateModelforScenZ();
+    void updateDataModelRowColumn(QVector<QString> rhsList);
+    void updateFilterCrossProdRowColumn(QVector<QString> rhsList);
+    void saveSpecsToFile(int specTypeIndex);
+
+    void logSMPDataOptionsAnalysis();
 };
-
-
 
 #endif // MAINWINDOW_H
 

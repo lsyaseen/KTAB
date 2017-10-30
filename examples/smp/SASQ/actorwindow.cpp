@@ -29,7 +29,7 @@ ActorFrame::ActorFrame(QObject *parent)
     frameMainLayout = new QGridLayout(this);
     initializeFrameLayout();
     setLayout(frameMainLayout);
-    importedData = true; //csv
+    importedDataCSV = true; //csv
 }
 
 ActorFrame::~ActorFrame()
@@ -206,7 +206,7 @@ void ActorFrame::setActorTableModel(QStandardItemModel *model, QStringList scena
     actorDataTableView->setModel(csvActorDataModel);
     connect(csvActorDataModel,SIGNAL(itemChanged(QStandardItem*)),this,SLOT(cellSelected(QStandardItem*)));
 
-    importedData=true;
+    importedDataCSV=true;
     initializeAccomodationMatrix("CSV");
     intitalizeSasGridColumn();
     actorAtrributesHeaderList();
@@ -222,7 +222,7 @@ void ActorFrame::setAccTableModel(QStandardItemModel *model,
     xmlActorDataModel=model;
     actorDataTableView->setModel(xmlActorDataModel);
     connect(xmlActorDataModel,SIGNAL(itemChanged(QStandardItem*)),this,SLOT(cellSelected(QStandardItem*)));
-    importedData=false;
+    importedDataCSV=false;
 
     QVector <QString> actors ;
 
@@ -266,6 +266,30 @@ void ActorFrame::setAccTableModel(QStandardItemModel *model,
     intitalizeSasGridColumn();
     actorAtrributesHeaderList();
     validateData();
+}
+
+void ActorFrame::getDataModel()
+{
+    QStandardItemModel * accDataModel;
+    QStandardItemModel * accModel;
+
+    if(importedDataCSV== true)// csv
+    {
+        accDataModel = csvActorDataModel;
+        accModel = csvAccModel;
+
+    }
+    else // xml
+    {
+        accDataModel = xmlActorDataModel;
+        accModel = csvAccModel;
+    }
+
+    QStringList scenarioData;
+    scenarioData.append(scenarioName->text());
+    scenarioData.append(scenarioDescription->text());
+    scenarioData.append("0"); //seed
+    emit dataModel(accDataModel,accModel,scenarioData);
 }
 
 
@@ -1582,7 +1606,7 @@ void ActorFrame::displayMenuTableView(QPoint pos)
     {
         if(actorDataTableView->currentIndex().column()>2)
         {
-            if(importedData==true)//csv
+            if(importedDataCSV==true)//csv
             {
                 csvActorDataModel->removeColumn(actorDataTableView->currentIndex().column());
             }
@@ -1599,7 +1623,7 @@ void ActorFrame::displayMenuTableView(QPoint pos)
     }
     if (act == row)
     {
-        if(importedData==true)
+        if(importedDataCSV==true)
         {
             csvAccModel->removeColumn(actorDataTableView->currentIndex().row());
             csvAccModel->removeRow(actorDataTableView->currentIndex().row());
@@ -1611,7 +1635,7 @@ void ActorFrame::displayMenuTableView(QPoint pos)
         }
 
 
-        if(importedData==true)//csv
+        if(importedDataCSV==true)//csv
         {
             csvActorDataModel->removeRow(actorDataTableView->currentIndex().row());
         }
@@ -1626,7 +1650,7 @@ void ActorFrame::displayMenuTableView(QPoint pos)
         {
             bool ok;
             QString text;
-            if(importedData==true)//csv
+            if(importedDataCSV==true)//csv
             {
                 text = QInputDialog::getText(this, tr("Plesase Enter the Header Name"),
                                              tr("Header Name"), QLineEdit::Normal,
@@ -1660,7 +1684,7 @@ void ActorFrame::displayMenuTableView(QPoint pos)
                         text = header;
                     }
 
-                    if(importedData==true)//csv
+                    if(importedDataCSV==true)//csv
                     {
                         csvActorDataModel->horizontalHeaderItem(actorDataTableView->currentIndex().column())->
                                 setToolTip("The stated position, or advocacy, of the actor");
@@ -1688,7 +1712,7 @@ void ActorFrame::displayMenuTableView(QPoint pos)
                         header.append("\n Salience");
                         text = header;
                     }
-                    if(importedData==true)//csv
+                    if(importedDataCSV==true)//csv
                     {
                         csvActorDataModel->horizontalHeaderItem(actorDataTableView->currentIndex().column())->
                                 setToolTip("The relative importance, or priority, for the actor");
@@ -1700,7 +1724,7 @@ void ActorFrame::displayMenuTableView(QPoint pos)
                     }
                 }
 
-                if(importedData==true)//csv
+                if(importedDataCSV==true)//csv
                 {
                     csvActorDataModel->setHeaderData(actorDataTableView->currentIndex().column(),Qt::Horizontal,text);
                 }
@@ -1721,7 +1745,7 @@ void ActorFrame::displayMenuTableView(QPoint pos)
     {
         if(actorDataTableView->currentIndex().column()>2)
         {
-            if(importedData==true)//csv
+            if(importedDataCSV==true)//csv
             {
                 csvActorDataModel->insertColumn(actorDataTableView->currentIndex().column());
                 csvActorDataModel->setHeaderData(actorDataTableView->currentIndex().column()-1,Qt::Horizontal,"Position");
@@ -1748,7 +1772,7 @@ void ActorFrame::displayMenuTableView(QPoint pos)
     {
         if(actorDataTableView->currentIndex().column()>2)
         {
-            if(importedData==true)//csv
+            if(importedDataCSV==true)//csv
             {
                 csvActorDataModel->insertColumn(actorDataTableView->currentIndex().column());
                 csvActorDataModel->setHeaderData(actorDataTableView->currentIndex().column()-1,Qt::Horizontal,"Salience");
@@ -1774,7 +1798,7 @@ void ActorFrame::displayMenuTableView(QPoint pos)
 
     if(act == newRow)
     {
-        if(importedData==true)
+        if(importedDataCSV==true)
         {
             csvAccModel->insertColumn(actorDataTableView->currentIndex().row());
             csvAccModel->insertRow(actorDataTableView->currentIndex().row());
@@ -1787,7 +1811,7 @@ void ActorFrame::displayMenuTableView(QPoint pos)
 
         QString actorHeader;
         actorHeader.append(" Actor ")/*.append(QString::number(rows+1))*/;
-        if(importedData==true)
+        if(importedDataCSV==true)
         {
             csvAccModel->setHorizontalHeaderItem(actorDataTableView->currentIndex().row(),
                                                  new QStandardItem(actorHeader));
@@ -1802,7 +1826,7 @@ void ActorFrame::displayMenuTableView(QPoint pos)
                                                new QStandardItem(actorHeader));
         }
 
-        if(importedData==true)//csv
+        if(importedDataCSV==true)//csv
         {
             initializeAccMatrixRowCol(actorDataTableView->currentIndex().row(),"CSV");
         }
@@ -1812,7 +1836,7 @@ void ActorFrame::displayMenuTableView(QPoint pos)
         }
         actorHeader.clear();
 
-        if(importedData==true)//csv
+        if(importedDataCSV==true)//csv
         {
             csvActorDataModel->insertRow(actorDataTableView->currentIndex().row());
         }
@@ -1867,7 +1891,7 @@ void ActorFrame::cellSelected(QStandardItem* in)
 {
     if(0==in->column())
     {
-        if(importedData == true)//csv
+        if(importedDataCSV == true)//csv
         {
             csvAccModel->setHorizontalHeaderItem(in->row(),new QStandardItem(in->text()));
             csvAccModel->setVerticalHeaderItem(in->row(),new QStandardItem(in->text()));

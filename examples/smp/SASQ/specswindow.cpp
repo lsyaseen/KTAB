@@ -256,7 +256,7 @@ void SpecificationFrame::createCrossProductSpec(int att1, int att2)
         {
             att2SpecType = 3;
             att2SpecTypeIndex = attributeIndex2 -(specsIndexlist[0]+specsIndexlist[1]+specsIndexlist[2]);
-//            qDebug()<< att2SpecTypeIndex <<"att2SpecTypeIndex";
+            //            qDebug()<< att2SpecTypeIndex <<"att2SpecTypeIndex";
         }
         else
         {
@@ -277,7 +277,7 @@ void SpecificationFrame::createCrossProductSpec(int att1, int att2)
         //LHS specification of cross product
         if(att1SpecType==0)
         {
-//            qDebug()<< modelSpecificationsLHS <<"modelSpecificationsLHS";
+            //            qDebug()<< modelSpecificationsLHS <<"modelSpecificationsLHS";
             lhsVec.append(modelSpecificationsLHS.at(att1SpecTypeIndex));
             specsStr.append(modelSpecificationsLHS.at(att1SpecTypeIndex)).append(",");
 
@@ -285,7 +285,7 @@ void SpecificationFrame::createCrossProductSpec(int att1, int att2)
         }
         else if(att1SpecType==1)
         {
-//            qDebug()<< actorSpecificationsLHS<< "actorSpecificationsLHS";
+            //            qDebug()<< actorSpecificationsLHS<< "actorSpecificationsLHS";
 
             lhsVec.append(actorSpecificationsLHS.at(att1SpecTypeIndex));
             specsStr.append(actorSpecificationsLHS.at(att1SpecTypeIndex)).append(",");
@@ -294,7 +294,7 @@ void SpecificationFrame::createCrossProductSpec(int att1, int att2)
         }
         else if(att1SpecType==2)
         {
-//            qDebug()<< filterSpecificationsLHS<< "filterSpecificationsLHS";
+            //            qDebug()<< filterSpecificationsLHS<< "filterSpecificationsLHS";
             for(int i =0; i <filterSpecificationsLHS.at(att1SpecTypeIndex).length();++i)
             {
                 lhsVec.append(filterSpecificationsLHS.at(att1SpecTypeIndex).at(i));
@@ -304,7 +304,7 @@ void SpecificationFrame::createCrossProductSpec(int att1, int att2)
         }
         else if(att1SpecType==3)
         {
-//            qDebug()<< crossProdSpecificationsLHS<<"crossProdSpecificationsLHS";
+            //            qDebug()<< crossProdSpecificationsLHS<<"crossProdSpecificationsLHS";
             for(int i =0; i <crossProdSpecificationsLHS.at(att1SpecTypeIndex).length();++i)
             {
                 lhsVec.append(crossProdSpecificationsLHS.at(att1SpecTypeIndex).at(i));
@@ -316,7 +316,7 @@ void SpecificationFrame::createCrossProductSpec(int att1, int att2)
         //second specification of cross product
         if(att2SpecType==0)
         {
-//            qDebug()<< modelSpecificationsLHS<<"modelSpecificationsLHS";
+            //            qDebug()<< modelSpecificationsLHS<<"modelSpecificationsLHS";
             lhsVec.append(modelSpecificationsLHS.at(att2SpecTypeIndex));
             specsStr.append(modelSpecificationsLHS.at(att2SpecTypeIndex)).append(",");
             specsStr.append("#").remove(",#").append(")=(");
@@ -324,7 +324,7 @@ void SpecificationFrame::createCrossProductSpec(int att1, int att2)
         }
         else if(att2SpecType==1)
         {
-//            qDebug()<< actorSpecificationsLHS<<"actorSpecificationsLHS";
+            //            qDebug()<< actorSpecificationsLHS<<"actorSpecificationsLHS";
 
             lhsVec.append(actorSpecificationsLHS.at(att2SpecTypeIndex));
             specsStr.append(actorSpecificationsLHS.at(att2SpecTypeIndex)).append(",");
@@ -334,7 +334,7 @@ void SpecificationFrame::createCrossProductSpec(int att1, int att2)
         }
         else if(att2SpecType==2)
         {
-//            qDebug()<< filterSpecificationsLHS<<"filterSpecificationsLHS";
+            //            qDebug()<< filterSpecificationsLHS<<"filterSpecificationsLHS";
             for(int i =0; i <filterSpecificationsLHS.at(att2SpecTypeIndex).length();++i)
             {
                 lhsVec.append(filterSpecificationsLHS.at(att2SpecTypeIndex).at(i));
@@ -345,7 +345,7 @@ void SpecificationFrame::createCrossProductSpec(int att1, int att2)
         }
         else if(att2SpecType==3)
         {
-//            qDebug()<< crossProdSpecificationsLHS<<"crossProdSpecificationsLHS";
+            //            qDebug()<< crossProdSpecificationsLHS<<"crossProdSpecificationsLHS";
             for(int i =0; i <crossProdSpecificationsLHS.at(att2SpecTypeIndex).length();++i)
             {
                 lhsVec.append(crossProdSpecificationsLHS.at(att2SpecTypeIndex).at(i));
@@ -370,7 +370,7 @@ void SpecificationFrame::createCrossProductSpec(int att1, int att2)
                     specsStr.append(modActDataVal2.at(j)).append("),");
                     newSpec.append(modActDataVal2.at(j));
                     specification.append(newSpec);
-//                    qDebug()<< newSpec << "newSpec" ;
+                    //                    qDebug()<< newSpec << "newSpec" ;
                     newSpec.clear();
                 }
             }
@@ -478,7 +478,7 @@ void SpecificationFrame::createCrossProductSpec(int att1, int att2)
         }
 
         crossProductSpecsLHS.append(lhsVec);
-//        qDebug()<< lhsVec << "\n" << specsStr<<"lhsVec";
+        //        qDebug()<< lhsVec << "\n" << specsStr<<"lhsVec";
         crossProductSpecsRHS.append(specification);
 
         QStandardItem * item = new QStandardItem(specsStr);
@@ -598,7 +598,7 @@ void SpecificationFrame::actorModelSpecification(QString spec,QPair<Specificatio
         item->setEditable(false);
 
         specsListModel->insertRow(specsIndexlist[0],item);
-//        qDebug()<< specsIndexlist[0]  << "apecs Index list" <<specsListModel->rowCount();
+        //        qDebug()<< specsIndexlist[0]  << "apecs Index list" <<specsListModel->rowCount();
         specsListView->scrollToBottom();
 
         if(!specData.second.isEmpty())
@@ -609,8 +609,8 @@ void SpecificationFrame::actorModelSpecification(QString spec,QPair<Specificatio
             //            specsIndexlist[0]=specData.second.length();
             specsIndexlist[0]=specsIndexlist[0]+1;
 
-//            qDebug()<< specsIndexlist[0]  << "apecs Index list";
-//            qDebug()<< specsListModel->item(specsListModel->rowCount()-1)->text();
+            //            qDebug()<< specsIndexlist[0]  << "apecs Index list";
+            //            qDebug()<< specsListModel->item(specsListModel->rowCount()-1)->text();
         }
     }
 
@@ -689,7 +689,7 @@ void SpecificationFrame::removeSpecModelActor(int index, int type,QString specLH
     {
         if(index < specsIndexlist[0])
         {
-//            qDebug()<<modelSpecificationsLHS.at(index) << specLHS;
+            //            qDebug()<<modelSpecificationsLHS.at(index) << specLHS;
 
             if(modelSpecificationsLHS.at(index)==specLHS)
             {
@@ -704,7 +704,7 @@ void SpecificationFrame::removeSpecModelActor(int index, int type,QString specLH
     {
         if(index < specsIndexlist[1])
         {
-//            qDebug()<<actorSpecificationsLHS.at(index) << specLHS;
+            //            qDebug()<<actorSpecificationsLHS.at(index) << specLHS;
 
             if(actorSpecificationsLHS.at(index)==specLHS)
             {
@@ -726,7 +726,7 @@ void SpecificationFrame::removeSpecFilterCrossProd(int index, int type, Specific
     {
         if(index < specsIndexlist[2])
         {
-//            qDebug()<<filterSpecificationsLHS.at(index) << specLHS;
+            //            qDebug()<<filterSpecificationsLHS.at(index) << specLHS;
 
             if(filterSpecificationsLHS.at(index).count()==specLHS.count())
             {
@@ -749,7 +749,7 @@ void SpecificationFrame::removeSpecFilterCrossProd(int index, int type, Specific
     {
         if(index < specsIndexlist[3])
         {
-//            qDebug()<<crossProdSpecificationsLHS.at(index) << specLHS;
+            //            qDebug()<<crossProdSpecificationsLHS.at(index) << specLHS;
 
             if(crossProdSpecificationsLHS.at(index).count()==specLHS.count())
             {
@@ -770,6 +770,25 @@ void SpecificationFrame::removeSpecFilterCrossProd(int index, int type, Specific
     populateCrossProductComboBox();
 }
 
+void SpecificationFrame::getFinalSpecificationsList()
+{
+    if(specsIndexlist[0]>0)
+    {
+        emit finalSpecListModel(modelSpecificationsLHS,modelSpecificationsRHS,specsIndexlist[0]);
+    }
+    if(specsIndexlist[1]>0)
+    {
+        emit finalSpecListActor(actorSpecificationsLHS,actorSpecificationsRHS,specsIndexlist[1]);
+    }
+    if(specsIndexlist[2]>0)
+    {
+        emit finalSpecListFilter(filterSpecificationsLHS,filterSpecificationsRHS,specsIndexlist[2]);
+    }
+    if(specsIndexlist[3]>0)
+    {
+        emit finalSpecListCrossProduct(crossProdSpecificationsLHS,crossProdSpecificationsRHS,specsIndexlist[3]);
+    }
+}
 
 void SpecificationFrame::specsListViewContextMenu(QPoint pos)
 {
@@ -975,7 +994,7 @@ void SpecificationFrame::filterAddSpecificationClicked(bool bl)
                 return;
             }
             filterSpecsRHS.append(filterDataRHS);
-//            qDebug()<<filterSpecsRHS <<"filterSpecsRHS"<<filterSpecsLHS;
+            //            qDebug()<<filterSpecsRHS <<"filterSpecsRHS"<<filterSpecsLHS;
             filterDataRHS.clear();
         }
         filterListView->scrollToBottom();

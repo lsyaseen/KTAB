@@ -23,16 +23,16 @@ if(SASQ_SOURCE_DIR)
   set (QtSASQProjectLib_src
     ${SASQ_SOURCE_DIR}/mainwindow.cpp
     ${SASQ_SOURCE_DIR}/actorwindow.cpp
-     ${SASQ_SOURCE_DIR}/modelwindow.cpp
-     ${SASQ_SOURCE_DIR}/specswindow.cpp
-     ${SASQ_SOURCE_DIR}/xmlparser.cpp
+    ${SASQ_SOURCE_DIR}/modelwindow.cpp
+    ${SASQ_SOURCE_DIR}/specswindow.cpp
+    ${SASQ_SOURCE_DIR}/xmlparser.cpp
     ${SASQ_SOURCE_DIR}/csv.cpp
-#    ${SASQ_SOURCE_DIR}/runsmp.cpp
-#    ${SASQ_SOURCE_DIR}/quadmap.cpp
-#    ${SASQ_SOURCE_DIR}/xmlwidget.cpp
-#    ${SASQ_SOURCE_DIR}/colorpickerdialog.cpp
-#    ${SASQ_SOURCE_DIR}/popupwidget.cpp
-)
+    ${SASQ_SOURCE_DIR}/runmodel.cpp
+    #    ${SASQ_SOURCE_DIR}/quadmap.cpp
+    #    ${SASQ_SOURCE_DIR}/xmlwidget.cpp
+    #    ${SASQ_SOURCE_DIR}/colorpickerdialog.cpp
+    #    ${SASQ_SOURCE_DIR}/popupwidget.cpp
+    )
 
   set (QtSASQProjectLib_hdr
     ${SASQ_SOURCE_DIR}/mainwindow.h
@@ -41,7 +41,8 @@ if(SASQ_SOURCE_DIR)
     ${SASQ_SOURCE_DIR}/specswindow.h
     ${SASQ_SOURCE_DIR}/xmlparser.h
     ${SASQ_SOURCE_DIR}/csv.h
-)
+    ${SASQ_SOURCE_DIR}/runmodel.h
+    )
 
   set (QtSASQProjectLib_ui  ${SASQ_SOURCE_DIR}/mainwindow.ui)
   set (QtSASQProjectRsc_qrc ${SASQ_SOURCE_DIR}/sasqwindow.qrc)

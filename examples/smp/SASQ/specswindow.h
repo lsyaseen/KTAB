@@ -93,6 +93,10 @@ signals:
     void crossProductList(QStandardItemModel *, QPair<SpecsData,SpecificationVector>);
     void getActorAttribQuteheaders();
     void statusMessage(QString);
+    void finalSpecListModel(DataValues,SpecsData,int);
+    void finalSpecListActor(DataValues,SpecsData,int);
+    void finalSpecListFilter(SpecsData,SpecificationVector,int);
+    void finalSpecListCrossProduct(SpecsData,SpecificationVector,int);
 
 private slots:
     void listViewClicked();
@@ -118,6 +122,7 @@ public slots:
     void filterCrossProdSpecification(QString spec, QPair<SpecsData,SpecificationVector> specData, int type);
     void removeSpecModelActor(int index, int type, QString specLHS);
     void removeSpecFilterCrossProd(int index, int type, DataValues specLHS);
+    void getFinalSpecificationsList();
 
 };
 

@@ -214,7 +214,9 @@ void Xmlparser::saveToXmlFile(QStringList parameters, QStandardItemModel *smpDat
         xmlWriter.writeEndDocument();
 
         file.close();
-        emit newXmlFilePath(filename);
+        //        emit newXmlFilePath(filename);
+
+        qDebug()<<"completed" << filename;
     }
 }
 
@@ -506,5 +508,6 @@ void Xmlparser::organizeXmlData()
             xmlModel->setItem(row,++col, new QStandardItem(precision));
         }
     }
+    qDebug()<<"modelDES"<<modelDesc<< modelParametes << dimensionNames;
     emit xmlParsedData(modelDesc,modelParametes,dimensionNames,xmlModel,idealAdjustmentList);
 }
