@@ -92,6 +92,12 @@ extern "C" {
     return SMPLib::SMPModel::getIterationCount();
   }
 
+  void getLastError(char * errBuffer, const unsigned int buffsize) {
+    std::string modelErr = KBase::Model::getLastError();
+    
+    modelErr.copy(errBuffer, buffsize);
+  }
+
   void destroySMPModel() {
     SMPLib::SMPModel::destroyModel();
   }
