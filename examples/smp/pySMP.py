@@ -21,12 +21,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # --------------------------------------------
 #
-# This Python scrip demonstrates how to use the SMP shared library to execute the KTAB SMP
+# This Python script demonstrates how to use the SMP shared library to execute the KTAB SMP
 # model in Python. The only difference in running this script in Windows or Linux should
 # be the name of the library: libsmpDyn.so for Linux, and smpDyn.dll for Windows. Please
 # note that this demo script has *not* been tested as extensively as the rest of KTAB. Usage
 # is demonstrated below after the SMP class declaration.  If an .xml file is use as data
 # input, any model parameters stored in the .xml file will *not* be used.
+#
+# After a model run, the SMP process will "remember" results and statuses; multiple runs
+# will require restarting python (technically, any SMP will access and use an existing
+# smpDyn.dll process, and the OS will only kill the process when python exits).
 #
 # See the KTAB documentation and relevant publications for details on the model inputs.
 #
@@ -71,6 +75,7 @@ class SMP(object):
 	posHists - triply-nested list; complete history of actors' positions
 		from the model; states are nested in dimensions are nested in actors
 	scenID - string; scenario ID of the model run, returned by runModel()
+	lastError - string; last SMP error (if any)
 
 	Methods
 	setDatabase() - set the database connection
@@ -81,24 +86,25 @@ class SMP(object):
 	getNumStates() - self-explanatory
 	getPositionHistory() - self-explanatory
 	delModel() - delete the model object through the SMP library and release the memory
+	getLastError() - self-explanatory
 	'''
 	# define special types for the SMP Model Runner
 	_sqlFlagsTypeC = c.c_bool*5     # array of 5 booleans
 	_modelParamsTypeC = c.c_int*9   # array of 9 integers	
-	# define attributes
-	_bsize = 32*16
-	_scenIDC = c.create_string_buffer(_bsize)
+	# define string sizes
+	_bsize = 32*16		# scenario ID 
+	_bsize2 = 256*16	# last error message
 
 	def __init__(self):
 		# get the library
 		if sys.platform == 'linux':
-			self.__smpLib = c.cdll.LoadLibrary(os.getcwd()+os.sep+'libsmpDyn.so')
+			self._smpLib = c.cdll.LoadLibrary(os.getcwd()+os.sep+'libsmpDyn.so')
 		else:
-			self.__smpLib = c.cdll.LoadLibrary(os.getcwd()+os.sep+'smpDyn.dll')
-		self.__logged = False
-		self.__dbased = False
-		self.__runned = False
-		self.__deleted = False
+			self._smpLib = c.cdll.LoadLibrary(os.getcwd()+os.sep+'smpDyn.dll')
+		self._logged = False
+		self._dbased = False
+		self._runned = False
+		self._deleted = False
 
 	#def __repr__(self):
 
@@ -109,10 +115,10 @@ class SMP(object):
 		Run the SMP model; must be executed after setDatabase and setLogger
 		scenID = runModel(sqlFlags,inputDataFile,seed,saveHist,modelParams)
 		'''
-		if not(self.__logged and self.__dbased):
+		if not(self._logged and self._dbased):
 			print('Please execute setDatabase and setLogger first!')
 			return None
-		self.__deleted = False
+		self._deleted = False
 		# save user inputs
 		self.sqlFlags = sqlFlags
 		self.inputDataFile = inputDataFile
@@ -125,9 +131,10 @@ class SMP(object):
 			# uint runSmpModel(char * buffer, const unsigned int buffsize,
 			#   bool sqlLogFlags[5], const char* inputDataFile,
 			#   unsigned int seed, unsigned int saveHistory, int modelParams[9] = 0)
+			self._scenIDC = c.create_string_buffer(self._bsize)
 			proto_SMP = c.CFUNCTYPE(c.c_uint,c.c_char_p,c.c_uint,self._sqlFlagsTypeC,\
 				c.c_char_p,c.c_uint64,c.c_bool,self._modelParamsTypeC)
-			self._runSmpModel = proto_SMP(('runSmpModel',self.__smpLib))
+			self._runSmpModel = proto_SMP(('runSmpModel',self._smpLib))
 		# prepare c-style parameters from inputs
 		self._sqlFlagsC = self._sqlFlagsTypeC(*sqlFlags)
 		self._inputDataFileC = bytes(inputDataFile,encoding="ascii")
@@ -138,7 +145,11 @@ class SMP(object):
 		self.numStates = self._runSmpModel(self._scenIDC,self._bsize,self._sqlFlagsC,
 			self._inputDataFileC,self._seedC,self._saveHistC,self._modelParamsC)
 		self.scenID = self._scenIDC.value.decode('utf-8')
-		self.__runned = True
+		# check for errors
+		err = self.getLastError()
+		if err != '':
+			print('Error occurred: %s'%err)
+		self._runned = True
 		return self.scenID
 
 	def setDatabase(self,connString):
@@ -151,12 +162,16 @@ class SMP(object):
 			# database connection string; the C function declaration is
 			# void dbLoginCredentials(const char *connStr)
 			proto_LC = c.CFUNCTYPE(c.c_voidp, c.c_char_p)
-			self._dbLoginCredentials = proto_LC(('dbLoginCredentials',self.__smpLib))
+			self._dbLoginCredentials = proto_LC(('dbLoginCredentials',self._smpLib))
 		# setup the database connection
 		self.connString = connString
 		self._connStringC = bytes(connString,encoding="ascii")
 		self._dbLoginCredentials(self._connStringC)
-		self.__dbased = True
+		# check for errors
+		err = self.getLastError()
+		if err != '':
+			print('Error occurred: %s'%err)
+		self._dbased = True
 
 	def setLogger(self,logFile):
 		'''
@@ -168,19 +183,23 @@ class SMP(object):
 			# logger configuration; the C function declaration is
 			# void configLogger(const char *cfgFile)
 			proto_CL = c.CFUNCTYPE(c.c_voidp, c.c_char_p)
-			self._configLogger = proto_CL(('configLogger',self.__smpLib))
+			self._configLogger = proto_CL(('configLogger',self._smpLib))
 		# setup the logger
 		self.logFile = logFile
 		self._logFileC = bytes(logFile,encoding="ascii")
 		self._configLogger(self._logFileC)
-		self.__logged = True
+		# check for errors
+		err = self.getLastError()
+		if err != '':
+			print('Error occurred: %s'%err)
+		self._logged = True
 
 	def delModel(self):
 		'''
 		Delete the library SMP model object and release all it's memory
 		delModel()
 		'''
-		if not(self.__deleted):
+		if not(self._deleted) and (self._runned):
 			# first get the data & remove the getter functions
 			self.getNumActors()
 			delattr(self,'_getActorCount')
@@ -189,13 +208,13 @@ class SMP(object):
 			self.getPositionHistory()
 			delattr(self,'_getVPHistory')
 			# define the linking function if not already defined
-			if not(hasattr(self,'_destroySMPModel')):
-				# model desctructor; the C function delaration is
-				# void destroySMPModel()
-				proto_DM = c.CFUNCTYPE(c.c_voidp)
-				self._destroySMPModel = proto_DM(('destroySMPModel',self.__smpLib))
-			self.__deleted = True
-			self._destroySMPModel()
+		if not(hasattr(self,'_destroySMPModel')):
+			# model desctructor; the C function delaration is
+			# void destroySMPModel()
+			proto_DM = c.CFUNCTYPE(c.c_voidp)
+			self._destroySMPModel = proto_DM(('destroySMPModel',self._smpLib))
+		self._deleted = True
+		self._destroySMPModel()
 
 	def getNumStates(self):
 		'''
@@ -203,7 +222,7 @@ class SMP(object):
 		the actors' positions evolved
 		numStates = getNumStates()
 		'''
-		if not(self.__runned):
+		if not(self._runned):
 			# be sure model has run
 			print('Please execute runModel first!')
 			return 0
@@ -215,11 +234,11 @@ class SMP(object):
 		the same as in the data file
 		numActors = getNumActors()
 		'''
-		if not(self.__runned):
+		if not(self._runned):
 			# be sure model has run
 			print('Please execute runModel first!')
 			return 0
-		elif self.__deleted:
+		elif self._deleted:
 			# if model object deleted, just return the stored value
 			return self.numActors
 		# define the linking function if not already defined
@@ -227,9 +246,13 @@ class SMP(object):
 			# get number actors; the C function declaration is:
 			# uint getActorCount()
 			proto_NA = c.CFUNCTYPE(c.c_uint)
-			self._getActorCount = proto_NA(('getActorCount',self.__smpLib))
+			self._getActorCount = proto_NA(('getActorCount',self._smpLib))
 		# execute the getter
 		self.numActors = self._getActorCount()
+		# check for errors
+		err = self.getLastError()
+		if err != '':
+			print('Error occurred: %s'%err)
 		return self.numActors
 
 	def getNumDimensions(self):
@@ -238,11 +261,11 @@ class SMP(object):
 		the same as in the data file
 		numDimensions = getNumDimensions()
 		'''
-		if not(self.__runned):
+		if not(self._runned):
 			# be sure model has run
 			print('Please execute runModel first!')
 			return 0
-		elif self.__deleted:
+		elif self._deleted:
 			# if model object deleted, just return the stored value
 			return self.numDimensions
 		# define the linking function if not already defined
@@ -250,9 +273,13 @@ class SMP(object):
 			# get number dimensions; the C function declaration is:
 			# uint getDimensionCount()
 			proto_ND = c.CFUNCTYPE(c.c_uint)
-			self._getDimensionCount = proto_ND(('getDimensionCount',self.__smpLib))
+			self._getDimensionCount = proto_ND(('getDimensionCount',self._smpLib))
 		# exectue the getter
 		self.numDimensions = self._getDimensionCount()
+		# check for errors
+		err = self.getLastError()
+		if err != '':
+			print('Error occurred: %s'%err)
 		return self.numDimensions
 
 	def getPositionHistory(self):
@@ -262,11 +289,11 @@ class SMP(object):
 		states within dimensions within actors: posHists[actors][dimensions][states]
 		posHists = getPositionHistory()
 		'''
-		if not(self.__runned):
+		if not(self._runned):
 			# be sure model has run
 			print('Please execute runModel first!')
 			return []
-		elif self.__deleted:
+		elif self._deleted:
 			# if model object deleted, just return the stored value
 			return self.posHists
 		# define the linking function if not already defined
@@ -276,17 +303,42 @@ class SMP(object):
 			# void getVPHistory(float positions[])
 			self._posHistTypeC = c.c_float * (self.numStates*self.numDimensions*self.numActors)
 			proto_PS = c.CFUNCTYPE(c.c_voidp,c.POINTER(self._posHistTypeC))
-			self._getVPHistory = proto_PS(('getVPHistory',self.__smpLib))
+			self._getVPHistory = proto_PS(('getVPHistory',self._smpLib))
 		# get the position histories
 		self.posHists = self._posHistTypeC()
 		self._getVPHistory(self.posHists)
-		# reshape into a more useful shape; posHist is a long array in blocks of length
-		# numStates, within blocks of length numDimensions, within blocks of length numActors
-		tmp = [self.posHists[i*self.numStates:(i*self.numStates+self.numStates)] for i in range(self.numActors*self.numDimensions)]
-		self.posHists = [tmp[i*self.numDimensions:(i*self.numDimensions+self.numDimensions)] for i in range(self.numActors)]
-		# could just use posHist = np.reshape(posHists,(numActors,numDimensions,numStates)),
-		# but that would kind of hide what's actually happening in the parsing
+		# check for errors
+		err = self.getLastError()
+		if err != '':
+			print('Error occurred: %s'%err)
+		else:
+			# reshape into a more useful shape; posHist is a long array in blocks of length
+			# numStates, within blocks of length numDimensions, within blocks of length numActors
+			tmp = [self.posHists[i*self.numStates:(i*self.numStates+self.numStates)] for i in range(self.numActors*self.numDimensions)]
+			self.posHists = [tmp[i*self.numDimensions:(i*self.numDimensions+self.numDimensions)] for i in range(self.numActors)]
+			# could just use posHist = np.reshape(posHists,(numActors,numDimensions,numStates)),
+			# but that would kind of hide what's actually happening in the parsing
 		return self.posHists
+  
+	def getLastError(self):
+		'''
+		get the last error, if any:
+		lastError = getLastError()
+		'''
+		if self._deleted:
+			# if model object deleted, just return the stored value
+			return self.lastError
+		# define the linking function if not already defined
+		if not(hasattr(self,'_getLastError')):
+			# get number actors; the C function declaration is:
+			# void getLastError(char * errBuffer, const unsigned int buffsize)
+			self._lastErrorC = c.create_string_buffer(self._bsize2)
+			proto_LE = c.CFUNCTYPE(c.c_voidp,c.c_char_p,c.c_uint)
+			self._getLastError = proto_LE(('getLastError',self._smpLib))
+		# execute the getter
+		self._getLastError(self._lastErrorC,self._bsize2)
+		self.lastError = self._lastErrorC.value.decode('utf-8')
+		return self.lastError
 
 
 ''' Use of the SMP object '''
@@ -328,6 +380,8 @@ if __name__ == "__main__":
 	thisSMP.setLogger(logFile)
 	thisSMP.setDatabase(connString)
 	scenID = thisSMP.runModel(sqlFlags,inputDataFile,seed,saveHist,modelParams)
+	# check for any error
+	err = thisSMP.getLastError()
 	# get data
 	actorCnt = thisSMP.getNumActors()
 	dimensionCnt = thisSMP.getNumDimensions()
