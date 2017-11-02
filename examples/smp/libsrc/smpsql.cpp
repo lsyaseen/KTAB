@@ -55,7 +55,9 @@ KTable * SMPModel::createSQL(unsigned int n)  {
   string name = "";
   unsigned int grpID = 0;
   // check total number of table exceeds
-  assert(n < Model::NumTables + NumTables);
+  if (n >= Model::NumTables + NumTables) {
+    throw KException("SMPModel::createSQL: Asked to create more number of tables than required");
+  }
   if (n < Model::NumTables) {
     return Model::createSQL(n);
   }
@@ -133,7 +135,9 @@ KTable * SMPModel::createSQL(unsigned int n)  {
     }
   }
 
-  assert(grpID<(Model::NumSQLLogGrps+NumSQLLogGrps));
+  if (grpID >= (Model::NumSQLLogGrps + NumSQLLogGrps)) {
+    throw KException("SMPModel::createSQL: grpID not valid");
+  }
   auto tab = new KTable(n,name,sql,grpID);
   return tab;
 }
@@ -147,8 +151,8 @@ void SMPModel::sqlTest() {
     if (!connectDB()) {
       // connect with the default postgres db (the user should have admin privilege)
       if(!connect(server, port, "postgres", userName, password)) {
-        LOG(INFO) << "Please check the login credentials, ip address or port number";
-        assert(false);
+        LOG(INFO) << "Error: Please check the login credentials, ip address or port number";
+        throw KException("Error: SMPModel::sqlTest: Invalid login credentials to connect with database");
       }
 
       query = QSqlQuery(*qtDB);
@@ -165,19 +169,19 @@ void SMPModel::sqlTest() {
             query = QSqlQuery(*qtDB);
           }
           else {
-            LOG(INFO) << "Not connected to new db";
+            LOG(INFO) << "Error: Not connected to new db";
             LOG(INFO) << qtDB->lastError().text().toStdString();
-            assert(false);
+            throw KException("Error: SMPModel::sqlTest: Could not connect with newly created database");
           }
         }
         else {
-          assert(false);
+          throw KException("Error: SMPModel::sqlTest: Could not create a new database");
         }
       }
       else {
         LOG(INFO) << "Database " << databaseName.toStdString()
           << " exists but not able to connect to it.";
-        assert(false);
+        throw KException("Error: SMPModel::sqlTest: Could not connect with the database");
       }
     }
     else {
@@ -192,7 +196,7 @@ void SMPModel::sqlTest() {
   }
   else {
       LOG(INFO) << "Invalid DB driver name";
-      assert(false);
+      throw KException("SMPModel::sqlTest: Please specify correct DB driver (QPSQL or QSQLITE)");
   }
 
   // Create & execute SQL statements
@@ -200,7 +204,9 @@ void SMPModel::sqlTest() {
   for (unsigned int i = 0; i < SMPModel::NumTables + Model::NumTables; i++) {
     // get the table and add to the vector
     auto thistable = SMPModel::createSQL(i);
-    assert(nullptr != thistable);
+    if (nullptr == thistable) {
+      throw KException("SMPModel::sqlTest: Could not create a database table");
+    }
     KTables.push_back(thistable);
     // create the table
     execQuery(thistable->tabSQL);
@@ -220,7 +226,9 @@ void SMPModel::LogInfoTables()
 
   // now do mine
   // assert tests for all tables here at the start
-  assert(numDim == dimName.size());
+  if (numDim != dimName.size()) {
+    throw KException("SMPModel::LogInfoTables: dimension count mismatch");
+  }
 
   // for efficiency sake, we'll do all tables in a single transaction
   // form insert commands
@@ -246,12 +254,16 @@ void SMPModel::LogInfoTables()
 
   // Retrieve accommodation matrix
   auto st = dynamic_cast<SMPState *>(history.back());
-  assert(st != nullptr);
+  if (st == nullptr) {
+    throw KException("SMPModel::LogInfoTables: st is null pointer");
+  }
   auto accM = st->getAccomodate();
 
   // Accomodation table to record affinities
   query.prepare(QString::fromStdString(sqlAcc));
-  assert((accM.numR() == numAct) && (accM.numC() == numAct));
+  if ((accM.numR() != numAct) || (accM.numC() != numAct)) {
+    throw KException("SMPModel::LogInfoTables: accM matrix shape is not correct");
+  }
   for (unsigned int Act_i = 0; Act_i < numAct; ++Act_i) {
       for (unsigned int Act_j = 0; Act_j < numAct; ++Act_j) {
           //bind the data
@@ -261,7 +273,7 @@ void SMPModel::LogInfoTables()
           // record
           if (!query.exec()) {
             LOG(INFO) << query.lastError().text().toStdString();
-            assert(false);
+            throw KException("SMPModel::LogInfoTables: Failed to write Accommodation record");
           }
       }
   }
@@ -276,7 +288,7 @@ void SMPModel::LogInfoTables()
     // record
     if (!query.exec()) {
       LOG(INFO) << query.lastError().text().toStdString();
-      assert(false);
+      throw KException("SMPModel::LogInfoTables: Failed to write DimensionDescription record");
     }
   }
 
@@ -296,7 +308,7 @@ void SMPModel::LogInfoTables()
       // record
       if (!query.exec()) {
         LOG(INFO) << query.lastError().text().toStdString();
-        assert(false);
+        throw KException("SMPModel::LogInfoTables: Failed to write SpatialCapability record");
       }
     }
   }
@@ -324,7 +336,7 @@ void SMPModel::LogInfoTables()
         // record
         if (!query.exec()) {
           LOG(INFO) << query.lastError().text().toStdString();
-          assert(false);
+          throw KException("SMPModel::LogInfoTables: Failed to write SpatialSalience record");
         }
       }
     }
@@ -341,7 +353,7 @@ void SMPModel::LogInfoTables()
 
   if (!query.exec()) {
     LOG(INFO) << query.lastError().text().toStdString();
-    assert(false);
+    throw KException("SMPModel::LogInfoTables: Failed to write ScenarioDesc record");   
   }
 
   // finish
@@ -397,7 +409,7 @@ void SMPState::updateBargnTable(const vector<vector<BargainSMP*>> & brgns,
 
     if (!query.exec()) {
       LOG(INFO) << query.lastError().text().toStdString();
-      assert(false);
+      throw KException("SMPState::updateBargnTable: DB query failed");
     }
 
     return;
@@ -419,7 +431,9 @@ void SMPState::updateBargnTable(const vector<vector<BargainSMP*>> & brgns,
     //uint64_t bgID = 0; // tag uninitialized value
     int countDown = 2; // Stop iterating if cases for i:i and i:j processed
     for (auto bg : bargains_i) {
-      assert(nullptr != bg);
+      if (nullptr == bg) {
+        throw KException("SMPState::updateBargnTable: bg is null pointer");
+      }
       if (bg->actInit == bg->actRcvr) { // For SQ case
         initActr = model->actrNdx(bg->actInit);
         rcvrActr = initActr;
@@ -447,7 +461,9 @@ void SMPState::updateBargnTable(const vector<vector<BargainSMP*>> & brgns,
           double rcvrProb = -1.0;
           int rcvrSelected = -1;
           for (auto bgRcv : brgnRcvr) {
-            assert(nullptr != bgRcv);
+            if (nullptr == bgRcv) {
+              throw KException("SMPState::updateBargnTable: bgRcv is null pointer");
+            }
             if (ai == bgRcv->actInit) {
               rcvrProb = (actorBargains[rcvrActr])(rcvrBgNdx, 0);
 
@@ -532,7 +548,7 @@ void SMPState::recordProbEduChlg() const {
       // actually record it
       if (!query.exec()) {
         LOG(INFO) << query.lastError().text().toStdString();
-        assert(false);
+        throw KException("SMPState::recordProbEduChlg: DB query failed.");
       }
     }
   }
@@ -565,7 +581,7 @@ void SMPState::recordProbEduChlg() const {
     // actually record it
     if (!query.exec()) {
       LOG(INFO) << query.lastError().text().toStdString();
-      assert(false);
+      throw KException("SMPState::recordProbEduChlg: DB query failed.");
     }
   }
 
@@ -606,7 +622,7 @@ void SMPState::recordProbEduChlg() const {
     // actually record it
     if (!query.exec()) {
       LOG(INFO) << query.lastError().text().toStdString();
-      assert(false);
+      throw KException("SMPState::recordProbEduChlg: DB query failed.");
     }
   }
 

@@ -37,6 +37,7 @@ using KBase::KMatrix;
 using KBase::PRNG;
 using KBase::VUI;
 using KBase::printVUI;
+using KBase::KException;
 using std::get;
 
 // -------------------------------------------------
@@ -49,7 +50,9 @@ using std::get;
 vector<VUI> scanAllPossiblePositions(const RPModel * rpm) {
   unsigned int numA = rpm->numAct;
   unsigned int numRefItem = rpm->numItm;
-  assert(numRefItem == rpm->numCat);
+  if (numRefItem != rpm->numCat) {
+    throw KException("scanAllPossiblePositions: Number of ref item should be equal to number of categories in rpm");
+  }
 
   LOG(INFO) << "There are" << numA << "actors and" << numRefItem << "reform items";
 
@@ -67,7 +70,9 @@ vector<VUI> scanAllPossiblePositions(const RPModel * rpm) {
   LOG(INFO) << "Effective gov cost of items:";
   (rpm->govCost).mPrintf("%.3f ");
   LOG(INFO) << "Government budget: " << rpm->govBudget;
-  assert(0 < rpm->govBudget);
+  if (0 >= rpm->govBudget) {
+    throw KException("scanAllPossiblePositions: govBudget must be positive");
+  }
 
 
   string log("Value to actors (rows) of individual reform items (columns):");
@@ -126,8 +131,12 @@ vector<VUI> scanAllPossiblePositions(const RPModel * rpm) {
         pvMax = rij;
       }
     }
-    assert(0 <= pvMin);
-    assert(pvMin < pvMax);
+    if (0 > pvMin) {
+      throw KException("scanAllPossiblePositions: pvMin must be non-negative");
+    }
+    if (pvMin >= pvMax) {
+      throw KException("scanAllPossiblePositions: pvMin must be less than pvMax");
+    }
     auto ai = ((RPActor*)(rpm->actrs[i]));
     ai->posValMin = pvMin;
     ai->posValMax = pvMax;
@@ -179,7 +188,9 @@ vector<VUI> scanAllPossiblePositions(const RPModel * rpm) {
 
   LOG(INFO) << "Computing zeta ... ";
   KMatrix zeta = aCap * uij;
-  assert((1 == zeta.numR()) && (numPos == zeta.numC()));
+  if ((1 != zeta.numR()) || (numPos != zeta.numC())) {
+    throw KException("scanAllPossiblePositions: zeta must be a row vector with numPos number of columns");
+  }
 
 
   LOG(INFO) << "Sorting positions from most to least net support ...";
@@ -383,26 +394,53 @@ int main(int ac, char **av) {
     }
 
   if (rp2P) {
-    RfrmPri2::rp2Creation(seed);
+    try {
+      RfrmPri2::rp2Creation(seed);
+    }
+    catch (KBase::KException &ke) {
+      LOG(INFO) << ke.msg;
+    }
+    catch (...) {
+      LOG(INFO) << "Unknown exception from RfrmPri2::rp2Creation";
+    }
     return 0;
   }
 
   auto rpm = new RPModel("", seed);
   if (xmlP) {
-    rpm->readXML(inputXML);
+    try {
+      rpm->readXML(inputXML);
+    }
+    catch (KBase::KException &ke) {
+      LOG(INFO) << ke.msg;
+      return -1;
+    }
+    catch (...) {
+      LOG(INFO) << "Unknown exception from ";
+      return -1;
+    }
     LOG(INFO) << "done reading XML";
   }
   else {
     switch (sNum) {
     case 0:
     case 1:
-      rpm->initScen(sNum);
+      try {
+        rpm->initScen(sNum);
+      }
+      catch (KBase::KException &ke) {
+        LOG(INFO) << ke.msg;
+        return -1;
+      }
+      catch (...) {
+        LOG(INFO) << "Unknown exception from ";
+        return -1;
+      }
       break;
 
     default:
       LOG(INFO) << "Unrecognized scenario number" << sNum;
-      assert(false);
-      break;
+      return -1;
     }
   }
 
@@ -410,16 +448,26 @@ int main(int ac, char **av) {
   unsigned int numR = rpm->numItm;
   //unsigned int numC = rpm->numCat;
 
+  try {
   auto rps0 = new RPState(rpm);
   rpm->addState(rps0);
 
   // NOTE WELL: Records each actor's most self-interested position, but does not set them.
   // Further, it appends Central Position after the last actor position
   auto siPstns = RfrmPri::scanAllPossiblePositions(rpm);
-  assert(numA + 1 == siPstns.size());
+  if (numA + 1 != siPstns.size()) {
+    LOG(INFO) << "main: inaccurate size of siPstns";
+    return -1;
+  }
   const KBase::VUI bestPerm = siPstns[numA];
-  assert(numR == bestPerm.size());
-  assert(numA == rps0->pstns.size()); // pre-allocated by constructor, all nullptr's
+  if (numR != bestPerm.size()) {
+    LOG(INFO) << "main: inaccurate size of bestPerm";
+    return -1;
+  }
+  if (numA != rps0->pstns.size()) { // pre-allocated by constructor, all nullptr's
+    LOG(INFO) << "main: inaccurate positions count in rps0";
+    return -1;
+  }
 
   // Move them all to either the CP or to SI positions which
   // maximize their direct utility, regardless of expected utility.
@@ -435,7 +483,10 @@ int main(int ac, char **av) {
     }
     rps0->pstns[i] = pi;
   }
-  assert(numA == rps0->pstns.size());
+  if (numA != rps0->pstns.size()) {
+    LOG(INFO) << "main: inaccurate positions count in rps0";
+    return -1;
+  }
 
   rps0->step = [rps0]() {
     return rps0->stepSUSN();
@@ -460,6 +511,14 @@ int main(int ac, char **av) {
 
   rps0->setUENdx();
   rpm->run();
+  rps0 = nullptr;
+  }
+  catch (KBase::KException &ke) {
+    LOG(INFO) << ke.msg;
+  }
+  catch (...) {
+    LOG(INFO) << "Unknown exception";
+  }
 
   // we already displayed each state as it was processed,
   // so there is no need to show it again
@@ -468,7 +527,6 @@ int main(int ac, char **av) {
 
   delete rpm; // and actors, and states
   rpm = nullptr;
-  rps0 = nullptr;
 
   KBase::displayProgramEnd(sTime);
 

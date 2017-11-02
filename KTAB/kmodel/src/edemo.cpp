@@ -43,6 +43,7 @@ using KBase::Model;
 using KBase::Position;
 using KBase::State;
 using KBase::VotingRule;
+using KBase::KException;
 
 // --------------------------------------------
 
@@ -104,7 +105,9 @@ function < vector<VBool>()> tbv(unsigned int nAct, unsigned int nBits, PRNG* rng
       }
 
       unsigned int ni = nFromBV(vi);
-      assert(i == ni);
+      if (i != ni) {
+        throw KException("tbv: inaccurate ni");
+      }
 
       rbv.push_back(vi);
     }
@@ -120,7 +123,9 @@ function < vector<VBool>()> tbv(unsigned int nAct, unsigned int nBits, PRNG* rng
         iMin = (um1(i, j) < iMin) ? um1(i, j) : iMin;
         iMax = (um1(i, j) > iMax) ? um1(i, j) : iMax;
       }
-      assert(iMax > iMin);
+      if (iMax <= iMin) {
+        throw KException("tbv: iMax must be more than iMin");
+      }
       for (unsigned int j = 0; j < um1.numC(); j++) {
         um2(i, j) = (um1(i, j) - iMin) / (iMax - iMin);
       }
@@ -130,15 +135,20 @@ function < vector<VBool>()> tbv(unsigned int nAct, unsigned int nBits, PRNG* rng
 
   auto smooth = [normRows, nAct, nBits, ic](const KMatrix& um1) {
     auto um2 = um1;
-    assert(nAct == um1.numR());
-    assert(ic == um1.numC());
+    if (nAct != um1.numR()) {
+      throw KException("tbv: inaccurate number of rows in um1");
+    }
+    if (ic != um1.numC()) {
+      throw KException("tbv: inaccurate number of columns in um1");
+    }
     for (unsigned int i = 0; i < nAct; i++) { // for each row, i.e. each actor
       for (unsigned int j = 0; j < ic; j++) { // for each column, i.e. each vector
         double sumij = um1(i, j);
         for (unsigned int s = 0; s < nBits; s++) {
           unsigned int k = j ^ (1 << s); // flip the s-bit
-          //assert(0 <= k);
-          assert(k < ic);
+          if (k >= ic) {
+            throw KException("tbv: k must be less than ic");
+          }
           sumij = sumij + um1(i, k);
         }
         um2(i, j) = sumij / (1.0 + nBits);

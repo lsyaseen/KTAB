@@ -25,6 +25,8 @@
 #include "agenda.h"
 #include <easylogging++.h>
 
+using KBase::KException;
+
 namespace AgendaControl {
 
 uint64_t fact(unsigned int n) {
@@ -46,8 +48,12 @@ uint64_t fact(unsigned int n) {
 
 
 uint64_t numSets(unsigned int n, unsigned int m) {
-  assert(0 < n);
-  assert(0 < m);
+  if (0 >= n) {
+    throw KException("numSets: n must be positive");
+  }
+  if (0 >= m) {
+    throw KException("numSets: m must be positive");
+  }
   uint64_t ns = fact(n) / (fact(m)*fact(n - m));
   return ns;
 }
@@ -55,7 +61,9 @@ uint64_t numSets(unsigned int n, unsigned int m) {
 uint64_t numAgenda(unsigned int n) {
   // how many distinct agendas are there for n items?
   // Crucially, [x:y] == [y:x]
-  assert(0 < n);
+  if (0 >= n) {
+    throw KException("numAgenda: n must be positive");
+  }
   uint64_t cn = 0;
   switch (n) {
   case 1:
@@ -93,7 +101,9 @@ uint64_t numAgenda(unsigned int n) {
       cm = cm + splits*lC*rC;
     }
     cn = cm / 2;
-    assert(cm == (2 * cn));
+    if (cm != (2 * cn)) {
+      throw KException("numAgenda: cm must be even");
+    }
   }
     break;
   }
@@ -103,8 +113,12 @@ uint64_t numAgenda(unsigned int n) {
 
 // returns the list of all ways to choose an unordered set of m items from a set of n.
 vector< vector <unsigned int> > chooseSet(const unsigned int n, const unsigned int m) {
-  assert(0 < n);
-  assert(0 < m);
+  if (0 >= n) {
+    throw KException("chooseSet: n must be positive");
+  }
+  if (0 >= m) {
+    throw KException("chooseSet: m must be positive");
+  }
   auto csnm = vector< vector <unsigned int> >();
   if (1 == m) {
     for (unsigned int i = 0; i < n; i++) {
@@ -116,7 +130,9 @@ vector< vector <unsigned int> > chooseSet(const unsigned int n, const unsigned i
     auto cLess = chooseSet(n, m - 1);
     for (auto lst : cLess) {
       auto len = ((const unsigned int)(lst.size()));
-      assert(1 <= len);
+      if (1 > len) {
+        throw KException("chooseSet: len must be positive");
+      }
       auto maxEl = ((const unsigned int)(lst[len - 1]));
       for (unsigned int j = maxEl + 1; j < n; j++) {
         VUI ls = lst;
@@ -150,7 +166,9 @@ tuple<VUI, VUI> indexedSet(const VUI xs,
 
 vector<Agenda*> Agenda::agendaSet(PartitionRule pr, const VUI xs) {
   auto n = ((const unsigned int)(xs.size()));
-  assert(0 < n);
+  if (0 >= n) {
+    throw KException("Agenda::agendaSet: n must be positive");
+  }
   auto showA = [](const VUI &as) {
     std::string vui("[");
     for (auto a : as) {
@@ -194,7 +212,9 @@ vector<Agenda*> Agenda::agendaSet(PartitionRule pr, const VUI xs) {
       // we discard the second half.
       if (n == (2 * k)) {
         auto m = ((const unsigned int)(leftIndices.size()));
-        assert(m == 2 * (m / 2));
+        if (m != 2 * (m / 2)) {
+          throw KException("Agenda::agendaSet: m is not even");
+        }
         vector<VUI> shortIndices = {};
         for (unsigned int i = 0; i < (m / 2); i++) {
           shortIndices.push_back(leftIndices[i]);
@@ -227,13 +247,17 @@ vector<Agenda*> Agenda::agendaSet(PartitionRule pr, const VUI xs) {
 
 
   if (PartitionRule::FreePR == pr) {
-    assert(as.size() == numAgenda(n));
+    if (as.size() != numAgenda(n)) {
+      throw KException("Agenda::agendaSet: inaccurate number of agendas");
+    }
   }
   if ((2 <= n) && (PartitionRule::SeqPR == pr)) {
     // just a sorted list, of which there are n!,
     // except that the two orders of the last pair are equivalent
     auto fn = fact(n);
-    assert(as.size() == (fn / 2));
+    if (as.size() != (fn / 2)) {
+      throw KException("Agenda::agendaSet: inaccurate size of as");
+    }
   }
   return as;
 }
@@ -252,7 +276,9 @@ vector<Agenda*> Agenda::enumerateAgendas(unsigned int n, PartitionRule pr) {
   vector<Agenda*> as2 = {};
   for (auto a : as1) {
     bool ok = a->balanced(pr);
-    assert(ok); // should be true by construction
+    if (!ok) { // should be true by construction
+      throw KException("Agenda::enumerateAgendas: not balanced agenda");
+    }
     if (ok) {
       as2.push_back(a);
     }
@@ -262,7 +288,9 @@ vector<Agenda*> Agenda::enumerateAgendas(unsigned int n, PartitionRule pr) {
 
 
 unsigned int Agenda::minAgendaSize(PartitionRule pr, unsigned int n) {
-  assert(0 < n); // could be 1, but not 0
+  if (0 >= n) { // could be 1, but not 0
+    throw KException("Agenda::minAgendaSize: n must be greater than 0");
+  }
   unsigned int minM = 0;
   switch (pr) {
   case PartitionRule::FullBalancedPR:
@@ -314,8 +342,12 @@ Agenda* Agenda::makeAgenda(vector<int> xs, PartitionRule pr, PRNG* rng) {
       zs.push_back(xs[i]);
     }
     bool ok = Agenda::balancedLR(pr, ys.size(), zs.size());
-    assert(minM <= ys.size());
-    assert(minM <= zs.size());
+    if (minM > ys.size()) {
+      throw KException("Agenda::makeAgenda: size of ys must be above minimum value");
+    }
+    if (minM > zs.size()) {
+      throw KException("Agenda::makeAgenda: size of zs must be above minimum value");
+    }
     auto a1 = makeAgenda(ys, pr, rng);
     auto a2 = makeAgenda(zs, pr, rng);
     ap = new Choice(a1, a2);
@@ -337,7 +369,9 @@ double Choice::eval(const KMatrix& val, unsigned int i) {
 
 bool Agenda::balancedLR(PartitionRule pr, unsigned int numL, unsigned int numR) {
   const unsigned int n = numL + numR;
-  assert(2 <= n);
+  if (2 > n) {
+    throw KException("Agenda::balancedLR: n must not be less than 2");
+  }
 
   unsigned int minN = 1;
   switch (pr) {
@@ -370,7 +404,9 @@ bool Choice::balanced(PartitionRule pr) const {
   const unsigned int n = length();
   // every choice is between two items, and the shortest possible sub-agenda
   // is a Terminal of length 1, so this must be at least 2 long
-  assert(2 <= n);
+  if (2 > n) {
+    throw KException("Choice::balanced: n must not be less than 2");
+  }
   unsigned int lN = lhs->length();
   unsigned int rN = rhs->length();
   bool okTop = balancedLR(pr, lN, rN);

@@ -22,7 +22,7 @@
 // -------------------------------------------------
 
 
-#include <assert.h>
+//#include <assert.h>
 
 #include "prng.h"
 
@@ -103,8 +103,12 @@ W64 rotl(const W64 x, unsigned int n) {
     z = (x << n) | (x >> (WordLength - n));
   }
 
-  assert(z == (z & MASK64)); // just double-check
-  assert(x == rotr(z, n)); // just double-check
+  if (z != (z & MASK64)) { // just double-check
+    throw KException("rotl: masking bits not valid");
+  }
+  if (x != rotr(z, n)) { // just double-check
+    throw KException("rotl: values mismatch");
+  }
   return z;
 }
 
@@ -115,7 +119,9 @@ W64 rotr(const W64 x, unsigned int n) {
     z = (x >> n) | (x << (WordLength - n));
   }
 
-  assert(z == (z & MASK64)); // just double-check
+  if (z != (z & MASK64)) { // just double-check
+    throw KException("rotr: masking bits not valid");
+  }
   return z;
 }
 
@@ -143,18 +149,28 @@ uint64_t PRNG::setSeed(uint64_t s) {
 double PRNG::uniform(double a, double b) {
   uint64_t n = uniform();
   double x = ((double)n) / ((double)0xFFFFFFFFFFFFFFFF);
-  assert(0.0 <= x);
-  assert(x <= 1.0);
+  if (0.0 > x) {
+    throw KException("PRNG::uniform: x must be non-negative");
+  }
+  if (x > 1.0) {
+    throw KException("PRNG::uniform: x must be less than or equal to 1.0");
+  }
   x = a + ((b - a)*x);
   return x;
 }
 
 unsigned int PRNG::probSel(const KMatrix & cv) {
   const unsigned int nr = cv.numR();
-  assert(0 < nr);
-  assert(1 == cv.numC());
+  if (0 >= nr) {
+    throw KException("PRNG::probSel: cv matrix has got no records");
+  }
+  if (1 != cv.numC()) {
+    throw KException("PRNG::probSel: cv matrix doesn't have only one column");
+  }
   const double pTol = 1E-8;
-  assert(fabs(KBase::sum(cv) - 1.0) < pTol);
+  if (fabs(KBase::sum(cv) - 1.0) >= pTol) {
+    throw KException("PRNG::probSel: sum total of probabilities can not exceed 1.0");
+  }
 
   int iMax = -1;
   const double p = uniform(0.0, 1.0);

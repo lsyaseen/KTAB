@@ -23,6 +23,7 @@
 
 #include "sqlitedemo.h"
 #include "kmodel.h"
+#include <assert.h>
 #include <easylogging++.h>
 
 using std::string;

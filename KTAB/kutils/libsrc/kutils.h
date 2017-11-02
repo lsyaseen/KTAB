@@ -150,7 +150,8 @@ ueIndices(const vector<T> &xs, function<bool(const T &a, const T &b)> eqv) {
     if (!found) {
       uns.push_back(i); // now uns.size is at least 1
       auto en = ((unsigned int)(uns.size()));
-      assert(1 <= en);
+      //assert(1 <= en);
+
       ens.push_back(en - 1);
     }
   }

@@ -35,10 +35,12 @@ using KBase::PRNG;
 using KBase::Model;
 using KBase::VotingRule;
 using KBase::trans;
-
+using KBase::KException;
 
 void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, const vector<string> & aNames) {
-  assert(0 != s);
+  if (0 == s) {
+    throw KException("runPMM: ");
+  }
   LOG(INFO) << "Creating PMatrixModel objects ...";
 
   auto eKEM = new PMatrixModel("PMatrixModel", s);
@@ -127,7 +129,9 @@ void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, cons
 
 
   auto es1 = new PMatrixState(eKEM); // pre-allocates the pstns array
-  assert(eKEM->numAct == es1->pstns.size());
+  if (eKEM->numAct != es1->pstns.size()) {
+    throw KException("runPMM: inaccurate position count in es1");
+  }
 
   if (cpP) {
     LOG(INFO) << "Assigning actors to the central position";
@@ -150,7 +154,9 @@ void runPMM(uint64_t s, bool cpP, const KMatrix& wMat, const KMatrix& uMat, cons
     es1->pstns[i] = pi;
   }
 
-  assert(eKEM->numAct == es1->pstns.size());
+  if (eKEM->numAct != es1->pstns.size()) {
+    throw KException("runPMM: inaccurate position count in es1");
+  }
   es1->setUENdx();
 
   // test instantiation of templates
@@ -233,7 +239,9 @@ void fitFile(string fName, uint64_t seed) {
 }
 
 void genPMM(uint64_t sd) {
-  assert(0 != sd);
+  if (0 == sd) {
+    throw KException("genPMM: sd must not be zero");
+  }
   auto rng = new PRNG(sd);
 
   bool cpP = (1 == (rng->uniform() % 2));
@@ -345,19 +353,45 @@ int main(int ac, char **av) {
     LOG(INFO) << "Must continue with single-threaded execution";
   }
   if (pmm) {
+    try {
     auto pmm = PMatDemo::pmmCreation(seed);
-    assert(nullptr != pmm);
+    if(nullptr == pmm) {
+      LOG(INFO) << "pmm is a null pointer";
+      return -1;
+    }
     auto pmp = PMatDemo::pmpCreation(pmm);
-    assert(nullptr != pmp);
+    if (nullptr == pmp) {
+      LOG(INFO) << "pmp is a null pointer";
+      return -1;
+    }
     auto pms = PMatDemo::pmsCreation(pmm);
-    assert(nullptr != pms);
+    if (nullptr == pms) {
+      LOG(INFO) << "pms is a null pointer";
+      return -1;
+    }
 
     PMatDemo::genPMM(seed);
-
+    }
+    catch (KBase::KException &ke) {
+      LOG(INFO) << ke.msg;
+      return -1;
+    }
+    catch (...) {
+      LOG(INFO) << "Unknown exception";
+      return -1;
+    }
   }
 
   if (fit) {
-    PMatDemo::fitFile(fitFileCSV, seed);
+    try {
+      PMatDemo::fitFile(fitFileCSV, seed);
+    }
+    catch (KBase::KException &ke) {
+      LOG(INFO) << ke.msg;
+    }
+    catch (...) {
+      LOG(INFO) << "Unknown exception from PMatDemo::fitFile";
+    }
   }
 
 

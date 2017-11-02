@@ -48,7 +48,9 @@ vector<KMatrix> VHCSearch::vn1(const KMatrix & m0, double s) {
 
 vector<KMatrix> VHCSearch::vn2(const KMatrix & m0, double s) {
   unsigned int n = m0.numR();
-  assert(1 < n);
+  if (1 >= n) {
+    throw KException("VHCSearch::vn2: m0 should have more than one rows");
+  }
   auto nghbrs = vector<KMatrix>();
   double pms[] = { -1, +1 };
   for (unsigned int i = 0; i < n; i++) {
@@ -83,8 +85,12 @@ VHCSearch::run(KMatrix p0,
                ReportingLevel rl) {
   using std::thread;
 
-  assert(eval != nullptr);
-  assert(nghbrs != nullptr);
+  if (eval == nullptr) {
+    throw KException("VHCSearch::run: eval is a null pointer");
+  }
+  if (nghbrs == nullptr) {
+    throw KException("VHCSearch::run: nghbrs is a null pointer");
+  }
   unsigned int iter = 0;
   unsigned int sIter = 0;
   double currStep = s0;
@@ -111,7 +117,9 @@ VHCSearch::run(KMatrix p0,
   }
 
   while ((iter < iMax) && (sIter < sMax) && (minStep < currStep)) {
-    assert(vInitial <= v0);
+    if (vInitial > v0) {
+      throw KException("VHCSearch::run: either stay at orig point or improve it");
+    }
 
 
     // TODO: change this to use groupThreads
@@ -169,7 +177,9 @@ VHCSearch::run(KMatrix p0,
     }
     vhcEvalMtx.unlock();
 
-    assert(vInitial <= v0);
+    if (vInitial > v0) {
+      throw KException("VHCSearch::run: either stay at orig point or improve it");
+    }
 
     iter++;
 
@@ -188,7 +198,9 @@ VHCSearch::run(KMatrix p0,
     }
   }
 
-  assert(vInitial <= v0); // either stay at orig point or improve it: never less
+  if (vInitial > v0) { // either stay at orig point or improve it: never less
+    throw KException("VHCSearch::run: either stay at orig point or improve it");
+  }
   tuple<double, KMatrix, unsigned int, unsigned int> rslt { v0, p0, iter, sIter };
 
   if (ReportingLevel::Low <= rl) {
