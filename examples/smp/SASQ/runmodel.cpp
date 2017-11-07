@@ -9,8 +9,7 @@ RunModel::~RunModel()
 
 }
 
-
-void RunModel::runSMPModel(QStringList fileNames)
+void RunModel::runSMPModel(QStringList fileNames,bool logStatus, QString seedVal)
 {
     qDebug()<<"inside";
     //    configureDbRun();
@@ -22,10 +21,8 @@ void RunModel::runSMPModel(QStringList fileNames)
 
     for( int fileIndex = 0 ; fileIndex < fileNames.length() ; ++ fileIndex)
     {
-
-        runModel(con,fileNames.at(fileIndex));
+        runModel(con,fileNames.at(fileIndex),logStatus,seedVal);
         qDebug()<<"runModel" << fileIndex;
-
 
     }
 
@@ -65,8 +62,11 @@ QString RunModel::configureDbRun()
 
 }
 
-void RunModel::runModel(QString conStr, QString fileName)
+void RunModel::runModel(QString conStr, QString fileName, bool logStatus, QString seedVal)
 {
+
+    auto sTime = KBase::displayProgramStart(DemoSMP::appName, DemoSMP::appVersion);
+
     std::vector<int> parameters;
 
     //    parameters={0,0,0,0,0,0,0,0,0}; // need to update
@@ -80,19 +80,8 @@ void RunModel::runModel(QString conStr, QString fileName)
     {
         // A code snippet from Demosmp.cpp to run the model
 
-        using KBase::dSeed;
-        auto sTime = KBase::displayProgramStart(DemoSMP::appName, DemoSMP::appVersion);
-        uint64_t seed = dSeed;
 
-
-        if (0 == seed)
-        {
-            PRNG * rng = new PRNG();
-            seed = rng->setSeed(seed); // 0 == get a random number
-            delete rng;
-            rng = nullptr;
-        }
-
+        uint64_t seed = seedVal.toULongLong();
 
         // JAH 20160730 vector of SQL logging flags for 5 groups of tables:
         // 0 = Information Tables, 1 = Position Tables, 2 = Challenge Tables,
@@ -101,10 +90,10 @@ void RunModel::runModel(QString conStr, QString fileName)
         std::vector<bool> sqlFlags = {true,true,true,true,true};
 
         //log minimum
-        //        if(logMinimum->isChecked())
-        //        {
-        //            sqlFlags = {true,false,false,false,true};
-        //        }
+        if(true==logStatus)
+        {
+            sqlFlags = {true,false,false,false,true};
+        }
 
         // Notice that we NEVER use anything but the default seed.
         //        printf("Using PRNG seed:  %020llu \n", seed);

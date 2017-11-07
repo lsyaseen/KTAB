@@ -26,6 +26,7 @@
 
 #include "smp.h"
 #include "demosmp.h"
+#include <QtCore>
 #include <functional>
 #include <QDebug>
 #include <QFileDialog>
@@ -106,14 +107,14 @@ public:
     ~RunModel();
 
 public slots:
-    void runSMPModel(QStringList fileNames);
+     void runSMPModel(QStringList fileNames, bool logStatus, QString seedVal);
 
 
 private:
-    QString connectionString;
-    QString dbPath;
-    QString configureDbRun();
-    void runModel(QString conStr, QString fileName);
+     QString configureDbRun();
+    void runModel(QString conStr, QString fileName,bool logStatus, QString seedVal);
+
+
 };
 
 #endif // RUNMODEL_H

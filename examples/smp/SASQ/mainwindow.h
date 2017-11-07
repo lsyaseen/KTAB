@@ -108,6 +108,7 @@ private slots:
     void clearSpecifications(bool bl);
     void runSpecModel(bool bl);
     void displayMessage(QString cls, QString message);
+    void logMinimumStatus(bool bl);
 
 
     //GUI Initialization
@@ -198,6 +199,9 @@ private :
     QStringList runFileNamesList;
 
     el::Configurations loggerConf;
+    QLineEdit * seedLineEdit;
+    bool logMin = true;
+    QString seedVal;
 
 
 signals:

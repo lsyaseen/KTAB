@@ -296,6 +296,17 @@ void MainWindow::createActions()
     fileMenu->addAction(runFileAct);
     fileToolBar->addAction(runFileAct);
 
+    seq.clear();
+    QCheckBox * logMinimumAct = new QCheckBox(" Log Minimum  ", this);
+    logMinimumAct->setChecked(true);
+    connect(logMinimumAct, SIGNAL(clicked(bool)), this,SLOT(logMinimumStatus(bool)));
+    fileToolBar->addWidget(logMinimumAct);
+
+    seedLineEdit=new QLineEdit(this);
+    seedLineEdit->setPlaceholderText("Seed...");
+    seedLineEdit->setMaximumWidth(200);
+    fileToolBar->addWidget(seedLineEdit);
+
     const QIcon saveIcon = QIcon::fromTheme("document-save", QIcon("://images/save.png"));
     QAction *saveAct = new QAction(saveIcon, tr("Save"), this);
     connect(saveAct, SIGNAL(triggered(bool)), this, SLOT(saveClicked(bool)));
@@ -511,6 +522,11 @@ void MainWindow::displayMessage(QString cls, QString message)
     QMessageBox::warning(0,cls,message);
 }
 
+void MainWindow::logMinimumStatus(bool bl)
+{
+    logMin=bl;
+}
+
 void MainWindow::about()
 {
     QMessageBox::about(this, tr("About KTAB SAS"),
@@ -564,6 +580,32 @@ void MainWindow::saveClicked(bool bl)
 
 void MainWindow::runSpecModel(bool bl)
 {
+    //Generate Seed
+    using KBase::dSeed;
+    uint64_t seed = dSeed;
+
+    //Collect flags and Data from GUI
+    if(seedLineEdit->text().length()>0 && !seedLineEdit->text().isNull())
+    {
+        seed = seedLineEdit->text().toULongLong();
+    }
+    else
+    {
+        seed=0;
+    }
+
+    if (0 == seed)
+    {
+        PRNG * rng = new PRNG();
+        seed = rng->setSeed(seed); // 0 == get a random number
+        delete rng;
+        rng = nullptr;
+    }
+    seedVal = QString::number(seed);
+
+    qDebug() <<  seed << "seed " << seedVal;
+
+
     //get final specs - Done
     emit getFinalSpecs();
 
@@ -575,7 +617,7 @@ void MainWindow::runSpecModel(bool bl)
     updateModelwithSpecChanges();
 
     //Run SMP Model
-    runSmp->runSMPModel(runFileNamesList);
+    runSmp->runSMPModel(runFileNamesList,logMin,seedVal);
     qDebug()<<"runSmpModelXMLFiles";
 
     //clear
@@ -806,6 +848,8 @@ void MainWindow::getRowColumnIndicesModelActor(QString lhsList )
     columnIndices.clear();
     accRowIndices.clear();
     accColumnIndices.clear();
+    specType.clear();
+
 
     // parse lhs list split spec for actor and get row id and column id
     QStringList rowColumnData = lhsList.split(".");
@@ -938,6 +982,8 @@ void MainWindow::getRowColumnIndicesFilterCrossProd(QVector<QString> lhsList)
             }
         }
     }
+
+    qDebug()<< rowIndices << "row" << columnIndices << "col" << accRowIndices << accColumnIndices << modRowIndices << modColIndices;
 }
 
 void MainWindow::generateModelforScenZ()
@@ -1006,7 +1052,7 @@ void MainWindow::generateModelforScenZ()
 
     parameters.append(QString("Scen_"+QString::number(dummy)+";"+actorScenarioList.at(0)));//name
     parameters.append(QString("Scen_"+QString::number(dummy)+";"+actorScenarioList.at(1)));//desc
-    parameters.append(actorScenarioList.at(2));//seed
+    parameters.append(seedVal);//seed
 
     parameters.append(modelParams); // Modify Parameters
 
@@ -1032,7 +1078,6 @@ void MainWindow::generateModelforScenZ()
         updatedAccModel->setVerticalHeaderItem(i,new QStandardItem(updatedDataModel->item(i)->text()));
     }
 
-
     // emit model and save to xml file
     emit generateXMLFile(parameters,updatedDataModel,updatedAccModel,file);
     runFileNamesList.append(file);
@@ -1047,7 +1092,6 @@ void MainWindow::generateModelforScenZ()
 
 void MainWindow::updateDataModelRowColumn(QVector<QString> rhsList)
 {
-
     QStandardItemModel * updatedDataModel= new QStandardItemModel;
     QStandardItemModel * updatedAccModel = new QStandardItemModel;
 
@@ -1132,11 +1176,11 @@ void MainWindow::updateDataModelRowColumn(QVector<QString> rhsList)
             {
                 modelParams.append(modelFrameObj->modelParameters.at(i).at(0));
             }
-        //updating Modelparameters with values
+            //updating Modelparameters with values
         }
         for(int r=0; r<modRowIndices.length(); ++r)
         {
-            modelParams[modRowIndices.at(modelCount)] = rhsList.at(modelCount);
+            modelParams[modRowIndices.at(r)] = rhsList.at(modelCount);
         }
 
         QStringList parameters;
@@ -1145,7 +1189,7 @@ void MainWindow::updateDataModelRowColumn(QVector<QString> rhsList)
 
         parameters.append(QString("Scen_"+QString::number(dummy)+";"+actorScenarioList.at(0)));//name
         parameters.append(QString("Scen_"+QString::number(dummy)+";"+actorScenarioList.at(1)));//desc
-        parameters.append(actorScenarioList.at(2));//seed
+        parameters.append(seedVal);//seed
 
         parameters.append(modelParams); // Modify Parameters
 
@@ -1164,6 +1208,11 @@ void MainWindow::updateDataModelRowColumn(QVector<QString> rhsList)
         QString file = fileNameSplit.at(0);
         file.append("_scen_" + QString::number(dummy)+ ".xml");
 
+        for(int i=0; i < actorDataModel->rowCount(); ++i)
+        {
+            updatedAccModel->setHorizontalHeaderItem(i,new QStandardItem(updatedDataModel->item(i)->text()));
+            updatedAccModel->setVerticalHeaderItem(i,new QStandardItem(updatedDataModel->item(i)->text()));
+        }
         // emit model and save to xml file
         emit generateXMLFile(parameters,updatedDataModel,updatedAccModel,file);
         runFileNamesList.append(file);
@@ -1181,7 +1230,9 @@ void MainWindow::updateFilterCrossProdRowColumn(QVector<QString> rhsList)
     updatedDataModel->clear();
     updatedAccModel->clear();
     QStringList parameters;
-    int r=0;
+    int in=0;
+    int actIn=0;
+    int accIn=0;
 
     //making a copy of the model to make modifications in it
     updatedDataModel->insertColumns(0,actorDataModel->columnCount());
@@ -1236,57 +1287,27 @@ void MainWindow::updateFilterCrossProdRowColumn(QVector<QString> rhsList)
         }
     }
 
-
     for(int modelCount = 0 ; modelCount < rhsList.length(); ++modelCount)
     {
-        qDebug() <<rhsList.length()<<" rhsList len and data"<< rhsList.at(modelCount);
-        qDebug() << specType << "specType";
-
-
-        qDebug()<<actorDataModel->rowCount() << "RC" << updatedDataModel->rowCount();
-        qDebug()<<actorDataModel->columnCount() << "CC" << updatedDataModel->columnCount();
-
-
         if(specType.at(modelCount)==1)
         {
-            //updating Data Model with values
-            for(int r=0; r<rowIndices.length(); ++r)
-            {
-                for(int c=0; c < columnIndices.length(); ++ c)
-                {
-                    QStandardItem * item = new QStandardItem(QString(rhsList.at(modelCount)));
+            QStandardItem * item = new QStandardItem(QString(rhsList.at(modelCount)));
 
-                    updatedDataModel->setItem(rowIndices.at(r),columnIndices.at(c),item);
-
-                    //                    qDebug()<< rhsList.at(modelCount) << "DataModel" << rowIndices.at(r) << columnIndices.at(c);
-                }
-            }
+            updatedDataModel->setItem(rowIndices.at(actIn),columnIndices.at(actIn),item);
+            ++actIn;
         }
         if(specType.at(modelCount)==2)
         {
-            //updating Acc Model with values
-            for(int r=0; r<accRowIndices.length(); ++r)
-            {
-                for(int c=0; c < accColumnIndices.length(); ++ c)
-                {
-                    QStandardItem * item = new QStandardItem(QString(rhsList.at(modelCount)));
+            QStandardItem * item = new QStandardItem(QString(rhsList.at(modelCount)));
 
-                    updatedAccModel->setItem(accRowIndices.at(r),accColumnIndices.at(c),item);
-
-                    //                    qDebug()<< rhsList.at(modelCount) << "DataModel" << accRowIndices.at(r) << accColumnIndices.at(c);
-
-                }
-            }
+            updatedAccModel->setItem(accRowIndices.at(accIn),accColumnIndices.at(accIn),item);
+            ++accIn;
         }
         if(specType.at(modelCount)==0)
         {
-
             //updating Modelparameters with values
-//            for(int r=0; r<modRowIndices.length(); ++r)
             {
-
-                modelParams[modRowIndices.at(r++)] = rhsList.at(modelCount);
-
+                modelParams[modRowIndices.at(in++)] = rhsList.at(modelCount);
             }
         }
     }
@@ -1295,7 +1316,7 @@ void MainWindow::updateFilterCrossProdRowColumn(QVector<QString> rhsList)
 
     parameters.append(QString("Scen_"+QString::number(dummy)+";"+actorScenarioList.at(0)));//name
     parameters.append(QString("Scen_"+QString::number(dummy)+";"+actorScenarioList.at(1)));//desc
-    parameters.append(actorScenarioList.at(2));//seed
+    parameters.append(seedVal);//seed
 
     parameters.append(modelParams); // Modify Parameters
 
@@ -1356,7 +1377,7 @@ void MainWindow::saveSpecsToFile(int specTypeIndex)
                 }
                 spec.append("#");
                 spec.remove(",#").append(")");
-                data <<spec + "\n";
+                data <<spec + " \n";
             }
         }
         if(specTypeIndex==1)
@@ -1375,7 +1396,7 @@ void MainWindow::saveSpecsToFile(int specTypeIndex)
                 }
                 spec.append("#");
                 spec.remove(",#").append(")");
-                data <<spec + "\n";
+                data <<spec + " \n";
             }
         }
         if(specTypeIndex==2)
@@ -1404,7 +1425,7 @@ void MainWindow::saveSpecsToFile(int specTypeIndex)
                 spec.append("#");
                 spec.remove(",#").append(")");
 
-                data <<spec + "\n";
+                data <<spec + " \n";
             }
 
         }
@@ -1432,7 +1453,7 @@ void MainWindow::saveSpecsToFile(int specTypeIndex)
                     spec.append("#");
                     spec.remove(",#").append(")");
 
-                    data <<spec + "\n";
+                    data <<spec + " \n";
                 }
             }
         }
