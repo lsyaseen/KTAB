@@ -107,11 +107,11 @@ public:
     ~RunModel();
 
 public slots:
-     void runSMPModel(QStringList fileNames, bool logStatus, QString seedVal);
+     void runSMPModel(QStringList fileNames, bool logStatus, QString seedVal, QString dbFilePath);
 
 
 private:
-     QString configureDbRun();
+     QString configureDbRun(QString dbFilePath);
     void runModel(QString conStr, QString fileName,bool logStatus, QString seedVal);
 
 

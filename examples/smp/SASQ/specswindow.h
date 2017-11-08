@@ -107,6 +107,7 @@ private slots:
     void filterAddSpecificationClicked(bool bl);
     void crossproductAddSpecificationClicked(bool bl);
     void crossAllSpecs(bool bl);
+    void keepFinalCrossProduct();
     void filterListViewContextMenu(QPoint pos);
     void filterListViewRemoveSelectedClicked();
     void crossproductContextMenu(QPoint pos);

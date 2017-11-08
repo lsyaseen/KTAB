@@ -1043,6 +1043,19 @@ void SpecificationFrame::crossAllSpecs(bool bl)
             createCrossProductSpec(specIndex,att1ComboBox->count()-1);
         }
     }
+    keepFinalCrossProduct();
+}
+
+void SpecificationFrame::keepFinalCrossProduct()
+{
+    if(specsListModel->rowCount()>1)
+    {
+        for(int index=0; index < specsListModel->rowCount()-1;++index) // -1, final spec is excluded
+        {
+            specsListModel->item(index)->setCheckState(Qt::Checked);
+        }
+        listViewClicked();
+    }
 }
 
 void SpecificationFrame::filterListViewContextMenu(QPoint pos)

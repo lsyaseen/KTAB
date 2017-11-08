@@ -616,8 +616,17 @@ void MainWindow::runSpecModel(bool bl)
     //Generate  XML files for the model
     updateModelwithSpecChanges();
 
+    QDateTime UTC = QDateTime::currentDateTime().toTimeSpec(Qt::UTC);
+    QString name (UTC.toString());
+
+    name.replace(" ","_").replace(":","_");
+
+    QFileDialog fileDialog;
+    QString dbFilePath = fileDialog.getSaveFileName(this, tr("Save DB file as "),
+                                                    QString(QDir::separator()+name),tr("DB File (*.db)"),
+                                                    0,QFileDialog::DontConfirmOverwrite);
     //Run SMP Model
-    runSmp->runSMPModel(runFileNamesList,logMin,seedVal);
+    runSmp->runSMPModel(runFileNamesList,logMin,seedVal,dbFilePath);
     qDebug()<<"runSmpModelXMLFiles";
 
     //clear
@@ -850,7 +859,6 @@ void MainWindow::getRowColumnIndicesModelActor(QString lhsList )
     accColumnIndices.clear();
     specType.clear();
 
-
     // parse lhs list split spec for actor and get row id and column id
     QStringList rowColumnData = lhsList.split(".");
     if(rowColumnData.count()==1)
@@ -865,7 +873,6 @@ void MainWindow::getRowColumnIndicesModelActor(QString lhsList )
         {
             modRowIndices.append(row);
         }
-
     }
     else
     {
@@ -966,7 +973,7 @@ void MainWindow::getRowColumnIndicesFilterCrossProd(QVector<QString> lhsList)
                 qDebug()<<rowColumnData.at(0) <<"lhsList" << rowColumnData.at(1);
                 for(int rowIndex = 0; rowIndex < actorDataModel->rowCount(); ++ rowIndex)
                 {
-                    if(rowColumnData.at(0)==actorDataModel->item(rowIndex)->text())
+                    if(rowColumnData.at(0)==actorDataModel->item(rowIndex)->text().simplified().trimmed())
                     {
                         rowIndices.append(rowIndex);
                         specType.append(1);
@@ -974,7 +981,7 @@ void MainWindow::getRowColumnIndicesFilterCrossProd(QVector<QString> lhsList)
                 }
                 for(int colIndex = 0; colIndex < actorDataModel->columnCount(); ++colIndex)
                 {
-                    if(rowColumnData.at(1)==actorDataModel->horizontalHeaderItem(colIndex)->text())
+                    if(rowColumnData.at(1)==actorDataModel->horizontalHeaderItem(colIndex)->text().simplified().trimmed())
                     {
                         columnIndices.append(colIndex);
                     }
@@ -982,8 +989,6 @@ void MainWindow::getRowColumnIndicesFilterCrossProd(QVector<QString> lhsList)
             }
         }
     }
-
-    qDebug()<< rowIndices << "row" << columnIndices << "col" << accRowIndices << accColumnIndices << modRowIndices << modColIndices;
 }
 
 void MainWindow::generateModelforScenZ()
@@ -1377,7 +1382,7 @@ void MainWindow::saveSpecsToFile(int specTypeIndex)
                 }
                 spec.append("#");
                 spec.remove(",#").append(")");
-                data <<spec + " \n";
+                data <<spec + "\n";
             }
         }
         if(specTypeIndex==1)
@@ -1396,7 +1401,7 @@ void MainWindow::saveSpecsToFile(int specTypeIndex)
                 }
                 spec.append("#");
                 spec.remove(",#").append(")");
-                data <<spec + " \n";
+                data <<spec + "\n";
             }
         }
         if(specTypeIndex==2)
@@ -1425,7 +1430,7 @@ void MainWindow::saveSpecsToFile(int specTypeIndex)
                 spec.append("#");
                 spec.remove(",#").append(")");
 
-                data <<spec + " \n";
+                data <<spec + "\n";
             }
 
         }
@@ -1453,7 +1458,7 @@ void MainWindow::saveSpecsToFile(int specTypeIndex)
                     spec.append("#");
                     spec.remove(",#").append(")");
 
-                    data <<spec + " \n";
+                    data <<spec + "\n";
                 }
             }
         }

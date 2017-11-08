@@ -9,13 +9,13 @@ RunModel::~RunModel()
 
 }
 
-void RunModel::runSMPModel(QStringList fileNames,bool logStatus, QString seedVal)
+void RunModel::runSMPModel(QStringList fileNames,bool logStatus, QString seedVal, QString dbFilePath)
 {
     qDebug()<<"inside";
     //    configureDbRun();
     qDebug()<<"configureDbRun"  ;
 
-    QString con = configureDbRun();
+    QString con = configureDbRun(dbFilePath);
     //    if(!connectionString.isEmpty())
     //    {
 
@@ -32,18 +32,9 @@ void RunModel::runSMPModel(QStringList fileNames,bool logStatus, QString seedVal
 }
 
 
-QString RunModel::configureDbRun()
+QString RunModel::configureDbRun(QString dbFilePath)
 {
-    QDateTime UTC = QDateTime::currentDateTime().toTimeSpec(Qt::UTC);
-    QString name (UTC.toString());
-
-    name.replace(" ","_").replace(":","_");
-
-    QFileDialog fileDialog;
-    QString dbFilePath = fileDialog.getSaveFileName(0, tr("Save DB file as "),
-                                                    QString(QDir::separator()+name),tr("DB File (*.db)"),
-                                                    0,QFileDialog::DontConfirmOverwrite);
-    if(!dbFilePath.isEmpty())
+     if(!dbFilePath.isEmpty())
     {
         QString connectionStr;
         connectionStr.append("Driver=QSQLITE;");//connectionType
