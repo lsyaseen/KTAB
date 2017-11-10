@@ -2,6 +2,10 @@
 
 RunModel::RunModel()
 {
+    loggerConf.parseFromFile("./ktab-smp-logger.conf");
+    // Disable all the logging to begin with
+    loggerConf.set(el::Level::Global, el::ConfigurationType::Enabled, "false");
+    el::Loggers::reconfigureAllLoggers(loggerConf);
 }
 
 RunModel::~RunModel()
@@ -9,24 +13,20 @@ RunModel::~RunModel()
 
 }
 
-void RunModel::runSMPModel(QStringList fileNames,bool logStatus, QString seedVal, QString dbFilePath)
+void RunModel::runSMPModel(QStringList fileNames, bool logStatus, QString seedVal, QString dbFilePath, QString logType, QString logFileLoc)
 {
-    qDebug()<<"inside";
-    //    configureDbRun();
-    qDebug()<<"configureDbRun"  ;
+    logFileName.clear();
+    logFileLocation = logFileLoc;
 
     QString con = configureDbRun(dbFilePath);
-    //    if(!connectionString.isEmpty())
-    //    {
 
     for( int fileIndex = 0 ; fileIndex < fileNames.length() ; ++ fileIndex)
     {
+        logSMPDataOptionsAnalysis(logType,QString("_spec_"+ QString::number(fileIndex)));
         runModel(con,fileNames.at(fileIndex),logStatus,seedVal);
         qDebug()<<"runModel" << fileIndex;
-
     }
 
-    //    }
     QMessageBox::information(0,"Done", "Model run completed");
     qDebug()<<"here";
 }
@@ -34,7 +34,7 @@ void RunModel::runSMPModel(QStringList fileNames,bool logStatus, QString seedVal
 
 QString RunModel::configureDbRun(QString dbFilePath)
 {
-     if(!dbFilePath.isEmpty())
+    if(!dbFilePath.isEmpty())
     {
         QString connectionStr;
         connectionStr.append("Driver=QSQLITE;");//connectionType
@@ -101,4 +101,59 @@ void RunModel::runModel(QString conStr, QString fileName, bool logStatus, QStrin
 
 }
 
+void RunModel::logSMPDataOptionsAnalysis(QString logType, QString specCount)
+{
+    QDateTime UTC = QDateTime::currentDateTime().toTimeSpec(Qt::UTC);
+    QString name("ktab-smp-");
+    name.append(QString::number(UTC.date().year())).append("-");
+    name.append(QString("%1").arg(UTC.date().month(), 2, 10, QLatin1Char('0'))).append("-");
+    name.append(QString("%1").arg(UTC.date().day(), 2, 10, QLatin1Char('0'))).append("__");
+    name.append(QString("%1").arg(UTC.time().hour(), 2, 10, QLatin1Char('0'))).append("-");
+    name.append(QString("%1").arg(UTC.time().minute(), 2, 10, QLatin1Char('0'))).append("-");
+    name.append(QString("%1").arg(UTC.time().second(), 2, 10, QLatin1Char('0')));
+    name.append("_GMT");
+
+    if(logType=="Default")
+    {
+        if(logFileName.isEmpty())
+        {
+            logFileName = logFileLocation + QDir::separator() + name;
+            logFileName.append("_log.txt");
+        }
+        qDebug()<<logFileName <<"logFileName";
+
+        loggerConf.setGlobally(el::ConfigurationType::Filename, logFileName.toStdString());
+        // Enable all the logging
+        loggerConf.set(el::Level::Global, el::ConfigurationType::Enabled, "true");
+        el::Loggers::reconfigureAllLoggers(loggerConf);
+    }
+    else if(logType=="New")
+    {
+        fclose(stdout);
+        fp_old = *stdout;
+
+        QString logFileNewName = logFileLocation + QDir::separator() +name;
+        qDebug()<<logFileNewName <<"logFileNewName";
+        if(!logFileNewName.isEmpty())
+        {
+            logFileNewName.append(specCount).append("_log.txt");
+
+            std::string logFileName = logFileNewName.toStdString();
+            loggerConf.setGlobally(el::ConfigurationType::Filename, logFileName);
+            // Enable all the logging
+            loggerConf.set(el::Level::Global, el::ConfigurationType::Enabled, "true");
+            el::Loggers::reconfigureAllLoggers(loggerConf);
+        }
+    }
+    else
+    {
+        if(logType=="None")
+        {
+            // Disable all the logging
+            loggerConf.set(el::Level::Global, el::ConfigurationType::Enabled, "false");
+
+            el::Loggers::reconfigureAllLoggers(loggerConf);
+        }
+    }
+}
 

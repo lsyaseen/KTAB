@@ -125,7 +125,6 @@ private :
     void modelFrameInitialization();
     void actorFrameInitialization();
     void specsFrameInitialization();
-    void runModelInitialization();
 
     //navigation
     QPushButton * modelPushButton= nullptr;
@@ -198,11 +197,16 @@ private :
 
     QStringList runFileNamesList;
 
-    el::Configurations loggerConf;
     QLineEdit * seedLineEdit;
     bool logMin = true;
     QString seedVal;
 
+
+    QActionGroup * logActions;
+
+    QAction *logDefaultAct;
+    QAction *logNewAct;
+    QAction *logNoneAct;
 
 signals:
     void csvFilePath(QString);
@@ -234,7 +238,7 @@ private:
     void updateFilterCrossProdRowColumn(QVector<QString> rhsList);
     void saveSpecsToFile(int specTypeIndex);
 
-    void logSMPDataOptionsAnalysis();
+    //    void logSMPDataOptionsAnalysis();
 };
 
 #endif // MAINWINDOW_H

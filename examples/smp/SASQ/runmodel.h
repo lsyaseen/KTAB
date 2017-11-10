@@ -38,6 +38,12 @@
 #include <QtGlobal>
 #include <easylogging++.h>
 
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <fstream>
+#include <string>
+
 // Copied this code snippet from demosmp.cpp
 
 using KBase::PRNG;
@@ -103,17 +109,25 @@ class RunModel : public QObject
     Q_OBJECT
 
 public:
-    RunModel();
+    explicit RunModel();
     ~RunModel();
 
 public slots:
-     void runSMPModel(QStringList fileNames, bool logStatus, QString seedVal, QString dbFilePath);
+    void runSMPModel(QStringList fileNames, bool logStatus, QString seedVal, QString dbFilePath, QString logType, QString logFileLoc);
 
 
 private:
-     QString configureDbRun(QString dbFilePath);
+    QString configureDbRun(QString dbFilePath);
     void runModel(QString conStr, QString fileName,bool logStatus, QString seedVal);
+    void logSMPDataOptionsAnalysis(QString logType, QString specCount);
 
+    el::Configurations loggerConf;
+    QString logFileName;
+    QString logFileLocation;
+
+    std::streambuf *coutbuf;
+    FILE *stream ;
+    FILE fp_old;
 
 };
 

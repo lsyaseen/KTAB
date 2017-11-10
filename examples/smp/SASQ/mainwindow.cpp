@@ -34,8 +34,8 @@ MainWindow::MainWindow()
     intializeHomeDirectory();
     intializeGUI();
     createConnections();
-    logSMPDataOptionsAnalysis();
 
+    runSmp = new RunModel;
     updatedDataModel= new QStandardItemModel();
     updatedAccModel = new QStandardItemModel();
 }
@@ -214,13 +214,6 @@ void MainWindow::specsFrameInitialization()
             this,SLOT(finalSpecificationsListCrossProduct(SpecsData,SpecificationVector,int)));
 }
 
-void MainWindow::runModelInitialization()
-{
-    runSmp = new RunModel;
-
-    connect(this,SIGNAL(runSmpModelXMLFiles(QStringList)),runSmp,SLOT(runSMPModel(QStringList)));
-}
-
 void MainWindow::modelNaviClicked()
 {
     modelPushButton->setStyleSheet( "QPushButton {background-color: rgb(50,205,50);}"
@@ -355,6 +348,36 @@ void MainWindow::createActions()
     fileMenu->addAction(quitAct);
     quitAct->setShortcuts(QKeySequence::Quit);
     quitAct->setStatusTip(tr("Quit the application"));
+
+    menuBar()->addSeparator();
+
+    QMenu *optionMenu = menuBar()->addMenu(tr("&Log Options"));
+    optionMenu->setToolTipsVisible(true);
+
+    logActions = new QActionGroup(this);
+    logActions->setExclusive(true);
+
+    logDefaultAct =new QAction(tr("&Default"), this);
+    logDefaultAct->setCheckable(true);
+    optionMenu->addAction(logDefaultAct);
+    logDefaultAct->setToolTip("Record the SMP model log in a timestamp-named file");
+    logDefaultAct->setStatusTip(tr("Record the SMP model log in a timestamp-named file"));
+    logActions->addAction(logDefaultAct);
+    logDefaultAct->setChecked(true);
+
+    logNewAct =new QAction(tr("&Custom"), this);
+    logNewAct->setCheckable(true);
+    optionMenu->addAction(logNewAct);
+    logNewAct->setToolTip("Record the SMP model log in a specific file / location");
+    logNewAct->setStatusTip(tr("Record the SMP model log in a specific file / location"));
+    logActions->addAction(logNewAct);
+
+    logNoneAct =new QAction(tr("&None"), this);
+    logNoneAct->setCheckable(true);
+    optionMenu->addAction(logNoneAct);
+    logNoneAct->setToolTip(tr("Disable logging of the SMP model run"));
+    logNoneAct->setStatusTip(tr("Disable logging of the SMP model run"));
+    logActions->addAction(logNoneAct);
 
     menuBar()->addSeparator();
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
@@ -530,7 +553,7 @@ void MainWindow::logMinimumStatus(bool bl)
 void MainWindow::about()
 {
     QMessageBox::about(this, tr("About KTAB SAS"),
-                       tr("KTAB SAS\n\nVersion 1.0\n\n"
+                       tr("KTAB SAS\n\nVersion Beta 0.5\n\n"
                           "\n \n"
                           "More information can be found at http://kapsarc.github.io/KTAB/"
                           "\n \n"
@@ -580,6 +603,7 @@ void MainWindow::saveClicked(bool bl)
 
 void MainWindow::runSpecModel(bool bl)
 {
+    runFileNamesList.clear();
     //Generate Seed
     using KBase::dSeed;
     uint64_t seed = dSeed;
@@ -616,19 +640,50 @@ void MainWindow::runSpecModel(bool bl)
     //Generate  XML files for the model
     updateModelwithSpecChanges();
 
+    //DBfile location
     QDateTime UTC = QDateTime::currentDateTime().toTimeSpec(Qt::UTC);
     QString name (UTC.toString());
 
     name.replace(" ","_").replace(":","_");
 
     QFileDialog fileDialog;
+
+    QString logFilePath="";
+    if(logNoneAct->isChecked()==false)
+    {
+        logFilePath = fileDialog.getExistingDirectory(this, tr("Open Log Directory"),"/home",
+                                                      QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+
+        fileDialog.close();
+    }
+
+
     QString dbFilePath = fileDialog.getSaveFileName(this, tr("Save DB file as "),
                                                     QString(QDir::separator()+name),tr("DB File (*.db)"),
                                                     0,QFileDialog::DontConfirmOverwrite);
-    //Run SMP Model
-    runSmp->runSMPModel(runFileNamesList,logMin,seedVal,dbFilePath);
-    qDebug()<<"runSmpModelXMLFiles";
 
+    QString logType;
+    //log file type
+    if(logDefaultAct->isChecked()==true)
+    {
+        logType="Default";
+    }
+    else if(logNewAct->isChecked()==true)
+    {
+        logType="New";
+    }
+    else
+    {
+        logType="None";
+    }
+
+    QApplication::processEvents();
+    //Run SMP Model
+    statusBar()->showMessage("Please wait ! SMP Model Run in progress This will take some time to complete !");
+    runSmp->runSMPModel(runFileNamesList,logMin,seedVal,dbFilePath,logType,logFilePath);
+    statusBar()->showMessage("Completed");
+    qDebug()<<"runSmpModelXMLFiles";
     //clear
     dummy=0;
     //    runFileNamesList.clear();
@@ -648,6 +703,7 @@ void MainWindow::runSpecModel(bool bl)
 
 
 }
+/*
 void MainWindow::logSMPDataOptionsAnalysis()
 {
     loggerConf.parseFromFile("./ktab-smp-logger.conf");
@@ -712,8 +768,8 @@ void MainWindow::logSMPDataOptionsAnalysis()
     //            el::Loggers::reconfigureAllLoggers(loggerConf);
     //        }
     //    }
-
 }
+*/
 
 
 
