@@ -326,7 +326,7 @@ void MainWindow::createActions()
 
     fileMenu->addSeparator();
 
-    QAction *clearFileHistoryAct = new QAction(tr("Clear Recent File History"), this);
+  /*  QAction *clearFileHistoryAct = new QAction(tr("Clear Recent File History"), this);
     clearFileHistoryAct->setToolTip("Clear Recently Open File History");
     clearFileHistoryAct->setStatusTip(tr("Clear Recently Open File History"));
     connect(clearFileHistoryAct, SIGNAL(triggered(bool)), this,SLOT(clearRecentFile(bool)));
@@ -341,7 +341,7 @@ void MainWindow::createActions()
     connect(changeHomeAct, SIGNAL(triggered(bool)), this,SLOT(changeHomeDirectory(bool)));
     fileMenu->addAction(changeHomeAct);
     fileMenu->addSeparator();
-
+*/
     const QIcon exitIcon = QIcon::fromTheme("Quit ", QIcon("://images/exit.png"));
     QAction *quitAct = new QAction(exitIcon, tr("&Quit"), this);
     connect(quitAct, SIGNAL(triggered(bool)), this,SLOT(close()));

@@ -750,8 +750,11 @@ void ActorFrame::addSpecClicked(bool bl)
             }
         }
 
-        int dimensionCount = (actorDataTableView->model()->columnCount()-3/2);
 
+        //Salience Validation Part - Incomplete
+        /*
+
+        int dimensionCount = (actorDataTableView->model()->columnCount()-3/2);
         //getting the user specified salience values
         QVector<QVector<QString>> salValues;
 
@@ -1033,7 +1036,7 @@ void ActorFrame::addSpecClicked(bool bl)
 
         //        }
 
-
+*/
         // final spec code
 
         for(int specIndx=0; specIndx < specList.length(); ++specIndx )
@@ -1480,7 +1483,7 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
                         str.clear();
                     }
                 }
-
+                /*
 
                 //validate sal against other dimensions
                 if(salIndex.length()>1)
@@ -1568,6 +1571,8 @@ void ActorFrame::addBasePushButtonClicked(bool bl)
                     scaleSum=false;
 
                 }
+
+                */
                 for(int specIndx=0; specIndx < specList.length(); ++specIndx )
                 {
                     QStandardItem *item = new QStandardItem(specList.at(specIndx));
