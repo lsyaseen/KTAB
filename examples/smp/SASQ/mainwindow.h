@@ -208,6 +208,8 @@ private :
     QAction *logNewAct;
     QAction *logNoneAct;
 
+    QString logSpecListLoc;
+
 signals:
     void csvFilePath(QString);
     void setActorModel(QStandardItemModel *,QStringList);

@@ -25,6 +25,7 @@ void RunModel::runSMPModel(QStringList fileNames, bool logStatus, QString seedVa
         logSMPDataOptionsAnalysis(logType,QString("_spec_"+ QString::number(fileIndex)));
         runModel(con,fileNames.at(fileIndex),logStatus,seedVal);
         qDebug()<<"runModel" << fileIndex;
+//        fclose(coutbuf);
     }
 
     QMessageBox::information(0,"Done", "Model run completed");
@@ -126,11 +127,11 @@ void RunModel::logSMPDataOptionsAnalysis(QString logType, QString specCount)
         // Enable all the logging
         loggerConf.set(el::Level::Global, el::ConfigurationType::Enabled, "true");
         el::Loggers::reconfigureAllLoggers(loggerConf);
-    }
+     }
     else if(logType=="New")
     {
-        fclose(stdout);
-        fp_old = *stdout;
+//        fclose(stdout);
+//        fp_old = *stdout;
 
         QString logFileNewName = logFileLocation + QDir::separator() +name;
         qDebug()<<logFileNewName <<"logFileNewName";

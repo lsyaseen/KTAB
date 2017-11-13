@@ -636,10 +636,6 @@ void MainWindow::runSpecModel(bool bl)
     //get latest Data Model and Affinity Model from ActorObj
     emit getActorDataModel();
 
-    //make a new local copy of thee model with changed spec values
-    //Generate  XML files for the model
-    updateModelwithSpecChanges();
-
     //DBfile location
     QDateTime UTC = QDateTime::currentDateTime().toTimeSpec(Qt::UTC);
     QString name (UTC.toString());
@@ -654,7 +650,7 @@ void MainWindow::runSpecModel(bool bl)
         logFilePath = fileDialog.getExistingDirectory(this, tr("Open Log Directory"),"/home",
                                                       QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
-
+        logSpecListLoc = logFilePath;
         fileDialog.close();
     }
 
@@ -662,6 +658,11 @@ void MainWindow::runSpecModel(bool bl)
     QString dbFilePath = fileDialog.getSaveFileName(this, tr("Save DB file as "),
                                                     QString(QDir::separator()+name),tr("DB File (*.db)"),
                                                     0,QFileDialog::DontConfirmOverwrite);
+
+
+    //make a new local copy of thee model with changed spec values
+    //Generate  XML files for the model
+    updateModelwithSpecChanges();
 
     QString logType;
     //log file type
@@ -1412,7 +1413,10 @@ void MainWindow::updateFilterCrossProdRowColumn(QVector<QString> rhsList)
 
 void MainWindow::saveSpecsToFile(int specTypeIndex)
 {
-    QFile f("specListFile.txt");
+    QString fileName;
+    fileName.append(logSpecListLoc).append(QDir::separator()).append("specListFile.txt");
+
+    QFile f(fileName);
 
     if (f.open(QFile::WriteOnly | QFile::Append))
     {
