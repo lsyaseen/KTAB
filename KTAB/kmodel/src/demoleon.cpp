@@ -2611,7 +2611,7 @@ int main(int ac, char **av) {
   // both euEcon and maxEcon are run. I'm unsure what maxEcon really
   // does vis-a-vis euEcon, but this seems like unintended behavior to me.
   if (euEconP) {
-    LOG(INFO) << "----------------------------------";
+    LOG(INFO) << "E----------------------------------";
     try {
       DemoLeon::demoEUEcon(seed, numF, numG, numS, rng);
     }

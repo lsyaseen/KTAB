@@ -164,7 +164,7 @@ namespace ComSelLib {
 
   // return the clm-vector of actors' expected utility for this particular committee
   KMatrix CSModel::oneCSPstnUtil(const VUI& vb) const {
-    if (actorSpPstnUtil != nullptr) { // prerequisite data must be provided
+    if (actorSpPstnUtil == nullptr) { // prerequisite data must be provided
       throw KException("CSModel::oneCSPstnUtil: actorSpPstnUtil is a null pointer");
     }
 
