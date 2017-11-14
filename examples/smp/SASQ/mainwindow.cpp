@@ -27,7 +27,7 @@
 MainWindow::MainWindow()
 {
 
-    setWindowTitle(tr("KTAB: Sensitivity Analysis Specification for SMP (SAS)"));
+    setWindowTitle(tr("KTAB: Sensitivity Analysis for SMP (SAS)"));
 
     createActions();
     createStatusBar();
