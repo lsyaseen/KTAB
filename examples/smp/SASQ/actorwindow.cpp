@@ -412,8 +412,8 @@ void ActorFrame::initializeSpecificationsTypeButtons()
     specsTypeBox->setLayout(specsTypeLayout);
 
     actorControlsGridLayout->addWidget(specsTypeBox,0,0);
-    actorControlsGridLayout->addWidget(addBasePushButton,1,0);
-    actorControlsGridLayout->addWidget(addSpecsPushButton,2,0);
+    actorControlsGridLayout->addWidget(addBasePushButton,2,0);
+    actorControlsGridLayout->addWidget(addSpecsPushButton,1,0);
 
 }
 
