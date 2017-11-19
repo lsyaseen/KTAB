@@ -365,12 +365,15 @@ void MainWindow::createActions()
     logActions->addAction(logDefaultAct);
     logDefaultAct->setChecked(true);
 
-    logNewAct =new QAction(tr("&Custom"), this);
-    logNewAct->setCheckable(true);
-    optionMenu->addAction(logNewAct);
-    logNewAct->setToolTip("Record the SMP model log in a specific file / location");
-    logNewAct->setStatusTip(tr("Record the SMP model log in a specific file / location"));
-    logActions->addAction(logNewAct);
+// comment out - would prefer this to allow custom filename as well as location,
+// but didn't realize until too late that it did not; as "Default" allows for setting
+// a custom location, this is currently not much use
+//    logNewAct =new QAction(tr("&Custom"), this);
+//    logNewAct->setCheckable(true);
+//    optionMenu->addAction(logNewAct);
+//    logNewAct->setToolTip("Record the SMP model log in a specific file / location");
+//    logNewAct->setStatusTip(tr("Record the SMP model log in a specific file / location"));
+//    logActions->addAction(logNewAct);
 
     logNoneAct =new QAction(tr("&None"), this);
     logNoneAct->setCheckable(true);
@@ -645,13 +648,21 @@ void MainWindow::runSpecModel(bool bl)
     QFileDialog fileDialog;
 
     QString logFilePath="";
+    //QString logSpecListLoc = "";
     if(logNoneAct->isChecked()==false)
     {
-        logFilePath = fileDialog.getExistingDirectory(this, tr("Open Log Directory"),"/home",
+        logFilePath = fileDialog.getExistingDirectory(this, tr("Open Output Directory"),"/home",
                                                       QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
         logSpecListLoc = logFilePath;
         fileDialog.close();
+    }
+    else
+    {
+      logSpecListLoc = fileDialog.getExistingDirectory(this, tr("Open Spec. List Output Directory"),"/home",
+                                                    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+      fileDialog.close();
     }
 
 
@@ -670,10 +681,10 @@ void MainWindow::runSpecModel(bool bl)
     {
         logType="Default";
     }
-    else if(logNewAct->isChecked()==true)
-    {
-        logType="New";
-    }
+//    else if(logNewAct->isChecked()==true)
+//    {
+//        logType="New";
+//    }
     else
     {
         logType="None";
@@ -1414,7 +1425,7 @@ void MainWindow::updateFilterCrossProdRowColumn(QVector<QString> rhsList)
 void MainWindow::saveSpecsToFile(int specTypeIndex)
 {
     QString fileName;
-    fileName.append(logSpecListLoc).append(QDir::separator()).append("specListFile.txt");
+    fileName.append(logSpecListLoc).append(QDir::separator()).append("specList.txt");
 
     QFile f(fileName);
 
