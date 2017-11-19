@@ -241,7 +241,7 @@ void ActorFrame::setAccTableModel(QStandardItemModel *model,
     }
 
     QStringList xmlTableHeaders;
-    xmlTableHeaders<< "Actor" << "Description" << "Power"
+    xmlTableHeaders<< "Actor" << "Description" << "Influence"
                    << "Position " << "Salience ";
 
     for(int col =0 ; col <3;++col)
