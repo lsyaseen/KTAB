@@ -300,12 +300,12 @@ void MainWindow::createActions()
     seedLineEdit->setMaximumWidth(200);
     fileToolBar->addWidget(seedLineEdit);
 
-    const QIcon saveIcon = QIcon::fromTheme("document-save", QIcon("://images/save.png"));
-    QAction *saveAct = new QAction(saveIcon, tr("Save"), this);
-    connect(saveAct, SIGNAL(triggered(bool)), this, SLOT(saveClicked(bool)));
-    saveAct->setShortcuts(QKeySequence::Save);
-    saveAct->setStatusTip(tr("Save"));
-    fileMenu->addAction(saveAct);
+//    const QIcon saveIcon = QIcon::fromTheme("document-save", QIcon("://images/save.png"));
+//    QAction *saveAct = new QAction(saveIcon, tr("Save"), this);
+//    connect(saveAct, SIGNAL(triggered(bool)), this, SLOT(saveClicked(bool)));
+//    saveAct->setShortcuts(QKeySequence::Save);
+//    saveAct->setStatusTip(tr("Save"));
+//    fileMenu->addAction(saveAct);
 
     fileMenu->addSeparator();
 
