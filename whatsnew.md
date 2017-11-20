@@ -7,7 +7,7 @@ We have updated and enhanced error handling throughout all KTAB libraries and ap
 We have written a tutorial and user guide on installing and running the SMP application. It can be accessed [here](./examples/smp/SMPTutorial.pdf).
 
 ## New Application: Sensitivity Analysis for SMP
-This release includes a new application to partially automate sensitivity analysis of the SMP. The analyst can analyze the sensitivity of model results with respect to different model parameters, variable input data, or a combination of both.  All sensitivity analysis scenarios are automatically saved into the same SQLITE database to facilitate review and analysis. This new `KTAB_SAS` application is being release as a beta version.  This application also has a user guide, which can be accessed [here](./examples/smp/SASUserGuide.pdf)
+This release includes a new application to partially automate sensitivity analysis of the SMP. The analyst can analyze the sensitivity of model results with respect to different model parameters, variable input data, or a combination of both.  All sensitivity analysis scenarios are automatically saved into the same SQLITE database to facilitate review and analysis. This new `KTAB_SAS` application is being release as a beta version.  This application also has a user guide, which can be accessed [here](./examples/smp/SASUserGuide.pdf).
 
 # What's New in Version 1.1
 
