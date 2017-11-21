@@ -58,7 +58,7 @@ public slots :
     void getAffinityDB();
 
     //BarCharts
-    void getActorsInRangeFromDB(double lowerRng, double higherRng, int dim, int turn);
+    void getActorsInRangeFromDB(double lowerRng, double higherRng, int dim, int turn, bool yaxis);
     void getDims();
 
     //QuadMap
@@ -70,6 +70,9 @@ public slots :
     //GetActorMovedData
     void getActorMovedDataDB(QString scenario);
     QString getConnectionName();
+
+    //get MaxYAxis len;
+    void getYaxisMaxLength(double range, int dim);
 
 signals:
     void Message(QString , QString );
@@ -92,12 +95,16 @@ signals:
 
     //BarCharts
     void listActorsSalienceCapability(QVector<int>,QVector<double>,QVector<double>,double r1,double r2);
+    void maxYaxisLen(double yAxisScale);
 
     //QuadMap
     void utilChlngAndSQ(int turn, double hor, double ver , int actorID);
 
     //ActorMoved
     void actorMovedInfo(QStandardItemModel *);
+
+
+
 private:
     QSqlDatabase *db = nullptr;
     QString dbName;
@@ -133,6 +140,8 @@ private:
     QVector <int> actorIdsList;
     QVector <double> actorSalienceList;
     QVector <double> actorCapabilityList;
+    double yAxisLen;
+    double barData = 0;
 
     //quadMap
     QVector <double> utilChlgV;

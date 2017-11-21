@@ -46,7 +46,9 @@ KMatrix projBox(const KMatrix & lb, const KMatrix & ub, const KMatrix & w) {
   auto box = [&lb, &ub, &w](unsigned int i, unsigned int j){
     double lij = lb(i, j);
     double uij = ub(i, j);
-    assert(lij <= uij);
+    if (lij > uij) {
+      throw KException("projBox: lij should not be more than uij");
+    }
     double x = w(i, j);
     x = (lij < x) ? x : lij;
     x = (x < uij) ? x : uij;
@@ -70,8 +72,12 @@ tuple<KMatrix, unsigned int, KMatrix> viABG(const KMatrix & xInit,
   KMatrix e0;
   auto x0 = P(xInit);
   auto f0 = F(x0);
-  assert(1 == x0.numC());
-  assert(1 == f0.numC());
+  if (1 != x0.numC()) {
+    throw KException("viABG: x0 can have only one column");
+  }
+  if (1 != f0.numC()) {
+    throw KException("viABG: f0 can have only one column");
+  }
   double change = 10.0 * thresh;
   double estL = 1.0E8;
   unsigned int iter = 0;
@@ -120,17 +126,31 @@ tuple<KMatrix, unsigned int, KMatrix> viBSHe96(const KMatrix & M, const KMatrix 
   }
 
   unsigned int n = q.numR();
-  assert(1 == q.numC());
-  assert(n == M.numR());
-  assert(n == M.numC());
-  assert(n == u0.numR());
-  assert(1 == u0.numC());
-  assert(eps > 0.0);
+  if (1 != q.numC()) {
+    throw KException("viBSHe96: q matrix doesn't have one column");
+  }
+  if (n != M.numR()) {
+    throw KException(string("viBSHe96: M matrix doesn't have ") + std::to_string(n) + " rows");
+  }
+  if (n != M.numC()) {
+    throw KException(string("viBSHe96: M matrix doesn't have ") + std::to_string(n) + " column");
+  }
+  if (n != u0.numR()) {
+    throw KException(string("viBSHe96: u0 matrix doesn't have ") + std::to_string(n) + " rows");
+  }
+  if (1 != u0.numC()) {
+    throw KException(string("viBSHe96: u0 matrix doesn't have ") + std::to_string(n) + " column");
+  }
+  if (eps <= 0.0) {
+    throw KException("viBSHe96: eps must be positive");
+  }
 
   double gamma = 1.8; // any 0<gamma<2 will do. Note that 1.618034 = (1+sqrt(5))/2
   KMatrix Mt = trans(M);
   double qMax = maxAbs(q);
-  assert(qMax > 0.0);
+  if (qMax <= 0.0) {
+    throw KException("viBSHe96: qMax must be positive");
+  }
   KMatrix I = iMat(n);
 
   // for general VI, e(u) = u - pK(u - F(u))
@@ -157,7 +177,9 @@ tuple<KMatrix, unsigned int, KMatrix> viBSHe96(const KMatrix & M, const KMatrix 
     KMatrix e2 = err(u2);
 
     iter++;
-    assert(iter < iMax);
+    if (iter >= iMax) {
+      throw KException("viBSHe96: iteration number crossed the upper limit");
+    }
     u1 = u2;
     e1 = e2;
     r = maxAbs(e1) / qMax;

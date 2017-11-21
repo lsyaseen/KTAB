@@ -95,7 +95,7 @@ int main(int ac, char **av) {
     printf("--savehist       export by-dim by-turn position histories (input+'_posLog.csv') and\n");
     printf("                 by-dim actor effective powers (input+'_effPower.csv')\n");
     printf("--seed <n>       set a 64bit seed; default is %020llu; 0 means truly random\n", dSeed);
-    printf("--connstr        a comma separated string for database server credentials:\n");
+    printf("--connstr        a semicolon separated string for database server credentials:\n");
     printf("                 \"Driver=<QPSQL|QSQLITE>;Server=<IP>*;[Port=<port>]*;Database=<DB_name>;\n");
     printf("                 Uid=<user_id>*;Pwd=<password>*\"*for QPSQL only\n");
   };
@@ -179,7 +179,8 @@ int main(int ac, char **av) {
   }
 
   // Set logging configuration from a file
-  SMPLib::SMPModel::configLogger("./smpc-logger.conf");
+  //SMPLib::SMPModel::configLogger("./smpc-logger.conf");
+  KBase::Model::configLogger("./smpc-logger.conf");
 
   auto sTime = KBase::displayProgramStart(DemoSMP::appName, DemoSMP::appVersion);
   if (0 == seed) {
@@ -200,20 +201,35 @@ int main(int ac, char **av) {
       seed = KBase::dSeed;
   }
 
-  SMPLib::SMPModel::loginCredentials(connstr);
+  bool checkCredentials = SMPLib::SMPModel::loginCredentials(connstr);
+  if (!checkCredentials) { // Some error with input credentials
+    LOG(INFO) << KBase::Model::getLastError();
+    return -1;
+  }
 
   // note that we reset the seed every time, so that in case something
   // goes wrong, we need not scroll back too far to find the
   // seed required to reproduce the bug.
   if (euSmpP) {
-    SMPLib::SMPModel::randomSMP(0, 0, randAccP, seed, sqlFlags);
+    try {
+      SMPLib::SMPModel::randomSMP(0, 0, randAccP, seed, sqlFlags);
+    }
+    catch (...) {
+      LOG(INFO) << "Exception caught in randomSMP. Check previous messages for error";
+    }
   }
   if (csvP) {
-    SMPLib::SMPModel::runModel(sqlFlags, inputCSV, seed, saveHist);
+    string scenid = SMPLib::SMPModel::runModel(sqlFlags, inputCSV, seed, saveHist);
+    if (scenid.empty()) {
+      LOG(INFO) << "Error: " << KBase::Model::getLastError();
+    }
     SMPLib::SMPModel::destroyModel();
   }
   if (xmlP) {
-    SMPLib::SMPModel::runModel(sqlFlags, inputXML, seed, saveHist);
+    string scenid = SMPLib::SMPModel::runModel(sqlFlags, inputXML, seed, saveHist);
+    if (scenid.empty()) {
+      LOG(INFO) << "Error: " << KBase::Model::getLastError();
+    }
     SMPLib::SMPModel::destroyModel();
   }
 

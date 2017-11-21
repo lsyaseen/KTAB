@@ -111,9 +111,12 @@ MainWindow::MainWindow()
 
 
     //BAR Charts
-    connect(this,SIGNAL(getActorIdsInRange(double,double,int,int)),dbObj,SLOT(getActorsInRangeFromDB(double,double,int,int)));
+    connect(this,SIGNAL(getActorIdsInRange(double,double,int,int,bool)),dbObj,SLOT(getActorsInRangeFromDB(double,double,int,int,bool)));
     connect(dbObj,SIGNAL(listActorsSalienceCapability(QVector<int>,QVector<double>,QVector<double>,double,double)),this,
             SLOT(barGraphActorsSalienceCapability(QVector<int>,QVector<double>,QVector<double>,double,double)));
+    connect(this,SIGNAL(getYaxisMaxHeight(double,int)),dbObj,SLOT(getYaxisMaxLength(double,int)));
+    connect(dbObj,SIGNAL(maxYaxisLen(double)),this,SLOT(yAxisMaxLength(double)));
+
 
     //LINE GRAPHS
     //To get dimensions count
@@ -282,6 +285,7 @@ void MainWindow::dbGetFilePAth(bool bl, QString smpDBPath, bool run)
             connect(scenarioComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(scenarioComboBoxValue(int)));
             connect(turnSlider,SIGNAL(valueChanged(int)),this,SLOT(sliderStateValueToQryDB(int)));
 
+            yAxisMaxFixedVal=0;
             modeltoDB->clear();
             emit dbFilePath(dbPath,conType,connectionString,run);
             turnSlider->setEnabled(true);
@@ -292,6 +296,9 @@ void MainWindow::dbGetFilePAth(bool bl, QString smpDBPath, bool run)
             populateLineGraphDimensions(dimensionsLineEdit->text().toInt());
             //To populate Bar Graph Dimensions combo box
             populateBarGraphDimensions(dimensionsLineEdit->text().toInt());
+
+            //yaxis range
+            getYaxisMaxHeight(barGraphGroupRangeLineEdit->text().toDouble(),barGraphDimensionComboBox->currentIndex());
 
         }
         else
@@ -366,7 +373,6 @@ void MainWindow::updateScenarioListComboBox(QStringList * scenarios,QStringList*
                              "this may take some time !!");
     emit getActorMovedData(scenarioBox);
     QApplication::restoreOverrideCursor();
-
 
     //qDebug() <<scenarioBox;
     //    sliderStateValueToQryDB(0);//when new database is opened, start from zero
@@ -451,6 +457,7 @@ void MainWindow::scenarioComboBoxValue(int scenario)
             emit getStateCountfromDB();
 
             emit getDimforBar();
+            getYaxisMaxHeight(barGraphGroupRangeLineEdit->text().toDouble(),barGraphDimensionComboBox->currentIndex());
             barGraphTurnSliderChanged(barGraphTurnSlider->value());
 
             if (prevScenario != scenarioBox)
@@ -1392,22 +1399,53 @@ void MainWindow::initializeCentralViewFrame()
 
 void MainWindow::about()
 {
-    QMessageBox::about(this, tr("About KTAB SMP"),
-                       tr("KTAB SMP\n\nVersion 1.0\n\n"
-                          "KTAB is an open-source toolkit for assembling models that allow "
-                          "systematic and rigorous analysis of Collective Decision-Making "
-                          "Processes (CDMPs).  KTAB is intended to be a platform that contains "
-                          "a number of models that can simulate CDMPs.  The initial model that "
-                          "has been instantiated in KTAB is called the Spatial Model of Politics(SMP)."
-                          "\n \n"
-                          "More information can be found at http://kapsarc.github.io/KTAB/"
-                          "\n \n"
-                          "Copyright © KAPSARC"
-                          "\n \n"
-                          "KTAB is released as open source software under the terms of the MIT License (Expat)"
-                          "\n \n"
-                          "Please email comments, bug reports, and any feedback to ktab@kapsarc.org"));
+    QString text(tr("KTAB SMP\n\nVersion 1.2\n\n"
+                    "KTAB is an open-source toolkit for assembling models that allow "
+                    "systematic and rigorous analysis of Collective Decision-Making "
+                    "Processes (CDMPs).  KTAB is intended to be a platform that contains "
+                    "a number of models that can simulate CDMPs.  The initial model that "
+                    "has been instantiated in KTAB is called the Spatial Model of Politics(SMP)."
+                    "\n \n"
+                    "More information can be found at http://kapsarc.github.io/KTAB/"
+                    "\n \n"
+                    "Copyright © KAPSARC"
+                    "\n \n"
+                    "KTAB is released as open source software under the terms of the MIT License(Expat)"
+                    "\n \n"
+                    "Please email comments, bug reports, and any feedback to ktab@kapsarc.org"));
 
+    QMessageBox msgBox(this);
+    msgBox.setText("About KTAB SMP");
+    msgBox.setInformativeText(text);
+    msgBox.setIconPixmap(QPixmap(":/images/KTABIcon.jpg"));
+    QAbstractButton *openTutButton = msgBox.addButton(trUtf8("Open Tutorial "), QMessageBox::YesRole);
+    QAbstractButton *okButton = msgBox.addButton(trUtf8("OK"), QMessageBox::YesRole);
+    msgBox.exec();
+
+    if(msgBox.clickedButton() == openTutButton)
+    {
+        openTutorial();
+    }
+}
+
+void MainWindow::openTutorial()
+{
+    QString link = QDir::currentPath()+"/SMPTutorial.pdf"; // rename the file
+
+    if(!QDesktopServices::openUrl(QUrl(link.trimmed())))
+    {
+        displayMessage(" Access Error", "Unable to find an application to open a file of type .pdf");
+    }
+}
+
+void MainWindow::openBrowser(bool)
+{
+    QString link = QDir::currentPath()+"/SMP_VIZ.html"; // rename the file
+
+    if(! QDesktopServices::openUrl(QUrl(link.trimmed())))
+    {
+        displayMessage("Access Error", "Unable to find an application to open a file of type .html");
+    }
 }
 
 void MainWindow::chooseActorColors()
@@ -1704,14 +1742,31 @@ void MainWindow::createActions()
     resetActorColorAct->setStatusTip(tr("Reset Actor colors to Default"));
 
     fileToolBar->addAction(colorAct);
-
+    fileToolBar->addSeparator();
     menuBar()->addSeparator();
+
+    QAction *openVisual = menuBar()->addAction(tr("&Open Visualization"));
+    connect(openVisual, SIGNAL(triggered(bool)),this,SLOT(openBrowser(bool)));
+
+    const QIcon visualIcon = QIcon::fromTheme("Open Visualization", QIcon("://images/visualization.png"));
+    QAction *visualAct =new QAction(visualIcon,tr("&Open Visualization in Browser"), this);
+    visualAct->setToolTip("Open Visualization in a Browser");
+    connect(visualAct, SIGNAL(triggered(bool)),this,SLOT(openBrowser(bool)));
+
+    fileToolBar->addAction(visualAct);
+    menuBar()->addSeparator();
+
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
+
+    QAction *tutorialAct =new QAction(tr("&KTAB SMP Tutorial"), this);
+    helpMenu->addAction(tutorialAct);
+    connect(tutorialAct, SIGNAL(triggered(bool)),this,SLOT(openTutorial()));
+    tutorialAct->setStatusTip(tr("KTAB SMP Tutorial"));
 
     QAction *aboutAct =new QAction(tr("&About"), this);
     helpMenu->addAction(aboutAct);
     connect(aboutAct, SIGNAL(triggered(bool)),this,SLOT(about()));
-    aboutAct->setStatusTip(tr("About SMPQ "));
+    aboutAct->setStatusTip(tr("About KTAB SMP "));
 
 }
 

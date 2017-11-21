@@ -40,6 +40,8 @@ Database::Database()
     }
 
     addDatabase("QSQLITE");
+
+    yAxisLen=0;
 }
 
 Database::~Database()
@@ -54,16 +56,10 @@ Database::~Database()
 void Database::addDatabase(const QString &driver)
 {
     if(db != nullptr) {
-      if(0 == driver.compare(db->driverName())) {
-          return;
-      }
-      releaseDB();
-//      if(db->open()) {
-//          db->close();
-//      }
-//      delete db;
-//      db = nullptr;
-//      QSqlDatabase::removeDatabase("guiDb");
+        if(0 == driver.compare(db->driverName())) {
+            return;
+        }
+        releaseDB();
     }
     QSqlDatabase qdb = QSqlDatabase::addDatabase(driver, "guiDb");
     db = new QSqlDatabase(qdb);
@@ -297,7 +293,6 @@ void Database::getInfluenceDB(int turn)
 {
     actorInfluence.clear();
 
-    //qDebug()<<scenario_m << "turn" << turn ;
     QString query= QString(" select SpatialCapability.Cap from SpatialCapability,ActorDescription where "
                            " ActorDescription.Act_i = SpatialCapability.Act_i "
                            " and SpatialCapability.ScenarioId='%1' "
@@ -310,7 +305,6 @@ void Database::getInfluenceDB(int turn)
     while(qry->next())
     {
         actorInfluence.append(qry->value(0).toString());
-        //qDebug()<<actorInfluence << "Influence" <<turn;
     }
 
     emit actorsInflu(actorInfluence);
@@ -319,7 +313,6 @@ void Database::getInfluenceDB(int turn)
 void Database::getPositionDB(int dim, int turn)
 {
     actorPosition.clear();
-    //qDebug()<<scenario_m;
 
     QString query= QString(" select VectorPosition.Pos_Coord from VectorPosition,ActorDescription where"
                            " ActorDescription.Act_i = VectorPosition.Act_i"
@@ -343,7 +336,6 @@ void Database::getPositionDB(int dim, int turn)
 void Database::getSalienceDB(int dim, int turn)
 {
     actorSalience.clear();
-    //qDebug()<<scenario_m;
 
     QString query= QString(" select SpatialSalience.Sal from SpatialSalience,ActorDescription where"
                            " ActorDescription.Act_i = SpatialSalience.Act_i"
@@ -382,13 +374,14 @@ void Database::getAffinityDB()
     emit actorsAffinity(actorAffinity,actorI,actorJ);
 }
 
-void Database::getActorsInRangeFromDB(double lowerRng, double higherRng, int dim, int turn)
+void Database::getActorsInRangeFromDB(double lowerRng, double higherRng, int dim, int turn, bool yaxis)
 {
     double lwr = lowerRng;
     double upr = higherRng;
     actorIdsList.clear();
     actorSalienceList.clear();
     actorCapabilityList.clear();
+    barData=0;
 
     QString query= QString(" select Act_i from VectorPosition where"
                            " Pos_Coord >= '%1'  AND Pos_Coord < '%2' AND "
@@ -402,7 +395,6 @@ void Database::getActorsInRangeFromDB(double lowerRng, double higherRng, int dim
     {
         actorIdsList.append(qry->value(0).toInt());
     }
-    // qDebug()<<actorIdsList << "ACat tat"  << query;
 
     for(int actInd =0; actInd < actorIdsList.length() ; actInd++)
     {
@@ -431,7 +423,28 @@ void Database::getActorsInRangeFromDB(double lowerRng, double higherRng, int dim
             actorCapabilityList.append(qry->value(0).toDouble());
         }
     }
-    emit listActorsSalienceCapability(actorIdsList,actorSalienceList,actorCapabilityList,lwr,upr);
+
+    //Max Y axis Scale value
+    if(yaxis==false)
+    {
+        emit listActorsSalienceCapability(actorIdsList,actorSalienceList,actorCapabilityList,lwr,upr);
+    }
+    else
+    {
+        for(int act =0 ; act < actorIdsList.length(); ++act)
+        {
+            barData += actorSalienceList.at(act) * actorCapabilityList.at(act);
+        }
+
+        if(barData > yAxisLen)
+        {
+            yAxisLen =barData;
+        }
+        else
+        {
+            barData =0;
+        }
+    }
 }
 
 void Database::getDims()
@@ -633,12 +646,38 @@ void Database::getDatabaseList(bool imp, QString &connectionName)
     while(qry->next())
     {
         postgresDBList->append(qry->value(0).toString());
-        //        qDebug()<<qry->value(0).toString();
     }
     qry->finish();
     delete qry;
     qry = nullptr;
     emit postgresExistingDBList(postgresDBList,imp);
+}
+
+void Database::getYaxisMaxLength(double range,int dim)//lower & higher range, dimension
+{
+    double numberOfBins = range;
+    double lowerRange = 0.0;
+    double upperRange = 1.0;
+    double binWidth = 0;
+    yAxisLen=0;
+
+    binWidth = (upperRange-lowerRange)/numberOfBins;
+
+    //Get actors for a range
+    for(int turn=0; turn < numStates; ++turn)
+    {
+        double r1=0.0;
+        double r2=binWidth;
+
+        //calculating bin_width
+        while(r2 <=1.0)
+        {
+            getActorsInRangeFromDB(r1*100,r2*100,dim,turn,true);
+            r1=r2;
+            r2+=binWidth;
+        }
+    }
+    emit maxYaxisLen(yAxisLen);
 }
 
 void Database::getNumActors()
@@ -652,7 +691,6 @@ void Database::getNumActors()
     {
         numActors = qry->value(0).toInt();
     }
-
     emit actorCount(numActors);
 }
 

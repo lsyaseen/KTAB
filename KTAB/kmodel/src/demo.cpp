@@ -79,8 +79,7 @@ void demoPCE(uint64_t s, PRNG* rng) {
     break;
   default:
     LOG(INFO) << "Unrecognized VPModel option";
-    assert(false);
-    break;
+    throw KBase::KException("demoPCE: Unrecognized VPModel option");
   }
 
   LOG(INFO) << "Using VPModel " << vpm;
@@ -273,7 +272,10 @@ int main(int ac, char **av) {
       else if (strcmp(av[i], "--emod") == 0) {
         emodP = true;
         i++;
-        assert(i < ac);
+        //assert(i < ac);
+        if (i >= ac) {
+          exit(-1);
+        }
         cpP = (strcmp(av[i], "cp") == 0);
       }
       else if (strcmp(av[i], "--sql") == 0) {
@@ -309,15 +311,39 @@ int main(int ac, char **av) {
   // seed required to reproduce the bug.
   if (pceP) {
     LOG(INFO) << "-----------------------------------";
-    MDemo::demoPCE(seed, rng);
+    try {
+      MDemo::demoPCE(seed, rng);
+    }
+    catch (KBase::KException &ke) {
+      LOG(INFO) << ke.msg;
+    }
+    catch (...) {
+      LOG(INFO) << "Unknown exception from MDemo::demoPCE";
+    }
   }
   if (spvsrP) {
     LOG(INFO) << "-----------------------------------";
-    MDemo::demoSpVSR(seed, rng);
+    try {
+      MDemo::demoSpVSR(seed, rng);
+    }
+    catch (KBase::KException &ke) {
+      LOG(INFO) << ke.msg;
+    }
+    catch (...) {
+      LOG(INFO) << "Unknown exception from MDemo::demoSpVSR";
+    }
   }
   if (csvSMP) {
     LOG(INFO) << "-----------------------------------";
-    MDemo::demoMiniCSV(inputCSVSMP);
+    try {
+      MDemo::demoMiniCSV(inputCSVSMP);
+    }
+    catch (KBase::KException &ke) {
+      LOG(INFO) << ke.msg;
+    }
+    catch (...) {
+      LOG(INFO) << "Unknown exception from MDemo::demoMiniCSV";
+    }
   }
 
   if (miP) {
@@ -342,15 +368,31 @@ int main(int ac, char **av) {
         coalitions(i, j) = cij * cij;
       }
     }
-    auto pDist = Model::markovIncentivePCE(coalitions, vpm);
-    LOG(INFO) << "Markov Incentive probabiities with " << vpm;
-    trans(pDist).mPrintf(" %.4f");
+    try {
+      auto pDist = Model::markovIncentivePCE(coalitions, vpm);
+      LOG(INFO) << "Markov Incentive probabiities with " << vpm;
+      trans(pDist).mPrintf(" %.4f");
+    }
+    catch (KBase::KException &ke) {
+      LOG(INFO) << ke.msg;
+    }
+    catch (...) {
+      LOG(INFO) << "Unknown exception from Model::markovIncentivePCE";
+    }
   }
 
 
   if (emodP) {
     LOG(INFO) << "-----------------------------------";
-    MDemo::demoEMod(seed);
+    try {
+      MDemo::demoEMod(seed);
+    }
+    catch (KBase::KException &ke) {
+      LOG(INFO) << ke.msg;
+    }
+    catch (...) {
+      LOG(INFO) << "Unknown exception from MDemo::demoEMod";
+    }
   }
 
   if (sqlP) {
@@ -361,7 +403,15 @@ int main(int ac, char **av) {
 
   if (tx2P) {
     LOG(INFO) << "-----------------------------------";
-    TXDemo::demoTX2(inputXML);
+    try {
+      TXDemo::demoTX2(inputXML);
+    }
+    catch (KBase::KException &ke) {
+      LOG(INFO) << ke.msg;
+    }
+    catch (...) {
+      LOG(INFO) << "Unknown exception from TXDemo::demoTX2";
+    }
   }
 
   LOG(INFO) << "-----------------------------------";

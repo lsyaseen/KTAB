@@ -75,8 +75,12 @@ ostream& operator<< (ostream& os, const InterVecBrgn& ivb) {
 // --------------------------------------------
 
 BargainSMP::BargainSMP(const SMPActor* ai, const SMPActor* ar, const VctrPstn & pi, const VctrPstn & pr) {
-  assert(nullptr != ai);
-  assert(nullptr != ar);
+  if (nullptr == ai) {
+    throw KException("BargainSMP::BargainSMP: Initiator actor is null");
+  }
+  if (nullptr == ar) {
+    throw KException("BargainSMP::BargainSMP: Receiver actor is null");
+  }
   actInit = ai;
   actRcvr = ar;
   posInit = pi;
@@ -353,8 +357,13 @@ void SMPState::doBCN(unsigned int i) {
         }
     }
     // be sure that it found this table
-    assert(grpID != 42);
-    assert(grpID < model->sqlFlags.size());
+    //assert(grpID != 42);
+    if (grpID == 42) {
+      throw KException("SMPState::doBCN(i): The Bargn table's entry was not found in model");
+    }
+    if (grpID >= model->sqlFlags.size()) {
+      throw KException("SMPState::doBCN(i): Table's group id is not matching the logging flags");
+    }
 
     if (model->sqlFlags[grpID])
     {
@@ -370,7 +379,10 @@ void SMPState::doBCN(unsigned int i) {
     if (0 < bestEU) {
       unsigned int bestJ = get<0>(chlgI); //
       const double piiJ = get<1>(chlgI); // i's estimate of probability i defeats j
-      assert(0 <= bestJ);
+      if (0 > bestJ) {
+        throw KException("SMPState::doBCN(i): Best receiver index is negative ");
+      }
+
       const unsigned int j = bestJ; // for consistency in code below
 
       auto aj = ((const SMPActor*)(model->actrs[j]));
@@ -399,8 +411,13 @@ void SMPState::doBCN(unsigned int i) {
       const int nai = model->actrNdx(brgnIIJ->actInit);
       const int naj = model->actrNdx(brgnIIJ->actRcvr);
       // verify that identities match up as expected
-      assert(nai == i);
-      assert(naj == j);
+      if (nai != i) {
+        throw KException("SMPState::doBCN(i): Actor i's identity didn't match");
+      }
+
+      if (naj != j) {
+        throw KException("SMPState::doBCN(i): Actor j's identity didn't match");
+      }
 
       // interpolate a bargain from targeted J's perspective
       double pjiJ = get<1>(Vjij); // j's estimate of the probability that i defeats j
@@ -581,8 +598,9 @@ void SMPState::doBCN(unsigned int i) {
         break;
 
       default:
-        LOG(INFO) << "SMPState::doBCN unrecognized SMPBargnModel";
-        exit(-1);
+        LOG(INFO) << "unrecognized SMPBargnModel";
+        //exit(-1);
+        throw KException("SMPState::doBCN(i): unrecognized SMPBargnModel");
       }
 
       thr.join();
@@ -595,9 +613,15 @@ void SMPState::doBCN(unsigned int i) {
 void SMPState::updateBestBrgnPositions(int k) {
   auto ndxMaxProb = [](const KMatrix & cv) {
     const double pTol = 1E-8;
-    assert(fabs(KBase::sum(cv) - 1.0) < pTol);
-    assert(0 < cv.numR());
-    assert(1 == cv.numC());
+    if (fabs(KBase::sum(cv) - 1.0) >= pTol) {
+      throw KException("SMPState::updateBestBrgnPositions: Sum of cv is greater than 1");
+    }
+    if (0 == cv.numR()) {
+      throw KException("SMPState::updateBestBrgnPositions: cv doesn't have records");
+    }
+    if (1 != cv.numC()) {
+      throw KException("SMPState::updateBestBrgnPositions: cv must be a column matrix");
+    }
     auto ndxIJ = ndxMaxAbs(cv);
     unsigned int iMax = get<0>(ndxIJ);
     return iMax;
@@ -608,7 +632,9 @@ void SMPState::updateBestBrgnPositions(int k) {
   auto brgnUtil = [this](unsigned int nk, unsigned int nai, unsigned int nbj) {
     const unsigned int na = model->numAct;
     BargainSMP * b = brgns[nk][nbj];
-    assert(nullptr != b);
+    if (nullptr == b) {
+      throw KException("SMPState::updateBestBrgnPositions: bargain smp pointer is null");
+    }
     double uAvrg = 0.0;
 
     if (b->actInit == b->actRcvr) { // SQ bargain
@@ -622,12 +648,16 @@ void SMPState::updateBestBrgnPositions(int k) {
     else { // all positions unchanged, except Init and Rcvr
       uAvrg = 0.0;
       auto ndxInit = model->actrNdx(b->actInit);
-      assert((0 <= ndxInit) && (ndxInit < na)); // must find it
+      if ((0 > ndxInit) || (ndxInit >= na)) { // must find it
+        throw KException("SMPState::updateBestBrgnPositions This initiator actor number is not present in model");
+      }
       double uPosInit = ((SMPActor*)(model->actrs[nai]))->posUtil(&(b->posInit), this);
       uAvrg = uAvrg + uPosInit;
 
       auto ndxRcvr = model->actrNdx(b->actRcvr);
-      assert((0 <= ndxRcvr) && (ndxRcvr < na)); // must find it
+      if ((0 > ndxRcvr) || (ndxRcvr >= na)) {
+        throw KException("SMPState::updateBestBrgnPositions: This receiver actor number is not present in model");
+      }
       double uPosRcvr = ((SMPActor*)(model->actrs[nai]))->posUtil(&(b->posRcvr), this);
       uAvrg = uAvrg + uPosRcvr;
 
@@ -641,8 +671,12 @@ void SMPState::updateBestBrgnPositions(int k) {
 
     uAvrg = uAvrg / na;
 
-    assert(0.0 < uAvrg); // none negative, at least own is positive
-    assert(uAvrg <= 1.0); // can not all be over 1.0
+    if (0.0 >= uAvrg) { // none negative, at least own is positive
+      throw KException("SMPState::updateBestBrgnPositions: uAvrg should be non-negative");
+    }
+    if (uAvrg > 1.0) { // can not all be over 1.0
+      throw KException("SMPState::updateBestBrgnPositions: uAvrg can't be over 1.0");
+    }
     return uAvrg;
   };
   // end of λ-fn
@@ -667,8 +701,12 @@ void SMPState::updateBestBrgnPositions(int k) {
 
     LOG(INFO) << "Doing scalarPCE for the" << nb << "bargains of actor" << k << "...";
     auto p = Model::scalarPCE(na, nb, w, u_im, smod->vrCltn, smod->vpm, smod->pcem, ReportingLevel::Medium);
-    assert(nb == p.numR());
-    assert(1 == p.numC());
+    if (nb != p.numR()) {
+      throw KException("SMPState::updateBestBrgnPositions: number of bargains mismatched with scalar PCE row count");
+    }
+    if (1 != p.numC()) {
+      throw KException("SMPState::updateBestBrgnPositions: scalar pce column size is not 1");
+    }
     actorBargains.insert(map<unsigned int, KBase::KMatrix>::value_type(k, p));
 
     unsigned int mMax = nb; // indexing actors by i, bargains by m
@@ -680,11 +718,13 @@ void SMPState::updateBestBrgnPositions(int k) {
       mMax = model->rng->probSel(p);
       break;
     default:
-      throw KException("SMPState::doBCN - unrecognized StateTransMode");
+      throw KException("SMPState::updateBestBrgnPositions - unrecognized StateTransMode");
       break;
     }
     // 0 <= mMax assured for uint
-    assert(mMax < nb);
+    if (mMax >= nb) {
+      throw KException("SMPState::updateBestBrgnPositions: Bargain number with max probability can't be more than bargain count");
+    }
     actorMaxBrgNdx.insert(map<unsigned int, unsigned int>::value_type(k, mMax));
     auto bkm = brgns[k][mMax];
     LOG(INFO) << "Chosen bargain (" << smod->stm << "):" << bkm->getID()
@@ -738,9 +778,8 @@ void SMPState::updateBestBrgnPositions(int k) {
         pk = new VctrPstn(bkm->posRcvr);
       }
       else {
-        LOG(INFO) << "SMPState::doBCN: unrecognized actor in bargain";
-        assert(false);
-        exit(-1);
+        LOG(INFO) << "unrecognized actor in bargain";
+        throw KException("SMPState::updateBestBrgnPositions: unrecognized actor in bargain");
       }
 
       // If the actor has changed its position, record the bargain id
@@ -752,7 +791,9 @@ void SMPState::updateBestBrgnPositions(int k) {
         }
       }
     }
-    assert(nullptr != pk);
+    if (nullptr == pk) {
+      throw KException("SMPState::updateBestBrgnPositions: pk is null pointer");
+    }
 
     // Make sure that the pk is stored at right position in s2.
     s2->pstns[k] = pk;
@@ -778,22 +819,34 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
 
   // h's estimate of utility to k of status-quo positions of i and j
   const double euSQ = aUtil[h](k, i) + aUtil[h](k, j);
-  assert((0.0 <= euSQ) && (euSQ <= 2.0));
+  if ((0.0 > euSQ) || (euSQ > 2.0)) {
+    LOG(INFO) << "euSQ =" << euSQ;
+    throw KException("SMPState::probEduChlg: euSQ must be in the range [0.0, 2.0]");
+  }
 
   // h's estimate of utility to k of i defeating j, so j adopts i's position
   const double uhkij = aUtil[h](k, i) + aUtil[h](k, i);
-  assert((0.0 <= uhkij) && (uhkij <= 2.0));
+  if ((0.0 > uhkij) || (uhkij > 2.0)) {
+    LOG(INFO) << "uhkij =" << uhkij;
+    throw KException("SMPState::probEduChlg: uhkij must be in the range [0.0, 2.0]");
+  }
 
   // h's estimate of utility to k of j defeating i, so i adopts j's position
   const double uhkji = aUtil[h](k, j) + aUtil[h](k, j);
-  assert((0.0 <= uhkji) && (uhkji <= 2.0));
+  if ((0.0 > uhkji) || (uhkji > 2.0)) {
+    LOG(INFO) << "uhkji =" << uhkji;
+    throw KException("SMPState::probEduChlg: uhkji must be in the range [0.0, 2.0]");
+  }
 
   auto ai = ((const SMPActor*)(model->actrs[i]));
   double si = KBase::sum(ai->vSal);
   double ci = ai->sCap;
   auto aj = ((const SMPActor*)(model->actrs[j]));
   double sj = KBase::sum(aj->vSal);
-  assert((0 < sj) && (sj <= 1));
+  if ((0 >= sj) || (sj > 1)) {
+    LOG(INFO) << "sj =" << sj;
+    throw KException("SMPState::probEduChlg: sj must be in the range (0, 1]");
+  }
   double cj = aj->sCap;
   const double minCltn = 1E-10;
 
@@ -803,7 +856,9 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
   // When ideals perfectly track positions, this must be positive
   double contrib_i_ij = Model::vote(vr, si*ci, uii, uij);
   if (identAccMat) {
-    assert(0 <= contrib_i_ij);
+    if (0 > contrib_i_ij) {
+      throw KException("SMPState::probEduChlg: h's estimate of i's contribution to (i:j) must be positive");
+    }
   }
   // If not, you could have the ordering (Idl_i, Pos_j, Pos_i)
   // so that i would prefer j's position over his own.
@@ -813,7 +868,9 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
   // When ideals perfectly track positions, this must be negative
   double contrib_j_ij = Model::vote(vr, sj*cj, uji, ujj);
   if (identAccMat) {
-    assert(contrib_j_ij <= 0);
+    if (contrib_j_ij > 0) {
+      throw KException("SMPState::probEduChlg: h's estimate of j's contribution to (i:j) must be positive");
+    }
   }
   // Similarly, you could have an ordering like (Idl_j, Pos_i, Pos_j)
   // so that j would prefer i's position over his own.
@@ -825,23 +882,35 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
   if (contrib_i_ij > 0.0) {
     chij = chij + contrib_i_ij;
   }
-  assert(0.0 < chij);
+  if (0.0 >= chij) {
+    throw KException("SMPState::probEduChlg: "
+      "i's contribution to the complete coalition supporting i over j must be positive");
+  }
 
   if (contrib_i_ij < 0.0) {
     chji = chji - contrib_i_ij;
   }
-  assert(0.0 < chji);
+  if (0.0 >= chji) {
+    throw KException("SMPState::probEduChlg: "
+      "i's contribution to the complete coalition supporting j over i must be positive");
+  }
 
   // add j's contribution to the appropriate coalition
   if (contrib_j_ij > 0.0) {
     chij = chij + contrib_j_ij;
   }
-  assert(0.0 < chij);
+  if (0.0 >= chij) {
+    throw KException("SMPState::probEduChlg: "
+      "j's contribution to the complete coalition supporting i over j must be positive");
+  }
 
   if (contrib_j_ij < 0.0) {
     chji = chji - contrib_j_ij;
   }
-  assert(0.0 < chji);
+  if (0.0 >= chji) {
+    throw KException("SMPState::probEduChlg: "
+      "j's contribution to the complete coalition supporting j over i must be positive");
+  }
 
   // cache those sums
   contrib_i_ij = chij;
@@ -868,15 +937,22 @@ tuple<double, double> SMPState::probEduChlg(unsigned int h, unsigned int k, unsi
       // considering only contributions of principals and itself
       double pin = Actor::vProbLittle(vr, sn*cn, uni, unj, contrib_i_ij, contrib_j_ij);
 
-      assert(0.0 <= pin);
-      assert(pin <= 1.0);
+      if ((0.0 > pin) && (pin > 1.0)) {
+        throw KException("SMPState::probEduChlg: Principal contribution of third party out of bound");
+      }
       double pjn = 1.0 - pin;
       auto vt_uv_ul = Actor::thirdPartyVoteSU(sn*cn, vr, tpc, pin, pjn, uni, unj, unn);
       const double vnij = get<0>(vt_uv_ul);
       chij = (vnij > 0) ? (chij + vnij) : chij;
-      assert(0 < chij);
+      if (0 >= chij) {
+        throw KException("SMPState::probEduChlg: "
+          "3rd party contribution to the complete coalition supporting i over j must be positive");
+      }
       chji = (vnij < 0) ? (chji - vnij) : chji;
-      assert(0 < chji);
+      if (0 >= chji) {
+        throw KException("SMPState::probEduChlg: "
+          "3rd party contribution to complete coalition supporting j over i must be positive");
+      }
 
       const double utpv = get<1>(vt_uv_ul);
       const double utpl = get<2>(vt_uv_ul);
@@ -955,7 +1031,9 @@ tuple<int, double, double> SMPState::bestChallenge(eduChlgsI &eduI) const {
     }
   }
   if (0 <= bestJ) {
-    assert(minSigEDU < bestEU);
+    if (minSigEDU >= bestEU) {
+      throw KException("SMPState::bestChallenge: best EU is less than the permissible value");
+    }
   }
   auto rslt = tuple<int, double, double>(bestJ, pIJ, bestEU);
   return rslt;

@@ -158,10 +158,10 @@ img {
 }
 
 header {
-  width: 300px;
+  width: 400px;
     position: fixed;
     float: left;
-    height: 500px;
+    height: 1000px;
 	overflow: hidden;
     -webkit-font-smoothing: subpixel-antialiased;
 }

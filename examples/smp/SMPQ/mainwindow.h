@@ -306,6 +306,7 @@ private :
     void getActorsInRange(int dim);
     void setStackedBars();
     void deleteBars();
+    void scaleBars();
 
     QCPBars *createBar(int actorId);
 
@@ -318,6 +319,7 @@ private :
 
     QCheckBox * barGraphSelectAllCheckBox;
     QRadioButton * barGraphRadioButton;
+    QComboBox * barGraphYaxisOptionsComboBox;
     QComboBox * barGraphDimensionComboBox;
     QLineEdit * barGraphGroupRangeLineEdit;
 
@@ -336,6 +338,8 @@ private :
     QVector <int> actorsIdsClr;
 
     double yAxisLen;
+    double yAxisFixedVal;
+    double yAxisMaxFixedVal;
 
     int in;
     int barsCount;
@@ -345,7 +349,8 @@ private :
     QCPPlotTitle * barGraphTitle;
 
 signals :
-    void getActorIdsInRange(double lowerRange, double upperRange, int dimension, int turn);
+    void getActorIdsInRange(double lowerRange, double upperRange, int dimension, int turn, bool yaxis);
+    void getYaxisMaxHeight(double range, int dim);
 
 private slots:
     void barGraphSelectAllActorsCheckBoxClicked(bool Click);
@@ -353,12 +358,16 @@ private slots:
     void barGraphDimensionChanged(int value);
     void barGraphTurnSliderChanged(int value);
     void barGraphBinWidthButtonClicked(bool bl);
+    void barGraphScalingChanged(int index);
     void barGraphActorsSalienceCapability(QVector<int> aId, QVector<double> sal, QVector<double>cap, double r1, double r2);
     void xAxisRangeChanged( const QCPRange &newRange, const QCPRange &oldRange );
     void yAxisRangeChanged( const QCPRange &newRange, const QCPRange &oldRange );
     void barPlotContextMenuRequest(QPoint pos);
     void saveBarPlotAsBMP();
     void saveBarPlotAsPDF();
+    double updateYaxisMaxVal(int dim);
+    void yAxisMaxLength(double yAxis);
+
 
     //line Graph
 private :
@@ -633,6 +642,12 @@ private slots:
     void dbDonePushButtonClicked(bool bl);
     void getTimeStamp(bool bl);
     void configUsingMenu(bool bl);
+
+    //Open external link
+private slots :
+    void openTutorial();
+    void openBrowser(bool);
+
 
 };
 

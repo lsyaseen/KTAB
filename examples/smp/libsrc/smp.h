@@ -435,6 +435,12 @@ public:
 
   static uint getIterationCount();
 
+  static uint getNumActors();
+
+  static uint getNumDim();
+
+  static SMPModel * getSmpModel();
+
 protected:
   //sqlite3 *smpDB = nullptr; // keep this protected, to ease multi-threading
   //string scenName = "Scen";
@@ -470,17 +476,6 @@ private:
   
   static tuple<double, double> calcContribs(VotingRule vrCltn, double wi, double wj, tuple<double, double, double, double>(utils));
 
-  // Method used in sqlite execution for callback functionality
-  static int callBack(void *data, int numCol, char **stringFields, char **colNames);
-
-  // fieldVals is used to store the result of select sql queries
-  static std::vector<string> fieldVals;
-
-  // Method used in sqlite execution for callback functionality for sankeyOoutput
-  static int sankeyCallBack(void *data, int numCol, char **stringFields, char **colNames);
-
-  // fieldVals is used to store the result of select sql queries
-  static std::vector<string> dbFieldVals;
  };
 
 

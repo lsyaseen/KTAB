@@ -88,7 +88,7 @@ ET enumFromName (const string& ets, const vector<string>& etNames) {
     }
   }
   if (!found) {
-    throw(KException("enumFromName: unrecognized enum-type name"));
+    throw(KException(string("enumFromName: unrecognized enum-type name: ") + ets));
   }
   return et;
 }
@@ -425,12 +425,13 @@ public:
   void initDBDriver(QString connectionName);
   bool connectDB();
   void closeDB();
-  static void loginCredentials(string connString);
+  static bool loginCredentials(string connString);
   void beginDBTransaction();
   void commitDBTransaction();
   QSqlQuery getQuery();
 
   static void configLogger(string logFile);
+  static string getLastError();
 
 protected:
   //static string createTableSQL(unsigned int tn);
@@ -467,6 +468,8 @@ protected:
     const QString& userName,
     const QString& password);
   bool isDB(const QString& databaseName);
+
+  static string lastExceptionMsg;
 private:
   static KMatrix markovUniformPCE(const KMatrix & pv);
   //static KMatrix markovIncentivePCE(const KMatrix & pv);
