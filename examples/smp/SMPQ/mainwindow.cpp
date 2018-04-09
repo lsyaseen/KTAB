@@ -1432,7 +1432,7 @@ void MainWindow::openTutorial()
 {
     QString link = QDir::currentPath()+"/SMPTutorial.pdf"; // rename the file
 
-    if(!QDesktopServices::openUrl(QUrl(link.trimmed())))
+    if(! QDesktopServices::openUrl(QUrl("file:" + link.trimmed())))
     {
         displayMessage(" Access Error", "Unable to find an application to open a file of type .pdf");
     }
@@ -1441,8 +1441,9 @@ void MainWindow::openTutorial()
 void MainWindow::openBrowser(bool)
 {
     QString link = QDir::currentPath()+"/SMP_VIZ.html"; // rename the file
+    qDebug() << link;
 
-    if(! QDesktopServices::openUrl(QUrl(link.trimmed())))
+    if(! QDesktopServices::openUrl(QUrl("file:" + link.trimmed())))
     {
         displayMessage("Access Error", "Unable to find an application to open a file of type .html");
     }
