@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>KTAB SMP Visualization Dashboard</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+    <link href="../dist/css/style.css" rel="stylesheet">
+
+
+    <!-- Custom Fonts -->
+    <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- d3 -->
+    <script src="../vendor/d3/js/d3.min.js"></script>
+
+    <link href="../vendor/charts/charts.css" rel="stylesheet">
+
+    <!-- sql.js -->
+    <script src="../vendor/sql\js/sql.js"></script>
+
+
+</head>
+
+<body>
+
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="index.html">KTAB SMP Visualization Dashboard</a>
+        </div>
+    </nav>
+
+    <div id="fileUpload">
+        <div class="row space">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-md-offset-3 col-lg-offset-3">
+                <div class="container-fluid">
+                    <!-- <div class="col-sm-12 col-md-6 col-lg-6"> -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading"> <strong>Upload Database:</strong></div>
+                        <div class="panel-body panel-body-size">
+
+                            <div class="input-group">
+                                <label class="input-group-btn"> 
+                                        <span class="btn btn-primary">
+                                            Browse&hellip;
+                                            <input id="uploadInput" type="file" accept=".db" style="display: none;" onchange="getfile()">
+                                            
+                                        </span>
+                                    </label>
+                                <input type="text" class="form-control" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="content" style="display:none">
+        <!-- /.row -->
+        <div class="row space">
+            <div class="col-lg-8 col-md-6">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-10">
+                                <strong>Secnario Name: </strong> <span id="SecnarioName"> </span>
+                            </div>
+                            <div class="col-xs-10">
+                                <strong>Secnario description: </strong> <span id="SecnarioDesc"> </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-9">
+                                <strong>Number of Actors: </strong> <span id="NumOfActors"> </span>
+                            </div>
+                            <div class="col-xs-9">
+                                <strong>Number of Dimensions: </strong> <span id="NumOfDim"> </span>
+                            </div>
+                            <div class="col-xs-9">
+                                <strong>Turn: </strong> <span id="currentTurn">  </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row space">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="container-fluid">
+                    <div class="col-sm-12 col-md-6 col-lg-6">
+                        <div class="panel panel-default" id="LinePanel">
+                            <div class="panel-heading"> <strong>Line Chart</strong></div>
+                            <div id="Linechart" class="panel-body panel-body-size">
+                                <script src="../vendor/charts/Linechart.js"></script>
+                            </div>
+                        </div>
+                        <!-- </div> -->
+                    </div>
+                    <div class="col-sm-12  col-md-6 col-md-offset-0 col-lg-6">
+                        <div class="panel panel-default" id="BarPanel">
+                            <div class="panel-heading"> <strong>Bar Chart</strong> </div>
+                            <div id="Barchart" class="panel-body panel-body-size">
+                                <script src="../vendor/charts/barchart.js"></script>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+    <!-- jQuery -->
+    <script src="../vendor/jquery/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- load db file -->
+    <script src="../vendor/charts/loadSQL.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../dist/js/sb-admin-2.js"></script>
+
+
+</body>
+<script>
+    $('#LinePanel').click(function (e) {
+
+        e.preventDefault();
+        getData();
+        window.location = 'graphs.html#LineGraphTab';
+    });
+
+    $('#BarPanel').click(function (e) {
+        e.preventDefault();
+        getData();
+
+        window.location = 'graphs.html#BarGraphTab';
+    });
+
+    function getData() {
+        sessionStorage.setItem("ActorsNames", JSON.stringify(ActorsNames));
+        sessionStorage.setItem("ActorsPositions", JSON.stringify(positionsArray));
+        sessionStorage.setItem("NumOfTurns", NumOfTurns);
+        sessionStorage.setItem("EffectivePowArray", JSON.stringify(EffectivePowArray));
+        sessionStorage.setItem("ScenarioArray", JSON.stringify(ScenarioArray));
+    }
+
+</script>
+
+</html>

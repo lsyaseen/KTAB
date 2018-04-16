@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>KTAB-LineChart</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- noUiSlider css -->
+    <link href="../vendor/noUiSlider.11.0.3/css/nouislider.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+    <link href="../dist/css/style.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- d3 -->
+    <script src="../vendor/d3/js/d3.min.js"></script>
+    <link href="../vendor/charts/charts.css" rel="stylesheet">
+
+    <!-- sql.js -->
+    <script src="../vendor/sql\js/sql.js"></script>
+
+</head>
+
+<body>
+
+    <div class="page-container" id="ChartsPanel">
+
+        <!-- top navbar -->
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container-fluid" id="ChartsPanel">
+                <div class="navbar-header">
+
+                    <a class="navbar-brand" href="index.html">KTAB SMP Visualization Dashboard</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- main area -->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+
+            <!-- /.row -->
+            <div class="row space">
+                <div class="col-lg-8 col-md-12">
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-10">
+                                    <strong>Secnario Name: </strong> <span id="SecnarioName"> </span>
+                                </div>
+                                <div class="col-xs-10">
+                                    <strong>Secnario description: </strong> <span id="SecnarioDesc"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-12">
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-9">
+                                    <strong>Number of Actors: </strong> <span id="NumOfActors"> </span>
+                                </div>
+                                <div class="col-xs-9">
+                                    <strong>Number of Dimensions: </strong> <span id="NumOfDim"> </span>
+                                </div>
+                                <div class="col-xs-9">
+                                    <strong>Turn: </strong> <span id="currentTurn"> 1 </span>
+                                    <!--1 by default -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- slider -->
+            <div class="row space">
+                <div class="col-sm-12 col-lg-12 col-md-12">
+                    <div id="slider"></div>
+                </div>
+            </div>
+
+            <div class="row space">
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                    <div class="panel with-nav-tabs panel-default">
+                        <div class="panel-heading tabs">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a href="#LineGraphTab" data-toggle="tab">Line Graph</a></li>
+                                <li><a href="#BarGraphTab" data-toggle="tab">Bar Graph</a></li>
+                            </ul>
+                        </div>
+                        <div class="panel-body">
+                            <div class="tab-content">
+                                <div class="tab-pane fade in active" id="LineGraphTab">
+                                    <!-- Default 1 -->
+                                    <div class="container-fluid">
+                                        <canvas id="canvas" width="1020px" height="768px" style="display:none;"></canvas>
+                                        <div class="col-sm-12 col-md-12 col-lg-8">
+                                            <div class="panel panel-default">
+                                                <div id="chart" class="panel-body "> </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12  col-md-12 col-md-offset-0 col-lg-4">
+                                            <div class="panel panel-default">
+                                                <div id="legend" class="panel-body scrollable-panel">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- //2nd tab -->
+                                <div class="tab-pane fade" id="BarGraphTab">
+                                    <div class="container-fluid">
+                                        <canvas id="Barcanvas" width="1020px" height="768px" style="display:none;"></canvas>
+                                        <div class="col-sm-12 col-md-12 col-lg-8">
+                                            <div class="panel panel-default">
+                                                <div id="MainBarChart" class="panel-body "></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12  col-md-12 col-md-offset-0 col-lg-4">
+                                            <div class="panel panel-default">
+                                                <div id="Barlegend" class="panel-body scrollable-panel">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row space">
+                <div class="col-sm-14  col-md-14  col-lg-4">
+                    <button class="btn btn-success" onclick="downloadPNG()">Download Chart as PNG</button>
+                </div>
+            </div>
+        </div>
+        <!-- /.col-xs-12 main -->
+    </div>
+    <!--/.row-->
+    </div>
+    <!--/.page-container -->
+
+
+    <!-- jQuery -->
+    <script src="../vendor/jquery/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- noUiSlider -->
+    <script src="../vendor/noUiSlider.11.0.3/js/nouislider.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../dist/js/sb-admin-2.js"></script>
+
+    <!-- canvg -->
+    <script src="../vendor/canvg/js/canvg.bundle.js"></script>
+
+    <!-- charts -->
+    <script src="../vendor/charts/MainLinechart.js"></script>
+    <script src="../vendor/charts/MainBarchart.js"></script>
+    <!-- slider -->
+    <script src="../vendor/charts/slider.js"></script>
+
+</body>
+
+<script>
+    // data from load.js (session data)
+    var ScenarioArray = JSON.parse(sessionStorage.getItem("ScenarioArray"));
+    var ScenarioName = ScenarioArray[0][0];
+    var ScenarioDesc = ScenarioArray[0][1];
+    var NumOfActors = namesArray.length;
+    var NumOfDim = 1;
+
+
+    document.getElementById('SecnarioName').innerHTML = ScenarioName;
+    document.getElementById('SecnarioDesc').innerHTML = ScenarioDesc;
+    document.getElementById('NumOfActors').innerHTML = NumOfActors;
+    document.getElementById('NumOfDim').innerHTML = NumOfDim;
+
+    $(document).ready(function () {
+        $('[data-toggle=offcanvas]').click(function () {
+            $('.row-offcanvas').toggleClass('active');
+        });
+    });
+
+    //Linking to specific tab
+    $(function () {
+        var hash = window.location.hash;
+        hash && $('ul.nav a[href="' + hash + '"]').tab('show');
+
+        $('.nav-tabs a').click(function (e) {
+            $(this).tab('show');
+            var scrollmem = $('body').scrollTop() || $('html').scrollTop();
+            window.location.hash = this.hash;
+            $('html,body').scrollTop(scrollmem);
+        });
+    });
+
+
+    function downloadPNG() {
+
+        var id = $('.tab-content .active').attr('id');
+
+        // which tap is active
+        if (id == "LineGraphTab") {
+
+            var $container = $('#chart'),
+                // Canvg requires trimmed content
+                content = $container.html().trim(),
+                canvas = document.getElementById('canvas');
+            var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
+            canvg(canvas, content);
+            var image = canvas.toDataURL("image/png")
+            let filename = 'LineChart'
+            let link = document.createElement('a')
+            link.href = image
+            link.download = filename
+            document.body.appendChild(link)
+            link.click()
+        }
+        else {
+
+            var $barcontainer = $('#MainBarChart'),
+                // Canvg requires trimmed content
+                Barcontent = $barcontainer.html().trim(),
+                canvas_bar = document.getElementById('Barcanvas');
+            var image = canvas_bar.toDataURL("image/png").replace("image/png", "image/octet-stream");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
+            canvg(canvas_bar, Barcontent);
+
+            var image = canvas_bar.toDataURL("image/png")
+            let filename = 'BarChart'
+            let barlink = document.createElement('a')
+            barlink.href = image
+            barlink.download = filename
+            document.body.appendChild(barlink)
+            barlink.click()
+        }
+
+    }
+
+</script>
+
+</html>

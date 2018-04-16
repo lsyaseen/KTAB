@@ -1440,7 +1440,7 @@ void MainWindow::openTutorial()
 
 void MainWindow::openBrowser(bool)
 {
-    QString link = QDir::currentPath()+"/SMP_VIZ.html"; // rename the file
+    QString link = QDir::currentPath()+"/SMPV/index.html"; // rename the file
     qDebug() << link;
 
     if(! QDesktopServices::openUrl(QUrl("file:" + link.trimmed())))
