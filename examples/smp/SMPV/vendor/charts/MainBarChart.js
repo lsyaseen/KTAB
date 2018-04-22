@@ -1,11 +1,9 @@
-// var margin = { top: 0, right: 20, bottom: 30, left: 50 },
-// width2 = 850 - margin.left - margin.right,
-// height = 370 - 30 - margin.bottom;
 
 // data from load.js (session data)
-var ActorsPositions = JSON.parse(sessionStorage.getItem("ActorsPositions"));
+var allpos = JSON.parse(sessionStorage.getItem("ActorsPositions"));
 var NumOfTurns = sessionStorage.getItem("NumOfTurns");
-var EffectivePowArray = JSON.parse(sessionStorage.getItem("EffectivePowArray"));
+var effpow = JSON.parse(sessionStorage.getItem("effpow"));
+var selectedDimNum = 0;
 
 var margin = { top: 30, right: 20, bottom: 30, left: 50 },
     width2 = 460 - margin.left - margin.right,
@@ -19,7 +17,8 @@ var svg3 = d3.select("#Barlegend")
     .attr("viewBox", "0 0 250 500")
     .attr('transform', "translate(" + 15 + "," + 15 + ")")
     .append("g")
-    .attr("class", "legend2")
+    .attr("class", "legend2");
+
 function drawChart() {
 
     // Clear the exiting chart
@@ -31,14 +30,12 @@ function drawChart() {
         .attr("width", "100%")
         .attr("width", "100%")
         .attr("preserveAspectRatio", "xMidYMid meet")
-        .attr("viewBox", "0 0 500 300")
+        .attr("viewBox", "0 0 550 300")
         .append("g")
         .attr("transform", "translate(" + (margin.left + 40) + "," + margin.top + ")")
 
-    var xScale = d3.scaleBand()
-        .rangeRound([0, width2])
-        .paddingInner(0.05)
-        .align(0.1);
+    var xScale = d3.scaleLinear()
+        .range([0, width2]);
 
     var yScale = d3.scaleLinear()
         .range([height, 0]);
@@ -93,30 +90,31 @@ function drawChart() {
 
 
     var PositionsArray = [],
+        ActorsPositions = [],
         PositionsArray2 = [],
-        roundedPositions = [],
         effpowArray = [],
         effpowArray2 = [],
         namesArray = [],
         highestRange = 0,
         rows,
+        y_range,
         selectedRect,
         selectedLegend;
 
 
     var xAxis = d3.axisBottom(xScale).scale(xScale);
     var yAxis = d3.axisLeft(yScale).scale(yScale);
-    var range1, range2, range3, range4, range5, range6, range7, range8, range9, range10; // initializing an array for each range of positions 
+    var range0, range1, range2, range3, range4, range5, range6, range7, range8, range9; // initializing an array for each range of positions 
 
     turn = currentTurn; //current turn from slider
 
-    for (var i = 0; i < EffectivePowArray.length; i++) {
-        namesArray.push(EffectivePowArray[i][0]);
+    for (var i = 0; i < allpos[selectedDimNum].length; i += 1) {
+        ActorsPositions.push(allpos[selectedDimNum][i].positions);
     }
 
-    for (var i = 0; i < EffectivePowArray.length; i++) {
-        effpowArray.push(EffectivePowArray[i][1]);
-    }
+    var namesArray = effpow[selectedDimNum].map(function (a) { return a.Name; });
+    var effpowArray = effpow[selectedDimNum].map(function (a) { return a.fpower; });
+
 
     effpowArray2 = effpowArray.slice();
 
@@ -130,17 +128,14 @@ function drawChart() {
     findHighestEffpow();
 
     for (var i = 0; i < ActorsPositions.length; i++) {
-        PositionsArray.push(ActorsPositions[i][turn + 1]); // it should be a var based on which turn is chosen
-    }
-    //round positions to group by position range
-    for (i = 0; i < PositionsArray.length; i++) {
-        roundedPositions.push(Math.round(PositionsArray[i] / 10) * 10);
+        PositionsArray.push(ActorsPositions[i][turn]); // it should be a var based on which turn is chosen
     }
 
-    groupActors(roundedPositions);
+    groupActors(PositionsArray);
 
     //adding range position
     namesArray.unshift("Actor");
+    range0.unshift(0);
     range1.unshift(10);
     range2.unshift(20);
     range3.unshift(30);
@@ -150,8 +145,6 @@ function drawChart() {
     range7.unshift(70);
     range8.unshift(80);
     range9.unshift(90);
-    range10.unshift(100);
-
 
     var result = rows.map(function (row) {
         return row.reduce(function (result, field, index) {
@@ -174,23 +167,23 @@ function drawChart() {
         barnames.push(result[i].Actor);
     };
 
-    xScale.domain(result.map(function (d) { return d.Actor; }));
+    xScale.domain([0, 100]);
 
-    // if (y_range == "fixed") {
-    // 	yScale.domain([0, highestRange]).nice();
+    if (document.getElementById('Fixedbtn').checked) {
+        y_range = "fixed"
+        yScale.domain([0, highestRange]).nice();
+    }
 
-    // }
-    // else {
-    yScale.domain([0, d3.max(idheights)]).nice();
-    // }
+    else if (document.getElementById('Responsivebtn').checked) {
+        yScale.domain([0, d3.max(idheights)]).nice();
+        y_range = "responsive"
+    }
     z.domain(keys);
 
 
     var stack = d3.stack().keys(keys)(result);
-
     var newData = namesArray.slice(1).map(function (name, i) {
         return {
-
             Name: name,
             values: stack[i],
             color: z(name)
@@ -200,7 +193,6 @@ function drawChart() {
     // gridlines in x axis function
     function make_x_gridlines() {
         return d3.axisBottom(xScale)
-        // .ticks(turns)
     }
 
     // gridlines in y axis function
@@ -236,7 +228,7 @@ function drawChart() {
         .data(newData)
         .enter().append("g")
         .attr("fill", function (d) { return d.color })
-        .attr("id", function (d, i) { return 'Actor_' + d.Name.replace(/\s+/g, '') }) // assign ID)  //  
+        .attr("id", function (d, i) { return 'Actor_' + d.Name.replace(/\s+/g, '').replace(".", '') }) // assign ID)  //  
         .on("mouseover", function (d, i) {
             selectedRect = "#Actor_" + d.Name;
             selectedLegend = "#Blegend_" + d.Name;
@@ -246,18 +238,26 @@ function drawChart() {
         .selectAll("rect")
         .data(function (d) { return d.values; })
         .enter().append("rect")
-        .attr("x", function (d, i) { return xScale((barnames[i])); })
-        .attr("y", function (d) { return yScale(d[1]); })
-        .attr("height", function (d) { return yScale(d[0]) - yScale(d[1]); })
-        .attr("width", xScale.bandwidth())
+        .attr("x", function (d, i) { return xScale((barnames[i])) - (width2 / newData[0].values.length) + 2; })
+        .attr("width", function (d) {
+            var barWidth = width2 / (newData[0].values.length + 1);
+            return barWidth
+        })
+        .attr("y", height)
+        .attr("height", 0)
         .on("mouseover", function () { tooltip.style("display", null); })
         .on("mouseout", function () { tooltip.style("display", "none"); })
         .on("mousemove", function (d) {
             var xPosition = d3.mouse(this)[0];
             var yPosition = d3.mouse(this)[1];
-            tooltip.attr("transform", "translate(" + (xPosition) + "," + (yPosition) + ")");
+            tooltip.attr("transform", "translate(" + (xPosition - 50) + "," + (yPosition + 10) + ")");
             tooltip.select("text").text(" Effective Power: " + (d[1] - d[0]));
-        });
+        })
+        .transition()
+        .duration(3000)
+        .attr("y", function (d) { return yScale(d[1]); })
+        .attr("height", function (d) { return yScale(d[0]) - yScale(d[1]); })
+        ;
 
     //draw the axis
     svg.append("g")
@@ -303,7 +303,6 @@ function drawChart() {
         });
 
     legend.append("rect")
-        // .attr("x", 40)
         .attr("width", 10)
         .attr("height", 10)
         .attr("id", function (d) { return 'Blegend_' + d.Name })
@@ -328,7 +327,6 @@ function drawChart() {
         .style("display", "none")
         .style("opacity", 1);
 
-
     tooltip.append("text")
         .attr("x", 50)
         .attr("dy", "1.2em")
@@ -339,7 +337,7 @@ function drawChart() {
     function onMouseover() {
 
         newData.forEach(function (d, i) {
-            d3.selectAll("#Actor_" + d.Name.replace(/\s+/g, ''))
+            d3.selectAll("#Actor_" + d.Name.replace(/\s+/g, '').replace(".", ''))
                 .transition()
                 .duration(50)
                 .style("opacity", function () {
@@ -356,7 +354,7 @@ function drawChart() {
     function onMouseout() {
 
         newData.forEach(function (d, i) {
-            d3.selectAll("#Actor_" + d.Name.replace(/\s+/g, ''))
+            d3.selectAll("#Actor_" + d.Name.replace(/\s+/g, '').replace(".", ''))
                 .transition()
                 .duration(50)
                 .style("opacity", 1);
@@ -376,20 +374,19 @@ function drawChart() {
             roundPositions(PositionsArray2);
         }
     }
-    //round positions to group by position range
+
     function roundPositions(y) {
         //keep PositionsArray for the specified turn and PositionsArray2 for all other turns
-        for (i = 0; i < PositionsArray2.length; i++) {
-            roundedPositions.push(Math.round(PositionsArray2[i] / 10) * 10);
-        }
-        groupActors(roundedPositions);
+        groupActors(PositionsArray2);
+
         //make sure arrays are empty for rounding another turn's positions
         PositionsArray2.splice(0, PositionsArray2.length);
-        roundedPositions.splice(0, roundedPositions.length);
     }
+
     function groupActors(e) {
         // initializing an array for each range of positions 
         //filling it with zeroes cuz d3 stack layout is expecting arrays of the same length. 
+        range0 = Array(26).fill(0);
         range1 = Array(26).fill(0);
         range2 = Array(26).fill(0);
         range3 = Array(26).fill(0);
@@ -399,42 +396,42 @@ function drawChart() {
         range7 = Array(26).fill(0);
         range8 = Array(26).fill(0);
         range9 = Array(26).fill(0);
-        range10 = Array(26).fill(0);
 
-        for (i = 0; i < roundedPositions.length; i++) {
+        for (i = 0; i < e.length; i++) {
 
-            if (roundedPositions[i] == 10) {
+            if (e[i] >= 0 && e[i] < 10) {
+                range0[i] = +effpowArray2[i];
+            }
+            else if (e[i] >= 10 && e[i] < 20) {
                 range1[i] = +effpowArray2[i];
             }
-            else if (roundedPositions[i] == 20) {
+            else if (e[i] >= 20 && e[i] < 30) {
                 range2[i] = +effpowArray2[i];
             }
-            else if (roundedPositions[i] == 30) {
+            else if (e[i] >= 30 && e[i] < 40) {
                 range3[i] = +effpowArray2[i];
             }
-            else if (roundedPositions[i] == 40) {
+            else if (e[i] >= 40 && e[i] < 50) {
                 range4[i] = +effpowArray2[i];
             }
-            else if (roundedPositions[i] == 50) {
+            else if (e[i] >= 50 && e[i] < 60) {
                 range5[i] = +effpowArray2[i];
             }
-            else if (roundedPositions[i] == 60) {
+            else if (e[i] >= 60 && e[i] < 70) {
                 range6[i] = +effpowArray2[i];
             }
-            else if (roundedPositions[i] == 70) {
+            else if (e[i] >= 70 && e[i] < 80) {
                 range7[i] = +effpowArray2[i];
             }
-            else if (roundedPositions[i] == 80) {
+            else if (e[i] >= 80 && e[i] < 90) {
                 range8[i] = +effpowArray2[i];
             }
-            else if (roundedPositions[i] == 90) {
+            else if (e[i] >= 90 && e[i] < 100) {
                 range9[i] = +effpowArray2[i];
             }
-            else if (roundedPositions[i] == 100) {
-                range10[i] = +effpowArray2[i];
-            }
         }
-        rows = [range1, range2, range3, range4, range5, range6, range7, range8, range9, range10];
+        rows = [range0, range1, range2, range3, range4, range5, range6, range7, range8, range9];
+
         // sum all ranges and find the highest		
         for (var i = 0; i < 10; i++) {
             var sum = (rows[i]).reduce(add, 0);

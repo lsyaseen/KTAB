@@ -47,10 +47,9 @@
         <div class="row space">
             <div class="col-lg-6 col-md-6 col-sm-6 col-md-offset-3 col-lg-offset-3">
                 <div class="container-fluid">
-                    <!-- <div class="col-sm-12 col-md-6 col-lg-6"> -->
                     <div class="panel panel-default">
                         <div class="panel-heading"> <strong>Upload Database:</strong></div>
-                        <div class="panel-body panel-body-size">
+                        <div class="panel-body ">
 
                             <div class="input-group">
                                 <label class="input-group-btn"> 
@@ -70,7 +69,6 @@
 
     </div>
     <div id="content" style="display:none">
-        <!-- /.row -->
         <div class="row space">
             <div class="col-lg-8 col-md-6">
                 <div class="panel">
@@ -111,16 +109,15 @@
                     <div class="col-sm-12 col-md-6 col-lg-6">
                         <div class="panel panel-default" id="LinePanel">
                             <div class="panel-heading"> <strong>Line Chart</strong></div>
-                            <div id="Linechart" class="panel-body panel-body-size">
+                            <div id="Linechart" class="panel-body ">
                                 <script src="../vendor/charts/Linechart.js"></script>
                             </div>
                         </div>
-                        <!-- </div> -->
                     </div>
                     <div class="col-sm-12  col-md-6 col-md-offset-0 col-lg-6">
                         <div class="panel panel-default" id="BarPanel">
                             <div class="panel-heading"> <strong>Bar Chart</strong> </div>
-                            <div id="Barchart" class="panel-body panel-body-size">
+                            <div id="Barchart" class="panel-body ">
                                 <script src="../vendor/charts/barchart.js"></script>
                             </div>
                         </div>
@@ -146,8 +143,14 @@
 
 </body>
 <script>
-    $('#LinePanel').click(function (e) {
+    // jQuery( document ).ready(function( $ ) {
+    //    //Use this inside your document ready jQuery 
+    //    $(window).on('popstate', function() {
+    //       location.reload(true);
+    //    });
 
+    // });
+    $('#LinePanel').click(function (e) {
         e.preventDefault();
         getData();
         window.location = 'graphs.html#LineGraphTab';
@@ -162,10 +165,12 @@
 
     function getData() {
         sessionStorage.setItem("ActorsNames", JSON.stringify(ActorsNames));
-        sessionStorage.setItem("ActorsPositions", JSON.stringify(positionsArray));
+        sessionStorage.setItem("ActorsPositions", JSON.stringify(positionalData));
         sessionStorage.setItem("NumOfTurns", NumOfTurns);
         sessionStorage.setItem("EffectivePowArray", JSON.stringify(EffectivePowArray));
+        sessionStorage.setItem("effpow", JSON.stringify(effpow));
         sessionStorage.setItem("ScenarioArray", JSON.stringify(ScenarioArray));
+        sessionStorage.setItem("DimAraay", JSON.stringify(DimAraay));
     }
 
 </script>

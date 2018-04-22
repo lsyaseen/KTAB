@@ -4,7 +4,10 @@ var positionalData = [],
     effpowArray,
     ScenarioArray = [],
     EffectivePowArray,
+    DimAraay = [],
+    effpow = {},
     NumOfTurns;
+
 function getfile() {
     var files = document.getElementById("uploadInput").files;
     var file = files[0];
@@ -27,33 +30,73 @@ function getfile() {
 
         let keys = ActorsData[0].columns;
         let values = ActorsData[0].values;
-        let objects = values.map(function(array){ 
+        let objects = values.map(function (array) {
             let object = {};
-            keys.forEach(function(key, i) {
-                return  object[key] = array[i]});
+            keys.forEach(function (key, i) {
+                return object[key] = array[i]
+            });
             return object;
-         });
+        });
 
-        objects.forEach(function (a) {
-            if (!this[a.Name]) {
-                this[a.Name] = { name: a.Name, positions: [] };
-                positionalData.push(this[a.Name]);
+        // to find num of dim
+        DimAraay = [...new Set(objects.map(item => item.Dim_k))];
+
+        //convert effpow array to obj
+        let keys2 = EffPowerData[0].columns;
+        let values2 = EffPowerData[0].values;
+        let objects2 = values2.map(function (array) {
+            let object = {};
+            keys2.forEach(function (key, i) {
+                return object[key] = array[i]
+            });
+            return object;
+        });
+
+        //group effpow by dim
+        objects2.forEach(function (item) {
+            var list = effpow[item.Dim_k];
+            if (list) {
+                list.push(item);
+            } else {
+                effpow[item.Dim_k] = [item];
             }
-            this[a.Name].positions.push(a.Pos_Coord);
-        }, Object.create(null));
+        });
 
-        for (var i = 0; i < positionalData.length; i += 1) {
-            ActorsNames.push(positionalData[i].name);
+        //group positions by dim
+        var allposuions = {};
+        objects.forEach(function (item) {
+            var list = allposuions[item.Dim_k];
+            if (list) {
+                list.push(item);
+            } else {
+                allposuions[item.Dim_k] = [item];
+            }
+        });
+
+        // var arr = [];  // creates a new array .
+        for (var i = 0; i < DimAraay.length; i++) {
+            positionalData[i] = [];
+            allposuions[i].forEach(function (a) {
+                if (!this[a.Name]) {
+                    this[a.Name] = { name: a.Name, positions: [] };
+                    positionalData[i].push(this[a.Name]);
+                }
+                this[a.Name].positions.push(a.Pos_Coord);
+            }, Object.create(null));
         }
-        for (var i = 0; i < positionalData.length; i += 1) {
-            positionsArray.push(positionalData[i].positions);
+
+        for (var i = 0; i < positionalData[0].length; i += 1) {
+            ActorsNames.push(positionalData[0][i].name);
+        }
+        for (var i = 0; i < positionalData[0].length; i += 1) {
+            positionsArray.push(positionalData[0][i].positions);
         }
         NumOfTurns = positionsArray[0].length - 1; // -1 cuz we start from 0
 
         document.getElementById('SecnarioName').innerHTML = ScenarioArray[0][0];;
         document.getElementById('SecnarioDesc').innerHTML = ScenarioArray[0][1];;
         document.getElementById('NumOfActors').innerHTML = ActorsNames.length;;
-        document.getElementById('NumOfDim').innerHTML = 1;
+        document.getElementById('NumOfDim').innerHTML = DimAraay.length;
         document.getElementById('currentTurn').innerHTML = NumOfTurns;
 
         sendData();

@@ -80,6 +80,11 @@
                                     <strong>Turn: </strong> <span id="currentTurn"> 1 </span>
                                     <!--1 by default -->
                                 </div>
+                                <div class="col-xs-9">
+                                    <strong>Dimension: </strong> <span> 
+                                        <select id="Dimpicker">
+                                    </select> </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -128,6 +133,16 @@
                                         <canvas id="Barcanvas" width="1020px" height="768px" style="display:none;"></canvas>
                                         <div class="col-sm-12 col-md-12 col-lg-8">
                                             <div class="panel panel-default">
+                                                <form id="yAxisScale">
+                                                    <div class="yscaleoptions">
+                                                        <span data-container="body" role="tooltip" aria-haspopup="true" class="tooltip tooltip-bottom-right ">
+                                                              <input type="radio" id="Fixedbtn" name="radio-group" >                                                             
+                                                              <label for="Fixedbtn">Fixed y-axis scale</label>
+                                                              <input type="radio" id="Responsivebtn" name="radio-group" checked >               
+                                                              <label for="Responsivebtn">Responsive y-axis scale</label>
+                                                            </span>
+                                                    </div>
+                                                </form>
                                                 <div id="MainBarChart" class="panel-body "></div>
                                             </div>
                                         </div>
@@ -174,8 +189,8 @@
     <script src="../vendor/canvg/js/canvg.bundle.js"></script>
 
     <!-- charts -->
-    <script src="../vendor/charts/MainLinechart.js"></script>
-    <script src="../vendor/charts/MainBarchart.js"></script>
+    <script src="../vendor/charts/MainLineChart.js"></script>
+    <script src="../vendor/charts/MainBarChart.js"></script>
     <!-- slider -->
     <script src="../vendor/charts/slider.js"></script>
 
@@ -187,7 +202,9 @@
     var ScenarioName = ScenarioArray[0][0];
     var ScenarioDesc = ScenarioArray[0][1];
     var NumOfActors = namesArray.length;
-    var NumOfDim = 1;
+    var DimAraay2 = JSON.parse(sessionStorage.getItem("DimAraay"));
+    var NumOfDim = DimAraay2.length;
+    var selectedDim = 0;//default
 
 
     document.getElementById('SecnarioName').innerHTML = ScenarioName;
@@ -201,6 +218,19 @@
         });
     });
 
+    $(document).ready(function () {
+        //option for Dim
+        for (i = 0; i < DimAraay2.length; i++) {
+            $("#Dimpicker").append('<option value="' + DimAraay2[i] + '">' + (DimAraay2[i] + 1) + '</option>');
+
+        }
+        $("#Dimpicker").val(0); //select first opt by default
+    });
+    $("#Dimpicker").on('change', function () {
+        selectedDimNum = $('#Dimpicker').val()
+        drawChart();
+        drawLine();
+    });
     //Linking to specific tab
     $(function () {
         var hash = window.location.hash;
@@ -255,6 +285,11 @@
         }
 
     }
+    $(document).ready(function () {
+        $('#yAxisScale').change(function () {
+            drawChart();
+        });
+    });
 
 </script>
 

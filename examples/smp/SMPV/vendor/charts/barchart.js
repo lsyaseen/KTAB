@@ -1,4 +1,3 @@
-// Define margins        
 
 var margin = { top: 30, right: 20, bottom: 30, left: 50 },
   width = 500 - margin.left - margin.right,
@@ -13,15 +12,10 @@ var svg2 = d3.select("#Barchart")
   .append("g")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-
-var x = d3.scaleBand()
-  .rangeRound([0, width])
-  .paddingInner(0.05)
-  .align(0.1);
-
-var y = d3.scaleLinear()
+var xScale = d3.scaleLinear()
+  .range([0, width]);
+var yScale = d3.scaleLinear()
   .range([height, 0]);
-
 var z = d3.scaleOrdinal()
   .range(["#5C8598", "#219DD8", "#96C9E5", "#3C3D3B",
     "#ECCE6A", "#f8ecba", "#60805D", "#8AC791",
@@ -69,85 +63,44 @@ var z = d3.scaleOrdinal()
     "#333300", "#ff9933", "#000033", "#4d4d4d"
   ]);
 
-var xAxis = d3.axisBottom(x).scale(x);
-var yAxis = d3.axisLeft(y).scale(y);
-
 function drawBarchart() {
+
+  var xAxis = d3.axisBottom(xScale).scale(xScale);
+  var yAxis = d3.axisLeft(yScale).scale(yScale);
+
   var PositionsPerTurn = [],
-    roundedPositions = [],
     effpowArray = [],
     namesArray = [],
+    namesArray2 = [],
     effpowData,
+    highestRange = 0,
+    alleffpow = [],
     turns;
 
-  //from loadSQL.js
   var positionsData = positionsArray;
   turns = NumOfTurns;
-  effpowData = EffectivePowArray;
+  alleffpow = effpow;
+
+  var range0, range1, range2, range3, range4, range5, range6, range7, range8, range9; // initializing an array for each range of positions 
+
+  //show for 1st dim
+  var namesArray = alleffpow[0].map(function (a) { return a.Name; });
+  var effpowArray = alleffpow[0].map(function (a) { return a.fpower; });
+
+  effpowArray2 = effpowArray.slice();
+
+  for (var i = 0; i < effpowArray.length; i++) {
+    var index = namesArray.indexOf(namesArray[i])
+    if (index !== -1) {
+      effpowArray2[index] = effpowArray[i];
+    }
+  }
 
   for (var i = 0; i < positionsData.length; i++) {
     PositionsPerTurn.push(positionsData[i][turns]); // it should be a var based on which turn is chosen
   }
 
-  //round positions to group by position range
-  for (i = 0; i < PositionsPerTurn.length; i++) {
-    roundedPositions.push(Math.round(PositionsPerTurn[i] / 10) * 10);
-  }
-
-  for (var i = 0; i < effpowData.length; i++) {
-    effpowArray.push(effpowData[i][1]);
-  }
-
-  for (var i = 0; i < effpowData.length; i++) {
-    namesArray.push(effpowData[i][0]);
-  }
-
-  // initializing an array for each range of positions 
-  var range1 = new Array(26).fill(0);
-  var range2 = new Array(26).fill(0);
-  var range3 = new Array(26).fill(0);
-  var range4 = new Array(26).fill(0);
-  var range5 = new Array(26).fill(0);
-  var range6 = new Array(26).fill(0);
-  var range7 = new Array(26).fill(0);
-  var range8 = new Array(26).fill(0);
-  var range9 = new Array(26).fill(0);
-  var range10 = new Array(26).fill(0);
-
-  //group positions
-  for (i = 0; i < roundedPositions.length; i++) {
-
-    if (roundedPositions[i] == 10) {
-      range1[i] = effpowArray[i];
-    }
-    else if (roundedPositions[i] == 20) {
-      range2[i] = effpowArray[i];
-    }
-    else if (roundedPositions[i] == 30) {
-      range3[i] = effpowArray[i];
-    }
-    else if (roundedPositions[i] == 40) {
-      range4[i] = effpowArray[i];
-    }
-    else if (roundedPositions[i] == 50) {
-      range5[i] = effpowArray[i];
-    }
-    else if (roundedPositions[i] == 60) {
-      range6[i] = effpowArray[i];
-    }
-    else if (roundedPositions[i] == 70) {
-      range7[i] = effpowArray[i];
-    }
-    else if (roundedPositions[i] == 80) {
-      range8[i] = effpowArray[i];
-    }
-    else if (roundedPositions[i] == 90) {
-      range9[i] = effpowArray[i];
-    }
-    else if (roundedPositions[i] == 100) {
-      range10[i] = effpowArray[i];
-    }
-  }
+  groupActors(PositionsPerTurn);
 
   //adding range position
   namesArray.unshift("Actor");
@@ -160,10 +113,8 @@ function drawBarchart() {
   range7.unshift(70);
   range8.unshift(80);
   range9.unshift(90);
-  range10.unshift(100);
+  range0.unshift(100);
 
-
-  var rows = [range1, range2, range3, range4, range5, range6, range7, range8, range9, range10];
   var result = rows.map(function (row) {
     return row.reduce(function (result, field, index) {
       result[namesArray[index]] = field;
@@ -180,61 +131,78 @@ function drawBarchart() {
     var tempvalues = d3.values(result[i]);
     tempvalues.shift();
     var tempsum = 0;
-    for (var j = 0; j < tempvalues.length; j++) { tempsum = tempsum + tempvalues[j]; }
+    for (var j = 0; j < tempvalues.length; j++) { tempsum = tempsum + parseFloat(tempvalues[j]); }
     idheights.push(tempsum);
     barnames.push(result[i].Actor);
   };
 
-  x.domain(result.map(function (d) { return d.Actor; }));
-  y.domain([0, d3.max(idheights)]).nice();
+  xScale.domain([0, 100]);
+  yScale.domain([0, d3.max(idheights)]).nice();
   z.domain(keys);
+
+  var stack = d3.stack().keys(keys)(result);
+  var newData = namesArray.slice(1).map(function (name, i) {
+    return {
+      Name: name,
+      values: stack[i],
+      color: z(name)
+    };
+  })
 
   // gridlines in x axis function
   function make_x_gridlines() {
-    return d3.axisBottom(x)
-    // .ticks(turns)
+    return d3.axisBottom(xScale)
+      .ticks(10)
   }
 
   // gridlines in y axis function
   function make_y_gridlines() {
-    return d3.axisLeft(y)
+    return d3.axisLeft(yScale)
       .ticks(10)
   }
 
   // add the X gridlines
   svg2.append("g")
-    .attr("class", "grid")
     .attr("transform", "translate(0," + height + ")")
+    .style("stroke-opacity", "0.2")
+    .style("stroke-dasharray", "2")
+    .style("shape-rendering", "crispEdges")
     .call(make_x_gridlines()
       .tickSize(-height)
       .tickFormat("")
-    )
+    );
 
   // add the Y gridlines
   svg2.append("g")
     .attr("class", "grid")
+    .style("stroke-opacity", "0.2")
+    .style("stroke-dasharray", "2")
+    .style("shape-rendering", "crispEdges")
     .call(make_y_gridlines()
       .tickSize(-width)
       .tickFormat("")
-    )
+    );
 
   svg2.append("g")
     .selectAll("g")
-    .data(d3.stack().keys(keys)(result))
+    .data(newData)
     .enter().append("g")
-    .attr("fill", function (d) { return z(d.key); })
+    .attr("fill", function (d) { return d.color })
+    .attr("id", function (d, i) { return 'Actor_' + d.Name.replace(/\s+/g, '').replace(".", '') }) // assign ID)  
     .selectAll("rect")
-    .data(function (d) { return d; })
+    .data(function (d) { return d.values; })
     .enter().append("rect")
-    .attr("x", function (d, i) { return x((barnames[i])); })
+    .attr("x", function (d, i) { return xScale((barnames[i])) - (width / newData[0].values.length) + 2; }) //to add space
+    .attr("width", function (d) {
+      var barWidth = width / (newData[0].values.length + 1);
+      return barWidth
+    })
     .attr("y", height)
-    .attr("width", x.bandwidth())
     .attr("height", 0)
     .transition()
     .duration(3000)
-    .delay(function (d, i) { return i * 400 })
-    .attr("y", function (d) { return y(d[1]); })
-    .attr("height", function (d) { return y(d[0]) - y(d[1]); })
+        .attr("y", function (d) { return yScale(d[1]); })
+    .attr("height", function (d) { return yScale(d[0]) - yScale(d[1]); });
 
   //draw the axis
   svg2.append("g")
@@ -255,10 +223,79 @@ function drawBarchart() {
   // text label for the y axis
   svg2.append("text")
     .attr("transform", "rotate(-90)")
-    .attr("y", 0 - margin.left)
+    .attr("y", -30 - margin.left)
     .attr("x", 0 - (height / 2))
     .attr("dy", "1em")
     .style("text-anchor", "middle")
     .text("Effective Power");
 
+  svg2.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0 - margin.left)
+    .attr("x", 0 - (height / 2))
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text("Influence x Salience");
+
+
+  function groupActors(e) {
+    // initializing an array for each range of positions 
+    //filling it with zeroes cuz d3 stack layout is expecting arrays of the same length. 
+    range0 = Array(26).fill(0);
+    range1 = Array(26).fill(0);
+    range2 = Array(26).fill(0);
+    range3 = Array(26).fill(0);
+    range4 = Array(26).fill(0);
+    range5 = Array(26).fill(0);
+    range6 = Array(26).fill(0);
+    range7 = Array(26).fill(0);
+    range8 = Array(26).fill(0);
+    range9 = Array(26).fill(0);
+
+    for (i = 0; i < e.length; i++) {
+
+      if (e[i] >= 0 && e[i] < 10) {
+        range0[i] = +effpowArray2[i];
+      }
+      else if (e[i] >= 10 && e[i] < 20) {
+        range1[i] = +effpowArray2[i];
+      }
+      else if (e[i] >= 20 && e[i] < 30) {
+        range2[i] = +effpowArray2[i];
+      }
+      else if (e[i] >= 30 && e[i] < 40) {
+        range3[i] = +effpowArray2[i];
+      }
+      else if (e[i] >= 40 && e[i] < 50) {
+        range4[i] = +effpowArray2[i];
+      }
+      else if (e[i] >= 50 && e[i] < 60) {
+        range5[i] = +effpowArray2[i];
+      }
+      else if (e[i] >= 60 && e[i] < 70) {
+        range6[i] = +effpowArray2[i];
+      }
+      else if (e[i] >= 70 && e[i] < 80) {
+        range7[i] = +effpowArray2[i];
+      }
+      else if (e[i] >= 80 && e[i] < 90) {
+        range8[i] = +effpowArray2[i];
+      }
+      else if (e[i] >= 90 && e[i] < 100) {
+        range9[i] = +effpowArray2[i];
+      }
+    }
+    rows = [range0, range1, range2, range3, range4, range5, range6, range7, range8, range9];
+
+    // sum all ranges and find the highest		
+    for (var i = 0; i < 10; i++) {
+      var sum = (rows[i]).reduce(add, 0);
+      var temp = sum;
+      if (highestRange < temp)
+        highestRange = temp;
+    }
+    function add(a, b) {
+      return a + b;
+    }
+  }
 }

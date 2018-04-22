@@ -20,16 +20,21 @@ var x_axix_data = [], // create an array for x-axix
   yAxis,
   turns,
   line,
-  positions,
+  positionsData =[],
+  allpos,
   selectedLine;
 
 
 function drawLinechart() {
 
   //from loadSQL.js
-  positions = positionsArray;
+  allpos = positionalData;
   names = ActorsNames;
   turns = NumOfTurns + 1;
+
+  for (var i = 0; i < allpos[0].length; i += 1) {
+    positionsData.push(allpos[0][i].positions);
+}
 
   //define the scales
   XScale = d3.scaleLinear().domain([0, turns - 1]).range([0, width]);
@@ -83,7 +88,6 @@ function drawLinechart() {
   svg.append("g")
     .attr("class", "y axis")
     .call(yAxis);
-
 
   // text label for the y axis
   svg.append("text")
@@ -151,7 +155,7 @@ function drawLinechart() {
       values: x_axix_data.map(function (x_value) {
         return {
           Turn: x_value,
-          val: positions[i].map(function (y_values) {
+          val: positionsData[i].map(function (y_values) {
             return y_values
           })
         }
@@ -198,7 +202,6 @@ function drawLinechart() {
         .style("opacity", function () {
           return ("#Line_" + d.actor_name === selectedLine) ? 1.0 : 0.2;
         })
-
       d3.select(selectedLine.replace(/\s+/g, ''))
         .style("stroke-width", 4);
 
