@@ -3,15 +3,6 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
   width = 500 - margin.left - margin.right,
   height = 270 - margin.top - margin.bottom;
 
-var svg2 = d3.select("#Barchart")
-  .append("svg")
-  .attr("width", "100%")
-  .attr("height", "100%")
-  .attr("preserveAspectRatio", "xMidYMid meet")
-  .attr("viewBox", "0 0 500 300")
-  .append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
 var xScale = d3.scaleLinear()
   .range([0, width]);
 var yScale = d3.scaleLinear()
@@ -65,6 +56,16 @@ var z = d3.scaleOrdinal()
 
 function drawBarchart() {
 
+  d3.select("#Barchart").html("");
+  
+  var svg2 = d3.select("#Barchart")
+  .append("svg")
+  .attr("width", "100%")
+  .attr("height", "100%")
+  .attr("preserveAspectRatio", "xMidYMid meet")
+  .attr("viewBox", "0 0 500 300")
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
   var xAxis = d3.axisBottom(xScale).scale(xScale);
   var yAxis = d3.axisLeft(yScale).scale(yScale);
 
@@ -75,20 +76,34 @@ function drawBarchart() {
     effpowData,
     highestRange = 0,
     alleffpow = [],
+    efptest=[],
+    scenNum,
+    positionsData =[],
     turns;
 
-  var positionsData = positionsArray;
   turns = NumOfTurns;
   alleffpow = effpow;
-
+  efptest = arreff;
+  scenNum = selectedScen;
+  allpos = arrPos;
+    
   var range0, range1, range2, range3, range4, range5, range6, range7, range8, range9; // initializing an array for each range of positions 
 
-  //show for 1st dim
-  var namesArray = alleffpow[0].map(function (a) { return a.Name; });
-  var effpowArray = alleffpow[0].map(function (a) { return a.fpower; });
+
+   for (i=0 ; i<efptest[scenNum][0].length;i++ ){
+    namesArray.push(efptest[scenNum][0][0][i].Name)//sec [] for dim
+      
+    }
+    for (i=0 ; i<efptest[scenNum][0].length;i++ ){
+      effpowArray.push(efptest[scenNum][0][0][i].fpower)//sec [] for dim
+      }
+
+      for (var i = 0; i < allpos[scenNum][0].length; i += 1) {
+        positionsData.push(allpos[scenNum][0][i].positions);
+      }
 
   effpowArray2 = effpowArray.slice();
-
+  
   for (var i = 0; i < effpowArray.length; i++) {
     var index = namesArray.indexOf(namesArray[i])
     if (index !== -1) {
@@ -99,7 +114,7 @@ function drawBarchart() {
   for (var i = 0; i < positionsData.length; i++) {
     PositionsPerTurn.push(positionsData[i][turns]); // it should be a var based on which turn is chosen
   }
-
+   
   groupActors(PositionsPerTurn);
 
   //adding range position
@@ -192,9 +207,9 @@ function drawBarchart() {
     .selectAll("rect")
     .data(function (d) { return d.values; })
     .enter().append("rect")
-    .attr("x", function (d, i) { return xScale((barnames[i])) - (width / newData[0].values.length) + 2; }) //to add space
+    .attr("x", function (d, i) { return xScale((barnames[i]))  +2.5; }) //to add space
     .attr("width", function (d) {
-      var barWidth = width / (newData[0].values.length + 1);
+      var barWidth = width / (newData[0].values.length )- 4;
       return barWidth
     })
     .attr("y", height)

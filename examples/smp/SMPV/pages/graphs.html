@@ -57,7 +57,12 @@
                         <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-10">
-                                    <strong>Secnario Name: </strong> <span id="SecnarioName"> </span>
+                                    <strong>Number of Scenarios: </strong> <span id="NumOfscen"> </span>
+                                </div>
+                                <div class="col-xs-10">
+                                    <strong>Scenario Name: </strong>
+                                    <span id="SecnarioName"> </span>
+                                    <select id="SecnarioPicker"> </select>
                                 </div>
                                 <div class="col-xs-10">
                                     <strong>Secnario description: </strong> <span id="SecnarioDesc"> </span>
@@ -197,20 +202,20 @@
 </body>
 
 <script>
-    // data from load.js (session data)
+    var Positions = JSON.parse(sessionStorage.getItem("ActorsPositions"));
     var ScenarioArray = JSON.parse(sessionStorage.getItem("ScenarioArray"));
-    var ScenarioName = ScenarioArray[0][0];
-    var ScenarioDesc = ScenarioArray[0][1];
-    var NumOfActors = namesArray.length;
-    var DimAraay2 = JSON.parse(sessionStorage.getItem("DimAraay"));
-    var NumOfDim = DimAraay2.length;
-    var selectedDim = 0;//default
+    var SceAraay2 = JSON.parse(sessionStorage.getItem("SceAraay"));
+    var selectedScen2 = sessionStorage.getItem("selectedScen");
+    var ScenarioDesc = ScenarioArray[selectedScen2][1];
+    var NumOfDim = Positions[selectedScen2].length;
+    var NumOfTurns = sessionStorage.getItem("NumOfTurns");
+    var ActorsNames = JSON.parse(sessionStorage.getItem("ActorsNames"));
 
-
-    document.getElementById('SecnarioName').innerHTML = ScenarioName;
+    document.getElementById('NumOfscen').innerHTML = ScenarioArray.length;
     document.getElementById('SecnarioDesc').innerHTML = ScenarioDesc;
     document.getElementById('NumOfActors').innerHTML = NumOfActors;
     document.getElementById('NumOfDim').innerHTML = NumOfDim;
+    document.getElementById('NumOfActors').innerHTML = ActorsNames[selectedScen2].length;;
 
     $(document).ready(function () {
         $('[data-toggle=offcanvas]').click(function () {
@@ -219,9 +224,9 @@
     });
 
     $(document).ready(function () {
-        //option for Dim
-        for (i = 0; i < DimAraay2.length; i++) {
-            $("#Dimpicker").append('<option value="' + DimAraay2[i] + '">' + (DimAraay2[i] + 1) + '</option>');
+
+        for (i = 0; i < NumOfDim; i++) {
+            $("#Dimpicker").append('<option value="' + i + '">' + (i + 1) + '</option>');
 
         }
         $("#Dimpicker").val(0); //select first opt by default
@@ -230,6 +235,50 @@
         selectedDimNum = $('#Dimpicker').val()
         drawChart();
         drawLine();
+    });
+
+    // option for scenarios
+    for (i = 0; i < SceAraay2.length; i++) {
+        $("#SecnarioPicker").append('<option value="' + i + '">' + ScenarioArray[i][0] + '</option>');
+    }
+    $("#SecnarioPicker").val(selectedScen2); //select first scenario by default
+
+    $("#SecnarioPicker").on('change', function () {
+        selectedScen2 = $('#SecnarioPicker').val();
+        selectedScenNum = $('#SecnarioPicker').val();
+        selectedDimNum = 0;
+
+        turns = Positions[selectedScen2][0][1].positions.length - 1;
+
+        selectedScenNum = $('#SecnarioPicker').val();
+        slider.noUiSlider.updateOptions({
+            range: {
+                'min': 0,
+                'max': turns
+            },
+            pips: {
+                mode: 'count',
+                density: 0,
+                values: turns + 1, //+1 since we're starting from zero
+                stepped: true
+            }
+
+        });
+        $('#Dimpicker')
+            .find('option')
+            .remove()
+        NumOfDim = Positions[selectedScen2].length;
+
+
+        for (i = 0; i < NumOfDim; i++) {
+
+            $("#Dimpicker").append('<option value="' + i + '">' + (i + 1) + '</option>');
+        }
+        $("#Dimpicker").val(0); //select first opt by default
+        updateDesc();
+        drawChart();
+        drawLine();
+
     });
     //Linking to specific tab
     $(function () {
@@ -244,6 +293,19 @@
         });
     });
 
+    function updateDesc() {
+
+        turns = Positions[selectedScen2][0][1].positions.length;
+        ScenarioDesc = ScenarioArray[selectedScen2][1];
+        NumOfDim = Positions[selectedScen2].length;
+        NumOfTurns = sessionStorage.getItem("NumOfTurns");
+        document.getElementById('NumOfscen').innerHTML = ScenarioArray.length;
+        document.getElementById('SecnarioDesc').innerHTML = ScenarioDesc;
+        document.getElementById('NumOfActors').innerHTML = NumOfActors;
+        document.getElementById('NumOfDim').innerHTML = NumOfDim;
+        document.getElementById('NumOfActors').innerHTML = ActorsNames[selectedScen2].length;;
+
+    }
 
     function downloadPNG() {
 

@@ -4,10 +4,11 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
   height = 270 - margin.top - margin.bottom;
 
 // data from load.js (session data)
-var namesArray = JSON.parse(sessionStorage.getItem("ActorsNames"));
+var ActorsNamesAllSce = JSON.parse(sessionStorage.getItem("ActorsNames"));
 var ActorsPositions = JSON.parse(sessionStorage.getItem("ActorsPositions"));
 var NumOfTurns = sessionStorage.getItem("NumOfTurns");
 var selectedDimNum = 0;
+var selectedScenNum = sessionStorage.getItem("selectedScen");
 
 function drawLine() {
 
@@ -43,15 +44,21 @@ function drawLine() {
     turn,
     line,
     positionsData = [],
+    namesArray = [],
+
     selectedLine,
     selectedLegend;
 
+  //names based on selected scenario
+  namesArray = ActorsNamesAllSce[selectedScenNum];
+
   //positions based on selected Dim
-  for (var i = 0; i < ActorsPositions[selectedDimNum].length; i += 1) {
-    positionsData.push(ActorsPositions[selectedDimNum][i].positions);
+  for (var i = 0; i < ActorsPositions[selectedScenNum][selectedDimNum].length; i += 1) {
+    positionsData.push(ActorsPositions[selectedScenNum][selectedDimNum][i].positions);
   }
+
   turn = currentTurn; //current turn from slider
-  turns = NumOfTurns; //turns from sqlite
+  turns = NumOfTurns - 1; //cuz we're starting from 0
 
   //define the scales
   XScale = d3.scaleLinear().domain([0, turn]).range([0, width]);

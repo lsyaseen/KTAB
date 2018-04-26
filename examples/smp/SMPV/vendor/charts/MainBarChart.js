@@ -1,6 +1,7 @@
 
 // data from load.js (session data)
 var allpos = JSON.parse(sessionStorage.getItem("ActorsPositions"));
+var AllEffcPow = JSON.parse(sessionStorage.getItem("AllEffcPow"));
 var NumOfTurns = sessionStorage.getItem("NumOfTurns");
 var effpow = JSON.parse(sessionStorage.getItem("effpow"));
 var selectedDimNum = 0;
@@ -9,21 +10,12 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
     width2 = 460 - margin.left - margin.right,
     height = 270 - margin.top - margin.bottom;
 
-var svg3 = d3.select("#Barlegend")
-    .append("svg")
-    .attr("width", "100%")
-    .attr("height", "100%")
-    .attr("preserveAspectRatio", "xMidYMid meet")
-    .attr("viewBox", "0 0 250 500")
-    .attr('transform', "translate(" + 15 + "," + 15 + ")")
-    .append("g")
-    .attr("class", "legend2");
 
 function drawChart() {
 
     // Clear the exiting chart
     d3.select("#MainBarChart").html("");
-    // d3.select("#Barlegend").html(""); //no selection so no need to reload
+    d3.select("#Barlegend").html("");
 
     var svg = d3.select("#MainBarChart")
         .append("svg")
@@ -32,8 +24,17 @@ function drawChart() {
         .attr("preserveAspectRatio", "xMidYMid meet")
         .attr("viewBox", "0 0 550 300")
         .append("g")
-        .attr("transform", "translate(" + (margin.left + 40) + "," + margin.top + ")")
+        .attr("transform", "translate(" + (margin.left + 40) + "," + margin.top + ")");
 
+    var svg3 = d3.select("#Barlegend")
+        .append("svg")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .attr("preserveAspectRatio", "xMidYMid meet")
+        .attr("viewBox", "0 0 250 500")
+        .attr('transform', "translate(" + 15 + "," + 15 + ")")
+        .append("g")
+        .attr("class", "legend2");
     var xScale = d3.scaleLinear()
         .range([0, width2]);
 
@@ -88,10 +89,10 @@ function drawChart() {
             "#333300", "#ff9933", "#000033", "#4d4d4d"
         ]);
 
-
     var PositionsArray = [],
         ActorsPositions = [],
         PositionsArray2 = [],
+        positionsData = [],
         effpowArray = [],
         effpowArray2 = [],
         namesArray = [],
@@ -108,13 +109,18 @@ function drawChart() {
 
     turn = currentTurn; //current turn from slider
 
-    for (var i = 0; i < allpos[selectedDimNum].length; i += 1) {
-        ActorsPositions.push(allpos[selectedDimNum][i].positions);
+    for (var i = 0; i < allpos[selectedScenNum][selectedDimNum].length; i += 1) {
+        positionsData.push(allpos[selectedScenNum][selectedDimNum][i].positions);
     }
 
-    var namesArray = effpow[selectedDimNum].map(function (a) { return a.Name; });
-    var effpowArray = effpow[selectedDimNum].map(function (a) { return a.fpower; });
+    for (i = 0; i < AllEffcPow[selectedScenNum][selectedDimNum].length; i++) {
+        namesArray.push(AllEffcPow[selectedScenNum][selectedDimNum][0][i].Name)//sec [] for dim
 
+    }
+
+    for (i = 0; i < AllEffcPow[selectedScenNum][selectedDimNum].length; i++) {
+        effpowArray.push(AllEffcPow[selectedScenNum][selectedDimNum][0][i].fpower)//sec [] for dim
+    }
 
     effpowArray2 = effpowArray.slice();
 
@@ -127,8 +133,8 @@ function drawChart() {
 
     findHighestEffpow();
 
-    for (var i = 0; i < ActorsPositions.length; i++) {
-        PositionsArray.push(ActorsPositions[i][turn]); // it should be a var based on which turn is chosen
+    for (var i = 0; i < positionsData.length; i++) {
+        PositionsArray.push(positionsData[i][turn]); // it should be a var based on which turn is chosen
     }
 
     groupActors(PositionsArray);
@@ -166,7 +172,6 @@ function drawChart() {
         idheights.push(tempsum);
         barnames.push(result[i].Actor);
     };
-
     xScale.domain([0, 100]);
 
     if (document.getElementById('Fixedbtn').checked) {
@@ -179,7 +184,6 @@ function drawChart() {
         y_range = "responsive"
     }
     z.domain(keys);
-
 
     var stack = d3.stack().keys(keys)(result);
     var newData = namesArray.slice(1).map(function (name, i) {
@@ -238,9 +242,9 @@ function drawChart() {
         .selectAll("rect")
         .data(function (d) { return d.values; })
         .enter().append("rect")
-        .attr("x", function (d, i) { return xScale((barnames[i])) - (width2 / newData[0].values.length) + 2; })
+        .attr("x", function (d, i) { return xScale((barnames[i])) + 2.5; }) // + to shift bars 
         .attr("width", function (d) {
-            var barWidth = width2 / (newData[0].values.length + 1);
+            var barWidth = width2 / (newData[0].values.length) - 4;
             return barWidth
         })
         .attr("y", height)
@@ -299,7 +303,7 @@ function drawChart() {
         .attr("transform", function (d, i) {
             var xOff = (i % 3) * 65
             var yOff = Math.floor(i / 3) * 20
-            return "translate(" + xOff + "," + (yOff + 80) + ")"
+            return "translate(" + xOff + "," + (yOff + 30) + ")"
         });
 
     legend.append("rect")
@@ -313,7 +317,6 @@ function drawChart() {
             onMouseover();
         })
         .on("mouseout", onMouseout);
-
 
     legend.append("text")
         .attr("x", 15)
@@ -368,8 +371,8 @@ function drawChart() {
 
         for (var turnNo = 0; turnNo < turns; turnNo++) {
             // repeat for all turns to find the highest range and set it as y-axes max value
-            for (var i = 0; i < ActorsPositions.length; i++) {
-                PositionsArray2.push(ActorsPositions[i][turnNo + 1]);
+            for (var i = 0; i < positionsData.length; i++) {
+                PositionsArray2.push(positionsData[i][turnNo + 1]);
             }
             roundPositions(PositionsArray2);
         }

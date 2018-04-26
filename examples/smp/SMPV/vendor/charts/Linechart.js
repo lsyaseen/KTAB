@@ -3,38 +3,43 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
   width = 500 - margin.left - margin.right,
   height = 270 - margin.top - margin.bottom;
 
-var svg = d3.select("#Linechart")
-  .append("svg")
-  .attr("width", "100%")
-  .attr("height", "100%")
-  .attr("preserveAspectRatio", "xMidYMid meet")
-  .attr("viewBox", "0 0 500 300")
-  .append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-
-var x_axix_data = [], // create an array for x-axix 
-  names = [],
-  XScale,
-  YScale,
-  xAxis,
-  yAxis,
-  turns,
-  line,
-  positionsData =[],
-  allpos,
-  selectedLine;
-
-
 function drawLinechart() {
 
-  //from loadSQL.js
-  allpos = positionalData;
-  names = ActorsNames;
-  turns = NumOfTurns + 1;
+  d3.select("#Linechart").html("");
 
-  for (var i = 0; i < allpos[0].length; i += 1) {
-    positionsData.push(allpos[0][i].positions);
-}
+  var svg = d3.select("#Linechart")
+    .append("svg")
+    .attr("width", "100%")
+    .attr("height", "100%")
+    .attr("preserveAspectRatio", "xMidYMid meet")
+    .attr("viewBox", "0 0 500 300")
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+  var x_axix_data = [], // create an array for x-axix 
+    names = [],
+    XScale,
+    YScale,
+    xAxis,
+    yAxis,
+    turns,
+    line,
+    positionsData = [],
+    allpos,
+    scenNum,
+    selectedLine;
+
+  //from loadSQL.js
+  allpos = arrPos;
+
+  scenNum = selectedScen;
+  names = ActorsNames[scenNum];
+
+  for (var i = 0; i < allpos[scenNum][0].length; i += 1) {
+    positionsData.push(allpos[scenNum][0][i].positions);
+  }
+
+  turns = allpos[scenNum][0][1].positions.length;
 
   //define the scales
   XScale = d3.scaleLinear().domain([0, turns - 1]).range([0, width]);

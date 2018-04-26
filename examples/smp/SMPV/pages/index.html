@@ -35,7 +35,6 @@
 
 <body>
 
-
     <!-- Navigation -->
     <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
         <div class="navbar-header">
@@ -75,10 +74,15 @@
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-xs-10">
-                                <strong>Secnario Name: </strong> <span id="SecnarioName"> </span>
+                                <strong>Number of Scenarios: </strong> <span id="NumOfscen"> </span>
                             </div>
                             <div class="col-xs-10">
-                                <strong>Secnario description: </strong> <span id="SecnarioDesc"> </span>
+                                <strong>Scenario Name: </strong>
+                                <span id="SecnarioName"> </span>
+                                <select id="SecnarioPicker"> </select>
+                            </div>
+                            <div class="col-xs-10">
+                                <strong>Scenario description: </strong> <span id="SecnarioDesc"> </span>
                             </div>
                         </div>
                     </div>
@@ -143,13 +147,6 @@
 
 </body>
 <script>
-    // jQuery( document ).ready(function( $ ) {
-    //    //Use this inside your document ready jQuery 
-    //    $(window).on('popstate', function() {
-    //       location.reload(true);
-    //    });
-
-    // });
     $('#LinePanel').click(function (e) {
         e.preventDefault();
         getData();
@@ -165,12 +162,15 @@
 
     function getData() {
         sessionStorage.setItem("ActorsNames", JSON.stringify(ActorsNames));
-        sessionStorage.setItem("ActorsPositions", JSON.stringify(positionalData));
+        sessionStorage.setItem("ActorsPositions", JSON.stringify(arrPos));
+        sessionStorage.setItem("AllEffcPow", JSON.stringify(arreff));
         sessionStorage.setItem("NumOfTurns", NumOfTurns);
         sessionStorage.setItem("EffectivePowArray", JSON.stringify(EffectivePowArray));
         sessionStorage.setItem("effpow", JSON.stringify(effpow));
         sessionStorage.setItem("ScenarioArray", JSON.stringify(ScenarioArray));
-        sessionStorage.setItem("DimAraay", JSON.stringify(DimAraay));
+        sessionStorage.setItem("SceAraay", JSON.stringify(SceAraay));
+        sessionStorage.setItem("selectedScen", selectedScen);
+
     }
 
 </script>
