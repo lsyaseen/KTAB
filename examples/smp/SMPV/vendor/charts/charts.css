@@ -1,0 +1,135 @@
+  .grid line {
+    stroke: lightgrey;
+    stroke-opacity: 0.7;
+    stroke-dasharray: 2 ;
+  }
+
+  .grid path {
+    stroke-width: 0;
+  }
+
+  .line {
+    fill: none;
+    stroke-width: 1.5px;
+  }
+  body {
+    padding-top: 51px;  
+  }
+  .text-center {
+    padding-top: 20px;
+  }
+  .col-xs-12 {
+    background-color: #fff;
+  }
+  #sidebar {
+    height: 100%;
+    padding-right: 0;
+    padding-top: 20px;
+  }
+  #sidebar .nav {
+    width: 95%;
+  }
+  #sidebar li {
+    border:0 #f2f2f2 solid;
+    border-bottom-width:1px;
+  }
+  
+  #ChartsPanel{
+    padding-left: 10%;
+    padding-right: 10%;    
+  }
+
+/* linechart legend */
+  .legend1 { 
+    padding: 10px;
+   overflow: auto;
+   font: 10px sans-serif;
+   border: 1px solid #bbb;
+   background-color: #cccccc;
+   box-shadow: 2px 2px 1px #888;
+ }
+
+ .legend2 { 
+  padding: 10px;
+ overflow: auto;
+ font: 10px sans-serif;
+ border: 1px solid #bbb;
+ background-color: #cccccc;
+ box-shadow: 2px 2px 1px #888;
+}
+ .scrollable-panel{
+  max-height: 300px;
+  overflow: auto;
+}
+#slider{
+  margin-bottom: 2%;
+}
+.tooltip{
+  opacity: 1 !important;
+  margin-left:25%;
+  /* padding-left:65px; */
+  
+}
+.yscaleoptions {
+  margin-top:5%;
+    /* margin-top: 2%; */
+
+/* margin-right: 30%  !important; */
+}
+.options_btn :checked 
+{
+    font-size: 13px;
+    box-shadow: none;
+}
+[type="radio"]:checked,
+[type="radio"]:not(:checked) {
+    position: absolute;
+    left: -9999px;
+}
+[type="radio"]:checked + label,
+[type="radio"]:not(:checked) + label
+{
+    position: relative;
+    padding-left: 28px;
+    padding-right: 30px;
+    
+    cursor: pointer;
+    line-height: 20px;
+    display: inline-block;
+    color: #666;
+}
+[type="radio"]:checked + label:before,
+[type="radio"]:not(:checked) + label:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18px;
+    height: 18px;
+    border: 1px solid #ddd;
+    border-radius: 100%;
+    background: #fff;
+}
+[type="radio"]:checked + label:after,
+[type="radio"]:not(:checked) + label:after {
+    content: '';
+    width: 12px;
+    height: 12px;
+    background: #61A24F;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    border-radius: 100%;
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+[type="radio"]:not(:checked) + label:after {
+    opacity: 0;
+    -webkit-transform: scale(0);
+    transform: scale(0);
+}
+[type="radio"]:checked + label:after {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+}
