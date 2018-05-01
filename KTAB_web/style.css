@@ -1,0 +1,176 @@
+
+.sidebar {
+  background-color: #ececec;
+  height:100vh;
+  width: 300px;
+  position: fixed;
+  top: 0;
+  padding: 20px 10px;
+}
+
+.sidebar-logo{
+  padding: 30px 40px 40px;
+  overflow: auto;
+}
+
+.logo{
+  width: 70px;
+  float: left;
+  margin-right: 15px;
+}
+.logo img{
+  width: 70px;
+}
+
+.logo-text{
+  width: 60px;
+  float: left;
+  font-size: 20px;
+}
+
+.logo-text h3{
+  margin: 0;
+  padding-top: 7px;
+  color: gray;
+  font-size: 28px;
+}
+
+.sidebar ul {
+  list-style-type: none;
+}
+
+.sidebar ul li{
+  padding: 15px 0;
+}
+
+.sidebar a:hover {
+  color: black;
+  text-decoration:none;
+}
+
+.icon-holder{
+  margin-right: 14px;
+  text-align: center;
+  width: 35px;
+}
+.icon{
+  display: inline-block;
+  background-size: cover;
+}
+.home{
+  background-image: url(img/home.png);
+  width: 18px;
+  height: 18px;
+}
+.about{
+  background-image: url(img/about.png);
+  width: 18px;
+  height: 18px;
+}
+.papers{
+  background-image: url(img/papers.png);
+  width: 18px;
+  height: 18px;
+}
+.projects{
+  background-image: url(img/projects.png);
+  width: 18px;
+  height: 18px;
+}
+.software{
+  background-image: url(img/software.png);
+  width: 18px;
+  height: 18px;
+}
+.events{
+  background-image: url(img/events.png);
+  width: 18px;
+  height: 18px;
+}
+.github{
+  background-image: url(img/github.png);
+  width: 18px;
+  height: 18px;
+}
+
+.title{
+  color: gray;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: Roboto,-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,Arial,sans-serif;
+}
+.title:hover {
+  color: black;
+}
+.selected{
+  color: black;
+  font-weight: bold;
+  font-size: 17px;
+}
+
+.page-container{
+  margin-left: 300px;
+  padding: 20px 40px;
+  min-height: calc(100vh - 50px);
+  max-width: 1500px;
+}
+.main-content{
+  font-size: 16px;
+  color: gray;
+}
+header{
+  margin-bottom: 40px;
+}
+header h4{
+  font-size: 17px;
+}
+
+.chart{
+  width: 100%;
+}
+
+footer{
+  color: gray;
+  height: 50px;
+  margin-left: 340px;
+  max-width: 1500px;
+}
+
+footer span{
+  padding: 15px 0;
+}
+
+.info{
+  float: left;
+}
+.copyright{
+  float: right;
+  margin-right: 40px;
+}
+
+
+/* About page */
+
+.sub-title{
+  color: black;
+}
+.margin{
+  margin-left: 15px;
+}
+
+.bold{
+  font-weight: bold;
+}
+
+.paper-holder{
+  overflow: auto;
+  margin: 30px 0;  
+}
+.paper-img{
+  width: 50px;
+  float: left;
+}
+
+.paper-title{
+  margin-left: 60px;
+}
