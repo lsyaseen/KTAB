@@ -2,6 +2,18 @@ language: cpp
 
 matrix:
   include:
+    - os: osx
+      compiler: gcc
+      env:
+        - C_COMPILER=gcc
+        - CXX_COMPILER=g++
+        
+    - os: osx
+      compiler: clang
+      env:
+        - C_COMPILER=clang
+        - C_COMPILER=clang++
+      
     - os: linux
       dist: trusty
       compiler: gcc
@@ -48,6 +60,7 @@ matrix:
       env:
         - C_COMPILER=gcc-6
         - CXX_COMPILER=g++-6
+        
     - os: linux
       dist: trusty
       compiler: clang
@@ -82,13 +95,19 @@ matrix:
       env:
         - C_COMPILER=clang-3.6
         - CXX_COMPILER=clang++-3.6
-
 before_install:  # necessary because Travis overwrites CXX and CC!
   - if [[ $TRAVIS_OS_NAME == linux ]]; then export CXX=$CXX_COMPILER CC=$C_COMPILER; fi
 
 install:
+#Linux Prerequisites 
   - if [[ $TRAVIS_OS_NAME == linux ]]; then sudo apt-get install qt5-default; fi #install Qt5 libraries
   - if [[ $TRAVIS_OS_NAME == linux ]]; then sudo bash ./install-linux-deps.sh; fi  # Why do I need permission?
+#OS X Prerequisties  
+  - if [[ $TRAVIS_OS_NAME == osx ]]; then bash ./install-osx-deps.sh; fi #install Qt5 libraries
+  - if [[ $TRAVIS_OS_NAME == osx ]]; then export PATH=$PATH:/usr/local/opt/qt@5.5/lib/cmake && ls; fi #Add Qt to system path
+  - if [[ $TRAVIS_OS_NAME == osx ]]; then export export CFLAGS=-I/opt/X11/include && export LDFLAGS=-L/opt/X11/lib; fi #Add proper X11 libs to system path
+  
+  
 
   # install tinyxml2
   - git clone https://github.com/leethomason/tinyxml2.git
