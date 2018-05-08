@@ -105,7 +105,7 @@ install:
 #OS X Prerequisties  
   - if [[ $TRAVIS_OS_NAME == osx ]]; then bash ./install-osx-deps.sh; fi #install Qt5 libraries
   - if [[ $TRAVIS_OS_NAME == osx ]]; then export PATH=$PATH:/usr/local/opt/qt@5.5/lib/cmake && ls; fi #Add Qt to system path
-  - if [[ $TRAVIS_OS_NAME == osx ]]; then export export CFLAGS=-I/opt/X11/include && export LDFLAGS=-L/opt/X11/lib; fi #Add proper X11 libs to system path
+  - if [[ $TRAVIS_OS_NAME == osx ]]; then export CFLAGS=-I/opt/X11/include && export LDFLAGS=-L/opt/X11/lib; fi #Add proper X11 libs to system path
   
   
 
