@@ -10,10 +10,6 @@ cmake --version  # This allows us to confirm which version of cmake has been ins
 # install additional dependencies
 brew tap linuxbrew/homebrew-xorg && brew install libxaw
 
-#install Qt5 libs
+#install Qt5
 brew tap homebrew/versions
 brew install qt55
-
-#symlink the bundles
-brew linkapps qt55
-

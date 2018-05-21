@@ -257,9 +257,10 @@ if(ENABLE_QT_SMPQ_GUI)
         Qt5::Widgets
         Qt5::Sql
         Qt5::PrintSupport)
-
+        
     # WIN32 to suppress the console window under Windows
-    add_executable(KTAB_SMP WIN32 ${QtProjectBin_src} ${QtProjectLib_qrc_rcc})
+    # MACOSX_BUNDLE to create the OS X bundle for KTAB_SMP Release
+    add_executable(KTAB_SMP WIN32 MACOSX_BUNDLE ${QtProjectBin_src} ${QtProjectLib_qrc_rcc})
 
     target_link_libraries (KTAB_SMP
         QtProjectLib
@@ -311,7 +312,8 @@ if(ENABLE_QT_SASQ_GUI)
         Qt5::PrintSupport)
 
     # WIN32 to suppress the console window under Windows
-    add_executable(KTAB_SAS WIN32 ${QtSASQProjectBin_src} ${QtSASQProjectLib_qrc_rcc})
+    # MACOSX_BUNDLE to create the OS X bundle for KTAB_SAS Release
+    add_executable(KTAB_SAS WIN32 MACOSX_BUNDLE ${QtSASQProjectBin_src} ${QtSASQProjectLib_qrc_rcc})
 
     target_link_libraries (KTAB_SAS
         QtSASQProjectLib
