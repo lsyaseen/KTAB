@@ -1,3 +1,11 @@
+# What's New in Version 1.3
+
+## More Modern Results Visualization
+We have begun refactoring and building new results visualizations using more modern javascript technology. This version includes the release of the first set of [D3](https://d3js.org/)-based interactive visualizations - line and bar charts. Upon completion of a run of the SMP model, clicking the *Open Visualization* button or menu item will load the new visualization dashboard in your default browser. From here, you may load the results database and view / interact the results plots.
+
+## OS X Compilation
+This version adds support for compiling an OS X bundle for the KTAB_SMP and KTAB_SAS applications.
+
 # What's New in Version 1.2
 
 ## Better Error Handling
