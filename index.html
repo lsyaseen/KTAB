@@ -12,6 +12,7 @@
     <link href="web/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="web/style.css" rel="stylesheet" type="text/css">
 
+    <script src="web/vendor/jquery/jquery.min.js"></script>    
     <script src="web/vendor/bootstrap/js/bootstrap.min.js"></script>
 
 </head>
@@ -20,15 +21,24 @@
 
   <div class="wrapper">
 
-    <div class="sidebar">
+      <nav class="navbar navbar-default sidebar" role="navigation">
+          <div class="navbar-header">
+                  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-sidebar-navbar-collapse-1">
+                          <span class="sr-only">Toggle navigation</span>
+                          <span class="icon-bar"></span>
+                          <span class="icon-bar"></span>
+                          <span class="icon-bar"></span>
+                        </button> 
       <div class="sidebar-logo">
         <a class="sidebar-link" href="index.html">
           <div class="logo"><img src="web/img/logo-icon.png" alt=""></div>
           <div class="logo-text"><h3>KTAB</h3></div>
         </a>
       </div>
-
-      <ul class="sidebar-menu">
+    </div>
+    
+    <div class="collapse navbar-collapse" id="bs-sidebar-navbar-collapse-1">  
+      <ul class="nav navbar-nav">
         <li class="nav-item"><a href="index.html"><span class="icon-holder"><i class="icon home"></i></span><span class="title selected">Home</span></a></li>
         <li class="nav-item"><a href="web/about.html"><span class="icon-holder"><i class="icon about"></i></span><span class="title">About KTAB</span></a></li>
         <li class="nav-item"><a href="web/papers.html"><span class="icon-holder"><i class="icon papers"></i></span><span class="title">Papers & Data</span></a></li>
@@ -38,7 +48,8 @@
         <li class="nav-item"><a href="https://github.com/KAPSARC/KTAB" target="_blank"><span class="icon-holder"><i class="icon github"></i></span><span class="title">View the Project on GitHub</span></a></li>
       </ul>
     </div>
-
+  </nav>
+  
     <div class="page-container">
       <header>
         <h2>KAPSARC Toolkit for Behavioral Analysis</h2>
@@ -47,13 +58,13 @@
 
       <main class="main-content">
         <div class="row">
-          <div class="col-md-5">
-            <p>KTAB is an open-source toolkit for assembling models that allow the systematic and rigorous analysis of collective decision-making processes (CDMPs).</p>
+            <div class="col-lg-5 col-md-12 col-sm-12">
+                <p>KTAB is an open-source toolkit for assembling models that allow the systematic and rigorous analysis of collective decision-making processes (CDMPs).</p>
             <br><p>KTAB has been developed to meet the need for widely available, state-of-the-art, supported, and open source software that facilitates the modeling and analysis of collective decision-making. The software libraries and source code for KTAB are released as open source under the MIT license.</p>
             <br><p>The main development site for KTAB is the King Abdullah Center for Petroleum Studies and Research (KAPSARC) in Riyadh, Saudi Arabia.</p>
           </div>
-          <div class="col-md-7">
-            <img class="chart" src="web/img/chart2.png">
+          <div class="col-lg-7 col-md-12 col-sm-12">
+              <img class="chart" src="web/img/chart2.png">
           </div>
         </div>
       </main>
