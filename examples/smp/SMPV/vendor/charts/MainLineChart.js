@@ -66,6 +66,11 @@ function drawLine() {
   turn = currentTurn; //current turn from slider
   turns = NumOfTurns - 1; //cuz we're starting from 0
 
+  //show points till chosen turn
+  var bargnsDataByTurn = bargnsData.filter(function (obj) {
+    return obj.turn <= turn;
+  });
+
   //define the scales
   XScale = d3.scaleLinear().domain([0, turn]).range([0, width]);
   YScale = d3.scaleLinear().domain([0, 100]).range([height, 0]);
@@ -202,14 +207,14 @@ function drawLine() {
   });
 
   // get initiator color for the point  
-  for (i = 0; i < bargnsData.length; i++) {
-    let obj = actors.findIndex(o => o.actor_name === bargnsData[i].Initiator);
-    bargnsData[i]["color"] = actors[obj].color;
+  for (i = 0; i < bargnsDataByTurn.length; i++) {
+    let obj = actors.findIndex(o => o.actor_name === bargnsDataByTurn[i].Initiator);
+    bargnsDataByTurn[i]["color"] = actors[obj].color;
   }
 
 
   //initialize bargains points visibilaty status  
-  bargnsData.forEach(function (obj) { obj["PointVisible"] = false; });
+  bargnsDataByTurn.forEach(function (obj) { obj["PointVisible"] = false; });
 
   //to show details about each bargain
   var tooltip = d3.select('#chart')
@@ -284,7 +289,7 @@ function drawLine() {
 
     //add bargns' points
     var dot = svg.selectAll(".dot")
-      .data(bargnsData)
+      .data(bargnsDataByTurn)
       .enter();
 
     svg2.append("text")
@@ -304,14 +309,14 @@ function drawLine() {
           .attr("class", function (d) {
             return "dot" + d["Moved_Name"].replace(/\s+/, "").replace(".", '');
           })
-        var visible = bargnsData[i]["PointVisible"] ? false : true;
+        var visible = bargnsDataByTurn[i]["PointVisible"] ? false : true;
         //show/hide Bargns' points
-        if (bargnsData[i]["PointVisible"] == false) {
+        if (bargnsDataByTurn[i]["PointVisible"] == false) {
 
           //select all points on the selected line 
           d3.selectAll(".dot" + d.actor_name.replace(/\s+/, "").replace(".", ''))
             .attr("fill", function (d) {
-              bargnsData[i]["PointVisible"] = d.PointVisible;
+              bargnsDataByTurn[i]["PointVisible"] = d.PointVisible;
               return d.color;
             })
             .attr("r", 3.5)
@@ -331,10 +336,9 @@ function drawLine() {
                 + "<br/> a result of a bargain proposed " + "<br/>" + "by " + d["Initiator"] + " to " + d["Receiver"])
 
               tooltip
-                // .style('top', (yPosition + 70) + 'px')
-                // .style('left',(xPosition +90)  + 'px');
                 .style('top', (yPosition) + 'px')
                 .style('left', (xPosition) + 'px');
+
               // highlight the actor who initiated the bargain 
               d3.select("#legend_" + d["Initiator"].replace(".", ''))
                 .style("stroke", "black")
@@ -346,10 +350,10 @@ function drawLine() {
                 .style("stroke", "none")
             });
           // Update whether or not points are visible
-          bargnsData[i]["PointVisible"] = visible;
+          bargnsDataByTurn[i]["PointVisible"] = visible;
         }
         else {
-          bargnsData[i]["PointVisible"] = visible;
+          bargnsDataByTurn[i]["PointVisible"] = visible;
           d3.selectAll(".dot" + d.actor_name.replace(/\s+/, "").replace(".", ''))
             .transition().remove();
         }
@@ -365,7 +369,7 @@ function drawLine() {
     .style("fill", "black")
     .on("click", function () {
       if (d3.select("#SelectLabel").text() == "Clear All") {
-        bargnsData.forEach(function (d, i) {
+        bargnsDataByTurn.forEach(function (d, i) {
           d.visible = false;
         })
         clearAll();
@@ -472,7 +476,7 @@ function drawLine() {
       d.visible = false;
       d3.selectAll("#legend_" + d.actor_name.replace(".", ''))
         .attr("fill", "#F1F1F2")
-      bargnsData[i]["PointVisible"] = false;
+      bargnsDataByTurn[i]["PointVisible"] = false;
       d3.selectAll(".dot" + d.actor_name.replace(/\s+/, "").replace(".", '')).remove();
 
     })
