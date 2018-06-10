@@ -11,7 +11,20 @@ drawChart();
 drawLine();
 
 turns = +NumOfTurns;
+
 InitializeSlider(turns);
+
+$("#SecnarioPicker").on('change', function () {
+  selectedScen = $('#SecnarioPicker').val();
+  currentTurn = 1;
+  slider.noUiSlider.set(currentTurn);
+  document.getElementById('currentTurn').innerHTML = currentTurn;
+  
+  
+  // updateDesc();
+  drawLine();
+  drawChart();
+});
 
 function InitializeSlider(turns) {
   noUiSlider.create(slider, {

@@ -1,97 +1,113 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="KTAB">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="KTAB">
 
-    <title>KTAB</title>
+  <title>KTAB</title>
 
-    <link href="./vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet" type="text/css">
+  <link href="./vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet" type="text/css">
 
-    <link href="./vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <script src="./vendor/jquery/jquery.min.js"></script>
-    <script src="./vendor/bootstrap/js/bootstrap.min.js"></script>
+  <link href="./vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <script src="./vendor/jquery/jquery.min.js"></script>
+  <script src="./vendor/bootstrap/js/bootstrap.min.js"></script>
 
 </head>
 
 <body>
 
-    <div class="wrapper">
+  <div class="wrapper">
 
-        <div class="sidebar">
-          <div class="sidebar-logo">
-            <a class="sidebar-link" href="../index.html">
-              <div class="logo"><img src="img/logo-icon.png" alt=""></div>
-              <div class="logo-text"><h3>KTAB</h3></div>
-            </a>
-          </div>
-
-          <ul class="sidebar-menu">
-            <li class="nav-item"><a href="../index.html"><span class="icon-holder"><i class="icon home"></i></span><span class="title">Home</span></a></li>
-            <li class="nav-item"><a href="about.html"><span class="icon-holder"><i class="icon about"></i></span><span class="title">About KTAB</span></a></li>
-            <li class="nav-item"><a href="papers.html"><span class="icon-holder"><i class="icon papers"></i></span><span class="title">Papers & Data</span></a></li>
-            <li class="nav-item"><a href="research.html"><span class="icon-holder"><i class="icon projects"></i></span><span class="title selected">KTAB Research</span></a></li>
-            <li class="nav-item"><a href="software.html"><span class="icon-holder"><i class="icon software"></i></span><span class="title">KTAB Software</span></a></li>
-            <li class="nav-item"><a href="events.html"><span class="icon-holder"><i class="icon events"></i></span><span class="title">News & Events</span></a></li>
-            <li class="nav-item"><a href="https://github.com/KAPSARC/KTAB" target="_blank"><span class="icon-holder"><i class="icon github"></i></span><span class="title">View the Project on GitHub</span></a></li>
-          </ul>
+    <nav class="navbar navbar-default sidebar" role="navigation">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-sidebar-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                      </button>
+        <div class="sidebar-logo">
+          <a class="sidebar-link" href="../index.html">
+            <div class="logo"><img src="img/logo-icon.png" alt=""></div>
+            <div class="logo-text">
+              <h3>KTAB</h3>
+            </div>
+          </a>
         </div>
-
-        <div class="page-container">
-        <header>
-          <h2>KAPSARC Toolkit for Behavioral Analysis</h2>
-          <h4>A Framework for Modeling Collective Decision-Making Processes (CDMPs)</h4>
-            <p>This page provides a short summary of ongoing research, either in the application of KTAB models, or in novel methodological and technical development efforts. If you are interested in any of these studies, feel free to reach out to the <a href="mailto:ktab@kapsarc.org">team</a>.</p>
-        </header>
-
-        <main class="main-content">
-          <div class="row">
-              <div class="col-md-12">
-                <h4 class="sub-title">KTAB Applications:</h4>
-                <p>
-                  <div class="bold">Political Feasibility of GCC Power Trading</div>
-                  <i>A study that focuses on the potential for expanding utilization of the GCC power grid, i.e. the physical interconnection among all GCC countries which could facilitate region-wide electricity trading. This study assesses the politically acceptable scope of each GCC country’s willingness to move toward GCC-wide power trading.</i>
-                </p>
-                <p>
-                  <div class="bold">Political Will for Restarting Nuclear Power in Japan</div>
-              <i>A study that evaluates the political will of stakeholders in Japan, at a municipal, prefecture, and state level, to restart nuclear reactors. We assess the dynamics of political support and opposition to this question, as well as the timing and potential scope of nuclear power coming back online. Additionally, we assess the displacement of LNG as a result of nuclear power restarting so that the impact on global markets can be evaluated.</i>
-                </p>
-                <p>
-                  <div class="bold">Political Feasibility of Nationally Determined Contributions under the Paris Agreement</div>
-            <i>This project evaluates the political feasibility for signatories of the Paris Agreement under the United Nations Framework Convention on Climate Change (UNFCCC) to effectively implement and iteratively improve their Nationally Determined Contributions (NDCs) such that the rise of global temperature is limited to 2&#8451; above pre-industrial levels (or less). This includes five “deep dive” studies for each of the top 5 emitters. This includes China, the US, the European Union, India, and Russia. Additionally, we focus on a global, geopolitical perspective for this question based on non-expert data.</i>
-                </p>
-                <br/>
-
-                <h4 class="sub-title">KTAB Technical & Software Developments:</h4>
-                <p>
-                  <div class="bold">CDMPs, Neural Networks, and Machine Learning</div>
-            <i>This project integrates the logic of a KTAB-style model of collective decision-making processes (CDMPs) with machine learning to develop a hybrid approach that can be used to anticipate politically-driven outcomes for population-scale analytic questions. If successful, this will extend the applicability of KTAB to include the decision-making of families, households, and actors at the scale of a market or country’s population, as opposed to only finite, bounded, and limited numbers of actors. This CDMP Deep Learning methodology could then be used to provide a bottom-up perspective on politically-feasible choices for an entire economy. We are currently using TensorFlow to develop a deep-learning neural network that predicts household vehicle purchasing decisions in an entire market. The source data includes behavioral and demographic characteristics for households drawn from the California Vehicle Choice dataset. The neural network includes an additional layer of calculations that implements a KTAB-style CDMP.</i>
-                </p>
-                <p>
-                  <div class="bold">Hybrid Political-Economic Modeling</div>
-        <i>This project integrates models of Collective Decision-Making Processes in KTAB with economic models, so as to create hybrid models that endogenously develop and bargain over economic policies. This research includes formal development of hybrid models as well policy-relevant applications to evaluate the utility and effectiveness of the integrated approach. Currently, we are developing a hybrid KTAB-style CDMP model integrated with a dynamic stochastic general equilibrium model, applied to Saudi Arabia. Unlike most other KTAB research, this CDMP uses an Enumerated Model of Politics (EMP).</i>
-                </p>
-                <p>
-                  <div class="bold">iKTAB</div>
-    <i>iKTAB is a simplified, web-based version of KTAB that does not require installation of any software on a local PC. iKTAB is currently in beta release, and can be accessed <a href = "http://apps.kapsarc.org/iktab/home">here</a>.</i>
-                </p>
-                <p>
-                  <div class="bold">Advanced KTAB Visualization</div>
-    <i>The team is engaged in extending the quality and variety of visualizations in KTAB. We are particularly interested in the application of network diagram techniques for between-turn dynamics, multidimensional problems, and sensitivity analysis (with respect to both actor attributes and model parameters).</i>
-                </p>
-              </div>
-          </div>
-        </main>
       </div>
-      <footer>
-        <span class="info">For more information email <a href="mailto:ktab@kapsarc.org">ktab@kapsarc.org</a></span>
-        <span class="copyright">Copyright KAPSARC. Open source MIT License</span>
-      </footer>
+      <div class="collapse navbar-collapse" id="bs-sidebar-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li class="nav-item"><a href="../index.html"><span class="icon-holder"><i class="icon home"></i></span><span class="title">Home</span></a></li>
+          <li class="nav-item"><a href="about.html"><span class="icon-holder"><i class="icon about"></i></span><span class="title">About KTAB</span></a></li>
+          <li class="nav-item"><a href="papers.html"><span class="icon-holder"><i class="icon papers"></i></span><span class="title">Papers & Data</span></a></li>
+          <li class="nav-item"><a href="research.html"><span class="icon-holder"><i class="icon projects"></i></span><span class="title selected">KTAB Research</span></a></li>
+          <li class="nav-item"><a href="software.html"><span class="icon-holder"><i class="icon software"></i></span><span class="title">KTAB Software</span></a></li>
+          <li class="nav-item"><a href="events.html"><span class="icon-holder"><i class="icon events"></i></span><span class="title">News & Events</span></a></li>
+          <li class="nav-item"><a href="https://github.com/KAPSARC/KTAB" target="_blank"><span class="icon-holder"><i class="icon github"></i></span><span class="title">View the Project on GitHub</span></a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="page-container">
+      <header>
+        <h2>KAPSARC Toolkit for Behavioral Analysis</h2>
+        <h4>A Framework for Modeling Collective Decision-Making Processes (CDMPs)</h4>
+        <p>This page provides a short summary of ongoing research, either in the application of KTAB models, or in novel methodological
+          and technical development efforts. If you are interested in any of these studies, feel free to reach out to the
+          <a href="mailto:ktab@kapsarc.org">team</a>.</p>
+      </header>
+
+      <main class="main-content">
+        <div class="row">
+          <div class="col-md-12">
+            <h4 class="sub-title">KTAB Applications:</h4>
+            <p>
+              <div class="bold">Political Feasibility of GCC Power Trading</div>
+              <i>A study that focuses on the potential for expanding utilization of the GCC power grid, i.e. the physical interconnection among all GCC countries which could facilitate region-wide electricity trading. This study assesses the politically acceptable scope of each GCC country’s willingness to move toward GCC-wide power trading.</i>
+            </p>
+            <p>
+              <div class="bold">Political Will for Restarting Nuclear Power in Japan</div>
+              <i>A study that evaluates the political will of stakeholders in Japan, at a municipal, prefecture, and state level, to restart nuclear reactors. We assess the dynamics of political support and opposition to this question, as well as the timing and potential scope of nuclear power coming back online. Additionally, we assess the displacement of LNG as a result of nuclear power restarting so that the impact on global markets can be evaluated.</i>
+            </p>
+            <p>
+              <div class="bold">Political Feasibility of Nationally Determined Contributions under the Paris Agreement</div>
+              <i>This project evaluates the political feasibility for signatories of the Paris Agreement under the United Nations Framework Convention on Climate Change (UNFCCC) to effectively implement and iteratively improve their Nationally Determined Contributions (NDCs) such that the rise of global temperature is limited to 2&#8451; above pre-industrial levels (or less). This includes five “deep dive” studies for each of the top 5 emitters. This includes China, the US, the European Union, India, and Russia. Additionally, we focus on a global, geopolitical perspective for this question based on non-expert data.</i>
+            </p>
+            <br/>
+
+            <h4 class="sub-title">KTAB Technical & Software Developments:</h4>
+            <p>
+              <div class="bold">CDMPs, Neural Networks, and Machine Learning</div>
+              <i>This project integrates the logic of a KTAB-style model of collective decision-making processes (CDMPs) with machine learning to develop a hybrid approach that can be used to anticipate politically-driven outcomes for population-scale analytic questions. If successful, this will extend the applicability of KTAB to include the decision-making of families, households, and actors at the scale of a market or country’s population, as opposed to only finite, bounded, and limited numbers of actors. This CDMP Deep Learning methodology could then be used to provide a bottom-up perspective on politically-feasible choices for an entire economy. We are currently using TensorFlow to develop a deep-learning neural network that predicts household vehicle purchasing decisions in an entire market. The source data includes behavioral and demographic characteristics for households drawn from the California Vehicle Choice dataset. The neural network includes an additional layer of calculations that implements a KTAB-style CDMP.</i>
+            </p>
+            <p>
+              <div class="bold">Hybrid Political-Economic Modeling</div>
+              <i>This project integrates models of Collective Decision-Making Processes in KTAB with economic models, so as to create hybrid models that endogenously develop and bargain over economic policies. This research includes formal development of hybrid models as well policy-relevant applications to evaluate the utility and effectiveness of the integrated approach. Currently, we are developing a hybrid KTAB-style CDMP model integrated with a dynamic stochastic general equilibrium model, applied to Saudi Arabia. Unlike most other KTAB research, this CDMP uses an Enumerated Model of Politics (EMP).</i>
+            </p>
+            <p>
+              <div class="bold">iKTAB</div>
+              <i>iKTAB is a simplified, web-based version of KTAB that does not require installation of any software on a local PC. iKTAB is currently in beta release, and can be accessed <a href = "http://apps.kapsarc.org/iktab/home">here</a>.</i>
+            </p>
+            <p>
+              <div class="bold">Advanced KTAB Visualization</div>
+              <i>The team is engaged in extending the quality and variety of visualizations in KTAB. We are particularly interested in the application of network diagram techniques for between-turn dynamics, multidimensional problems, and sensitivity analysis (with respect to both actor attributes and model parameters).</i>
+            </p>
+          </div>
+        </div>
     </div>
+    </main>
+  </div>
+  <footer>
+    <span class="info">For more information email <a href="mailto:ktab@kapsarc.org">ktab@kapsarc.org</a></span>
+    <span class="copyright">Copyright KAPSARC. Open source MIT License</span>
+  </footer>
+  </div>
 
 </body>
+
 </html>
