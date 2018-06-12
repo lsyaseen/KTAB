@@ -6,6 +6,7 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
 // data from load.js (session data)
 var ActorsNamesAllSce = JSON.parse(sessionStorage.getItem("ActorsNames"));
 var ActorsPositions = JSON.parse(sessionStorage.getItem("ActorsPositions"));
+var whyActorChanged = JSON.parse(sessionStorage.getItem("BargnsData"));
 var NumOfTurns = sessionStorage.getItem("NumOfTurns");
 var selectedDimNum = 0;
 var selectedScenNum = sessionStorage.getItem("selectedScen");
@@ -45,7 +46,7 @@ function drawLine() {
     line,
     positionsData = [],
     namesArray = [],
-
+    bargnsData = [],
     selectedLine,
     selectedLegend;
 
@@ -57,8 +58,18 @@ function drawLine() {
     positionsData.push(ActorsPositions[selectedScenNum][selectedDimNum][i].positions);
   }
 
+  //bargains based on selected Dim and scenario
+  for (var i = 0; i < whyActorChanged[selectedScenNum][selectedDimNum][0].length; i += 1) {
+    bargnsData.push(whyActorChanged[selectedScenNum][selectedDimNum][0][i]);
+  }
+
   turn = currentTurn; //current turn from slider
   turns = NumOfTurns - 1; //cuz we're starting from 0
+
+  //show points till chosen turn
+  var bargnsDataByTurn = bargnsData.filter(function (obj) {
+    return obj.turn <= turn;
+  });
 
   //define the scales
   XScale = d3.scaleLinear().domain([0, turn]).range([0, width]);
@@ -195,35 +206,41 @@ function drawLine() {
     }
   });
 
+  // get initiator color for the point  
+  for (i = 0; i < bargnsDataByTurn.length; i++) {
+    let obj = actors.findIndex(o => o.actor_name === bargnsDataByTurn[i].Initiator);
+    bargnsDataByTurn[i]["color"] = actors[obj].color;
+  }
+
+
+  //initialize bargains points visibilaty status  
+  bargnsDataByTurn.forEach(function (obj) { obj["PointVisible"] = false; });
+
+  //to show details about each bargain
+  var tooltip = d3.select('#chart')
+    .append('div')
+    .attr('class', 'tooltip')
+    .style("display", "none")
+    .style('position', 'absolute')
+    .style('background', '#fcfcfc')
+    .style('z-index', 1);
+
+  tooltip.append('div')
+    .attr('class', 'label')
+    .style('height', '100%')
+    .style('padding', '7%')
+    .style('line-height', '15px')
+    .style('pointer-events', 'none')
+    .style('color', 'black');
+
+
   actors.forEach(function (d, i) {
 
     //draw the lines
-    svg.append("path")
-      .attr("class", "line")
-      .style("fill", "none")
-      .style("stroke", d.color)
-      .attr("id", 'Line_' + d.actor_name.replace(/\s+/g, '').replace(".", '')) // assign ID
-      .attr("d", function () {
-        return d.visible ? line(d.values) : null;
-      })
-      .on("mouseover", function () {
-        selectedLine = "#Line_" + d.actor_name;
-        selectedLegend = "#legend_" + d.actor_name;
-        onMouseover();
-      })
-      .on("mouseout", onMouseout)
-      .attr("stroke-dasharray", function () {
-        var totalLength = this.getTotalLength();
-        return totalLength + " " + totalLength;
-      })
-      .attr("stroke-dashoffset", function () {
-        var totalLength = this.getTotalLength();
-        return totalLength;
-      })
-      .transition("drawLines")
-      .duration(3000)
-      .ease(d3.easeLinear)
-      .attr("stroke-dashoffset", 0);
+    drawLines(d, i);
+    d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", '')).transition().duration(100)
+      .style("stroke", function () { return d.visible ? d.color : "#F1F1F2"; })
+      .style("opacity", function () { return d.visible ? 1 : 0; })
 
     //add the legend
     svg2.append("rect")
@@ -235,26 +252,45 @@ function drawLine() {
         yOff = Math.floor(i / 3) * 20
         return "translate(" + xOff + "," + (yOff + 80) + ")"
       })
-      .attr("fill", d.color)
+      .attr("fill", function () {
+        return d.visible ? d.color : "#F1F1F2";
+      })
       .on("click", function () {
-        visible = d.visible ? false : true,
-          newOpacity = d.visible ? 0 : 1;
         d3.select(this).attr("fill", function () {
-          return d.visible ? "#F1F1F2" : d.color;
+          return d.visible ? d.color : "#F1F1F2";
         })
+
         // Hide or show the elements based on the ID
-        d3.select("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
+        d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
           .transition().duration(100)
-          .style("opacity", newOpacity);
-        // Update whether or not the elements are active
-        d.visible = visible;
+        if (d.visible == true) {
+          d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
+            .transition().remove();
+          actors[i].visible = false;
+          d.visible = false;
+        }
+        else if (d.visible == false) {
+          drawLines(d, i);
+          actors[i].visible = true;
+          d.visible = true;
+        }
       })
       .on("mouseover", function () {
         selectedLine = "#Line_" + d.actor_name;
         selectedLegend = "#legend_" + d.actor_name;
-        onMouseover();
+        onMouseover(d, i);
+
       })
-      .on("mouseout", onMouseout);
+      // .on("mouseout", onMouseout);
+      .on("mouseout", function () {
+        MouseOutLegend(d, i);
+        onMouseout();
+      });
+
+    //add bargns' points
+    var dot = svg.selectAll(".dot")
+      .data(bargnsDataByTurn)
+      .enter();
 
     svg2.append("text")
       .attr("transform", function () {
@@ -264,7 +300,64 @@ function drawLine() {
         return "translate(" + (xOff + 15) + "," + (yOff + 89) + ")"
       })
       .text(function () { return d.actor_name })
-      .attr("text-anchor", "start");
+      .attr("text-anchor", "start")
+      .style("cursor", "pointer")
+      .on("click", function () {
+        //append points on selected line
+        dot.append("circle")
+          .attr("class", "dot")
+          .attr("class", function (d) {
+            return "dot" + d["Moved_Name"].replace(/\s+/, "").replace(".", '');
+          })
+        var visible = bargnsDataByTurn[i]["PointVisible"] ? false : true;
+        //show/hide Bargns' points
+        if (bargnsDataByTurn[i]["PointVisible"] == false) {
+
+          //select all points on the selected line 
+          d3.selectAll(".dot" + d.actor_name.replace(/\s+/, "").replace(".", ''))
+            .attr("fill", function (d) {
+              bargnsDataByTurn[i]["PointVisible"] = d.PointVisible;
+              return d.color;
+            })
+            .attr("r", 3.5)
+            .attr("cx", function (d) { return XScale(d["turn"]); })
+            .attr("cy", function (d) { return YScale(d["CurrPos"]); })
+            .on("mouseover", function (d) {
+              // tooltip.style("display", "inline");
+              tooltip.style("display", null);
+
+              d3.select(this).style("cursor", "pointer");
+            })
+            .on("mousemove", function (d) {
+              var xPosition = d3.mouse(this)[0];
+              var yPosition = d3.mouse(this)[1];
+              d3.select('.label').html("From turn " + (d["turn"] - 1) + " to turn " + d["turn"] + " "
+                + d["Moved_Name"] + "<br/> moved " + roundTo(d["Diff"], 2) + " from " + roundTo(d["PrevPos"], 2) + " to " + roundTo(d["CurrPos"], 2) + " as "
+                + "<br/> a result of a bargain proposed " + "<br/>" + "by " + d["Initiator"] + " to " + d["Receiver"])
+
+              tooltip
+                .style('top', (yPosition) + 'px')
+                .style('left', (xPosition) + 'px');
+
+              // highlight the actor who initiated the bargain 
+              d3.select("#legend_" + d["Initiator"].replace(".", ''))
+                .style("stroke", "black")
+                .style("stroke-width", "2.5");
+            })
+            .on("mouseout", function (d) {
+              tooltip.style("display", "none");
+              d3.select("#legend_" + d["Initiator"].replace(".", ''))
+                .style("stroke", "none")
+            });
+          // Update whether or not points are visible
+          bargnsDataByTurn[i]["PointVisible"] = visible;
+        }
+        else {
+          bargnsDataByTurn[i]["PointVisible"] = visible;
+          d3.selectAll(".dot" + d.actor_name.replace(/\s+/, "").replace(".", ''))
+            .transition().remove();
+        }
+      });
 
   }) // end of forEach
 
@@ -276,9 +369,15 @@ function drawLine() {
     .style("fill", "black")
     .on("click", function () {
       if (d3.select("#SelectLabel").text() == "Clear All") {
+        bargnsDataByTurn.forEach(function (d, i) {
+          d.visible = false;
+        })
         clearAll();
       }
       else {
+        actors.forEach(function (d, i) {
+          d.visible = true;
+        })
         selectAll();
       }
     });
@@ -290,14 +389,19 @@ function drawLine() {
     .attr("id", "SelectLabel");
 
 
-  function onMouseover() {
-
+  function onMouseover(d, i) {
+    MouseOverLegend(d, i);
     actors.forEach(function (d, i) {
       d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
         .transition()
         .duration(50)
         .style("opacity", function () {
-          return ("#Line_" + d.actor_name === selectedLine) ? 1.0 : 0.2;
+          if ("#Line_" + d.actor_name === selectedLine)
+            return 1.0
+          else if (d.visible == true)
+            return 0.2
+          else
+            MouseOutLegend(d, i); //remove line if visible = false
         })
 
       d3.select(selectedLine.replace(/\s+/g, '').replace(".", ''))
@@ -316,7 +420,10 @@ function drawLine() {
         .transition()
         .duration(50)
         .style("opacity", function () {
-          return d.visible ? 1 : 0;
+          if (d.visible == true)
+            return 1;
+          else
+            d3.select("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", '')).remove(); //remove instead of chainging opacity
         })
       d3.select(selectedLine.replace(/\s+/g, '').replace(".", ''))
         .style("stroke-width", 1.2);
@@ -327,13 +434,32 @@ function drawLine() {
     })
   }
 
+  function MouseOverLegend(d, i) {
+
+    // if actor was not selected, just draw its line on hover then remove it 
+    if (d.visible == false) {
+      svg.append("path")
+        .attr("class", "line")
+        .style("fill", "none")
+        .attr("id", 'Line_' + d.actor_name.replace(/\s+/g, '').replace(".", '')) // assign ID
+        .style("stroke", d.color)
+        .style("opacity", 1)
+        .attr("d", line(d.values))
+      // .transition()
+    }
+  }
+
+  function MouseOutLegend(d, i) {
+    if (d.visible == false) {
+      d3.select("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
+        .remove();
+    }
+  }
+
   function selectAll() {
     actors.forEach(function (d, i) {
-      d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
-        .transition()
-        .duration(50)
-        .style("opacity", 1);
-      d.visible = true;
+      drawLines(d, i);
+      actors[i].visible = true;
       d3.selectAll("#legend_" + d.actor_name.replace(".", ''))
         .attr("fill", d.color)
     })
@@ -346,15 +472,51 @@ function drawLine() {
       d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
         .transition()
         .duration(50)
-        .style("opacity", 0);
+        .remove();
       d.visible = false;
       d3.selectAll("#legend_" + d.actor_name.replace(".", ''))
         .attr("fill", "#F1F1F2")
+      bargnsDataByTurn[i]["PointVisible"] = false;
+      d3.selectAll(".dot" + d.actor_name.replace(/\s+/, "").replace(".", '')).remove();
+
     })
     d3.select("#SelectLabel")
       .text("Select All")
   }
 
+  function drawLines(d, i) {
+
+    //remove line if already exist (when hovering on a disabled actor's legend, his line is 
+    // drwan but still d.visible = false so when legened is clicked and since d.visible = false another line will be drawn !) 
+    d3.select("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
+      .remove();
+
+    svg.append("path")
+      .attr("class", "line")
+      .style("fill", "none")
+      .attr("id", 'Line_' + d.actor_name.replace(/\s+/g, '').replace(".", '')) // assign ID
+      .style("stroke", d.color)
+      .style("opacity", 1)
+      .attr("d", line(d.values))
+      .attr("stroke-dasharray", function () {
+        var totalLength = this.getTotalLength();
+        return totalLength + " " + totalLength;
+      })
+      .attr("stroke-dashoffset", function () {
+        var totalLength = this.getTotalLength();
+        return totalLength;
+      })
+      .on("mouseover", function () {
+        selectedLine = "#Line_" + d.actor_name;
+        selectedLegend = "#legend_" + d.actor_name;
+        onMouseover(d, i);
+      })
+      .on("mouseout", onMouseout)
+      .transition("drawLines")
+      .duration(2000)
+      .ease(d3.easeLinear)
+      .attr("stroke-dashoffset", 0);
+  }
   // gridlines in x axis function
   function make_x_gridlines() {
     return d3.axisBottom(XScale)
@@ -365,5 +527,14 @@ function drawLine() {
   function make_y_gridlines() {
     return d3.axisLeft(YScale)
       .ticks(10)
+  }
+  function roundTo(n, digits) {
+    if (digits === undefined) {
+      digits = 0;
+    }
+
+    var multiplicator = Math.pow(10, digits);
+    n = parseFloat((n * multiplicator).toFixed(11));
+    return Math.round(n) / multiplicator;
   }
 }
