@@ -143,10 +143,57 @@
 
     <!-- Custom Theme JavaScript -->
     <script src="../dist/js/sb-admin-2.js"></script>
-
+<!-- d3 -->
+<!-- <script src="../vendor/d3/js/d3.min.js"></script> -->
 
 </body>
 <script>
+    var defaultColors =
+    ["#5C8598", "#219DD8", "#96C9E5", "#3C3D3B",
+            "#ECCE6A", "#f8ecba", "#60805D", "#8AC791",
+            "#bebfc1", "#636664", "#a5f3cc", "#6acbec",
+            "#6aecec", "#ff9966", "#1d80e2", "#6a8aec",
+            "#a5a5f3", "#ffd857", "#a8bfa6", "#cb6aec",
+            "#c88dc8", "#ec6a6a", "#ec6aab", "#e84a72",
+            "#f1a7a7", "#e3994f", "#d87d22", "#d8ab22",
+            "#d8d822", "#a6e765", "#4fd822", "#1cb01c",
+            "#22d84f", "#22d87d", "#22d8ab", "#22d8d8",
+            "#22abd8", "#156184", "#d3e6f8", "#224fd8",
+            // Darker Shade for (Set #1)
+            "#436170", "#18719a", "#5cabd6", "#1a1a19",
+            "#e5bb34", "#f1d874", "#425940", "#75bd7e",
+            "#97989b", "#3f4040", "#62eaa6", "#1db1e2",
+            "#1de2e2", "#ff5500", "#124d87", "#1a47cb",
+            "#4b4be7", "#ffc91a", "#6e946b", "#b11de2",
+            "#ac53ac", "#e21d1d", "#e21d80", "#b5173f",
+            "#e34f4f", "#b0661c", "#844d15", "#846815",
+            "#848415", "#73c71f", "#318415", "#0e580e",
+            "#158431", "#15844d", "#158468", "#158484",
+            "#156884", "#07202c", "#7bb4ea", "#153184",
+            // Lighter Shade for (Set #2)
+            "#8faebc", "#7bc7ea", "#d6eaf5", "#737570",
+            "#f9f0d2", "#fdf9e8", "#9ab497", "#ddeedf",
+            "#e5e5e6", "#8b8d8c", "#e9fcf2", "#d2eff9",
+            "#bbf6f6", "#ffddcc", "#8ebff0", "#d2dcf9",
+            "#e9e9fc", "#fff3cc", "#e2eae1", "#efd2f9",
+            "#e6cbe6", "#f9d2d2", "#f9d2e6", "#f6bbca",
+            "#fce9e9", "#f5d9bd", "#eab37b", "#eace7b",
+            "#eaea7b", "#d9f5bd", "#97ea7b", "#65e765",
+            "#7bea97", "#7beab3", "#38e0b6", "#65e7e7",
+            "#7bceea", "#38abe0", "#e9f3fc", "#91a8ee",
+            // Another set of 18 (warm) Distinct Colors (Set #2)
+            "#e6194b", "#3cb44b", "#ffe119", "#0082c8",
+            "#f58231", "#911eb4", "#46f0f0", "#f032e6",
+            "#d2f53c", "#fabebe", "#008080", "#e6beff",
+            "#aa6e28", "#fffac8", "#800000", "#aaffc3",
+            "#808000", "#ffd8b1", "#000080", "#808080",
+            // Darker shade for set #2
+            "#8a0f2e", "#267330", "#b39b00", "#004266",
+            "#c35709", "#58126d", "#0fbdbd", "#be0eb5",
+            "#a0c20a", "#f47171", "#003333", "#c466ff",
+            "#674218", "#fff266", "#330000", "#66ff94",
+            "#333300", "#ff9933", "#000033", "#4d4d4d"
+        ]; 
     $('#LinePanel').click(function (e) {
         e.preventDefault();
         getData();
@@ -156,7 +203,6 @@
     $('#BarPanel').click(function (e) {
         e.preventDefault();
         getData();
-
         window.location = 'graphs.html#BarGraphTab';
     });
 
@@ -169,6 +215,23 @@
         sessionStorage.setItem("ScenarioArray", JSON.stringify(ScenarioArray));
         sessionStorage.setItem("SceAraay", JSON.stringify(SceAraay));
         sessionStorage.setItem("selectedScen", selectedScen);
+        sessionStorage.setItem("defaultColors",JSON.stringify(defaultColors));
+
+var namesArray = ActorsNames[selectedScen];
+var colors3 = d3.scaleOrdinal()
+    .domain(namesArray)
+    .range(defaultColors);
+var actors2 = namesArray.map(function (row, i) {
+
+return {
+  actor_name: row,
+  visible: true,
+  color: colors3(row),
+
+}
+});
+
+sessionStorage.setItem("ActorsObj", JSON.stringify(actors2));
 
     }
 

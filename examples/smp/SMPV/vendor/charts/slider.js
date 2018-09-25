@@ -20,8 +20,7 @@ $("#SecnarioPicker").on('change', function () {
   slider.noUiSlider.set(currentTurn);
   document.getElementById('currentTurn').innerHTML = currentTurn;
   
-  
-  // updateDesc();
+  getActorsData();
   drawLine();
   drawChart();
 });
@@ -47,7 +46,6 @@ function InitializeSlider(turns) {
   slider.noUiSlider.on('change', function () {
     currentTurn = + slider.noUiSlider.get();
     document.getElementById('currentTurn').innerHTML = currentTurn;
-
     drawChart();
     drawLine();
   });

@@ -4,6 +4,7 @@ var allpos = JSON.parse(sessionStorage.getItem("ActorsPositions"));
 var AllEffcPow = JSON.parse(sessionStorage.getItem("AllEffcPow"));
 var NumOfTurns = sessionStorage.getItem("NumOfTurns");
 var effpow = JSON.parse(sessionStorage.getItem("effpow"));
+var ActorsObj2 = JSON.parse(sessionStorage.getItem("ActorsObj"));
 var selectedDimNum = 0;
 
 var margin = { top: 30, right: 20, bottom: 30, left: 50 },
@@ -41,56 +42,7 @@ function drawChart() {
     var yScale = d3.scaleLinear()
         .range([height, 0]);
 
-    var z = d3.scaleOrdinal()
-        // Set of Distinct Colors (Set #1)
-        .range(["#5C8598", "#219DD8", "#96C9E5", "#3C3D3B",
-            "#ECCE6A", "#f8ecba", "#60805D", "#8AC791",
-            "#bebfc1", "#636664", "#a5f3cc", "#6acbec",
-            "#6aecec", "#ff9966", "#1d80e2", "#6a8aec",
-            "#a5a5f3", "#ffd857", "#a8bfa6", "#cb6aec",
-            "#c88dc8", "#ec6a6a", "#ec6aab", "#e84a72",
-            "#f1a7a7", "#e3994f", "#d87d22", "#d8ab22",
-            "#d8d822", "#a6e765", "#4fd822", "#1cb01c",
-            "#22d84f", "#22d87d", "#22d8ab", "#22d8d8",
-            "#22abd8", "#156184", "#d3e6f8", "#224fd8",
-            // Darker Shade for (Set #1)
-            "#436170", "#18719a", "#5cabd6", "#1a1a19",
-            "#e5bb34", "#f1d874", "#425940", "#75bd7e",
-            "#97989b", "#3f4040", "#62eaa6", "#1db1e2",
-            "#1de2e2", "#ff5500", "#124d87", "#1a47cb",
-            "#4b4be7", "#ffc91a", "#6e946b", "#b11de2",
-            "#ac53ac", "#e21d1d", "#e21d80", "#b5173f",
-            "#e34f4f", "#b0661c", "#844d15", "#846815",
-            "#848415", "#73c71f", "#318415", "#0e580e",
-            "#158431", "#15844d", "#158468", "#158484",
-            "#156884", "#07202c", "#7bb4ea", "#153184",
-            // Lighter Shade for (Set #2)
-            "#8faebc", "#7bc7ea", "#d6eaf5", "#737570",
-            "#f9f0d2", "#fdf9e8", "#9ab497", "#ddeedf",
-            "#e5e5e6", "#8b8d8c", "#e9fcf2", "#d2eff9",
-            "#bbf6f6", "#ffddcc", "#8ebff0", "#d2dcf9",
-            "#e9e9fc", "#fff3cc", "#e2eae1", "#efd2f9",
-            "#e6cbe6", "#f9d2d2", "#f9d2e6", "#f6bbca",
-            "#fce9e9", "#f5d9bd", "#eab37b", "#eace7b",
-            "#eaea7b", "#d9f5bd", "#97ea7b", "#65e765",
-            "#7bea97", "#7beab3", "#38e0b6", "#65e7e7",
-            "#7bceea", "#38abe0", "#e9f3fc", "#91a8ee",
-            // Another set of 18 (warm) Distinct Colors (Set #2)
-            "#e6194b", "#3cb44b", "#ffe119", "#0082c8",
-            "#f58231", "#911eb4", "#46f0f0", "#f032e6",
-            "#d2f53c", "#fabebe", "#008080", "#e6beff",
-            "#aa6e28", "#fffac8", "#800000", "#aaffc3",
-            "#808000", "#ffd8b1", "#000080", "#808080",
-            // Darker shade for set #2
-            "#8a0f2e", "#267330", "#b39b00", "#004266",
-            "#c35709", "#58126d", "#0fbdbd", "#be0eb5",
-            "#a0c20a", "#f47171", "#003333", "#c466ff",
-            "#674218", "#fff266", "#330000", "#66ff94",
-            "#333300", "#ff9933", "#000033", "#4d4d4d"
-        ]);
-
     var PositionsArray = [],
-        ActorsPositions = [],
         PositionsArray2 = [],
         positionsData = [],
         effpowArray = [],
@@ -102,6 +54,7 @@ function drawChart() {
         selectedRect,
         selectedLegend;
 
+    ActorsObj2 = JSON.parse(sessionStorage.getItem("ActorsObj"));
 
     var xAxis = d3.axisBottom(xScale).scale(xScale);
     var yAxis = d3.axisLeft(yScale).scale(yScale);
@@ -183,16 +136,28 @@ function drawChart() {
         yScale.domain([0, d3.max(idheights)]).nice();
         y_range = "responsive"
     }
-    z.domain(keys);
 
     var stack = d3.stack().keys(keys)(result);
-    var newData = namesArray.slice(1).map(function (name, i) {
-        return {
-            Name: name,
-            values: stack[i],
-            color: z(name)
-        };
-    })
+
+    ActorsObj2.forEach(function (obj, i) {
+        obj.values = stack[i]
+    });
+
+    var fKeys = keys.slice();
+    var fKeyReference = fKeys.map(function (key) {
+        return true; //used to indicate if the corresponding key is active
+    });
+
+    function getActiveKeys(reference) {
+        return reference.map(function (state, index) {
+            if (state) {
+                return keys[index]; //just keep keys whoes state is true
+            }
+            return false; //return false to be filtered
+        }).filter(function (name) {
+            return name
+        });
+    }
 
     // gridlines in x axis function
     function make_x_gridlines() {
@@ -227,41 +192,7 @@ function drawChart() {
             .tickFormat("")
         );
 
-    svg.append("g")
-        .selectAll("g")
-        .data(newData)
-        .enter().append("g")
-        .attr("fill", function (d) { return d.color })
-        .attr("id", function (d, i) { return 'Actor_' + d.Name.replace(/\s+/g, '').replace(".", '') }) // assign ID)  //  
-        .on("mouseover", function (d, i) {
-            selectedRect = "#Actor_" + d.Name;
-            selectedLegend = "#Blegend_" + d.Name;
-            onMouseover();;
-        })
-        .on("mouseout", onMouseout)
-        .selectAll("rect")
-        .data(function (d) { return d.values; })
-        .enter().append("rect")
-        .attr("x", function (d, i) { return xScale((barnames[i])) + 2.5; }) // + to shift bars 
-        .attr("width", function (d) {
-            var barWidth = width2 / (newData[0].values.length) - 4;
-            return barWidth
-        })
-        .attr("y", height)
-        .attr("height", 0)
-        .on("mouseover", function () { tooltip.style("display", null); })
-        .on("mouseout", function () { tooltip.style("display", "none"); })
-        .on("mousemove", function (d) {
-            var xPosition = d3.mouse(this)[0];
-            var yPosition = d3.mouse(this)[1];
-            tooltip.attr("transform", "translate(" + (xPosition - 50) + "," + (yPosition + 10) + ")");
-            tooltip.select("text").text(" Effective Power: " + (d[1] - d[0]));
-        })
-        .transition()
-        .duration(3000)
-        .attr("y", function (d) { return yScale(d[1]); })
-        .attr("height", function (d) { return yScale(d[0]) - yScale(d[1]); })
-        ;
+    DrawBars(ActorsObj2);
 
     //draw the axis
     svg.append("g")
@@ -298,10 +229,10 @@ function drawChart() {
 
     var legend = svg3.append("g")
         .selectAll("g")
-        .data(newData)
+        .data(ActorsObj2)
         .enter().append("g")
         .attr("transform", function (d, i) {
-            var xOff = (i % 3) * 65
+            var xOff = (i % 3) * 85
             var yOff = Math.floor(i / 3) * 20
             return "translate(" + xOff + "," + (yOff + 30) + ")"
         });
@@ -309,11 +240,30 @@ function drawChart() {
     legend.append("rect")
         .attr("width", 10)
         .attr("height", 10)
-        .attr("id", function (d) { return 'Blegend_' + d.Name })
+        .attr("id", function (d) { return 'Blegend_' + d.actor_name.replace(/\s+/g, '').replace(".", '') })
         .attr("fill", function (d) { return d.color; })
+        .on("click", function (d, i) {
+
+            if (fKeys.length === 1 && fKeys[0] === d) {
+                return;
+            }
+            fKeyReference[i] = !fKeyReference[i]; // toggle state of fKeyReference
+            fKeys = getActiveKeys(fKeyReference);
+
+            if (d.visible == true) {
+                d.visible = false;
+            }
+            else if (d.visible == false) {
+                d.visible = true;
+            }
+            d3.select(this).attr("fill", function () {
+                return d.visible ? d.color : "#F1F1F2";
+            })
+            RedrawonLegendClick(fKeys);
+        })
         .on("mouseover", function (d) {
-            selectedRect = "#Actor_" + d.Name;
-            selectedLegend = "#Blegend_" + d.Name;
+            selectedRect = "#Actor_" + d.actor_name;
+            selectedLegend = "#Blegend_" + d.actor_name;
             onMouseover();
         })
         .on("mouseout", onMouseout);
@@ -322,7 +272,7 @@ function drawChart() {
         .attr("x", 15)
         .attr("y", 5)
         .attr("dy", "0.32em")
-        .text(function (d) { return d.Name; });
+        .text(function (d) { return d.actor_name; });
 
     // Prep the tooltip bits, initial display is hidden
     var tooltip = svg.append("g")
@@ -334,36 +284,57 @@ function drawChart() {
         .attr("x", 50)
         .attr("dy", "1.2em")
         .style("text-anchor", "middle")
-        .attr("font-size", "12px")
+        .attr("font-size", "10px")
         .attr("font-weight", "bold");
 
     function onMouseover() {
 
-        newData.forEach(function (d, i) {
-            d3.selectAll("#Actor_" + d.Name.replace(/\s+/g, '').replace(".", ''))
+        ActorsObj2.forEach(function (d, i) {
+            d3.selectAll("#Actor_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
                 .transition()
                 .duration(50)
                 .style("opacity", function () {
-                    return ("#Actor_" + d.Name === selectedRect) ? 1.0 : 0.2;
+                    return ("#Actor_" + d.actor_name === selectedRect) ? 1.0 : 0.2;
                 })
 
-            d3.selectAll("#Blegend_" + d.Name)
+            d3.selectAll("#Blegend_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
                 .attr("fill", function () {
-                    return ("#Blegend_" + d.Name === selectedLegend) ? d.color : "#F1F1F2"
+                    return ("#Blegend_" + d.actor_name === selectedLegend) ? d.color : "#F1F1F2"
                 })
         })
     }
 
+    function RedrawonLegendClick(fkeys) {
+        var activeActorsObj = []; //to use index for getting colors
+        stack = d3.stack().keys(fkeys)(result);
+        var updatedData = fkeys.map(function (name, i) {
+            var obj1 = ActorsObj2.findIndex(o => o.actor_name === name);
+            activeActorsObj.push(ActorsObj2[obj1].color);
+            return {
+                actor_name: name,
+                visible: true,
+                values: stack[i],
+                color: activeActorsObj[i]
+            };
+        })
+        d3.selectAll(".bars") //remove all bars
+            .remove();
+        DrawBars(updatedData);
+        //redraw after update
+    }
+
     function onMouseout() {
 
-        newData.forEach(function (d, i) {
-            d3.selectAll("#Actor_" + d.Name.replace(/\s+/g, '').replace(".", ''))
+        ActorsObj2.forEach(function (d, i) {
+            d3.selectAll("#Actor_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
                 .transition()
                 .duration(50)
                 .style("opacity", 1);
 
-            d3.selectAll("#Blegend_" + d.Name)
-                .attr("fill", d.color)
+            d3.selectAll("#Blegend_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
+                .attr("fill", function () {
+                    return d.visible ? d.color : "#F1F1F2";
+                })
         })
     }
 
@@ -378,10 +349,51 @@ function drawChart() {
         }
     }
 
+    function DrawBars(data) {
+        svg.append("g")
+            .selectAll("g")
+            .data(data)
+            .enter().append("g")
+            .attr("fill", function (d) {
+                return d.color
+            })
+            .attr("class", "bars")
+            .attr("id", function (d, i) {
+                return 'Actor_' + d.actor_name.replace(/\s+/g, '').replace(".", '')
+            }) // assign ID)  
+            .on("mouseover", function (d, i) {
+                selectedRect = "#Actor_" + d.actor_name;
+                selectedLegend = "#Blegend_" + d.actor_name;
+                onMouseover();
+            })
+            .on("mouseout", onMouseout)
+            .selectAll("rect")
+            .data(function (d) { return d.values; })
+            .enter().append("rect")
+            .attr("x", function (d, i) { return xScale((barnames[i])) + 2.5; }) // + to shift bars 
+            .attr("width", function (d) {
+                var barWidth = width2 / (data[0].values.length) - 4;
+                return barWidth
+            })
+            .attr("y", height)
+            .attr("height", 0)
+            .on("mouseover", function () { tooltip.style("display", null); })
+            .on("mouseout", function () { tooltip.style("display", "none"); })
+            .on("mousemove", function (d) {
+                var xPosition = d3.mouse(this)[0];
+                var yPosition = d3.mouse(this)[1];
+                tooltip.attr("transform", "translate(" + (xPosition - 50) + "," + (yPosition + 10) + ")");
+                tooltip.select("text").text(" Effective Power: " + (d[1] - d[0]));
+            })
+            .transition()
+            .duration(3000)
+            .attr("y", function (d) { return yScale(d[1]); })
+            .attr("height", function (d) { return yScale(d[0]) - yScale(d[1]); });
+
+    }
     function roundPositions(y) {
         //keep PositionsArray for the specified turn and PositionsArray2 for all other turns
         groupActors(PositionsArray2);
-
         //make sure arrays are empty for rounding another turn's positions
         PositionsArray2.splice(0, PositionsArray2.length);
     }
