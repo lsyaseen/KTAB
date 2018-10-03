@@ -112,8 +112,8 @@ matrix:
       env:
         - C_COMPILER=clang-3.6
         - CXX_COMPILER=clang++-3.6
+        
 before_install:  
-  - if [[ $TRAVIS_OS_NAME == linux]]; then sudo apt-get install gcc-6 g++-6; fi
    # necessary because Travis overwrites CXX and CC!
   - if [[ $TRAVIS_OS_NAME == linux ]]; then export CXX=$CXX_COMPILER CC=$C_COMPILER; fi
 
