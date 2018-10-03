@@ -119,7 +119,6 @@ before_install:
 
 install:
 #Linux Prerequisites 
-  - if [[ $TRAVIS_OS_NAME == linux ]]; then sudo apt-get --allow-unauthenticated upgrade #Allow unuthenticated for llvm-toolchain-trusty
   - if [[ $TRAVIS_OS_NAME == linux ]]; then sudo apt-get install qt5-default; fi #install Qt5 libraries
   - if [[ $TRAVIS_OS_NAME == linux ]]; then sudo bash ./install-linux-deps.sh; fi  # Why do I need permission?
 #OS X Prerequisties  
