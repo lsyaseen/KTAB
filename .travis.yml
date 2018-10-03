@@ -73,10 +73,10 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-6.3
+            - g++-7
       env:
-        - C_COMPILER=gcc-6.3
-        - CXX_COMPILER=g++-6.3
+        - C_COMPILER=gcc-7
+        - CXX_COMPILER=g++-7
         
     - os: linux
       dist: trusty
