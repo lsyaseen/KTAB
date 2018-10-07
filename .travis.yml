@@ -13,8 +13,106 @@ matrix:
       env:
         - C_COMPILER=clang
         - C_COMPILER=clang++
-
-
+      
+    - os: linux
+      dist: trusty
+      compiler: gcc
+      branches:
+        only:
+          - master
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env:
+        - C_COMPILER=gcc-4.9
+        - CXX_COMPILER=g++-4.9
+    - os: linux
+      dist: trusty
+      compiler: gcc
+      branches:
+        only:
+          - master
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env:
+        - C_COMPILER=gcc-5
+        - CXX_COMPILER=g++-5
+    - os: linux
+      dist: trusty
+      compiler: gcc
+      branches:
+        only:
+          - master
+          - testing
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env:
+        - C_COMPILER=gcc-6
+        - CXX_COMPILER=g++-6
+        
+    - os: linux
+      dist: trusty
+      compiler: gcc
+      branches:
+        only:
+          - master
+          - testing
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env:
+        - C_COMPILER=gcc-7
+        - CXX_COMPILER=g++-7
+        
+    - os: linux
+      dist: trusty
+      compiler: clang
+      branches:
+        only:
+          - master
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.5
+          packages:
+            - g++-4.9
+            - clang-3.5
+      env:
+        - C_COMPILER=clang-3.5
+        - CXX_COMPILER=clang++-3.5
+    - os: linux
+      dist: trusty
+      compiler: clang
+      branches:
+        only:
+          - master
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.6
+          packages:
+            - g++-4.9
+            - clang-3.6
+      env:
+        - C_COMPILER=clang-3.6
+        - CXX_COMPILER=clang++-3.6
+        
 before_install:  
    # necessary because Travis overwrites CXX and CC!   
   - if [[ $TRAVIS_OS_NAME == linux ]]; then export CXX=$CXX_COMPILER CC=$C_COMPILER; fi
@@ -24,7 +122,7 @@ install:
   - if [[ $TRAVIS_OS_NAME == linux ]]; then sudo apt-get install qt5-default; fi #install Qt5 libraries
   - if [[ $TRAVIS_OS_NAME == linux ]]; then sudo bash ./install-linux-deps.sh; fi  # Why do I need permission?
 #OS X Prerequisties  
-  - if [[ $TRAVIS_OS_NAME == osx ]]; then bash ./install-osx-deps.sh; fi #install Qt libraries
+  - if [[ $TRAVIS_OS_NAME == osx ]]; then bash ./install-osx-deps.sh; fi #install Qt5 libraries
   - if [[ $TRAVIS_OS_NAME == osx ]]; then export PATH=$PATH:/usr/local/opt/qt/lib/cmake && ls; fi #Add Qt to system path
   - if [[ $TRAVIS_OS_NAME == osx ]]; then export CFLAGS=-I/opt/X11/include && export LDFLAGS=-L/opt/X11/lib; fi #Add proper X11 libs to system path
   
