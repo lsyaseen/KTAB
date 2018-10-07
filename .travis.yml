@@ -79,7 +79,7 @@ matrix:
         - CXX_COMPILER=g++-7
         
     - os: linux
-      dist: precise
+      dist: trusty
       compiler: clang
       branches:
         only:
@@ -96,7 +96,7 @@ matrix:
         - C_COMPILER=clang-3.5
         - CXX_COMPILER=clang++-3.5
     - os: linux
-      dist: precise
+      dist: trusty
       compiler: clang
       branches:
         only:
