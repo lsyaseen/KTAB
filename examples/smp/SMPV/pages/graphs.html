@@ -17,6 +17,12 @@
     <!-- noUiSlider css -->
     <link href="../vendor/noUiSlider.11.0.3/css/nouislider.min.css" rel="stylesheet">
 
+    <!--  jQuery UI theme css -->
+    <link href="../vendor/jquery/jquery-ui.theme.css" rel="stylesheet">
+
+    <!-- evol-colorpicker css -->
+    <link href="../vendor/colorpicker/css/evol-colorpicker.css" rel="stylesheet">
+
     <!-- Custom CSS -->
     <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
     <link href="../dist/css/style.css" rel="stylesheet">
@@ -46,7 +52,6 @@
                 </div>
             </div>
         </div>
-
         <!-- main area -->
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 
@@ -57,7 +62,8 @@
                         <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-10">
-                                    <strong>Number of Scenarios: </strong> <span id="NumOfscen"> </span>
+                                    <strong>Number of Scenarios: </strong>
+                                    <span id="NumOfscen"> </span>
                                 </div>
                                 <div class="col-xs-10">
                                     <strong>Scenario Name: </strong>
@@ -65,7 +71,8 @@
                                     <select id="SecnarioPicker"> </select>
                                 </div>
                                 <div class="col-xs-10">
-                                    <strong>Secnario description: </strong> <span id="SecnarioDesc"> </span>
+                                    <strong>Secnario description: </strong>
+                                    <span id="SecnarioDesc"> </span>
                                 </div>
                             </div>
                         </div>
@@ -76,19 +83,24 @@
                         <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-9">
-                                    <strong>Number of Actors: </strong> <span id="NumOfActors"> </span>
+                                    <strong>Number of Actors: </strong>
+                                    <span id="NumOfActors"> </span>
                                 </div>
                                 <div class="col-xs-9">
-                                    <strong>Number of Dimensions: </strong> <span id="NumOfDim"> </span>
+                                    <strong>Number of Dimensions: </strong>
+                                    <span id="NumOfDim"> </span>
                                 </div>
                                 <div class="col-xs-9">
-                                    <strong>Turn: </strong> <span id="currentTurn"> 1 </span>
+                                    <strong>Turn: </strong>
+                                    <span id="currentTurn"> 1 </span>
                                     <!--1 by default -->
                                 </div>
                                 <div class="col-xs-9">
-                                    <strong>Dimension: </strong> <span> 
+                                    <strong>Dimension: </strong>
+                                    <span>
                                         <select id="Dimpicker">
-                                    </select> </span>
+                                        </select>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -108,8 +120,12 @@
                     <div class="panel with-nav-tabs panel-default">
                         <div class="panel-heading tabs">
                             <ul class="nav nav-tabs">
-                                <li class="active"><a href="#LineGraphTab" data-toggle="tab">Line Graph</a></li>
-                                <li><a href="#BarGraphTab" data-toggle="tab">Bar Graph</a></li>
+                                <li class="active">
+                                    <a href="#LineGraphTab" data-toggle="tab">Line Graph</a>
+                                </li>
+                                <li>
+                                    <a href="#BarGraphTab" data-toggle="tab">Bar Graph</a>
+                                </li>
                             </ul>
                         </div>
                         <div class="panel-body">
@@ -141,11 +157,11 @@
                                                 <form id="yAxisScale">
                                                     <div class="yscaleoptions">
                                                         <span data-container="body" role="tooltip" aria-haspopup="true" class="tooltip tooltip-bottom-right ">
-                                                              <input type="radio" id="Fixedbtn" name="radio-group" >                                                             
-                                                              <label for="Fixedbtn">Fixed y-axis scale</label>
-                                                              <input type="radio" id="Responsivebtn" name="radio-group" checked >               
-                                                              <label for="Responsivebtn">Responsive y-axis scale</label>
-                                                            </span>
+                                                            <input type="radio" id="Fixedbtn" name="radio-group">
+                                                            <label for="Fixedbtn">Fixed y-axis scale</label>
+                                                            <input type="radio" id="Responsivebtn" name="radio-group" checked>
+                                                            <label for="Responsivebtn">Responsive y-axis scale</label>
+                                                        </span>
                                                     </div>
                                                 </form>
                                                 <div id="MainBarChart" class="panel-body "></div>
@@ -168,6 +184,18 @@
             <div class="row space">
                 <div class="col-sm-14  col-md-14  col-lg-4">
                     <button class="btn btn-success" onclick="downloadPNG()">Download Chart as PNG</button>
+                    <button class="toggle btn btn-success" data-target="myPopup" onclick="changecolors()"> Change Colors</button>
+                </div>
+                <div id="myPopup" class="popup hide">
+                    <div class="popup-header">
+                        <span class="close toggle" data-target="myPopup">close</span>
+                    </div>
+                    <div class="popup-body">
+                    </div>
+                    <div class="popup-footer">
+                        <br>
+                        <button class="toggle button" data-target="myPopup" onclick="saveSelectedColors()">Apply Changes</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -180,6 +208,12 @@
 
     <!-- jQuery -->
     <script src="../vendor/jquery/jquery.min.js"></script>
+
+    <!-- jQueryUI -->
+    <script src="../vendor/jquery/jquery-ui.min.js"></script>
+
+    <!-- evol-colorpicker -->
+    <script src="../vendor/colorpicker/js/evol-colorpicker.min.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
@@ -210,12 +244,18 @@
     var NumOfDim = Positions[selectedScen2].length;
     var NumOfTurns = sessionStorage.getItem("NumOfTurns");
     var ActorsNames = JSON.parse(sessionStorage.getItem("ActorsNames"));
+    var defaultColors = JSON.parse(sessionStorage.getItem("defaultColors"));
+    var ActorsObj;
+    var temActorsObj
+    var changeColorsCounter = 0;
 
     document.getElementById('NumOfscen').innerHTML = ScenarioArray.length;
     document.getElementById('SecnarioDesc').innerHTML = ScenarioDesc;
     document.getElementById('NumOfActors').innerHTML = NumOfActors;
     document.getElementById('NumOfDim').innerHTML = NumOfDim;
     document.getElementById('NumOfActors').innerHTML = ActorsNames[selectedScen2].length;;
+
+    getActorsData();
 
     $(document).ready(function () {
         $('[data-toggle=offcanvas]').click(function () {
@@ -227,7 +267,6 @@
 
         for (i = 0; i < NumOfDim; i++) {
             $("#Dimpicker").append('<option value="' + i + '">' + (i + 1) + '</option>');
-
         }
         $("#Dimpicker").val(0); //select first opt by default
     });
@@ -237,6 +276,15 @@
         drawLine();
     });
 
+    $(document).ready(function () {
+        $("#mycolor").colorpicker({ showOn: 'button' });
+    });
+    $(document).on('click', '.toggle', function (event) {
+        event.preventDefault();
+
+        var target = $(this).data('target');
+        $('#' + target).toggleClass('hide');
+    });
     // option for scenarios
     for (i = 0; i < SceAraay2.length; i++) {
         $("#SecnarioPicker").append('<option value="' + i + '">' + ScenarioArray[i][0] + '</option>');
@@ -247,7 +295,7 @@
         selectedScen2 = $('#SecnarioPicker').val();
         selectedScenNum = $('#SecnarioPicker').val();
         selectedDimNum = 0;
-
+        changeColorsCounter = 0;
         turns = Positions[selectedScen2][0][1].positions.length - 1;
 
         selectedScenNum = $('#SecnarioPicker').val();
@@ -275,6 +323,7 @@
             $("#Dimpicker").append('<option value="' + i + '">' + (i + 1) + '</option>');
         }
         $("#Dimpicker").val(0); //select first opt by default
+        getActorsData();
         updateDesc();
         drawChart();
         drawLine();
@@ -306,7 +355,27 @@
         document.getElementById('NumOfActors').innerHTML = ActorsNames[selectedScen2].length;;
 
     }
+    function getActorsData() {
 
+        //names based on selected scenario
+        var namesArray = ActorsNames[selectedScenNum];
+
+        var colors3 = d3.scaleOrdinal()
+            .domain(namesArray)
+            .range(defaultColors);
+
+        var actors2 = namesArray.map(function (row, i) {
+            return {
+                actor_name: row,
+                visible: true,
+                color: colors3(row),
+            }
+        });
+
+        sessionStorage.setItem("ActorsObj", JSON.stringify(actors2));
+
+        ActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
+    }
     function downloadPNG() {
 
         var id = $('.tab-content .active').attr('id');
@@ -346,6 +415,42 @@
             barlink.click()
         }
 
+    }
+    function changecolors() {
+        temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
+
+        if (changeColorsCounter <= 0) { //only initilaze once!
+            $('.popup-body').empty(); //clear existing actors
+
+            for (var i = 0; i < temActorsObj.length; i++) {
+                $(".popup-body").append('<div id="Div' + temActorsObj[i].actor_name + '"class="col-sm-12 col-md-6 col-lg-6" </div> ')
+                $("#Div" + temActorsObj[i].actor_name).append('<br><span><strong>' + temActorsObj[i].actor_name + '</strong></span>' +
+                    '<input style="width:100px;" id="' + temActorsObj[i].actor_name + '" class="colorPicker evo-cp0" >')
+
+
+                $("#" + temActorsObj[i].actor_name).colorpicker({ showOn: 'button' })
+                $("#" + temActorsObj[i].actor_name).colorpicker("val", temActorsObj[i].color);
+
+
+                $("#" + temActorsObj[i].actor_name).on("change.color", function (event, color) {
+                    //find index of selected actor to change its color
+                    for (i = 0; i < temActorsObj.length; i++) {
+                        var obj1 = temActorsObj.findIndex(o => o.actor_name === this.id);
+                        temActorsObj[obj1]["color"] = $("#" + this.id).colorpicker("val");
+                    }
+
+                    sessionStorage.setItem("ActorsObj", JSON.stringify(temActorsObj));
+
+                });
+                changeColorsCounter++;
+            }
+        }
+    }
+
+    function saveSelectedColors() {
+
+        drawChart();
+        drawLine();
     }
     $(document).ready(function () {
         $('#yAxisScale').change(function () {

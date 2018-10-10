@@ -72,9 +72,8 @@
 }
 .yscaleoptions {
   margin-top:5%;
-    /* margin-top: 2%; */
-
-/* margin-right: 30%  !important; */
+  position: relative;
+  z-index: 10;
 }
 .options_btn :checked 
 {

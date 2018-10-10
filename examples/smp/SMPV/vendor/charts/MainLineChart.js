@@ -10,6 +10,7 @@ var whyActorChanged = JSON.parse(sessionStorage.getItem("BargnsData"));
 var NumOfTurns = sessionStorage.getItem("NumOfTurns");
 var selectedDimNum = 0;
 var selectedScenNum = sessionStorage.getItem("selectedScen");
+var defaultColors = sessionStorage.getItem("defaultColors");
 
 function drawLine() {
 
@@ -49,6 +50,8 @@ function drawLine() {
     bargnsData = [],
     selectedLine,
     selectedLegend;
+
+  var ActorsObj1 = JSON.parse(sessionStorage.getItem("ActorsObj"));
 
   //names based on selected scenario
   namesArray = ActorsNamesAllSce[selectedScenNum];
@@ -115,8 +118,8 @@ function drawLine() {
   //text label for the x axis
   svg.append("text")
     .attr("transform",
-    "translate(" + (width / 2) + " ," +
-    (height + 30) + ")")
+      "translate(" + (width / 2) + " ," +
+      (height + 30) + ")")
     .style("text-anchor", "middle")
     .text("Turn");
 
@@ -139,77 +142,25 @@ function drawLine() {
     .style("text-anchor", "middle")
     .text("Position");
 
+
   var colors = d3.scaleOrdinal()
     .domain(namesArray)
-    .range(["#5C8598", "#219DD8", "#96C9E5", "#3C3D3B",
-      "#ECCE6A", "#f8ecba", "#60805D", "#8AC791",
-      "#bebfc1", "#636664", "#a5f3cc", "#6acbec",
-      "#6aecec", "#ff9966", "#1d80e2", "#6a8aec",
-      "#a5a5f3", "#ffd857", "#a8bfa6", "#cb6aec",
-      "#c88dc8", "#ec6a6a", "#ec6aab", "#e84a72",
-      "#f1a7a7", "#e3994f", "#d87d22", "#d8ab22",
-      "#d8d822", "#a6e765", "#4fd822", "#1cb01c",
-      "#22d84f", "#22d87d", "#22d8ab", "#22d8d8",
-      "#22abd8", "#156184", "#d3e6f8", "#224fd8",
-      // Darker Shade for (Set #1)
-      "#436170", "#18719a", "#5cabd6", "#1a1a19",
-      "#e5bb34", "#f1d874", "#425940", "#75bd7e",
-      "#97989b", "#3f4040", "#62eaa6", "#1db1e2",
-      "#1de2e2", "#ff5500", "#124d87", "#1a47cb",
-      "#4b4be7", "#ffc91a", "#6e946b", "#b11de2",
-      "#ac53ac", "#e21d1d", "#e21d80", "#b5173f",
-      "#e34f4f", "#b0661c", "#844d15", "#846815",
-      "#848415", "#73c71f", "#318415", "#0e580e",
-      "#158431", "#15844d", "#158468", "#158484",
-      "#156884", "#07202c", "#7bb4ea", "#153184",
-      // Lighter Shade for (Set #2)
-      "#8faebc", "#7bc7ea", "#d6eaf5", "#737570",
-      "#f9f0d2", "#fdf9e8", "#9ab497", "#ddeedf",
-      "#e5e5e6", "#8b8d8c", "#e9fcf2", "#d2eff9",
-      "#bbf6f6", "#ffddcc", "#8ebff0", "#d2dcf9",
-      "#e9e9fc", "#fff3cc", "#e2eae1", "#efd2f9",
-      "#e6cbe6", "#f9d2d2", "#f9d2e6", "#f6bbca",
-      "#fce9e9", "#f5d9bd", "#eab37b", "#eace7b",
-      "#eaea7b", "#d9f5bd", "#97ea7b", "#65e765",
-      "#7bea97", "#7beab3", "#38e0b6", "#65e7e7",
-      "#7bceea", "#38abe0", "#e9f3fc", "#91a8ee",
-      // Another set of 18 (warm) Distinct Colors (Set #2)
-      "#e6194b", "#3cb44b", "#ffe119", "#0082c8",
-      "#f58231", "#911eb4", "#46f0f0", "#f032e6",
-      "#d2f53c", "#fabebe", "#008080", "#e6beff",
-      "#aa6e28", "#fffac8", "#800000", "#aaffc3",
-      "#808000", "#ffd8b1", "#000080", "#808080",
-      // Darker shade for set #2
-      "#8a0f2e", "#267330", "#b39b00", "#004266",
-      "#c35709", "#58126d", "#0fbdbd", "#be0eb5",
-      "#a0c20a", "#f47171", "#003333", "#c466ff",
-      "#674218", "#fff266", "#330000", "#66ff94",
-      "#333300", "#ff9933", "#000033", "#4d4d4d"
-    ]);
-
-
-  //create an object for each actor, map all the properties.
-  var actors = namesArray.map(function (row, i) {
-
-    return {
-      actor_name: row,
-      visible: true,
-      values: x_axix_data.map(function (x_value) {
-        return {
-          Turn: x_value,
-          val: positionsData[i].map(function (y_values) {
-            return y_values
-          })
-        }
-      }),
-      color: colors(row)
-    }
+    .range(defaultColors)
+  ActorsObj1.forEach(function (obj, index) {
+    obj.values = x_axix_data.map(function (x_value) {
+      return {
+        Turn: x_value,
+        val: positionsData[index].map(function (y_values) {
+          return y_values
+        })
+      }
+    })
   });
 
   // get initiator color for the point  
   for (i = 0; i < bargnsDataByTurn.length; i++) {
-    let obj = actors.findIndex(o => o.actor_name === bargnsDataByTurn[i].Initiator);
-    bargnsDataByTurn[i]["color"] = actors[obj].color;
+    var obj1 = ActorsObj1.findIndex(o => o.actor_name === bargnsDataByTurn[i].Initiator);
+    bargnsDataByTurn[i]["color"] = ActorsObj1[obj1].color;
   }
 
 
@@ -234,7 +185,7 @@ function drawLine() {
     .style('color', 'black');
 
 
-  actors.forEach(function (d, i) {
+  ActorsObj1.forEach(function (d, i) {
 
     //draw the lines
     drawLines(d, i);
@@ -246,9 +197,9 @@ function drawLine() {
     svg2.append("rect")
       .attr("width", 10)
       .attr("height", 10)
-      .attr("id", 'legend_' + d.actor_name.replace(".", ''))
+      .attr("id", 'legend_' + d.actor_name.replace(/\s+/g, '').replace(".", ''))
       .attr("transform", function () {
-        xOff = (i % 3) * 65
+        xOff = (i % 3) * 85
         yOff = Math.floor(i / 3) * 20
         return "translate(" + xOff + "," + (yOff + 80) + ")"
       })
@@ -266,12 +217,12 @@ function drawLine() {
         if (d.visible == true) {
           d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
             .transition().remove();
-          actors[i].visible = false;
+          ActorsObj1[i].visible = false;
           d.visible = false;
         }
         else if (d.visible == false) {
           drawLines(d, i);
-          actors[i].visible = true;
+          ActorsObj1[i].visible = true;
           d.visible = true;
         }
       })
@@ -281,7 +232,6 @@ function drawLine() {
         onMouseover(d, i);
 
       })
-      // .on("mouseout", onMouseout);
       .on("mouseout", function () {
         MouseOutLegend(d, i);
         onMouseout();
@@ -294,7 +244,7 @@ function drawLine() {
 
     svg2.append("text")
       .attr("transform", function () {
-        xOff = (i % 3) * 65
+        xOff = (i % 3) * 85
         yOff = Math.floor(i / 3) * 20
 
         return "translate(" + (xOff + 15) + "," + (yOff + 89) + ")"
@@ -340,13 +290,13 @@ function drawLine() {
                 .style('left', (xPosition) + 'px');
 
               // highlight the actor who initiated the bargain 
-              d3.select("#legend_" + d["Initiator"].replace(".", ''))
+              d3.select("#legend_" + d["Initiator"].replace(/\s+/g, '').replace(".", ''))
                 .style("stroke", "black")
                 .style("stroke-width", "2.5");
             })
             .on("mouseout", function (d) {
               tooltip.style("display", "none");
-              d3.select("#legend_" + d["Initiator"].replace(".", ''))
+              d3.select("#legend_" + d["Initiator"].replace(/\s+/g, '').replace(".", ''))
                 .style("stroke", "none")
             });
           // Update whether or not points are visible
@@ -371,11 +321,12 @@ function drawLine() {
       if (d3.select("#SelectLabel").text() == "Clear All") {
         bargnsDataByTurn.forEach(function (d, i) {
           d.visible = false;
+          bargnsDataByTurn[i]["PointVisible"] = false;
         })
         clearAll();
       }
       else {
-        actors.forEach(function (d, i) {
+        ActorsObj1.forEach(function (d) {
           d.visible = true;
         })
         selectAll();
@@ -391,7 +342,7 @@ function drawLine() {
 
   function onMouseover(d, i) {
     MouseOverLegend(d, i);
-    actors.forEach(function (d, i) {
+    ActorsObj1.forEach(function (d, i) {
       d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
         .transition()
         .duration(50)
@@ -407,7 +358,7 @@ function drawLine() {
       d3.select(selectedLine.replace(/\s+/g, '').replace(".", ''))
         .style("stroke-width", 4);
 
-      d3.selectAll("#legend_" + d.actor_name.replace(".", ''))
+      d3.selectAll("#legend_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
         .attr("fill", function () {
           return ("#legend_" + d.actor_name === selectedLegend) ? d.color : "#F1F1F2"
         })
@@ -415,7 +366,7 @@ function drawLine() {
   }
 
   function onMouseout() {
-    actors.forEach(function (d, i) {
+    ActorsObj1.forEach(function (d, i) {
       d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
         .transition()
         .duration(50)
@@ -427,7 +378,7 @@ function drawLine() {
         })
       d3.select(selectedLine.replace(/\s+/g, '').replace(".", ''))
         .style("stroke-width", 1.2);
-      d3.selectAll("#legend_" + d.actor_name.replace(".", ''))
+      d3.selectAll("#legend_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
         .attr("fill", function () {
           return d.visible ? d.color : "#F1F1F2";
         })
@@ -457,10 +408,10 @@ function drawLine() {
   }
 
   function selectAll() {
-    actors.forEach(function (d, i) {
+    ActorsObj1.forEach(function (d, i) {
       drawLines(d, i);
-      actors[i].visible = true;
-      d3.selectAll("#legend_" + d.actor_name.replace(".", ''))
+      ActorsObj1[i].visible = true;
+      d3.selectAll("#legend_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
         .attr("fill", d.color)
     })
     d3.select("#SelectLabel")
@@ -468,21 +419,21 @@ function drawLine() {
   }
 
   function clearAll() {
-    actors.forEach(function (d, i) {
+    ActorsObj1.forEach(function (d, i) {
       d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
         .transition()
         .duration(50)
         .remove();
       d.visible = false;
-      d3.selectAll("#legend_" + d.actor_name.replace(".", ''))
+      d3.selectAll("#legend_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
         .attr("fill", "#F1F1F2")
-      bargnsDataByTurn[i]["PointVisible"] = false;
       d3.selectAll(".dot" + d.actor_name.replace(/\s+/, "").replace(".", '')).remove();
 
     })
     d3.select("#SelectLabel")
       .text("Select All")
   }
+
 
   function drawLines(d, i) {
 
