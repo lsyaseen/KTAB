@@ -488,8 +488,8 @@ void MainWindow::createSpline(const QVector<double> &x, const QVector<double> &y
         {
             deltaX.append(X.at(i)-X.at(i-1));
             deltaY.append(Y.at(i)-Y.at(i-1));
-            absDeltaX.append(abs(X.at(i)-X.at(i-1)));
-            absDeltaY.append(abs(Y.at(i)-Y.at(i-1)));
+            absDeltaX.append(std::abs(X.at(i)-X.at(i-1)));
+            absDeltaY.append(std::abs(Y.at(i)-Y.at(i-1)));
             sgnDeltaX.append((deltaX.at(i) > 0) ? 1 : (deltaX.at(i) < 0) ? -1 : 0);
             sgnDeltaY.append((deltaY.at(i) > 0) ? 1 : (deltaY.at(i) < 0) ? -1 : 0);
         }
