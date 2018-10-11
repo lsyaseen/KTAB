@@ -11,5 +11,4 @@ cmake --version  # This allows us to confirm which version of cmake has been ins
 brew tap linuxbrew/homebrew-xorg && brew install libxaw
 
 #install Qt5
-brew tap homebrew/versions
-brew install qt55
+brew install qt5
