@@ -1,139 +1,232 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="KTAB">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="KTAB">
 
-    <title>KTAB</title>
+  <title>KTAB</title>
+  <!-- Google Analytics -->
+  <script>
+    (function (i, s, o, g, r, a, m) {
+    i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+      (i[r].q = i[r].q || []).push(arguments)
+    }, i[r].l = 1 * new Date(); a = s.createElement(o),
+      m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 
-    <link href="./vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet" type="text/css">
+    ga('create', 'UA-86040304-1', 'auto');
+    ga('send', 'pageview');
+  </script>
 
-    <link href="./vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <script src="./vendor/jquery/jquery.min.js"></script>
-    <script src="./vendor/bootstrap/js/bootstrap.min.js"></script>
+  <link href="./vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet" type="text/css">
+
+  <link href="./vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <script src="./vendor/jquery/jquery.min.js"></script>
+  <script src="./vendor/bootstrap/js/bootstrap.min.js"></script>
 
 </head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-86040304-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'UA-86040304-1');
+</script>
 
 <body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PNGSJ9B" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript>
+  <!-- End Google Tag Manager (noscript) -->
+  <div class="wrapper">
 
-    <div class="wrapper">
-
-      <nav class="navbar navbar-default sidebar" role="navigation">
-        <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-sidebar-navbar-collapse-1">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                      </button> 
-                                <div class="sidebar-logo">
-            <a class="sidebar-link" href="../index.html">
-              <div class="logo"><img src="img/logo-icon.png" alt=""></div>
-              <div class="logo-text"><h3>KTAB</h3></div>
-            </a>
-          </div>
-        </div>
-        <div class="collapse navbar-collapse" id="bs-sidebar-navbar-collapse-1">  
-          
-          <ul class="nav navbar-nav"> 
-            <li class="nav-item"><a href="../index.html"><span class="icon-holder"><i class="icon home"></i></span><span class="title">Home</span></a></li>
-            <li class="nav-item"><a href="about.html"><span class="icon-holder"><i class="icon about"></i></span><span class="title">About KTAB</span></a></li>
-            <li class="nav-item"><a href="papers.html"><span class="icon-holder"><i class="icon papers"></i></span><span class="title selected">Papers & Data</span></a></li>
-            <li class="nav-item"><a href="research.html"><span class="icon-holder"><i class="icon projects"></i></span><span class="title">KTAB Research</span></a></li>
-            <li class="nav-item"><a href="software.html"><span class="icon-holder"><i class="icon software"></i></span><span class="title">KTAB Software</span></a></li>
-            <li class="nav-item"><a href="events.html"><span class="icon-holder"><i class="icon events"></i></span><span class="title">News & Events</span></a></li>
-            <li class="nav-item"><a href="https://github.com/KAPSARC/KTAB" target="_blank"><span class="icon-holder"><i class="icon github"></i></span><span class="title">View the Project on GitHub</span></a></li>
-          </ul>
-        </div>
-</nav>
-        <div class="page-container">
-        <header>
-          <h2>KAPSARC Toolkit for Behavioral Analysis</h2>
-          <h4>A Framework for Modeling Collective Decision-Making Processes (CDMPs)</h4>
-        </header>
-
-        <main class="main-content">
-          <div class="row">
-              <div class="col-md-12">
-                <p>We are releasing a series of papers that describe the assumptions, algebra, and mathematical underpinnings of KTAB. As we develop the code base, we will continue to document the foundations of new models available within KTAB in a series of KAPSARC Discussion and Methodology papers.</p>
-                <p>We are also releasing papers that show applications of KTAB models to relevant topics. The papers are available for download on this page.</p>
-              </div>
-          </div>
-          <br>
-          <div class="row">
-            <div class="col-md-6">
-              <h4 class="sub-title">Methodology & Technical Papers</h4>
-              <div class="paper-holder">
-                <a href="https://www.kapsarc.org/wp-content/uploads/2015/10/KS-1517-DP011A-An-Introduction-to-the-KAPSARC-Toolkit-for-Behavioral-Analysis-KTAB.pdf" target="_blank">
-                  <img src="img/paper.png" class="paper-img">
-                  <p class="paper-title">An Introduction to the KAPSARC Toolkit for Behavioral Analysis (KTAB)</p>
-                </a>
-              </div>
-              <div class="paper-holder">
-                <a href="https://www.kapsarc.org/wp-content/uploads/2015/12/KS-1524-DP018B-Multidimensional-Bargaining-Using-KTAB.pdf" target="_blank">
-                  <img src="img/paper.png" class="paper-img">
-                  <p class="paper-title">Multidimensional Bargaining Using KTAB</p>
-                </A>
-              </div>
-              <div class="paper-holder">
-                <a href="https://www.kapsarc.org/wp-content/uploads/2016/04/KS-1629-MP023B-Group-Choice-with-Interdependent-Sublinear-Voting_Methodology-Paper.pdf" target="_blank">
-                  <img src="img/paper.png" class="paper-img">
-                  <p class="paper-title">Group Choice with Interdependent Sublinear Voting</p>
-                </a>
-              </div>
-              <div class="paper-holder">
-                <a href="https://www.kapsarc.org/wp-content/uploads/2017/05/KS-2017-MP03-Toward-the-Integration-of-Policymaking-Models-and-Economic-Models.pdf" target="_blank">
-                  <img src="img/paper.png" class="paper-img">
-                  <p class="paper-title">Toward the Integration of Policymaking Models and Economic Models</p>
-                </a>
-              </div>
+    <nav class="navbar navbar-default sidebar" role="navigation">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-sidebar-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <div class="sidebar-logo">
+          <a class="sidebar-link" href="../index.html">
+            <div class="logo">
+              <img src="img/logo-icon.png" alt="">
             </div>
-
-            <div class="col-md-6">
-              <h4 class="sub-title">Applications of KTAB</h4>
-              <div class="paper-holder">
-                <a href="https://www.kapsarc.org/wp-content/uploads/2015/10/KS-1520-DP014A-Reforming-the-Role-of-State-Owned-Enterprise-in-China%E2%80%99s-Energy-Sector-web.pdf" target="_blank">
-                  <img src="img/paper.png" class="paper-img">
-                  <p class="paper-title">Reforming the Role of State-Owned Enterprise in China’s Energy Sector</p>
-                </a>
-              </div>
-              <div class="paper-holder">
-                <a href="https://www.kapsarc.org/wp-content/uploads/2016/04/KS-1630-DP024A-Policy-Options-for-Reducing-Water-for-Agriculture-in-SA.pdf" target="_blank">
-                  <img src="img/paper.png" class="paper-img">
-                  <p class="paper-title">Policy Options for Reducing Water for Agriculture in Saudi Arabia</p>
-                </a>
-              </div>
-              <div class="paper-holder">
-                <a href="https://www.researchgate.net/publication/302917727_Analyzing_coalitions_in_China%27s_policy_formulation_Reforming_the_role_of_state-owned_enterprises_in_China%27s_energy_sector" target="_blank">
-                  <img src="img/paper2.png" class="paper-img">
-                  <p class="paper-title">Analyzing Coalitions in China’s Policy Formulation</p>
-                </a>
-              </div>
-              <div class="paper-holder">
-                <a href="https://www.kapsarc.org/wp-content/uploads/2017/06/KS-2017-DP09-Support-for-a-Carbon-Tax-in-China-A-CDMP-Simulation-Using-KTAB.pdf" target="_blank">
-                  <img src="img/paper.png" class="paper-img">
-                  <p class="paper-title">Support for a Carbon Tax in China: A CDMP Process Simulation using KTAB</p>
-                </a>
-              </div>
-              <div class="paper-holder">
-                <a href="https://www.kapsarc.org/wp-content/uploads/2017/10/KS-2017-DP22-The-Political-Feasibility-of-Policy-Options-for-the-UAEs-Energy-Transition.pdf" target="_blank">
-                  <img src="img/paper.png" class="paper-img">
-                  <p class="paper-title">The Political Feasibility of Policy Options for the UAE's Energy Transition</p>
-                </a>
-              </div>
+            <div class="logo-text">
+              <h3>KTAB</h3>
             </div>
-          </div>
-        </main>
+          </a>
+        </div>
       </div>
-      <footer>
-        <span class="info">For more information email <a href="mailto:ktab@kapsarc.org">ktab@kapsarc.org</a></span>
-        <span class="copyright">Copyright KAPSARC. Open source MIT License</span>
-      </footer>
+      <div class="collapse navbar-collapse" id="bs-sidebar-navbar-collapse-1">
+
+        <ul class="nav navbar-nav">
+          <li class="nav-item">
+            <a href="../index.html">
+              <span class="icon-holder">
+                <i class="icon home"></i>
+              </span>
+              <span class="title">Home</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="about.html">
+              <span class="icon-holder">
+                <i class="icon about"></i>
+              </span>
+              <span class="title">About KTAB</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="papers.html">
+              <span class="icon-holder">
+                <i class="icon papers"></i>
+              </span>
+              <span class="title selected">Papers & Data</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="research.html">
+              <span class="icon-holder">
+                <i class="icon projects"></i>
+              </span>
+              <span class="title">KTAB Research</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="software.html">
+              <span class="icon-holder">
+                <i class="icon software"></i>
+              </span>
+              <span class="title">KTAB Software</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="events.html">
+              <span class="icon-holder">
+                <i class="icon events"></i>
+              </span>
+              <span class="title">News & Events</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="https://github.com/KAPSARC/KTAB" target="_blank">
+              <span class="icon-holder">
+                <i class="icon github"></i>
+              </span>
+              <span class="title">View the Project on GitHub</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="page-container">
+      <header>
+        <h2>KAPSARC Toolkit for Behavioral Analysis</h2>
+        <h4>A Framework for Modeling Collective Decision-Making Processes (CDMPs)</h4>
+      </header>
+
+      <main class="main-content">
+        <div class="row">
+          <div class="col-md-12">
+            <p>We are releasing a series of papers that describe the assumptions, algebra, and mathematical underpinnings of
+              KTAB. As we develop the code base, we will continue to document the foundations of new models available within
+              KTAB in a series of KAPSARC Discussion and Methodology papers.</p>
+            <p>We are also releasing papers that show applications of KTAB models to relevant topics. The papers are available
+              for download on this page.</p>
+          </div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-md-6">
+            <h4 class="sub-title">Methodology & Technical Papers</h4>
+            <div class="paper-holder">
+              <a href="https://www.kapsarc.org/wp-content/uploads/2015/10/KS-1517-DP011A-An-Introduction-to-the-KAPSARC-Toolkit-for-Behavioral-Analysis-KTAB.pdf"
+                target="_blank" onclick="ga('send', 'event', 'Papers', 'View', 'KTAB intoduction');">
+                <img src="img/paper.png" class="paper-img">
+                <p class="paper-title">An Introduction to the KAPSARC Toolkit for Behavioral Analysis (KTAB)</p>
+              </a>
+            </div>
+            <div class="paper-holder">
+              <a href="https://www.kapsarc.org/wp-content/uploads/2015/12/KS-1524-DP018B-Multidimensional-Bargaining-Using-KTAB.pdf" target="_blank"
+                onclick="ga('send', 'event', 'Papers', 'View', 'Multidimensional Bargaining Using KTAB');">        
+                <img src="img/paper.png" class="paper-img">
+                <p class="paper-title">Multidimensional Bargaining Using KTAB</p>
+              </A>
+            </div>
+            <div class="paper-holder">
+              <a href="https://www.kapsarc.org/wp-content/uploads/2016/04/KS-1629-MP023B-Group-Choice-with-Interdependent-Sublinear-Voting_Methodology-Paper.pdf"
+                target="_blank" onclick="ga('send', 'event', 'Papers', 'View', 'Group Choice with Interdependent Sublinear Voting');">
+
+                <img src="img/paper.png" class="paper-img">
+                <p class="paper-title">Group Choice with Interdependent Sublinear Voting</p>
+              </a>
+            </div>
+            <div class="paper-holder">
+              <a href="https://www.kapsarc.org/wp-content/uploads/2017/05/KS-2017-MP03-Toward-the-Integration-of-Policymaking-Models-and-Economic-Models.pdf"
+                target="_blank" onclick="ga('send', 'event', 'Papers', 'View', 'Toward the Integration of Policymaking Models and Economic Models');">
+                <img src="img/paper.png" class="paper-img">
+                <p class="paper-title">Toward the Integration of Policymaking Models and Economic Models</p>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <h4 class="sub-title">Applications of KTAB</h4>
+            <div class="paper-holder">
+              <a href="https://www.kapsarc.org/wp-content/uploads/2015/10/KS-1520-DP014A-Reforming-the-Role-of-State-Owned-Enterprise-in-China%E2%80%99s-Energy-Sector-web.pdf"
+                target="_blank" onclick="ga('send', 'event', 'Papers', 'View', 'Reforming the Role of State-Owned Enterprise in China’s Energy Sector');">
+                <img src="img/paper.png" class="paper-img">
+                <p class="paper-title">Reforming the Role of State-Owned Enterprise in China’s Energy Sector</p>
+              </a>
+            </div>
+            <div class="paper-holder">
+              <a href="https://www.kapsarc.org/wp-content/uploads/2016/04/KS-1630-DP024A-Policy-Options-for-Reducing-Water-for-Agriculture-in-SA.pdf"
+                target="_blank" onclick="ga('send', 'event', 'Papers', 'View', 'Policy Options for Reducing Water for Agriculture in Saudi Arabia');">
+                <img src="img/paper.png" class="paper-img">
+                <p class="paper-title">Policy Options for Reducing Water for Agriculture in Saudi Arabia</p>
+              </a>
+            </div>
+            <div class="paper-holder">
+              <a href="https://www.researchgate.net/publication/302917727_Analyzing_coalitions_in_China%27s_policy_formulation_Reforming_the_role_of_state-owned_enterprises_in_China%27s_energy_sector"
+                target="_blank" onclick="ga('send', 'event', 'Papers', 'View', 'Analyzing Coalitions in China’s Policy Formulation');">
+                <img src="img/paper2.png" class="paper-img">
+                <p class="paper-title">Analyzing Coalitions in China’s Policy Formulation</p>
+              </a>
+            </div>
+            <div class="paper-holder">
+              <a href="https://www.kapsarc.org/wp-content/uploads/2017/06/KS-2017-DP09-Support-for-a-Carbon-Tax-in-China-A-CDMP-Simulation-Using-KTAB.pdf"
+                target="_blank" onclick="ga('send', 'event', 'Papers', 'View', 'Support for a Carbon Tax in China: A CDMP Process Simulation using KTAB');">
+                <img src="img/paper.png" class="paper-img">
+                <p class="paper-title">Support for a Carbon Tax in China: A CDMP Process Simulation using KTAB</p>
+              </a>
+            </div>
+            <div class="paper-holder">
+              <a href="https://www.kapsarc.org/wp-content/uploads/2017/10/KS-2017-DP22-The-Political-Feasibility-of-Policy-Options-for-the-UAEs-Energy-Transition.pdf"
+                target="_blank" onclick="ga('send', 'event', 'Papers', 'View', '>The Political Feasibility of Policy Options for the UAE Energy Transition');">
+                <img src="img/paper.png" class="paper-img">
+                <p class="paper-title">The Political Feasibility of Policy Options for the UAE's Energy Transition</p>
+              </a>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
+    <footer>
+      <span class="info">For more information email
+        <a href="mailto:ktab@kapsarc.org">ktab@kapsarc.org</a>
+      </span>
+      <span class="copyright">Copyright KAPSARC. Open source MIT License</span>
+    </footer>
+  </div>
 
 </body>
 </html>
