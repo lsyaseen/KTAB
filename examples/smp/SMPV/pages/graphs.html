@@ -35,10 +35,10 @@
     <link href="../vendor/charts/charts.css" rel="stylesheet">
 
     <!-- sql.js -->
-    <script src="../vendor/sql\js/sql.js"></script>
+    <script src="../vendor/sql/js/sql.js"></script>
 
     <!-- papaparse.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.6.1/papaparse.js"></script>
+    <script src="../vendor/PapaParse/papaparse.js"></script>
 
 
 </head>
@@ -472,10 +472,16 @@
 
     function updateColors() {
         temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
-        for (i = 0; i < newColors.length; i++) {
-            temActorsObj[i]["color"] = newColors[i];
-            $("#" + temActorsObj[i].actor_name).colorpicker("val", newColors[i]);
-        }
+        if (temActorsObj.length < newColors.length) {
+            for (i = 0; i < temActorsObj.length; i++) {
+                temActorsObj[i]["color"] = newColors[i];
+                $("#" + temActorsObj[i].actor_name).colorpicker("val", newColors[i]);
+            } }
+         else {
+            for (i = 0; i < newColors.length; i++) {
+                temActorsObj[i]["color"] = newColors[i];
+                $("#" + temActorsObj[i].actor_name).colorpicker("val", newColors[i]);
+            }    }
         sessionStorage.setItem("ActorsObj", JSON.stringify(temActorsObj));
     }
 
