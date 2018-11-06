@@ -422,8 +422,9 @@
 
     $(document).on('change', '[class="sizeRadio"]', function () {
         if ($('#defaultSize').is(':checked')) {
-            // $('#sizeOptDiv').remove(); //clear if alredy exists
-            // $('#widthbox').val("400");
+            $('#widthbox').val("550");
+            $('#heightbox').val(300);
+
             $('#widthbox').prop('disabled', true);
             $('#heightbox').prop('disabled', true);
         }
@@ -463,7 +464,6 @@
 
     function getNewColors(csvcolors) {
         newColors.splice(0,newColors.length)
-      
       if (csvcolors[0][0] == 0) {
             const transposed = csvcolors;
             const res = transposed.map(row => row.reduce((acc, col, ind) => {
