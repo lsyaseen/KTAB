@@ -202,7 +202,9 @@
                     </div>
                     <div class="SizePopup-footer">
                         <br>
-                        <button class="toggle button" data-target="SizePopup" onclick="GetNewSize()">Confirm</button>
+                        <button class="toggle button" data-target="SizePopup" onclick="GetNewSize()">Confirm Edits</button>
+                        <button class="toggle button" data-target="SizePopup" onclick="downloadPNG()">download</button>
+
                     </div>
                 </div>
                 <div id="myPopup" class="popup hide">
@@ -411,19 +413,26 @@
                 '<label for="defaultSize">Default Size </label>' +
                 ' <input type="radio" class="sizeRadio" id="ChangeSize" name="radio-group2" >' +
                 '<label for="ChangeSize">User defined Size  </label> <br> <br> </span>')
-            Sizecounter++;
+             $(".SizePopup-body").append('<div id="sizeOptDiv"><p>Please input a number between 100 and 1000:</p> <strong> Width: </strong>'
+                + '<input id="widthbox" type="text" name="width" maxlength="4" size="4" value="550" disabled>'
+                + '<strong> Height: </strong> <input id="heightbox" type="text" name="height" maxlength="4" value="300" size="4" disabled></div>');
+                Sizecounter++;
         }
     }
 
     $(document).on('change', '[class="sizeRadio"]', function () {
         if ($('#defaultSize').is(':checked')) {
-            $('#sizeOptDiv').remove();
+            // $('#sizeOptDiv').remove(); //clear if alredy exists
+            // $('#widthbox').val("400");
+            $('#widthbox').prop('disabled', true);
+            $('#heightbox').prop('disabled', true);
         }
         else if ($('#ChangeSize').is(':checked')) {
-            $('#sizeOptDiv').remove(); //clear if alredy exists
-            $(".SizePopup-body").append('<div id="sizeOptDiv"><br><p>Please input a number between 100 and 1000:</p> <strong> Width: </strong>'
-                + '<input id="widthbox" type="text" name="width" maxlength="4" size="4" required>'
-                + '<strong> Height: </strong> <input id="heightbox" type="text" name="height" maxlength="4" size="4"required></div>');
+
+            $('#widthbox').prop('disabled', false);
+            $('#heightbox').prop('disabled', false);
+
+
         }
     });
 
@@ -453,8 +462,9 @@
     }
 
     function getNewColors(csvcolors) {
-
-        if (csvcolors[0][0] == 0) {
+        newColors.splice(0,newColors.length)
+      
+      if (csvcolors[0][0] == 0) {
             const transposed = csvcolors;
             const res = transposed.map(row => row.reduce((acc, col, ind) => {
                 acc[transposed[ind]] = col; return acc
@@ -463,7 +473,7 @@
             for (i = 0; i < csvcolors.length; i++) {
                 newColors.push(transposed[i][1]);
             }
-            updateColors();
+        updateColors();
         }
         else {
             alert('Please check CSV Format');
@@ -494,7 +504,7 @@
             drawChart();
             drawLine();
             checkLabels();
-            setTimeout(downloadPNG, 3000); //give it time to draw
+            // setTimeout(downloadPNG, 3000); //give it time to draw
         }
         else if ($('#ChangeSize').is(':checked')) {
             var width = parseInt($("#widthbox").val());
@@ -507,7 +517,7 @@
                 drawChart();
                 drawLine();
                 checkLabels();
-                setTimeout(downloadPNG, 3000); //give it time to draw
+                // setTimeout(downloadPNG, 3000); //give it time to draw
             }
             else {
                 alert("invalid width or height");
@@ -563,7 +573,6 @@
     }
     function changecolors() {
         temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
-
         if (changeColorsCounter <= 0) { //only initilaze once!
             $('.popup-body').empty(); //clear existing actors
 
