@@ -1,8 +1,3 @@
-// Define margins        
-var margin = { top: 30, right: 20, bottom: 30, left: 50 },
-  width = 500 - margin.left - margin.right,
-  height = 270 - margin.top - margin.bottom;
-
 // data from load.js (session data)
 var ActorsNamesAllSce = JSON.parse(sessionStorage.getItem("ActorsNames"));
 var ActorsPositions = JSON.parse(sessionStorage.getItem("ActorsPositions"));
@@ -11,20 +6,32 @@ var NumOfTurns = sessionStorage.getItem("NumOfTurns");
 var selectedDimNum = 0;
 var selectedScenNum = sessionStorage.getItem("selectedScen");
 var defaultColors = sessionStorage.getItem("defaultColors");
+var svgWidth2 = 550;
+var svgheight2=300;
+
+function getNewResoulution(w,h){
+  svgWidth2= w;
+  svgheight2 = h;
+}
 
 function drawLine() {
 
+// Define margins        
+var margin = { top: 30, right: 20, bottom: 30, left: 50 },
+  width = svgWidth2 - margin.left - margin.right,
+  height = svgheight2 - margin.top - margin.bottom;
+
   // Clear the exiting chart
-  d3.select("#chart").html("");
+  d3.select("#MainLineChart").html("");
   d3.select("#legend").html("");
 
-  var svg = d3.select("#chart")
+  var svg = d3.select("#MainLineChart")
     .append("svg")
     .attr("width", "100%")
     .attr("height", "100%")
-    .attr("preserveAspectRatio", "xMidYMid meet")
-    .attr("viewBox", "0 0 500 300")
-    .append("g")
+    .attr("viewBox", "0 0 "+" "+ svgWidth2+" "+svgheight2 )
+     .attr("preserveAspectRatio", "xMidYMid meet")
+     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
   var svg2 = d3.select("#legend")
@@ -117,6 +124,7 @@ function drawLine() {
 
   //text label for the x axis
   svg.append("text")
+  .attr("class", "CharLabel")
     .attr("transform",
       "translate(" + (width / 2) + " ," +
       (height + 30) + ")")
@@ -135,6 +143,7 @@ function drawLine() {
 
   // text label for the y axis
   svg.append("text")
+  .attr("class", "CharLabel")
     .attr("transform", "rotate(-90)")
     .attr("y", 0 - margin.left)
     .attr("x", 0 - (height / 2))
@@ -168,7 +177,7 @@ function drawLine() {
   bargnsDataByTurn.forEach(function (obj) { obj["PointVisible"] = false; });
 
   //to show details about each bargain
-  var tooltip = d3.select('#chart')
+  var tooltip = d3.select('#MainLineChart')
     .append('div')
     .attr('class', 'tooltip')
     .style("display", "none")

@@ -6,26 +6,32 @@ var NumOfTurns = sessionStorage.getItem("NumOfTurns");
 var effpow = JSON.parse(sessionStorage.getItem("effpow"));
 var ActorsObj2 = JSON.parse(sessionStorage.getItem("ActorsObj"));
 var selectedDimNum = 0;
+var svgWidth2 = 550;
+var svgheight2=300;
 
-var margin = { top: 30, right: 20, bottom: 30, left: 50 },
-    width2 = 460 - margin.left - margin.right,
-    height = 270 - margin.top - margin.bottom;
-
+function getNewResoulution(w,h){
+    svgWidth2= w;
+    svgheight2 = h;
+}
 
 function drawChart() {
+
+var margin = { top: 30, right: 20, bottom: 30, left: 50 },
+    width2 = svgWidth2 - margin.left - margin.right,
+    height = svgheight2 - margin.top - margin.bottom;
 
     // Clear the exiting chart
     d3.select("#MainBarChart").html("");
     d3.select("#Barlegend").html("");
-
+    
     var svg = d3.select("#MainBarChart")
         .append("svg")
         .attr("width", "100%")
-        .attr("width", "100%")
-        .attr("preserveAspectRatio", "xMidYMid meet")
-        .attr("viewBox", "0 0 550 300")
+        .attr("height", "100%")
+        .attr("viewBox", "0 0 "+" "+ svgWidth2+" "+svgheight2 )
+        .attr("preserveAspectRatio", "xMidYMid meet")   
         .append("g")
-        .attr("transform", "translate(" + (margin.left + 40) + "," + margin.top + ")");
+        .attr("transform", "translate(" + (margin.left ) + "," + margin.top +  ")");
 
     var svg3 = d3.select("#Barlegend")
         .append("svg")
@@ -202,6 +208,7 @@ function drawChart() {
 
     // text label for the x axis
     svg.append("text")
+    .attr("class", "CharLabel")//used it to view and hide lablels when downloading
         .attr("transform", "translate(" + (width2 / 2) + " ," + (height + 30) + ")")
         .style("text-anchor", "middle")
         .text("Position");
@@ -210,22 +217,15 @@ function drawChart() {
         .attr("class", "y axis")
         .call(yAxis);
 
-    // text label for the y axis
-    svg.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", -30 - margin.left)
-        .attr("x", 0 - (height / 2))
-        .attr("dy", "1em")
-        .style("text-anchor", "middle")
-        .text("Effective Power");
 
     svg.append("text")
+    .attr("class", "CharLabel")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - margin.left)
         .attr("x", 0 - (height / 2))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
-        .text("Influence x Salience");
+        .text("Effective Power (Influence x Salience)");
 
     var legend = svg3.append("g")
         .selectAll("g")
