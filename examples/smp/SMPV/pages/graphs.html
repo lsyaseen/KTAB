@@ -572,6 +572,7 @@
 
     }
     function changecolors() {
+        $('#txtFileUpload').val("");  
         temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
         if (changeColorsCounter <= 0) { //only initilaze once!
             $('.popup-body').empty(); //clear existing actors
