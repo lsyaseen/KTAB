@@ -91,7 +91,6 @@
     position: relative;
     padding-left: 28px;
     padding-right: 30px;
-    
     cursor: pointer;
     line-height: 20px;
     display: inline-block;
@@ -131,4 +130,16 @@
     opacity: 1;
     -webkit-transform: scale(1);
     transform: scale(1);
+}
+.canvasDiv {
+  position: absolute;
+  width: 550px;
+  height: 300px;
+}
+.popup-footer{
+float: left;
+margin-top:7%;
+}
+#DivUplad{
+  padding-bottom:5%;
 }

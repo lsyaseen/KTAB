@@ -35,7 +35,11 @@
     <link href="../vendor/charts/charts.css" rel="stylesheet">
 
     <!-- sql.js -->
-    <script src="../vendor/sql\js/sql.js"></script>
+    <script src="../vendor/sql/js/sql.js"></script>
+
+    <!-- papaparse.js -->
+    <script src="../vendor/PapaParse/papaparse.js"></script>
+
 
 </head>
 
@@ -133,10 +137,12 @@
                                 <div class="tab-pane fade in active" id="LineGraphTab">
                                     <!-- Default 1 -->
                                     <div class="container-fluid">
-                                        <canvas id="canvas" width="1020px" height="768px" style="display:none;"></canvas>
+                                        <div class="canvasDiv">
+                                            <canvas id="canvas" style="display:none;"></canvas>
+                                        </div>
                                         <div class="col-sm-12 col-md-12 col-lg-8">
                                             <div class="panel panel-default">
-                                                <div id="chart" class="panel-body "> </div>
+                                                <div id="MainLineChart" class="panel-body "> </div>
                                             </div>
                                         </div>
                                         <div class="col-sm-12  col-md-12 col-md-offset-0 col-lg-4">
@@ -151,7 +157,9 @@
                                 <!-- //2nd tab -->
                                 <div class="tab-pane fade" id="BarGraphTab">
                                     <div class="container-fluid">
-                                        <canvas id="Barcanvas" width="1020px" height="768px" style="display:none;"></canvas>
+                                        <div class="canvasDiv">
+                                            <canvas id="Barcanvas" style="display:none;"></canvas>
+                                        </div>
                                         <div class="col-sm-12 col-md-12 col-lg-8">
                                             <div class="panel panel-default">
                                                 <form id="yAxisScale">
@@ -183,8 +191,21 @@
 
             <div class="row space">
                 <div class="col-sm-14  col-md-14  col-lg-4">
-                    <button class="btn btn-success" onclick="downloadPNG()">Download Chart as PNG</button>
+                    <button class="toggle btn btn-success" data-target="SizePopup" onclick="ChangeresolutionandDownload()">Edit and Download</button>
                     <button class="toggle btn btn-success" data-target="myPopup" onclick="changecolors()"> Change Colors</button>
+                </div>
+                <div id="SizePopup" class="popup hide">
+                    <div class="popup-header">
+                        <span class="close toggle" data-target="SizePopup">close</span>
+                    </div>
+                    <div class="SizePopup-body">
+                    </div>
+                    <div class="SizePopup-footer">
+                        <br>
+                        <button class="toggle button" data-target="SizePopup" onclick="GetNewSize()">Confirm Edits</button>
+                        <button class="toggle button" data-target="SizePopup" onclick="downloadPNG()">download</button>
+
+                    </div>
                 </div>
                 <div id="myPopup" class="popup hide">
                     <div class="popup-header">
@@ -193,8 +214,16 @@
                     <div class="popup-body">
                     </div>
                     <div class="popup-footer">
-                        <br>
-                        <button class="toggle button" data-target="myPopup" onclick="saveSelectedColors()">Apply Changes</button>
+                        <div id="DivUplad">
+                            <span>
+                                <strong> Import Colors from a CSV : </strong>
+                            </span>
+                            <input type="file" name="File Upload" id="txtFileUpload" accept=".csv" />
+                        </div>
+
+                        <div>
+                            <button class="toggle button" data-target="myPopup" onclick="saveSelectedColors()">Apply Changes</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -248,7 +277,8 @@
     var ActorsObj;
     var temActorsObj
     var changeColorsCounter = 0;
-
+    var Sizecounter = 0;
+    var newColors = [];
     document.getElementById('NumOfscen').innerHTML = ScenarioArray.length;
     document.getElementById('SecnarioDesc').innerHTML = ScenarioDesc;
     document.getElementById('NumOfActors').innerHTML = NumOfActors;
@@ -363,7 +393,6 @@
         var colors3 = d3.scaleOrdinal()
             .domain(namesArray)
             .range(defaultColors);
-
         var actors2 = namesArray.map(function (row, i) {
             return {
                 actor_name: row,
@@ -371,11 +400,139 @@
                 color: colors3(row),
             }
         });
-
         sessionStorage.setItem("ActorsObj", JSON.stringify(actors2));
-
         ActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
     }
+
+    function ChangeresolutionandDownload() {
+        if (Sizecounter <= 0) { //to only appened once
+            $(".SizePopup-body").append('<div> <strong> Image resolution :</strong> </div> ');
+            $(".SizePopup-body").append('<div><br> <input type="checkbox" name="Labels" id="RemoveLabels" value="RemoveLabels" > Remove Lables</div>');
+            $(".SizePopup-body").append('<div id="sizeOpt" </div> ')
+            $("#sizeOpt").append('<br><span> <input type="radio" class="sizeRadio" id="defaultSize" name="radio-group2" checked>' +
+                '<label for="defaultSize">Default Size </label>' +
+                ' <input type="radio" class="sizeRadio" id="ChangeSize" name="radio-group2" >' +
+                '<label for="ChangeSize">User defined Size  </label> <br> <br> </span>')
+             $(".SizePopup-body").append('<div id="sizeOptDiv"><p>Please input a number between 100 and 1000:</p> <strong> Width: </strong>'
+                + '<input id="widthbox" type="text" name="width" maxlength="4" size="4" value="550" disabled>'
+                + '<strong> Height: </strong> <input id="heightbox" type="text" name="height" maxlength="4" value="300" size="4" disabled></div>');
+                Sizecounter++;
+        }
+    }
+
+    $(document).on('change', '[class="sizeRadio"]', function () {
+        if ($('#defaultSize').is(':checked')) {
+            $('#widthbox').val("550");
+            $('#heightbox').val(300);
+
+            $('#widthbox').prop('disabled', true);
+            $('#heightbox').prop('disabled', true);
+        }
+        else if ($('#ChangeSize').is(':checked')) {
+
+            $('#widthbox').prop('disabled', false);
+            $('#heightbox').prop('disabled', false);
+
+
+        }
+    });
+
+    //parse the csv file
+    document.getElementById('txtFileUpload').addEventListener('change', upload, false);
+
+    function upload(evt) {
+
+        var data = null;
+        var file = evt.target.files[0];
+        var reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload = function (event) {
+            var csvData = event.target.result;
+            var data = Papa.parse(csvData, {
+                header: false,
+                skipEmptyLines: true,
+                dynamicTyping: true,
+                complete: function (results) {
+                    getNewColors(results.data)
+                }
+            });
+        };
+        reader.onerror = function () {
+            alert('Unable to read ' + file.fileName);
+        };
+    }
+
+    function getNewColors(csvcolors) {
+        newColors.splice(0,newColors.length)
+      if (csvcolors[0][0] == 0) {
+            const transposed = csvcolors;
+            const res = transposed.map(row => row.reduce((acc, col, ind) => {
+                acc[transposed[ind]] = col; return acc
+            }, {}))
+
+            for (i = 0; i < csvcolors.length; i++) {
+                newColors.push(transposed[i][1]);
+            }
+        updateColors();
+        }
+        else {
+            alert('Please check CSV Format');
+        }
+    }
+
+    function updateColors() {
+        temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
+        if (temActorsObj.length < newColors.length) {
+            for (i = 0; i < temActorsObj.length; i++) {
+                temActorsObj[i]["color"] = newColors[i];
+                $("#" + temActorsObj[i].actor_name).colorpicker("val", newColors[i]);
+            } }
+         else {
+            for (i = 0; i < newColors.length; i++) {
+                temActorsObj[i]["color"] = newColors[i];
+                $("#" + temActorsObj[i].actor_name).colorpicker("val", newColors[i]);
+            }    }
+        sessionStorage.setItem("ActorsObj", JSON.stringify(temActorsObj));
+    }
+
+    function GetNewSize() {
+
+        if ($('#defaultSize').is(':checked')) {
+            getNewResoulution(550, 300);
+            $('.canvasDiv').height(300);//change canvas div size
+            $('.canvasDiv').width(550);
+            drawChart();
+            drawLine();
+            checkLabels();
+            // setTimeout(downloadPNG, 3000); //give it time to draw
+        }
+        else if ($('#ChangeSize').is(':checked')) {
+            var width = parseInt($("#widthbox").val());
+            var height = parseInt($("#heightbox").val());
+
+            if (width >= 100 && width <= 1000 && width != NaN && height >= 100 && height <= 1000 && height != NaN) {
+                $('.canvasDiv').height(height);//change canvas div size
+                $('.canvasDiv').width(width);
+                getNewResoulution(width, height);
+                drawChart();
+                drawLine();
+                checkLabels();
+                // setTimeout(downloadPNG, 3000); //give it time to draw
+            }
+            else {
+                alert("invalid width or height");
+            }
+        }
+        function checkLabels() {
+            if ($('#RemoveLabels').is(':checked')) {
+                $(".CharLabel").hide();
+            }
+            else {
+                $(".CharLabel").show();
+            }
+        }
+    }
+
     function downloadPNG() {
 
         var id = $('.tab-content .active').attr('id');
@@ -383,7 +540,7 @@
         // which tap is active
         if (id == "LineGraphTab") {
 
-            var $container = $('#chart'),
+            var $container = $('#MainLineChart'),
                 // Canvg requires trimmed content
                 content = $container.html().trim(),
                 canvas = document.getElementById('canvas');
@@ -400,12 +557,10 @@
         else {
 
             var $barcontainer = $('#MainBarChart'),
-                // Canvg requires trimmed content
                 Barcontent = $barcontainer.html().trim(),
                 canvas_bar = document.getElementById('Barcanvas');
             var image = canvas_bar.toDataURL("image/png").replace("image/png", "image/octet-stream");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
             canvg(canvas_bar, Barcontent);
-
             var image = canvas_bar.toDataURL("image/png")
             let filename = 'BarChart'
             let barlink = document.createElement('a')
@@ -417,8 +572,8 @@
 
     }
     function changecolors() {
+        $('#txtFileUpload').val("");  
         temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
-
         if (changeColorsCounter <= 0) { //only initilaze once!
             $('.popup-body').empty(); //clear existing actors
 
@@ -427,10 +582,8 @@
                 $("#Div" + temActorsObj[i].actor_name).append('<br><span><strong>' + temActorsObj[i].actor_name + '</strong></span>' +
                     '<input style="width:100px;" id="' + temActorsObj[i].actor_name + '" class="colorPicker evo-cp0" >')
 
-
                 $("#" + temActorsObj[i].actor_name).colorpicker({ showOn: 'button' })
                 $("#" + temActorsObj[i].actor_name).colorpicker("val", temActorsObj[i].color);
-
 
                 $("#" + temActorsObj[i].actor_name).on("change.color", function (event, color) {
                     //find index of selected actor to change its color
