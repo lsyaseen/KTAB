@@ -214,7 +214,7 @@
                     <div class="popup-body">
                     </div>
                     <div class="popup-footer">
-                        <div id="DivUplad">
+                        <div id="DivUpload">
                             <span>
                                 <strong> Import Colors from a CSV : </strong>
                             </span>
@@ -279,12 +279,15 @@
     var changeColorsCounter = 0;
     var Sizecounter = 0;
     var newColors = [];
+    var NoOfBars;
+    var axisLables;
+
     document.getElementById('NumOfscen').innerHTML = ScenarioArray.length;
     document.getElementById('SecnarioDesc').innerHTML = ScenarioDesc;
     document.getElementById('NumOfActors').innerHTML = NumOfActors;
     document.getElementById('NumOfDim').innerHTML = NumOfDim;
-    document.getElementById('NumOfActors').innerHTML = ActorsNames[selectedScen2].length;;
-
+    document.getElementById('NumOfActors').innerHTML = ActorsNames[selectedScen2].length;
+    
     getActorsData();
 
     $(document).ready(function () {
@@ -416,6 +419,8 @@
              $(".SizePopup-body").append('<div id="sizeOptDiv"><p>Please input a number between 100 and 1000:</p> <strong> Width: </strong>'
                 + '<input id="widthbox" type="text" name="width" maxlength="4" size="4" value="550" disabled>'
                 + '<strong> Height: </strong> <input id="heightbox" type="text" name="height" maxlength="4" value="300" size="4" disabled></div>');
+                $(".SizePopup-body").append('<div id="ChangeNBars"><p><strong> Number of Bars: </strong>'
+                + '<input id="NoOfBars" type="text" name="BarsNo" maxlength="2" size="2" value="25" ></p></div>');
                 Sizecounter++;
         }
     }
@@ -437,6 +442,14 @@
         }
     });
 
+$(document).on('change', '[id="NoOfBars"]', function () {
+ NoOfBars = parseInt($("#NoOfBars").val());
+ if (NoOfBars <10 || NoOfBars > 50 ){
+    alert('Please chose a number between 10 and 50');
+     $('#NoOfBars').val(25); //back to default
+NoOfBars =parseInt($("#NoOfBars").val());
+ }
+});
     //parse the csv file
     document.getElementById('txtFileUpload').addEventListener('change', upload, false);
 
@@ -498,7 +511,7 @@
     function GetNewSize() {
 
         if ($('#defaultSize').is(':checked')) {
-            getNewResoulution(550, 300);
+            getNewResoulution(550, 300,NoOfBars,axisLables);
             $('.canvasDiv').height(300);//change canvas div size
             $('.canvasDiv').width(550);
             drawChart();
@@ -513,7 +526,7 @@
             if (width >= 100 && width <= 1000 && width != NaN && height >= 100 && height <= 1000 && height != NaN) {
                 $('.canvasDiv').height(height);//change canvas div size
                 $('.canvasDiv').width(width);
-                getNewResoulution(width, height);
+                getNewResoulution(width, height,NoOfBars,axisLables);
                 drawChart();
                 drawLine();
                 checkLabels();
@@ -526,9 +539,14 @@
         function checkLabels() {
             if ($('#RemoveLabels').is(':checked')) {
                 $(".CharLabel").hide();
+                $(".axis text").hide();
+                axisLables = false;
             }
             else {
                 $(".CharLabel").show();
+                $(".axis text").show();
+                axisLables = true;
+
             }
         }
     }

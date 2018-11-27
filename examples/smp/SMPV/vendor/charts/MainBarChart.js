@@ -7,31 +7,35 @@ var effpow = JSON.parse(sessionStorage.getItem("effpow"));
 var ActorsObj2 = JSON.parse(sessionStorage.getItem("ActorsObj"));
 var selectedDimNum = 0;
 var svgWidth2 = 550;
-var svgheight2=300;
+var svgheight2 = 300;
+var NoOfBars = 25; //default
+var axisLables = true;
 
-function getNewResoulution(w,h){
-    svgWidth2= w;
+function getNewResoulution(w, h, Bn,lables) {
+    svgWidth2 = w;
     svgheight2 = h;
+    NoOfBars = Bn;
+    axisLables= lables;
 }
 
 function drawChart() {
 
-var margin = { top: 30, right: 20, bottom: 30, left: 50 },
-    width2 = svgWidth2 - margin.left - margin.right,
-    height = svgheight2 - margin.top - margin.bottom;
+    var margin = { top: 30, right: 20, bottom: 30, left: 50 },
+        width2 = svgWidth2 - margin.left - margin.right,
+        height = svgheight2 - margin.top - margin.bottom;
 
     // Clear the exiting chart
     d3.select("#MainBarChart").html("");
     d3.select("#Barlegend").html("");
-    
+
     var svg = d3.select("#MainBarChart")
         .append("svg")
         .attr("width", "100%")
         .attr("height", "100%")
-        .attr("viewBox", "0 0 "+" "+ svgWidth2+" "+svgheight2 )
-        .attr("preserveAspectRatio", "xMidYMid meet")   
+        .attr("viewBox", "0 0 " + " " + svgWidth2 + " " + svgheight2)
+        .attr("preserveAspectRatio", "xMidYMid meet")
         .append("g")
-        .attr("transform", "translate(" + (margin.left ) + "," + margin.top +  ")");
+        .attr("transform", "translate(" + (margin.left) + "," + margin.top + ")");
 
     var svg3 = d3.select("#Barlegend")
         .append("svg")
@@ -42,11 +46,17 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
         .attr('transform', "translate(" + 15 + "," + 15 + ")")
         .append("g")
         .attr("class", "legend2");
+
     var xScale = d3.scaleLinear()
         .range([0, width2]);
-
     var yScale = d3.scaleLinear()
         .range([height, 0]);
+
+    var rangearray = [];  //based on the no of bars
+    for (i = 0; i < NoOfBars; i++) {
+        rangearray.push(i);
+    }
+    var Qscale = d3.scaleQuantize().domain([0, 100]).range(rangearray);
 
     var PositionsArray = [],
         PositionsArray2 = [],
@@ -55,8 +65,7 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
         effpowArray2 = [],
         namesArray = [],
         highestRange = 0,
-        rows,
-        y_range,
+        rows = [],
         selectedRect,
         selectedLegend;
 
@@ -64,8 +73,6 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
 
     var xAxis = d3.axisBottom(xScale).scale(xScale);
     var yAxis = d3.axisLeft(yScale).scale(yScale);
-    var range0, range1, range2, range3, range4, range5, range6, range7, range8, range9; // initializing an array for each range of positions 
-
     turn = currentTurn; //current turn from slider
 
     for (var i = 0; i < allpos[selectedScenNum][selectedDimNum].length; i += 1) {
@@ -95,21 +102,10 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
     for (var i = 0; i < positionsData.length; i++) {
         PositionsArray.push(positionsData[i][turn]); // it should be a var based on which turn is chosen
     }
-
     groupActors(PositionsArray);
 
     //adding range position
     namesArray.unshift("Actor");
-    range0.unshift(0);
-    range1.unshift(10);
-    range2.unshift(20);
-    range3.unshift(30);
-    range4.unshift(40);
-    range5.unshift(50);
-    range6.unshift(60);
-    range7.unshift(70);
-    range8.unshift(80);
-    range9.unshift(90);
 
     var result = rows.map(function (row) {
         return row.reduce(function (result, field, index) {
@@ -174,6 +170,7 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
     function make_y_gridlines() {
         return d3.axisLeft(yScale)
             .ticks(10)
+
     }
 
     // add the X gridlines
@@ -208,7 +205,7 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
 
     // text label for the x axis
     svg.append("text")
-    .attr("class", "CharLabel")//used it to view and hide lablels when downloading
+        .attr("class", "CharLabel")//used it to view and hide lablels when downloading
         .attr("transform", "translate(" + (width2 / 2) + " ," + (height + 30) + ")")
         .style("text-anchor", "middle")
         .text("Position");
@@ -219,7 +216,7 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
 
 
     svg.append("text")
-    .attr("class", "CharLabel")
+        .attr("class", "CharLabel")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - margin.left)
         .attr("x", 0 - (height / 2))
@@ -287,6 +284,14 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
         .attr("font-size", "10px")
         .attr("font-weight", "bold");
 
+        if (axisLables == true){
+    $(".CharLabel").show();
+    $(".axis text").show();
+}
+else if (axisLables == false){
+    $(".CharLabel").hide();
+    $(".axis text").hide();
+}
     function onMouseover() {
 
         ActorsObj2.forEach(function (d, i) {
@@ -340,7 +345,7 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
 
     function findHighestEffpow() {
 
-        for (var turnNo = 0; turnNo < turns; turnNo++) {
+        for (var turnNo = 0; turnNo < turns - 1; turnNo++) {
             // repeat for all turns to find the highest range and set it as y-axes max value
             for (var i = 0; i < positionsData.length; i++) {
                 PositionsArray2.push(positionsData[i][turnNo + 1]);
@@ -370,9 +375,11 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
             .selectAll("rect")
             .data(function (d) { return d.values; })
             .enter().append("rect")
-            .attr("x", function (d, i) { return xScale((barnames[i])) + 2.5; }) // + to shift bars 
+            .attr("x", function (d, i) {
+                return xScale((barnames[i])) + 2.5;
+            }) // + to shift bars 
             .attr("width", function (d) {
-                var barWidth = width2 / (data[0].values.length) - 4;
+                var barWidth = width2 / (data[0].values.length)- 4;
                 return barWidth
             })
             .attr("y", height)
@@ -399,56 +406,23 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
     }
 
     function groupActors(e) {
-        // initializing an array for each range of positions 
-        //filling it with zeroes cuz d3 stack layout is expecting arrays of the same length. 
-        range0 = Array(26).fill(0);
-        range1 = Array(26).fill(0);
-        range2 = Array(26).fill(0);
-        range3 = Array(26).fill(0);
-        range4 = Array(26).fill(0);
-        range5 = Array(26).fill(0);
-        range6 = Array(26).fill(0);
-        range7 = Array(26).fill(0);
-        range8 = Array(26).fill(0);
-        range9 = Array(26).fill(0);
 
-        for (i = 0; i < e.length; i++) {
+        var NoOfActors = e.length;
 
-            if (e[i] >= 0 && e[i] < 10) {
-                range0[i] = +effpowArray2[i];
-            }
-            else if (e[i] >= 10 && e[i] < 20) {
-                range1[i] = +effpowArray2[i];
-            }
-            else if (e[i] >= 20 && e[i] < 30) {
-                range2[i] = +effpowArray2[i];
-            }
-            else if (e[i] >= 30 && e[i] < 40) {
-                range3[i] = +effpowArray2[i];
-            }
-            else if (e[i] >= 40 && e[i] < 50) {
-                range4[i] = +effpowArray2[i];
-            }
-            else if (e[i] >= 50 && e[i] < 60) {
-                range5[i] = +effpowArray2[i];
-            }
-            else if (e[i] >= 60 && e[i] < 70) {
-                range6[i] = +effpowArray2[i];
-            }
-            else if (e[i] >= 70 && e[i] < 80) {
-                range7[i] = +effpowArray2[i];
-            }
-            else if (e[i] >= 80 && e[i] < 90) {
-                range8[i] = +effpowArray2[i];
-            }
-            else if (e[i] >= 90 && e[i] < 100) {
-                range9[i] = +effpowArray2[i];
-            }
+        for (i = 0; i <= NoOfBars - 1; i++) {
+            rows[i] = Array(NoOfActors).fill(0);
         }
-        rows = [range0, range1, range2, range3, range4, range5, range6, range7, range8, range9];
+        for (i = 0; i < NoOfActors; i++) {
+            var temp = Qscale(e[i]);
+            rows[temp][i] = +effpowArray2[i];
+        }
+        for (i = 0; i <= NoOfBars - 1; i++) {
+            var temp2 = Qscale.invertExtent(i)[0];
+            rows[i].unshift(temp2);
+        }
 
         // sum all ranges and find the highest		
-        for (var i = 0; i < 10; i++) {
+        for (var i = 0; i < NoOfBars; i++) {
             var sum = (rows[i]).reduce(add, 0);
             var temp = sum;
             if (highestRange < temp)
