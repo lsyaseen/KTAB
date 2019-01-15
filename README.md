@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.org/KAPSARC/KTAB.svg?branch=master)](https://travis-ci.org/KAPSARC/KTAB)
-[![Build status](https://ci.appveyor.com/api/projects/status/iebb8gg63ugqwfpi/branch/master?svg=true)](https://ci.appveyor.com/project/davidrpugh/ktab/branch/master)
 
 
 # KTAB #
