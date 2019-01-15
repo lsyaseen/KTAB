@@ -82,7 +82,7 @@ Open the kutils project with your IDE; it should display two targets: kutils and
 of some of the utility functions.
 
 The INSTALL  target for kutils will install it into  C:/local for Windows and /usr/local for Linux.
- In fact, the CMake files of KTAB expect all the libraries to be in C:/local for Windows: fltk, kmodel, sqlite, tinyxml, kutil. Under Linux, the kutils, kmodel files will be installed to /usr/local. There is no need to modify your PATH under either Linux or Windows.
+ In fact, the CMake files of KTAB expect all the libraries to be in C:/local for Windows: easyloggingpp, kmodel, sqlite, tinyxml, kutil. Under Linux, the kutils, kmodel files will be installed to /usr/local. There is no need to modify your PATH under either Linux or Windows.
 
 The demonstration program provides a help menu, as follows:
 
