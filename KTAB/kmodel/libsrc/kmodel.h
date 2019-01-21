@@ -127,6 +127,14 @@ ostream& operator<< (ostream& os, const VotingRule& vr);
 enum class StateTransMode {
   DeterminsticSTM=0, StochasticSTM
 };
+
+
+// Are competing bargains resolved in each actor queue separately and 
+// non-binding, or as binding bargains in most-supported order?
+enum class BargainResolutionMethod{
+  ActorQueues=0, BindingBest
+};
+
 const vector<string> StateTransModeNames = {
   "Deterministic", "Stochastic" };
 ostream& operator<< (ostream& os, const StateTransMode& stm);
@@ -316,6 +324,9 @@ public:
 
   // default state transition mode is deterministic, not stochastic
   StateTransMode stm = StateTransMode::DeterminsticSTM;
+  
+  // default bargain resolution method is ActorQueues
+  BargainResolutionMethod brm = BargainResolutionMethod::ActorQueues;
 
   // In the abstract, you run a model by stepping it until it is time to stop.
   // In detail, each step is likely to record copious information to

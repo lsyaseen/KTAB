@@ -29,6 +29,7 @@
 #include <QSqlQuery>
 #include <QVariant>
 #include <QSqlError>
+#include <set>
 
 namespace SMPLib {
 using std::function;
@@ -70,6 +71,23 @@ ostream& operator<< (ostream& os, const InterVecBrgn& ivb) {
   string s = nameFromEnum<InterVecBrgn>(ivb, InterVecBrgnNames);
   os << s;
   return os;
+}
+
+// --------------------------------------------
+unsigned int ndxMaxProb(const KMatrix & cv) {
+    const double pTol = 1E-8;
+    if (fabs(KBase::sum(cv) - 1.0) >= pTol) {
+        throw KException("ndxMaxProb: Sum of cv is greater than 1");
+    }
+    if (0 == cv.numR()) {
+        throw KException("ndxMaxProb: cv doesn't have rows");
+    }
+    if (1 != cv.numC()) {
+        throw KException("ndxMaxProb: cv must be a column matrix");
+    }
+    auto ndxIJ = ndxMaxAbs(cv);
+    unsigned int iMax = get<0>(ndxIJ);
+    return iMax;
 }
 
 // --------------------------------------------
@@ -238,8 +256,10 @@ SMPState* SMPState::doBCN() {
 
   //model->commitDBTransaction();
 
+  // Resolution of competing proposed bargains
   LOG(INFO) << "Bargains to be resolved";
   showBargains(brgns);
+
 
   w = actrCaps();
   LOG(INFO) << "w:";
@@ -247,11 +267,28 @@ SMPState* SMPState::doBCN() {
 
   s2 = new SMPState(model);
 
-  auto thrCalcPosts = [this](unsigned int k) {
-    this->updateBestBrgnPositions(k);
-  };
+  
+    switch (model->brm) {
+    case KBase::BargainResolutionMethod::ActorQueues:
+    {
+        auto thrCalcPosts = [this](unsigned int k) { // thread to calculate positions
+            this->queueUpdatePstn(k);
+        };
+        KBase::groupThreads(thrCalcPosts, 0, na - 1);
+    }
+    
+    LOG(INFO) << "For debugging, do PCE over all bargains";
+    groupUpdatePstns();
+    
+    break;
 
-  KBase::groupThreads(thrCalcPosts, 0, na - 1);
+    case KBase::BargainResolutionMethod::BindingBest:
+        groupUpdatePstns();
+        break;
+    default:
+      throw KException("SMPState::doBCN: Unrecognized BargainResolutionMethod");
+      break;
+    }
 
   //model->beginDBTransaction();
 
@@ -610,84 +647,13 @@ void SMPState::doBCN(unsigned int i) {
     }
 }
 
-void SMPState::updateBestBrgnPositions(int k) {
-  auto ndxMaxProb = [](const KMatrix & cv) {
-    const double pTol = 1E-8;
-    if (fabs(KBase::sum(cv) - 1.0) >= pTol) {
-      throw KException("SMPState::updateBestBrgnPositions: Sum of cv is greater than 1");
-    }
-    if (0 == cv.numR()) {
-      throw KException("SMPState::updateBestBrgnPositions: cv doesn't have records");
-    }
-    if (1 != cv.numC()) {
-      throw KException("SMPState::updateBestBrgnPositions: cv must be a column matrix");
-    }
-    auto ndxIJ = ndxMaxAbs(cv);
-    unsigned int iMax = get<0>(ndxIJ);
-    return iMax;
-  };
-
-  // what is the utility to actor nai of the state resulting after
-  // the nbj-th bargain of the k-th actor is implemented?
-  auto brgnUtil = [this](unsigned int nk, unsigned int nai, unsigned int nbj) {
-    const unsigned int na = model->numAct;
-    BargainSMP * b = brgns[nk][nbj];
-    if (nullptr == b) {
-      throw KException("SMPState::updateBestBrgnPositions: bargain smp pointer is null");
-    }
-    double uAvrg = 0.0;
-
-    if (b->actInit == b->actRcvr) { // SQ bargain
-      uAvrg = 0.0;
-      for (unsigned int n = 0; n < na; n++) {
-        // nai's estimate of the utility to nai of position n, i.e. the true value
-        uAvrg = uAvrg + aUtil[nai](nai, n);
-      }
-    }
-
-    else { // all positions unchanged, except Init and Rcvr
-      uAvrg = 0.0;
-      auto ndxInit = model->actrNdx(b->actInit);
-      if ((0 > ndxInit) || (ndxInit >= na)) { // must find it
-        throw KException("SMPState::updateBestBrgnPositions This initiator actor number is not present in model");
-      }
-      double uPosInit = ((SMPActor*)(model->actrs[nai]))->posUtil(&(b->posInit), this);
-      uAvrg = uAvrg + uPosInit;
-
-      auto ndxRcvr = model->actrNdx(b->actRcvr);
-      if ((0 > ndxRcvr) || (ndxRcvr >= na)) {
-        throw KException("SMPState::updateBestBrgnPositions: This receiver actor number is not present in model");
-      }
-      double uPosRcvr = ((SMPActor*)(model->actrs[nai]))->posUtil(&(b->posRcvr), this);
-      uAvrg = uAvrg + uPosRcvr;
-
-      for (unsigned int n = 0; n < na; n++) {
-        if ((ndxInit != n) && (ndxRcvr != n)) {
-          // again, nai's estimate of the utility to nai of position n, i.e. the true value
-          uAvrg = uAvrg + aUtil[nai](nai, n);
-        }
-      }
-    }
-
-    uAvrg = uAvrg / na;
-
-    if (0.0 >= uAvrg) { // none negative, at least own is positive
-      throw KException("SMPState::updateBestBrgnPositions: uAvrg should be non-negative");
-    }
-    if (uAvrg > 1.0) { // can not all be over 1.0
-      throw KException("SMPState::updateBestBrgnPositions: uAvrg can't be over 1.0");
-    }
-    return uAvrg;
-  };
-  // end of λ-fn
 
 
-  // The key is to build the usual matrix of U_ai (Brgn_m) for all bargains in brgns[k],
-  // making sure to divide the sum of the utilities of positions by 1/N
-  // so 0 <= Util(state after Brgn_m) <= 1, then do the standard scalarPCE for bargains involving k.
-
-    auto buk = [brgnUtil, k](unsigned int nai, unsigned int nbj) {
-      return brgnUtil(k, nai, nbj);
+void SMPState::queueUpdatePstn(int k) {
+    auto buk = [this, k](unsigned int nai, unsigned int nbj) {
+      BargainSMP * b = this->brgns[k][nbj];
+      double u2 = this->brgnStateUtil(nai, b);
+      return u2;
     };
     auto smod = dynamic_cast<SMPModel *>(model);
     unsigned int na = smod->numAct;
@@ -702,10 +668,10 @@ void SMPState::updateBestBrgnPositions(int k) {
     LOG(INFO) << "Doing scalarPCE for the" << nb << "bargains of actor" << k << "...";
     auto p = Model::scalarPCE(na, nb, w, u_im, smod->vrCltn, smod->vpm, smod->pcem, ReportingLevel::Medium);
     if (nb != p.numR()) {
-      throw KException("SMPState::updateBestBrgnPositions: number of bargains mismatched with scalar PCE row count");
+      throw KException("SMPState::queueUpdatePstn: number of bargains mismatched with scalar PCE row count");
     }
     if (1 != p.numC()) {
-      throw KException("SMPState::updateBestBrgnPositions: scalar pce column size is not 1");
+      throw KException("SMPState::queueUpdatePstn: scalar pce column size is not 1");
     }
     actorBargains.insert(map<unsigned int, KBase::KMatrix>::value_type(k, p));
 
@@ -718,12 +684,12 @@ void SMPState::updateBestBrgnPositions(int k) {
       mMax = model->rng->probSel(p);
       break;
     default:
-      throw KException("SMPState::updateBestBrgnPositions - unrecognized StateTransMode");
+      throw KException("SMPState::queueUpdatePstn - unrecognized StateTransMode");
       break;
     }
     // 0 <= mMax assured for uint
     if (mMax >= nb) {
-      throw KException("SMPState::updateBestBrgnPositions: Bargain number with max probability can't be more than bargain count");
+      throw KException("SMPState::queueUpdatePstn: Bargain number with max probability can't be more than bargain count");
     }
     actorMaxBrgNdx.insert(map<unsigned int, unsigned int>::value_type(k, mMax));
     auto bkm = brgns[k][mMax];
@@ -779,7 +745,7 @@ void SMPState::updateBestBrgnPositions(int k) {
       }
       else {
         LOG(INFO) << "unrecognized actor in bargain";
-        throw KException("SMPState::updateBestBrgnPositions: unrecognized actor in bargain");
+        throw KException("SMPState::queueUpdatePstn: unrecognized actor in bargain");
       }
 
       // If the actor has changed its position, record the bargain id
@@ -792,14 +758,127 @@ void SMPState::updateBestBrgnPositions(int k) {
       }
     }
     if (nullptr == pk) {
-      throw KException("SMPState::updateBestBrgnPositions: pk is null pointer");
+      throw KException("SMPState::queueUpdatePstn: pk is null pointer");
     }
 
     // Make sure that the pk is stored at right position in s2.
     s2->pstns[k] = pk;
 }
 
+void SMPState::groupUpdatePstns() {
+  const unsigned int na = model->numAct;
+    
+  // we use unordered sets, not ordered vectors
+  vector<unsigned int> uniqueBrgnID={};
+  vector<BargainSMP*> uniqueBrgn={};
+  
+  for (unsigned int i=0; i<na; i++) {
+    vector<BargainSMP*> bi = brgns[i];
+    unsigned int nbi = bi.size();
+    LOG(INFO) << "actor "<<i<<" has "<<nbi<< " bargains";
+    for (unsigned int j=0; j<nbi; j++) {
+      BargainSMP* bij = bi[j];
+      unsigned int bID = bij->getID();
+      unsigned int aI = model->actrNdx(bij->actInit);
+      unsigned int aR = model->actrNdx(bij->actRcvr);
+      LOG(INFO) << bID <<": "<<aI<<" -> "<<aR;
+      bool newP = (std::find(uniqueBrgn.begin(), uniqueBrgn.end(), bij) == uniqueBrgn.end());
+      if (newP) {
+        uniqueBrgn.push_back(bij);
+        uniqueBrgnID.push_back(bID);
+      }
+    }
+  }
+  
+  string brgnFormat = " %llu    ";
+  string bNums;
+  for (auto bID : uniqueBrgnID) {
+    bNums += KBase::getFormattedString(brgnFormat.c_str(),bID);
+  }
+    LOG(INFO) << "Unique bargain IDs:\n " << bNums;
+ 
+    unsigned int nb = uniqueBrgn.size();
+    auto buk = [this, uniqueBrgn](unsigned int nai, unsigned int nbj) {
+        const BargainSMP* b = uniqueBrgn[nbj];
+        double u2 = this->brgnStateUtil(nai, b);
+        return u2;
+    };
+    auto u_im = KMatrix::map(buk, na, nb);
+    LOG(INFO) << "u_im:";
+    u_im.mPrintf(" %.5f ");
 
+    LOG(INFO) << "Doing scalarPCE for the" << nb << "unique bargains of all actors ...";
+    auto smod = dynamic_cast<SMPModel *>(model);
+    auto p = Model::scalarPCE(na, nb, w, u_im, smod->vrCltn, smod->vpm, smod->pcem, ReportingLevel::Medium);
+    if (nb != p.numR()) {
+        throw KException("SMPState::groupUpdatePstns: number of bargains mismatched with scalar PCE row count");
+    }
+    if (1 != p.numC()) {
+        throw KException("SMPState::groupUpdatePstns: scalar pce column size is not 1");
+    }
+    
+    LOG(INFO) << "p[bi]:";
+    trans(p).mPrintf(" %.5f ");
+    trans(p).mPrintf(" %.2e");
+    
+    return;
+}
+
+  double SMPState::brgnStateUtil(unsigned int nai, const BargainSMP* b) const {
+    // The key is to build the usual matrix of U_ai (Brgn_m) for all bargains in brgns[k],
+    // making sure to divide the sum of the utilities of positions by 1/N
+    // so 0 <= Util(state after Brgn_m) <= 1, then do the standard scalarPCE for bargains involving k.
+
+    const unsigned int na = model->numAct;
+    if (nullptr == b) {
+      throw KException("SMPState::brgnStateUtil: bargain smp pointer is null");
+    }
+    double uAvrg = 0.0;
+
+    if (b->actInit == b->actRcvr) { // SQ bargain
+      uAvrg = 0.0;
+      for (unsigned int n = 0; n < na; n++) {
+        // nai's estimate of the utility to nai of position n, i.e. the true value
+        uAvrg = uAvrg + aUtil[nai](nai, n);
+      }
+    }
+
+    else { // all positions unchanged, except Init and Rcvr
+      uAvrg = 0.0;
+      auto ndxInit = model->actrNdx(b->actInit);
+      if ((0 > ndxInit) || (ndxInit >= na)) { // must find it
+        throw KException("SMPState::brgnStateUtil This initiator actor number is not present in model");
+      }
+      double uPosInit = ((SMPActor*)(model->actrs[nai]))->posUtil(&(b->posInit), this);
+      uAvrg = uAvrg + uPosInit;
+
+      auto ndxRcvr = model->actrNdx(b->actRcvr);
+      if ((0 > ndxRcvr) || (ndxRcvr >= na)) {
+        throw KException("SMPState::brgnStateUtil: This receiver actor number is not present in model");
+      }
+      double uPosRcvr = ((SMPActor*)(model->actrs[nai]))->posUtil(&(b->posRcvr), this);
+      uAvrg = uAvrg + uPosRcvr;
+
+      for (unsigned int n = 0; n < na; n++) {
+        if ((ndxInit != n) && (ndxRcvr != n)) {
+          // again, nai's estimate of the utility to nai of position n, i.e. the true value
+          uAvrg = uAvrg + aUtil[nai](nai, n);
+        }
+      }
+    }
+
+    uAvrg = uAvrg / na;
+
+    if (0.0 >= uAvrg) { // none negative, at least own is positive
+      throw KException("SMPState::brgnStateUtil: uAvrg should be non-negative");
+    }
+    if (uAvrg > 1.0) { // can not all be over 1.0
+      throw KException("SMPState::brgnStateUtil: uAvrg cannot be over 1.0");
+    }
+    return uAvrg;
+  }
+
+  
 // h's estimate of the victory probability and expected delta in utility for k from i challenging j,
 // compared to status quo.
 // Note that the  aUtil vector of KMatrix must be set before starting this.

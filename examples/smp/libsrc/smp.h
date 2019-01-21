@@ -248,6 +248,10 @@ private:
   // risk-aware probabilities are uProb
 
   KMatrix nra = KMatrix();
+  
+  
+  // Returns the utility to actor nai of the state resulting after the bargain is implemented
+  double brgnStateUtil(unsigned int nai, const BargainSMP* b) const;
 
   SMPState* doBCN();
 
@@ -306,7 +310,11 @@ private:
 
   std::mutex mtxLock;
 
-  void updateBestBrgnPositions(int k);
+  // update position of k-th actor from its queue of bargains
+  void queueUpdatePstn(int k);
+  
+  // update positions of all actors from complete group of bargains
+  void groupUpdatePstns();
 
   vector<double> calcVotes(KMatrix w, KMatrix u, int actor) const;
 
