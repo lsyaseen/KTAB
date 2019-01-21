@@ -1,10 +1,10 @@
 // data from load.js (session data)
-var ActorsNamesAllSce = JSON.parse(sessionStorage.getItem("ActorsNames"));
+// var ActorsNamesAllSce = JSON.parse(sessionStorage.getItem("ActorsNames"));
 var ActorsPositions = JSON.parse(sessionStorage.getItem("ActorsPositions"));
 var whyActorChanged = JSON.parse(sessionStorage.getItem("BargnsData"));
 var NumOfTurns = sessionStorage.getItem("NumOfTurns");
 var selectedDimNum = 0;
-var selectedScenNum = sessionStorage.getItem("selectedScen");
+// var selectedScenNum = sessionStorage.getItem("selectedScen");
 var defaultColors = sessionStorage.getItem("defaultColors");
 var svgWidth2 = 550;
 var svgheight2=300;
@@ -16,7 +16,12 @@ function getNewResoulution(w,h){
 
 function drawLine() {
 
-// Define margins        
+var ActorsNamesAllSce = ActorsNames,
+selectedScenNum = selectedScen,
+ActorsPositions = arrPos,
+whyActorChanged = arrBargns;
+
+    // Define margins        
 var margin = { top: 30, right: 20, bottom: 30, left: 50 },
   width = svgWidth2 - margin.left - margin.right,
   height = svgheight2 - margin.top - margin.bottom;
@@ -73,7 +78,7 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
     bargnsData.push(whyActorChanged[selectedScenNum][selectedDimNum][0][i]);
   }
 
-  turn = currentTurn; //current turn from slider
+turn = currentTurn; //current turn from slider
   turns = NumOfTurns - 1; //cuz we're starting from 0
 
   //show points till chosen turn

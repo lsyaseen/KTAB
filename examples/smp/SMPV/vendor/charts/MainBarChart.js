@@ -1,7 +1,7 @@
 
 // data from load.js (session data)
-var allpos = JSON.parse(sessionStorage.getItem("ActorsPositions"));
-var AllEffcPow = JSON.parse(sessionStorage.getItem("AllEffcPow"));
+// var allpos = JSON.parse(sessionStorage.getItem("ActorsPositions"));
+// var AllEffcPow = JSON.parse(sessionStorage.getItem("AllEffcPow"));
 var NumOfTurns = sessionStorage.getItem("NumOfTurns");
 var effpow = JSON.parse(sessionStorage.getItem("effpow"));
 var ActorsObj2 = JSON.parse(sessionStorage.getItem("ActorsObj"));
@@ -10,6 +10,7 @@ var svgWidth2 = 550;
 var svgheight2 = 300;
 var NoOfBars = 25; //default
 var axisLables = true;
+var currentTurn;
 
 function getNewResoulution(w, h, Bn,lables) {
     svgWidth2 = w;
@@ -17,9 +18,17 @@ function getNewResoulution(w, h, Bn,lables) {
     NoOfBars = Bn;
     axisLables= lables;
 }
+// function getTurnData(turn){
+
+//     currentTurn= turn;
+// } 
 
 function drawChart() {
 
+    
+    allpos = arrPos;
+    AllEffcPow =arreff;
+ 
     var margin = { top: 30, right: 20, bottom: 30, left: 50 },
         width2 = svgWidth2 - margin.left - margin.right,
         height = svgheight2 - margin.top - margin.bottom;
@@ -68,20 +77,20 @@ function drawChart() {
         rows = [],
         selectedRect,
         selectedLegend;
-
+var selectedScenNum = selectedScen;
     ActorsObj2 = JSON.parse(sessionStorage.getItem("ActorsObj"));
 
     var xAxis = d3.axisBottom(xScale).scale(xScale);
     var yAxis = d3.axisLeft(yScale).scale(yScale);
     turn = currentTurn; //current turn from slider
 
+   
     for (var i = 0; i < allpos[selectedScenNum][selectedDimNum].length; i += 1) {
         positionsData.push(allpos[selectedScenNum][selectedDimNum][i].positions);
     }
 
     for (i = 0; i < AllEffcPow[selectedScenNum][selectedDimNum].length; i++) {
         namesArray.push(AllEffcPow[selectedScenNum][selectedDimNum][0][i].Name)//sec [] for dim
-
     }
 
     for (i = 0; i < AllEffcPow[selectedScenNum][selectedDimNum].length; i++) {
@@ -102,6 +111,7 @@ function drawChart() {
     for (var i = 0; i < positionsData.length; i++) {
         PositionsArray.push(positionsData[i][turn]); // it should be a var based on which turn is chosen
     }
+  
     groupActors(PositionsArray);
 
     //adding range position
@@ -140,7 +150,6 @@ function drawChart() {
     }
 
     var stack = d3.stack().keys(keys)(result);
-
     ActorsObj2.forEach(function (obj, i) {
         obj.values = stack[i]
     });
@@ -345,7 +354,7 @@ else if (axisLables == false){
 
     function findHighestEffpow() {
 
-        for (var turnNo = 0; turnNo < turns - 1; turnNo++) {
+        for (var turnNo = 0; turnNo < NumOfTurns - 1; turnNo++) {
             // repeat for all turns to find the highest range and set it as y-axes max value
             for (var i = 0; i < positionsData.length; i++) {
                 PositionsArray2.push(positionsData[i][turnNo + 1]);
@@ -373,7 +382,8 @@ else if (axisLables == false){
             })
             .on("mouseout", onMouseout)
             .selectAll("rect")
-            .data(function (d) { return d.values; })
+            .data(function (d) { 
+                return d.values; })
             .enter().append("rect")
             .attr("x", function (d, i) {
                 return xScale((barnames[i])) + 2.5;
@@ -399,6 +409,7 @@ else if (axisLables == false){
 
     }
     function roundPositions(y) {
+      
         //keep PositionsArray for the specified turn and PositionsArray2 for all other turns
         groupActors(PositionsArray2);
         //make sure arrays are empty for rounding another turn's positions
@@ -411,10 +422,14 @@ else if (axisLables == false){
 
         for (i = 0; i <= NoOfBars - 1; i++) {
             rows[i] = Array(NoOfActors).fill(0);
+
         }
+        
         for (i = 0; i < NoOfActors; i++) {
+
             var temp = Qscale(e[i]);
             rows[temp][i] = +effpowArray2[i];
+           
         }
         for (i = 0; i <= NoOfBars - 1; i++) {
             var temp2 = Qscale.invertExtent(i)[0];

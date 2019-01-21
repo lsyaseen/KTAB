@@ -17,18 +17,26 @@
     <!-- Custom CSS -->
     <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
     <link href="../dist/css/style.css" rel="stylesheet">
+    <!--  jQuery UI theme css -->
+    <link href="../vendor/jquery/jquery-ui.theme.css" rel="stylesheet">
 
+    <!-- evol-colorpicker css -->
+    <link href="../vendor/colorpicker/css/evol-colorpicker.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
     <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
     <!-- d3 -->
     <script src="../vendor/d3/js/d3.min.js"></script>
+    <!-- noUiSlider -->
+    <script src="../vendor/noUiSlider.11.0.3/js/nouislider.min.js"></script>
+    <link href="../vendor/noUiSlider.11.0.3/css/nouislider.min.css" rel="stylesheet">
 
     <link href="../vendor/charts/charts.css" rel="stylesheet">
-
     <!-- sql.js -->
-    <script src="../vendor/sql\js/sql.js"></script>
+    <script src="../vendor/sql/js/sql.js"></script>
+    <!-- papaparse.js -->
+    <script src="../vendor/PapaParse/papaparse.js"></script>
 
 
 </head>
@@ -47,18 +55,18 @@
             <div class="col-lg-6 col-md-6 col-sm-6 col-md-offset-3 col-lg-offset-3">
                 <div class="container-fluid">
                     <div class="panel panel-default">
-                        <div class="panel-heading"> <strong>Upload Database:</strong></div>
+                        <div class="panel-heading">
+                            <strong>Upload Database:</strong>
+                        </div>
                         <div class="panel-body ">
-
                             <div class="input-group">
-                                <label class="input-group-btn"> 
-                                        <span class="btn btn-primary">
-                                            Browse&hellip;
-                                            <input id="uploadInput" type="file" accept=".db" style="display: none;" onchange="getfile()">
-                                            
-                                        </span>
-                                    </label>
-                                <input type="text" class="form-control" readonly>
+                                <label class="input-group-btn">
+                                    <span class="btn btn-primary">
+                                        Browse&hellip;
+                                        <input id="uploadInput" type="file" accept=".db" style="display: none;" onchange="getfile()">
+                                    </span>
+                                </label>
+                                <input type="text" id="fileNameText" class="form-control" readonly>
                             </div>
                         </div>
                     </div>
@@ -74,7 +82,8 @@
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-xs-10">
-                                <strong>Number of Scenarios: </strong> <span id="NumOfscen"> </span>
+                                <strong>Number of Scenarios: </strong>
+                                <span id="NumOfscen"> </span>
                             </div>
                             <div class="col-xs-10">
                                 <strong>Scenario Name: </strong>
@@ -82,7 +91,8 @@
                                 <select id="SecnarioPicker"> </select>
                             </div>
                             <div class="col-xs-10">
-                                <strong>Scenario description: </strong> <span id="SecnarioDesc"> </span>
+                                <strong>Scenario description: </strong>
+                                <span id="SecnarioDesc"> </span>
                             </div>
                         </div>
                     </div>
@@ -93,63 +103,228 @@
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-xs-9">
-                                <strong>Number of Actors: </strong> <span id="NumOfActors"> </span>
+                                <strong>Number of Actors: </strong>
+                                <span id="NumOfActors"> </span>
                             </div>
                             <div class="col-xs-9">
-                                <strong>Number of Dimensions: </strong> <span id="NumOfDim"> </span>
+                                <strong>Number of Dimensions: </strong>
+                                <span id="NumOfDim"> </span>
                             </div>
                             <div class="col-xs-9">
-                                <strong>Turn: </strong> <span id="currentTurn">  </span>
+                                <strong>Turn: </strong>
+                                <span id="currentTurn"> </span>
+                            </div>
+                            <div class="col-xs-9">
+                                <strong>Dimension: </strong>
+                                <span>
+                                    <select id="Dimpicker">
+                                    </select>
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <!-- slider -->
+        <div class="row space">
+            <div class="col-sm-12 col-lg-12 col-md-12">
+                <div id="slider"></div>
+            </div>
+        </div>
+        <div class="row space">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="panel with-nav-tabs panel-default">
+                    <div class="panel-heading tabs">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="#LineGraphTab" data-toggle="tab">Policy Position </a>
+                            </li>
+                            <li>
+                                <a href="#BarGraphTab" data-toggle="tab">Effective Power Landscape </a>
+                            </li>
+                            <li>
+                                <a href="#NetworkTab" data-toggle="tab"> Bargain Queue Resolution </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="panel-body">
+                        <div class="tab-content">
+                            <div class="tab-pane fade in active" id="LineGraphTab">
+                                <!-- Default 1 -->
+                                <div class="container-fluid">
+                                    <div class="canvasDiv">
+                                        <canvas id="canvas" style="display:none;"></canvas>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12 col-lg-8">
+                                        <div class="panel panel-default">
+                                            <div id="MainLineChart" class="panel-body "> </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12  col-md-12 col-md-offset-0 col-lg-4">
+                                        <div class="panel panel-default">
+                                            <div id="legend" class="panel-body scrollable-panel">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- //2nd tab -->
+                            <div class="tab-pane fade" id="BarGraphTab">
+                                <div class="container-fluid">
+                                    <div class="canvasDiv">
+                                        <canvas id="Barcanvas" style="display:none;"></canvas>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12 col-lg-8">
+                                        <div class="panel panel-default">
+                                            <form id="yAxisScale">
+                                                <div class="yscaleoptions">
+                                                    <span data-container="body" role="tooltip" aria-haspopup="true" class="tooltip tooltip-bottom-right ">
+                                                        <input type="radio" id="Fixedbtn" name="radio-group">
+                                                        <label for="Fixedbtn">Fixed y-axis scale</label>
+                                                        <input type="radio" id="Responsivebtn" name="radio-group" checked>
+                                                        <label for="Responsivebtn">Responsive y-axis scale</label>
+                                                    </span>
+                                                </div>
+                                            </form>
+                                            <div id="MainBarChart" class="panel-body "></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12  col-md-12 col-md-offset-0 col-lg-4">
+                                        <div class="panel panel-default">
+                                            <div id="Barlegend" class="panel-body scrollable-panel">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- //3rd tab -->
+                            <div class="tab-pane fade" id="NetworkTab">
+                                <div class="container-fluid">
+                                    <div class="canvasDiv">
+                                        <canvas id="Networkcanvas" style="display:none;"></canvas>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12 col-lg-12">
+                                        <div class="panel panel-default">
+                                            <div id="MainNetwork" class="panel-body"></div>
+                                        </div>
+                                    </div>
+                                    <!-- <div class="col-sm-12  col-md-12 col-md-offset-0 col-lg-4">
+                                        <div class="panel panel-default">
+                                            <div id="Networklegend" class="panel-body scrollable-panel">
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row space">
+            <div class="col-sm-12  col-md-12  col-lg-12">
+                <button class="toggle btn btn-success" data-target="SizePopup" onclick="ChangeresolutionandDownload()">Edit and Download</button>
+                <button class="toggle btn btn-success" data-target="ColorPopup" onclick="changecolors()"> Change Colors</button>
+                <button class="toggle btn btn-success" data-target="NetworkDetails" id="NetworkButton" style="display: none;">Network Explanation</button>
+
+            </div>
+            <div id="SizePopup" class="popup hide">
+                <div class="popup-header">
+                    <span class="close toggle" data-target="SizePopup">close</span>
+                </div>
+                <div class="SizePopup-body">
+                </div>
+                <div class="SizePopup-footer">
+                    <br>
+                    <button class="toggle button" data-target="SizePopup" onclick="GetNewSize()">Confirm Edits</button>
+                    <button class="toggle button" data-target="SizePopup" onclick="downloadPNG()">download</button>
+                </div>
+            </div>
+            <div id="ColorPopup" class="popup hide">
+                <div class="popup-header">
+                    <span class="close toggle" data-target="ColorPopup">close</span>
+                </div>
+                <div class="popup-body">
+                </div>
+                <div class="popup-footer">
+                    <div id="DivUpload">
+                        <span>
+                            <strong> Import Colors from a CSV : </strong>
+                        </span>
+                        <input type="file" name="File Upload" id="txtFileUpload" accept=".csv" />
+                    </div>
+                    <div id="DivExportCSV">
+                        <button class="toggle button" onclick="ExportColorsCSV()">Export CSV</button>
+
+                    </div>
+                    <div>
+                        <button class="toggle button" data-target="ColorPopup" onclick="saveSelectedColors()">Apply Changes</button>
+                    </div>
+                </div>
+            </div>
+            <div id="NetworkDetails" class="popup hide">
+                <div class="popup-header">
+                    <span class="close toggle" data-target="NetworkDetails">close</span>
+                    Network Diagram of Bargain Queue Resolution
+                </div>
+
+                <div class="NetworkDetails-body">
+
+
+
+                    This Diagram visulize the Propose-Resolve stages of the SMP bargaining model
+                    <ul>
+                        <li>Actors are represented with nodes colred according to each actor's color. </li>
+                        <li>Bargains are represented with small grey nodes. </li>
+                        <li>All edges are directed. </li>
+                        <li>The edge coming to the bargain node from the actor's node represent the initiator. </li>
+                        <li>The edge coming to the actor's node from the bargain node represent the Reciever. </li>
+                        <li>Solid-line edges represent accepted bargains, dashed edges represent rejected bargains. </li>
+                        <li> Egdes thickness are proportional to the probability of the bargain being accepted. </li>
+
+                    </ul>
+
+                </div>
+
             </div>
         </div>
 
-        <div class="row space">
-            <div class="col-lg-12 col-md-12 col-sm-12">
-                <div class="container-fluid">
-                    <div class="col-sm-12 col-md-6 col-lg-6">
-                        <div class="panel panel-default" id="LinePanel">
-                            <div class="panel-heading"> <strong>Line Chart</strong></div>
-                            <div id="Linechart" class="panel-body ">
-                                <script src="../vendor/charts/Linechart.js"></script>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-12  col-md-6 col-md-offset-0 col-lg-6">
-                        <div class="panel panel-default" id="BarPanel">
-                            <div class="panel-heading"> <strong>Bar Chart</strong> </div>
-                            <div id="Barchart" class="panel-body ">
-                                <script src="../vendor/charts/barchart.js"></script>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     </div>
     <!-- jQuery -->
     <script src="../vendor/jquery/jquery.min.js"></script>
+    <!-- jQueryUI -->
+    <script src="../vendor/jquery/jquery-ui.min.js"></script>
+
+    <!-- evol-colorpicker -->
+    <script src="../vendor/colorpicker/js/evol-colorpicker.min.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
 
     <!-- load db file -->
     <script src="../vendor/charts/loadSQL.js"></script>
+    <!-- canvg -->
+    <script src="../vendor/canvg/js/canvg.bundle.js"></script>
 
+    <!-- charts -->
+    <script src="../vendor/charts/MainLineChart.js"></script>
+    <script src="../vendor/charts/MainBarChart.js"></script>
+    <script src="../vendor/charts/NetworkDiagram.js"></script>
+    <!-- slider -->
+    <script src="../vendor/charts/slider.js"></script>
     <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
-<!-- d3 -->
-<!-- <script src="../vendor/d3/js/d3.min.js"></script> -->
+    <!-- <script src="../dist/js/\sb-admin-2.js"></script> -->
+    <!-- d3 -->
+    <!-- <script src="../vendor/d3/js/d3.min.js"></script> -->
 
 </body>
 <script>
     var defaultColors =
-    ["#5C8598", "#219DD8", "#96C9E5", "#3C3D3B",
+        ["#5C8598", "#219DD8", "#96C9E5", "#3C3D3B",
             "#ECCE6A", "#f8ecba", "#60805D", "#8AC791",
             "#bebfc1", "#636664", "#a5f3cc", "#6acbec",
             "#6aecec", "#ff9966", "#1d80e2", "#6a8aec",
@@ -193,45 +368,426 @@
             "#a0c20a", "#f47171", "#003333", "#c466ff",
             "#674218", "#fff266", "#330000", "#66ff94",
             "#333300", "#ff9933", "#000033", "#4d4d4d"
-        ]; 
-    $('#LinePanel').click(function (e) {
-        e.preventDefault();
-        getData();
-        window.location = 'graphs.html#LineGraphTab';
+        ];
+
+    var actors2, ActorsObj, temActorsObj, NoOfBars, axisLables;
+    var changeColorsCounter = 0;
+    var Sizecounter = 0;
+    var newColors = [];
+
+    $(document).ready(function () {
+
+        $('[data-toggle=offcanvas]').click(function () {
+            $('.row-offcanvas').toggleClass('active');
+        });
+        $("#mycolor").colorpicker({ showOn: 'button' });
+
+        $('#yAxisScale').change(function () {
+            drawChart();
+        });
+    });
+    $(document).on('click', '.toggle', function (event) {
+        event.preventDefault();
+        var target = $(this).data('target');
+        $('#' + target).toggleClass('hide');
+    });
+    $("#Dimpicker").on('change', function () {
+        selectedDimNum = $('#Dimpicker').val();
+        loadCurrentTurnData(currentTurn);
+        drawChart();
+        drawLine();
+        drawNetwork();
     });
 
-    $('#BarPanel').click(function (e) {
-        e.preventDefault();
-        getData();
-        window.location = 'graphs.html#BarGraphTab';
+    $("#SecnarioPicker").on('change', function () {
+        selectedScen = $('#SecnarioPicker').val();
+        currentTurn = NumOfTurns - 1;
+        slider.noUiSlider.set(currentTurn);
+        document.getElementById('currentTurn').innerHTML = currentTurn;
+        selectedDimNum = 0;
+        changeColorsCounter = 0;
+        slider.noUiSlider.updateOptions({
+            range: {
+                'min': 0,
+                'max': NumOfTurns
+            },
+            pips: {
+                mode: 'count',
+                density: 0,
+                values: NumOfTurns + 1, //+1 since we're starting from zero
+                stepped: true
+            }
+
+        });
+
+        $('#Dimpicker')
+            .find('option')
+            .remove()
+
+        for (i = 0; i < NoOfDim; i++) {
+
+            $("#Dimpicker").append('<option value="' + i + '">' + (i + 1) + '</option>');
+        }
+        $("#Dimpicker").val(0); //select first opt by default
+        getActorsData();
+        loadCurrentTurnData(NumOfTurns - 1);
+        drawChart();
+        drawLine();
+        drawNetwork();
+
     });
+
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        var target = $(e.target).attr("href") // activated tab
+        //to show netork explination button
+        if (target == "#NetworkTab") {
+            document.getElementById("NetworkButton").style.display = "inline-block";
+            slider.noUiSlider.updateOptions({
+                range: {
+                    'min': 0,
+                    'max': NumOfTurns - 1
+                },
+                pips: {
+                    mode: 'count',
+                    density: 0,
+                    values: NumOfTurns + 1, //+1 since we're starting from zero
+                    stepped: true
+                }
+
+            });
+            slider.noUiSlider.set(currentTurn);
+        }
+        else {
+            document.getElementById("NetworkButton").style.display = "none";
+            slider.noUiSlider.updateOptions({
+                range: {
+                    'min': 0,
+                    'max': NumOfTurns
+                },
+                pips: {
+                    mode: 'count',
+                    density: 0,
+                    values: NumOfTurns + 1, //+1 since we're starting from zero
+                    stepped: true
+                }
+
+            });
+            slider.noUiSlider.set(currentTurn);
+        }
+    });
+    function getActorsData() {
+
+        //names based on selected scenario
+        var namesArray = ActorsNames[selectedScen];
+
+        var colors3 = d3.scaleOrdinal()
+            .domain(namesArray)
+            .range(defaultColors);
+        var actors2 = namesArray.map(function (row, i) {
+            return {
+                actor_name: row,
+                visible: true,
+                color: colors3(row),
+            }
+        });
+        sessionStorage.setItem("ActorsObj", JSON.stringify(actors2));
+        ActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
+    }
+
+    function ChangeresolutionandDownload() {
+        if (Sizecounter <= 0) { //to only appened once
+            $(".SizePopup-body").append('<div> <strong> Image resolution :</strong> </div> ');
+            $(".SizePopup-body").append('<div><br> <input type="checkbox" name="Labels" id="RemoveLabels" value="RemoveLabels" > Remove Lables</div>');
+            $(".SizePopup-body").append('<div id="sizeOpt" </div> ')
+            $("#sizeOpt").append('<br><span> <input type="radio" class="sizeRadio" id="defaultSize" name="radio-group2" checked>' +
+                '<label for="defaultSize">Default Size </label>' +
+                ' <input type="radio" class="sizeRadio" id="ChangeSize" name="radio-group2" >' +
+                '<label for="ChangeSize">User defined Size  </label> <br> <br> </span>')
+            $(".SizePopup-body").append('<div id="sizeOptDiv"><p>Please input a number between 100 and 1000:</p> <strong> Width: </strong>'
+                + '<input id="widthbox" type="text" name="width" maxlength="4" size="4" value="550" disabled>'
+                + '<strong> Height: </strong> <input id="heightbox" type="text" name="height" maxlength="4" value="300" size="4" disabled></div>');
+            $(".SizePopup-body").append('<div id="ChangeNBars"><p><strong> Number of Bars: </strong>'
+                + '<input id="NoOfBars" type="text" name="BarsNo" maxlength="2" size="2" value="25" ></p></div>');
+            Sizecounter++;
+        }
+    }
+
+    $(document).on('change', '[class="sizeRadio"]', function () {
+        if ($('#defaultSize').is(':checked')) {
+            $('#widthbox').val("550");
+            $('#heightbox').val(300);
+
+            $('#widthbox').prop('disabled', true);
+            $('#heightbox').prop('disabled', true);
+        }
+        else if ($('#ChangeSize').is(':checked')) {
+
+            $('#widthbox').prop('disabled', false);
+            $('#heightbox').prop('disabled', false);
+
+
+        }
+    });
+
+    $(document).on('change', '[id="NoOfBars"]', function () {
+        NoOfBars = parseInt($("#NoOfBars").val());
+        if (NoOfBars < 10 || NoOfBars > 50) {
+            alert('Please chose a number between 10 and 50');
+            $('#NoOfBars').val(25); //back to default
+            NoOfBars = parseInt($("#NoOfBars").val());
+        }
+    });
+
+    //parse the csv file
+    document.getElementById('txtFileUpload').addEventListener('change', upload, false);
+
+    function upload(evt) {
+        var data = null;
+        var file = evt.target.files[0];
+        var reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload = function (event) {
+            var csvData = event.target.result;
+            var data = Papa.parse(csvData, {
+                header: false,
+                skipEmptyLines: true,
+                dynamicTyping: true,
+                complete: function (results) {
+                    getNewColors(results.data)
+                    console.log(results);
+                }
+            });
+
+
+        };
+        reader.onerror = function () {
+            alert('Unable to read ' + file.fileName);
+        };
+    }
+
+    //exportcuurent colors to csv
+    function ExportColorsCSV() {
+        var colorsArray = [];
+        for (i = 0; i < temActorsObj.length; i++) {
+            var newArray = new Array();
+            newArray = [temActorsObj[i].id, temActorsObj[i].color]; // just example values
+            colorsArray.push(newArray);
+        }
+
+        var csv = Papa.unparse(colorsArray);
+        var blob = new Blob([csv]);
+        var a = window.document.createElement("a");
+        a.href = window.URL.createObjectURL(blob, { type: "text/plain" });
+        a.download = "colors.csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+    function getNewColors(csvcolors) {
+        newColors.splice(0, newColors.length)
+        if (csvcolors[0][0] == 0) {
+            const transposed = csvcolors;
+            const res = transposed.map(row => row.reduce((acc, col, ind) => {
+                acc[transposed[ind]] = col; return acc
+            }, {}))
+
+            for (i = 0; i < csvcolors.length; i++) {
+                newColors.push(transposed[i][1]);
+            }
+            updateColors();
+        }
+        else {
+            alert('Please check CSV Format');
+        }
+    }
+
+    function updateColors() {
+        temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
+        if (temActorsObj.length < newColors.length) {
+            for (i = 0; i < temActorsObj.length; i++) {
+                temActorsObj[i]["color"] = newColors[i];
+                $("#" + temActorsObj[i].actor_name).colorpicker("val", newColors[i]);
+            }
+        }
+        else {
+            for (i = 0; i < newColors.length; i++) {
+                temActorsObj[i]["color"] = newColors[i];
+                $("#" + temActorsObj[i].actor_name).colorpicker("val", newColors[i]);
+            }
+        }
+        sessionStorage.setItem("ActorsObj", JSON.stringify(temActorsObj));
+    }
+
+    function GetNewSize() {
+
+        if ($('#defaultSize').is(':checked')) {
+            getNewResoulution(550, 300, NoOfBars, axisLables);
+            $('.canvasDiv').height(300);//change canvas div size
+            $('.canvasDiv').width(550);
+            drawChart();
+            drawLine();
+            loadCurrentTurnData(currentTurn);
+            drawNetwork();
+            checkLabels();
+            // setTimeout(downloadPNG, 3000); //give it time to draw
+        }
+        else if ($('#ChangeSize').is(':checked')) {
+            var width = parseInt($("#widthbox").val());
+            var height = parseInt($("#heightbox").val());
+
+            if (width >= 100 && width <= 1000 && width != NaN && height >= 100 && height <= 1000 && height != NaN) {
+                $('.canvasDiv').height(height);//change canvas div size
+                $('.canvasDiv').width(width);
+                getNewResoulution(width, height, NoOfBars, axisLables);
+                drawChart();
+                drawLine();
+                loadCurrentTurnData(currentTurn);
+
+                drawNetwork();
+                checkLabels();
+                // setTimeout(downloadPNG, 3000); //give it time to draw
+            }
+            else {
+                alert("invalid width or height");
+            }
+        }
+        function checkLabels() {
+            if ($('#RemoveLabels').is(':checked')) {
+                $(".CharLabel").hide();
+                $(".axis text").hide();
+                axisLables = false;
+            }
+            else {
+                $(".CharLabel").show();
+                $(".axis text").show();
+                axisLables = true;
+
+            }
+        }
+    }
+
+    function downloadPNG() {
+
+        var id = $('.tab-content .active').attr('id');
+
+        // which tap is active
+        if (id == "LineGraphTab") {
+
+            var $container = $('#MainLineChart'),
+                // Canvg requires trimmed content
+                content = $container.html().trim(),
+                canvas = document.getElementById('canvas');
+            var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
+            canvg(canvas, content);
+            var image = canvas.toDataURL("image/png")
+
+            let filename = 'LineChart'
+            let link = document.createElement('a')
+            link.href = image
+            link.download = filename
+            document.body.appendChild(link)
+            link.click()
+        }
+        else if (id == "BarGraphTab") {
+
+            var $barcontainer = $('#MainBarChart'),
+                Barcontent = $barcontainer.html().trim(),
+                canvas_bar = document.getElementById('Barcanvas');
+
+            var image = canvas_bar.toDataURL("image/png").replace("image/png", "image/octet-stream");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
+            canvg(canvas_bar, Barcontent);
+            var image = canvas_bar.toDataURL("image/png")
+            let filename = 'BarChart'
+            let barlink = document.createElement('a')
+            barlink.href = image
+            barlink.download = filename
+            document.body.appendChild(barlink)
+            barlink.click()
+        }
+        else {
+            var $Networkcontainer = $('#MainNetwork'),
+                // Canvg requires trimmed content
+                Networkcontent = $Networkcontainer.html().trim();
+            canvas_Network = document.getElementById('Networkcanvas');
+
+            var image = canvas_Network.toDataURL("image/png").replace("image/png", "image/octet-stream");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
+
+            canvg(canvas_Network, Networkcontent);
+            var image = canvas_Network.toDataURL("image/png")
+
+            let filename = 'NetworkDiagram'
+            let Networklink = document.createElement('a')
+            Networklink.href = image
+            Networklink.download = filename
+            document.body.appendChild(Networklink)
+            Networklink.click()
+
+        }
+
+    }
+    function changecolors() {
+        $('#txtFileUpload').val("");
+        temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
+        if (changeColorsCounter <= 0) { //only initilaze once!
+            $('.popup-body').empty(); //clear existing actors
+
+            for (var i = 0; i < temActorsObj.length; i++) {
+                $(".popup-body").append('<div id="Div' + temActorsObj[i].actor_name + '"class="col-xs-6 col-sm-4 col-md-6 col-lg-6" </div> ')
+                $("#Div" + temActorsObj[i].actor_name).append('<br><span><strong>' + temActorsObj[i].actor_name + '</strong></span>' +
+                    '<input style="width:100px;" id="' + temActorsObj[i].actor_name + '" class="colorPicker evo-cp0" >')
+
+                $("#" + temActorsObj[i].actor_name).colorpicker({ showOn: 'button' })
+                $("#" + temActorsObj[i].actor_name).colorpicker("val", temActorsObj[i].color);
+
+                $("#" + temActorsObj[i].actor_name).on("change.color", function (event, color) {
+                    //find index of selected actor to change its color
+                    for (i = 0; i < temActorsObj.length; i++) {
+                        var obj1 = temActorsObj.findIndex(o => o.actor_name === this.id);
+                        temActorsObj[obj1]["color"] = $("#" + this.id).colorpicker("val");
+                    }
+                    sessionStorage.setItem("ActorsObj", JSON.stringify(temActorsObj));
+
+                });
+                changeColorsCounter++;
+            }
+        }
+    }
+
+    function saveSelectedColors() {
+        loadCurrentTurnData(currentTurn);
+        drawChart();
+        drawLine();
+        drawNetwork();
+
+    }
 
     function getData() {
+        console.log("getdata");
         sessionStorage.setItem("ActorsNames", JSON.stringify(ActorsNames));
         sessionStorage.setItem("ActorsPositions", JSON.stringify(arrPos));
         sessionStorage.setItem("AllEffcPow", JSON.stringify(arreff));
         sessionStorage.setItem("NumOfTurns", NumOfTurns);
-        sessionStorage.setItem("BargnsData",JSON.stringify(arrBargns))
+        sessionStorage.setItem("BargnsData", JSON.stringify(arrBargns))
+        sessionStorage.setItem("NetworkData", JSON.stringify(arrNetwork))
         sessionStorage.setItem("ScenarioArray", JSON.stringify(ScenarioArray));
-        sessionStorage.setItem("SceAraay", JSON.stringify(SceAraay));
         sessionStorage.setItem("selectedScen", selectedScen);
-        sessionStorage.setItem("defaultColors",JSON.stringify(defaultColors));
+        sessionStorage.setItem("defaultColors", JSON.stringify(defaultColors));
 
-var namesArray = ActorsNames[selectedScen];
-var colors3 = d3.scaleOrdinal()
-    .domain(namesArray)
-    .range(defaultColors);
-var actors2 = namesArray.map(function (row, i) {
+        var namesArray = ActorsNames[selectedScen];
+        var colors3 = d3.scaleOrdinal()
+            .domain(namesArray)
+            .range(defaultColors);
+        actors2 = namesArray.map(function (row, i) {
 
-return {
-  actor_name: row,
-  visible: true,
-  color: colors3(row),
+            return {
+                actor_name: row,
+                visible: true,
+                color: colors3(row),
+                id: i,
+            }
+        });
 
-}
-});
-
-sessionStorage.setItem("ActorsObj", JSON.stringify(actors2));
+        sessionStorage.setItem("ActorsObj", JSON.stringify(actors2));
 
     }
 

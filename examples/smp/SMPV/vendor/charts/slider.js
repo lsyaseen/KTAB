@@ -4,26 +4,11 @@ var data,
   turns,
   NumOfTurns,
   currentTurn = 1;
-
 var slider = document.getElementById('slider');
 NumOfTurns = sessionStorage.getItem("NumOfTurns");
-drawChart();
-drawLine();
-
 turns = +NumOfTurns;
 
-InitializeSlider(turns);
 
-$("#SecnarioPicker").on('change', function () {
-  selectedScen = $('#SecnarioPicker').val();
-  currentTurn = 1;
-  slider.noUiSlider.set(currentTurn);
-  document.getElementById('currentTurn').innerHTML = currentTurn;
-  
-  getActorsData();
-  drawLine();
-  drawChart();
-});
 
 function InitializeSlider(turns) {
   noUiSlider.create(slider, {
@@ -44,10 +29,19 @@ function InitializeSlider(turns) {
     }
   });
   slider.noUiSlider.on('change', function () {
-    currentTurn = + slider.noUiSlider.get();
+    console.log("slider change")
+currentTurn = + slider.noUiSlider.get(); 
+
+ if (currentTurn != turns){
+   //last turn has no bargains
+  loadCurrentTurnData(currentTurn);
+  drawNetwork();
+}  
     document.getElementById('currentTurn').innerHTML = currentTurn;
+   
     drawChart();
     drawLine();
+
   });
 
 }

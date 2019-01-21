@@ -140,9 +140,35 @@
 float: left;
 margin-top:7%;
 }
+.NetworkDetails-body{
+  line-height: 2em;
+}
 #DivUpload{
   padding-bottom:5%;
+  padding-top:5%;
 }
 #ChangeNBars{
   padding-top:5%;
+}
+#fromb {
+  fill: green;
+}
+.link.tob {
+  stroke: green;
+}
+#tob {
+  fill: green;
+}
+.link.fromb {
+  stroke: green;
+}
+.link.rejectb {
+  stroke: gray;
+  stroke-dasharray: 0,2 1;
+}
+#turns {
+  height: 20px;
+}
+#graph {
+  overflow: auto;
 }
