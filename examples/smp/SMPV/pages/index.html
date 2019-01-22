@@ -144,6 +144,15 @@
                                 <a href="#BarGraphTab" data-toggle="tab">Effective Power Landscape </a>
                             </li>
                             <li>
+                                <a href="#SankeyDiagramTab" data-toggle="tab">Sankey</a>
+                            </li>
+                            <li>
+                                <a href="#ScatterPlotTab" data-toggle="tab">ScatterPlot</a>
+                            </li>
+                            <li>
+                                <a href="#ParallelCoordinatesGraphTab" data-toggle="tab">Parallel Coordinates Graph</a>
+                            </li>
+                            <li>
                                 <a href="#NetworkTab" data-toggle="tab"> Bargain Queue Resolution </a>
                             </li>
                         </ul>
@@ -200,6 +209,63 @@
                                 </div>
                             </div>
                             <!-- //3rd tab -->
+                            <div class="tab-pane fade" id="SankeyDiagramTab">
+                                <div class="container-fluid">
+                                    <div class="canvasDiv">
+                                        <canvas id="canvas" style="display:none;"></canvas>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12 col-lg-8">
+                                        <div class="panel panel-default">
+                                            <div id="MainLineChart" class="panel-body "> </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12  col-md-12 col-md-offset-0 col-lg-4">
+                                        <div class="panel panel-default">
+                                            <div id="legend" class="panel-body scrollable-panel">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- //4th tab -->
+                            <div class="tab-pane fade" id="ScatterPlotTab">
+                                <div class="container-fluid">
+                                    <div class="canvasDiv">
+                                        <canvas id="canvas" style="display:none;"></canvas>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12 col-lg-8">
+                                        <div class="panel panel-default">
+                                            <div id="MainLineChart" class="panel-body "> </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12  col-md-12 col-md-offset-0 col-lg-4">
+                                        <div class="panel panel-default">
+                                            <div id="legend" class="panel-body scrollable-panel">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                             <!-- //5th tab -->
+                             <div class="tab-pane fade" id="ParallelCoordinatesGraphTab">
+                                <div class="container-fluid">
+                                    <div class="canvasDiv">
+                                        <canvas id="canvas" style="display:none;"></canvas>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12 col-lg-8">
+                                        <div class="panel panel-default">
+                                            <div id="MainLineChart" class="panel-body "> </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12  col-md-12 col-md-offset-0 col-lg-4">
+                                        <div class="panel panel-default">
+                                            <div id="legend" class="panel-body scrollable-panel">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- //6th tab -->
                             <div class="tab-pane fade" id="NetworkTab">
                                 <div class="container-fluid">
                                     <div class="canvasDiv">
@@ -218,6 +284,7 @@
                                     </div> -->
                                 </div>
                             </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -313,6 +380,9 @@
     <!-- charts -->
     <script src="../vendor/charts/MainLineChart.js"></script>
     <script src="../vendor/charts/MainBarChart.js"></script>
+    <script src="../vendor/charts/SankeyDiagram.js"></script>
+    <script src="../vendor/charts/ParallelCoordinatesGraph.js"></script>
+    <script src="../vendor/charts/ScatterPlot.js"></script>
     <script src="../vendor/charts/NetworkDiagram.js"></script>
     <!-- slider -->
     <script src="../vendor/charts/slider.js"></script>
@@ -694,6 +764,22 @@
                 Barcontent = $barcontainer.html().trim(),
                 canvas_bar = document.getElementById('Barcanvas');
 
+            var image = canvas_bar.toDataURL("image/png").replace("image/png", "image/octet-stre    am");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
+            canvg(canvas_bar, Barcontent);
+            var image = canvas_bar.toDataURL("image/png")
+            let filename = 'BarChart'
+            let barlink = document.createElement('a')
+            barlink.href = image
+            barlink.download = filename
+            document.body.appendChild(barlink)
+            barlink.click()
+        }
+        else if (id == "SankeyDiagramTab") {
+
+            var $barcontainer = $('#MainBarChart'),
+                Barcontent = $barcontainer.html().trim(),
+                canvas_bar = document.getElementById('Barcanvas');
+
             var image = canvas_bar.toDataURL("image/png").replace("image/png", "image/octet-stream");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
             canvg(canvas_bar, Barcontent);
             var image = canvas_bar.toDataURL("image/png")
@@ -704,6 +790,40 @@
             document.body.appendChild(barlink)
             barlink.click()
         }
+
+        else if (id == "ScatterPlotTab") {
+
+            var $barcontainer = $('#MainBarChart'),
+            Barcontent = $barcontainer.html().trim(),
+            canvas_bar = document.getElementById('Barcanvas');
+
+            var image = canvas_bar.toDataURL("image/png").replace("image/png", "image/octet-stream");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
+            canvg(canvas_bar, Barcontent);
+            var image = canvas_bar.toDataURL("image/png")
+            let filename = 'BarChart'
+            let barlink = document.createElement('a')
+            barlink.href = image
+            barlink.download = filename
+            document.body.appendChild(barlink)
+            barlink.click()
+        }
+        else if (id == "ParallelCoordinatesGraphTab") {
+
+            var $barcontainer = $('#MainBarChart'),
+            Barcontent = $barcontainer.html().trim(),
+            canvas_bar = document.getElementById('Barcanvas');
+
+            var image = canvas_bar.toDataURL("image/png").replace("image/png", "image/octet-stream");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
+            canvg(canvas_bar, Barcontent);
+            var image = canvas_bar.toDataURL("image/png")
+            let filename = 'BarChart'
+            let barlink = document.createElement('a')
+            barlink.href = image
+            barlink.download = filename
+            document.body.appendChild(barlink)
+            barlink.click()
+        }
+
         else {
             var $Networkcontainer = $('#MainNetwork'),
                 // Canvg requires trimmed content
