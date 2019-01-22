@@ -809,17 +809,92 @@ void SMPState::groupUpdatePstns() {
 
     LOG(INFO) << "Doing scalarPCE for the" << nb << "unique bargains of all actors ...";
     auto smod = dynamic_cast<SMPModel *>(model);
-    auto p = Model::scalarPCE(na, nb, w, u_im, smod->vrCltn, smod->vpm, smod->pcem, ReportingLevel::Medium);
-    if (nb != p.numR()) {
+    PCEModel myPCEM = smod->pcem;
+    myPCEM = PCEModel::MarkovIPCM;
+    auto bProb = Model::scalarPCE(na, nb, w, u_im, smod->vrCltn, smod->vpm, myPCEM, ReportingLevel::Medium);
+    if (nb != bProb.numR()) {
         throw KException("SMPState::groupUpdatePstns: number of bargains mismatched with scalar PCE row count");
     }
-    if (1 != p.numC()) {
+    if (1 != bProb.numC()) {
         throw KException("SMPState::groupUpdatePstns: scalar pce column size is not 1");
     }
     
     LOG(INFO) << "p[bi]:";
-    trans(p).mPrintf(" %.5f ");
-    trans(p).mPrintf(" %.2e");
+    trans(bProb).mPrintf(" %.5f ");
+    trans(bProb).mPrintf(" %.1e ");
+    
+    auto selProb = bProb; // selection probabilities
+    vector<bool> viable = {}; // is this unique bargain still viable?
+    vector<bool> useBrgn = {}; // is this unique bargain to be used?
+    viable.resize(nb);
+    useBrgn.resize(nb);
+    for (unsigned int i=0; i<nb; i++) {
+      viable[i] = true;
+      useBrgn[i] = false;
+    }
+    unsigned int numViable = nb;
+    while (numViable > 0) {
+        double psum = KBase::sum(selProb);
+        selProb = selProb / psum;
+        int ndx = -1; // which unique bargain was chosen
+        BargainSMP* bn = nullptr;
+        if (smod->stm == StateTransMode::DeterminsticSTM) {
+            double prbMax = -1.0;
+            double pwrMax = -1.0;
+            for (unsigned int i=0; i<nb; i++) {
+                BargainSMP* bi = uniqueBrgn[i];
+                double pwrN = (2.0 * bi->actInit->sCap) + bi->actRcvr->sCap;
+                if (viable[i]) {
+                    double pi = bProb(i,0);
+                    if ((pi > prbMax) || ((pi == prbMax) && (pwrN > pwrMax))) {
+                        ndx = i;
+                        prbMax = pi;
+                        pwrMax = pwrN;
+                    }
+                }
+            }
+            bn = uniqueBrgn[ndx];
+            LOG(INFO) << "Choose bargain " << bn->getID() << " deterministically with original probability " << bProb(ndx,0) << " and power " << pwrMax;
+        }
+        else {
+            ndx = smod->rng->probSel(selProb);
+            bn = uniqueBrgn[ndx];
+            LOG(INFO) << "Choose bargain " << bn->getID() << " stochastically with original probability " << bProb(ndx,0);
+        }
+        useBrgn[ndx] = true;
+        numViable = 0;
+        const unsigned int aI = smod->actrNdx(bn->actInit);
+        const unsigned int aR = smod->actrNdx(bn->actRcvr);
+        for (unsigned int i=0; i<nb; i++) {
+            if (viable[i]) {
+                BargainSMP* bi = uniqueBrgn[i];
+                unsigned int aii = smod->actrNdx(bi->actInit);
+                unsigned int air = smod->actrNdx(bi->actRcvr);
+                if (
+                    (aI == aii) || (aI == air) ||
+                    (aR == aii) || (aR == air)) {
+                    viable[i] = false;
+                    selProb(i,0) = 0.0;
+                }
+                else {
+                    numViable = numViable + 1;
+                }
+            }
+        }
+        LOG(INFO) << "Leaves " << numViable << " unique bargains viable";
+        for (unsigned int i=0; i<nb; i++) {
+            if (viable[i]) {
+                LOG(INFO) << " " << SMPState::showOneBargain(uniqueBrgn[i]);
+            }
+        }
+    }
+
+    LOG(INFO) << "Unique bargains used";
+    for (unsigned int i=0; i<nb; i++) {
+        if (useBrgn[i]) {
+            LOG(INFO) << " " << SMPState::showOneBargain(uniqueBrgn[i]);
+        }
+    }
     
     return;
 }

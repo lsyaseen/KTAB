@@ -70,7 +70,10 @@ public:
   virtual ~PRNG();
   uint64_t uniform();
   double uniform(double a, double b);
+  
+  // chosen an index according to a column-vector of probabilities
   unsigned int probSel(const KMatrix & cv);
+  
   VBool bits(unsigned int nb);
   uint64_t setSeed(uint64_t sd);
 protected:
