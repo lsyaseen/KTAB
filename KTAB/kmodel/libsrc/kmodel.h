@@ -141,9 +141,6 @@ const vector<string> StateTransModeNames = {
 ostream& operator<< (ostream& os, const StateTransMode& stm);
 
 
-// At this point, the LISP keyword 'defmacro' should leap to mind.
-// Take in a list of strings, and template out everything else.
-
 // Will this PCE be Conditional or Markov-Incentive or Markov-Uniform or  ...
 enum class PCEModel {
   ConditionalPCM=0, MarkovIPCM, MarkovUPCM

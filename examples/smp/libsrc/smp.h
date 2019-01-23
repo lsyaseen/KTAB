@@ -310,6 +310,10 @@ private:
 
   std::mutex mtxLock;
 
+  // populate the Bargain Vote & Util tables for k-th actor,
+  // be sure to surround with sql flag logging control
+  void popBrgnUtil(unsigned int k, const KMatrix & u_im);
+  
   // update position of k-th actor from its queue of bargains
   void queueUpdatePstn(int k);
   

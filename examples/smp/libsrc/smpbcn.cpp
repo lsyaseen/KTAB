@@ -276,18 +276,17 @@ SMPState* SMPState::doBCN() {
         };
         KBase::groupThreads(thrCalcPosts, 0, na - 1);
     }
-    
-    LOG(INFO) << "For debugging, do PCE over all bargains";
+    LOG(INFO) << "For debugging, do "<< KBase::BargainResolutionMethod::BindingBest <<" over all bargains";
     groupUpdatePstns();
-    
     break;
 
     case KBase::BargainResolutionMethod::BindingBest:
         groupUpdatePstns();
         break;
+        
     default:
-      throw KException("SMPState::doBCN: Unrecognized BargainResolutionMethod");
-      break;
+        throw KException("SMPState::doBCN: Unrecognized BargainResolutionMethod");
+        break;
     }
 
   //model->beginDBTransaction();
@@ -647,6 +646,31 @@ void SMPState::doBCN(unsigned int i) {
     }
 }
 
+void SMPState::popBrgnUtil(unsigned int k, const KMatrix & u_im) {
+    const unsigned int na = model->numAct;
+    const vector<BargainSMP*> bk = brgns[k];
+    const unsigned int nb = bk.size();
+    vector< std::tuple<uint64_t, uint64_t>> barginIDsPair_i_j;
+    vector<uint64_t> bargnIdsRows = {};
+    for (int j = 0; j < nb; j++) {
+        bargnIdsRows.push_back(bk[j]->getID());
+    }
+    for (unsigned int brgnFirst = 0; brgnFirst < nb; brgnFirst++) {
+        for (unsigned int brgnSecond = 0; brgnSecond < brgnFirst; brgnSecond++) {
+            barginIDsPair_i_j.push_back(tuple<uint64_t, uint64_t>(bk[brgnFirst]->getID(), bk[brgnSecond]->getID()));
+        }
+    }
+    BrgnVotes votes;
+    for (unsigned int actor = 0; actor < na; ++actor) {
+        auto pv_ij = calcVotes(w, u_im, actor);
+        votes.push_back(BrgnVote(turn, barginIDsPair_i_j, pv_ij, actor));
+    }
+    brgnPosLock.lock();
+    brgnVotes.push_back(votes);
+    brgnUtils.push_back(BrgnUtil(turn, bargnIdsRows, u_im));
+    brgnPosLock.unlock();
+    return;
+}
 
 
 void SMPState::queueUpdatePstn(int k) {
@@ -665,8 +689,9 @@ void SMPState::queueUpdatePstn(int k) {
     LOG(INFO) << "u_im:";
     u_im.mPrintf(" %.5f ");
 
-    LOG(INFO) << "Doing scalarPCE for the" << nb << "bargains of actor" << k << "...";
-    auto p = Model::scalarPCE(na, nb, w, u_im, smod->vrCltn, smod->vpm, smod->pcem, ReportingLevel::Medium);
+    KBase::PCEModel myPCEM = smod->pcem;
+    LOG(INFO) << "Doing scalarPCE "<< myPCEM<<" for the" << nb << "bargains of actor" << k << "...";
+    auto p = Model::scalarPCE(na, nb, w, u_im, smod->vrCltn, smod->vpm, myPCEM, ReportingLevel::Medium);
     if (nb != p.numR()) {
       throw KException("SMPState::queueUpdatePstn: number of bargains mismatched with scalar PCE row count");
     }
@@ -694,41 +719,39 @@ void SMPState::queueUpdatePstn(int k) {
     actorMaxBrgNdx.insert(map<unsigned int, unsigned int>::value_type(k, mMax));
     auto bkm = brgns[k][mMax];
     LOG(INFO) << "Chosen bargain (" << smod->stm << "):" << bkm->getID()
-      << mMax + 1 << "out of" << nb << "bargains";
+              << mMax + 1 << "out of" << nb << "bargains";
     mtxLock.unlock();
 
-    //populate the Bargain Vote & Util tables
     // JAH added sql flag logging control
-  if (model->sqlFlags[3])
-  {
-    auto brgns_k = brgns[k];
-    vector< std::tuple<uint64_t, uint64_t>> barginIDsPair_i_j;
-    vector<uint64_t> bargnIdsRows = {};
-    for (int j = 0; j < nb; j++)
-    {
-      bargnIdsRows.push_back(brgns[k][j]->getID());
-    }
-    for (unsigned int brgnFirst = 0; brgnFirst < nb; brgnFirst++)
-    {
-      for (unsigned int brgnSecond = 0; brgnSecond < brgnFirst; brgnSecond++)
-      {
-        barginIDsPair_i_j.push_back(tuple<uint64_t, uint64_t>(brgns_k[brgnFirst]->getID(), brgns_k[brgnSecond]->getID()));
-      }
-    }
+    if (model->sqlFlags[3]) {
+      popBrgnUtil(k, u_im);
+      /*
+        auto brgns_k = brgns[k];
+        vector< std::tuple<uint64_t, uint64_t>> barginIDsPair_i_j;
+        vector<uint64_t> bargnIdsRows = {};
+        for (int j = 0; j < nb; j++) {
+            bargnIdsRows.push_back(brgns[k][j]->getID());
+        }
+        for (unsigned int brgnFirst = 0; brgnFirst < nb; brgnFirst++) {
+            for (unsigned int brgnSecond = 0; brgnSecond < brgnFirst; brgnSecond++) {
+                barginIDsPair_i_j.push_back(tuple<uint64_t, uint64_t>(brgns_k[brgnFirst]->getID(), brgns_k[brgnSecond]->getID()));
+            }
+        }
 
-    BrgnVotes votes;
-    for (unsigned int actor = 0; actor < na; ++actor) {
-      auto pv_ij = calcVotes(w, u_im, actor);
+        BrgnVotes votes;
+        for (unsigned int actor = 0; actor < na; ++actor) {
+            auto pv_ij = calcVotes(w, u_im, actor);
 
-      votes.push_back(BrgnVote(turn, barginIDsPair_i_j, pv_ij, actor));
-    }
-    brgnPosLock.lock();
-    brgnVotes.push_back(votes);
-    brgnUtils.push_back(BrgnUtil(turn, bargnIdsRows, u_im));
-    brgnPosLock.unlock();
+            votes.push_back(BrgnVote(turn, barginIDsPair_i_j, pv_ij, actor));
+        }
+        brgnPosLock.lock();
+        brgnVotes.push_back(votes);
+        brgnUtils.push_back(BrgnUtil(turn, bargnIdsRows, u_im));
+        brgnPosLock.unlock();
+        */
   }
 
-    // TODO: create a fresh position for k, from the selected bargain mMax.
+    // create a fresh position for k, from the selected bargain mMax.
     VctrPstn * pk = nullptr;
     auto oldPK = dynamic_cast<VctrPstn *>(pstns[k]);
     if (bkm->actInit == bkm->actRcvr) { // SQ
@@ -766,44 +789,36 @@ void SMPState::queueUpdatePstn(int k) {
 }
 
 void SMPState::groupUpdatePstns() {
-  
-  /* The data tables require, for each actor k, the pair (k, n_k) saying which bargain
-   * in k's queue was selected. As queueUpdatePstn processes the k-th queue alone,
-   * it is easy in that case.
-   * For group update, we select bargains. Then, we must go back to each bargain (i->j)
-   * to find the (i, n_i) and (j, n_j) data which the tables require.
-   * 
-   */
-  const unsigned int na = model->numAct;
+    const unsigned int na = model->numAct;
     
-  vector<unsigned int> uniqueBrgnID={};
-  vector<BargainSMP*> uniqueBrgn={};
-  
-  for (unsigned int i=0; i<na; i++) {
-    vector<BargainSMP*> bi = brgns[i];
-    unsigned int nbi = bi.size();
-    LOG(INFO) << "actor "<<i<<" has "<<nbi<< " bargains";
-    for (unsigned int j=0; j<nbi; j++) {
-      BargainSMP* bij = bi[j];
-      unsigned int bID = bij->getID();
-      unsigned int aI = model->actrNdx(bij->actInit);
-      unsigned int aR = model->actrNdx(bij->actRcvr);
-      LOG(INFO) << bID <<": "<<aI<<" -> "<<aR;
-      bool newP = (std::find(uniqueBrgn.begin(), uniqueBrgn.end(), bij) == uniqueBrgn.end());
-      if (newP) {
-        uniqueBrgn.push_back(bij);
-        uniqueBrgnID.push_back(bID);
-      }
+    // First, find the unique bargains, over which a PCE shall be done
+    vector<unsigned int> uniqueBrgnID = {};
+    vector<BargainSMP*> uniqueBrgn = {};
+    for (unsigned int i=0; i<na; i++) {
+        vector<BargainSMP*> bi = brgns[i];
+        unsigned int nbi = bi.size();
+        //LOG(INFO) << "actor "<<i<<" has "<<nbi<< " bargains";
+        for (unsigned int j=0; j<nbi; j++) {
+            BargainSMP* bij = bi[j];
+            unsigned int bID = bij->getID();
+            unsigned int aI = model->actrNdx(bij->actInit);
+            unsigned int aR = model->actrNdx(bij->actRcvr);
+            //LOG(INFO) << bID <<": "<<aI<<" -> "<<aR;
+            bool newP = (std::find(uniqueBrgn.begin(), uniqueBrgn.end(), bij) == uniqueBrgn.end());
+            if (newP) {
+                uniqueBrgn.push_back(bij);
+                uniqueBrgnID.push_back(bID);
+            }
+        }
     }
-  }
-  
-  string brgnFormat = " %llu    ";
-  string bNums;
-  for (auto bID : uniqueBrgnID) {
-    bNums += KBase::getFormattedString(brgnFormat.c_str(),bID);
-  }
+    string brgnFormat = " %llu    ";
+    string bNums;
+    for (auto bID : uniqueBrgnID) {
+        bNums += KBase::getFormattedString(brgnFormat.c_str(),bID);
+    }
     LOG(INFO) << "Unique bargain IDs:\n " << bNums;
- 
+
+    // Second, get the utilities of those unique bargains and do PCE
     const unsigned int nb = uniqueBrgn.size();
     auto buk = [this, uniqueBrgn](unsigned int nai, unsigned int nbj) {
         const BargainSMP* b = uniqueBrgn[nbj];
@@ -818,26 +833,27 @@ void SMPState::groupUpdatePstns() {
     PCEModel myPCEM = smod->pcem;
     myPCEM = PCEModel::MarkovIPCM;
     LOG(INFO) << "Doing scalarPCE ("<<myPCEM<<") for the" << nb << "unique bargains of all actors ...";
-    auto bProb = Model::scalarPCE(na, nb, w, u_im, smod->vrCltn, smod->vpm, myPCEM, ReportingLevel::Medium);
+    const KMatrix bProb = Model::scalarPCE(na, nb, w, u_im, smod->vrCltn, smod->vpm, myPCEM, ReportingLevel::Medium);
     if (nb != bProb.numR()) {
         throw KException("SMPState::groupUpdatePstns: number of bargains mismatched with scalar PCE row count");
     }
     if (1 != bProb.numC()) {
         throw KException("SMPState::groupUpdatePstns: scalar pce column size is not 1");
     }
-    
+
     LOG(INFO) << "Probability of each bargain:";
     trans(bProb).mPrintf(" %.5f ");
     trans(bProb).mPrintf(" %.1e ");
-    
-    auto selProb = bProb; // selection probabilities
+
+    // Third, select (det or stoch) using those probabilities. Break ties with weighted-average power.
+    KMatrix selProb = bProb; // selection probabilities
     vector<bool> viable = {}; // is this unique bargain still viable?
     vector<bool> useBrgn = {}; // is this unique bargain to be used?
     viable.resize(nb);
     useBrgn.resize(nb);
     for (unsigned int i=0; i<nb; i++) {
-      viable[i] = true;
-      useBrgn[i] = false;
+        viable[i] = true;
+        useBrgn[i] = false;
     }
     unsigned int numViable = nb;
     while (numViable > 0) {
@@ -850,7 +866,7 @@ void SMPState::groupUpdatePstns() {
             double pwrMax = -1.0;
             for (unsigned int i=0; i<nb; i++) {
                 BargainSMP* bi = uniqueBrgn[i];
-                double pwrN = (2.0 * bi->actInit->sCap) + bi->actRcvr->sCap;
+                double pwrN = ((2.0 * bi->actInit->sCap) + bi->actRcvr->sCap)/3.0;
                 if (viable[i]) {
                     double pi = bProb(i,0);
                     if ((pi > prbMax) || ((pi == prbMax) && (pwrN > pwrMax))) {
@@ -888,12 +904,14 @@ void SMPState::groupUpdatePstns() {
                 }
             }
         }
+        /*
         LOG(INFO) << "Leaves " << numViable << " unique bargains viable";
         for (unsigned int i=0; i<nb; i++) {
             if (viable[i]) {
                 LOG(INFO) << " " << SMPState::showOneBargain(uniqueBrgn[i]);
             }
         }
+        */
     }
 
     LOG(INFO) << "Unique bargains used";
@@ -902,44 +920,101 @@ void SMPState::groupUpdatePstns() {
             LOG(INFO) << " " << SMPState::showOneBargain(uniqueBrgn[i]);
         }
     }
+
+    // Fourth, rearrange the results so as to fill in the SQL tables.
+    
+    if (model->sqlFlags[3]) {
+        for (unsigned int k=0; k<na; k++) {
+            unsigned int nb = brgns[k].size();
+            auto buk = [this, k](unsigned int nai, unsigned int nbj) {
+                BargainSMP * b = this->brgns[k][nbj];
+                double u2 = this->brgnStateUtil(nai, b);
+                return u2;
+            };
+            auto u_im = KMatrix::map(buk, na, nb);
+            popBrgnUtil(k, u_im);
+        }
+    }
     
     auto brgnNdx = [this](unsigned int k, const BargainSMP* b) {
-      int n = -1; 
-      unsigned int nbk = this->brgns[k].size();
-      for (unsigned int i=0; i<nbk; i++) {
-        if (b == this->brgns[k][i]) {
-          n = i;
+        int n = -1;
+        unsigned int nbk = this->brgns[k].size();
+        for (unsigned int i=0; i<nbk; i++) {
+            if (b == this->brgns[k][i]) {
+                n = i;
+            }
         }
-      }
-      if (n < 0) {
-        throw KException("SMPState::groupUpdatePstns: Bargain of an actor not found in that actor's queue");
-      }
-      return n;
+        if (n < 0) {
+            throw KException("SMPState::groupUpdatePstns: Bargain of an actor not found in that actor's queue");
+        }
+        return n;
     };
-    
+
     // record where each used bargain appeared in each actor's queue.
     // We know (by construction of uniqueBrgn) that there are no repetitions.
-    vector<unsigned int> brgnPstn = {};
-    unsigned int numFound = 0;
-        // TODO: record them
-    for (unsigned int i=0; i<nb; i++) {
-      if (useBrgn[i]) {
-        const BargainSMP* bi = uniqueBrgn[i];
-        LOG(INFO) << "Processing bargain: " << SMPState::showOneBargain(bi);
-        const unsigned int aI = smod->actrNdx(bi->actInit);
-        const unsigned int aR = smod->actrNdx(bi->actRcvr);
-        unsigned int nI = brgnNdx(aI, bi);
-        numFound++;
-        LOG(INFO) << "actor "<< aI << " took "<< nI << "bargain in queue";
-        if (aI != aR) {
-          unsigned int nR = brgnNdx(aR, bi);
-          numFound++;
-          LOG(INFO) << "actor "<< aR << " took "<< nR << "bargain in queue";
-        }
-      }
+    vector<int> brgnPstn = {};
+    brgnPstn.resize(na);
+    for (unsigned int i=0; i<na; i++) {
+        brgnPstn[i] = -1;
     }
-    assert (na == numFound);
+    unsigned int numFound = 0;
+    for (unsigned int i=0; i<nb; i++) {
+        if (useBrgn[i]) {
+            const BargainSMP* bi = uniqueBrgn[i];
+            LOG(INFO) << "Processing bargain: " << SMPState::showOneBargain(bi);
+            const unsigned int aI = smod->actrNdx(bi->actInit);
+            const unsigned int aR = smod->actrNdx(bi->actRcvr);
+            unsigned int nI = brgnNdx(aI, bi);
+            numFound++;
+            LOG(INFO) << "actor "<< aI << " took "<< nI << "bargain in queue";
+            brgnPstn[aI] = nI;
+            if (aI != aR) {
+                unsigned int nR = brgnNdx(aR, bi);
+                numFound++;
+                LOG(INFO) << "actor "<< aR << " took "<< nR << "bargain in queue";
+                brgnPstn[aR] = nR;
+            }
+        }
+    }
+    // note that na == numfound here
     
+    for (unsigned int i=0; i<na; i++) {
+        LOG(INFO) << "actor "<< i << " took "<< brgnPstn[i] << "bargain in queue";
+        if (brgnPstn[i] < 0) {
+            throw KException("SMPState::groupUpdatePstns: failed to locate bargain position");
+        }
+    }
+
+    // Now we must build the inputs to create SQL tables
+    const double epsProb = 1E-10;
+    for (unsigned int k=0; k<na; k++) {
+        actorMaxBrgNdx.insert(map<unsigned int, unsigned int>::value_type(k, brgnPstn[k]));
+
+        // get the probabilities for those bargains in k's queue.
+        // Note that, because they are semi-randomly rearranged, they will rarely add to 1.
+        unsigned int nbk = brgns[k].size();
+        auto pk = KMatrix(nbk, 1);
+        for (unsigned int n=0; n<nbk; n++) {
+            double pkn = -1.0;  // probability, in k's queue, of n-th bargain
+            const BargainSMP* bn = brgns[k][n];
+            for (unsigned int m=0; m<nb; m++) {
+                if (bn == uniqueBrgn[m]) {
+                    pkn = bProb(m, 0) + epsProb; // avoid 0/0
+                }
+            }
+            pk(n,0) = pkn;
+            if (pkn < 0) {
+                throw KException("SMPState::groupUpdatePstns: failed to assign probability to bargain in queue");
+            }
+        }
+        pk = pk/ sum(pk);
+        LOG(INFO) << "Bargain conditional-probabilities for actor " << k;
+        trans(pk).mPrintf("%.4f  ");
+        actorBargains.insert(map<unsigned int, KBase::KMatrix>::value_type(k, pk));
+    }
+
+
+
     return;
 }
 
