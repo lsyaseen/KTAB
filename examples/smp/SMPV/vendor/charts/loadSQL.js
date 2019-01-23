@@ -76,7 +76,7 @@ function GraphData(file, onloaddb) {
             return object;
         });
 
-        //group by scenario 
+        //group by scenario
         const group = (arr, k) => arr.reduce((r, c) => (r[c[k]] = [...r[c[k]] || [], c], r), {});
         groupedScenarios = group(NewactorsObj, 'ScenarioId')
 
@@ -114,7 +114,7 @@ function GraphData(file, onloaddb) {
             }
         });
 
-        //group Positions by Scenario and Dim   
+        //group Positions by Scenario and Dim
         var GroupedPosData = GroupbySceAndDim(actorsObj);
 
 
@@ -160,7 +160,7 @@ function GraphData(file, onloaddb) {
             return object;
         });
 
-        //group effePoer by Scenario and Dim   
+        //group effePoer by Scenario and Dim
         var effpowData = GroupbySceAndDim(objects2);
 
         for (var i = 0; i < effpowData.length; i++) {
@@ -203,7 +203,7 @@ function GraphData(file, onloaddb) {
             return object;
         });
 
-        //group Bargains Data by Scenario and Dim   
+        //group Bargains Data by Scenario and Dim
         var BargainsData = GroupbySceAndDim(Bargnsobjects);
 
         for (var i = 0; i < BargainsData.length; i++) {
@@ -312,6 +312,8 @@ function getfile() {
         InitializeSlider(NumOfTurns);
         drawChart();
         drawLine();
+        drawScatterPlot();
+        draw2DimPlot();
         loadCurrentTurnData(currentTurn);
         drawNetwork();
 
