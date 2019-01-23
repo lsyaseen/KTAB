@@ -123,18 +123,19 @@ const vector<string> VotingRuleNames = {
 ostream& operator<< (ostream& os, const VotingRule& vr); 
 
 
+// Are competing SMP bargains resolved in each actor queue separately and 
+// non-binding, or as binding bargains in most-supported order?
+enum class BargainResolutionMethod {
+  ActorQueues=0, BindingBest
+};
+const vector<string> BargainResolutionMethodNames = {
+  "ActorQueues", "BindingBest" };
+ostream& operator<< (ostream& os, const BargainResolutionMethod& brm);
+
 // Will state transitions be in deterministic or stochastic mode
 enum class StateTransMode {
   DeterminsticSTM=0, StochasticSTM
 };
-
-
-// Are competing bargains resolved in each actor queue separately and 
-// non-binding, or as binding bargains in most-supported order?
-enum class BargainResolutionMethod{
-  ActorQueues=0, BindingBest
-};
-
 const vector<string> StateTransModeNames = {
   "Deterministic", "Stochastic" };
 ostream& operator<< (ostream& os, const StateTransMode& stm);

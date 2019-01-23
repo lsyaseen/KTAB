@@ -257,7 +257,7 @@ SMPState* SMPState::doBCN() {
   //model->commitDBTransaction();
 
   // Resolution of competing proposed bargains
-  LOG(INFO) << "Bargains to be resolved";
+  LOG(INFO) << "Bargains to be resolved by method"<<model->brm;
   showBargains(brgns);
 
 
@@ -804,7 +804,7 @@ void SMPState::groupUpdatePstns() {
   }
     LOG(INFO) << "Unique bargain IDs:\n " << bNums;
  
-    unsigned int nb = uniqueBrgn.size();
+    const unsigned int nb = uniqueBrgn.size();
     auto buk = [this, uniqueBrgn](unsigned int nai, unsigned int nbj) {
         const BargainSMP* b = uniqueBrgn[nbj];
         double u2 = this->brgnStateUtil(nai, b);
@@ -814,10 +814,10 @@ void SMPState::groupUpdatePstns() {
     LOG(INFO) << "u_im:";
     u_im.mPrintf(" %.5f ");
 
-    LOG(INFO) << "Doing scalarPCE for the" << nb << "unique bargains of all actors ...";
     auto smod = dynamic_cast<SMPModel *>(model);
     PCEModel myPCEM = smod->pcem;
     myPCEM = PCEModel::MarkovIPCM;
+    LOG(INFO) << "Doing scalarPCE ("<<myPCEM<<") for the" << nb << "unique bargains of all actors ...";
     auto bProb = Model::scalarPCE(na, nb, w, u_im, smod->vrCltn, smod->vpm, myPCEM, ReportingLevel::Medium);
     if (nb != bProb.numR()) {
         throw KException("SMPState::groupUpdatePstns: number of bargains mismatched with scalar PCE row count");
@@ -826,7 +826,7 @@ void SMPState::groupUpdatePstns() {
         throw KException("SMPState::groupUpdatePstns: scalar pce column size is not 1");
     }
     
-    LOG(INFO) << "p[bi]:";
+    LOG(INFO) << "Probability of each bargain:";
     trans(bProb).mPrintf(" %.5f ");
     trans(bProb).mPrintf(" %.1e ");
     
@@ -902,6 +902,43 @@ void SMPState::groupUpdatePstns() {
             LOG(INFO) << " " << SMPState::showOneBargain(uniqueBrgn[i]);
         }
     }
+    
+    auto brgnNdx = [this](unsigned int k, const BargainSMP* b) {
+      int n = -1; 
+      unsigned int nbk = this->brgns[k].size();
+      for (unsigned int i=0; i<nbk; i++) {
+        if (b == this->brgns[k][i]) {
+          n = i;
+        }
+      }
+      if (n < 0) {
+        throw KException("SMPState::groupUpdatePstns: Bargain of an actor not found in that actor's queue");
+      }
+      return n;
+    };
+    
+    // record where each used bargain appeared in each actor's queue.
+    // We know (by construction of uniqueBrgn) that there are no repetitions.
+    vector<unsigned int> brgnPstn = {};
+    unsigned int numFound = 0;
+        // TODO: record them
+    for (unsigned int i=0; i<nb; i++) {
+      if (useBrgn[i]) {
+        const BargainSMP* bi = uniqueBrgn[i];
+        LOG(INFO) << "Processing bargain: " << SMPState::showOneBargain(bi);
+        const unsigned int aI = smod->actrNdx(bi->actInit);
+        const unsigned int aR = smod->actrNdx(bi->actRcvr);
+        unsigned int nI = brgnNdx(aI, bi);
+        numFound++;
+        LOG(INFO) << "actor "<< aI << " took "<< nI << "bargain in queue";
+        if (aI != aR) {
+          unsigned int nR = brgnNdx(aR, bi);
+          numFound++;
+          LOG(INFO) << "actor "<< aR << " took "<< nR << "bargain in queue";
+        }
+      }
+    }
+    assert (na == numFound);
     
     return;
 }

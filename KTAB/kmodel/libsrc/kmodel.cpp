@@ -33,14 +33,75 @@ using std::get;
 using std::tuple;
 
 using KBase::nameFromEnum;
+using KBase::VPModel;
+using KBase::VotingRule;
+using KBase::BargainResolutionMethod;
+using KBase::StateTransMode;
+using KBase::PCEModel;
+using KBase::ThirdPartyCommit;
+using KBase::BigRAdjust;
+using KBase::BigRRange;
 
 // --------------------------------------------
 // Global Variables
 
 static std::mutex mtx_spce_log; // control access to log inside Model::scalarPCE
 
-// --------------------------------------------
 string Model::lastExceptionMsg = string();
+// --------------------------------------------
+
+ostream& operator<< (ostream& os, const VPModel& vpm) {
+  string s = nameFromEnum<VPModel>(vpm, KBase::VPModelNames);
+  os << s;
+  return os;
+}
+
+
+ostream& operator<< (ostream& os, const VotingRule& vr) {
+  string s = nameFromEnum<VotingRule>(vr, KBase::VotingRuleNames);
+  os << s;
+  return os;
+}
+
+ostream& operator<< (ostream& os, const BargainResolutionMethod& brm) {
+  string s = nameFromEnum<KBase::BargainResolutionMethod>(brm, KBase::BargainResolutionMethodNames);
+  os << s;
+  return os;
+}
+
+
+ostream& operator<< (ostream& os, const StateTransMode& stm) {
+  string s = nameFromEnum<StateTransMode>(stm, KBase::StateTransModeNames);
+  os << s;
+  return os;
+}
+
+ostream& operator<< (ostream& os, const PCEModel& pcm) {
+  string s = nameFromEnum<PCEModel>(pcm, KBase::PCEModelNames);
+  os << s;
+  return os;
+}
+
+ostream& operator<< (ostream& os, const ThirdPartyCommit& tpc) {
+  string s = nameFromEnum<ThirdPartyCommit>(tpc, KBase::ThirdPartyCommitNames);
+  os << s;
+  return os;
+} 
+
+ostream& operator << (ostream& os, const BigRRange& rRng) {
+  string s = nameFromEnum<BigRRange>(rRng, KBase::BigRRangeNames);
+  os << s;
+  return os;
+}
+
+ostream& operator << (ostream& os, const BigRAdjust& rAdj) {
+  string s = nameFromEnum<BigRAdjust>(rAdj, KBase::BigRAdjustNames);
+  os << s;
+  return os;
+}
+
+
+// --------------------------------------------
 
 string Model::getLastError() {
   return lastExceptionMsg;
@@ -303,55 +364,6 @@ int Model::actrNdx(const Actor* a) const {
   return ai; // negative iff this "actor" was not found
 }
 
-
-
-ostream& operator<< (ostream& os, const VPModel& vpm) {
-  string s = nameFromEnum<VPModel>(vpm, KBase::VPModelNames);
-  os << s;
-  return os;
-}
-
-
-ostream& operator<< (ostream& os, const VotingRule& vr) {
-  string s = nameFromEnum<VotingRule>(vr, KBase::VotingRuleNames);
-  os << s;
-  return os;
-}
-
-
-//   auto et = KBase::enumFromName<VotingRule>(s, KBase::VotingRuleNames);
-//   string s2 = KBase::nameFromEnum<VotingRule>(vr, KBase::VotingRuleNames);
-
-
-ostream& operator<< (ostream& os, const StateTransMode& stm) {
-  string s = nameFromEnum<StateTransMode>(stm, KBase::StateTransModeNames);
-  os << s;
-  return os;
-}
-
-ostream& operator<< (ostream& os, const PCEModel& pcm) {
-  string s = nameFromEnum<PCEModel>(pcm, KBase::PCEModelNames);
-  os << s;
-  return os;
-}
-
-ostream& operator<< (ostream& os, const ThirdPartyCommit& tpc) {
-  string s = nameFromEnum<ThirdPartyCommit>(tpc, KBase::ThirdPartyCommitNames);
-  os << s;
-  return os;
-} 
-
-ostream& operator << (ostream& os, const BigRRange& rRng) {
-  string s = nameFromEnum<BigRRange>(rRng, KBase::BigRRangeNames);
-  os << s;
-  return os;
-}
-
-ostream& operator << (ostream& os, const BigRAdjust& rAdj) {
-  string s = nameFromEnum<BigRAdjust>(rAdj, KBase::BigRAdjustNames);
-  os << s;
-  return os;
-}
 
 
 

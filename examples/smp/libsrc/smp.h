@@ -449,6 +449,12 @@ public:
 
   static SMPModel * getSmpModel();
 
+  // Default is deterministic, not stochastic
+  KBase::StateTransMode stm = KBase::StateTransMode::DeterminsticSTM;
+  
+  // default is ActorQueues
+  KBase::BargainResolutionMethod brm = KBase::BargainResolutionMethod::ActorQueues;
+
 protected:
   //sqlite3 *smpDB = nullptr; // keep this protected, to ease multi-threading
   //string scenName = "Scen";

@@ -555,7 +555,7 @@ void SMPState::setOneAUtil(unsigned int perspH, ReportingLevel rl) {
 
 void SMPState::showBargains(const vector < vector < BargainSMP* > > & brgns) const {
     string msg = "Bargains involving actor %2u: ";
-    string brgnFormat = "[%llu, %u:%u]"; // [bargainID, initAct:recvAct]
+    string brgnFormat = "[%llu, %u:%u] "; // [bargainID, initAct:recvAct]
     string actorBargains;
 
     auto printOneBargain = [this, &brgns, &actorBargains, &brgnFormat](unsigned int i, unsigned int j) {
