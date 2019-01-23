@@ -482,9 +482,7 @@ tuple<double, double> Model::vProb(VPModel vpm, const double s1, const double s2
   return tuple<double, double>(p1, p2);
 }
 
-// note that while the C_ij can be any arbitrary positive matrix
-// with C_kk = 0, the p_ij matrix has the symmetry pij + pji = 1
-// (and hence pkk = 1/2).
+
 KMatrix Model::vProb(VPModel vpm, const KMatrix & c) {
   unsigned int numOpt = c.numR();
   if (numOpt != c.numC()) {
@@ -542,9 +540,7 @@ KMatrix Model::coalitions(function<double(unsigned int ak, unsigned int pi, unsi
   return c;
 }
 
-// returns a square matrix of prob(OptI > OptJ)
-// these are assumed to be unique options.
-// w is a [1,actor] row-vector of actor strengths, u is [act,option] utilities.
+
 KMatrix Model::vProb(VotingRule vr, VPModel vpm, const KMatrix & w, const KMatrix & u) {
   // u_ij is utility to actor i of the position advocated by actor j
   unsigned int numAct = u.numR();
@@ -598,42 +594,8 @@ tuple<KMatrix, KMatrix> Model::probCE2(PCEModel pcm, VPModel vpm, const KMatrix 
   return tuple<KMatrix, KMatrix>(p, victProb);
 }
 
-/*
-  // Given square matrix of Prob[i>j] returns a column vector for Prob[i]
-  KMatrix Model::probCE(PCEModel pcm, const KMatrix & pv) {
-    const double pTol = 1E-8;
-    unsigned int numOpt = pv.numR();
-    assert(numOpt == pv.numC()); // must be square
-    auto test = [&pv, pTol](unsigned int i, unsigned int j) {
-      assert(0 <= pv(i, j));
-      assert(fabs(pv(i, j) + pv(j, i) - 1.0) < pTol);
-      return;
-    };
-    KMatrix::mapV(test, numOpt, numOpt); // catch gross errors
 
-    auto p = KMatrix();
-    switch (pcm) {
-    case PCEModel::ConditionalPCM:
-      p = condPCE(pv);
-      break;
-    case PCEModel::MarkovIPCM:
-      throw KException("Model::probCE not yet implemented MarkovIPCM");
-      break;
-    case PCEModel::MarkovUPCM:
-      p = markovUniformPCE(pv);
-      break;
-    default:
-      throw KException("Model::probCE unrecognized PCEModel");
-      break;
-    }
-    assert(fabs(sum(p) - 1.0) < pTol);
-    return p;
-  }
-*/
 
-// Given square matrix of strengths, Coalition[i over j] returns a column vector for Prob[i].
-// Uses Markov process, not 1-step conditional probability.
-// Challenge probabilities are proportional to influence promoting a challenge
 KMatrix Model::markovIncentivePCE(const KMatrix & coalitions, VPModel vpm) {
   using KBase::sqr;
   using KBase::qrtc;
@@ -731,28 +693,8 @@ KMatrix Model::markovIncentivePCE(const KMatrix & coalitions, VPModel vpm) {
   return p;
 }
 
-/*
-  KMatrix Model::markovIncentivePCE(const KMatrix & pv) {
-    throw KException("Model::markovIncentivePCE not yet implemented");
 
-    const double pTol = 1E-6;
-    unsigned int numOpt = pv.numR();
-    auto p = KMatrix(numOpt, 1, 1.0) / numOpt;  // all 1/n
-    auto q = p;
-    unsigned int iMax = 1000;  // 10-30 is typical
-    unsigned int iter = 0;
-    double change = 1.0;
 
-    // do the markov calculation
-
-    assert(iter < iMax); // no way to recover
-    return p;
-  }
-  */
-
-// Given square matrix of Prob[i>j] returns a column vector for Prob[i].
-// Uses Markov process, not 1-step conditional probability.
-// Challenges have uniform probability 1/N
 KMatrix Model::markovUniformPCE(const KMatrix & pv) {
   const double pTol = 1E-6;
   unsigned int numOpt = pv.numR();
@@ -789,8 +731,6 @@ KMatrix Model::markovUniformPCE(const KMatrix & pv) {
 }
 
 
-// Given square matrix of Prob[i>j] returns a column vector for Prob[i].
-// Uses 1-step conditional probabilities, not Markov process
 KMatrix Model::condPCE(const KMatrix & pv) {
   unsigned int numOpt = pv.numR();
   auto p = KMatrix(numOpt, 1);
@@ -812,11 +752,7 @@ KMatrix Model::condPCE(const KMatrix & pv) {
 }
 
 
-// calculate the [option,1] column vector of option-probabilities.
-// w is a [1,actor] row-vector of actor strengths, u is [act,option] utilities.
-// This assumes scalar capabilities of actors (w), so that the voting strength
-// is a direct function of difference in utilities.Therefore, we can use
-// Model::vProb(VotingRule vr, const KMatrix & w, const KMatrix & u)
+
 KMatrix Model::scalarPCE(unsigned int numAct, unsigned int numOpt, const KMatrix & w, const KMatrix & u,
                          VotingRule vr, VPModel vpm, PCEModel pcem, ReportingLevel rl) {
 

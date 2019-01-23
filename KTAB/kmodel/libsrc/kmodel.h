@@ -350,14 +350,17 @@ public:
                             unsigned int numAct, unsigned int numOpt);
 
   // calculate pv[i>j] from coalitions
-  // c[i,j] is the strength of coalition supporting OptI over OptJ
+  // c[i,j] is the strength of coalition supporting OptI over OptJ.
+  // note that while the C_ij can be any arbitrary positive matrix
+  // with C_kk = 0, the p_ij matrix has the symmetry pij + pji = 1
+  // (and hence pkk = 1/2).
   static KMatrix vProb(VPModel vpm, const KMatrix & c);
 
   // assumes simple voting over those options with that utility matrix,
   // builds coalitions, and returns a square matrix of prob(OptI > OptJ)
   // these are assumed to be unique options.
   // w is a [1,actor] row-vector of actor strengths, u is [act,option] utilities.
-  static KMatrix vProb(VotingRule vr, VPModel vpm, const KMatrix & w, const KMatrix & u);
+    static KMatrix vProb(VotingRule vr, VPModel vpm, const KMatrix & w, const KMatrix & u);
 
   // calculate column vector P[i] from square matrix pv[i>j]
   //static KMatrix probCE(PCEModel pcm, const KMatrix & pv);
@@ -369,10 +372,15 @@ public:
 
   // calculate the [option,1] column vector of option-probabilities.
   // w is a [1,actor] row-vector of actor strengths, u is [act,option] utilities.
+  // This assumes scalar capabilities of actors (w), so that the voting strength
+  // is a direct function of difference in utilities.Therefore, we can use
+  // Model::vProb(VotingRule vr, const KMatrix & w, const KMatrix & u)
   static KMatrix scalarPCE(unsigned int numAct, unsigned int numOpt, const KMatrix & w,
                            const KMatrix & u, VotingRule vr, VPModel vpm, PCEModel pcem, ReportingLevel rl);
 
-
+// Given square matrix of strengths, Coalition[i over j] returns a column vector for Prob[i].
+// Uses Markov process, not 1-step conditional probability.
+// Challenge probabilities are proportional to influence promoting a challenge
   static KMatrix markovIncentivePCE(const KMatrix & coalitions, VPModel vpm);
 
   virtual unsigned int addActor(Actor* a); // returns new number of actors, always at least 1
@@ -474,16 +482,22 @@ protected:
   void execQuery(std::string& qry);
   bool createDB(const QString& dbName);
   bool connect(const QString& server,
-    const int port,
-    const QString& databaseName,
-    const QString& userName,
-    const QString& password);
+                 const int port,
+                 const QString& databaseName,
+                 const QString& userName,
+                 const QString& password);
   bool isDB(const QString& databaseName);
 
   static string lastExceptionMsg;
 private:
+  // Given square matrix of Prob[i>j] returns a column vector for Prob[i].
+  // Uses Markov process, not 1-step conditional probability.
+  // Challenges have uniform probability 1/N
   static KMatrix markovUniformPCE(const KMatrix & pv);
-  //static KMatrix markovIncentivePCE(const KMatrix & pv);
+
+
+  // Given square matrix of Prob[i>j] returns a column vector for Prob[i].
+  // Uses 1-step conditional probabilities, not Markov process
   static KMatrix condPCE(const KMatrix & pv);
 };
 

@@ -25,6 +25,7 @@
 #include "demosmp.h"
 #include <functional>
 #include "mainwindow.h"
+#include <string>
 
 // Copied this code snippet from demosmp.cpp
 
@@ -291,7 +292,6 @@ void MainWindow::runModel(QString conStr, QString fileName)
     QString connectDBString;
 
     connectDBString = conStr;
-    //    qDebug()<<connectDBString << "db";
 
     if(!connectDBString.isEmpty())
     {
@@ -338,6 +338,7 @@ void MainWindow::runModel(QString conStr, QString fileName)
         // 3 = Bargain Resolution Tables, 4 = VectorPosition table
         // JAH 20161010 added group 4 for only VectorPos so it can be logged alone
         std::vector<bool> sqlFlags = {true,true,true,true,true};
+        LOG(INFO) << "Database connection string: " << conStr.toStdString();
 
         //log minimum
         if(logMinimum->isChecked())

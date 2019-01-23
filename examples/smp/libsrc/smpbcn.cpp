@@ -766,9 +766,16 @@ void SMPState::queueUpdatePstn(int k) {
 }
 
 void SMPState::groupUpdatePstns() {
+  
+  /* The data tables require, for each actor k, the pair (k, n_k) saying which bargain
+   * in k's queue was selected. As queueUpdatePstn processes the k-th queue alone,
+   * it is easy in that case.
+   * For group update, we select bargains. Then, we must go back to each bargain (i->j)
+   * to find the (i, n_i) and (j, n_j) data which the tables require.
+   * 
+   */
   const unsigned int na = model->numAct;
     
-  // we use unordered sets, not ordered vectors
   vector<unsigned int> uniqueBrgnID={};
   vector<BargainSMP*> uniqueBrgn={};
   

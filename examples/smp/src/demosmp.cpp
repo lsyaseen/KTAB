@@ -89,15 +89,22 @@ int main(int ac, char **av) {
     printf("--help           print this message\n");
     printf("--euSMP          exp. util. of spatial model of politics\n");
     printf("--ra             randomize the adjustment of ideal points with euSMP \n");
-    printf("--csv <f>        read a scenario from CSV\n");
-    printf("--xml <f>        read a scenario from XML\n");
     printf("--logmin         log only scenario information + position histories\n");
     printf("--savehist       export by-dim by-turn position histories (input+'_posLog.csv') and\n");
     printf("                 by-dim actor effective powers (input+'_effPower.csv')\n");
     printf("--seed <n>       set a 64bit seed; default is %020llu; 0 means truly random\n", dSeed);
-    printf("--connstr        a semicolon separated string for database server credentials:\n");
+    printf("\n");
+    printf("                 One of the following two scenario specifications are required:\n");
+    printf("--csv <f>        read a scenario from CSV\n");
+    printf("--xml <f>        read a scenario from XML\n");
+    printf("\n");
+    printf("                 A database is always required:\n");
+    printf("--connstr <s>    quoted, semicolon-separated string for database server credentials:\n");
     printf("                 \"Driver=<QPSQL|QSQLITE>;Server=<IP>*;[Port=<port>]*;Database=<DB_name>;\n");
     printf("                 Uid=<user_id>*;Pwd=<password>*\"*for QPSQL only\n");
+    printf("\n");
+    printf("Example minimal command: \n");
+    printf("./smpc --logmin --connstr \"Driver=QSQLITE;Database=./log\" --csv ./data.csv \n");
   };
 
   if (ac > 1) {
@@ -161,6 +168,7 @@ int main(int ac, char **av) {
     run = false; // no arguments supplied
   }
 
+  
   // JAH 20160730 vector of SQL logging flags for 5 groups of tables:
   // 0 = Information Tables, 1 = Position Tables, 2 = Challenge Tables,
   // 3 = Bargain Resolution Tables, 4 = VectorPosition table
@@ -192,7 +200,7 @@ int main(int ac, char **av) {
 
   //printf("Using PRNG seed:  %020llu \n", seed);
   //printf("Same seed in hex:   0x%016llX \n", seed);
-
+  LOG(INFO) << "Database connection string: " << connstr.c_str();
   // JAH 20170109 we set the seed first to -1 then change it to dseed
   // here only if input is not xml, so as to ensure that a manually
   // input seed on the cmdline can override the seed in an xml file,
