@@ -30,19 +30,17 @@ for (var d = 0; d < dimensions.length; d++) {
       }
   }
 }
-
+var xRedDot=40;
+var yRedDot=60;
 var data=[
-  {"cereal":"Apple_Cinnamon_Cheerios","manufacturer":"General Mills","calories":110,"sugar":10},
-  {"cereal":"Apple_Jacks","manufacturer":"Kelloggs","calories":112,"sugar":14},
-  {"cereal":"Cap'n'Crunch","manufacturer":"Quaker Oats","calories":120,"sugar":12},
-  {"cereal":"Cheerios","manufacturer":"General Mills","calories":110,"sugar":1},
-  {"cereal":"Cinnamon_Toast_Crunch","manufacturer":"General Mills","calories":120,"sugar":9},
-  {"cereal":"Cocoa_Puffs","manufacturer":"General Mills","calories":110,"sugar":13},
-
+  {"actor":"XY","dim1pos":50,"dim2pos":90, "rx": 285, "ry": 40, "angle":0},
+  {"actor":"LK","dim1pos":90,"dim2pos":20, "rx": 110, "ry": 150, "angle":0},
+  {"actor":"HLJ","dim1pos":30,"dim2pos":50, "rx": 70, "ry": 93, "angle":0},
 ];
+
   data.forEach(function(d) { // convert strings to numbers
-      d.calories = +d.calories;
-      d.sugar = +d.sugar;
+      d.dim1pos = +d.dim1pos;
+      d.dim2pos = +d.dim2pos;
   });
 
 // Common pattern for defining vis size and margins
@@ -58,16 +56,18 @@ var canvas = d3.select("#twoDimPlot").append("svg")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 // Define our scales
-var colorScale = d3.scaleOrdinal(["#5C8598","#219DD8","#96C9E5","#3C3D3B","#ECCE6A","#f8ecba"]);
+var colorScale = d3.scaleOrdinal(["#3366cc", "#109618", "#990099", "#0099c6", "#ff9900", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"]);
 
 var xScale = d3.scaleLinear()
-    .domain([ d3.min(data, function(d) { return d.sugar; }) - 1,
-              d3.max(data, function(d) { return d.sugar; }) + 1 ])
+               .domain([0,100])
+    // .domain([ d3.min(data, function(d) { return d.dim2pos; }) - 1,
+    //           d3.max(data, function(d) { return d.dim2pos; }) + 1 ])
     .range([0, width]);
 
 var yScale = d3.scaleLinear()
-    .domain([ d3.min(data, function(d) { return d.calories; }) - 1,
-              d3.max(data, function(d) { return d.calories; }) + 1 ])
+               .domain([0,100])
+    // .domain([ d3.min(data, function(d) { return d.dim1pos; }) - 1,
+    //           d3.max(data, function(d) { return d.dim1pos; }) + 1 ])
     .range([height, 0]); // flip order because y-axis origin is upper LEFT
 
 
@@ -104,7 +104,7 @@ canvas.append("g")
 
  // add the Y gridlines
  canvas.append("g")
- .attr("transform", "translate(0,90)")
+ .attr("transform", "translate(0,"+height/2+")")
 .attr("class", "grid")
  .style("stroke-opacity", "0.2")
  .style("stroke-dasharray", "2")
@@ -124,7 +124,7 @@ canvas.append("g")
     .attr("x", width) // x-offset from the xAxis, move label all the way to the right
     .attr("y", -6)    // y-offset from the xAxis, moves text UPWARD!
     .style("text-anchor", "end") // right-justify text
-    .text("Sugar");
+    .text("dim2pos");
 
 // Add y-axis to the canvas
 canvas.append("g")
@@ -135,7 +135,7 @@ canvas.append("g")
     .attr("transform", "rotate(-90)") // although axis is rotated, text is not
     .attr("y", 15) // y-offset from yAxis, moves text to the RIGHT because it's rotated, and positive y is DOWN
     .style("text-anchor", "end")
-    .text("Calories");
+    .text("dim1pos");
 
 // Add the tooltip container to the vis container
 // it's invisible and its position/contents are defined during mouseover
@@ -145,10 +145,9 @@ var tooltip = d3.select("#twoDimPlot").append("div")
 
 // tooltip mouseover event handler
 var tipMouseover = function(d) {
-    var color = colorScale(d.manufacturer);
-    var html  = d.cereal + "<br/>" +
-                "<span style='color:" + color + ";'>" + d.manufacturer + "</span><br/>" +
-                "<b>" + d.sugar + "</b> sugar, <b/>" + d.calories + "</b> calories";
+    var color = colorScale(d.actor);
+    var html  = "<span style='color:" + color + ";'>" + d.actor + "</span><br/>" +
+                "<b>" + d.dim2pos + "</b> dim2pos, <b/>" + d.dim1pos + "</b> dim1pos";
 
     tooltip.html(html)
         .style("left", (d3.event.pageX + 15) + "px")
@@ -168,14 +167,36 @@ var tipMouseout = function(d) {
 // Add data points!
 canvas.selectAll("circle")
   .data(data)
-.enter().append("circle")
+  .enter().append("circle")
   .attr("class", "circle")
-  .attr("r", 5.5) // radius size, could map to another data dimension
-  .attr("cx", function(d) { return xScale( d.sugar ); })     // x position
-  .attr("cy", function(d) { return yScale( d.calories ); })  // y position
-  .style("fill", function(d) { return colorScale(d.manufacturer); })
+  .attr("r", 4) // radius size, could map to another data dimension
+  .attr("cx", function(d) { return xScale( d.dim2pos ); })     // x position
+  .attr("cy", function(d) { return yScale( d.dim1pos ); })  // y position
+  .style("fill", function(d) { return colorScale(d.actor); })
   .on("mouseover", tipMouseover)
   .on("mouseout", tipMouseout);
+
+
+  canvas.append("circle")
+  .attr("r", 2) // radius size, could map to another data dimension
+  .attr("cx", xScale(xRedDot))     // x position
+  .attr("cy", yScale(yRedDot))  // y position
+  .attr("fill", "red");
+
+
+  canvas.selectAll("ellipse")
+  .data(data)
+  .enter().append("ellipse")
+  .attr("rx", function(d) { return d.rx ; }) // radius size, could map to another data dimension
+  .attr("ry", function(d) { return d.ry ; }) // radius size, could map to another data dimension
+  .attr("cx", function(d) { return xScale( d.dim2pos ); })     // x position
+  .attr("cy", function(d) { return yScale( d.dim1pos ); })  // y position
+  .style("fill","none" )
+  .style("stroke", function(d) { return colorScale(d.actor); })
+  .attr("transform", function(d) { return "rotate("+d.angle +","+xScale( d.dim2pos )+","+yScale( d.dim1pos )+")";})
+
+
+
 
   var legend = canvas.selectAll(".legend")
       .data(colorScale.domain())
