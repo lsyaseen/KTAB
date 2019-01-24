@@ -207,8 +207,8 @@ public:
   void setNRA(); // TODO: this just sets risk neutral, for now
   // return actor's normalized risk attitude (if set)
   double aNRA(unsigned int i) const;
-
-  void setAccomodate(double adjRate = 1.0);
+  
+  void setAccomodate(double aRate = 1.0);
   // set ideal-accomodation matrix to scaled identity matrix, for current number of actors
 
   void setAccomodate(const KMatrix & aMat);
@@ -462,6 +462,7 @@ public:
   KBase::BargainResolutionMethod brm = KBase::BargainResolutionMethod::ActorQueues;
 
 protected:
+  
   //sqlite3 *smpDB = nullptr; // keep this protected, to ease multi-threading
   //string scenName = "Scen";
   static const int NumTables = 5; // TODO : Add one to this num when new table is added

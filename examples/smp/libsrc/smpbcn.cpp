@@ -268,7 +268,7 @@ SMPState* SMPState::doBCN() {
     s2 = new SMPState(model);
 
     //TODO: remove this testing code
-    model->brm = KBase::BargainResolutionMethod::BindingBest;
+    //model->brm = KBase::BargainResolutionMethod::BindingBest;
 
     switch (model->brm) {
     case KBase::BargainResolutionMethod::ActorQueues:
@@ -352,17 +352,21 @@ SMPState* SMPState::doBCN() {
   s2->setUENdx();
 
   if (0 == accomodate.numC()) { // nothing to copy
-    s2->setAccomodate(1.0); // set to identity matrix
+    s2->setAccomodate(); // set to scaled identity matrix
   }
   else {
     s2->setAccomodate(accomodate);
   }
+    LOG(INFO) << "Setting accomodation matrix:";
+    accomodate.mPrintf("%5.3f  ");
 
   if (0 == ideals.size()) { // nothing to copy
     s2->idealsFromPstns(); // set s2's current ideals to s2's current positions
+    LOG(INFO) << "Setting current ideals to current positions";
   }
   else {
     s2->ideals = ideals; // copy s1's old ideals
+    LOG(INFO) << "Copying old ideals into new position";
   }
   s2->newIdeals(); // adjust s2 ideals toward new ones
   double ipDist = s2->posIdealDist(ReportingLevel::Medium);

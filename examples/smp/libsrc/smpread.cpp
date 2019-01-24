@@ -249,8 +249,9 @@ SMPModel * SMPModel::csvRead(string fName, uint64_t s, vector<bool> f) {
     pos = pos / 100.0;
     sal = sal / 100.0;
 
-    LOG(INFO) << "Setting ideal-accomodation matrix to identity matrix";
-    auto accM = KBase::iMat(numActor);
+    double adjRate = 1.0; 
+    LOG(INFO) << "Setting ideal-accomodation matrix to identity matrix times "<< adjRate;
+    auto accM = adjRate * KBase::iMat(numActor);
 
     // now that it is read and verified, use the data
     auto sm0 = initModel(actorNames, actorDescs, dNames, cap, pos, sal, accM,  s, f, scenDesc, scenName);

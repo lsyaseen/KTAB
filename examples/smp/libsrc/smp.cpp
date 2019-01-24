@@ -867,25 +867,25 @@ double SMPState::posIdealDist(ReportingLevel rl) const {
     return rmsDist;
 }
 
-void SMPState::setAccomodate(double adjRate) {
+void SMPState::setAccomodate(double aRate) {
 
     // a man's gotta know his limits
     // (with apologies to HC)
-    if (0.0 > adjRate) {
-      throw KException("SMPState::setAccomodate: adjRate must be non-negative");
+    if (0.0 > aRate) {
+      throw KException("SMPState::setAccomodate: aRate must be non-negative");
     }
-    if (adjRate > 1.0) {
-      throw KException("SMPState::setAccomodate: adjRate must not be more than 1.0");
+    if (aRate > 1.0) {
+      throw KException("SMPState::setAccomodate: aRate must not be more than 1.0");
     }
     const unsigned int na = model->numAct;
 
     LOG(INFO) << KBase::getFormattedString(
-      "Setting SMPState::accomodate to %.3f * identity matrix", adjRate);
+      "Setting SMPState::accomodate to %.3f * identity matrix", aRate);
 
     // A standard Identity matrix is helpful here because it
     // should keep the behavior same as the original "cynical" model:
     //      ideal_{i,t} := pstn_{i,t}
-    auto am = adjRate * KBase::iMat(na);
+    auto am = aRate * KBase::iMat(na);
     setAccomodate(am);
     return;
 }
