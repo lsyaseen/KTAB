@@ -150,7 +150,7 @@
                                 <a href="#ScatterPlotTab" data-toggle="tab">ScatterPlot</a>
                             </li>
                             <li>
-                                <a href="#2DimChartTab" data-toggle="tab">2DimChart</a>
+                                <a href="#2DimChartTab" data-toggle="tab">Winset</a>
                             </li>
                             <li>
                                 <a href="#ParallelCoordinatesGraphTab" data-toggle="tab">Parallel Coordinates Graph</a>
@@ -277,7 +277,7 @@
                                     </div>
                                     <div class="col-sm-12 col-md-12 col-lg-8">
                                         <div class="panel panel-default">
-                                            <div id="MainLineChart" class="panel-body "> </div>
+                                            <div id="ParallelCoordinatesGraph" class="panel-body "> </div>
                                         </div>
                                     </div>
                                     <div class="col-sm-12  col-md-12 col-md-offset-0 col-lg-4">
@@ -394,6 +394,7 @@
 
     <!-- Bootstrap Core JavaScript -->
     <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://bl.ocks.org/syntagmatic/raw/3341641/render-queue.js"></script>
 
     <!-- load db file -->
     <script src="../vendor/charts/loadSQL.js"></script>
@@ -492,6 +493,7 @@
         drawLine();
         drawScatterPlot();
         draw2DimPlot();
+        drawParacoordChart();
         drawNetwork();
     });
 
@@ -531,6 +533,7 @@
         drawLine();
         drawScatterPlot();
         draw2DimPlot();
+        drawParacoordChart();
         drawNetwork();
 
     });
@@ -726,6 +729,7 @@
             drawLine();
             drawScatterPlot();
             draw2DimPlot();
+            drawParacoordChart();
             loadCurrentTurnData(currentTurn);
             drawNetwork();
             checkLabels();
@@ -743,6 +747,7 @@
                 drawLine();
                 drawScatterPlot();
                 draw2DimPlot();
+                drawParacoordChart();
                 loadCurrentTurnData(currentTurn);
 
                 drawNetwork();
@@ -927,6 +932,7 @@
         drawLine();
         drawScatterPlot();
         draw2DimPlot();
+        drawParacoordChart();
         drawNetwork();
 
     }
