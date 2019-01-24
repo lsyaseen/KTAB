@@ -261,13 +261,15 @@ SMPState* SMPState::doBCN() {
   showBargains(brgns);
 
 
-  w = actrCaps();
-  LOG(INFO) << "w:";
-  w.mPrintf(" %6.2f ");
+    w = actrCaps();
+    LOG(INFO) << "w:";
+    w.mPrintf(" %6.2f ");
 
-  s2 = new SMPState(model);
+    s2 = new SMPState(model);
 
-  
+    //TODO: remove this testing code
+    model->brm = KBase::BargainResolutionMethod::BindingBest;
+
     switch (model->brm) {
     case KBase::BargainResolutionMethod::ActorQueues:
     {
@@ -277,13 +279,13 @@ SMPState* SMPState::doBCN() {
         KBase::groupThreads(thrCalcPosts, 0, na - 1);
     }
     LOG(INFO) << "For debugging, do "<< KBase::BargainResolutionMethod::BindingBest <<" over all bargains";
-    groupUpdatePstns();
+    groupUpdatePstns(false);
     break;
 
     case KBase::BargainResolutionMethod::BindingBest:
-        groupUpdatePstns();
+        groupUpdatePstns(true);
         break;
-        
+
     default:
         throw KException("SMPState::doBCN: Unrecognized BargainResolutionMethod");
         break;
@@ -758,27 +760,31 @@ void SMPState::queueUpdatePstn(int k) {
       pk = new VctrPstn(*oldPK);
     }
     else {
-      const unsigned int ndxInit = model->actrNdx(bkm->actInit);
-      const unsigned int ndxRcvr = model->actrNdx(bkm->actRcvr);
-      if (ndxInit == k) {
-        pk = new VctrPstn(bkm->posInit);
-      }
-      else if (ndxRcvr == k) {
-        pk = new VctrPstn(bkm->posRcvr);
-      }
-      else {
-        LOG(INFO) << "unrecognized actor in bargain";
-        throw KException("SMPState::queueUpdatePstn: unrecognized actor in bargain");
-      }
-
-      // If the actor has changed its position, record the bargain id
-      for (int dimen = 0; dimen < pk->numR(); dimen++) {
-        auto pCoordOld = (*oldPK)(dimen, 0);
-        auto pCoord = (*pk)(dimen, 0);
-        if (pCoord != pCoordOld) {
-          s2->setPosMoverBargain(k, bkm->getID());
+        const unsigned int ndxInit = model->actrNdx(bkm->actInit);
+        const unsigned int ndxRcvr = model->actrNdx(bkm->actRcvr);
+        if (ndxInit == k) {
+            pk = new VctrPstn(bkm->posInit);
         }
-      }
+        else if (ndxRcvr == k) {
+            pk = new VctrPstn(bkm->posRcvr);
+        }
+        else {
+            LOG(INFO) << "unrecognized actor in bargain";
+            throw KException("SMPState::queueUpdatePstn: unrecognized actor in bargain");
+        }
+
+        // If the actor has changed any coordinate, record the bargain id once
+        bool changedP = false;
+        for (int dimen = 0; dimen < pk->numR(); dimen++) {
+            auto pCoordOld = (*oldPK)(dimen, 0);
+            auto pCoord = (*pk)(dimen, 0);
+            if (pCoord != pCoordOld) {
+              changedP = true;
+            }
+        }
+        if (changedP) {
+            s2->setPosMoverBargain(k, bkm->getID());
+        }
     }
     if (nullptr == pk) {
       throw KException("SMPState::queueUpdatePstn: pk is null pointer");
@@ -788,7 +794,7 @@ void SMPState::queueUpdatePstn(int k) {
     s2->pstns[k] = pk;
 }
 
-void SMPState::groupUpdatePstns() {
+void SMPState::groupUpdatePstns(bool applyChangeP) {
     const unsigned int na = model->numAct;
     
     // First, find the unique bargains, over which a PCE shall be done
@@ -976,7 +982,7 @@ void SMPState::groupUpdatePstns() {
             }
         }
     }
-    // note that na == numfound here
+    // note that na == numFound, by construction
     
     for (unsigned int i=0; i<na; i++) {
         LOG(INFO) << "actor "<< i << " took "<< brgnPstn[i] << "bargain in queue";
@@ -986,7 +992,7 @@ void SMPState::groupUpdatePstns() {
     }
 
     // Now we must build the inputs to create SQL tables
-    const double epsProb = 1E-10;
+    const double epsProb = 1E-15;
     for (unsigned int k=0; k<na; k++) {
         actorMaxBrgNdx.insert(map<unsigned int, unsigned int>::value_type(k, brgnPstn[k]));
 
@@ -1012,9 +1018,47 @@ void SMPState::groupUpdatePstns() {
         trans(pk).mPrintf("%.4f  ");
         actorBargains.insert(map<unsigned int, KBase::KMatrix>::value_type(k, pk));
     }
-
-
-
+    
+    assert (nullptr != s2);
+    if (applyChangeP) {
+        auto recordChangeBrgn = [this] (unsigned int bID, unsigned int k, const VctrPstn* pk1) {
+            auto pk0 = dynamic_cast<VctrPstn *>(this->pstns[k]);
+            // If the actor has changed any component of its position, record bargain ID once
+            bool changedP = false;
+            for (unsigned int d = 0; d < pk1->numR(); d++) {
+                double pd0 = (*pk0)(d, 0);
+                double pd1 = (*pk1)(d, 0);
+                if (pd1 != pd0) {
+                    changedP = true;
+                }
+            }
+            if (changedP) {
+              s2->setPosMoverBargain(k, bID);
+            }
+            return;
+        };
+      for (unsigned int i=0; i<nb; i++) {
+        if (useBrgn[i]) {
+          const BargainSMP* bi = uniqueBrgn[i];
+          const unsigned int bID = bi->getID();
+          const unsigned int aI = model->actrNdx(bi->actInit);
+          const unsigned int aR = model->actrNdx(bi->actRcvr);
+          if (aI == aR) { // SQ proposed bargain
+            VctrPstn * pI = new VctrPstn(bi->posInit);
+            recordChangeBrgn(bID, aI, pI);
+            s2->pstns[aI] = pI;
+          }
+          else { // Two new proposed positions
+            VctrPstn * pI = new VctrPstn(bi->posInit);
+            recordChangeBrgn(bID, aI, pI);
+            s2->pstns[aI] = pI;
+            VctrPstn * pR = new VctrPstn(bi->posRcvr);
+            recordChangeBrgn(bID, aR, pR);
+            s2->pstns[aR] = pR;
+          }
+        }
+      }
+    }
     return;
 }
 

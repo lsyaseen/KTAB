@@ -318,7 +318,7 @@ private:
   void queueUpdatePstn(int k);
   
   // update positions of all actors from complete group of bargains
-  void groupUpdatePstns();
+  void groupUpdatePstns(bool applyChangeP = false);
 
   vector<double> calcVotes(KMatrix w, KMatrix u, int actor) const;
 
@@ -350,6 +350,7 @@ private:
     unsigned int                        //actor k
   >;
   using BrgnVotes = vector<BrgnVote>;
+  // record of actor vote on bargain
   vector<BrgnVotes> brgnVotes;
 
   using BrgnUtil = tuple<
@@ -358,6 +359,7 @@ private:
     KBase::KMatrix     //Util_mat
   >;
   using BrgnUtils = vector<BrgnUtil>;
+  // record of actor:bargain utility matrix
   BrgnUtils brgnUtils;
   std::mutex brgnPosLock;
 };
