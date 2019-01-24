@@ -30,8 +30,14 @@ for (var d = 0; d < dimensions.length; d++) {
       }
   }
 }
-var xRedDot=40;
-var yRedDot=60;
+
+console.log(document.getElementById('statusQuoX').value);
+var statusQuoX = document.getElementById('statusQuoX').value;
+var statusQuoY = document.getElementById('statusQuoY').value;
+
+var xRedDot= (statusQuoX != null) ?  statusQuoX : 40;
+var yRedDot= (statusQuoY != null) ?  statusQuoY : 60;;
+// document.getElementById('statusQoay').value;
 var data=[
   {"actor":"XY","dim1pos":50,"dim2pos":90, "rx": 285, "ry": 40, "angle":0},
   {"actor":"LK","dim1pos":90,"dim2pos":20, "rx": 110, "ry": 150, "angle":0},
@@ -215,8 +221,7 @@ canvas.selectAll("circle")
       .attr("y", 9)
       .attr("dy", ".35em")
       .style("text-anchor", "end")
-      .text(function(d) { return d;
-        });
+      .text(function(d) { return d;});
 
 
 

@@ -11,7 +11,7 @@ function drawScatterPlot() {
 
   d3.select("#ScatterPlot").html("");
 
-  var margin = { top: 30, right: 20, bottom: 30, left: 50 },
+  var margin = { top: 30, right: 120, bottom: 30, left: 50 },
       width = svgWidth2 - margin.left - margin.right,
       height = svgheight2 - margin.top - margin.bottom;
       
@@ -31,7 +31,16 @@ function drawScatterPlot() {
   var yAxis = d3.axisLeft()
   		.scale(y);
 
-  var color = d3.scaleOrdinal(["#5C8598","#219DD8","#96C9E5","#3C3D3B","#ECCE6A","#f8ecba"]);
+  var color = d3.scaleOrdinal(  ["#5C8598", "#219DD8", "#96C9E5", "#3C3D3B",
+  "#ECCE6A", "#f8ecba", "#60805D", "#8AC791",
+  "#bebfc1", "#636664", "#a5f3cc", "#6acbec",
+  "#6aecec", "#ff9966", "#1d80e2", "#6a8aec",
+  "#a5a5f3", "#ffd857", "#a8bfa6", "#cb6aec",
+  "#c88dc8", "#ec6a6a", "#ec6aab", "#e84a72",
+  "#f1a7a7", "#e3994f", "#d87d22", "#d8ab22",
+  "#d8d822", "#a6e765", "#4fd822", "#1cb01c",
+  "#22d84f", "#22d87d", "#22d8ab", "#22d8d8",
+  "#22abd8", "#156184", "#d3e6f8", "#224fd8"]);
 
   var symbols = d3.scaleOrdinal(d3.symbols);
 
@@ -134,13 +143,13 @@ for (var d = 0; d < dimensions.length; d++) {
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
   legend.append("rect")
-      .attr("x", width - 18)
+      .attr("x", width + 80)
       .attr("width", 18)
       .attr("height", 18)
       .style("fill", color);
 
   legend.append("text")
-      .attr("x", width - 24)
+      .attr("x", width + 70)
       .attr("y", 9)
       .attr("dy", ".35em")
       .style("text-anchor", "end")

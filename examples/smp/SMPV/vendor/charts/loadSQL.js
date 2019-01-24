@@ -314,6 +314,7 @@ function getfile() {
         drawLine();
         drawScatterPlot();
         draw2DimPlot();
+        drawSankey();
         drawParacoordChart();
         loadCurrentTurnData(currentTurn);
         drawNetwork();

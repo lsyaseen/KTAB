@@ -42,6 +42,7 @@ currentTurn = + slider.noUiSlider.get();
     drawChart();
     drawLine();
     drawParacoordChart();
+    drawSankey();
 
   });
 

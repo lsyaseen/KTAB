@@ -1,11 +1,11 @@
 
 function drawParacoordChart() {
 
-
+  d3.select("#ParallelCoordinatesGraph").html("");
     
-    var margin = {top: 66, right: 110, bottom: 20, left: 188},
-    width = document.body.clientWidth - margin.left - margin.right,
-    height = 340 - margin.top - margin.bottom,
+    var margin = {top: 66, right: 210, bottom: 20, left: 50},
+    width = 700 - margin.left - margin.right,
+    height = 640 - margin.top - margin.bottom,
     innerHeight = height - 2;
 var devicePixelRatio = window.devicePixelRatio || 1;
 var color = d3.scaleOrdinal()
@@ -16,7 +16,7 @@ var types = {
     coerce: function(d) { return +d; },
     extent: d3.extent,
     within: function(d, extent, dim) { return extent[0] <= dim.scale(d) && dim.scale(d) <= extent[1]; },
-    defaultScale: d3.scaleLinear().range([innerHeight, 0])
+    defaultScale: d3.scaleLinear().range([300, 0])
   },
   "String": {
     key: "String",
@@ -35,33 +35,19 @@ var types = {
 };
 var dimensions = [
   {
-    key: "actor",
-    description: "Food Group",
-    type: types["String"],
-    axis: d3.axisLeft()
-      .tickFormat(function(d,i) {
-        return d;
-      })
+    key: "Dim1",
+    type: types["Number"],
+    scale: d3.scaleSqrt().range([100, 0])
   },
   {
-    key: "Sugars, total (g)",
+    key: "Dim2",
     type: types["Number"],
-    scale: d3.scaleSqrt().range([innerHeight, 0])
+    scale: d3.scaleSqrt().range([100, 0])
   },
   {
-    key: "Iron, Fe (mg)",
+    key: "Dim3",
     type: types["Number"],
-    scale: d3.scaleSqrt().range([innerHeight, 0])
-  },
-  {
-    key: "Magnesium, Mg (mg)",
-    type: types["Number"],
-    scale: d3.scaleSqrt().range([innerHeight, 0])
-  },
-  {
-    key: "Fiber, total dietary (g)",
-    type: types["Number"],
-    scale: d3.scaleSqrt().range([innerHeight, 0])
+    scale: d3.scaleSqrt().range([100, 0])
   }
 ];
 var xscale = d3.scalePoint()
@@ -101,14 +87,20 @@ var axes = svg.selectAll(".axis")
 // d3.csv("nutrient.csv", function(error, data) {
 
 
-var data = [
 
-{"actor":"actor1","Sugars, total (g)":0.85,"Fiber, total dietary (g)":81.11,"Calcium, Ca (mg)":0.06,"Iron, Fe (mg)":717,"Magnesium, Mg (mg)":0.06},
-{"actor":"actor2","Sugars, total (g)":0.49,"Fiber, total dietary (g)":78.3,"Calcium, Ca (mg)":2.87,"Iron, Fe (mg)":718,"Magnesium, Mg (mg)":0.06},
-{"actor":"actor3","Sugars, total (g)":0.28,"Fiber, total dietary (g)":99.48,"Calcium, Ca (mg)":0,"Iron, Fe (mg)":876,"Magnesium, Mg (mg)":0},
-{"actor":"actor4","Sugars, total (g)":21.4,"Fiber, total dietary (g)":28.74,"Calcium, Ca (mg)":2.34,"Iron, Fe (mg)":353,"Magnesium, Mg (mg)":0.5},
+
+
+var data = [
+  {"turn": 0,	"Dim1" :75.79, "Dim2" :	6.37, "Dim3" :70.45, "actor": "SActor-00"	},
+  {"turn": 0,	"Dim1" :82.72, "Dim2" :	73.5, "Dim3" :64, "actor": "SActor-01"	},
+  {"turn": 0,	"Dim1" :82.45, "Dim2" :	90.89, "Dim3" :0.07, "actor": "SActor-02"	},
+  {"turn": 0,	"Dim1" :62.52, "Dim2" :	50.82, "Dim3" :62.33, "actor": "SActor-03"	},
+  {"turn": 0,	"Dim1" :82.72, "Dim2" :	73.5, "Dim3" :64, "actor": "SActor-04"	},
+  {"turn": 0,	"Dim1" :84.48, "Dim2" :	33.7, "Dim3" :88.11, "actor": "SActor-05"	},
+  {"turn": 0,	"Dim1" :70.96, "Dim2" :	33.46, "Dim3" :90.36, "actor": "SActor-06"	},
 
 ]
+
   // if (error) throw error;
   // shuffle the data!
   data = d3.shuffle(data);
@@ -147,7 +139,15 @@ var data = [
     .append("text")
       .attr("class", "title")
       .attr("text-anchor", "start")
-      .text(function(d) { return "description" in d ? d.description : d.key; });
+      .text(function(d) { return d.key ; });
+
+      axes.append("text")
+    .attr("x", function(d) { return d.axis})
+    .attr("y", -10)
+    // .attr("dy", ".35em")
+    .style("text-anchor", "end")
+    .text(function(d) { return d.key ; });
+
   // Add and store a brush for each axis.
   axes.append("g")
       .attr("class", "brush")
@@ -166,6 +166,26 @@ var data = [
     .style("fill", color);
     
   
+    var legend = svg.selectAll(".legend")
+    .data(color.domain())
+  .enter().append("g")
+    .attr("class", "legend")
+    .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+legend.append("rect")
+    .attr("x", width + 90)
+    .attr("width", 18)
+    .attr("height", 18)
+    .style("fill", color);
+
+legend.append("text")
+    .attr("x", width + 90)
+    .attr("y", 0)
+    .attr("dy", ".35em")
+    .style("text-anchor", "end")
+    .text(function(d) { return d;
+      });
+
 
     function draw(d) {
         ctx.strokeStyle = color(d.actor);
