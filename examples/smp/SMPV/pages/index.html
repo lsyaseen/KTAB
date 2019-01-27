@@ -227,6 +227,7 @@
             <div class="col-sm-12  col-md-12  col-lg-12">
                 <button class="toggle btn btn-success" data-target="SizePopup" onclick="ChangeresolutionandDownload()">Edit and Download</button>
                 <button class="toggle btn btn-success" data-target="ColorPopup" onclick="changecolors()"> Change Colors</button>
+                <button class="toggle btn btn-success" data-target="GroupPopup" onclick="GroupActors()"> Add Groups</button>
                 <button class="toggle btn btn-success" data-target="NetworkDetails" id="NetworkButton" style="display: none;">Network Explanation</button>
 
             </div>
@@ -262,6 +263,28 @@
                     <div>
                         <button class="toggle button" data-target="ColorPopup" onclick="saveSelectedColors()">Apply Changes</button>
                     </div>
+                </div>
+            </div>
+            <div id="GroupPopup" class="popup hide">
+                <div class="popup-header">
+                    <span class="close toggle" data-target="GroupPopup">close</span>
+                </div>
+                <div class="GroupActorsPopup-body">
+                </div>
+                <div class="popup-footer">
+                    <!-- <div id="DivUpload">
+                        <span>
+                            <strong> Import Colors from a CSV : </strong>
+                        </span>
+                        <input type="file" name="File Upload" id="txtFileUpload" accept=".csv" />
+                    </div>
+                    <div id="DivExportCSV">
+                        <button class="toggle button" onclick="ExportColorsCSV()">Export CSV</button>
+
+                    </div>
+                    <div>
+                        <button class="toggle button" data-target="GroupPopup" onclick="saveSelectedColors()">Apply Changes</button>
+                    </div> -->
                 </div>
             </div>
             <div id="NetworkDetails" class="popup hide">
@@ -316,10 +339,6 @@
     <script src="../vendor/charts/NetworkDiagram.js"></script>
     <!-- slider -->
     <script src="../vendor/charts/slider.js"></script>
-    <!-- Custom Theme JavaScript -->
-    <!-- <script src="../dist/js/\sb-admin-2.js"></script> -->
-    <!-- d3 -->
-    <!-- <script src="../vendor/d3/js/d3.min.js"></script> -->
 
 </body>
 <script>
@@ -370,8 +389,10 @@
             "#333300", "#ff9933", "#000033", "#4d4d4d"
         ];
 
-    var actors2, ActorsObj, temActorsObj, NoOfBars, axisLables;
+    var actors2, ActorsObj, temActorsObj, NoOfBars, NumOfGroups, axisLables;
     var changeColorsCounter = 0;
+    var changeActorsGroups = 0;
+
     var Sizecounter = 0;
     var newColors = [];
 
@@ -380,8 +401,6 @@
         $('[data-toggle=offcanvas]').click(function () {
             $('.row-offcanvas').toggleClass('active');
         });
-        $("#mycolor").colorpicker({ showOn: 'button' });
-
         $('#yAxisScale').change(function () {
             drawChart();
         });
@@ -434,7 +453,6 @@
         drawChart();
         drawLine();
         drawNetwork();
-
     });
 
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
@@ -456,6 +474,7 @@
 
             });
             slider.noUiSlider.set(currentTurn);
+            currentTurn = +slider.noUiSlider.get();
         }
         else {
             document.getElementById("NetworkButton").style.display = "none";
@@ -538,6 +557,32 @@
         }
     });
 
+    $(document).on('change', '[id="NoOfGroups"]', function () {
+
+        NumOfGroups = parseInt($("#NoOfGroups").val());
+        $('.ActorsGroups').remove(); 
+        $('.ActorsForGrouping').remove(); 
+         $(".GroupActorsPopup-body").append('<div class="ActorsGroups col-xs-12 col-sm-12 col-md-12 col-lg-12"> </div>');
+
+        for (var i = 0; i < NumOfGroups; i++) {
+            $(".ActorsGroups").append('<div id="Div_group_Name_' + (i + 1) + '"class="col-xs-4 col-sm-4 col-md-4 col-lg-4" </div> ')
+            $("#Div_group_Name_" + (i + 1)).append('<br><span><strong> Group ' + (i + 1) + ' Name: </strong></span>' +
+                '<input style="width:100px;" type="text" id="group_' + (i + 1) + '_Name">')
+            $(".ActorsGroups").append('<div id="Div_group_Color_' + (i + 1) + '"class="col-xs-8 col-sm-8 col-md-8 col-lg-8" </div> ')
+            $("#Div_group_Color_" + (i + 1)).append('<br><span><strong> Group ' + (i + 1) + ' Color: </strong> </span>' +
+                '<input style="width:100px;" id="Group_' + (i + 1) + '_Color" class=" colorPicker evo-cp0"> ');
+
+
+            $("#Group_" + (i + 1) + "_Color").colorpicker({ showOn: 'button' });
+            $("#Group_" + (i + 1) + "_Color").colorpicker("val", defaultColors[i]);
+
+            
+        }
+        $(".ActorsGroups").append('<br><span>  <button class="toggle button" id="confirmGroupsBut" onclick="ConfirmGroupsButton()"  > Confirm Groups </button> </span>');
+
+
+    });
+
     //parse the csv file
     document.getElementById('txtFileUpload').addEventListener('change', upload, false);
 
@@ -554,7 +599,6 @@
                 dynamicTyping: true,
                 complete: function (results) {
                     getNewColors(results.data)
-                    console.log(results);
                 }
             });
 
@@ -634,7 +678,6 @@
         else if ($('#ChangeSize').is(':checked')) {
             var width = parseInt($("#widthbox").val());
             var height = parseInt($("#heightbox").val());
-
             if (width >= 100 && width <= 1000 && width != NaN && height >= 100 && height <= 1000 && height != NaN) {
                 $('.canvasDiv').height(height);//change canvas div size
                 $('.canvasDiv').width(width);
@@ -642,7 +685,6 @@
                 drawChart();
                 drawLine();
                 loadCurrentTurnData(currentTurn);
-
                 drawNetwork();
                 checkLabels();
                 // setTimeout(downloadPNG, 3000); //give it time to draw
@@ -725,12 +767,62 @@
         }
 
     }
+    function GroupActors() {
+
+        if (changeActorsGroups <= 0) { //only initilaze once!
+        $(".GroupActorsPopup-body").append('<div class="NoOgGroupsInput" col-xs-12 col-sm-12 col-md-12 col-lg-12"> <strong> Number of Groups: </strong>'
+            + ' <input id="NoOfGroups" type="text"  maxlength="2" size="4"> <br></div>');
+
+        changeActorsGroups++;
+                    }
+    }
+
+    function ConfirmGroupsButton() {
+
+        temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
+
+        $('.ActorsForGrouping').remove(); 
+        $(".GroupActorsPopup-body").append('<div class="ActorsForGrouping col-xs-12 col-sm-12 col-md-12 col-lg-12"> </div>');
+
+            for (var i = 0; i < temActorsObj.length; i++) {
+
+                $(".ActorsForGrouping").append('<div  id="Div_Group_' + temActorsObj[i].actor_name + '" class="col-xs-6 col-sm-4 col-md-6 col-lg-6"> </div>');
+                $("#Div_Group_" + temActorsObj[i].actor_name).append('<br><span><strong>' + temActorsObj[i].actor_name + '  </strong></span>' +
+                    '<select class="GroupsOptions" id="GroupOf' + temActorsObj[i].actor_name + '" > </select>');
+
+                for (j = 0; j < NumOfGroups; j++) {
+                    var GroupName = document.getElementById("group_" + (j + 1) + "_Name").value;
+                    var $div = $("<option>", {
+                        value: j,
+                    }).text(GroupName);
+                    $("#GroupOf" + temActorsObj[i].actor_name).append($div);
+                }
+        }
+    $(".ActorsForGrouping").append('<br><br><span>  <button class="toggle button" data-target="GroupPopup" id="confirmActorsGroupsBut" onclick="ConfirmActorsGroups()"  >Confirm Actors Groups </button> </span>');
+
+    }
+    function ConfirmActorsGroups() {
+        temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
+        for (var i = 0; i < temActorsObj.length; i++) {
+            var selectedGroupColor, selectedGroup
+            var selectedGroup = $("#GroupOf" + temActorsObj[i].actor_name + " option:selected").text();
+            var selectedGroupIn = parseInt($("#GroupOf" + temActorsObj[i].actor_name + " option:selected").val());
+
+            var obj1 = temActorsObj.findIndex(o => o.actor_name === temActorsObj[i].actor_name);
+            temActorsObj[obj1]["group"] = selectedGroup;
+            temActorsObj[obj1]["color"] = $("#Group_" + (selectedGroupIn + 1) + "_Color").colorpicker("val");
+
+        }
+
+        sessionStorage.setItem("ActorsObj", JSON.stringify(temActorsObj));
+        saveSelectedColors();
+    }
+
     function changecolors() {
         $('#txtFileUpload').val("");
         temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
         if (changeColorsCounter <= 0) { //only initilaze once!
             $('.popup-body').empty(); //clear existing actors
-
             for (var i = 0; i < temActorsObj.length; i++) {
                 $(".popup-body").append('<div id="Div' + temActorsObj[i].actor_name + '"class="col-xs-6 col-sm-4 col-md-6 col-lg-6" </div> ')
                 $("#Div" + temActorsObj[i].actor_name).append('<br><span><strong>' + temActorsObj[i].actor_name + '</strong></span>' +
@@ -758,11 +850,9 @@
         drawChart();
         drawLine();
         drawNetwork();
-
     }
 
     function getData() {
-        console.log("getdata");
         sessionStorage.setItem("ActorsNames", JSON.stringify(ActorsNames));
         sessionStorage.setItem("ActorsPositions", JSON.stringify(arrPos));
         sessionStorage.setItem("AllEffcPow", JSON.stringify(arreff));

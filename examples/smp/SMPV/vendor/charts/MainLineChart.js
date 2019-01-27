@@ -156,7 +156,6 @@ turn = currentTurn; //current turn from slider
     .style("text-anchor", "middle")
     .text("Position");
 
-
   var colors = d3.scaleOrdinal()
     .domain(namesArray)
     .range(defaultColors)
@@ -170,7 +169,6 @@ turn = currentTurn; //current turn from slider
       }
     })
   });
-
   // get initiator color for the point  
   for (i = 0; i < bargnsDataByTurn.length; i++) {
     var obj1 = ActorsObj1.findIndex(o => o.actor_name === bargnsDataByTurn[i].Initiator);
@@ -255,7 +253,6 @@ turn = currentTurn; //current turn from slider
     var dot = svg.selectAll(".dot")
       .data(bargnsDataByTurn)
       .enter();
-
     svg2.append("text")
       .attr("transform", function () {
         xOff = (i % 3) * 85
@@ -352,7 +349,6 @@ turn = currentTurn; //current turn from slider
     .attr("y", 58)
     .text("Clear All")
     .attr("id", "SelectLabel");
-
 
   function onMouseover(d, i) {
     MouseOverLegend(d, i);

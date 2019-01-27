@@ -105,7 +105,6 @@ var selectedScenNum = selectedScen;
             effpowArray2[index] = effpowArray[i];
         }
     }
-
     findHighestEffpow();
 
     for (var i = 0; i < positionsData.length; i++) {
@@ -123,7 +122,6 @@ var selectedScenNum = selectedScen;
             return result;
         }, {});
     });
-
     var keys = namesArray.slice(1);
     var idheights = [];
     var barnames = [];
@@ -205,7 +203,6 @@ var selectedScenNum = selectedScen;
         );
 
     DrawBars(ActorsObj2);
-
     //draw the axis
     svg.append("g")
         .attr("class", "x axis")

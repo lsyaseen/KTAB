@@ -32,7 +32,6 @@ function GraphData(file, onloaddb) {
         var Uints = new Uint8Array(fr.result);
         db = new window.SQL.Database(Uints);
         var maxturn = db.exec("select max(Turn_t) as turns from Bargn");
-
         __this.turns = maxturn[0].values[0][0];
         __this.initScenarioData();
         __this.loadActorsData();
@@ -303,7 +302,6 @@ function getfile() {
     var file = files[0];
     var SelecteDBfileName =file.name;
      document.getElementById("fileNameText").value = SelecteDBfileName;
-
     // if (gd) gd.gren.destroy();
     gd = new GraphData(file, function () {
         $("#fileUpload").hide();

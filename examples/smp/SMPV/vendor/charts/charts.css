@@ -18,9 +18,9 @@
   .text-center {
     padding-top: 20px;
   }
-  .col-xs-12 {
+  /* .col-xs-12 {
     background-color: #fff;
-  }
+  } */
   #sidebar {
     height: 100%;
     padding-right: 0;
@@ -151,16 +151,16 @@ margin-top:7%;
   padding-top:5%;
 }
 #fromb {
-  fill: green;
+  /* fill: green; */
 }
 .link.tob {
-  stroke: green;
+  /* stroke: green; */
 }
 #tob {
-  fill: green;
+  /* fill: green; */
 }
 .link.fromb {
-  stroke: green;
+  /* stroke: green; */
 }
 .link.rejectb {
   stroke: gray;
@@ -171,4 +171,16 @@ margin-top:7%;
 }
 #graph {
   overflow: auto;
+}
+.NoOgGroupsInput{
+
+  padding-bottom: 30px;
+
+}
+#confirmGroupsBut{
+  margin-top: 5%;
+}
+#confirmActorsGroupsBut{
+  margin-top: 5%;
+
 }

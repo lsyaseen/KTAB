@@ -1,6 +1,6 @@
 
-var svgWidth2 = 550;
-var svgheight2 = 300;
+var svgWidth2 = 900;
+var svgheight2 = 500;
 function drawNetwork() {
 
     this.actorsById = {};
@@ -13,7 +13,6 @@ function drawNetwork() {
 
         initActorData();
         loadTurnData(turn);
-
     }
 
 
@@ -46,7 +45,7 @@ function drawNetwork() {
             if (!toself) {
                 __this.linksByBid[id1] = {
                     source: from,
-                    acceptanceprop: link[networkData[0].columns.indexOf('Init_Prob')],
+                    // acceptanceprop: link[networkData[0].columns.indexOf('Init_Prob')],
                     target: bgn,
                     strength: 2.0,
                     dist: 50,
@@ -56,7 +55,7 @@ function drawNetwork() {
                 };
                 __this.linksByBid[id2] = {
                     source: bgn,
-                    acceptanceprop: link[networkData[0].columns.indexOf('Recd_Prob')],
+                    // acceptanceprop: link[networkData[0].columns.indexOf('Recd_Prob')],
                     target: to,
                     strength: 2.0,
                     dist: 50,
@@ -198,7 +197,7 @@ function GraphRenderer(actors, links) {
             .attr("xoverflow", 'visible')
             .append('svg:path')
             .attr('d', 'M 0,-5 L 5 ,0 L 0,5')
-            .attr('fill', 'red')
+            .attr('fill', 'gray')
             .style('stroke', 'none');
 
         // simulation setup with all forces
@@ -239,9 +238,10 @@ function GraphRenderer(actors, links) {
             .attr("class", function (d) {
                 return "link " + d.type + " " + (d.accepted ? "" : "rejectb");
             })
-            .attr("stroke-width", function (d) {
-                return edgeWidthScale(d.acceptanceprop)
-            })
+            // .attr("stroke-width", function (d) {
+            //     // return edgeWidthScale(d.acceptanceprop)
+            // })
+            .attr("stroke-width", "1.5px")
             .attr("stroke", "rgba(50, 50, 50, 0.2)")
             .attr('marker-end', function (d) { return d.type == 'fromb' ? "url(#" + d.type + ")" : "" })
 
