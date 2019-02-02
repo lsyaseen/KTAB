@@ -111,7 +111,7 @@ BargainSMP::~BargainSMP() {
   actRcvr = nullptr;
   posInit = VctrPstn(KMatrix(0, 0));
   posRcvr = VctrPstn(KMatrix(0, 0));
-  auto mbid = myBargainID;
+  //auto mbid = myBargainID;
   myBargainID = 0;
 }
 
@@ -121,11 +121,8 @@ uint64_t BargainSMP::getID() const {
 }
 
 // --------------------------------------------
-/*
- * Calculate all the utilities and record in database. utitlity for (i,i,i,j)
- * combination is getting calculated and recorded in a separate method
- */
-void SMPState::calcUtils(unsigned int i, unsigned int bestJ ) const { // i == actor id
+
+void SMPState::calcUtils(unsigned int i, unsigned int bestJ ) const { 
   const unsigned int na = model->numAct;
   const bool recordTmpSQLP = true;  // Record this in SQLite
   auto pFn = [this, recordTmpSQLP](unsigned int h, unsigned int k, unsigned int i, unsigned int j) {
@@ -176,7 +173,7 @@ void SMPState::calcUtils(unsigned int i, unsigned int bestJ ) const { // i == ac
 }
 
 // --------------------------------------------
-eduChlgsI SMPState::bestChallengeUtils(unsigned int i) const {
+eduChlgsI SMPState::allChallengeUtils(unsigned int i) const {
   const unsigned int na = model->numAct;
   const bool recordTmpSQLP = true;  // Record this in SQLite
   eduChlgsI eduI;
@@ -267,22 +264,22 @@ SMPState* SMPState::doBCN() {
 
     s2 = new SMPState(model);
 
-    //TODO: remove this testing code
-    //model->brm = KBase::BargainResolutionMethod::BindingBest;
+    //TODO: make brm accessible through CSV, XML, SQL, GUI, etc. and remove this testing code
+   //model->brm = KBase::BargainResolutionMethod::BindingBest;
 
     switch (model->brm) {
     case KBase::BargainResolutionMethod::ActorQueues:
     {
+      LOG(INFO) << "Resolving bargains by actor queues (nonbinding)";
         auto thrCalcPosts = [this](unsigned int k) { // thread to calculate positions
             this->queueUpdatePstn(k);
         };
         KBase::groupThreads(thrCalcPosts, 0, na - 1);
     }
-    LOG(INFO) << "For debugging, do "<< KBase::BargainResolutionMethod::BindingBest <<" over all bargains";
-    groupUpdatePstns(false);
     break;
 
     case KBase::BargainResolutionMethod::BindingBest:
+      LOG(INFO) << "Resolving bargains by entire set (binding)";
         groupUpdatePstns(true);
         break;
 
@@ -337,15 +334,19 @@ SMPState* SMPState::doBCN() {
           uBrgns.push_back(bij); // this is the initiator's copy, so save it for deletion
         }
       }
-      brgns[i][j] = nullptr; // either way, null it out.
+      brgns[i][j] = nullptr; // either way, null out that memory location.
     }
   }
 
   for (auto b : uBrgns) {
-    //int aI = model->actrNdx(b->actInit);
-    //int aR = model->actrNdx(b->actRcvr);
-    //printf("Delete bargain [%2i:%2i] \n", aI, aR);
-    delete b;
+    if (b != nullptr) {
+      int aI = model->actrNdx(b->actInit);
+      int aR = model->actrNdx(b->actRcvr);
+      if ((aI >= 0) && (aR >= 0)) {
+	printf("Delete bargain [%2i:%2i] at %u  \n", aI, aR, b);
+	delete b;
+      }
+    }
   }
 
   // TODO: this really should do all the assessment: ueIndices, rnProb, all U^h_{ij}, raProb
@@ -414,15 +415,59 @@ void SMPState::doBCN(unsigned int i) {
       brgnValsLock.unlock();
     }
 
-    eduChlgsI eduI = bestChallengeUtils(i);
+    bool advTrgtP = false;
+    eduChlgsI eduI = allChallengeUtils(i);
+    // for SMP, positive expected gains on the first turn are typically in the 0.5 to 0.01 range
+    // I take a fraction of the minimum.
+    const double minSigEDU = 1e-5; 
+  
+    // TODO: make propMult accessible through CSV, XML, SQL, GUI, etc. and remove this testing code
+    //smod->propMult = KBase::ProposalMultiplicity::AllPositive;
+    
+    switch (smod->propMult) {
+    case KBase::ProposalMultiplicity::AllPositive:
+      LOG(INFO) << "For actor "<<i<<" developing proposals for all positive bargains";
+      for(const auto& eduIJ : eduI) {
+	int j = eduIJ.first;
+	double pij = get<0>(eduIJ.second);
+	double edu = get<1>(eduIJ.second);
+	if (minSigEDU < edu) {
+	  advTrgtP = true;
+	  auto chlgIJ = tuple<int, double, double>(j, pij, edu);
+	  chlgToBrgn(i, chlgIJ, grpID);
+	}
+      }
+      break;
+    case KBase::ProposalMultiplicity::SingleBest:
+      LOG(INFO) << "For actor " << i << " developing proposals for only the best bargain";
+    { // this lexical block is necessary so the compiler will allow two variables
+      auto chlgI = bestChallenge(eduI);
+      const double bestEU = get<2>(chlgI);
+      if (0 < bestEU) {
+	advTrgtP = true;
+	chlgToBrgn(i, chlgI, grpID);
+      }
+    }
+      break;
+    }
+  
+    if (!advTrgtP) {
+      LOG(INFO) << "In turn" << turn << "Actor" << i << "has no advantageous targets";
+    }
+}
 
-    auto chlgI = bestChallenge(eduI);
+void SMPState::chlgToBrgn(unsigned int i,  const tuple<int, double, double> & chlgI, unsigned int grpID) {
+    auto ai = ((const SMPActor*)(model->actrs[i]));
+    auto posI = ((const VctrPstn*)pstns[i]);
+    auto smod = dynamic_cast<SMPModel *>(model);
+    const InterVecBrgn ivb = smod->ivBrgn;
+    const SMPBargnModel bMod = smod->brgnMod;
     const double bestEU = get<2>(chlgI);
-    if (0 < bestEU) {
-      unsigned int bestJ = get<0>(chlgI); //
+    
+   unsigned int bestJ = get<0>(chlgI); //
       const double piiJ = get<1>(chlgI); // i's estimate of probability i defeats j
       if (0 > bestJ) {
-        throw KException("SMPState::doBCN(i): Best receiver index is negative ");
+        throw KException("SMPState::chlgToBrgn(i): Best receiver index is negative ");
       }
 
       const unsigned int j = bestJ; // for consistency in code below
@@ -430,9 +475,10 @@ void SMPState::doBCN(unsigned int i) {
       auto aj = ((const SMPActor*)(model->actrs[j]));
       auto posJ = ((const VctrPstn*)pstns[j]);
 
+      // Launch a parallel thread to fill in SQL tables.
+      // Re-join at end of this function
       std::thread thr(&SMPState::calcUtils, this, i, bestJ);
 
-      // make the variables local to lexical scope of this block.
       // for testing, calculate and print out a block of data showing each's perspective
       bool recordTmpSQLP = true;  // Record this in SQLite
       auto pFn = [this, recordTmpSQLP](unsigned int h, unsigned int k, unsigned int i, unsigned int j) {
@@ -454,11 +500,11 @@ void SMPState::doBCN(unsigned int i) {
       const int naj = model->actrNdx(brgnIIJ->actRcvr);
       // verify that identities match up as expected
       if (nai != i) {
-        throw KException("SMPState::doBCN(i): Actor i's identity didn't match");
+        throw KException("SMPState::chlgToBrgn(i): Actor i's identity didn't match");
       }
 
       if (naj != j) {
-        throw KException("SMPState::doBCN(i): Actor j's identity didn't match");
+        throw KException("SMPState::chlgToBrgn(i): Actor j's identity didn't match");
       }
 
       // interpolate a bargain from targeted J's perspective
@@ -642,14 +688,11 @@ void SMPState::doBCN(unsigned int i) {
       default:
         LOG(INFO) << "unrecognized SMPBargnModel";
         //exit(-1);
-        throw KException("SMPState::doBCN(i): unrecognized SMPBargnModel");
+        throw KException("SMPState::chlgToBrgn(i): unrecognized SMPBargnModel");
       }
 
       thr.join();
-    }
-    else {
-      LOG(INFO) << "In turn" << turn << "Actor" << i << "has no advantageous targets";
-    }
+  return;
 }
 
 void SMPState::popBrgnUtil(unsigned int k, const KMatrix & u_im) {

@@ -230,7 +230,10 @@ protected:
 
 private:
 
-  void calcUtils(unsigned int i, unsigned int bestJ) const;  // i == actor id
+// Calculate all the utilities and record in database for actor i. utility for (i,i,i,j)
+// combination is getting calculated and recorded in a separate method
+  void calcUtils(unsigned int i, unsigned int bestJ) const;
+  
   mutable std::mutex utilDataLock;
   mutable std::multimap<string, KMatrix> tpvData;
   mutable std::multimap<string, double>phijData;
@@ -282,11 +285,12 @@ private:
                         map<unsigned int, KBase::KMatrix>  actorBargains,
                         map<unsigned int, unsigned int>  actorMaxBrgNdx) const;
 
-  /**
-   * Calculate all challenge utilities (i, i, i, j) which would be used to find the best challenge
-   */
-  eduChlgsI bestChallengeUtils(unsigned int i /* initiator actor */) const;
+  // Calculate all challenge utilities (i, i, i, j) which would be used to find the best challenge
+  eduChlgsI allChallengeUtils(unsigned int i /* initiator actor */) const;
 
+  // Convert i's challenge to a bargain and put in i's queue
+  void chlgToBrgn(unsigned int i, const tuple<int, double, double> & chlgI, unsigned int grpID);
+  
   // Record the bargain id that caused an actor to move in each turn
   using moverBargains = std::map<
     unsigned int, // actor id
@@ -455,11 +459,14 @@ public:
 
   static SMPModel * getSmpModel();
 
-  // Default is deterministic, not stochastic
+  // Default state transitions are deterministic, not stochastic
   KBase::StateTransMode stm = KBase::StateTransMode::DeterminsticSTM;
   
-  // default is ActorQueues
+  // Default method of resolving competing bargains is queue-by-queue
   KBase::BargainResolutionMethod brm = KBase::BargainResolutionMethod::ActorQueues;
+  
+  // Default is to make one proposal from the best challenge, not all positive
+  KBase::ProposalMultiplicity propMult = KBase::ProposalMultiplicity::SingleBest;
 
 protected:
   

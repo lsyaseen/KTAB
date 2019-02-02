@@ -128,6 +128,14 @@ ostream& operator<< (ostream& os, const VotingRule& vr);
 enum class BargainResolutionMethod {
   ActorQueues=0, BindingBest
 };
+
+
+// Does actor propose bargains for all challenges with positive value, or just the best?
+enum class ProposalMultiplicity {
+  SingleBest=0, AllPositive
+};
+
+
 const vector<string> BargainResolutionMethodNames = {
   "ActorQueues", "BindingBest" };
 ostream& operator<< (ostream& os, const BargainResolutionMethod& brm);
