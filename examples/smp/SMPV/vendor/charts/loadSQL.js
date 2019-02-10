@@ -17,6 +17,12 @@ function getfile() {
     var files = document.getElementById("uploadInput").files;
     var file = files[0];
     var fr = new FileReader();
+
+    if(file.size > 1717986918){
+       alert("File must be smaller than 1.5 GB");
+      return location.reload();
+    };
+
     fr.onload = function () {
         var Uints = new Uint8Array(fr.result);
         var db = new window.SQL.Database(Uints);

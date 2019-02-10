@@ -51,15 +51,15 @@
                         <div class="panel-body ">
 
                             <div class="input-group">
-                                <label class="input-group-btn"> 
+                                <label class="input-group-btn">
                                         <span class="btn btn-primary">
                                             Browse&hellip;
                                             <input id="uploadInput" type="file" accept=".db" style="display: none;" onchange="getfile()">
-                                            
                                         </span>
                                     </label>
                                 <input type="text" class="form-control" readonly>
                             </div>
+                              <small>Note: Database file must be smaller than 1.5 GB</small>
                         </div>
                     </div>
                 </div>
@@ -193,7 +193,7 @@
             "#a0c20a", "#f47171", "#003333", "#c466ff",
             "#674218", "#fff266", "#330000", "#66ff94",
             "#333300", "#ff9933", "#000033", "#4d4d4d"
-        ]; 
+        ];
     $('#LinePanel').click(function (e) {
         e.preventDefault();
         getData();
