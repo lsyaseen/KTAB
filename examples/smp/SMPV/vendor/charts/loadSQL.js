@@ -28,6 +28,12 @@ function GraphData(file, onloaddb) {
     var __this = this;
     this.onloaddb = onloaddb
     var fr = new FileReader();
+
+    if(file.size > 1717986918){
+       alert("File must be smaller than 1.5 GB");
+      return location.reload();
+    };
+
     fr.onload = function () {
         var Uints = new Uint8Array(fr.result);
         db = new window.SQL.Database(Uints);
