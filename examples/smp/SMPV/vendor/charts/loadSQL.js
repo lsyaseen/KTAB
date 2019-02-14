@@ -21,7 +21,7 @@ var db, ActorsData, NetworkactorsData;
 
 var groupedScenarios, scenaioIds, NoOfDim;
 function GraphData(file, onloaddb) {
-
+    
     this.dbfile = file;
     this.actorsById = {};
     this.linksByBid = {};
@@ -54,7 +54,6 @@ function GraphData(file, onloaddb) {
         ActorsData = db.exec("select c.Name,  c.Act_i as id , c.\"Desc\", a.Turn_t, a.Dim_k , a.Pos_Coord , b.Sal, b.scenarioid, d.Scenario from actordescription c, VectorPosition a," +
             " SpatialSalience b, scenarioDesc d where c.Act_i = a.Act_i and c.Act_i = b.Act_i and a.ScenarioId = b.ScenarioId and c.ScenarioId = b.ScenarioId and d.ScenarioId = b.ScenarioId and a.Act_i = b.Act_i and " +
             " a.Turn_t = b.Turn_t and a.Dim_k = b.Dim_k");
-
         let keys = ActorsData[0].columns;
         let values = ActorsData[0].values;
         actorsObj = values.map(function (array) {
@@ -265,7 +264,6 @@ function loadCurrentTurnData(turn) {
     NetworkactorsData = db.exec("select c.Act_i as id, Name as name, a.Turn_t, a.Dim_k,  b.scenarioid from actordescription c, VectorPosition a," +
         " SpatialSalience b where c.Act_i = a.Act_i and c.Act_i = b.Act_i and a.ScenarioId = b.ScenarioId and b.ScenarioId = c.ScenarioId and b.ScenarioId = '" + scenaioIds[selectedScen] +
         "' and a.Dim_k = b.Dim_k and b.Dim_k = " + selectedDimNum + " and a.Turn_t = b.Turn_t and b.Turn_t= " + turn + " and b.scenarioid = '" + scenaioIds[selectedScen] + "'");
-
     networkData = db.exec("select B.ScenarioID, B.Turn_t, B.BargnID, B.Init_Act_i, B.Recd_Act_j,M.Dim_k, AI.Name as Init, AR.Name as Rcvr, " +
         " B.Init_Prob, B.Recd_Prob from Bargn as B inner join ActorDescription as AI on B.Init_Act_i = AI.Act_i and B.ScenarioID = AI.ScenarioID inner join " +
         " ActorDescription as AR on B.Recd_Act_j = AR.Act_i and B.ScenarioID = AR.ScenarioID inner join " +
@@ -273,17 +271,19 @@ function loadCurrentTurnData(turn) {
         "  where M.Turn_t = " + turn + " and M.Dim_k = " + selectedDimNum + " and M.ScenarioId = '" + scenaioIds[selectedScen] +
         "' order by B.Turn_t, BargnID ");
 
-    acceptedBgn = db.exec(" select B.*, M.Dim_k, AI.Name as Init, AR.Name as Rcvr " +
+        acceptedBgn = db.exec(" select B.*, M.Dim_k, AI.Name as Init, AR.Name as Rcvr " +
         " from (select ScenarioId, Turn_t, BargnId, Init_Act_i, Recd_Act_j " +
-        " ,'Init' as Q from Bargn where Init_Seld = 1 union select ScenarioId," +
+        " ,'Init' as Q from Bargn where Init_Seld = 1 and Turn_t =  " + turn + " and "+
+        " ScenarioId ='" + scenaioIds[selectedScen] + "' union select ScenarioId," +
         " Turn_t, BargnId, Init_Act_i, Recd_Act_j ,'Rcvr' from Bargn  " +
-        " where Recd_Seld = 1 ) as B inner join  ActorDescription as AI on " +
+        " where Recd_Seld = 1 and Turn_t =  " + turn + " and "+
+        " ScenarioId ='" + scenaioIds[selectedScen] + "') as B inner join  ActorDescription as AI on " +
         " B.Init_Act_i = AI.Act_i and B.ScenarioID = AI.ScenarioID inner join " +
         " ActorDescription as AR on B.Recd_Act_j = AR.Act_i and " +
         " B.ScenarioID = AR.ScenarioID inner join " +
-        " VectorPosition as M on M.Act_i = B.Init_Act_i and M.ScenarioId = B.ScenarioID  and M.Turn_t = B.Turn_t" +
-        " where B.Turn_t = " + turn + " and M.ScenarioId ='" + scenaioIds[selectedScen] + "' and M.Dim_k = " + selectedDimNum);
-}
+        " VectorPosition as M on M.ScenarioId = B.ScenarioID and BargnId = M.Mover_BargnId and M.Dim_k = " + selectedDimNum);
+
+    }
 
 $("#SecnarioPicker").on('change', function () {
     selectedScen = $('#SecnarioPicker').val();
@@ -306,17 +306,17 @@ function getfile() {
 
     var files = document.getElementById("uploadInput").files;
     var file = files[0];
+   $(".loading").show();
     var SelecteDBfileName =file.name;
      document.getElementById("fileNameText").value = SelecteDBfileName;
-    // if (gd) gd.gren.destroy();
     gd = new GraphData(file, function () {
+        $(".loading").hide();
         $("#fileUpload").hide();
         $("#content").show();
         getData();
         InitializeSlider(NumOfTurns);
         drawChart();
         drawLine();
-        loadCurrentTurnData(currentTurn);
         drawNetwork();
 
     });

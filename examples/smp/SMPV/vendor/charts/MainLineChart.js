@@ -15,7 +15,6 @@ function getNewResoulution(w,h){
 }
 
 function drawLine() {
-
 var ActorsNamesAllSce = ActorsNames,
 selectedScenNum = selectedScen,
 ActorsPositions = arrPos,
@@ -198,7 +197,6 @@ turn = currentTurn; //current turn from slider
 
 
   ActorsObj1.forEach(function (d, i) {
-
     //draw the lines
     drawLines(d, i);
     d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", '')).transition().duration(100)
@@ -321,6 +319,35 @@ turn = currentTurn; //current turn from slider
       });
 
   }) // end of forEach
+
+  if (GroupsDetails.length>0){
+    for (i =0 ; i < GroupsDetails.length;i++){
+           //add the legend
+         
+     svg2.append("rect")
+     .attr("width", 10)
+     .attr("height", 10)
+           .attr("class",'GroupsLeg')
+
+     .attr("transform", function () {    
+       xOff = ((ActorsObj1.length-1+i) % 3) * 85
+       yOff = Math.floor((ActorsObj1.length-1+i) / 3) * 20
+       return "translate(" + xOff + "," + (yOff + 120) + ")"
+     })
+      .attr("id", 'legend_' + GroupsDetails[i].Gname.replace(/\s+/g, '').replace(".", ''))
+     .attr("fill",  GroupsDetails[i].Gcolor )
+    
+     svg2.append("text")
+     .attr("transform", function () {
+       xOff = ((ActorsObj1.length-1+i) % 3) * 85
+       yOff = Math.floor((ActorsObj1.length-1+i) / 3) * 20
+
+       return "translate(" + (xOff + 15) + "," + (yOff + 128) + ")"
+     })
+     .text(function () { return GroupsDetails[i].Gname })    
+    
+    }
+      }
 
   svg2.append("rect")
     .attr("width", 10)
@@ -446,7 +473,6 @@ turn = currentTurn; //current turn from slider
 
 
   function drawLines(d, i) {
-
     //remove line if already exist (when hovering on a disabled actor's legend, his line is 
     // drwan but still d.visible = false so when legened is clicked and since d.visible = false another line will be drawn !) 
     d3.select("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))

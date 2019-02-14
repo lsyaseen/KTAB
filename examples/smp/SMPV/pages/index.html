@@ -66,7 +66,7 @@
                                             <input id="uploadInput" type="file" accept=".db" style="display: none;" onchange="getfile()">
                                         </span>
                                     </label>
-                                <input type="text" class="form-control" readonly>
+                                <input type="text" id="fileNameText" class="form-control" readonly>
                             </div>
                               <small>Note: Database file must be smaller than 1.5 GB</small>
                         </div>
@@ -74,6 +74,10 @@
                 </div>
             </div>
         </div>
+
+    </div>
+    <div class="loading" style="display:none ; text-align: center;">
+        <img src="../pages/images/loading1.gif">
 
     </div>
     <div id="content" style="display:none">
@@ -272,20 +276,20 @@
                 </div>
                 <div class="GroupActorsPopup-body">
                 </div>
-                <div class="popup-footer">
-                    <!-- <div id="DivUpload">
+                <div class="Groupspopup-footer" style="display: none; text-align: center;">
+                    <div id="DivUpload">
                         <span>
-                            <strong> Import Colors from a CSV : </strong>
+                            <strong> Import Groups from a CSV : </strong>
                         </span>
-                        <input type="file" name="File Upload" id="txtFileUpload" accept=".csv" />
+                        <input type="file" name="File Upload" id="GroupsFileUpload" accept=".csv" class="center-block" style="width: 175px; padding-top: 2%;"/>
                     </div>
-                    <div id="DivExportCSV">
-                        <button class="toggle button" onclick="ExportColorsCSV()">Export CSV</button>
+                    <!-- <div id="DivExportCSV">
+                        <button class="toggle button" onclick="ExportGroupsCSV()">Export CSV</button>
 
-                    </div>
+                    </div> -->
                     <div>
                         <button class="toggle button" data-target="GroupPopup" onclick="saveSelectedColors()">Apply Changes</button>
-                    </div> -->
+                    </div>
                 </div>
             </div>
             <div id="NetworkDetails" class="popup hide">
@@ -396,6 +400,7 @@
 
     var Sizecounter = 0;
     var newColors = [];
+    var GroupsDetails=[];
 
     $(document).ready(function () {
 
@@ -561,9 +566,9 @@
     $(document).on('change', '[id="NoOfGroups"]', function () {
 
         NumOfGroups = parseInt($("#NoOfGroups").val());
-        $('.ActorsGroups').remove(); 
-        $('.ActorsForGrouping').remove(); 
-         $(".GroupActorsPopup-body").append('<div class="ActorsGroups col-xs-12 col-sm-12 col-md-12 col-lg-12"> </div>');
+        $('.ActorsGroups').remove();
+        $('.ActorsForGrouping').remove();
+        $(".GroupActorsPopup-body").append('<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 GroupsInitialization ActorsGroups"> </div>');
 
         for (var i = 0; i < NumOfGroups; i++) {
             $(".ActorsGroups").append('<div id="Div_group_Name_' + (i + 1) + '"class="col-xs-4 col-sm-4 col-md-4 col-lg-4" </div> ')
@@ -577,12 +582,37 @@
             $("#Group_" + (i + 1) + "_Color").colorpicker({ showOn: 'button' });
             $("#Group_" + (i + 1) + "_Color").colorpicker("val", defaultColors[i]);
 
-            
+
         }
         $(".ActorsGroups").append('<br><span>  <button class="toggle button" id="confirmGroupsBut" onclick="ConfirmGroupsButton()"  > Confirm Groups </button> </span>');
 
 
     });
+
+    //parse the groups csv file
+    document.getElementById('GroupsFileUpload').addEventListener('change', uploadGroups, false);
+    function uploadGroups(evt) {
+        var data = null;
+        var file = evt.target.files[0];
+        var reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload = function (event) {
+            var csvData = event.target.result;
+            var data = Papa.parse(csvData, {
+                header: false,
+                skipEmptyLines: true,
+                dynamicTyping: true,
+                complete: function (results) {
+                    getNewGroups(results.data)
+                }
+            });
+
+
+        };
+        reader.onerror = function () {
+            alert('Unable to read ' + file.fileName);
+        };
+    }
 
     //parse the csv file
     document.getElementById('txtFileUpload').addEventListener('change', upload, false);
@@ -610,7 +640,7 @@
         };
     }
 
-    //exportcuurent colors to csv
+    //export cuurent colors to csv
     function ExportColorsCSV() {
         var colorsArray = [];
         for (i = 0; i < temActorsObj.length; i++) {
@@ -624,6 +654,24 @@
         var a = window.document.createElement("a");
         a.href = window.URL.createObjectURL(blob, { type: "text/plain" });
         a.download = "colors.csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    function ExportGroupsCSV() {
+        var groupsArray = [];
+        groupsArray.push(["Index", "Actor", "Group", "Color"]);
+        for (i = 0; i < temActorsObj.length; i++) {
+            var newArray = new Array();
+            newArray = [temActorsObj[i].id, temActorsObj[i].actor_name, temActorsObj[i].group, temActorsObj[i].color]; // just example values
+            groupsArray.push(newArray);
+        }
+        var csv = Papa.unparse(groupsArray);
+        var blob = new Blob([csv]);
+        var a = window.document.createElement("a");
+        a.href = window.URL.createObjectURL(blob, { type: "text/plain" });
+        a.download = "Groups.csv";
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -645,19 +693,72 @@
             alert('Please check CSV Format');
         }
     }
+    function getNewGroups(csvgroups) {
+    
+        var UploadedGroups = [] ;
+        temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
+        var firstrow = ["Index", "Actor", "Group", "Color"];
+       
+        if (csvgroups[0].toString() == firstrow.toString()) {
+            if (temActorsObj.length < csvgroups.length) {
+
+                for (i = 0; i < temActorsObj.length; i++) {
+                    UploadedGroups.push(csvgroups[i+1][2]);
+                    temActorsObj[i]["group"] = csvgroups[i+1][2];
+                    temActorsObj[i]["color"] = csvgroups[i+1][3];
+                    // $("#" + temActorsObj[i].actor_name).colorpicker("val", newColors[i]);
+                }
+
+            }
+            else {
+                for (i = 1; i < csvgroups.length; i++) {
+                    UploadedGroups.push(csvgroups[i][2])
+
+                    temActorsObj[i-1]["group"] = csvgroups[i][2];
+                    temActorsObj[i-1]["color"] = csvgroups[i][3];
+                }
+            }
+            
+            sessionStorage.setItem("ActorsObj", JSON.stringify(temActorsObj));
+
+
+        }
+       
+
+        else {
+            alert('Please check CSV Format');
+        }
+        
+        var uniqueGroups = Array.from(new Set(UploadedGroups));
+
+GroupsDetails.length =0 ;//to empty the array from previous groups
+
+ for (i=0 ; i< uniqueGroups.length ; i++){
+  var index =  temActorsObj.findIndex( elt => elt.group === uniqueGroups[i]);
+   GroupsDetails[i]= {
+           Gname: temActorsObj[index].group,
+           Gcolor: temActorsObj[index].color,
+        }
+ }
+ 
+//  GroupsDetails[j]= {
+//            Gname:document.getElementById("group_" + (j + 1) + "_Name").value,
+//            Gcolor: document.getElementById("Group_" + (j + 1) + "_Color").value,
+//         }
+    }
 
     function updateColors() {
         temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
         if (temActorsObj.length < newColors.length) {
             for (i = 0; i < temActorsObj.length; i++) {
                 temActorsObj[i]["color"] = newColors[i];
-                $("#" + temActorsObj[i].actor_name).colorpicker("val", newColors[i]);
+                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).colorpicker("val", newColors[i]);
             }
         }
         else {
             for (i = 0; i < newColors.length; i++) {
                 temActorsObj[i]["color"] = newColors[i];
-                $("#" + temActorsObj[i].actor_name).colorpicker("val", newColors[i]);
+                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).colorpicker("val", newColors[i]);
             }
         }
         sessionStorage.setItem("ActorsObj", JSON.stringify(temActorsObj));
@@ -769,53 +870,93 @@
 
     }
     function GroupActors() {
+        // $('.GroupActorsPopup-body').empty();
+       
 
-        if (changeActorsGroups <= 0) { //only initilaze once!
-        $(".GroupActorsPopup-body").append('<div class="NoOgGroupsInput" col-xs-12 col-sm-12 col-md-12 col-lg-12"> <strong> Number of Groups: </strong>'
-            + ' <input id="NoOfGroups" type="text"  maxlength="2" size="4"> <br></div>');
+            
+                 if (changeActorsGroups <= 0) { //only initilaze once!
+           $(".GroupActorsPopup-body").append('<div id="GropingOpt" </div> ')
+            $("#GropingOpt").append('<br><span> <input type="radio" class="groupingRadio" id="initialize" name="radio-group2" checked >' +
+                '<label for="initialize">Initialize Groups </label>' +
+                ' <input type="radio" class="groupingRadio" id="uploadGroups" name="radio-group2" >' +
+                '<label for="uploadGroups">Upload pre-defiend Groups  </label> <br> <br> </span>')
+                // style="display: none;"
+        $(".GroupActorsPopup-body").append('<div class=" col-xs-12 col-sm-12 col-md-12 col-lg-12 GroupsInitialization NoOgGroupsInput" > <strong> Number of Groups: </strong>'
+                + ' <input id="NoOfGroups" type="text"  maxlength="2" size="4"> <br></div>');
 
-        changeActorsGroups++;
-                    }
+            changeActorsGroups++;
+        }
+    //     $(".GroupActorsPopup-body").append('<div class=" col-xs-12 col-sm-12 col-md-12 col-lg-12 GroupsInitialization NoOgGroupsInput" style="display: none;"> <strong> Number of Groups: </strong>'
+    // + ' <input id="NoOfGroups" type="text"  maxlength="2" size="4"> <br></div>');
     }
+    $(document).on('change', '[class="groupingRadio"]', function () {
+        if ($('#initialize').is(':checked')) {
+            // $('.NoOgGroupsInput').show();
+            // $('.ActorsGroups').show();
+            $('.GroupsInitialization').css('display', 'block');
 
+            
+            // $(".GroupActorsPopup-body").append('<div class="NoOgGroupsInput" col-xs-12 col-sm-12 col-md-12 col-lg-12"> <strong> Number of Groups: </strong>'
+            //     + ' <input id="NoOfGroups" type="text"  maxlength="2" size="4"> <br></div>');
+                $('.Groupspopup-footer').hide();
+
+        }
+        else if ($('#uploadGroups').is(':checked')) {
+$('.Groupspopup-footer').show();
+$('.GroupsInitialization').css('display', 'none');
+
+
+        }
+    });
     function ConfirmGroupsButton() {
 
         temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
 
-        $('.ActorsForGrouping').remove(); 
-        $(".GroupActorsPopup-body").append('<div class="ActorsForGrouping col-xs-12 col-sm-12 col-md-12 col-lg-12"> </div>');
+        $('.ActorsForGrouping').remove();
+        $(".GroupActorsPopup-body").append('<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 GroupsInitialization ActorsForGrouping"> </div>');
+GroupsDetails.length =0 ;//to empty the array
+        for (var i = 0; i < temActorsObj.length; i++) {
 
-            for (var i = 0; i < temActorsObj.length; i++) {
-
-                $(".ActorsForGrouping").append('<div  id="Div_Group_' + temActorsObj[i].actor_name + '" class="col-xs-6 col-sm-4 col-md-6 col-lg-6"> </div>');
-                $("#Div_Group_" + temActorsObj[i].actor_name).append('<br><span><strong>' + temActorsObj[i].actor_name + '  </strong></span>' +
-                    '<select class="GroupsOptions" id="GroupOf' + temActorsObj[i].actor_name + '" > </select>');
-
-                for (j = 0; j < NumOfGroups; j++) {
-                    var GroupName = document.getElementById("group_" + (j + 1) + "_Name").value;
-                    var $div = $("<option>", {
-                        value: j,
-                    }).text(GroupName);
-                    $("#GroupOf" + temActorsObj[i].actor_name).append($div);
-                }
+            $(".ActorsForGrouping").append('<div  id="Div_Group_' + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + '" class="col-xs-6 col-sm-4 col-md-6 col-lg-6"> </div>');
+            $("#Div_Group_" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).append('<br><span><strong>' + temActorsObj[i].actor_name + '  </strong></span>' +
+                '<select class="GroupsOptions" id="GroupOf' + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + '" > </select>');
+                
+            for (j = 0; j < NumOfGroups; j++) {
+                var GroupName = document.getElementById("group_" + (j + 1) + "_Name").value;
+                var $div = $("<option>", {
+                    value: j,
+                }).text(GroupName);
+                $("#GroupOf" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).append($div);
+                GroupsDetails[j]= {
+           Gname:document.getElementById("group_" + (j + 1) + "_Name").value,
+           Gcolor: document.getElementById("Group_" + (j + 1) + "_Color").value,
         }
-    $(".ActorsForGrouping").append('<br><br><span>  <button class="toggle button" data-target="GroupPopup" id="confirmActorsGroupsBut" onclick="ConfirmActorsGroups()"  >Confirm Actors Groups </button> </span>');
+            }
+        }
+        
+
+        // $(".ActorsForGrouping").append('<br><br><span>  <button class="toggle button" data-target="GroupPopup" id="confirmActorsGroupsBut" onclick="ConfirmActorsGroups()"  >Confirm Actors Groups </button> </span>');
+        $(".ActorsForGrouping").append('<br><br><span>  <button class="toggle button"  id="confirmActorsGroupsBut" onclick="ConfirmActorsGroups()"  >Confirm Actors Groups </button> </span>');
 
     }
     function ConfirmActorsGroups() {
         temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
         for (var i = 0; i < temActorsObj.length; i++) {
             var selectedGroupColor, selectedGroup
-            var selectedGroup = $("#GroupOf" + temActorsObj[i].actor_name + " option:selected").text();
-            var selectedGroupIn = parseInt($("#GroupOf" + temActorsObj[i].actor_name + " option:selected").val());
+            var selectedGroup = $("#GroupOf" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + " option:selected").text();
+            var selectedGroupIn = parseInt($("#GroupOf" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + " option:selected").val());
 
             var obj1 = temActorsObj.findIndex(o => o.actor_name === temActorsObj[i].actor_name);
             temActorsObj[obj1]["group"] = selectedGroup;
             temActorsObj[obj1]["color"] = $("#Group_" + (selectedGroupIn + 1) + "_Color").colorpicker("val");
 
         }
+        $(".ActorsForGrouping").append('<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 GroupsInitialization"> <button class="toggle button" onclick="ExportGroupsCSV()">Export CSV</button></div>');
 
         sessionStorage.setItem("ActorsObj", JSON.stringify(temActorsObj));
+
+      
+
         saveSelectedColors();
     }
 
@@ -825,17 +966,17 @@
         if (changeColorsCounter <= 0) { //only initilaze once!
             $('.popup-body').empty(); //clear existing actors
             for (var i = 0; i < temActorsObj.length; i++) {
-                $(".popup-body").append('<div id="Div' + temActorsObj[i].actor_name + '"class="col-xs-6 col-sm-4 col-md-6 col-lg-6" </div> ')
-                $("#Div" + temActorsObj[i].actor_name).append('<br><span><strong>' + temActorsObj[i].actor_name + '</strong></span>' +
-                    '<input style="width:100px;" id="' + temActorsObj[i].actor_name + '" class="colorPicker evo-cp0" >')
+                $(".popup-body").append('<div id="Div' + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + '"class="col-xs-6 col-sm-4 col-md-6 col-lg-6" </div> ')
+                $("#Div" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).append('<br><span><strong>' + temActorsObj[i].actor_name + '</strong></span>' +
+                    '<input style="width:100px;" id="' + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + '" class="colorPicker evo-cp0" >')
 
-                $("#" + temActorsObj[i].actor_name).colorpicker({ showOn: 'button' })
-                $("#" + temActorsObj[i].actor_name).colorpicker("val", temActorsObj[i].color);
+                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).colorpicker({ showOn: 'button' })
+                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).colorpicker("val", temActorsObj[i].color);
 
-                $("#" + temActorsObj[i].actor_name).on("change.color", function (event, color) {
+                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).on("change.color", function (event, color) {
                     //find index of selected actor to change its color
                     for (i = 0; i < temActorsObj.length; i++) {
-                        var obj1 = temActorsObj.findIndex(o => o.actor_name === this.id);
+                        var obj1 = temActorsObj.findIndex(o => o.actor_name.replace(/\s+/g, '').replace(".", '') === this.id);
                         temActorsObj[obj1]["color"] = $("#" + this.id).colorpicker("val");
                     }
                     sessionStorage.setItem("ActorsObj", JSON.stringify(temActorsObj));

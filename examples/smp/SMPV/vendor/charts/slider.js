@@ -31,17 +31,15 @@ function InitializeSlider(turns) {
   slider.noUiSlider.on('change', function () {
     console.log("slider change")
 currentTurn = + slider.noUiSlider.get(); 
-
- if (currentTurn != turns){
+ 
+    document.getElementById('currentTurn').innerHTML = currentTurn;
+    drawChart();
+    drawLine();
+if (currentTurn != turns){
    //last turn has no bargains
   loadCurrentTurnData(currentTurn);
   drawNetwork();
 }  
-    document.getElementById('currentTurn').innerHTML = currentTurn;
-   
-    drawChart();
-    drawLine();
-
   });
 
 }

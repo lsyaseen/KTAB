@@ -1,6 +1,6 @@
 
 var svgWidth2 = 900;
-var svgheight2 = 500;
+var svgheight2 = 300;
 function drawNetwork() {
 
     this.actorsById = {};
@@ -123,7 +123,6 @@ function drawNetwork() {
     }
 
     function initActorData() {
-
         actorsData[0].values.forEach((actor, index) => {
 
             var aid = actor[actorsData[0].columns.indexOf('id')];

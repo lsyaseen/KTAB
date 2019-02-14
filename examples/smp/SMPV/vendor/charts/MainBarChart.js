@@ -24,7 +24,6 @@ function getNewResoulution(w, h, Bn,lables) {
 // } 
 
 function drawChart() {
-
     
     allpos = arrPos;
     AllEffcPow =arreff;
@@ -359,7 +358,33 @@ else if (axisLables == false){
             roundPositions(PositionsArray2);
         }
     }
+    if (GroupsDetails.length>0){
 
+        for (j =0 ; j < GroupsDetails.length;j++){
+               //add the legend
+               svg3.append("rect")
+         .attr("width", 10)
+         .attr("height", 10)
+               .attr("class",'GroupsLeg')
+               .attr("transform", function (d, i) {
+                var xOff = ((ActorsObj2.length-1+j) % 3) * 85
+                var yOff = Math.floor((ActorsObj2.length-1+j) / 3) * 20
+                return "translate(" + xOff + "," + (yOff + 70) + ")"
+            })
+          .attr("id", 'Barlegend_' + GroupsDetails[j].Gname.replace(/\s+/g, '').replace(".", ''))
+         .attr("fill",  GroupsDetails[j].Gcolor )
+        
+         svg3.append("text")
+         .attr("transform", function (d, i) {
+            var xOff = ((ActorsObj2.length-1+j) % 3) * 85
+            var yOff = Math.floor((ActorsObj2.length-1+j) / 3) * 20
+            return "translate(" + (xOff+15) + "," + (yOff + 78) + ")"
+        })
+         .text(function () { return GroupsDetails[j].Gname })    
+        
+        }
+          }
+            
     function DrawBars(data) {
         svg.append("g")
             .selectAll("g")
@@ -403,8 +428,20 @@ else if (axisLables == false){
             .duration(3000)
             .attr("y", function (d) { return yScale(d[1]); })
             .attr("height", function (d) { return yScale(d[0]) - yScale(d[1]); });
-
-    }
+//groupLegend
+    // legend.append("rect")
+    //         .attr("width", 10)
+    //         .attr("height", 10)
+    //         .attr("id", function (d) { return 'Blegend_' + d.actor_name.replace(/\s+/g, '').replace(".", '') })
+    //         .attr("fill", function (d) { return d.color; })
+            
+        // legend.append("text")
+        //     .attr("x", 15)
+        //     .attr("y", 5)
+        //     .attr("dy", "0.32em")
+        //     .text(function (d) { return d.actor_name; });
+          
+        }
     function roundPositions(y) {
       
         //keep PositionsArray for the specified turn and PositionsArray2 for all other turns
