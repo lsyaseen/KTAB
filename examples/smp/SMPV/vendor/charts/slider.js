@@ -3,7 +3,7 @@
 var data,
   turns,
   NumOfTurns,
-  currentTurn = 1;
+  currentTurn = 0;//start with turn 0 by default
 var slider = document.getElementById('slider');
 NumOfTurns = sessionStorage.getItem("NumOfTurns");
 turns = +NumOfTurns;
@@ -13,7 +13,7 @@ turns = +NumOfTurns;
 function InitializeSlider(turns) {
   noUiSlider.create(slider, {
     connect: true,
-    start: 1,
+    start: 0,
     keyboard: true,  // same as [keyboard]="true"
     step: 1,
     pageSteps: 10,  // number of page steps, defaults to 10
@@ -30,16 +30,15 @@ function InitializeSlider(turns) {
   });
   slider.noUiSlider.on('change', function () {
     console.log("slider change")
-currentTurn = + slider.noUiSlider.get(); 
- 
+    currentTurn = + slider.noUiSlider.get();
     document.getElementById('currentTurn').innerHTML = currentTurn;
     drawChart();
     drawLine();
-if (currentTurn != turns){
-   //last turn has no bargains
-  loadCurrentTurnData(currentTurn);
-  drawNetwork();
-}  
+    if (currentTurn != turns) {
+      //last turn has no bargains
+      loadCurrentTurnData(currentTurn);
+      drawNetwork();
+    }
   });
 
 }

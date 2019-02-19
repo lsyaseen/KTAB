@@ -12,22 +12,18 @@ var NoOfBars = 25; //default
 var axisLables = true;
 var currentTurn;
 
-function getNewResoulution(w, h, Bn,lables) {
+function getNewResoulution(w, h, Bn, lables) {
     svgWidth2 = w;
     svgheight2 = h;
     NoOfBars = Bn;
-    axisLables= lables;
+    axisLables = lables;
 }
-// function getTurnData(turn){
-
-//     currentTurn= turn;
-// } 
 
 function drawChart() {
-    
+
     allpos = arrPos;
-    AllEffcPow =arreff;
- 
+    AllEffcPow = arreff;
+
     var margin = { top: 30, right: 20, bottom: 30, left: 50 },
         width2 = svgWidth2 - margin.left - margin.right,
         height = svgheight2 - margin.top - margin.bottom;
@@ -50,7 +46,8 @@ function drawChart() {
         .attr("width", "100%")
         .attr("height", "100%")
         .attr("preserveAspectRatio", "xMidYMid meet")
-        .attr("viewBox", "0 0 250 500")
+        .attr("viewBox", "0 0 250 650")
+        // .attr("viewBox", "0 0 250 "+svgheight2+"")
         .attr('transform', "translate(" + 15 + "," + 15 + ")")
         .append("g")
         .attr("class", "legend2");
@@ -76,14 +73,14 @@ function drawChart() {
         rows = [],
         selectedRect,
         selectedLegend;
-var selectedScenNum = selectedScen;
+    var selectedScenNum = selectedScen;
     ActorsObj2 = JSON.parse(sessionStorage.getItem("ActorsObj"));
 
     var xAxis = d3.axisBottom(xScale).scale(xScale);
     var yAxis = d3.axisLeft(yScale).scale(yScale);
     turn = currentTurn; //current turn from slider
 
-   
+
     for (var i = 0; i < allpos[selectedScenNum][selectedDimNum].length; i += 1) {
         positionsData.push(allpos[selectedScenNum][selectedDimNum][i].positions);
     }
@@ -109,7 +106,7 @@ var selectedScenNum = selectedScen;
     for (var i = 0; i < positionsData.length; i++) {
         PositionsArray.push(positionsData[i][turn]); // it should be a var based on which turn is chosen
     }
-  
+
     groupActors(PositionsArray);
 
     //adding range position
@@ -289,14 +286,14 @@ var selectedScenNum = selectedScen;
         .attr("font-size", "10px")
         .attr("font-weight", "bold");
 
-        if (axisLables == true){
-    $(".CharLabel").show();
-    $(".axis text").show();
-}
-else if (axisLables == false){
-    $(".CharLabel").hide();
-    $(".axis text").hide();
-}
+    if (axisLables == true) {
+        $(".CharLabel").show();
+        $(".axis text").show();
+    }
+    else if (axisLables == false) {
+        $(".CharLabel").hide();
+        $(".axis text").hide();
+    }
     function onMouseover() {
 
         ActorsObj2.forEach(function (d, i) {
@@ -358,33 +355,36 @@ else if (axisLables == false){
             roundPositions(PositionsArray2);
         }
     }
-    if (GroupsDetails.length>0){
+    if (GroupsDetails.length > 0) {
+        var Actorslegendsize = Math.floor((ActorsObj2.length - 1) / 3) * 20
 
-        for (j =0 ; j < GroupsDetails.length;j++){
-               //add the legend
-               svg3.append("rect")
-         .attr("width", 10)
-         .attr("height", 10)
-               .attr("class",'GroupsLeg')
-               .attr("transform", function (d, i) {
-                var xOff = ((ActorsObj2.length-1+j) % 3) * 85
-                var yOff = Math.floor((ActorsObj2.length-1+j) / 3) * 20
-                return "translate(" + xOff + "," + (yOff + 70) + ")"
-            })
-          .attr("id", 'Barlegend_' + GroupsDetails[j].Gname.replace(/\s+/g, '').replace(".", ''))
-         .attr("fill",  GroupsDetails[j].Gcolor )
-        
-         svg3.append("text")
-         .attr("transform", function (d, i) {
-            var xOff = ((ActorsObj2.length-1+j) % 3) * 85
-            var yOff = Math.floor((ActorsObj2.length-1+j) / 3) * 20
-            return "translate(" + (xOff+15) + "," + (yOff + 78) + ")"
-        })
-         .text(function () { return GroupsDetails[j].Gname })    
-        
+        for (j = 0; j < GroupsDetails.length; j++) {
+            //add the legend
+            svg3.append("rect")
+                .attr("width", 10)
+                .attr("height", 10)
+                .attr("class", 'GroupsLeg')
+                .attr("transform", function (d, i) {
+                    var xOff = (j % 3) * 85
+                    var yOff = Math.floor((j) / 3) * 20
+
+                    return "translate(" + xOff + "," + (yOff + (Actorslegendsize) + 70) + ")"
+                })
+                .attr("id", 'Barlegend_' + GroupsDetails[j].Gname.replace(/\s+/g, '').replace(".", ''))
+                .attr("fill", GroupsDetails[j].Gcolor)
+
+            svg3.append("text")
+                .attr("transform", function (d, i) {
+                    var xOff = (j % 3) * 85
+
+                    var yOff = Math.floor((j) / 3) * 20
+                    return "translate(" + (xOff + 15) + "," + (yOff + (Actorslegendsize) + 78) + ")"
+                })
+                .text(function () { return GroupsDetails[j].Gname })
+
         }
-          }
-            
+    }
+
     function DrawBars(data) {
         svg.append("g")
             .selectAll("g")
@@ -404,14 +404,15 @@ else if (axisLables == false){
             })
             .on("mouseout", onMouseout)
             .selectAll("rect")
-            .data(function (d) { 
-                return d.values; })
+            .data(function (d) {
+                return d.values;
+            })
             .enter().append("rect")
             .attr("x", function (d, i) {
                 return xScale((barnames[i])) + 2.5;
             }) // + to shift bars 
             .attr("width", function (d) {
-                var barWidth = width2 / (data[0].values.length)- 4;
+                var barWidth = width2 / (data[0].values.length) - 4;
                 return barWidth
             })
             .attr("y", height)
@@ -428,22 +429,9 @@ else if (axisLables == false){
             .duration(3000)
             .attr("y", function (d) { return yScale(d[1]); })
             .attr("height", function (d) { return yScale(d[0]) - yScale(d[1]); });
-//groupLegend
-    // legend.append("rect")
-    //         .attr("width", 10)
-    //         .attr("height", 10)
-    //         .attr("id", function (d) { return 'Blegend_' + d.actor_name.replace(/\s+/g, '').replace(".", '') })
-    //         .attr("fill", function (d) { return d.color; })
-            
-        // legend.append("text")
-        //     .attr("x", 15)
-        //     .attr("y", 5)
-        //     .attr("dy", "0.32em")
-        //     .text(function (d) { return d.actor_name; });
-          
-        }
+
+    }
     function roundPositions(y) {
-      
         //keep PositionsArray for the specified turn and PositionsArray2 for all other turns
         groupActors(PositionsArray2);
         //make sure arrays are empty for rounding another turn's positions
@@ -458,12 +446,12 @@ else if (axisLables == false){
             rows[i] = Array(NoOfActors).fill(0);
 
         }
-        
+
         for (i = 0; i < NoOfActors; i++) {
 
             var temp = Qscale(e[i]);
             rows[temp][i] = +effpowArray2[i];
-           
+
         }
         for (i = 0; i <= NoOfBars - 1; i++) {
             var temp2 = Qscale.invertExtent(i)[0];

@@ -13,10 +13,13 @@
     stroke-width: 1.5px;
   }
   body {
-    padding-top: 51px;  
+    padding-top: 1%;  
   }
   .text-center {
     padding-top: 20px;
+  }
+  .row-custom-padding {
+    padding: 5px 20px 5px
   }
   /* .col-xs-12 {
     background-color: #fff;
@@ -48,7 +51,10 @@
    background-color: #cccccc;
    box-shadow: 2px 2px 1px #888;
  }
-
+#legend{
+  min-height: 330px;
+  overflow-y: auto;
+}
  .legend2 { 
   padding: 10px;
  overflow: auto;
@@ -59,7 +65,7 @@
 }
  .scrollable-panel{
   max-height: 300px;
-  overflow: auto;
+  overflow: scroll;
 }
 #slider{
   margin-bottom: 2%;
@@ -149,18 +155,6 @@ margin-top:7%;
 }
 #ChangeNBars{
   padding-top:5%;
-}
-#fromb {
-  /* fill: green; */
-}
-.link.tob {
-  /* stroke: green; */
-}
-#tob {
-  /* fill: green; */
-}
-.link.fromb {
-  /* stroke: green; */
 }
 .link.rejectb {
   stroke: gray;

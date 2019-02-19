@@ -21,7 +21,7 @@ var db, ActorsData, NetworkactorsData;
 
 var groupedScenarios, scenaioIds, NoOfDim;
 function GraphData(file, onloaddb) {
-    
+
     this.dbfile = file;
     this.actorsById = {};
     this.linksByBid = {};
@@ -29,9 +29,9 @@ function GraphData(file, onloaddb) {
     this.onloaddb = onloaddb
     var fr = new FileReader();
 
-    if(file.size > 1717986918){
-       alert("File must be smaller than 1.5 GB");
-      return location.reload();
+    if (file.size > 1717986918) {
+        alert("File must be smaller than 1.5 GB");
+        return location.reload();
     };
 
     fr.onload = function () {
@@ -42,7 +42,7 @@ function GraphData(file, onloaddb) {
         __this.initScenarioData();
         __this.loadActorsData();
         __this.loadBargainsData();
-        loadCurrentTurnData(1);//initial turn
+        loadCurrentTurnData(0);//initial turn
         updateDesc();
         __this.onloaddb();
 
@@ -271,19 +271,19 @@ function loadCurrentTurnData(turn) {
         "  where M.Turn_t = " + turn + " and M.Dim_k = " + selectedDimNum + " and M.ScenarioId = '" + scenaioIds[selectedScen] +
         "' order by B.Turn_t, BargnID ");
 
-        acceptedBgn = db.exec(" select B.*, M.Dim_k, AI.Name as Init, AR.Name as Rcvr " +
+    acceptedBgn = db.exec(" select B.*, M.Dim_k, AI.Name as Init, AR.Name as Rcvr " +
         " from (select ScenarioId, Turn_t, BargnId, Init_Act_i, Recd_Act_j " +
-        " ,'Init' as Q from Bargn where Init_Seld = 1 and Turn_t =  " + turn + " and "+
+        " ,'Init' as Q from Bargn where Init_Seld = 1 and Turn_t =  " + turn + " and " +
         " ScenarioId ='" + scenaioIds[selectedScen] + "' union select ScenarioId," +
         " Turn_t, BargnId, Init_Act_i, Recd_Act_j ,'Rcvr' from Bargn  " +
-        " where Recd_Seld = 1 and Turn_t =  " + turn + " and "+
+        " where Recd_Seld = 1 and Turn_t =  " + turn + " and " +
         " ScenarioId ='" + scenaioIds[selectedScen] + "') as B inner join  ActorDescription as AI on " +
         " B.Init_Act_i = AI.Act_i and B.ScenarioID = AI.ScenarioID inner join " +
         " ActorDescription as AR on B.Recd_Act_j = AR.Act_i and " +
         " B.ScenarioID = AR.ScenarioID inner join " +
         " VectorPosition as M on M.ScenarioId = B.ScenarioID and BargnId = M.Mover_BargnId and M.Dim_k = " + selectedDimNum);
 
-    }
+}
 
 $("#SecnarioPicker").on('change', function () {
     selectedScen = $('#SecnarioPicker').val();
@@ -306,9 +306,9 @@ function getfile() {
 
     var files = document.getElementById("uploadInput").files;
     var file = files[0];
-   $(".loading").show();
-    var SelecteDBfileName =file.name;
-     document.getElementById("fileNameText").value = SelecteDBfileName;
+    $(".loading").show();
+    var SelecteDBfileName = file.name;
+    document.getElementById("fileNameText").value = SelecteDBfileName;
     gd = new GraphData(file, function () {
         $(".loading").hide();
         $("#fileUpload").hide();

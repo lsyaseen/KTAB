@@ -2,7 +2,6 @@
 var svgWidth2 = 900;
 var svgheight2 = 300;
 function drawNetwork() {
-
     this.actorsById = {};
     this.linksByBid = {};
     var __this = this;
@@ -188,16 +187,16 @@ function GraphRenderer(actors, links) {
             .enter().append("marker")
             .attr("id", function (d) { return d; })
             .attr("viewBox", '-0 -5 10 10')
-            .attr("refX", function (d) { return d === 'fromb' ? 5 : 5; })
-            .attr("refY", 0)
-            .attr("orient", "auto").attr('markerUnits', 'userSpaceOnUse')
+            .attr("refX", function (d) { return d === 'fromb' ? 5.6 : 5.6; })
+            .attr("refY", 2.5)//pos
+            .attr("orient", "auto")
+            .attr('markerUnits', 'userSpaceOnUse')
             .attr("markerWidth", function (d) { return d === 'fromb' ? 8 : 8; })
             .attr("markerHeight", function (d) { return d === 'fromb' ? 8 : 8; })
             .attr("xoverflow", 'visible')
             .append('svg:path')
-            .attr('d', 'M 0,-5 L 5 ,0 L 0,5')
+            .attr('d', 'M0,0 L6.5,2.5 L0,5')
             .attr('fill', 'gray')
-            .style('stroke', 'none');
 
         // simulation setup with all forces
         var linkForce = d3
@@ -237,9 +236,6 @@ function GraphRenderer(actors, links) {
             .attr("class", function (d) {
                 return "link " + d.type + " " + (d.accepted ? "" : "rejectb");
             })
-            // .attr("stroke-width", function (d) {
-            //     // return edgeWidthScale(d.acceptanceprop)
-            // })
             .attr("stroke-width", "1.5px")
             .attr("stroke", "rgba(50, 50, 50, 0.2)")
             .attr('marker-end', function (d) { return d.type == 'fromb' ? "url(#" + d.type + ")" : "" })
@@ -261,7 +257,7 @@ function GraphRenderer(actors, links) {
             .enter().append("text")
             .attr("class", "CharLabel")
             .text(function (node) { return node.label })
-            .attr("font-size", 15)
+            .attr("font-size", 10)
             .attr("dx", 15)
             .attr("dy", 4)
         __this.simulation.nodes(__this.nodes).on('tick', () => {
@@ -283,12 +279,6 @@ function GraphRenderer(actors, links) {
         return node.type == 'actor' ? node.color : 'gray'
     }
 
-    this.getColor = function (value) {
-        var hue = ((1 - value) * 120).toString(10);
-        return ["hsl(", hue, ",100%,50%)"].join("");
-    }
-
-
     this.getNodeRadius = function (node) {
         if (node.type === 'actor') {
             node.radius = (node.fpower / 2) + ((Math.random() * 100) % 10);
@@ -306,7 +296,7 @@ function GraphRenderer(actors, links) {
             return "M" + d.source.x + "," + d.source.y + "L" + d.target.x + "," + d.target.y;
         }
         return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
-    }
+    }//why twice?
 
     this.linkArc = function (d) {
         var dx = d.target.x - d.source.x,

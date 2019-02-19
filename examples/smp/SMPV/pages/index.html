@@ -61,14 +61,14 @@
                         <div class="panel-body ">
                             <div class="input-group">
                                 <label class="input-group-btn">
-                                        <span class="btn btn-primary">
-                                            Browse&hellip;
-                                            <input id="uploadInput" type="file" accept=".db" style="display: none;" onchange="getfile()">
-                                        </span>
-                                    </label>
+                                    <span class="btn btn-primary">
+                                        Browse&hellip;
+                                        <input id="uploadInput" type="file" accept=".db" style="display: none;" onchange="getfile()">
+                                    </span>
+                                </label>
                                 <input type="text" id="fileNameText" class="form-control" readonly>
                             </div>
-                              <small>Note: Database file must be smaller than 1.5 GB</small>
+                            <small>Note: Database file must be smaller than 1.5 GB</small>
                         </div>
                     </div>
                 </div>
@@ -81,7 +81,7 @@
 
     </div>
     <div id="content" style="display:none">
-        <div class="row space">
+        <div class="row row-custom-padding">
             <div class="col-lg-8 col-md-6">
                 <div class="panel">
                     <div class="panel-heading">
@@ -132,8 +132,13 @@
             </div>
         </div>
         <!-- slider -->
-        <div class="row space">
+        <div class="row row-custom-padding">
             <div class="col-sm-12 col-lg-12 col-md-12">
+                <div>
+                    <p>
+                        <strong>Turn Selector: </strong>
+                    </p>
+                </div>
                 <div id="slider"></div>
             </div>
         </div>
@@ -143,19 +148,19 @@
                     <div class="panel-heading tabs">
                         <ul class="nav nav-tabs">
                             <li class="active">
-                                <a href="#LineGraphTab" data-toggle="tab">Policy Position </a>
+                                <a href="#BarGraphTab" data-toggle="tab">Effective Power Bar Chart</a>
                             </li>
                             <li>
-                                <a href="#BarGraphTab" data-toggle="tab">Effective Power Landscape </a>
+                                <a href="#LineGraphTab" data-toggle="tab">Position Line Graph </a>
                             </li>
                             <li>
-                                <a href="#NetworkTab" data-toggle="tab"> Bargain Queue Resolution </a>
+                                <a href="#NetworkTab" data-toggle="tab"> Network Diagram of Bargains </a>
                             </li>
                         </ul>
                     </div>
                     <div class="panel-body">
                         <div class="tab-content">
-                            <div class="tab-pane fade in active" id="LineGraphTab">
+                            <div class="tab-pane fade " id="LineGraphTab">
                                 <!-- Default 1 -->
                                 <div class="container-fluid">
                                     <div class="canvasDiv">
@@ -176,7 +181,7 @@
                             </div>
 
                             <!-- //2nd tab -->
-                            <div class="tab-pane fade" id="BarGraphTab">
+                            <div class="tab-pane fade in active" id="BarGraphTab">
                                 <div class="container-fluid">
                                     <div class="canvasDiv">
                                         <canvas id="Barcanvas" style="display:none;"></canvas>
@@ -245,7 +250,7 @@
                 <div class="SizePopup-footer">
                     <br>
                     <button class="toggle button" data-target="SizePopup" onclick="GetNewSize()">Confirm Edits</button>
-                    <button class="toggle button" data-target="SizePopup" onclick="downloadPNG()">download</button>
+                    <button class="toggle button" data-target="SizePopup" onclick="downloadPNG()" id="DownloadButton" style="display: inline-block;">download</button>
                 </div>
             </div>
             <div id="ColorPopup" class="popup hide">
@@ -281,12 +286,9 @@
                         <span>
                             <strong> Import Groups from a CSV : </strong>
                         </span>
-                        <input type="file" name="File Upload" id="GroupsFileUpload" accept=".csv" class="center-block" style="width: 175px; padding-top: 2%;"/>
+                        <input type="file" name="File Upload" id="GroupsFileUpload" accept=".csv" class="center-block" style="width: 175px; padding-top: 2%;"
+                        />
                     </div>
-                    <!-- <div id="DivExportCSV">
-                        <button class="toggle button" onclick="ExportGroupsCSV()">Export CSV</button>
-
-                    </div> -->
                     <div>
                         <button class="toggle button" data-target="GroupPopup" onclick="saveSelectedColors()">Apply Changes</button>
                     </div>
@@ -295,7 +297,7 @@
             <div id="NetworkDetails" class="popup hide">
                 <div class="popup-header">
                     <span class="close toggle" data-target="NetworkDetails">close</span>
-                    Network Diagram of Bargain Queue Resolution
+                    Network Diagram of Bargains
                 </div>
 
                 <div class="NetworkDetails-body">
@@ -305,13 +307,12 @@
                     This Diagram visulize the Propose-Resolve stages of the SMP bargaining model
                     <ul>
                         <li>Actors are represented with nodes colred according to each actor's color. </li>
+                        <li>Size of Actors' nodes represent each actor's Effective Power</li>
                         <li>Bargains are represented with small grey nodes. </li>
                         <li>All edges are directed. </li>
                         <li>The edge coming to the bargain node from the actor's node represent the initiator. </li>
                         <li>The edge coming to the actor's node from the bargain node represent the Reciever. </li>
                         <li>Solid-line edges represent accepted bargains, dashed edges represent rejected bargains. </li>
-                        <li> Egdes thickness are proportional to the probability of the bargain being accepted. </li>
-
                     </ul>
 
                 </div>
@@ -400,7 +401,7 @@
 
     var Sizecounter = 0;
     var newColors = [];
-    var GroupsDetails=[];
+    var GroupsDetails = [];
 
     $(document).ready(function () {
 
@@ -462,10 +463,13 @@
     });
 
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+
         var target = $(e.target).attr("href") // activated tab
         //to show netork explination button
         if (target == "#NetworkTab") {
+            document.getElementById("DownloadButton").style.display = "none";
             document.getElementById("NetworkButton").style.display = "inline-block";
+            $("#ChangeNBars").hide();
             slider.noUiSlider.updateOptions({
                 range: {
                     'min': 0,
@@ -483,6 +487,7 @@
             currentTurn = +slider.noUiSlider.get();
         }
         else {
+            document.getElementById("DownloadButton").style.display = "inline-block";
             document.getElementById("NetworkButton").style.display = "none";
             slider.noUiSlider.updateOptions({
                 range: {
@@ -498,8 +503,15 @@
 
             });
             slider.noUiSlider.set(currentTurn);
+            if (target == "#BarGraphTab") {
+                $("#ChangeNBars").show();
+            }
+            else {
+                $("#ChangeNBars").hide();
+            }
         }
     });
+
     function getActorsData() {
 
         //names based on selected scenario
@@ -522,7 +534,7 @@
     function ChangeresolutionandDownload() {
         if (Sizecounter <= 0) { //to only appened once
             $(".SizePopup-body").append('<div> <strong> Image resolution :</strong> </div> ');
-            $(".SizePopup-body").append('<div><br> <input type="checkbox" name="Labels" id="RemoveLabels" value="RemoveLabels" > Remove Lables</div>');
+            $(".SizePopup-body").append('<div><br> <input type="checkbox" name="Labels" id="RemoveLabels" value="RemoveLabels" > Remove Labels</div>');
             $(".SizePopup-body").append('<div id="sizeOpt" </div> ')
             $("#sizeOpt").append('<br><span> <input type="radio" class="sizeRadio" id="defaultSize" name="radio-group2" checked>' +
                 '<label for="defaultSize">Default Size </label>' +
@@ -531,7 +543,7 @@
             $(".SizePopup-body").append('<div id="sizeOptDiv"><p>Please input a number between 100 and 1000:</p> <strong> Width: </strong>'
                 + '<input id="widthbox" type="text" name="width" maxlength="4" size="4" value="550" disabled>'
                 + '<strong> Height: </strong> <input id="heightbox" type="text" name="height" maxlength="4" value="300" size="4" disabled></div>');
-            $(".SizePopup-body").append('<div id="ChangeNBars"><p><strong> Number of Bars: </strong>'
+            $(".SizePopup-body").append('<div id="ChangeNBars" style="display: none;"><p><strong> Number of Bars: </strong>'
                 + '<input id="NoOfBars" type="text" name="BarsNo" maxlength="2" size="2" value="25" ></p></div>');
             Sizecounter++;
         }
@@ -539,14 +551,13 @@
 
     $(document).on('change', '[class="sizeRadio"]', function () {
         if ($('#defaultSize').is(':checked')) {
-            $('#widthbox').val("550");
+            $('#widthbox').val(550);
             $('#heightbox').val(300);
 
             $('#widthbox').prop('disabled', true);
             $('#heightbox').prop('disabled', true);
         }
         else if ($('#ChangeSize').is(':checked')) {
-
             $('#widthbox').prop('disabled', false);
             $('#heightbox').prop('disabled', false);
 
@@ -577,16 +588,10 @@
             $(".ActorsGroups").append('<div id="Div_group_Color_' + (i + 1) + '"class="col-xs-8 col-sm-8 col-md-8 col-lg-8" </div> ')
             $("#Div_group_Color_" + (i + 1)).append('<br><span><strong> Group ' + (i + 1) + ' Color: </strong> </span>' +
                 '<input style="width:100px;" id="Group_' + (i + 1) + '_Color" class=" colorPicker evo-cp0"> ');
-
-
             $("#Group_" + (i + 1) + "_Color").colorpicker({ showOn: 'button' });
             $("#Group_" + (i + 1) + "_Color").colorpicker("val", defaultColors[i]);
-
-
         }
         $(".ActorsGroups").append('<br><span>  <button class="toggle button" id="confirmGroupsBut" onclick="ConfirmGroupsButton()"  > Confirm Groups </button> </span>');
-
-
     });
 
     //parse the groups csv file
@@ -606,8 +611,6 @@
                     getNewGroups(results.data)
                 }
             });
-
-
         };
         reader.onerror = function () {
             alert('Unable to read ' + file.fileName);
@@ -632,7 +635,6 @@
                     getNewColors(results.data)
                 }
             });
-
 
         };
         reader.onerror = function () {
@@ -694,19 +696,18 @@
         }
     }
     function getNewGroups(csvgroups) {
-    
-        var UploadedGroups = [] ;
+
+        var UploadedGroups = [];
         temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
         var firstrow = ["Index", "Actor", "Group", "Color"];
-       
+
         if (csvgroups[0].toString() == firstrow.toString()) {
             if (temActorsObj.length < csvgroups.length) {
 
                 for (i = 0; i < temActorsObj.length; i++) {
-                    UploadedGroups.push(csvgroups[i+1][2]);
-                    temActorsObj[i]["group"] = csvgroups[i+1][2];
-                    temActorsObj[i]["color"] = csvgroups[i+1][3];
-                    // $("#" + temActorsObj[i].actor_name).colorpicker("val", newColors[i]);
+                    UploadedGroups.push(csvgroups[i + 1][2]);
+                    temActorsObj[i]["group"] = csvgroups[i + 1][2];
+                    temActorsObj[i]["color"] = csvgroups[i + 1][3];
                 }
 
             }
@@ -714,37 +715,26 @@
                 for (i = 1; i < csvgroups.length; i++) {
                     UploadedGroups.push(csvgroups[i][2])
 
-                    temActorsObj[i-1]["group"] = csvgroups[i][2];
-                    temActorsObj[i-1]["color"] = csvgroups[i][3];
+                    temActorsObj[i - 1]["group"] = csvgroups[i][2];
+                    temActorsObj[i - 1]["color"] = csvgroups[i][3];
                 }
             }
-            
             sessionStorage.setItem("ActorsObj", JSON.stringify(temActorsObj));
-
-
         }
-       
 
         else {
             alert('Please check CSV Format');
         }
-        
         var uniqueGroups = Array.from(new Set(UploadedGroups));
-
-GroupsDetails.length =0 ;//to empty the array from previous groups
-
- for (i=0 ; i< uniqueGroups.length ; i++){
-  var index =  temActorsObj.findIndex( elt => elt.group === uniqueGroups[i]);
-   GroupsDetails[i]= {
-           Gname: temActorsObj[index].group,
-           Gcolor: temActorsObj[index].color,
+        GroupsDetails.length = 0;//to empty the array from previous groups
+        for (i = 0; i < uniqueGroups.length; i++) {
+            var index = temActorsObj.findIndex(elt => elt.group === uniqueGroups[i]);
+            GroupsDetails[i] = {
+                Gname: temActorsObj[index].group.toString(),
+                Gcolor: temActorsObj[index].color,
+            }
         }
- }
- 
-//  GroupsDetails[j]= {
-//            Gname:document.getElementById("group_" + (j + 1) + "_Name").value,
-//            Gcolor: document.getElementById("Group_" + (j + 1) + "_Color").value,
-//         }
+
     }
 
     function updateColors() {
@@ -763,7 +753,16 @@ GroupsDetails.length =0 ;//to empty the array from previous groups
         }
         sessionStorage.setItem("ActorsObj", JSON.stringify(temActorsObj));
     }
-
+    $(window).on('resize', function () {
+        Resizelegend();
+    });
+    function Resizelegend() {
+        var LinedivHeight = '' + $('#MainLineChart').height();
+        var BardivHeight = '' + $('#MainBarChart').height();
+        var divHeight = (LinedivHeight < BardivHeight) ? BardivHeight + 'px' : LinedivHeight + 'px';
+        $("#legend").css('min-height', divHeight);
+        $("#Barlegend").css('min-height', divHeight);
+    }
     function GetNewSize() {
 
         if ($('#defaultSize').is(':checked')) {
@@ -772,10 +771,11 @@ GroupsDetails.length =0 ;//to empty the array from previous groups
             $('.canvasDiv').width(550);
             drawChart();
             drawLine();
+            Resizelegend();
             loadCurrentTurnData(currentTurn);
             drawNetwork();
             checkLabels();
-            // setTimeout(downloadPNG, 3000); //give it time to draw
+
         }
         else if ($('#ChangeSize').is(':checked')) {
             var width = parseInt($("#widthbox").val());
@@ -786,10 +786,10 @@ GroupsDetails.length =0 ;//to empty the array from previous groups
                 getNewResoulution(width, height, NoOfBars, axisLables);
                 drawChart();
                 drawLine();
+                Resizelegend();
                 loadCurrentTurnData(currentTurn);
                 drawNetwork();
                 checkLabels();
-                // setTimeout(downloadPNG, 3000); //give it time to draw
             }
             else {
                 alert("invalid width or height");
@@ -821,6 +821,7 @@ GroupsDetails.length =0 ;//to empty the array from previous groups
                 // Canvg requires trimmed content
                 content = $container.html().trim(),
                 canvas = document.getElementById('canvas');
+            // canvas.getContext('2d').scale(2,2)
             var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
             canvg(canvas, content);
             var image = canvas.toDataURL("image/png")
@@ -858,7 +859,6 @@ GroupsDetails.length =0 ;//to empty the array from previous groups
 
             canvg(canvas_Network, Networkcontent);
             var image = canvas_Network.toDataURL("image/png")
-
             let filename = 'NetworkDiagram'
             let Networklink = document.createElement('a')
             Networklink.href = image
@@ -870,40 +870,27 @@ GroupsDetails.length =0 ;//to empty the array from previous groups
 
     }
     function GroupActors() {
-        // $('.GroupActorsPopup-body').empty();
-       
 
-            
-                 if (changeActorsGroups <= 0) { //only initilaze once!
-           $(".GroupActorsPopup-body").append('<div id="GropingOpt" </div> ')
+        if (changeActorsGroups <= 0) { //only initilaze once!
+            $(".GroupActorsPopup-body").append('<div id="GropingOpt" </div> ')
             $("#GropingOpt").append('<br><span> <input type="radio" class="groupingRadio" id="initialize" name="radio-group2" checked >' +
                 '<label for="initialize">Initialize Groups </label>' +
                 ' <input type="radio" class="groupingRadio" id="uploadGroups" name="radio-group2" >' +
                 '<label for="uploadGroups">Upload pre-defiend Groups  </label> <br> <br> </span>')
-                // style="display: none;"
-        $(".GroupActorsPopup-body").append('<div class=" col-xs-12 col-sm-12 col-md-12 col-lg-12 GroupsInitialization NoOgGroupsInput" > <strong> Number of Groups: </strong>'
+            $(".GroupActorsPopup-body").append('<div class=" col-xs-12 col-sm-12 col-md-12 col-lg-12 GroupsInitialization NoOgGroupsInput" > <strong> Number of Groups: </strong>'
                 + ' <input id="NoOfGroups" type="text"  maxlength="2" size="4"> <br></div>');
 
             changeActorsGroups++;
         }
-    //     $(".GroupActorsPopup-body").append('<div class=" col-xs-12 col-sm-12 col-md-12 col-lg-12 GroupsInitialization NoOgGroupsInput" style="display: none;"> <strong> Number of Groups: </strong>'
-    // + ' <input id="NoOfGroups" type="text"  maxlength="2" size="4"> <br></div>');
     }
     $(document).on('change', '[class="groupingRadio"]', function () {
         if ($('#initialize').is(':checked')) {
-            // $('.NoOgGroupsInput').show();
-            // $('.ActorsGroups').show();
             $('.GroupsInitialization').css('display', 'block');
-
-            
-            // $(".GroupActorsPopup-body").append('<div class="NoOgGroupsInput" col-xs-12 col-sm-12 col-md-12 col-lg-12"> <strong> Number of Groups: </strong>'
-            //     + ' <input id="NoOfGroups" type="text"  maxlength="2" size="4"> <br></div>');
-                $('.Groupspopup-footer').hide();
-
+            $('.Groupspopup-footer').hide();
         }
         else if ($('#uploadGroups').is(':checked')) {
-$('.Groupspopup-footer').show();
-$('.GroupsInitialization').css('display', 'none');
+            $('.Groupspopup-footer').show();
+            $('.GroupsInitialization').css('display', 'none');
 
 
         }
@@ -914,29 +901,27 @@ $('.GroupsInitialization').css('display', 'none');
 
         $('.ActorsForGrouping').remove();
         $(".GroupActorsPopup-body").append('<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 GroupsInitialization ActorsForGrouping"> </div>');
-GroupsDetails.length =0 ;//to empty the array
+        GroupsDetails.length = 0;//to empty the array
         for (var i = 0; i < temActorsObj.length; i++) {
 
             $(".ActorsForGrouping").append('<div  id="Div_Group_' + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + '" class="col-xs-6 col-sm-4 col-md-6 col-lg-6"> </div>');
             $("#Div_Group_" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).append('<br><span><strong>' + temActorsObj[i].actor_name + '  </strong></span>' +
                 '<select class="GroupsOptions" id="GroupOf' + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + '" > </select>');
-                
+
             for (j = 0; j < NumOfGroups; j++) {
                 var GroupName = document.getElementById("group_" + (j + 1) + "_Name").value;
                 var $div = $("<option>", {
                     value: j,
                 }).text(GroupName);
                 $("#GroupOf" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).append($div);
-                GroupsDetails[j]= {
-           Gname:document.getElementById("group_" + (j + 1) + "_Name").value,
-           Gcolor: document.getElementById("Group_" + (j + 1) + "_Color").value,
-        }
+                GroupsDetails[j] = {
+                    Gname: document.getElementById("group_" + (j + 1) + "_Name").value,
+                    Gcolor: document.getElementById("Group_" + (j + 1) + "_Color").value,
+                }
             }
         }
-        
-
-        // $(".ActorsForGrouping").append('<br><br><span>  <button class="toggle button" data-target="GroupPopup" id="confirmActorsGroupsBut" onclick="ConfirmActorsGroups()"  >Confirm Actors Groups </button> </span>');
         $(".ActorsForGrouping").append('<br><br><span>  <button class="toggle button"  id="confirmActorsGroupsBut" onclick="ConfirmActorsGroups()"  >Confirm Actors Groups </button> </span>');
+        $(".ActorsForGrouping").append('<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 GroupsInitialization"> <button class="toggle button ExportButton disabled" onclick="ExportGroupsCSV()">Export CSV</button></div>');
 
     }
     function ConfirmActorsGroups() {
@@ -951,13 +936,9 @@ GroupsDetails.length =0 ;//to empty the array
             temActorsObj[obj1]["color"] = $("#Group_" + (selectedGroupIn + 1) + "_Color").colorpicker("val");
 
         }
-        $(".ActorsForGrouping").append('<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 GroupsInitialization"> <button class="toggle button" onclick="ExportGroupsCSV()">Export CSV</button></div>');
-
+        $('.ExportButton').prop('disabled', false);
         sessionStorage.setItem("ActorsObj", JSON.stringify(temActorsObj));
-
-      
-
-        saveSelectedColors();
+        saveSelectedColors(temActorsObj);
     }
 
     function changecolors() {

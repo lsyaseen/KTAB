@@ -7,23 +7,23 @@ var selectedDimNum = 0;
 // var selectedScenNum = sessionStorage.getItem("selectedScen");
 var defaultColors = sessionStorage.getItem("defaultColors");
 var svgWidth2 = 550;
-var svgheight2=300;
+var svgheight2 = 300;
 
-function getNewResoulution(w,h){
-  svgWidth2= w;
+function getNewResoulution(w, h) {
+  svgWidth2 = w;
   svgheight2 = h;
 }
 
 function drawLine() {
-var ActorsNamesAllSce = ActorsNames,
-selectedScenNum = selectedScen,
-ActorsPositions = arrPos,
-whyActorChanged = arrBargns;
+  var ActorsNamesAllSce = ActorsNames,
+    selectedScenNum = selectedScen,
+    ActorsPositions = arrPos,
+    whyActorChanged = arrBargns;
 
-    // Define margins        
-var margin = { top: 30, right: 20, bottom: 30, left: 50 },
-  width = svgWidth2 - margin.left - margin.right,
-  height = svgheight2 - margin.top - margin.bottom;
+  // Define margins        
+  var margin = { top: 30, right: 20, bottom: 30, left: 50 },
+    width = svgWidth2 - margin.left - margin.right,
+    height = svgheight2 - margin.top - margin.bottom;
 
   // Clear the exiting chart
   d3.select("#MainLineChart").html("");
@@ -33,9 +33,9 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
     .append("svg")
     .attr("width", "100%")
     .attr("height", "100%")
-    .attr("viewBox", "0 0 "+" "+ svgWidth2+" "+svgheight2 )
-     .attr("preserveAspectRatio", "xMidYMid meet")
-     .append("g")
+    .attr("viewBox", "0 0 " + " " + svgWidth2 + " " + svgheight2)
+    .attr("preserveAspectRatio", "xMidYMid meet")
+    .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
   var svg2 = d3.select("#legend")
@@ -43,11 +43,10 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
     .attr("width", "100%")
     .attr("height", "100%")
     .attr("preserveAspectRatio", "xMidYMid meet")
-    .attr("viewBox", "0 0 250 500")
+    .attr("viewBox", "0 0 250 650")
     .attr('transform', "translate(" + 15 + "," + 15 + ")")
     .append("g")
     .attr("class", "legend1")
-
   var x_axix_data = [], // create an array for x-axix 
     XScale,
     YScale,
@@ -71,13 +70,12 @@ var margin = { top: 30, right: 20, bottom: 30, left: 50 },
   for (var i = 0; i < ActorsPositions[selectedScenNum][selectedDimNum].length; i += 1) {
     positionsData.push(ActorsPositions[selectedScenNum][selectedDimNum][i].positions);
   }
-
   //bargains based on selected Dim and scenario
   for (var i = 0; i < whyActorChanged[selectedScenNum][selectedDimNum][0].length; i += 1) {
     bargnsData.push(whyActorChanged[selectedScenNum][selectedDimNum][0][i]);
   }
 
-turn = currentTurn; //current turn from slider
+  turn = currentTurn; //current turn from slider
   turns = NumOfTurns - 1; //cuz we're starting from 0
 
   //show points till chosen turn
@@ -96,7 +94,8 @@ turn = currentTurn; //current turn from slider
   // Define the line
   line = d3.line()
     .x(function (d) { return XScale(d.Turn); })
-    .y(function (d, i) { return YScale(d.val[i]); });
+    .y(function (d, i) { return YScale(d.val[i]); })
+    .curve(d3.curveMonotoneX);
 
 
   for (var i = 0; i < turn + 1; i++) {
@@ -128,7 +127,7 @@ turn = currentTurn; //current turn from slider
 
   //text label for the x axis
   svg.append("text")
-  .attr("class", "CharLabel")
+    .attr("class", "CharLabel")
     .attr("transform",
       "translate(" + (width / 2) + " ," +
       (height + 30) + ")")
@@ -147,7 +146,7 @@ turn = currentTurn; //current turn from slider
 
   // text label for the y axis
   svg.append("text")
-  .attr("class", "CharLabel")
+    .attr("class", "CharLabel")
     .attr("transform", "rotate(-90)")
     .attr("y", 0 - margin.left)
     .attr("x", 0 - (height / 2))
@@ -155,9 +154,7 @@ turn = currentTurn; //current turn from slider
     .style("text-anchor", "middle")
     .text("Position");
 
-  var colors = d3.scaleOrdinal()
-    .domain(namesArray)
-    .range(defaultColors)
+
   ActorsObj1.forEach(function (obj, index) {
     obj.values = x_axix_data.map(function (x_value) {
       return {
@@ -173,7 +170,6 @@ turn = currentTurn; //current turn from slider
     var obj1 = ActorsObj1.findIndex(o => o.actor_name === bargnsDataByTurn[i].Initiator);
     bargnsDataByTurn[i]["color"] = ActorsObj1[obj1].color;
   }
-
 
   //initialize bargains points visibilaty status  
   bargnsDataByTurn.forEach(function (obj) { obj["PointVisible"] = false; });
@@ -211,7 +207,7 @@ turn = currentTurn; //current turn from slider
       .attr("transform", function () {
         xOff = (i % 3) * 85
         yOff = Math.floor(i / 3) * 20
-        return "translate(" + xOff + "," + (yOff + 80) + ")"
+        return "translate(" + xOff + "," + (yOff + 50) + ")"
       })
       .attr("fill", function () {
         return d.visible ? d.color : "#F1F1F2";
@@ -227,11 +223,15 @@ turn = currentTurn; //current turn from slider
         if (d.visible == true) {
           d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
             .transition().remove();
+          d3.selectAll("#Spoint_" + d.actor_name.replace(/\s+/, "").replace(".", ''))
+            .style("display", 'none')
           ActorsObj1[i].visible = false;
           d.visible = false;
         }
         else if (d.visible == false) {
           drawLines(d, i);
+          d3.selectAll("#Spoint_" + d.actor_name.replace(/\s+/, "").replace(".", ''))
+            .style("display", 'inline')
           ActorsObj1[i].visible = true;
           d.visible = true;
         }
@@ -247,6 +247,21 @@ turn = currentTurn; //current turn from slider
         onMouseout();
       });
 
+    var startingPoints = svg.selectAll(".Spoint")
+      .data(ActorsObj1)
+      .enter()
+    startingPoints.append("circle")
+      .attr("class", "Spoint")
+      .attr("id", function (d) {
+        return "Spoint_" + d["actor_name"].replace(/\s+/, "").replace(".", '');
+      })
+      .attr("r", 3)
+      .attr("cx", function (d) { return XScale(d['values'][0].Turn); })
+      .attr("cy", function (d) { return YScale(d['values'][0]['val'][0]); })
+      .style("fill", function (d) { return d['color'] })
+      .style("display", 'inline')
+
+
     //add bargns' points
     var dot = svg.selectAll(".dot")
       .data(bargnsDataByTurn)
@@ -256,7 +271,7 @@ turn = currentTurn; //current turn from slider
         xOff = (i % 3) * 85
         yOff = Math.floor(i / 3) * 20
 
-        return "translate(" + (xOff + 15) + "," + (yOff + 89) + ")"
+        return "translate(" + (xOff + 15) + "," + (yOff + 59) + ")"
       })
       .text(function () { return d.actor_name })
       .attr("text-anchor", "start")
@@ -320,39 +335,38 @@ turn = currentTurn; //current turn from slider
 
   }) // end of forEach
 
-  if (GroupsDetails.length>0){
-    for (i =0 ; i < GroupsDetails.length;i++){
-           //add the legend
-         
-     svg2.append("rect")
-     .attr("width", 10)
-     .attr("height", 10)
-           .attr("class",'GroupsLeg')
+  if (GroupsDetails.length > 0) {
+    var Actorslegendsize = Math.floor((ActorsObj2.length - 1) / 3) * 20
+    for (j = 0; j < GroupsDetails.length; j++) {
+      //add the legend
 
-     .attr("transform", function () {    
-       xOff = ((ActorsObj1.length-1+i) % 3) * 85
-       yOff = Math.floor((ActorsObj1.length-1+i) / 3) * 20
-       return "translate(" + xOff + "," + (yOff + 120) + ")"
-     })
-      .attr("id", 'legend_' + GroupsDetails[i].Gname.replace(/\s+/g, '').replace(".", ''))
-     .attr("fill",  GroupsDetails[i].Gcolor )
-    
-     svg2.append("text")
-     .attr("transform", function () {
-       xOff = ((ActorsObj1.length-1+i) % 3) * 85
-       yOff = Math.floor((ActorsObj1.length-1+i) / 3) * 20
+      svg2.append("rect")
+        .attr("width", 10)
+        .attr("height", 10)
+        .attr("class", 'GroupsLeg')
+        .attr("transform", function () {
+          xOff = (j % 3) * 85
+          yOff = Math.floor((j) / 3) * 20
+          return "translate(" + xOff + "," + (yOff + Actorslegendsize + 90) + ")"
+        })
+        .attr("id", 'legend_' + GroupsDetails[j].Gname.replace(/\s+/g, '').replace(".", ''))
+        .attr("fill", GroupsDetails[j].Gcolor)
 
-       return "translate(" + (xOff + 15) + "," + (yOff + 128) + ")"
-     })
-     .text(function () { return GroupsDetails[i].Gname })    
-    
+      svg2.append("text")
+        .attr("transform", function () {
+          //  xOff = ((ActorsObj1.length-1+i) % 3) * 85
+          xOff = (j % 3) * 85
+          yOff = Math.floor((j) / 3) * 20
+          return "translate(" + (xOff + 15) + "," + (yOff + Actorslegendsize + 98) + ")"
+        })
+        .text(function () { return GroupsDetails[j].Gname })
     }
-      }
+  }
 
   svg2.append("rect")
     .attr("width", 10)
     .attr("height", 10)
-    .attr("y", 50)
+    .attr("y", 20)
     .attr("id", "select-All")
     .style("fill", "black")
     .on("click", function () {
@@ -373,7 +387,7 @@ turn = currentTurn; //current turn from slider
 
   svg2.append("text")
     .attr("x", 20)
-    .attr("y", 58)
+    .attr("y", 28)
     .text("Clear All")
     .attr("id", "SelectLabel");
 
@@ -450,6 +464,9 @@ turn = currentTurn; //current turn from slider
       ActorsObj1[i].visible = true;
       d3.selectAll("#legend_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
         .attr("fill", d.color)
+      d3.selectAll("#Spoint_" + d.actor_name.replace(/\s+/, "").replace(".", ''))
+        .style("display", 'inline')
+
     })
     d3.select("#SelectLabel")
       .text("Clear All")
@@ -465,6 +482,8 @@ turn = currentTurn; //current turn from slider
       d3.selectAll("#legend_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
         .attr("fill", "#F1F1F2")
       d3.selectAll(".dot" + d.actor_name.replace(/\s+/, "").replace(".", '')).remove();
+      d3.selectAll("#Spoint_" + d.actor_name.replace(/\s+/, "").replace(".", ''))
+        .style("display", 'none')
 
     })
     d3.select("#SelectLabel")
