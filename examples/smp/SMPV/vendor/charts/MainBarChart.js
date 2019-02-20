@@ -6,7 +6,7 @@ var NumOfTurns = sessionStorage.getItem("NumOfTurns");
 var effpow = JSON.parse(sessionStorage.getItem("effpow"));
 var ActorsObj2 = JSON.parse(sessionStorage.getItem("ActorsObj"));
 var selectedDimNum = 0;
-var svgWidth2 = 550;
+var svgWidth2 = 900;
 var svgheight2 = 300;
 var NoOfBars = 25; //default
 var axisLables = true;
@@ -23,7 +23,7 @@ function drawChart() {
 
     allpos = arrPos;
     AllEffcPow = arreff;
-
+    
     var margin = { top: 30, right: 20, bottom: 30, left: 50 },
         width2 = svgWidth2 - margin.left - margin.right,
         height = svgheight2 - margin.top - margin.bottom;

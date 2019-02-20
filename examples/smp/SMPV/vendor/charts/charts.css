@@ -52,7 +52,7 @@
    box-shadow: 2px 2px 1px #888;
  }
 #legend{
-  min-height: 330px;
+  min-height: 300px;
   overflow-y: auto;
 }
  .legend2 { 

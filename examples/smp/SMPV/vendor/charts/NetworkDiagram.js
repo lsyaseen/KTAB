@@ -11,9 +11,14 @@ function drawNetwork() {
     this.init = function () {
 
         initActorData();
-        loadTurnData(turn);
+        if (turn == NumOfTurns) {
+            //last turn has no bargains
+            loadTurnData(turn - 1);
+        }
+        else {
+            loadTurnData(turn);
+        }
     }
-
 
     this.init();
 

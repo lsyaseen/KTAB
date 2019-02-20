@@ -6,7 +6,7 @@ var NumOfTurns = sessionStorage.getItem("NumOfTurns");
 var selectedDimNum = 0;
 // var selectedScenNum = sessionStorage.getItem("selectedScen");
 var defaultColors = sessionStorage.getItem("defaultColors");
-var svgWidth2 = 550;
+var svgWidth2 = 900;
 var svgheight2 = 300;
 
 function getNewResoulution(w, h) {
@@ -19,7 +19,7 @@ function drawLine() {
     selectedScenNum = selectedScen,
     ActorsPositions = arrPos,
     whyActorChanged = arrBargns;
-
+    
   // Define margins        
   var margin = { top: 30, right: 20, bottom: 30, left: 50 },
     width = svgWidth2 - margin.left - margin.right,

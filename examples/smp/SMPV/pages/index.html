@@ -306,12 +306,12 @@
 
                     This Diagram visulize the Propose-Resolve stages of the SMP bargaining model
                     <ul>
-                        <li>Actors are represented with nodes colred according to each actor's color. </li>
+                        <li>Actors are represented with nodes colored according to each actor's color. </li>
                         <li>Size of Actors' nodes represent each actor's Effective Power</li>
                         <li>Bargains are represented with small grey nodes. </li>
                         <li>All edges are directed. </li>
                         <li>The edge coming to the bargain node from the actor's node represent the initiator. </li>
-                        <li>The edge coming to the actor's node from the bargain node represent the Reciever. </li>
+                        <li>The edge coming to the actor's node from the bargain node represent the Receiver. </li>
                         <li>Solid-line edges represent accepted bargains, dashed edges represent rejected bargains. </li>
                     </ul>
 
@@ -419,19 +419,22 @@
     });
     $("#Dimpicker").on('change', function () {
         selectedDimNum = $('#Dimpicker').val();
-        loadCurrentTurnData(currentTurn);
-        drawChart();
-        drawLine();
-        drawNetwork();
+        ReDrawAllCharts();
     });
 
     $("#SecnarioPicker").on('change', function () {
         selectedScen = $('#SecnarioPicker').val();
-        currentTurn = NumOfTurns - 1;
-        slider.noUiSlider.set(currentTurn);
+        console.log(NumOfTurns)
+        // currentTurn = NumOfTurns - 1;
+        // slider.noUiSlider.set(currentTurn);
+        currentTurn = 0;
+        slider.noUiSlider.set(0);
         document.getElementById('currentTurn').innerHTML = currentTurn;
         selectedDimNum = 0;
         changeColorsCounter = 0;
+        changeActorsGroups = 0;
+        $(".GroupActorsPopup-body").empty()
+        GroupsDetails.length = 0;//to empty the array
         slider.noUiSlider.updateOptions({
             range: {
                 'min': 0,
@@ -485,6 +488,8 @@
             });
             slider.noUiSlider.set(currentTurn);
             currentTurn = +slider.noUiSlider.get();
+            document.getElementById('currentTurn').innerHTML = currentTurn;
+            ReDrawAllCharts();
         }
         else {
             document.getElementById("DownloadButton").style.display = "inline-block";
@@ -503,6 +508,9 @@
 
             });
             slider.noUiSlider.set(currentTurn);
+            document.getElementById('currentTurn').innerHTML = currentTurn;
+            ReDrawAllCharts();
+
             if (target == "#BarGraphTab") {
                 $("#ChangeNBars").show();
             }
@@ -541,9 +549,9 @@
                 ' <input type="radio" class="sizeRadio" id="ChangeSize" name="radio-group2" >' +
                 '<label for="ChangeSize">User defined Size  </label> <br> <br> </span>')
             $(".SizePopup-body").append('<div id="sizeOptDiv"><p>Please input a number between 100 and 1000:</p> <strong> Width: </strong>'
-                + '<input id="widthbox" type="text" name="width" maxlength="4" size="4" value="550" disabled>'
+                + '<input id="widthbox" type="text" name="width" maxlength="4" size="4" value="900" disabled>'
                 + '<strong> Height: </strong> <input id="heightbox" type="text" name="height" maxlength="4" value="300" size="4" disabled></div>');
-            $(".SizePopup-body").append('<div id="ChangeNBars" style="display: none;"><p><strong> Number of Bars: </strong>'
+            $(".SizePopup-body").append('<div id="ChangeNBars" style="display: inline-block;"><p><strong> Number of Bars: </strong>'
                 + '<input id="NoOfBars" type="text" name="BarsNo" maxlength="2" size="2" value="25" ></p></div>');
             Sizecounter++;
         }
@@ -551,7 +559,7 @@
 
     $(document).on('change', '[class="sizeRadio"]', function () {
         if ($('#defaultSize').is(':checked')) {
-            $('#widthbox').val(550);
+            $('#widthbox').val(900);
             $('#heightbox').val(300);
 
             $('#widthbox').prop('disabled', true);
@@ -766,14 +774,11 @@
     function GetNewSize() {
 
         if ($('#defaultSize').is(':checked')) {
-            getNewResoulution(550, 300, NoOfBars, axisLables);
+            getNewResoulution(900, 300, NoOfBars, axisLables);
             $('.canvasDiv').height(300);//change canvas div size
-            $('.canvasDiv').width(550);
-            drawChart();
-            drawLine();
+            $('.canvasDiv').width(900);
+            ReDrawAllCharts();
             Resizelegend();
-            loadCurrentTurnData(currentTurn);
-            drawNetwork();
             checkLabels();
 
         }
@@ -784,11 +789,8 @@
                 $('.canvasDiv').height(height);//change canvas div size
                 $('.canvasDiv').width(width);
                 getNewResoulution(width, height, NoOfBars, axisLables);
-                drawChart();
-                drawLine();
+                ReDrawAllCharts();
                 Resizelegend();
-                loadCurrentTurnData(currentTurn);
-                drawNetwork();
                 checkLabels();
             }
             else {
@@ -876,7 +878,7 @@
             $("#GropingOpt").append('<br><span> <input type="radio" class="groupingRadio" id="initialize" name="radio-group2" checked >' +
                 '<label for="initialize">Initialize Groups </label>' +
                 ' <input type="radio" class="groupingRadio" id="uploadGroups" name="radio-group2" >' +
-                '<label for="uploadGroups">Upload pre-defiend Groups  </label> <br> <br> </span>')
+                '<label for="uploadGroups">Upload pre-defined Groups  </label> <br> <br> </span>')
             $(".GroupActorsPopup-body").append('<div class=" col-xs-12 col-sm-12 col-md-12 col-lg-12 GroupsInitialization NoOgGroupsInput" > <strong> Number of Groups: </strong>'
                 + ' <input id="NoOfGroups" type="text"  maxlength="2" size="4"> <br></div>');
 
@@ -969,12 +971,21 @@
     }
 
     function saveSelectedColors() {
-        loadCurrentTurnData(currentTurn);
+        ReDrawAllCharts();
+    }
+function ReDrawAllCharts(){
         drawChart();
-        drawLine();
+        drawLine();  
+    if (currentTurn == NumOfTurns) {
+      //last turn has no bargains
+      loadCurrentTurnData(currentTurn-1);
+      drawNetwork();
+    }
+    else{
+         loadCurrentTurnData(currentTurn);
         drawNetwork();
     }
-
+}
     function getData() {
         sessionStorage.setItem("ActorsNames", JSON.stringify(ActorsNames));
         sessionStorage.setItem("ActorsPositions", JSON.stringify(arrPos));
