@@ -1399,7 +1399,7 @@ void MainWindow::initializeCentralViewFrame()
 
 void MainWindow::about()
 {
-    QString text(tr("KTAB SMP\n\nVersion 1.3\n\n"
+    QString text(tr("KTAB SMP\n\nVersion 1.4\n\n"
                     "KTAB is an open-source toolkit for assembling models that allow "
                     "systematic and rigorous analysis of Collective Decision-Making "
                     "Processes (CDMPs).  KTAB is intended to be a platform that contains "
