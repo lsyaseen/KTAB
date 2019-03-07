@@ -259,7 +259,7 @@ void Database::getStateCount()
 void Database::getDimensionCount()
 {
     dimensionsList = new QStringList;
-    QString query= QString("select Dim_k, 'Desc' from DimensionDescription where ScenarioId = '%1'").arg(scenarioM);
+    QString query= QString("select Dim_k, DESC from DimensionDescription where ScenarioId = '%1'").arg(scenarioM);
     qry->exec(query);
 
     while(qry->next())
@@ -276,7 +276,7 @@ void Database::getActorsDescriptionDB()
     actorNameList.clear();
     actorDescList.clear();
 
-    QString query= QString("select Name,'DESC' from ActorDescription  where ScenarioId = '%1' ").arg(scenarioM);
+    QString query= QString("select Name, DESC from ActorDescription  where ScenarioId = '%1' ").arg(scenarioM);
 
     qry->exec(query);
 
@@ -450,7 +450,7 @@ void Database::getActorsInRangeFromDB(double lowerRng, double higherRng, int dim
 void Database::getDims()
 {
     dimList = new QStringList;
-    QString query= QString("select 'Desc' from DimensionDescription where ScenarioId = '%1'").arg(scenarioM);
+    QString query= QString("select DESC from DimensionDescription where ScenarioId = '%1'").arg(scenarioM);
     qry->exec(query);
 
     while(qry->next())
@@ -714,7 +714,7 @@ void Database::getScenarioList(bool run)
     scenarioList = new QStringList;
     scenarioIdList = new QStringList;
     scenarioDescList = new QStringList;
-    QString query= QString("select Scenario,ScenarioId,'Desc' from ScenarioDesc ");
+    QString query= QString("select Scenario,ScenarioId, DESC from ScenarioDesc ");
 
     qry->exec(query);
 

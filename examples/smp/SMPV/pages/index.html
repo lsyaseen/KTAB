@@ -17,18 +17,26 @@
     <!-- Custom CSS -->
     <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
     <link href="../dist/css/style.css" rel="stylesheet">
+    <!--  jQuery UI theme css -->
+    <link href="../vendor/jquery/jquery-ui.theme.css" rel="stylesheet">
 
+    <!-- evol-colorpicker css -->
+    <link href="../vendor/colorpicker/css/evol-colorpicker.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
     <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
     <!-- d3 -->
     <script src="../vendor/d3/js/d3.min.js"></script>
+    <!-- noUiSlider -->
+    <script src="../vendor/noUiSlider.11.0.3/js/nouislider.min.js"></script>
+    <link href="../vendor/noUiSlider.11.0.3/css/nouislider.min.css" rel="stylesheet">
 
     <link href="../vendor/charts/charts.css" rel="stylesheet">
-
     <!-- sql.js -->
-    <script src="../vendor/sql\js/sql.js"></script>
+    <script src="../vendor/sql/js/sql.js"></script>
+    <!-- papaparse.js -->
+    <script src="../vendor/PapaParse/papaparse.js"></script>
 
 
 </head>
@@ -47,19 +55,20 @@
             <div class="col-lg-6 col-md-6 col-sm-6 col-md-offset-3 col-lg-offset-3">
                 <div class="container-fluid">
                     <div class="panel panel-default">
-                        <div class="panel-heading"> <strong>Upload Database:</strong></div>
+                        <div class="panel-heading">
+                            <strong>Upload Database:</strong>
+                        </div>
                         <div class="panel-body ">
-
                             <div class="input-group">
-                                <label class="input-group-btn"> 
-                                        <span class="btn btn-primary">
-                                            Browse&hellip;
-                                            <input id="uploadInput" type="file" accept=".db" style="display: none;" onchange="getfile()">
-                                            
-                                        </span>
-                                    </label>
-                                <input type="text" class="form-control" readonly>
+                                <label class="input-group-btn">
+                                    <span class="btn btn-primary">
+                                        Browse&hellip;
+                                        <input id="uploadInput" type="file" accept=".db" style="display: none;" onchange="getfile()">
+                                    </span>
+                                </label>
+                                <input type="text" id="fileNameText" class="form-control" readonly>
                             </div>
+                            <small>Note: Database file must be smaller than 1.5 GB</small>
                         </div>
                     </div>
                 </div>
@@ -67,14 +76,19 @@
         </div>
 
     </div>
+    <div class="loading" style="display:none ; text-align: center;">
+        <img src="../pages/images/loading1.gif">
+
+    </div>
     <div id="content" style="display:none">
-        <div class="row space">
+        <div class="row row-custom-padding">
             <div class="col-lg-8 col-md-6">
                 <div class="panel">
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-xs-10">
-                                <strong>Number of Scenarios: </strong> <span id="NumOfscen"> </span>
+                                <strong>Number of Scenarios: </strong>
+                                <span id="NumOfscen"> </span>
                             </div>
                             <div class="col-xs-10">
                                 <strong>Scenario Name: </strong>
@@ -82,7 +96,8 @@
                                 <select id="SecnarioPicker"> </select>
                             </div>
                             <div class="col-xs-10">
-                                <strong>Scenario description: </strong> <span id="SecnarioDesc"> </span>
+                                <strong>Scenario description: </strong>
+                                <span id="SecnarioDesc"> </span>
                             </div>
                         </div>
                     </div>
@@ -93,82 +108,910 @@
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-xs-9">
-                                <strong>Number of Actors: </strong> <span id="NumOfActors"> </span>
+                                <strong>Number of Actors: </strong>
+                                <span id="NumOfActors"> </span>
                             </div>
                             <div class="col-xs-9">
-                                <strong>Number of Dimensions: </strong> <span id="NumOfDim"> </span>
+                                <strong>Number of Dimensions: </strong>
+                                <span id="NumOfDim"> </span>
                             </div>
                             <div class="col-xs-9">
-                                <strong>Turn: </strong> <span id="currentTurn">  </span>
+                                <strong>Turn: </strong>
+                                <span id="currentTurn"> </span>
+                            </div>
+                            <div class="col-xs-9">
+                                <strong>Dimension: </strong>
+                                <span>
+                                    <select id="Dimpicker">
+                                    </select>
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <!-- slider -->
+        <div class="row row-custom-padding">
+            <div class="col-sm-12 col-lg-12 col-md-12">
+                <div>
+                    <p>
+                        <strong>Turn Selector: </strong>
+                    </p>
+                </div>
+                <div id="slider"></div>
+            </div>
+        </div>
+        <div class="row space">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="panel with-nav-tabs panel-default">
+                    <div class="panel-heading tabs">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="#BarGraphTab" data-toggle="tab">Effective Power Bar Chart</a>
+                            </li>
+                            <li>
+                                <a href="#LineGraphTab" data-toggle="tab">Position Line Graph </a>
+                            </li>
+                            <li>
+                                <a href="#NetworkTab" data-toggle="tab"> Network Diagram of Bargains </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="panel-body">
+                        <div class="tab-content">
+                            <div class="tab-pane fade " id="LineGraphTab">
+                                <!-- Default 1 -->
+                                <div class="container-fluid">
+                                    <div class="canvasDiv">
+                                        <canvas id="canvas" style="display:none;"></canvas>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12 col-lg-8">
+                                        <div class="panel panel-default">
+                                            <div id="MainLineChart" class="panel-body "> </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12  col-md-12 col-md-offset-0 col-lg-4">
+                                        <div class="panel panel-default">
+                                            <div id="legend" class="panel-body scrollable-panel">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- //2nd tab -->
+                            <div class="tab-pane fade in active" id="BarGraphTab">
+                                <div class="container-fluid">
+                                    <div class="canvasDiv">
+                                        <canvas id="Barcanvas" style="display:none;"></canvas>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12 col-lg-8">
+                                        <div class="panel panel-default">
+                                            <form id="yAxisScale">
+                                                <div class="yscaleoptions">
+                                                    <span data-container="body" role="tooltip" aria-haspopup="true" class="tooltip tooltip-bottom-right ">
+                                                        <input type="radio" id="Fixedbtn" name="radio-group">
+                                                        <label for="Fixedbtn">Fixed y-axis scale</label>
+                                                        <input type="radio" id="Responsivebtn" name="radio-group" checked>
+                                                        <label for="Responsivebtn">Responsive y-axis scale</label>
+                                                    </span>
+                                                </div>
+                                            </form>
+                                            <div id="MainBarChart" class="panel-body "></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12  col-md-12 col-md-offset-0 col-lg-4">
+                                        <div class="panel panel-default">
+                                            <div id="Barlegend" class="panel-body scrollable-panel">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- //3rd tab -->
+                            <div class="tab-pane fade" id="NetworkTab">
+                                <div class="container-fluid">
+                                    <div class="canvasDiv">
+                                        <canvas id="Networkcanvas" style="display:none;"></canvas>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12 col-lg-12">
+                                        <div class="panel panel-default">
+                                            <div id="MainNetwork" class="panel-body"></div>
+                                        </div>
+                                    </div>
+                                    <!-- <div class="col-sm-12  col-md-12 col-md-offset-0 col-lg-4">
+                                        <div class="panel panel-default">
+                                            <div id="Networklegend" class="panel-body scrollable-panel">
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row space">
+            <div class="col-sm-12  col-md-12  col-lg-12">
+                <button class="toggle btn btn-success" data-target="SizePopup" onclick="ChangeresolutionandDownload()">Edit and Download</button>
+                <button class="toggle btn btn-success" data-target="ColorPopup" onclick="changecolors()"> Change Colors</button>
+                <button class="toggle btn btn-success" data-target="GroupPopup" onclick="GroupActors()"> Add Groups</button>
+                <button class="toggle btn btn-success" data-target="NetworkDetails" id="NetworkButton" style="display: none;">Network Explanation</button>
+
+            </div>
+            <div id="SizePopup" class="popup hide">
+                <div class="popup-header">
+                    <span class="close toggle" data-target="SizePopup">close</span>
+                </div>
+                <div class="SizePopup-body">
+                </div>
+                <div class="SizePopup-footer">
+                    <br>
+                    <button class="toggle button" data-target="SizePopup" onclick="GetNewSize()">Confirm Edits</button>
+                    <button class="toggle button" data-target="SizePopup" onclick="downloadPNG()" id="DownloadButton" style="display: inline-block;">download</button>
+                </div>
+            </div>
+            <div id="ColorPopup" class="popup hide">
+                <div class="popup-header">
+                    <span class="close toggle" data-target="ColorPopup">close</span>
+                </div>
+                <div class="popup-body">
+                </div>
+                <div class="popup-footer">
+                    <div id="DivUpload">
+                        <span>
+                            <strong> Import Colors from a CSV : </strong>
+                        </span>
+                        <input type="file" name="File Upload" id="txtFileUpload" accept=".csv" />
+                    </div>
+                    <div id="DivExportCSV">
+                        <button class="toggle button" onclick="ExportColorsCSV()">Export CSV</button>
+
+                    </div>
+                    <div>
+                        <button class="toggle button" data-target="ColorPopup" onclick="saveSelectedColors()">Apply Changes</button>
+                    </div>
+                </div>
+            </div>
+            <div id="GroupPopup" class="popup hide">
+                <div class="popup-header">
+                    <span class="close toggle" data-target="GroupPopup">close</span>
+                </div>
+                <div class="GroupActorsPopup-body">
+                </div>
+                <div class="Groupspopup-footer" style="display: none; text-align: center;">
+                    <div id="DivUpload">
+                        <span>
+                            <strong> Import Groups from a CSV : </strong>
+                        </span>
+                        <input type="file" name="File Upload" id="GroupsFileUpload" accept=".csv" class="center-block" style="width: 175px; padding-top: 2%;"
+                        />
+                    </div>
+                    <div>
+                        <button class="toggle button" data-target="GroupPopup" onclick="saveSelectedColors()">Apply Changes</button>
+                    </div>
+                </div>
+            </div>
+            <div id="NetworkDetails" class="popup hide">
+                <div class="popup-header">
+                    <span class="close toggle" data-target="NetworkDetails">close</span>
+                    Network Diagram of Bargains
+                </div>
+
+                <div class="NetworkDetails-body">
+
+
+
+                    This Diagram visulize the Propose-Resolve stages of the SMP bargaining model
+                    <ul>
+                        <li>Actors are represented with nodes colored according to each actor's color. </li>
+                        <li>Size of Actors' nodes represent each actor's Effective Power</li>
+                        <li>Bargains are represented with small grey nodes. </li>
+                        <li>All edges are directed. </li>
+                        <li>The edge coming to the bargain node from the actor's node represent the initiator. </li>
+                        <li>The edge coming to the actor's node from the bargain node represent the Receiver. </li>
+                        <li>Solid-line edges represent accepted bargains, dashed edges represent rejected bargains. </li>
+                    </ul>
+
+                </div>
+
             </div>
         </div>
 
-        <div class="row space">
-            <div class="col-lg-12 col-md-12 col-sm-12">
-                <div class="container-fluid">
-                    <div class="col-sm-12 col-md-6 col-lg-6">
-                        <div class="panel panel-default" id="LinePanel">
-                            <div class="panel-heading"> <strong>Line Chart</strong></div>
-                            <div id="Linechart" class="panel-body ">
-                                <script src="../vendor/charts/Linechart.js"></script>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-12  col-md-6 col-md-offset-0 col-lg-6">
-                        <div class="panel panel-default" id="BarPanel">
-                            <div class="panel-heading"> <strong>Bar Chart</strong> </div>
-                            <div id="Barchart" class="panel-body ">
-                                <script src="../vendor/charts/barchart.js"></script>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     </div>
     <!-- jQuery -->
     <script src="../vendor/jquery/jquery.min.js"></script>
+    <!-- jQueryUI -->
+    <script src="../vendor/jquery/jquery-ui.min.js"></script>
+
+    <!-- evol-colorpicker -->
+    <script src="../vendor/colorpicker/js/evol-colorpicker.min.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
 
     <!-- load db file -->
     <script src="../vendor/charts/loadSQL.js"></script>
+    <!-- canvg -->
+    <script src="../vendor/canvg/js/canvg.bundle.js"></script>
 
-    <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>
-
+    <!-- charts -->
+    <script src="../vendor/charts/MainLineChart.js"></script>
+    <script src="../vendor/charts/MainBarChart.js"></script>
+    <script src="../vendor/charts/NetworkDiagram.js"></script>
+    <!-- slider -->
+    <script src="../vendor/charts/slider.js"></script>
 
 </body>
 <script>
-    $('#LinePanel').click(function (e) {
-        e.preventDefault();
-        getData();
-        window.location = 'graphs.html#LineGraphTab';
+    var defaultColors =
+        ["#5C8598", "#219DD8", "#96C9E5", "#3C3D3B",
+            "#ECCE6A", "#f8ecba", "#60805D", "#8AC791",
+            "#bebfc1", "#636664", "#a5f3cc", "#6acbec",
+            "#6aecec", "#ff9966", "#1d80e2", "#6a8aec",
+            "#a5a5f3", "#ffd857", "#a8bfa6", "#cb6aec",
+            "#c88dc8", "#ec6a6a", "#ec6aab", "#e84a72",
+            "#f1a7a7", "#e3994f", "#d87d22", "#d8ab22",
+            "#d8d822", "#a6e765", "#4fd822", "#1cb01c",
+            "#22d84f", "#22d87d", "#22d8ab", "#22d8d8",
+            "#22abd8", "#156184", "#d3e6f8", "#224fd8",
+            // Darker Shade for (Set #1)
+            "#436170", "#18719a", "#5cabd6", "#1a1a19",
+            "#e5bb34", "#f1d874", "#425940", "#75bd7e",
+            "#97989b", "#3f4040", "#62eaa6", "#1db1e2",
+            "#1de2e2", "#ff5500", "#124d87", "#1a47cb",
+            "#4b4be7", "#ffc91a", "#6e946b", "#b11de2",
+            "#ac53ac", "#e21d1d", "#e21d80", "#b5173f",
+            "#e34f4f", "#b0661c", "#844d15", "#846815",
+            "#848415", "#73c71f", "#318415", "#0e580e",
+            "#158431", "#15844d", "#158468", "#158484",
+            "#156884", "#07202c", "#7bb4ea", "#153184",
+            // Lighter Shade for (Set #2)
+            "#8faebc", "#7bc7ea", "#d6eaf5", "#737570",
+            "#f9f0d2", "#fdf9e8", "#9ab497", "#ddeedf",
+            "#e5e5e6", "#8b8d8c", "#e9fcf2", "#d2eff9",
+            "#bbf6f6", "#ffddcc", "#8ebff0", "#d2dcf9",
+            "#e9e9fc", "#fff3cc", "#e2eae1", "#efd2f9",
+            "#e6cbe6", "#f9d2d2", "#f9d2e6", "#f6bbca",
+            "#fce9e9", "#f5d9bd", "#eab37b", "#eace7b",
+            "#eaea7b", "#d9f5bd", "#97ea7b", "#65e765",
+            "#7bea97", "#7beab3", "#38e0b6", "#65e7e7",
+            "#7bceea", "#38abe0", "#e9f3fc", "#91a8ee",
+            // Another set of 18 (warm) Distinct Colors (Set #2)
+            "#e6194b", "#3cb44b", "#ffe119", "#0082c8",
+            "#f58231", "#911eb4", "#46f0f0", "#f032e6",
+            "#d2f53c", "#fabebe", "#008080", "#e6beff",
+            "#aa6e28", "#fffac8", "#800000", "#aaffc3",
+            "#808000", "#ffd8b1", "#000080", "#808080",
+            // Darker shade for set #2
+            "#8a0f2e", "#267330", "#b39b00", "#004266",
+            "#c35709", "#58126d", "#0fbdbd", "#be0eb5",
+            "#a0c20a", "#f47171", "#003333", "#c466ff",
+            "#674218", "#fff266", "#330000", "#66ff94",
+            "#333300", "#ff9933", "#000033", "#4d4d4d"
+        ];
+
+    var actors2, ActorsObj, temActorsObj, NoOfBars, NumOfGroups, axisLables;
+    var changeColorsCounter = 0;
+    var changeActorsGroups = 0;
+
+    var Sizecounter = 0;
+    var newColors = [];
+    var GroupsDetails = [];
+
+    $(document).ready(function () {
+
+        $('[data-toggle=offcanvas]').click(function () {
+            $('.row-offcanvas').toggleClass('active');
+        });
+        $('#yAxisScale').change(function () {
+            drawChart();
+        });
+    });
+    $(document).on('click', '.toggle', function (event) {
+        event.preventDefault();
+        var target = $(this).data('target');
+        $('#' + target).toggleClass('hide');
+    });
+    $("#Dimpicker").on('change', function () {
+        selectedDimNum = $('#Dimpicker').val();
+        ReDrawAllCharts();
     });
 
-    $('#BarPanel').click(function (e) {
-        e.preventDefault();
-        getData();
+    $("#SecnarioPicker").on('change', function () {
+        selectedScen = $('#SecnarioPicker').val();
+        console.log(NumOfTurns)
+        // currentTurn = NumOfTurns - 1;
+        // slider.noUiSlider.set(currentTurn);
+        currentTurn = 0;
+        slider.noUiSlider.set(0);
+        document.getElementById('currentTurn').innerHTML = currentTurn;
+        selectedDimNum = 0;
+        changeColorsCounter = 0;
+        changeActorsGroups = 0;
+        $(".GroupActorsPopup-body").empty()
+        GroupsDetails.length = 0;//to empty the array
+        slider.noUiSlider.updateOptions({
+            range: {
+                'min': 0,
+                'max': NumOfTurns
+            },
+            pips: {
+                mode: 'count',
+                density: 0,
+                values: NumOfTurns + 1, //+1 since we're starting from zero
+                stepped: true
+            }
 
-        window.location = 'graphs.html#BarGraphTab';
+        });
+
+        $('#Dimpicker')
+            .find('option')
+            .remove()
+
+        for (i = 0; i < NoOfDim; i++) {
+
+            $("#Dimpicker").append('<option value="' + i + '">' + (i + 1) + '</option>');
+        }
+        $("#Dimpicker").val(0); //select first opt by default
+        getActorsData();
+        loadCurrentTurnData(NumOfTurns - 1);
+        drawChart();
+        drawLine();
+        drawNetwork();
     });
 
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+
+        var target = $(e.target).attr("href") // activated tab
+        //to show netork explination button
+        if (target == "#NetworkTab") {
+            document.getElementById("DownloadButton").style.display = "none";
+            document.getElementById("NetworkButton").style.display = "inline-block";
+            $("#ChangeNBars").hide();
+            slider.noUiSlider.updateOptions({
+                range: {
+                    'min': 0,
+                    'max': NumOfTurns - 1
+                },
+                pips: {
+                    mode: 'count',
+                    density: 0,
+                    values: NumOfTurns + 1, //+1 since we're starting from zero
+                    stepped: true
+                }
+
+            });
+            slider.noUiSlider.set(currentTurn);
+            currentTurn = +slider.noUiSlider.get();
+            document.getElementById('currentTurn').innerHTML = currentTurn;
+            ReDrawAllCharts();
+        }
+        else {
+            document.getElementById("DownloadButton").style.display = "inline-block";
+            document.getElementById("NetworkButton").style.display = "none";
+            slider.noUiSlider.updateOptions({
+                range: {
+                    'min': 0,
+                    'max': NumOfTurns
+                },
+                pips: {
+                    mode: 'count',
+                    density: 0,
+                    values: NumOfTurns + 1, //+1 since we're starting from zero
+                    stepped: true
+                }
+
+            });
+            slider.noUiSlider.set(currentTurn);
+            document.getElementById('currentTurn').innerHTML = currentTurn;
+            ReDrawAllCharts();
+
+            if (target == "#BarGraphTab") {
+                $("#ChangeNBars").show();
+            }
+            else {
+                $("#ChangeNBars").hide();
+            }
+        }
+    });
+
+    function getActorsData() {
+
+        //names based on selected scenario
+        var namesArray = ActorsNames[selectedScen];
+
+        var colors3 = d3.scaleOrdinal()
+            .domain(namesArray)
+            .range(defaultColors);
+        var actors2 = namesArray.map(function (row, i) {
+            return {
+                actor_name: row,
+                visible: true,
+                color: colors3(row),
+            }
+        });
+        sessionStorage.setItem("ActorsObj", JSON.stringify(actors2));
+        ActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
+    }
+
+    function ChangeresolutionandDownload() {
+        if (Sizecounter <= 0) { //to only appened once
+            $(".SizePopup-body").append('<div> <strong> Image resolution :</strong> </div> ');
+            $(".SizePopup-body").append('<div><br> <input type="checkbox" name="Labels" id="RemoveLabels" value="RemoveLabels" > Remove Labels</div>');
+            $(".SizePopup-body").append('<div id="sizeOpt" </div> ')
+            $("#sizeOpt").append('<br><span> <input type="radio" class="sizeRadio" id="defaultSize" name="radio-group2" checked>' +
+                '<label for="defaultSize">Default Size </label>' +
+                ' <input type="radio" class="sizeRadio" id="ChangeSize" name="radio-group2" >' +
+                '<label for="ChangeSize">User defined Size  </label> <br> <br> </span>')
+            $(".SizePopup-body").append('<div id="sizeOptDiv"><p>Please input a number between 100 and 1000:</p> <strong> Width: </strong>'
+                + '<input id="widthbox" type="text" name="width" maxlength="4" size="4" value="900" disabled>'
+                + '<strong> Height: </strong> <input id="heightbox" type="text" name="height" maxlength="4" value="300" size="4" disabled></div>');
+            $(".SizePopup-body").append('<div id="ChangeNBars" style="display: inline-block;"><p><strong> Number of Bars: </strong>'
+                + '<input id="NoOfBars" type="text" name="BarsNo" maxlength="2" size="2" value="25" ></p></div>');
+            Sizecounter++;
+        }
+    }
+
+    $(document).on('change', '[class="sizeRadio"]', function () {
+        if ($('#defaultSize').is(':checked')) {
+            $('#widthbox').val(900);
+            $('#heightbox').val(300);
+
+            $('#widthbox').prop('disabled', true);
+            $('#heightbox').prop('disabled', true);
+        }
+        else if ($('#ChangeSize').is(':checked')) {
+            $('#widthbox').prop('disabled', false);
+            $('#heightbox').prop('disabled', false);
+
+
+        }
+    });
+
+    $(document).on('change', '[id="NoOfBars"]', function () {
+        NoOfBars = parseInt($("#NoOfBars").val());
+        if (NoOfBars < 10 || NoOfBars > 50) {
+            alert('Please chose a number between 10 and 50');
+            $('#NoOfBars').val(25); //back to default
+            NoOfBars = parseInt($("#NoOfBars").val());
+        }
+    });
+
+    $(document).on('change', '[id="NoOfGroups"]', function () {
+
+        NumOfGroups = parseInt($("#NoOfGroups").val());
+        $('.ActorsGroups').remove();
+        $('.ActorsForGrouping').remove();
+        $(".GroupActorsPopup-body").append('<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 GroupsInitialization ActorsGroups"> </div>');
+
+        for (var i = 0; i < NumOfGroups; i++) {
+            $(".ActorsGroups").append('<div id="Div_group_Name_' + (i + 1) + '"class="col-xs-4 col-sm-4 col-md-4 col-lg-4" </div> ')
+            $("#Div_group_Name_" + (i + 1)).append('<br><span><strong> Group ' + (i + 1) + ' Name: </strong></span>' +
+                '<input style="width:100px;" type="text" id="group_' + (i + 1) + '_Name">')
+            $(".ActorsGroups").append('<div id="Div_group_Color_' + (i + 1) + '"class="col-xs-8 col-sm-8 col-md-8 col-lg-8" </div> ')
+            $("#Div_group_Color_" + (i + 1)).append('<br><span><strong> Group ' + (i + 1) + ' Color: </strong> </span>' +
+                '<input style="width:100px;" id="Group_' + (i + 1) + '_Color" class=" colorPicker evo-cp0"> ');
+            $("#Group_" + (i + 1) + "_Color").colorpicker({ showOn: 'button' });
+            $("#Group_" + (i + 1) + "_Color").colorpicker("val", defaultColors[i]);
+        }
+        $(".ActorsGroups").append('<br><span>  <button class="toggle button" id="confirmGroupsBut" onclick="ConfirmGroupsButton()"  > Confirm Groups </button> </span>');
+    });
+
+    //parse the groups csv file
+    document.getElementById('GroupsFileUpload').addEventListener('change', uploadGroups, false);
+    function uploadGroups(evt) {
+        var data = null;
+        var file = evt.target.files[0];
+        var reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload = function (event) {
+            var csvData = event.target.result;
+            var data = Papa.parse(csvData, {
+                header: false,
+                skipEmptyLines: true,
+                dynamicTyping: true,
+                complete: function (results) {
+                    getNewGroups(results.data)
+                }
+            });
+        };
+        reader.onerror = function () {
+            alert('Unable to read ' + file.fileName);
+        };
+    }
+
+    //parse the csv file
+    document.getElementById('txtFileUpload').addEventListener('change', upload, false);
+
+    function upload(evt) {
+        var data = null;
+        var file = evt.target.files[0];
+        var reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload = function (event) {
+            var csvData = event.target.result;
+            var data = Papa.parse(csvData, {
+                header: false,
+                skipEmptyLines: true,
+                dynamicTyping: true,
+                complete: function (results) {
+                    getNewColors(results.data)
+                }
+            });
+
+        };
+        reader.onerror = function () {
+            alert('Unable to read ' + file.fileName);
+        };
+    }
+
+    //export cuurent colors to csv
+    function ExportColorsCSV() {
+        var colorsArray = [];
+        for (i = 0; i < temActorsObj.length; i++) {
+            var newArray = new Array();
+            newArray = [temActorsObj[i].id, temActorsObj[i].color]; // just example values
+            colorsArray.push(newArray);
+        }
+
+        var csv = Papa.unparse(colorsArray);
+        var blob = new Blob([csv]);
+        var a = window.document.createElement("a");
+        a.href = window.URL.createObjectURL(blob, { type: "text/plain" });
+        a.download = "colors.csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    function ExportGroupsCSV() {
+        var groupsArray = [];
+        groupsArray.push(["Index", "Actor", "Group", "Color"]);
+        for (i = 0; i < temActorsObj.length; i++) {
+            var newArray = new Array();
+            newArray = [temActorsObj[i].id, temActorsObj[i].actor_name, temActorsObj[i].group, temActorsObj[i].color]; // just example values
+            groupsArray.push(newArray);
+        }
+        var csv = Papa.unparse(groupsArray);
+        var blob = new Blob([csv]);
+        var a = window.document.createElement("a");
+        a.href = window.URL.createObjectURL(blob, { type: "text/plain" });
+        a.download = "Groups.csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+    function getNewColors(csvcolors) {
+        newColors.splice(0, newColors.length)
+        if (csvcolors[0][0] == 0) {
+            const transposed = csvcolors;
+            const res = transposed.map(row => row.reduce((acc, col, ind) => {
+                acc[transposed[ind]] = col; return acc
+            }, {}))
+
+            for (i = 0; i < csvcolors.length; i++) {
+                newColors.push(transposed[i][1]);
+            }
+            updateColors();
+        }
+        else {
+            alert('Please check CSV Format');
+        }
+    }
+    function getNewGroups(csvgroups) {
+
+        var UploadedGroups = [];
+        temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
+        var firstrow = ["Index", "Actor", "Group", "Color"];
+
+        if (csvgroups[0].toString() == firstrow.toString()) {
+            if (temActorsObj.length < csvgroups.length) {
+
+                for (i = 0; i < temActorsObj.length; i++) {
+                    UploadedGroups.push(csvgroups[i + 1][2]);
+                    temActorsObj[i]["group"] = csvgroups[i + 1][2];
+                    temActorsObj[i]["color"] = csvgroups[i + 1][3];
+                }
+
+            }
+            else {
+                for (i = 1; i < csvgroups.length; i++) {
+                    UploadedGroups.push(csvgroups[i][2])
+
+                    temActorsObj[i - 1]["group"] = csvgroups[i][2];
+                    temActorsObj[i - 1]["color"] = csvgroups[i][3];
+                }
+            }
+            sessionStorage.setItem("ActorsObj", JSON.stringify(temActorsObj));
+        }
+
+        else {
+            alert('Please check CSV Format');
+        }
+        var uniqueGroups = Array.from(new Set(UploadedGroups));
+        GroupsDetails.length = 0;//to empty the array from previous groups
+        for (i = 0; i < uniqueGroups.length; i++) {
+            var index = temActorsObj.findIndex(elt => elt.group === uniqueGroups[i]);
+            GroupsDetails[i] = {
+                Gname: temActorsObj[index].group.toString(),
+                Gcolor: temActorsObj[index].color,
+            }
+        }
+
+    }
+
+    function updateColors() {
+        temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
+        if (temActorsObj.length < newColors.length) {
+            for (i = 0; i < temActorsObj.length; i++) {
+                temActorsObj[i]["color"] = newColors[i];
+                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).colorpicker("val", newColors[i]);
+            }
+        }
+        else {
+            for (i = 0; i < newColors.length; i++) {
+                temActorsObj[i]["color"] = newColors[i];
+                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).colorpicker("val", newColors[i]);
+            }
+        }
+        sessionStorage.setItem("ActorsObj", JSON.stringify(temActorsObj));
+    }
+    $(window).on('resize', function () {
+        Resizelegend();
+    });
+    function Resizelegend() {
+        var LinedivHeight = '' + $('#MainLineChart').height();
+        var BardivHeight = '' + $('#MainBarChart').height();
+        var divHeight = (LinedivHeight < BardivHeight) ? BardivHeight + 'px' : LinedivHeight + 'px';
+        $("#legend").css('min-height', divHeight);
+        $("#Barlegend").css('min-height', divHeight);
+    }
+    function GetNewSize() {
+
+        if ($('#defaultSize').is(':checked')) {
+            getNewResoulution(900, 300, NoOfBars, axisLables);
+            $('.canvasDiv').height(300);//change canvas div size
+            $('.canvasDiv').width(900);
+            ReDrawAllCharts();
+            Resizelegend();
+            checkLabels();
+
+        }
+        else if ($('#ChangeSize').is(':checked')) {
+            var width = parseInt($("#widthbox").val());
+            var height = parseInt($("#heightbox").val());
+            if (width >= 100 && width <= 1000 && width != NaN && height >= 100 && height <= 1000 && height != NaN) {
+                $('.canvasDiv').height(height);//change canvas div size
+                $('.canvasDiv').width(width);
+                getNewResoulution(width, height, NoOfBars, axisLables);
+                ReDrawAllCharts();
+                Resizelegend();
+                checkLabels();
+            }
+            else {
+                alert("invalid width or height");
+            }
+        }
+        function checkLabels() {
+            if ($('#RemoveLabels').is(':checked')) {
+                $(".CharLabel").hide();
+                $(".axis text").hide();
+                axisLables = false;
+            }
+            else {
+                $(".CharLabel").show();
+                $(".axis text").show();
+                axisLables = true;
+
+            }
+        }
+    }
+
+    function downloadPNG() {
+
+        var id = $('.tab-content .active').attr('id');
+
+        // which tap is active
+        if (id == "LineGraphTab") {
+
+            var $container = $('#MainLineChart'),
+                // Canvg requires trimmed content
+                content = $container.html().trim(),
+                canvas = document.getElementById('canvas');
+            // canvas.getContext('2d').scale(2,2)
+            var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
+            canvg(canvas, content);
+            var image = canvas.toDataURL("image/png")
+
+            let filename = 'LineChart'
+            let link = document.createElement('a')
+            link.href = image
+            link.download = filename
+            document.body.appendChild(link)
+            link.click()
+        }
+        else if (id == "BarGraphTab") {
+
+            var $barcontainer = $('#MainBarChart'),
+                Barcontent = $barcontainer.html().trim(),
+                canvas_bar = document.getElementById('Barcanvas');
+
+            var image = canvas_bar.toDataURL("image/png").replace("image/png", "image/octet-stream");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
+            canvg(canvas_bar, Barcontent);
+            var image = canvas_bar.toDataURL("image/png")
+            let filename = 'BarChart'
+            let barlink = document.createElement('a')
+            barlink.href = image
+            barlink.download = filename
+            document.body.appendChild(barlink)
+            barlink.click()
+        }
+        else {
+            var $Networkcontainer = $('#MainNetwork'),
+                // Canvg requires trimmed content
+                Networkcontent = $Networkcontainer.html().trim();
+            canvas_Network = document.getElementById('Networkcanvas');
+
+            var image = canvas_Network.toDataURL("image/png").replace("image/png", "image/octet-stream");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
+
+            canvg(canvas_Network, Networkcontent);
+            var image = canvas_Network.toDataURL("image/png")
+            let filename = 'NetworkDiagram'
+            let Networklink = document.createElement('a')
+            Networklink.href = image
+            Networklink.download = filename
+            document.body.appendChild(Networklink)
+            Networklink.click()
+
+        }
+
+    }
+    function GroupActors() {
+
+        if (changeActorsGroups <= 0) { //only initilaze once!
+            $(".GroupActorsPopup-body").append('<div id="GropingOpt" </div> ')
+            $("#GropingOpt").append('<br><span> <input type="radio" class="groupingRadio" id="initialize" name="radio-group2" checked >' +
+                '<label for="initialize">Initialize Groups </label>' +
+                ' <input type="radio" class="groupingRadio" id="uploadGroups" name="radio-group2" >' +
+                '<label for="uploadGroups">Upload pre-defined Groups  </label> <br> <br> </span>')
+            $(".GroupActorsPopup-body").append('<div class=" col-xs-12 col-sm-12 col-md-12 col-lg-12 GroupsInitialization NoOgGroupsInput" > <strong> Number of Groups: </strong>'
+                + ' <input id="NoOfGroups" type="text"  maxlength="2" size="4"> <br></div>');
+
+            changeActorsGroups++;
+        }
+    }
+    $(document).on('change', '[class="groupingRadio"]', function () {
+        if ($('#initialize').is(':checked')) {
+            $('.GroupsInitialization').css('display', 'block');
+            $('.Groupspopup-footer').hide();
+        }
+        else if ($('#uploadGroups').is(':checked')) {
+            $('.Groupspopup-footer').show();
+            $('.GroupsInitialization').css('display', 'none');
+
+
+        }
+    });
+    function ConfirmGroupsButton() {
+
+        temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
+
+        $('.ActorsForGrouping').remove();
+        $(".GroupActorsPopup-body").append('<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 GroupsInitialization ActorsForGrouping"> </div>');
+        GroupsDetails.length = 0;//to empty the array
+        for (var i = 0; i < temActorsObj.length; i++) {
+
+            $(".ActorsForGrouping").append('<div  id="Div_Group_' + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + '" class="col-xs-6 col-sm-4 col-md-6 col-lg-6"> </div>');
+            $("#Div_Group_" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).append('<br><span><strong>' + temActorsObj[i].actor_name + '  </strong></span>' +
+                '<select class="GroupsOptions" id="GroupOf' + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + '" > </select>');
+
+            for (j = 0; j < NumOfGroups; j++) {
+                var GroupName = document.getElementById("group_" + (j + 1) + "_Name").value;
+                var $div = $("<option>", {
+                    value: j,
+                }).text(GroupName);
+                $("#GroupOf" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).append($div);
+                GroupsDetails[j] = {
+                    Gname: document.getElementById("group_" + (j + 1) + "_Name").value,
+                    Gcolor: document.getElementById("Group_" + (j + 1) + "_Color").value,
+                }
+            }
+        }
+        $(".ActorsForGrouping").append('<br><br><span>  <button class="toggle button"  id="confirmActorsGroupsBut" onclick="ConfirmActorsGroups()"  >Confirm Actors Groups </button> </span>');
+        $(".ActorsForGrouping").append('<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 GroupsInitialization"> <button class="toggle button ExportButton disabled" onclick="ExportGroupsCSV()">Export CSV</button></div>');
+
+    }
+    function ConfirmActorsGroups() {
+        temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
+        for (var i = 0; i < temActorsObj.length; i++) {
+            var selectedGroupColor, selectedGroup
+            var selectedGroup = $("#GroupOf" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + " option:selected").text();
+            var selectedGroupIn = parseInt($("#GroupOf" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + " option:selected").val());
+
+            var obj1 = temActorsObj.findIndex(o => o.actor_name === temActorsObj[i].actor_name);
+            temActorsObj[obj1]["group"] = selectedGroup;
+            temActorsObj[obj1]["color"] = $("#Group_" + (selectedGroupIn + 1) + "_Color").colorpicker("val");
+
+        }
+        $('.ExportButton').prop('disabled', false);
+        sessionStorage.setItem("ActorsObj", JSON.stringify(temActorsObj));
+        saveSelectedColors(temActorsObj);
+    }
+
+    function changecolors() {
+        $('#txtFileUpload').val("");
+        temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
+        if (changeColorsCounter <= 0) { //only initilaze once!
+            $('.popup-body').empty(); //clear existing actors
+            for (var i = 0; i < temActorsObj.length; i++) {
+                $(".popup-body").append('<div id="Div' + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + '"class="col-xs-6 col-sm-4 col-md-6 col-lg-6" </div> ')
+                $("#Div" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).append('<br><span><strong>' + temActorsObj[i].actor_name + '</strong></span>' +
+                    '<input style="width:100px;" id="' + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + '" class="colorPicker evo-cp0" >')
+
+                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).colorpicker({ showOn: 'button' })
+                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).colorpicker("val", temActorsObj[i].color);
+
+                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).on("change.color", function (event, color) {
+                    //find index of selected actor to change its color
+                    for (i = 0; i < temActorsObj.length; i++) {
+                        var obj1 = temActorsObj.findIndex(o => o.actor_name.replace(/\s+/g, '').replace(".", '') === this.id);
+                        temActorsObj[obj1]["color"] = $("#" + this.id).colorpicker("val");
+                    }
+                    sessionStorage.setItem("ActorsObj", JSON.stringify(temActorsObj));
+
+                });
+                changeColorsCounter++;
+            }
+        }
+    }
+
+    function saveSelectedColors() {
+        ReDrawAllCharts();
+    }
+function ReDrawAllCharts(){
+        drawChart();
+        drawLine();  
+    if (currentTurn == NumOfTurns) {
+      //last turn has no bargains
+      loadCurrentTurnData(currentTurn-1);
+      drawNetwork();
+    }
+    else{
+         loadCurrentTurnData(currentTurn);
+        drawNetwork();
+    }
+}
     function getData() {
         sessionStorage.setItem("ActorsNames", JSON.stringify(ActorsNames));
         sessionStorage.setItem("ActorsPositions", JSON.stringify(arrPos));
         sessionStorage.setItem("AllEffcPow", JSON.stringify(arreff));
         sessionStorage.setItem("NumOfTurns", NumOfTurns);
-        sessionStorage.setItem("BargnsData",JSON.stringify(arrBargns))
+        sessionStorage.setItem("BargnsData", JSON.stringify(arrBargns))
+        sessionStorage.setItem("NetworkData", JSON.stringify(arrNetwork))
         sessionStorage.setItem("ScenarioArray", JSON.stringify(ScenarioArray));
-        sessionStorage.setItem("SceAraay", JSON.stringify(SceAraay));
         sessionStorage.setItem("selectedScen", selectedScen);
+        sessionStorage.setItem("defaultColors", JSON.stringify(defaultColors));
+
+        var namesArray = ActorsNames[selectedScen];
+        var colors3 = d3.scaleOrdinal()
+            .domain(namesArray)
+            .range(defaultColors);
+        actors2 = namesArray.map(function (row, i) {
+
+            return {
+                actor_name: row,
+                visible: true,
+                color: colors3(row),
+                id: i,
+            }
+        });
+
+        sessionStorage.setItem("ActorsObj", JSON.stringify(actors2));
 
     }
 

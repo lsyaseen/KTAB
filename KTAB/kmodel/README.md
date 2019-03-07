@@ -11,19 +11,18 @@ Several examples are included:
 
 ## Build Instructions ##
 
+For Windows, Note that at this point you will need to have Qt installed in your computer , using the Qt installer should link all the Qt libraries to the PATH, if you are using any other way of installing Qt please make sure to include the libraries in the PATH.
+
 To build the kmodel library and examples, you must
 obtain and install [CMake](www.cmake.org).
 
 You must have a working C++11 development environment.
-On Windows, the KTAB build has been verified with Visual Studio 12 2013 Win64
-(Community edition) using the default native compilers.
-On Linux, the build has been verified with KDevelop 3 and plain Unix makefiles,
-using both g++ 4.8 and clang++ 3.4.
+You will find a list of verified operating systems and tools for the KTAB build in the main [README](https://github.com/KAPSARC/KTAB/blob/testing/KTAB/kutils/README.md) page. 
 
 The kmodel library and examples use [SQLite3](https://www.sqlite.org/). Under Linux, simply install the sqlite3 package,
 and everything will be where CMake expects it.
 
-Under Windows, the simplest and most reliable way is to compile it and put the library and header into C:/local/sqlite. In fact, the CMake files of KTAB expect all the libraries to be in C:/local for Windows: fltk, kmodel, sqlite, tinyxml, kutil. Under Linux, the kutils, kmodel files will be installed to /usr/local. There is no need to modify your PATH under either Linux or Windows.
+Under Windows, the simplest and most reliable way is to compile it and put the library and header into C:/local/sqlite. In fact, the CMake files of KTAB expect all the libraries to be in C:/local for Windows: easyloggingcpp, kmodel, sqlite, tinyxml, kutil. Under Linux, the kutils, kmodel files will be installed to /usr/local. There is no need to modify your PATH under either Linux or Windows.
  
 First, download the source code "amalgamation" from the SQLite3
  [download](https://www.sqlite.org/download.html) page. The amalgamation contains the complete source code as a single
@@ -43,7 +42,9 @@ tree appears like this:
 	/home/KTAB/KTAB/kutils
 	...
   
+kmodel also uses [TinyXml2](https://github.com/leethomason/tinyxml2) a C++ XML parser library. Just how you previously built easyloggingcpp in [README](../kutils/README.md) you will replicate the same process for Tinyxml2.
 
+If you are using Windows, in the tinyxml2 folder, create two subfolders tinyxml2/include and Tinyxml2/lib. Move the compiled libraries into tinyxml2/lib and the tinyxml2 header file into tinyxml2/include
 
 Before attempting to build kmodel, you must configure and build kutils, as kmodel relies on that library. Build instructions are in the kutils [README](../kutils/README.md). It is strongly advised that you run the "demoutils" program to test the functionality. When you build the INSTALL target, it will copy the kutils library and header to where CMake expects to find them. Under Windows, this will be C:/local/; under Linux, it will be /usr/local.
 

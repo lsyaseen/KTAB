@@ -13,14 +13,17 @@
     stroke-width: 1.5px;
   }
   body {
-    padding-top: 51px;  
+    padding-top: 1%;  
   }
   .text-center {
     padding-top: 20px;
   }
-  .col-xs-12 {
-    background-color: #fff;
+  .row-custom-padding {
+    padding: 5px 20px 5px
   }
+  /* .col-xs-12 {
+    background-color: #fff;
+  } */
   #sidebar {
     height: 100%;
     padding-right: 0;
@@ -48,7 +51,10 @@
    background-color: #cccccc;
    box-shadow: 2px 2px 1px #888;
  }
-
+#legend{
+  min-height: 300px;
+  overflow-y: auto;
+}
  .legend2 { 
   padding: 10px;
  overflow: auto;
@@ -59,7 +65,7 @@
 }
  .scrollable-panel{
   max-height: 300px;
-  overflow: auto;
+  overflow: scroll;
 }
 #slider{
   margin-bottom: 2%;
@@ -72,9 +78,8 @@
 }
 .yscaleoptions {
   margin-top:5%;
-    /* margin-top: 2%; */
-
-/* margin-right: 30%  !important; */
+  position: relative;
+  z-index: 10;
 }
 .options_btn :checked 
 {
@@ -92,7 +97,6 @@
     position: relative;
     padding-left: 28px;
     padding-right: 30px;
-    
     cursor: pointer;
     line-height: 20px;
     display: inline-block;
@@ -132,4 +136,45 @@
     opacity: 1;
     -webkit-transform: scale(1);
     transform: scale(1);
+}
+.canvasDiv {
+  position: absolute;
+  width: 550px;
+  height: 300px;
+}
+.popup-footer{
+float: left;
+margin-top:7%;
+}
+.NetworkDetails-body{
+  line-height: 2em;
+}
+#DivUpload{
+  padding-bottom:5%;
+  padding-top:5%;
+}
+#ChangeNBars{
+  padding-top:5%;
+}
+.link.rejectb {
+  stroke: gray;
+  stroke-dasharray: 0,2 1;
+}
+#turns {
+  height: 20px;
+}
+#graph {
+  overflow: auto;
+}
+.NoOgGroupsInput{
+
+  padding-bottom: 30px;
+
+}
+#confirmGroupsBut{
+  margin-top: 5%;
+}
+#confirmActorsGroupsBut{
+  margin-top: 5%;
+
 }

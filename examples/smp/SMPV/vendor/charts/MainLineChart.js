@@ -1,28 +1,40 @@
-// Define margins        
-var margin = { top: 30, right: 20, bottom: 30, left: 50 },
-  width = 500 - margin.left - margin.right,
-  height = 270 - margin.top - margin.bottom;
-
 // data from load.js (session data)
-var ActorsNamesAllSce = JSON.parse(sessionStorage.getItem("ActorsNames"));
+// var ActorsNamesAllSce = JSON.parse(sessionStorage.getItem("ActorsNames"));
 var ActorsPositions = JSON.parse(sessionStorage.getItem("ActorsPositions"));
 var whyActorChanged = JSON.parse(sessionStorage.getItem("BargnsData"));
 var NumOfTurns = sessionStorage.getItem("NumOfTurns");
 var selectedDimNum = 0;
-var selectedScenNum = sessionStorage.getItem("selectedScen");
+// var selectedScenNum = sessionStorage.getItem("selectedScen");
+var defaultColors = sessionStorage.getItem("defaultColors");
+var svgWidth2 = 900;
+var svgheight2 = 300;
+
+function getNewResoulution(w, h) {
+  svgWidth2 = w;
+  svgheight2 = h;
+}
 
 function drawLine() {
+  var ActorsNamesAllSce = ActorsNames,
+    selectedScenNum = selectedScen,
+    ActorsPositions = arrPos,
+    whyActorChanged = arrBargns;
+    
+  // Define margins        
+  var margin = { top: 30, right: 20, bottom: 30, left: 50 },
+    width = svgWidth2 - margin.left - margin.right,
+    height = svgheight2 - margin.top - margin.bottom;
 
   // Clear the exiting chart
-  d3.select("#chart").html("");
+  d3.select("#MainLineChart").html("");
   d3.select("#legend").html("");
 
-  var svg = d3.select("#chart")
+  var svg = d3.select("#MainLineChart")
     .append("svg")
     .attr("width", "100%")
     .attr("height", "100%")
+    .attr("viewBox", "0 0 " + " " + svgWidth2 + " " + svgheight2)
     .attr("preserveAspectRatio", "xMidYMid meet")
-    .attr("viewBox", "0 0 500 300")
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
@@ -31,11 +43,10 @@ function drawLine() {
     .attr("width", "100%")
     .attr("height", "100%")
     .attr("preserveAspectRatio", "xMidYMid meet")
-    .attr("viewBox", "0 0 250 500")
+    .attr("viewBox", "0 0 250 650")
     .attr('transform', "translate(" + 15 + "," + 15 + ")")
     .append("g")
     .attr("class", "legend1")
-
   var x_axix_data = [], // create an array for x-axix 
     XScale,
     YScale,
@@ -50,6 +61,8 @@ function drawLine() {
     selectedLine,
     selectedLegend;
 
+  var ActorsObj1 = JSON.parse(sessionStorage.getItem("ActorsObj"));
+
   //names based on selected scenario
   namesArray = ActorsNamesAllSce[selectedScenNum];
 
@@ -57,7 +70,6 @@ function drawLine() {
   for (var i = 0; i < ActorsPositions[selectedScenNum][selectedDimNum].length; i += 1) {
     positionsData.push(ActorsPositions[selectedScenNum][selectedDimNum][i].positions);
   }
-
   //bargains based on selected Dim and scenario
   for (var i = 0; i < whyActorChanged[selectedScenNum][selectedDimNum][0].length; i += 1) {
     bargnsData.push(whyActorChanged[selectedScenNum][selectedDimNum][0][i]);
@@ -82,7 +94,8 @@ function drawLine() {
   // Define the line
   line = d3.line()
     .x(function (d) { return XScale(d.Turn); })
-    .y(function (d, i) { return YScale(d.val[i]); });
+    .y(function (d, i) { return YScale(d.val[i]); })
+    .curve(d3.curveMonotoneX);
 
 
   for (var i = 0; i < turn + 1; i++) {
@@ -114,9 +127,10 @@ function drawLine() {
 
   //text label for the x axis
   svg.append("text")
+    .attr("class", "CharLabel")
     .attr("transform",
-    "translate(" + (width / 2) + " ," +
-    (height + 30) + ")")
+      "translate(" + (width / 2) + " ," +
+      (height + 30) + ")")
     .style("text-anchor", "middle")
     .text("Turn");
 
@@ -132,6 +146,7 @@ function drawLine() {
 
   // text label for the y axis
   svg.append("text")
+    .attr("class", "CharLabel")
     .attr("transform", "rotate(-90)")
     .attr("y", 0 - margin.left)
     .attr("x", 0 - (height / 2))
@@ -139,85 +154,28 @@ function drawLine() {
     .style("text-anchor", "middle")
     .text("Position");
 
-  var colors = d3.scaleOrdinal()
-    .domain(namesArray)
-    .range(["#5C8598", "#219DD8", "#96C9E5", "#3C3D3B",
-      "#ECCE6A", "#f8ecba", "#60805D", "#8AC791",
-      "#bebfc1", "#636664", "#a5f3cc", "#6acbec",
-      "#6aecec", "#ff9966", "#1d80e2", "#6a8aec",
-      "#a5a5f3", "#ffd857", "#a8bfa6", "#cb6aec",
-      "#c88dc8", "#ec6a6a", "#ec6aab", "#e84a72",
-      "#f1a7a7", "#e3994f", "#d87d22", "#d8ab22",
-      "#d8d822", "#a6e765", "#4fd822", "#1cb01c",
-      "#22d84f", "#22d87d", "#22d8ab", "#22d8d8",
-      "#22abd8", "#156184", "#d3e6f8", "#224fd8",
-      // Darker Shade for (Set #1)
-      "#436170", "#18719a", "#5cabd6", "#1a1a19",
-      "#e5bb34", "#f1d874", "#425940", "#75bd7e",
-      "#97989b", "#3f4040", "#62eaa6", "#1db1e2",
-      "#1de2e2", "#ff5500", "#124d87", "#1a47cb",
-      "#4b4be7", "#ffc91a", "#6e946b", "#b11de2",
-      "#ac53ac", "#e21d1d", "#e21d80", "#b5173f",
-      "#e34f4f", "#b0661c", "#844d15", "#846815",
-      "#848415", "#73c71f", "#318415", "#0e580e",
-      "#158431", "#15844d", "#158468", "#158484",
-      "#156884", "#07202c", "#7bb4ea", "#153184",
-      // Lighter Shade for (Set #2)
-      "#8faebc", "#7bc7ea", "#d6eaf5", "#737570",
-      "#f9f0d2", "#fdf9e8", "#9ab497", "#ddeedf",
-      "#e5e5e6", "#8b8d8c", "#e9fcf2", "#d2eff9",
-      "#bbf6f6", "#ffddcc", "#8ebff0", "#d2dcf9",
-      "#e9e9fc", "#fff3cc", "#e2eae1", "#efd2f9",
-      "#e6cbe6", "#f9d2d2", "#f9d2e6", "#f6bbca",
-      "#fce9e9", "#f5d9bd", "#eab37b", "#eace7b",
-      "#eaea7b", "#d9f5bd", "#97ea7b", "#65e765",
-      "#7bea97", "#7beab3", "#38e0b6", "#65e7e7",
-      "#7bceea", "#38abe0", "#e9f3fc", "#91a8ee",
-      // Another set of 18 (warm) Distinct Colors (Set #2)
-      "#e6194b", "#3cb44b", "#ffe119", "#0082c8",
-      "#f58231", "#911eb4", "#46f0f0", "#f032e6",
-      "#d2f53c", "#fabebe", "#008080", "#e6beff",
-      "#aa6e28", "#fffac8", "#800000", "#aaffc3",
-      "#808000", "#ffd8b1", "#000080", "#808080",
-      // Darker shade for set #2
-      "#8a0f2e", "#267330", "#b39b00", "#004266",
-      "#c35709", "#58126d", "#0fbdbd", "#be0eb5",
-      "#a0c20a", "#f47171", "#003333", "#c466ff",
-      "#674218", "#fff266", "#330000", "#66ff94",
-      "#333300", "#ff9933", "#000033", "#4d4d4d"
-    ]);
 
-
-  //create an object for each actor, map all the properties.
-  var actors = namesArray.map(function (row, i) {
-
-    return {
-      actor_name: row,
-      visible: true,
-      values: x_axix_data.map(function (x_value) {
-        return {
-          Turn: x_value,
-          val: positionsData[i].map(function (y_values) {
-            return y_values
-          })
-        }
-      }),
-      color: colors(row)
-    }
+  ActorsObj1.forEach(function (obj, index) {
+    obj.values = x_axix_data.map(function (x_value) {
+      return {
+        Turn: x_value,
+        val: positionsData[index].map(function (y_values) {
+          return y_values
+        })
+      }
+    })
   });
-
   // get initiator color for the point  
   for (i = 0; i < bargnsDataByTurn.length; i++) {
-    let obj = actors.findIndex(o => o.actor_name === bargnsDataByTurn[i].Initiator);
-    bargnsDataByTurn[i]["color"] = actors[obj].color;
+    var obj1 = ActorsObj1.findIndex(o => o.actor_name === bargnsDataByTurn[i].Initiator);
+    bargnsDataByTurn[i]["color"] = ActorsObj1[obj1].color;
   }
-
 
   //initialize bargains points visibilaty status  
   bargnsDataByTurn.forEach(function (obj) { obj["PointVisible"] = false; });
 
   //to show details about each bargain
-  var tooltip = d3.select('#chart')
+  var tooltip = d3.select('#MainLineChart')
     .append('div')
     .attr('class', 'tooltip')
     .style("display", "none")
@@ -234,8 +192,7 @@ function drawLine() {
     .style('color', 'black');
 
 
-  actors.forEach(function (d, i) {
-
+  ActorsObj1.forEach(function (d, i) {
     //draw the lines
     drawLines(d, i);
     d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", '')).transition().duration(100)
@@ -246,11 +203,11 @@ function drawLine() {
     svg2.append("rect")
       .attr("width", 10)
       .attr("height", 10)
-      .attr("id", 'legend_' + d.actor_name.replace(".", ''))
+      .attr("id", 'legend_' + d.actor_name.replace(/\s+/g, '').replace(".", ''))
       .attr("transform", function () {
-        xOff = (i % 3) * 65
+        xOff = (i % 3) * 85
         yOff = Math.floor(i / 3) * 20
-        return "translate(" + xOff + "," + (yOff + 80) + ")"
+        return "translate(" + xOff + "," + (yOff + 50) + ")"
       })
       .attr("fill", function () {
         return d.visible ? d.color : "#F1F1F2";
@@ -266,12 +223,16 @@ function drawLine() {
         if (d.visible == true) {
           d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
             .transition().remove();
-          actors[i].visible = false;
+          d3.selectAll("#Spoint_" + d.actor_name.replace(/\s+/, "").replace(".", ''))
+            .style("display", 'none')
+          ActorsObj1[i].visible = false;
           d.visible = false;
         }
         else if (d.visible == false) {
           drawLines(d, i);
-          actors[i].visible = true;
+          d3.selectAll("#Spoint_" + d.actor_name.replace(/\s+/, "").replace(".", ''))
+            .style("display", 'inline')
+          ActorsObj1[i].visible = true;
           d.visible = true;
         }
       })
@@ -281,23 +242,36 @@ function drawLine() {
         onMouseover(d, i);
 
       })
-      // .on("mouseout", onMouseout);
       .on("mouseout", function () {
         MouseOutLegend(d, i);
         onMouseout();
       });
 
+    var startingPoints = svg.selectAll(".Spoint")
+      .data(ActorsObj1)
+      .enter()
+    startingPoints.append("circle")
+      .attr("class", "Spoint")
+      .attr("id", function (d) {
+        return "Spoint_" + d["actor_name"].replace(/\s+/, "").replace(".", '');
+      })
+      .attr("r", 3)
+      .attr("cx", function (d) { return XScale(d['values'][0].Turn); })
+      .attr("cy", function (d) { return YScale(d['values'][0]['val'][0]); })
+      .style("fill", function (d) { return d['color'] })
+      .style("display", 'inline')
+
+
     //add bargns' points
     var dot = svg.selectAll(".dot")
       .data(bargnsDataByTurn)
       .enter();
-
     svg2.append("text")
       .attr("transform", function () {
-        xOff = (i % 3) * 65
+        xOff = (i % 3) * 85
         yOff = Math.floor(i / 3) * 20
 
-        return "translate(" + (xOff + 15) + "," + (yOff + 89) + ")"
+        return "translate(" + (xOff + 15) + "," + (yOff + 59) + ")"
       })
       .text(function () { return d.actor_name })
       .attr("text-anchor", "start")
@@ -340,13 +314,13 @@ function drawLine() {
                 .style('left', (xPosition) + 'px');
 
               // highlight the actor who initiated the bargain 
-              d3.select("#legend_" + d["Initiator"].replace(".", ''))
+              d3.select("#legend_" + d["Initiator"].replace(/\s+/g, '').replace(".", ''))
                 .style("stroke", "black")
                 .style("stroke-width", "2.5");
             })
             .on("mouseout", function (d) {
               tooltip.style("display", "none");
-              d3.select("#legend_" + d["Initiator"].replace(".", ''))
+              d3.select("#legend_" + d["Initiator"].replace(/\s+/g, '').replace(".", ''))
                 .style("stroke", "none")
             });
           // Update whether or not points are visible
@@ -361,21 +335,50 @@ function drawLine() {
 
   }) // end of forEach
 
+  if (GroupsDetails.length > 0) {
+    var Actorslegendsize = Math.floor((ActorsObj2.length - 1) / 3) * 20
+    for (j = 0; j < GroupsDetails.length; j++) {
+      //add the legend
+
+      svg2.append("rect")
+        .attr("width", 10)
+        .attr("height", 10)
+        .attr("class", 'GroupsLeg')
+        .attr("transform", function () {
+          xOff = (j % 3) * 85
+          yOff = Math.floor((j) / 3) * 20
+          return "translate(" + xOff + "," + (yOff + Actorslegendsize + 90) + ")"
+        })
+        .attr("id", 'legend_' + GroupsDetails[j].Gname.replace(/\s+/g, '').replace(".", ''))
+        .attr("fill", GroupsDetails[j].Gcolor)
+
+      svg2.append("text")
+        .attr("transform", function () {
+          //  xOff = ((ActorsObj1.length-1+i) % 3) * 85
+          xOff = (j % 3) * 85
+          yOff = Math.floor((j) / 3) * 20
+          return "translate(" + (xOff + 15) + "," + (yOff + Actorslegendsize + 98) + ")"
+        })
+        .text(function () { return GroupsDetails[j].Gname })
+    }
+  }
+
   svg2.append("rect")
     .attr("width", 10)
     .attr("height", 10)
-    .attr("y", 50)
+    .attr("y", 20)
     .attr("id", "select-All")
     .style("fill", "black")
     .on("click", function () {
       if (d3.select("#SelectLabel").text() == "Clear All") {
         bargnsDataByTurn.forEach(function (d, i) {
           d.visible = false;
+          bargnsDataByTurn[i]["PointVisible"] = false;
         })
         clearAll();
       }
       else {
-        actors.forEach(function (d, i) {
+        ActorsObj1.forEach(function (d) {
           d.visible = true;
         })
         selectAll();
@@ -384,14 +387,13 @@ function drawLine() {
 
   svg2.append("text")
     .attr("x", 20)
-    .attr("y", 58)
+    .attr("y", 28)
     .text("Clear All")
     .attr("id", "SelectLabel");
 
-
   function onMouseover(d, i) {
     MouseOverLegend(d, i);
-    actors.forEach(function (d, i) {
+    ActorsObj1.forEach(function (d, i) {
       d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
         .transition()
         .duration(50)
@@ -407,7 +409,7 @@ function drawLine() {
       d3.select(selectedLine.replace(/\s+/g, '').replace(".", ''))
         .style("stroke-width", 4);
 
-      d3.selectAll("#legend_" + d.actor_name.replace(".", ''))
+      d3.selectAll("#legend_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
         .attr("fill", function () {
           return ("#legend_" + d.actor_name === selectedLegend) ? d.color : "#F1F1F2"
         })
@@ -415,7 +417,7 @@ function drawLine() {
   }
 
   function onMouseout() {
-    actors.forEach(function (d, i) {
+    ActorsObj1.forEach(function (d, i) {
       d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
         .transition()
         .duration(50)
@@ -427,7 +429,7 @@ function drawLine() {
         })
       d3.select(selectedLine.replace(/\s+/g, '').replace(".", ''))
         .style("stroke-width", 1.2);
-      d3.selectAll("#legend_" + d.actor_name.replace(".", ''))
+      d3.selectAll("#legend_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
         .attr("fill", function () {
           return d.visible ? d.color : "#F1F1F2";
         })
@@ -457,35 +459,39 @@ function drawLine() {
   }
 
   function selectAll() {
-    actors.forEach(function (d, i) {
+    ActorsObj1.forEach(function (d, i) {
       drawLines(d, i);
-      actors[i].visible = true;
-      d3.selectAll("#legend_" + d.actor_name.replace(".", ''))
+      ActorsObj1[i].visible = true;
+      d3.selectAll("#legend_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
         .attr("fill", d.color)
+      d3.selectAll("#Spoint_" + d.actor_name.replace(/\s+/, "").replace(".", ''))
+        .style("display", 'inline')
+
     })
     d3.select("#SelectLabel")
       .text("Clear All")
   }
 
   function clearAll() {
-    actors.forEach(function (d, i) {
+    ActorsObj1.forEach(function (d, i) {
       d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
         .transition()
         .duration(50)
         .remove();
       d.visible = false;
-      d3.selectAll("#legend_" + d.actor_name.replace(".", ''))
+      d3.selectAll("#legend_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
         .attr("fill", "#F1F1F2")
-      bargnsDataByTurn[i]["PointVisible"] = false;
       d3.selectAll(".dot" + d.actor_name.replace(/\s+/, "").replace(".", '')).remove();
+      d3.selectAll("#Spoint_" + d.actor_name.replace(/\s+/, "").replace(".", ''))
+        .style("display", 'none')
 
     })
     d3.select("#SelectLabel")
       .text("Select All")
   }
 
-  function drawLines(d, i) {
 
+  function drawLines(d, i) {
     //remove line if already exist (when hovering on a disabled actor's legend, his line is 
     // drwan but still d.visible = false so when legened is clicked and since d.visible = false another line will be drawn !) 
     d3.select("#Line_" + d.actor_name.replace(/\s+/g, '').replace(".", ''))
