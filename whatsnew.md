@@ -1,3 +1,20 @@
+# What's New in Version 1.4
+
+## Network Diagram for the Visualization Dashboard
+We completed the design and the implementation of the Network Diagram of Bargains, The Network Diagram is a scenario and turn specific bargains visualization, the diagram allows you to visualize the bargain proposals and acceptances for all actors in a single turn. more information about the Network Diagram found in the [KTAB SMP 1.4 user-guide](https://github.com/KAPSARC/KTAB/raw/testing/examples/smp/SMPTutorial.pdf)
+
+## Visualization Dashboard UI enhancement and new features
+the following enhancements and features were added to the Visualization Dashboard
+	* Modify the Bar numbers of the Bar charts to adjust size
+	* Customize the size of the charts
+	* The ability to remove labels of the charts
+	* Modify the colors of the actrs
+	* Export and import assigned colors for the actors
+	* Create groups and assign actors to groups
+	* Export and import created groups
+	* Smoother Line charts
+	* Enhancement of the look and feel of the Dashboard
+
 # What's New in Version 1.3
 
 ## More Modern Results Visualization
