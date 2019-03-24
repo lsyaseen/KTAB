@@ -19,7 +19,7 @@ function drawLine() {
     selectedScenNum = selectedScen,
     ActorsPositions = arrPos,
     whyActorChanged = arrBargns;
-    
+
   // Define margins        
   var margin = { top: 30, right: 20, bottom: 30, left: 50 },
     width = svgWidth2 - margin.left - margin.right,
@@ -191,11 +191,11 @@ function drawLine() {
     .style('pointer-events', 'none')
     .style('color', 'black');
 
-    
+
   ActorsObj1.forEach(function (d, i) {
     //draw the lines
     drawLines(d, i);
-    d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" )).transition().duration(100)
+    d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1")).transition().duration(100)
       .style("stroke", function () { return d.visible ? d.color : "#F1F1F2"; })
       .style("opacity", function () { return d.visible ? 1 : 0; })
 
@@ -218,19 +218,19 @@ function drawLine() {
         })
 
         // Hide or show the elements based on the ID
-        d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+        d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
           .transition().duration(100)
         if (d.visible == true) {
-          d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+          d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
             .transition().remove();
-          d3.selectAll("#Spoint_" + d.actor_name.replace(/\s+/, "").replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+          d3.selectAll("#Spoint_" + d.actor_name.replace(/\s+/, "").replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
             .style("display", 'none')
           ActorsObj1[i].visible = false;
           d.visible = false;
         }
         else if (d.visible == false) {
           drawLines(d, i);
-          d3.selectAll("#Spoint_" + d.actor_name.replace(/\s+/, "").replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+          d3.selectAll("#Spoint_" + d.actor_name.replace(/\s+/, "").replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
             .style("display", 'inline')
           ActorsObj1[i].visible = true;
           d.visible = true;
@@ -320,7 +320,7 @@ function drawLine() {
             })
             .on("mouseout", function (d) {
               tooltip.style("display", "none");
-              d3.select("#legend_" + d["Initiator"].replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+              d3.select("#legend_" + d["Initiator"].replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
                 .style("stroke", "none")
             });
           // Update whether or not points are visible
@@ -328,7 +328,7 @@ function drawLine() {
         }
         else {
           bargnsDataByTurn[i]["PointVisible"] = visible;
-          d3.selectAll(".dot" + d.actor_name.replace(/\s+/, "").replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+          d3.selectAll(".dot" + d.actor_name.replace(/\s+/, "").replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
             .transition().remove();
         }
       });
@@ -394,7 +394,7 @@ function drawLine() {
   function onMouseover(d, i) {
     MouseOverLegend(d, i);
     ActorsObj1.forEach(function (d, i) {
-      d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+      d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
         .transition()
         .duration(50)
         .style("opacity", function () {
@@ -406,10 +406,10 @@ function drawLine() {
             MouseOutLegend(d, i); //remove line if visible = false
         })
 
-      d3.select(selectedLine.replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+      d3.select(selectedLine.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
         .style("stroke-width", 4);
 
-      d3.selectAll("#legend_" + d.actor_name.replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+      d3.selectAll("#legend_" + d.actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
         .attr("fill", function () {
           return ("#legend_" + d.actor_name === selectedLegend) ? d.color : "#F1F1F2"
         })
@@ -418,18 +418,18 @@ function drawLine() {
 
   function onMouseout() {
     ActorsObj1.forEach(function (d, i) {
-      d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+      d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
         .transition()
         .duration(50)
         .style("opacity", function () {
           if (d.visible == true)
             return 1;
           else
-            d3.select("#Line_" + d.actor_name.replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" )).remove(); //remove instead of chainging opacity
+            d3.select("#Line_" + d.actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1")).remove(); //remove instead of chainging opacity
         })
-      d3.select(selectedLine.replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+      d3.select(selectedLine.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
         .style("stroke-width", 1.2);
-      d3.selectAll("#legend_" + d.actor_name.replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+      d3.selectAll("#legend_" + d.actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
         .attr("fill", function () {
           return d.visible ? d.color : "#F1F1F2";
         })
@@ -453,7 +453,7 @@ function drawLine() {
 
   function MouseOutLegend(d, i) {
     if (d.visible == false) {
-      d3.select("#Line_" + d.actor_name.replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+      d3.select("#Line_" + d.actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
         .remove();
     }
   }
@@ -462,9 +462,9 @@ function drawLine() {
     ActorsObj1.forEach(function (d, i) {
       drawLines(d, i);
       ActorsObj1[i].visible = true;
-      d3.selectAll("#legend_" + d.actor_name.replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+      d3.selectAll("#legend_" + d.actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
         .attr("fill", d.color)
-      d3.selectAll("#Spoint_" + d.actor_name.replace(/\s+/, "").replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+      d3.selectAll("#Spoint_" + d.actor_name.replace(/\s+/, "").replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
         .style("display", 'inline')
 
     })
@@ -474,15 +474,15 @@ function drawLine() {
 
   function clearAll() {
     ActorsObj1.forEach(function (d, i) {
-      d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+      d3.selectAll("#Line_" + d.actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
         .transition()
         .duration(50)
         .remove();
       d.visible = false;
-      d3.selectAll("#legend_" + d.actor_name.replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+      d3.selectAll("#legend_" + d.actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
         .attr("fill", "#F1F1F2")
-      d3.selectAll(".dot" + d.actor_name.replace(/\s+/, "").replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" )).remove();
-      d3.selectAll("#Spoint_" + d.actor_name.replace(/\s+/, "").replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+      d3.selectAll(".dot" + d.actor_name.replace(/\s+/, "").replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1")).remove();
+      d3.selectAll("#Spoint_" + d.actor_name.replace(/\s+/, "").replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
         .style("display", 'none')
 
     })
@@ -494,7 +494,7 @@ function drawLine() {
   function drawLines(d, i) {
     //remove line if already exist (when hovering on a disabled actor's legend, his line is 
     // drwan but still d.visible = false so when legened is clicked and since d.visible = false another line will be drawn !) 
-    d3.select("#Line_" + d.actor_name.replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+    d3.select("#Line_" + d.actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
       .remove();
 
     svg.append("path")

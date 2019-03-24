@@ -23,7 +23,7 @@ function drawChart() {
 
     allpos = arrPos;
     AllEffcPow = arreff;
-    
+
     var margin = { top: 30, right: 20, bottom: 30, left: 50 },
         width2 = svgWidth2 - margin.left - margin.right,
         height = svgheight2 - margin.top - margin.bottom;
@@ -297,14 +297,14 @@ function drawChart() {
     function onMouseover() {
 
         ActorsObj2.forEach(function (d, i) {
-            d3.selectAll("#Actor_" + d.actor_name.replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+            d3.selectAll("#Actor_" + d.actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
                 .transition()
                 .duration(50)
                 .style("opacity", function () {
                     return ("#Actor_" + d.actor_name === selectedRect) ? 1.0 : 0.2;
                 })
 
-            d3.selectAll("#Blegend_" + d.actor_name.replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+            d3.selectAll("#Blegend_" + d.actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
                 .attr("fill", function () {
                     return ("#Blegend_" + d.actor_name === selectedLegend) ? d.color : "#F1F1F2"
                 })
@@ -333,12 +333,12 @@ function drawChart() {
     function onMouseout() {
 
         ActorsObj2.forEach(function (d, i) {
-            d3.selectAll("#Actor_" + d.actor_name.replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+            d3.selectAll("#Actor_" + d.actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
                 .transition()
                 .duration(50)
                 .style("opacity", 1);
 
-            d3.selectAll("#Blegend_" + d.actor_name.replace(/\s+/g, '').replace( /(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\\$1" ))
+            d3.selectAll("#Blegend_" + d.actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1"))
                 .attr("fill", function () {
                     return d.visible ? d.color : "#F1F1F2";
                 })
