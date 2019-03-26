@@ -265,6 +265,7 @@ SMPState* SMPState::doBCN() {
     s2 = new SMPState(model);
 
     //TODO: make brm accessible through CSV, XML, SQL, GUI, etc. and remove this testing code
+   model->brm = KBase::BargainResolutionMethod::ActorQueues; // this is the default
    //model->brm = KBase::BargainResolutionMethod::BindingBest;
 
     switch (model->brm) {
@@ -343,7 +344,7 @@ SMPState* SMPState::doBCN() {
       int aI = model->actrNdx(b->actInit);
       int aR = model->actrNdx(b->actRcvr);
       if ((aI >= 0) && (aR >= 0)) {
-	printf("Delete bargain [%2i:%2i] at %u  \n", aI, aR, b);
+	//printf("Delete bargain [%2i:%2i] at %u  \n", aI, aR, b);
 	delete b;
       }
     }
@@ -422,11 +423,12 @@ void SMPState::doBCN(unsigned int i) {
     const double minSigEDU = 1e-5; 
   
     // TODO: make propMult accessible through CSV, XML, SQL, GUI, etc. and remove this testing code
+    smod->propMult = KBase::ProposalMultiplicity::SingleBest; // this is the default
     //smod->propMult = KBase::ProposalMultiplicity::AllPositive;
     
     switch (smod->propMult) {
     case KBase::ProposalMultiplicity::AllPositive:
-      LOG(INFO) << "For actor "<<i<<" developing proposals for all positive bargains";
+      LOG(INFO) << "For actor "<<i<<" developing multiple proposals for all positive bargains";
       for(const auto& eduIJ : eduI) {
 	int j = eduIJ.first;
 	double pij = get<0>(eduIJ.second);
@@ -439,7 +441,7 @@ void SMPState::doBCN(unsigned int i) {
       }
       break;
     case KBase::ProposalMultiplicity::SingleBest:
-      LOG(INFO) << "For actor " << i << " developing proposals for only the best bargain";
+      LOG(INFO) << "For actor " << i << " developing single proposals for only the best bargain";
     { // this lexical block is necessary so the compiler will allow two variables
       auto chlgI = bestChallenge(eduI);
       const double bestEU = get<2>(chlgI);
