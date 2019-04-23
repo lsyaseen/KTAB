@@ -36,7 +36,7 @@ find_path(TINYXML2_INCLUDE_DIR tinyxml2.h
 
 
 # try to find the compiled library object
-find_library (TINYXML2_LIBRARY NAMES tinyxml2 
+find_library (TINYXML2_LIBRARY NAMES tinyxml2  tinyxml2d 
   PATHS ${TINYXML2_POSSIBLE_PATHS}
   )
 
