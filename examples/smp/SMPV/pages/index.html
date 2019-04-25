@@ -424,9 +424,7 @@
 
     $("#SecnarioPicker").on('change', function () {
         selectedScen = $('#SecnarioPicker').val();
-        console.log(NumOfTurns)
-        // currentTurn = NumOfTurns - 1;
-        // slider.noUiSlider.set(currentTurn);
+
         currentTurn = 0;
         slider.noUiSlider.set(0);
         document.getElementById('currentTurn').innerHTML = currentTurn;
@@ -530,6 +528,7 @@
             .range(defaultColors);
         var actors2 = namesArray.map(function (row, i) {
             return {
+                id: i,
                 actor_name: row,
                 visible: true,
                 color: colors3(row),
@@ -750,13 +749,13 @@
         if (temActorsObj.length < newColors.length) {
             for (i = 0; i < temActorsObj.length; i++) {
                 temActorsObj[i]["color"] = newColors[i];
-                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).colorpicker("val", newColors[i]);
+                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1")).colorpicker("val", newColors[i]);
             }
         }
         else {
             for (i = 0; i < newColors.length; i++) {
                 temActorsObj[i]["color"] = newColors[i];
-                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).colorpicker("val", newColors[i]);
+                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1")).colorpicker("val", newColors[i]);
             }
         }
         sessionStorage.setItem("ActorsObj", JSON.stringify(temActorsObj));
@@ -907,7 +906,7 @@
         for (var i = 0; i < temActorsObj.length; i++) {
 
             $(".ActorsForGrouping").append('<div  id="Div_Group_' + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + '" class="col-xs-6 col-sm-4 col-md-6 col-lg-6"> </div>');
-            $("#Div_Group_" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).append('<br><span><strong>' + temActorsObj[i].actor_name + '  </strong></span>' +
+            $("#Div_Group_" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1")).append('<br><span><strong>' + temActorsObj[i].actor_name + '  </strong></span>' +
                 '<select class="GroupsOptions" id="GroupOf' + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + '" > </select>');
 
             for (j = 0; j < NumOfGroups; j++) {
@@ -915,7 +914,7 @@
                 var $div = $("<option>", {
                     value: j,
                 }).text(GroupName);
-                $("#GroupOf" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).append($div);
+                $("#GroupOf" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1")).append($div);
                 GroupsDetails[j] = {
                     Gname: document.getElementById("group_" + (j + 1) + "_Name").value,
                     Gcolor: document.getElementById("Group_" + (j + 1) + "_Color").value,
@@ -930,9 +929,8 @@
         temActorsObj = JSON.parse(sessionStorage.getItem("ActorsObj"));
         for (var i = 0; i < temActorsObj.length; i++) {
             var selectedGroupColor, selectedGroup
-            var selectedGroup = $("#GroupOf" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + " option:selected").text();
-            var selectedGroupIn = parseInt($("#GroupOf" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + " option:selected").val());
-
+            var selectedGroup = $("#GroupOf" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1") + " option:selected").text();
+            var selectedGroupIn = parseInt($("#GroupOf" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1") + " option:selected").val());
             var obj1 = temActorsObj.findIndex(o => o.actor_name === temActorsObj[i].actor_name);
             temActorsObj[obj1]["group"] = selectedGroup;
             temActorsObj[obj1]["color"] = $("#Group_" + (selectedGroupIn + 1) + "_Color").colorpicker("val");
@@ -950,17 +948,17 @@
             $('.popup-body').empty(); //clear existing actors
             for (var i = 0; i < temActorsObj.length; i++) {
                 $(".popup-body").append('<div id="Div' + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + '"class="col-xs-6 col-sm-4 col-md-6 col-lg-6" </div> ')
-                $("#Div" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).append('<br><span><strong>' + temActorsObj[i].actor_name + '</strong></span>' +
+                $("#Div" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1")).append('<br><span><strong>' + temActorsObj[i].actor_name + '</strong></span>' +
                     '<input style="width:100px;" id="' + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '') + '" class="colorPicker evo-cp0" >')
 
-                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).colorpicker({ showOn: 'button' })
-                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).colorpicker("val", temActorsObj[i].color);
 
-                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(".", '')).on("change.color", function (event, color) {
+                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1")).colorpicker({ showOn: 'button' })
+                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1")).colorpicker("val", temActorsObj[i].color);
+                $("#" + temActorsObj[i].actor_name.replace(/\s+/g, '').replace(/(:|\.|\&|\*|\?|\[|\]|,|=|@)/g, "\\\$1")).on("change.color", function (event, color) {
                     //find index of selected actor to change its color
                     for (i = 0; i < temActorsObj.length; i++) {
                         var obj1 = temActorsObj.findIndex(o => o.actor_name.replace(/\s+/g, '').replace(".", '') === this.id);
-                        temActorsObj[obj1]["color"] = $("#" + this.id).colorpicker("val");
+                        temActorsObj[obj1]["color"] = $("#" + this.id.replace(/(:|\.|\*|\?|\[|\]|,|=|@)/g, "\\$1")).colorpicker("val");
                     }
                     sessionStorage.setItem("ActorsObj", JSON.stringify(temActorsObj));
 
@@ -973,19 +971,19 @@
     function saveSelectedColors() {
         ReDrawAllCharts();
     }
-function ReDrawAllCharts(){
+    function ReDrawAllCharts() {
         drawChart();
-        drawLine();  
-    if (currentTurn == NumOfTurns) {
-      //last turn has no bargains
-      loadCurrentTurnData(currentTurn-1);
-      drawNetwork();
+        drawLine();
+        if (currentTurn == NumOfTurns) {
+            //last turn has no bargains
+            loadCurrentTurnData(currentTurn - 1);
+            drawNetwork();
+        }
+        else {
+            loadCurrentTurnData(currentTurn);
+            drawNetwork();
+        }
     }
-    else{
-         loadCurrentTurnData(currentTurn);
-        drawNetwork();
-    }
-}
     function getData() {
         sessionStorage.setItem("ActorsNames", JSON.stringify(ActorsNames));
         sessionStorage.setItem("ActorsPositions", JSON.stringify(arrPos));
