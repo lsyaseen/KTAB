@@ -1,0 +1,642 @@
+<!DOCTYPE html><html><head>
+      <title>SMPTutorial</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel = "stylesheet" type = "text/css" href = "prism.css" />
+    </head>
+    <body for="html-export">
+      <div class="mume markdown-preview  ">
+      <p><sub>August 2019</sub></p>
+<h1 class="mume-header" id="kapsarc-toolkit-for-behavioral-analysis-ktab-spatial-model-of-politics-gui-smp-user-guide">KAPSARC Toolkit for Behavioral Analysis (KTAB): Spatial Model of Politics GUI (SMP) User guide</h1>
+
+<p>Version 1.4</p>
+<p>This document will act as a user-guide for the KTAB: Spatial Model of Politics GUI. The guide will cover the whole process of using KTAB for the SMP model, taking the user through downloading and Installing the application, running the model, and visualizing the results. This document assumes a detailed understanding of the SMP as instantiated in KTAB. For more details, see two Discussion Papers published by King Abdullah Petroleum studies and Research Center (KAPSARC) <a href="https://www.kapsarc.org/research/publications/an-introduction-to-the-kapsarc-toolkit-for-behavioral-analysis-ktab/">An Introduction to the KAPSARC Toolkit for Behavioral Analysis (KTAB)</a> and <a href="https://www.kapsarc.org/research/publications/multidimensional-bargaining-using-ktab/">Multidimensional Bargaining using KTAB</a></p>
+<div style="page-break-after: always;"></div>
+<h4>Table of Contents</h4>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#spatial-model-of-politics">Spatial Model of Politics</a></li>
+<li><a href="#how-to-install-ktab-smp">How to Install KTAB SMP</a>
+<ul>
+<li><a href="#download-and-install-on-windows">Download and Install on Windows</a></li>
+<li><a href="#download-and-install-on-mac-os-x">Download and Install on MAC OS X</a></li>
+<li><a href="#building-from-source-for-linux">Building from source for Linux</a></li>
+</ul>
+</li>
+<li><a href="#getting-started-with-ktab-smp-gui">Getting started with KTAB SMP GUI</a>
+<ul>
+<li><a href="#changing-the-working-directory">Changing the working directory</a></li>
+<li><a href="#output-log-options">Output Log Options</a></li>
+<li><a href="#configuring-database">Configuring Database</a></li>
+<li><a href="#minimum-logging">Minimum logging</a></li>
+<li><a href="#model-parameters">Model Parameters</a></li>
+<li><a href="#the-affinity-matrix">The Affinity Matrix</a></li>
+<li><a href="#data-inputs">Data Inputs</a></li>
+<li><a href="#actor-data-description">Actor data description</a></li>
+<li><a href="#create-new-actor-data">Create new actor data</a>
+<ul>
+<li><a href="#data-input-using-a-csv-file">Data input using a CSV file</a></li>
+<li><a href="#data-input-using-an-xml-file">Data input using an XML file</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#output-and-results">Output and Results</a>
+<ul>
+<li><a href="#actor-data">Actor Data</a></li>
+<li><a href="#visualizations">Visualizations</a>
+<ul>
+<li><a href="#positions-by-turn-line-chart">Positions By Turn (Line Chart)</a></li>
+<li><a href="#effective-power-landscape-stacked-bar-chart">Effective Power Landscape (Stacked Bar Chart)</a>
+<ul>
+<li><a href="#bar-chart-scale-potions">Bar chart scale potions</a></li>
+</ul>
+</li>
+<li><a href="#quad-map">Quad Map</a></li>
+<li><a href="#changing-actors-colors">Changing Actor&#x2019;s Colors</a></li>
+</ul>
+</li>
+<li><a href="#advanced-visualizations">Advanced Visualizations</a>
+<ul>
+<li><a href="#effective-power-bar-chart-d3">Effective Power Bar Chart (D3)</a></li>
+<li><a href="#positions-line-graph-d3">Positions Line Graph (D3)</a></li>
+<li><a href="#network-diagram-of-bargains-d3">Network Diagram of Bargains (D3)</a></li>
+<li><a href="#other-controls-for-the-d3-charts">Other controls for the D3 charts</a></li>
+<li><a href="#customize-chart-size-and-download-as-an-image">Customize Chart Size and Download as an Image</a></li>
+<li><a href="#change-actors-colors">Change Actors Colors</a></li>
+<li><a href="#actors-groups">Actors Groups</a>
+<ul>
+<li><a href="#sample-groups-csv-file">Sample groups CSV file</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div style="page-break-after: always;"></div>
+<h2 class="mume-header" id="introduction">Introduction</h2>
+
+<p>KAPSARC Toolkit for behavioral analysis (KTAB) is an open source platform for building models to allow the systematic and rigorous analysis of Collective Decision-Making Processes (CDMPs). KTAB is under continual development by KAPSARC to meet the need for widely available, state- of-the-art, supported, and open source software that facilitates the modeling and analysis of collective decision making. The software libraries and source code for KTAB are released on github1 as open source under the MIT license.<br>
+CDMPs are those in which a group of individual actors interacts to arrive at a single decision. In both general and technical parlance, CDMPs may be termed bargaining or negotiating. To avoid confusion with legacy interpretations of these words we adopt the term CDMP, but the general meaning remains the same. The deliberations of a corporate board, the internal debates of ruling parties, the voting of electorates, and the haggling between seller and buyer at a market stall can all be viewed as CDMPs, albeit with different actors operating according to different rules. KTAB is intended to support reasonable analyses of the potential outcomes of CDMPs involving a range of modeled groups. In any group, the actors hold different values, positions, and views, which they bring to the CDMP.<br>
+KTAB is intended to be a platform that contains a number of models that can simulate CDMPs. The initial model that has been instantiated in KTAB is called the Spatial Model of Politics (SMP). The class of models represented by the SMP has a long history in the academic discipline of political science. More detail on the SMP, and references to the appropriate literature, can again be found in articles available for download on the main KTAB page. The majority of the development team&#x2019;s current efforts are focused on producing a GUI for the SMP. The official version with a working GUI is now available for download.</p>
+<h2 class="mume-header" id="spatial-model-of-politics">Spatial Model of Politics</h2>
+
+<p>The initial model that has been instantiated in KTAB is called the Spatial Model of Politics (SMP). The class of models represented by the SMP has a long history in the academic discipline of political science. The key distinguishing feature of the SMP is that the model assumes that positions can be arrayed along a linear, spatial dimension (usually a single line).<br>
+Fundamentally, this implies that differences in position, or advocacy, can be ordered along a position spectrum. Differences in actors&#x2019; advocacy (their position) reflect the ordering and magnitude of the political difficulty in moving from one position to another. The &#x201C;space&#x201D; between two points on the line measures the level of difference between two positions.<br>
+A non-spatial approach has also been implemented in KTAB. We call this the Enumerated Model of Politics (EMP).</p>
+<div style="page-break-after: always;"></div>
+<h2 class="mume-header" id="how-to-install-ktab-smp">How to Install KTAB SMP</h2>
+
+<h4 class="mume-header" id="download-and-install-on-windows">Download and Install on Windows</h4>
+
+<p>This is for Windows (64-bits)</p>
+<p>1- Download and install the Visual C++ Runtime libraries for Visual Studio 2015 or more recent, from the Microsoft support official website.<br>
+<a href="https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads">https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads</a><br>
+2- Download the latest SMP version from the KTAB official GitHub page<br>
+<a href="http://kapsarc.github.io/KTAB/">http://kapsarc.github.io/KTAB/</a>.<br>
+3- Extract the contents of the .zip archive to your PC, maintaining the directory structure in the archive.</p>
+<h4 class="mume-header" id="download-and-install-on-mac-os-x">Download and Install on MAC OS X</h4>
+
+<p>1- Download the latest SMP version for the Mac OS X from the KTAB official GitHub page <a href="http://kapsarc.github.io/KTAB/">http://kapsarc.github.io/KTAB/</a>.<br>
+2- Extract the contents of the .zip archive to your PC, maintaining the directory structure in the archive.</p>
+<blockquote>
+<p><strong>Important note:</strong> to use the smpc and smpDyn from the downloaded bundle you need to access the contents of the KTAB_SMP bundle. You will find both the smpc and smpcDyn executables in the bundle folder KTAB_SMP.app/Contents/MacOS/</p>
+</blockquote>
+<h4 class="mume-header" id="building-from-source-for-linux">Building from source for Linux</h4>
+
+<p>Once we have configured and installed all the dependencies. the easiest way to build KTAB on Linux is to run the scripts located in the home directory of KTAB. These are <code>clean.sh</code>, <code>reconfig.sh</code>, and <code>build.sh</code> &#x2013; they should be run in this order to rebuild all the libraries and models for KTAB.</p>
+<div style="page-break-after: always;"></div>
+<h2 class="mume-header" id="getting-started-with-ktab-smp-gui">Getting started with KTAB SMP GUI</h2>
+
+<h3 class="mume-header" id="changing-the-working-directory">Changing the working directory</h3>
+
+<p>The home directory will store your default model outputs. To change your home directory, go to<br>
+<code>File &gt; Change Home Directory</code></p>
+<h3 class="mume-header" id="output-log-options">Output Log Options</h3>
+
+<p>You can save the model log output in different ways by indicating which logging option you prefer.</p>
+<ol>
+<li>Default &#x2013; Records the SMP model log in a timestamp-named file.</li>
+<li>Custom - Records the SMP model log in a specific file / location.</li>
+<li>None - Disable output logging of the SMP model run.</li>
+</ol>
+<h3 class="mume-header" id="configuring-database">Configuring Database</h3>
+
+<p>You can set the database configuration to either record your model output in SQLite or PosgreSQL databases from<br>
+<code>File &gt; Configure Database</code></p>
+<p>or from the database icon: <img src="pics/database.png" alt="drawing" width="30" height="25"></p>
+<h3 class="mume-header" id="minimum-logging">Minimum logging</h3>
+
+<p>Minimum logging allows the user to limit database logging. Checking this disables logging except for: model / data information. You can find the Minimum Logging checkbox within the Model Parameters panel</p>
+<p align="center">
+<img src="pics/minlog.png" alt="drawing" width="350" height="250">
+</p>
+<blockquote>
+<p>Note: If you need complete database output for more advanced data analysis, you should keep this option unchecked.</p>
+</blockquote>
+<h3 class="mume-header" id="model-parameters">Model Parameters</h3>
+
+<p>The KTAB version of the Spatial Model of Politics is highly parameterized, with many options that can be set to model collective decision-making processes based on your understanding of how actors behave. We briefly describe the parameters that users can modify without modifying the source code. These parameters can be set either in the GUI application, or stored in an xml-format input file. As previously mentioned, the following descriptions of the model parameters assume a detailed understanding of the SMP model as instantiated in KTAB.<br>
+The default value for each model parameter is highlighted in blue in the descriptions below.</p>
+<ul>
+<li><strong>VictoryProbModel</strong> controls the rate at which the probability of a coalition supporting an option<br>
+winning against the coalition proposing it increases as the strength ratios increase. This is part of the Probabilistic Condorcet Election. If Binary is used, the result is the Deterministic Condorcet Winner.</li>
+</ul>
+<table>
+  <tbody><tr>
+    <td rowspan="5">VictoryProbModel</td>
+    <td><font color="blue">Linear</font></td>
+    <td><font color="blue">A 2:1 ratio gives a probability of 2/3 to the stronger coalition</font></td>
+  </tr>
+  <tr>
+    <td>Square</td>
+    <td>A 2:1 ratio gives a probability of 4/5 to the stronger coalition</td>
+  </tr>
+  <tr>
+    <td>Quartic</td>
+    <td>A 2:1 ratio gives a probability of 16/17 to the stronger coalition</td>
+  </tr>
+   <tr>
+    <td>Octic</td>
+    <td>A 2:1 ratio gives a probability of 256/257 to the stronger coalition</td>
+  </tr>
+    <tr>
+    <td>Binary</td>
+    <td>Any significant percentage difference gives a probability of 1 to the stronger coalition</td>
+  </tr>
+</tbody></table>
+<ul>
+<li><strong>ProbCondorcetElection</strong> controls how the limiting distribution of the Markov process, for the Probabilistic Condorcet Election, is computed.</li>
+</ul>
+<table>
+  <tbody><tr>
+    <td rowspan="3">ProbCondorcetElection</td>
+    <td><font color="blue">Conditional</font></td>
+    <td><font color="blue">PCE uses single-step conditional probabilities</font></td>
+  </tr>
+  <tr>
+    <td>Markov Incentive</td>
+    <td>PCE uses a Markov process in which challenge probabilities are proportional to the influence of the initiating actor(s)</td>
+  </tr>
+  <tr>
+    <td>Markov Uniform</td>
+    <td>PCE uses a Markov process in which challenge probabilities are uniform</td>
+  </tr>
+</tbody></table>
+<ul>
+<li><strong>StateTransition</strong> controls how the winning bargain in an actor&apos;s queue is chosen among all bargains; either by a Deterministic or Probabilistic Condorcet Election.</li>
+</ul>
+<table>
+  <tbody><tr>
+    <td rowspan="3">StateTransition</td>
+    <td><font color="blue">Deterministic</font></td>
+    <td><font color="blue">The bargain which has the strongest coalition wins, even with a very small margin</font></td>
+  </tr>
+  <tr>
+    <td>Stochastic</td>
+    <td>The probability of winning for each bargain is proportional to its relative coalition strength</td>
+  </tr>
+</tbody></table>
+<ul>
+<li><strong>VotingRule</strong> controls how the amount of influence an actor will exert between two options depends on the perceived difference in utilities.</li>
+</ul>
+<table>
+  <tbody><tr>
+    <td rowspan="6">VotingRule</td>
+    <td><font color="blue">Prop</font></td>
+    <td><font color="blue">The vote is linearly proportional to the difference in utilities</font></td>
+  </tr>
+  <tr>
+    <td>PropBin</td>
+    <td>The vote is proportional to the weighted average of Prop (80%) and Binary (20%)</td>
+  </tr>
+  <tr>
+    <td>Binary</td>
+    <td>The actor exerts all influence, regardless of the difference in utilities</td>
+  </tr>
+   <tr>
+    <td>PropCbc</td>
+    <td>The vote is proportional to the average of Prop and Cubic</td>
+  </tr>
+    <tr>
+    <td>ASymProsp</td>
+    <td>Influence is exerted asymmetrically: It is proportional to the difference of utilities if negative (a loss in utility). It is proportional to 2/3 of the difference, if positive (a gain in utility).</td>
+  </tr>
+      <tr>
+    <td>Cubic</td>
+    <td>The vote is proportional to the cubed difference in utilities</td>
+  </tr>
+</tbody></table>
+<ul>
+<li><strong>BigRAdjust</strong> controls how accurately actor i is able to estimate, relative to an anchor of its own risk attitude, the risk attitude of actor j (which is known to the model).</li>
+</ul>
+<table>
+  <tbody><tr>
+    <td rowspan="6">BigRAdjust</td>
+    <td><font color="blue">OneThird</font></td>
+    <td><font color="blue">Actor i estimates actor j&apos;s risk attitude by
+interpolating between them, such that its estimate is closer (2/3 anchored, 1/3 adjusted) to its risk attitude</font></td>
+  </tr>
+  <tr>
+    <td>None</td>
+    <td>Actor i judge&#x2019;s actor j&apos;s risk attitude as being identical to its risk attitude</td>
+  </tr>
+  <tr>
+    <td>Half</td>
+    <td>Actor i estimates actor j&apos;s risk attitude by interpolating midway between its risk attitude and actor j&apos;s actual risk attitude</td>
+  </tr>
+   <tr>
+    <td>TwoThirds</td>
+    <td>Actor i estimates actor j&apos;s risk attitude by interpolating between them, such that its estimate is closer (1/3 anchored, 2/3 adjusted) to actor j&apos;s risk attitude</td>
+  </tr>
+    <tr>
+    <td>Full</td>
+    <td>Actor i judge&#x2019;s actor j&apos;s risk attitude correctly</td>
+</tr></tbody></table>
+<ul>
+<li><strong>BigRRange</strong> controls actors&apos; risk tolerances, and hence the curvature of their utility functions.</li>
+</ul>
+<table>
+  <tbody><tr>
+    <td rowspan="6">BigRRange</td>
+      </tr><tr>
+    <td>Min</td>
+    <td>Sets risk tolerances in the range [0,1] such that actors with the most probable position are perfectly risk averse (1), while actors holding the least probable position are perfectly risk tolerant (0)</td>
+  </tr>
+    <tr><td><font color="blue">Mid</font></td>
+    <td><font color="blue">Sets risk tolerances in the range [-1&#x2044;2,1] such that actors with the most probable position are perfectly risk averse (1), while actors holding the least probable position are somewhat risk seeking, with an aversion of -1&#x2044;2</font></td>
+  </tr>
+  <tr>
+    <td>Max</td>
+    <td>Sets risk tolerances in the range [-1,1] such that actors with the most probable position are perfectly risk averse (1), while actors holding the least probable position are perfectly risk seeking (-1)</td>
+  </tr>
+</tbody></table>
+<ul>
+<li><strong>ThirdPartyCommit</strong> controls how committed a third-party actor k is in a challenge between actors i and j.</li>
+</ul>
+<table>
+  <tbody><tr>
+    <td rowspan="6">ThirdPartyCommit</td>
+      </tr><tr>
+    <td>NoCommit</td>
+    <td>controls how committed a third-party actor k is in a challenge between actors i and j.</td>
+  </tr>
+    <tr><td><font color="blue">SemiCommit</font></td>
+    <td><font color="blue">If the coalition actor joined by k loses, k must take the position of the winning coalition; otherwise it does not need to change position</font></td>
+  </tr>
+  <tr>
+    <td>FullCommit</td>
+    <td>Actor k is fully committed to the coalition it joins, and must adopt the position of the winning coalition</td>
+  </tr>
+</tbody></table>
+<ul>
+<li><strong>InterVecBrgn</strong> controls how proposed positions are interpolated between the positions of actor i and j in a bargain.</li>
+</ul>
+<table>
+  <tbody><tr>
+    <td rowspan="6">InterVecBrgn</td>
+      </tr><tr>
+    <td>S1P1</td>
+    <td>Proposed positions for each actor are computed as a weighted average of their current positions, where the weights are the products of salience and probability of success</td>
+  </tr>
+    <tr><td><font color="blue">S2P2</font></td>
+    <td><font color="blue">Proposed positions for each actor are computed as a weighted average of their current positions, where the weights are the squared products of salience*probability of success</font></td>
+  </tr>
+  <tr>
+    <td>S2PMax</td>
+    <td>Proposed positions for each actor are computed as asymmetric shifts from their current positions, which is a function of squared salience and truncated difference in probability of success</td>
+  </tr>
+</tbody></table>
+<ul>
+<li><strong>BargnModel</strong> controls from which actor&apos;s perspective the probability of success is used to interpolate bargains.</li>
+</ul>
+<table>
+  <tbody><tr>
+    <td rowspan="6">BargnModel</td>
+    <td><font color="blue">InitOnlyInterp</font></td>
+    <td><font color="blue">Bargains are only computed from the initiating actor&apos;s perspective</font></td>
+  </tr>
+  <tr>
+    <td>InitRcvrInterp</td>
+    <td>Bargains are computed from the perspective of both the initiating actor and receiving actor</td>
+  </tr>
+  <tr>
+    <td>PWCompInterp</td>
+    <td>Bargains are computed as an effective power- weighted average of both actor&apos;s perspectives</td>
+  </tr>
+   <tr>
+    <td>TwoThirds</td>
+    <td>Actor i estimates actor j&apos;s risk attitude by interpolating between them, such that its estimate is closer (1/3 anchored, 2/3 adjusted) to actor j&apos;s risk attitude</td>
+  </tr>
+    <tr>
+    <td>Full</td>
+    <td>Actor i judge&#x2019;s actor j&apos;s risk attitude correctly</td>
+</tr></tbody></table>
+<h3 class="mume-header" id="the-affinity-matrix">The Affinity Matrix</h3>
+
+<p>The affinity matrix is currently unused in the model; it is a placeholder for intended future development of the algorithm.</p>
+<h3 class="mume-header" id="data-inputs">Data Inputs</h3>
+
+<p>KTAB SMP uses two main data input formats: Comma Separated Value (CSV) files and Extensible Markup Language (XML) files. We assume in this tutorial that the user understands how to obtain appropriate data.<br>
+You can find CSV and XML templates in the <code>KTAB_SMP\sample_data</code> folder for the Windows release folder or you can find it in the official KTAB folder of the main GitHub repository under <code>KTAB\examples\smp\doc\</code> These templates show how a proper CSV or XML file input is structured for a KTAB SMP input.<br>
+The Database file .db is another type of input, holding data from a previously-run model.</p>
+<h3 class="mume-header" id="actor-data-description">Actor data description</h3>
+
+<ul>
+<li><strong>&#x201C;Actor&#x201D;</strong> data that represents an individual, institution or group (Note: actor must be no longer than 25 characters).</li>
+<li><strong>&#x201C;Description&#x201D;</strong> A description of the actor (Note: description must be no longer than 256 characters).</li>
+<li><strong>&#x201C;Influence&#x201D;</strong> The relative power, or political clout, for the actor.</li>
+<li><strong>&#x201C;Position&#x201D;</strong> The stated position an actor advocates for the specified dimension; this value must<br>
+be between 0 and 100.</li>
+<li><strong>&#x201C;Salience&#x201D;</strong> The relative importance to the actor of the specified dimension; salience across all<br>
+dimensions must sum to at most 100.</li>
+</ul>
+<blockquote>
+<p>Note: Influence, Position, and Salience are typically numeric values ranging from 0 &#x2013; 100</p>
+</blockquote>
+<ul>
+<li><strong>&#x201C;Dimensions&#x201D;</strong> Each dimension represents, on a continuous spectrum between two extremes, a decision over which actors are trying to influence each other, i.e. a CDMP. By convention, dimensions are represented as the inclusive range [0, 100].</li>
+<li><strong>&#x201C;Scenario Name&#x201D;</strong> Scenario, dataset or project name. &#x201C;Scenario Description&#x201D; A description of the Scenario.</li>
+</ul>
+<h3 class="mume-header" id="create-new-actor-data">Create new actor data</h3>
+
+<ol>
+<li>
+<p>To start creating new actor data you can either;<br>
+&#x2022; Go to <code>File &gt; Create New Actor Data</code><br>
+&#x2022; Or Click on the icon from the tool bar <img src="pics/add.png" alt="drawing" width="30" height="25"><br>
+&#x2022; Or use the Keyboard shortcut &#x201C;Ctrl+N&#x201D;</p>
+</li>
+<li>
+<p>Insert the number of dimensions for your new data-set<br>
+<br><br>
+<img src="pics/InitAddDim.png" alt="drawing" width="170" height="100"><br>
+<br></p>
+</li>
+<li>
+<p>To start typing in your data, you will need to set the Scenario Name and Description<br>
+<br><br>
+<img src="pics/scenarioNameDesc.jpg" alt="drawing" width="450" height="200"><br>
+<br></p>
+</li>
+<li>
+<p>You can increase or decrease the number of actors using the buttons +/- buttons<br>
+<br><br>
+<img src="pics/AddDelActors.png" alt="drawing" width="450" height="200"><br>
+<br></p>
+</li>
+<li>
+<p>You can also click on the &#x201C;Add Dimension&#x201D; button to add more dimensions<br>
+<br><br>
+<img src="pics/addDim.png" alt="drawing" width="450" height="200"><br>
+<br></p>
+</li>
+<li>
+<p>Type in your data in the table<br>
+<br><br>
+<img src="pics/typingActorData.png" alt="drawing" width="450" height="200"><br>
+<br></p>
+</li>
+<li>
+<p>You can also Add/Delete dimensions, insert new actors and rename column headers by right clicking on a column from the table.<br>
+<br><br>
+<img src="pics/editrowscolumns.png" alt="drawing" width="450" height="170"><br>
+<br></p>
+</li>
+<li>
+<p>Once you are done creating your new data-set, click on &#x201C;Done&#x201D; to save the data-set on your computer.<br>
+You can either save it in a CSV or an XML file format.</p>
+</li>
+</ol>
+<h5 class="mume-header" id="data-input-using-a-csv-file">Data input using a CSV file</h5>
+
+<ul>
+<li>Go to <code>File &gt; View/Modify Existing CSV File</code></li>
+<li>Or Click on the icon from the tool bar&#xA0;<img src="pics/csv.png" alt="drawing" width="30" height="25"></li>
+<li>Or use the Keyboard shortcut &#x201C;Ctrl+O&#x201D;</li>
+</ul>
+<p>You can then choose the CSV file that contains the data that you wish to use.</p>
+<h5 class="mume-header" id="data-input-using-an-xml-file">Data input using an XML file</h5>
+
+<ul>
+<li>Go to <code>File &gt; View/Modify Existing XML File</code></li>
+<li>Or Click on the icon from the tool bar&#xA0;<img src="pics/xml.png" alt="drawing" width="30" height="25"></li>
+<li>Or use the Keyboard shortcut &#x201C;Ctrl+X&#x201D;</li>
+</ul>
+<p>When you are done inserting your input data, the Run button will be highlighted in green for you to run the model.</p>
+<img src="pics/done.png" alt="done" width="250" height="60">
+<div style="page-break-after: always;"></div>
+<h2 class="mume-header" id="output-and-results">Output and Results</h2>
+
+<h3 class="mume-header" id="actor-data">Actor Data</h3>
+
+<p>The Actor&#x2019;s Data table shows the current turn, actor&#x2019;s name and description, actor&#x2019;s influence, actor&#x2019;s salience and the position for the current turn. You can navigate through turns with the slider.<br>
+<img src="pics/turn_scroll.png" alt="turn_scroll" width="600" height="270"><br>
+<br></p>
+<p>The next section introduces the visualizations within the KTAB-SMP application.<br>
+You can Hide and View charts from the &#x201C;View&#x201D; option on the toolbar.</p>
+<h3 class="mume-header" id="visualizations">Visualizations</h3>
+
+<h4 class="mume-header" id="positions-by-turn-line-chart">Positions By Turn (Line Chart)</h4>
+
+<img src="pics/qt_linechart.png" alt="line_chart" width="580" height="270">
+<br>
+<p>The line chart displays the change in the actors&#x2019; positions over turns. Each line corresponds to an actor, hovering over a line will trigger a tooltip showing the actor&#x2019;s name, description, and influence.<br>
+In the actor&#x2019;s controls on the right, you can show/hide the lines through the checkboxes for the actor. You can also switch between dimensions from the &#x201C;Dimensions&#x201D; section.</p>
+<p align="center">
+<img src="pics/whychange.png" alt="y_actor_change" width="200" height="100">
+</p>
+<p>On the chart, you can click on the line to toggle the name of the actor and you can also zoom in/out to change the chart scale.<br>
+When you double click on an actor&#x2019;s line, changing position for a specific turn, a small dialogue box will appear explaining why the actor&#x2019;s position changed for that turn.</p>
+<h4 class="mume-header" id="effective-power-landscape-stacked-bar-chart">Effective Power Landscape (Stacked Bar Chart)</h4>
+
+<img src="pics/BarChart.png" alt="bar_chart" width="500" height="270">
+<br>
+<p>The bar chart displays the effective power landscape, showing the effective power and positions of actors for each turn.<br>
+Similar to the line chart, in the actor&#x2019;s controls on the right, you can focus or unfocus bars through the checkboxes for the actors. You can also switch between dimensions from the &#x201C;Dimensions&#x201D; section. For the stacked bar chart, you can change the number of bars displayed by modifying &#x201C;No. of Bars&#x201D;.</p>
+<p><img src="pics/BarChart2.png" alt="bar_chart" width="420" height="240"> <img src="pics/BarChart3.png" alt="bar_chart" width="420" height="240"><br>
+<br></p>
+<h5 class="mume-header" id="bar-chart-scale-potions">Bar chart scale potions</h5>
+
+<p>You can change the scale options to automatic, max, or user defined.</p>
+<ul>
+<li>&#x201C;Automatic&#x201D; is the default scaling for the bar-chart where the height of the y-axis is responsive and automatic in each turn.</li>
+<li>The &#x201C;Max&#x201D; option locks the y-axis on a fixed max scale.</li>
+<li>The &#x201C;User-defined&#x201D; option enables the user to define the max value for the y-axis.</li>
+</ul>
+<img src="pics/BarOptions.png" alt="bar_options" width="500" height="270">
+<br>
+<h4 class="mume-header" id="quad-map">Quad Map</h4>
+
+<p>You can enable the Quad Map view from <code>View &gt; QuadMap</code><br>
+The Quad Map plots the change in utility to both the initiator (y-axis) and receiver (x-axis) expected as a result of a challenge from a specified initiator to at least one other actor.<br>
+There are four ways to compute the perspective from which the utility changes are computed:</p>
+<p><strong>Initiator:</strong> All computations performed from the perspective of the initiator.<br>
+<strong>Receiver(s):</strong> All computations performed from the perspective of each receiver selected for plotting.<br>
+<strong>Objective:</strong> The utilities for the initiator are computed from their perspective, and the utilities to each receiver are computed from their own perspective.<br>
+<strong>Other:</strong> All utilities are computed from a specified third party.</p>
+<p align="center">
+<img src="pics/perspective.png" alt="perspective" width="200" height="150">
+</p>
+<br>
+<p align="center">
+<img src="pics/quadmap.png" alt="quad" width="550" height="450">
+</p>
+<br>
+<p>The quad map is named as such because the plane is divided into four quadrants, between which the behavior of receivers can be expected to consistently vary. In the first (green) quadrant, both the initiator and receiver can expect to gain utility from a challenge. Hence, actors in this quadrant may be expected to cooperate. The second (red) quadrant contains the cases where the initiator is expected to gain utility, while the receiver is expected to lose. There is likely to be conflict between actors in this quadrant. In the grey third quadrant, both actors would expect to lose utility from a challenge, so it&#x2019;s unlikely any would be made. The last (yellow) quadrant contains cases where the initiator would be expected to lose utility, but the receiver would gain. Again, it&#x2019;s highly unlikely any challenge would be made. You can check the auto-scale option to change the scaling to focus on where the actors are scattered on the Quad Map.</p>
+<p align="center">
+<img src="pics/autoscaleQuadMap.png" alt="autoscale" width="650" height="550">
+</p>
+<h4 class="mume-header" id="changing-actors-colors">Changing Actor&#x2019;s Colors</h4>
+
+<p>To Change actors&#x2019; colors displayed in the charts you can;</p>
+<ul>
+<li>Go to <code>Color Options &gt; Change Actors Color</code></li>
+<li>Or Click on the icon  <img src="pics/color.png" alt="color" width="30" height="20"> from the tool bar.</li>
+<li>You can pick a color for each actor from the color picker widow, or you can import a color palette (which you previously designed) as a csv file from <code>Color Options</code> &gt; Import Actor Colors`</li>
+<li>You can also Export a CSV color palette after modifying, so that you can use the same color map in the future, from <code>Color Options &gt; Export Actor Colors</code>.</li>
+<li>Or reset the default colors for the actors. From <code>Color Options &gt; Reset Actors Colors</code></li>
+</ul>
+<p align="center">
+<img src="pics/changeColor.png" alt="color" width="650" height="250">
+</p>
+<div style="page-break-after: always;"></div>
+<h3 class="mume-header" id="advanced-visualizations">Advanced Visualizations</h3>
+
+<p>As of version 1.4, the SMP application includes a new visualization dashboard that opens in your favorite browser window (Chrome, Firefox, Safari). This dashboard currently includes Line and Bar plots included in the SMP application. However, the dashboard includes an additional feature for the actor movements and the Network Diagram that displays the bargains happening between the actors as a directed network diagram. We also have plans to improve the current visualizations to make them more interactive and give you more control over the look and feel. Please note that, though the visualization dashboard opens in a browser, there is no online content, and no data is sent off your computer. The plots are all drawn using the most popular and powerful open-source set of JavaScript visualization libraries, called &#x201C;D3&#x201D; (Data-Driven Documents).</p>
+<blockquote>
+<p>Important Notes</p>
+<ul>
+<li>You will have to load a database file of a previous SMP run into the dashboard to visualize your data.</li>
+<li>The database file has to be less than 1.5GB as of KTAB-SMP V1.4.</li>
+<li>This dashboard is separate from the visualizations within the SMP application.</li>
+</ul>
+</blockquote>
+<p>To open the visualization dashboard, you can either click on the Open Visualization menu item, or the visualization button from the tool bar</p>
+ <p align="center">
+<img src="pics/visbutton.png" alt="viz" width="450" height="70">
+</p>
+<p>After the browser is launched click on the Browse button to load your database file</p>
+<p>A dashboard will appear a few seconds after the data is loaded, showing you the currently available visualizations.</p>
+<div style="page-break-after: always;"></div>
+<h4 class="mume-header" id="effective-power-bar-chart-d3">Effective Power Bar Chart (D3)</h4>
+
+<p align="center">
+<img src="pics/D3barchart.png" alt="viz" width="850" height="500">
+</p>
+<p>The bar chart is also like the chart embedded in the KTAB_SMP.</p>
+<p>With the controls on the bar chart you can:</p>
+<ul>
+<li>Change scenarios from the Scenario Name dropdown menu.</li>
+<li>Change dimensions from the Dimension dropdown menu.</li>
+<li>Scroll through turns from the turn selector slider.</li>
+<li>Hover over actors on the chart or from the interactive legend panel to trigger bar<br>
+highlight and effective power tool-tip.</li>
+<li>Disable/Enable actors using the interactive legend panel.</li>
+<li>Change the number of bars from &#x201C;Edit and Download&#x201D; button.</li>
+<li>Switch between a fixed and a responsive scale for the y-axis.</li>
+</ul>
+<div style="page-break-after: always;"></div>
+<h4 class="mume-header" id="positions-line-graph-d3">Positions Line Graph (D3)</h4>
+
+<p align="center">
+<img src="pics/D3lineChart.png" alt="viz" width="850" height="500">
+</p>
+<p>The Line chart is very similar to the chart embedded in the KTAB_SMP application.</p>
+<p>There are several controls that you can use in this chart:</p>
+<ul>
+<li>Change scenarios from the Scenario Name dropdown menu.</li>
+<li>Change dimensions from the Dimension dropdown menu.</li>
+<li>Scroll through turns from the turn selector slider.</li>
+<li>Disable/Enable actors using the interactive legend panel.</li>
+<li>Hover over actors to trigger line highlight.</li>
+<li>Click on an actor&#x2019;s name from the legend to show why actor changed position&#x2019;s points.</li>
+<li>Hover over each point to trigger a tooltip explaining why the actor&#x2019;s position changed at<br>
+that point.</li>
+</ul>
+<div style="page-break-after: always;"></div>
+<h4 class="mume-header" id="network-diagram-of-bargains-d3">Network Diagram of Bargains (D3)</h4>
+
+<p align="center">
+<img src="pics/network.png" alt="viz" width="650" height="450">
+</p>
+<p>The Network Diagram is a scenario and turn specific bargains visualization. The diagram allows you to visualize the bargain proposals and acceptances for each actor in a single turn.</p>
+<ul>
+<li>Actors are represented with nodes colored according to each actor&apos;s color.</li>
+<li>Size of Actors&apos; nodes represent each actor&apos;s Effective Power.</li>
+<li>Bargains are represented with small grey nodes.</li>
+<li>The edge coming to the bargain node from the actor&apos;s node represent the initiator.</li>
+<li>The edge coming to the actor&apos;s node from the bargain node represent the Receiver.</li>
+<li>All edges are directed.</li>
+<li>Solid-line edges represent accepted bargains, dashed edges represent rejected bargains.</li>
+</ul>
+<div style="page-break-after: always;"></div>
+<h4 class="mume-header" id="other-controls-for-the-d3-charts">Other controls for the D3 charts</h4>
+
+<p>You can switch between charts from the tabs located above the chart.</p>
+<p align="center">
+<img src="pics/switch.png" alt="switch" width="450" height="50">
+</p>
+<p>You can also customize and download the charts, change the colors of actors and add actors to groups.</p>
+<p align="center">
+<img src="pics/buttons.png" alt="buttons" width="300" height="35">
+</p>
+<h4 class="mume-header" id="customize-chart-size-and-download-as-an-image">Customize Chart Size and Download as an Image</h4>
+
+<p align="center">
+<img src="pics/edit.png" alt="edit" width="700" height="350">
+</p>
+<ul>
+<li>To remove the labels from the charts simply click on the &#x201C;Remove Labels&#x201D; check box</li>
+<li>To Change the resolution/size of the charts choose &#x201C;User defined Size&#x201D; from the radio button then input the width and height desired</li>
+<li>After customizing the chart click on Confirm Edits, the application will take you back to the chart showing the confirmed changes</li>
+<li>To download the current view simply click on &#x201C;Download&#x201D;</li>
+</ul>
+<h4 class="mume-header" id="change-actors-colors">Change Actors Colors</h4>
+
+<p align="center">
+<img src="pics/actorsc.png" alt="colors" width="700" height="350">
+</p>
+<ul>
+<li>Like the KTAB-SMP application, you can change the colors of all the actors in your view and save the selection in a CSV file.</li>
+<li>There are two ways to change the colors, the first method is to manually change the colors by clicking on the colored box, you will be able to choose the colors that you need from the palette. You can also input the hex code for the colors in the given boxes.</li>
+<li>The second method is to click on &#x201C;Choose File&#x201D; to upload a CSV file that includes all the colors desired, the colors are assigned by actor index.</li>
+</ul>
+<blockquote>
+<p>Note: if you do not have a CSV file with current format click on &#x201C;Export CSV&#x201D; to download the csv file and customize.</p>
+</blockquote>
+<h4 class="mume-header" id="actors-groups">Actors Groups</h4>
+
+<ul>
+<li>You can assign groups to actors by setting a group name and a group color for a selected number of actors.</li>
+<li>There are two ways add groups, the first method is to manually initialize groups by selecting the number of groups desired and assigning a color to each group.</li>
+<li>You can export your initialized groups as a CSV file.</li>
+<li>The second method is to upload a pre-defined groups from a CSV file with a specific<br>
+format.</li>
+</ul>
+<p align="center">
+<img src="pics/actorsgroups.png" alt="groups" width="700" height="350">
+</p>
+<h5 class="mume-header" id="sample-groups-csv-file">Sample groups CSV file</h5>
+
+<img src="pics/groupscsv.png" alt="groups" width="450" height="350">
+<blockquote>
+<blockquote>
+<p>Note: You can find sample CSV files with desired format in /sample_data folder</p>
+</blockquote>
+</blockquote>
+
+      </div>
+      
+      
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    </body></html>
